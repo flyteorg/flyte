@@ -26,13 +26,13 @@ func (_m Updater_UpdateNamedEntity) Return(_a0 error) *Updater_UpdateNamedEntity
 }
 
 func (_m *Updater) OnUpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdcore.CommandContext) *Updater_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", ctx, name, project, domain, rsType, cmdCtx)
-	return &Updater_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", ctx, name, project, domain, rsType, cmdCtx)
+	return &Updater_UpdateNamedEntity{Call: c_call}
 }
 
 func (_m *Updater) OnUpdateNamedEntityMatch(matchers ...interface{}) *Updater_UpdateNamedEntity {
-	c := _m.On("UpdateNamedEntity", matchers...)
-	return &Updater_UpdateNamedEntity{Call: c}
+	c_call := _m.On("UpdateNamedEntity", matchers...)
+	return &Updater_UpdateNamedEntity{Call: c_call}
 }
 
 // UpdateNamedEntity provides a mock function with given fields: ctx, name, project, domain, rsType, cmdCtx

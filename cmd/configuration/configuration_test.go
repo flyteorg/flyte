@@ -59,15 +59,13 @@ func TestSetupConfigFunc(t *testing.T) {
 	initConfig.DefaultConfig.Host = ""
 	assert.Nil(t, err)
 
-	assert.Nil(t, initFlytectlConfig(ctx, yes))
-	assert.Nil(t, initFlytectlConfig(ctx, yes))
-	assert.Nil(t, initFlytectlConfig(ctx, no))
+	assert.Nil(t, initFlytectlConfig(yes))
+	assert.Nil(t, initFlytectlConfig(no))
 	initConfig.DefaultConfig.Host = "flyte.org"
-	assert.Nil(t, initFlytectlConfig(ctx, no))
+	assert.Nil(t, initFlytectlConfig(no))
 	initConfig.DefaultConfig.Host = "localhost:30081"
-	assert.Nil(t, initFlytectlConfig(ctx, no))
-	initConfig.DefaultConfig.Storage = true
-	assert.NotNil(t, initFlytectlConfig(ctx, yes))
+	assert.Nil(t, initFlytectlConfig(no))
+	assert.Nil(t, initFlytectlConfig(yes))
 }
 
 func TestTrimFunc(t *testing.T) {

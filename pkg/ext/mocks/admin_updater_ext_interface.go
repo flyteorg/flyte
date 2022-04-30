@@ -26,13 +26,13 @@ func (_m AdminUpdaterExtInterface_AdminServiceClient) Return(_a0 service.AdminSe
 }
 
 func (_m *AdminUpdaterExtInterface) OnAdminServiceClient() *AdminUpdaterExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient")
-	return &AdminUpdaterExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient")
+	return &AdminUpdaterExtInterface_AdminServiceClient{Call: c_call}
 }
 
 func (_m *AdminUpdaterExtInterface) OnAdminServiceClientMatch(matchers ...interface{}) *AdminUpdaterExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient", matchers...)
-	return &AdminUpdaterExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient", matchers...)
+	return &AdminUpdaterExtInterface_AdminServiceClient{Call: c_call}
 }
 
 // AdminServiceClient provides a mock function with given fields:
@@ -60,13 +60,13 @@ func (_m AdminUpdaterExtInterface_UpdateProjectDomainAttributes) Return(_a0 erro
 }
 
 func (_m *AdminUpdaterExtInterface) OnUpdateProjectDomainAttributes(ctx context.Context, project string, domain string, matchingAttr *admin.MatchingAttributes) *AdminUpdaterExtInterface_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", ctx, project, domain, matchingAttr)
-	return &AdminUpdaterExtInterface_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", ctx, project, domain, matchingAttr)
+	return &AdminUpdaterExtInterface_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminUpdaterExtInterface) OnUpdateProjectDomainAttributesMatch(matchers ...interface{}) *AdminUpdaterExtInterface_UpdateProjectDomainAttributes {
-	c := _m.On("UpdateProjectDomainAttributes", matchers...)
-	return &AdminUpdaterExtInterface_UpdateProjectDomainAttributes{Call: c}
+	c_call := _m.On("UpdateProjectDomainAttributes", matchers...)
+	return &AdminUpdaterExtInterface_UpdateProjectDomainAttributes{Call: c_call}
 }
 
 // UpdateProjectDomainAttributes provides a mock function with given fields: ctx, project, domain, matchingAttr
@@ -92,13 +92,13 @@ func (_m AdminUpdaterExtInterface_UpdateWorkflowAttributes) Return(_a0 error) *A
 }
 
 func (_m *AdminUpdaterExtInterface) OnUpdateWorkflowAttributes(ctx context.Context, project string, domain string, name string, matchingAttr *admin.MatchingAttributes) *AdminUpdaterExtInterface_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", ctx, project, domain, name, matchingAttr)
-	return &AdminUpdaterExtInterface_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", ctx, project, domain, name, matchingAttr)
+	return &AdminUpdaterExtInterface_UpdateWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminUpdaterExtInterface) OnUpdateWorkflowAttributesMatch(matchers ...interface{}) *AdminUpdaterExtInterface_UpdateWorkflowAttributes {
-	c := _m.On("UpdateWorkflowAttributes", matchers...)
-	return &AdminUpdaterExtInterface_UpdateWorkflowAttributes{Call: c}
+	c_call := _m.On("UpdateWorkflowAttributes", matchers...)
+	return &AdminUpdaterExtInterface_UpdateWorkflowAttributes{Call: c_call}
 }
 
 // UpdateWorkflowAttributes provides a mock function with given fields: ctx, project, domain, name, matchingAttr

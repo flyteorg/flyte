@@ -26,13 +26,13 @@ func (_m AdminDeleterExtInterface_AdminServiceClient) Return(_a0 service.AdminSe
 }
 
 func (_m *AdminDeleterExtInterface) OnAdminServiceClient() *AdminDeleterExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient")
-	return &AdminDeleterExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient")
+	return &AdminDeleterExtInterface_AdminServiceClient{Call: c_call}
 }
 
 func (_m *AdminDeleterExtInterface) OnAdminServiceClientMatch(matchers ...interface{}) *AdminDeleterExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient", matchers...)
-	return &AdminDeleterExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient", matchers...)
+	return &AdminDeleterExtInterface_AdminServiceClient{Call: c_call}
 }
 
 // AdminServiceClient provides a mock function with given fields:
@@ -60,13 +60,13 @@ func (_m AdminDeleterExtInterface_DeleteProjectDomainAttributes) Return(_a0 erro
 }
 
 func (_m *AdminDeleterExtInterface) OnDeleteProjectDomainAttributes(ctx context.Context, project string, domain string, rsType admin.MatchableResource) *AdminDeleterExtInterface_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", ctx, project, domain, rsType)
-	return &AdminDeleterExtInterface_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", ctx, project, domain, rsType)
+	return &AdminDeleterExtInterface_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminDeleterExtInterface) OnDeleteProjectDomainAttributesMatch(matchers ...interface{}) *AdminDeleterExtInterface_DeleteProjectDomainAttributes {
-	c := _m.On("DeleteProjectDomainAttributes", matchers...)
-	return &AdminDeleterExtInterface_DeleteProjectDomainAttributes{Call: c}
+	c_call := _m.On("DeleteProjectDomainAttributes", matchers...)
+	return &AdminDeleterExtInterface_DeleteProjectDomainAttributes{Call: c_call}
 }
 
 // DeleteProjectDomainAttributes provides a mock function with given fields: ctx, project, domain, rsType
@@ -92,13 +92,13 @@ func (_m AdminDeleterExtInterface_DeleteWorkflowAttributes) Return(_a0 error) *A
 }
 
 func (_m *AdminDeleterExtInterface) OnDeleteWorkflowAttributes(ctx context.Context, project string, domain string, name string, rsType admin.MatchableResource) *AdminDeleterExtInterface_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", ctx, project, domain, name, rsType)
-	return &AdminDeleterExtInterface_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", ctx, project, domain, name, rsType)
+	return &AdminDeleterExtInterface_DeleteWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminDeleterExtInterface) OnDeleteWorkflowAttributesMatch(matchers ...interface{}) *AdminDeleterExtInterface_DeleteWorkflowAttributes {
-	c := _m.On("DeleteWorkflowAttributes", matchers...)
-	return &AdminDeleterExtInterface_DeleteWorkflowAttributes{Call: c}
+	c_call := _m.On("DeleteWorkflowAttributes", matchers...)
+	return &AdminDeleterExtInterface_DeleteWorkflowAttributes{Call: c_call}
 }
 
 // DeleteWorkflowAttributes provides a mock function with given fields: ctx, project, domain, name, rsType

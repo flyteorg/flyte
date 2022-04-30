@@ -23,13 +23,13 @@ func (_m GHRepoService_GetCommitSHA1) Return(_a0 string, _a1 *github.Response, _
 }
 
 func (_m *GHRepoService) OnGetCommitSHA1(ctx context.Context, owner string, repo string, ref string, lastSHA string) *GHRepoService_GetCommitSHA1 {
-	c := _m.On("GetCommitSHA1", ctx, owner, repo, ref, lastSHA)
-	return &GHRepoService_GetCommitSHA1{Call: c}
+	c_call := _m.On("GetCommitSHA1", ctx, owner, repo, ref, lastSHA)
+	return &GHRepoService_GetCommitSHA1{Call: c_call}
 }
 
 func (_m *GHRepoService) OnGetCommitSHA1Match(matchers ...interface{}) *GHRepoService_GetCommitSHA1 {
-	c := _m.On("GetCommitSHA1", matchers...)
-	return &GHRepoService_GetCommitSHA1{Call: c}
+	c_call := _m.On("GetCommitSHA1", matchers...)
+	return &GHRepoService_GetCommitSHA1{Call: c_call}
 }
 
 // GetCommitSHA1 provides a mock function with given fields: ctx, owner, repo, ref, lastSHA
@@ -71,13 +71,13 @@ func (_m GHRepoService_GetLatestRelease) Return(_a0 *github.RepositoryRelease, _
 }
 
 func (_m *GHRepoService) OnGetLatestRelease(ctx context.Context, owner string, repo string) *GHRepoService_GetLatestRelease {
-	c := _m.On("GetLatestRelease", ctx, owner, repo)
-	return &GHRepoService_GetLatestRelease{Call: c}
+	c_call := _m.On("GetLatestRelease", ctx, owner, repo)
+	return &GHRepoService_GetLatestRelease{Call: c_call}
 }
 
 func (_m *GHRepoService) OnGetLatestReleaseMatch(matchers ...interface{}) *GHRepoService_GetLatestRelease {
-	c := _m.On("GetLatestRelease", matchers...)
-	return &GHRepoService_GetLatestRelease{Call: c}
+	c_call := _m.On("GetLatestRelease", matchers...)
+	return &GHRepoService_GetLatestRelease{Call: c_call}
 }
 
 // GetLatestRelease provides a mock function with given fields: ctx, owner, repo
@@ -121,13 +121,13 @@ func (_m GHRepoService_GetReleaseByTag) Return(_a0 *github.RepositoryRelease, _a
 }
 
 func (_m *GHRepoService) OnGetReleaseByTag(ctx context.Context, owner string, repo string, tag string) *GHRepoService_GetReleaseByTag {
-	c := _m.On("GetReleaseByTag", ctx, owner, repo, tag)
-	return &GHRepoService_GetReleaseByTag{Call: c}
+	c_call := _m.On("GetReleaseByTag", ctx, owner, repo, tag)
+	return &GHRepoService_GetReleaseByTag{Call: c_call}
 }
 
 func (_m *GHRepoService) OnGetReleaseByTagMatch(matchers ...interface{}) *GHRepoService_GetReleaseByTag {
-	c := _m.On("GetReleaseByTag", matchers...)
-	return &GHRepoService_GetReleaseByTag{Call: c}
+	c_call := _m.On("GetReleaseByTag", matchers...)
+	return &GHRepoService_GetReleaseByTag{Call: c_call}
 }
 
 // GetReleaseByTag provides a mock function with given fields: ctx, owner, repo, tag
@@ -171,13 +171,13 @@ func (_m GHRepoService_ListReleases) Return(_a0 []*github.RepositoryRelease, _a1
 }
 
 func (_m *GHRepoService) OnListReleases(ctx context.Context, owner string, repo string, opts *github.ListOptions) *GHRepoService_ListReleases {
-	c := _m.On("ListReleases", ctx, owner, repo, opts)
-	return &GHRepoService_ListReleases{Call: c}
+	c_call := _m.On("ListReleases", ctx, owner, repo, opts)
+	return &GHRepoService_ListReleases{Call: c_call}
 }
 
 func (_m *GHRepoService) OnListReleasesMatch(matchers ...interface{}) *GHRepoService_ListReleases {
-	c := _m.On("ListReleases", matchers...)
-	return &GHRepoService_ListReleases{Call: c}
+	c_call := _m.On("ListReleases", matchers...)
+	return &GHRepoService_ListReleases{Call: c_call}
 }
 
 // ListReleases provides a mock function with given fields: ctx, owner, repo, opts
