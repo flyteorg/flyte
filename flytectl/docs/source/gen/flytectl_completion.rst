@@ -19,11 +19,13 @@ To load completion, run the following commands in accordance with the shell you 
 	To load completions for each session:
 
 	- Linux
+
 	::
 
 	$ flytectl completion bash > /etc/bash_completion.d/flytectl
 
 	- macOS
+
 	::
 
 	$ flytectl completion bash > /usr/local/etc/bash_completion.d/flytectl

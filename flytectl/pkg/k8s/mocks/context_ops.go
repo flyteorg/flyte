@@ -22,13 +22,13 @@ func (_m ContextOps_CopyContext) Return(_a0 error) *ContextOps_CopyContext {
 }
 
 func (_m *ContextOps) OnCopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName string, targetCtxName string) *ContextOps_CopyContext {
-	c := _m.On("CopyContext", srcConfigAccess, srcCtxName, targetCtxName)
-	return &ContextOps_CopyContext{Call: c}
+	c_call := _m.On("CopyContext", srcConfigAccess, srcCtxName, targetCtxName)
+	return &ContextOps_CopyContext{Call: c_call}
 }
 
 func (_m *ContextOps) OnCopyContextMatch(matchers ...interface{}) *ContextOps_CopyContext {
-	c := _m.On("CopyContext", matchers...)
-	return &ContextOps_CopyContext{Call: c}
+	c_call := _m.On("CopyContext", matchers...)
+	return &ContextOps_CopyContext{Call: c_call}
 }
 
 // CopyContext provides a mock function with given fields: srcConfigAccess, srcCtxName, targetCtxName
@@ -54,13 +54,13 @@ func (_m ContextOps_RemoveContext) Return(_a0 error) *ContextOps_RemoveContext {
 }
 
 func (_m *ContextOps) OnRemoveContext(ctxName string) *ContextOps_RemoveContext {
-	c := _m.On("RemoveContext", ctxName)
-	return &ContextOps_RemoveContext{Call: c}
+	c_call := _m.On("RemoveContext", ctxName)
+	return &ContextOps_RemoveContext{Call: c_call}
 }
 
 func (_m *ContextOps) OnRemoveContextMatch(matchers ...interface{}) *ContextOps_RemoveContext {
-	c := _m.On("RemoveContext", matchers...)
-	return &ContextOps_RemoveContext{Call: c}
+	c_call := _m.On("RemoveContext", matchers...)
+	return &ContextOps_RemoveContext{Call: c_call}
 }
 
 // RemoveContext provides a mock function with given fields: ctxName

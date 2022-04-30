@@ -28,13 +28,13 @@ func (_m AdminFetcherExtInterface_AdminServiceClient) Return(_a0 service.AdminSe
 }
 
 func (_m *AdminFetcherExtInterface) OnAdminServiceClient() *AdminFetcherExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient")
-	return &AdminFetcherExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient")
+	return &AdminFetcherExtInterface_AdminServiceClient{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnAdminServiceClientMatch(matchers ...interface{}) *AdminFetcherExtInterface_AdminServiceClient {
-	c := _m.On("AdminServiceClient", matchers...)
-	return &AdminFetcherExtInterface_AdminServiceClient{Call: c}
+	c_call := _m.On("AdminServiceClient", matchers...)
+	return &AdminFetcherExtInterface_AdminServiceClient{Call: c_call}
 }
 
 // AdminServiceClient provides a mock function with given fields:
@@ -62,13 +62,13 @@ func (_m AdminFetcherExtInterface_FetchAllVerOfLP) Return(_a0 []*admin.LaunchPla
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfLP(ctx context.Context, lpName string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchAllVerOfLP {
-	c := _m.On("FetchAllVerOfLP", ctx, lpName, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchAllVerOfLP{Call: c}
+	c_call := _m.On("FetchAllVerOfLP", ctx, lpName, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchAllVerOfLP{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfLPMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchAllVerOfLP {
-	c := _m.On("FetchAllVerOfLP", matchers...)
-	return &AdminFetcherExtInterface_FetchAllVerOfLP{Call: c}
+	c_call := _m.On("FetchAllVerOfLP", matchers...)
+	return &AdminFetcherExtInterface_FetchAllVerOfLP{Call: c_call}
 }
 
 // FetchAllVerOfLP provides a mock function with given fields: ctx, lpName, project, domain, filter
@@ -103,13 +103,13 @@ func (_m AdminFetcherExtInterface_FetchAllVerOfTask) Return(_a0 []*admin.Task, _
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfTask(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchAllVerOfTask {
-	c := _m.On("FetchAllVerOfTask", ctx, name, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchAllVerOfTask{Call: c}
+	c_call := _m.On("FetchAllVerOfTask", ctx, name, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchAllVerOfTask{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfTaskMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchAllVerOfTask {
-	c := _m.On("FetchAllVerOfTask", matchers...)
-	return &AdminFetcherExtInterface_FetchAllVerOfTask{Call: c}
+	c_call := _m.On("FetchAllVerOfTask", matchers...)
+	return &AdminFetcherExtInterface_FetchAllVerOfTask{Call: c_call}
 }
 
 // FetchAllVerOfTask provides a mock function with given fields: ctx, name, project, domain, filter
@@ -144,13 +144,13 @@ func (_m AdminFetcherExtInterface_FetchAllVerOfWorkflow) Return(_a0 []*admin.Wor
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfWorkflow(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchAllVerOfWorkflow {
-	c := _m.On("FetchAllVerOfWorkflow", ctx, name, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c}
+	c_call := _m.On("FetchAllVerOfWorkflow", ctx, name, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllVerOfWorkflowMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchAllVerOfWorkflow {
-	c := _m.On("FetchAllVerOfWorkflow", matchers...)
-	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c}
+	c_call := _m.On("FetchAllVerOfWorkflow", matchers...)
+	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c_call}
 }
 
 // FetchAllVerOfWorkflow provides a mock function with given fields: ctx, name, project, domain, filter
@@ -185,13 +185,13 @@ func (_m AdminFetcherExtInterface_FetchAllWorkflows) Return(_a0 []*admin.NamedEn
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllWorkflows(ctx context.Context, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchAllWorkflows {
-	c := _m.On("FetchAllWorkflows", ctx, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchAllWorkflows{Call: c}
+	c_call := _m.On("FetchAllWorkflows", ctx, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchAllWorkflows{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchAllWorkflowsMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchAllWorkflows {
-	c := _m.On("FetchAllWorkflows", matchers...)
-	return &AdminFetcherExtInterface_FetchAllWorkflows{Call: c}
+	c_call := _m.On("FetchAllWorkflows", matchers...)
+	return &AdminFetcherExtInterface_FetchAllWorkflows{Call: c_call}
 }
 
 // FetchAllWorkflows provides a mock function with given fields: ctx, project, domain, filter
@@ -226,13 +226,13 @@ func (_m AdminFetcherExtInterface_FetchExecution) Return(_a0 *admin.Execution, _
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchExecution(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchExecution {
-	c := _m.On("FetchExecution", ctx, name, project, domain)
-	return &AdminFetcherExtInterface_FetchExecution{Call: c}
+	c_call := _m.On("FetchExecution", ctx, name, project, domain)
+	return &AdminFetcherExtInterface_FetchExecution{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchExecutionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchExecution {
-	c := _m.On("FetchExecution", matchers...)
-	return &AdminFetcherExtInterface_FetchExecution{Call: c}
+	c_call := _m.On("FetchExecution", matchers...)
+	return &AdminFetcherExtInterface_FetchExecution{Call: c_call}
 }
 
 // FetchExecution provides a mock function with given fields: ctx, name, project, domain
@@ -267,13 +267,13 @@ func (_m AdminFetcherExtInterface_FetchLPLatestVersion) Return(_a0 *admin.Launch
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchLPLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchLPLatestVersion {
-	c := _m.On("FetchLPLatestVersion", ctx, name, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c}
+	c_call := _m.On("FetchLPLatestVersion", ctx, name, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchLPLatestVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchLPLatestVersion {
-	c := _m.On("FetchLPLatestVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c}
+	c_call := _m.On("FetchLPLatestVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c_call}
 }
 
 // FetchLPLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
@@ -308,13 +308,13 @@ func (_m AdminFetcherExtInterface_FetchLPVersion) Return(_a0 *admin.LaunchPlan, 
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchLPVersion(ctx context.Context, name string, version string, project string, domain string) *AdminFetcherExtInterface_FetchLPVersion {
-	c := _m.On("FetchLPVersion", ctx, name, version, project, domain)
-	return &AdminFetcherExtInterface_FetchLPVersion{Call: c}
+	c_call := _m.On("FetchLPVersion", ctx, name, version, project, domain)
+	return &AdminFetcherExtInterface_FetchLPVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchLPVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchLPVersion {
-	c := _m.On("FetchLPVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchLPVersion{Call: c}
+	c_call := _m.On("FetchLPVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchLPVersion{Call: c_call}
 }
 
 // FetchLPVersion provides a mock function with given fields: ctx, name, version, project, domain
@@ -349,13 +349,13 @@ func (_m AdminFetcherExtInterface_FetchNodeExecutionData) Return(_a0 *admin.Node
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionData(ctx context.Context, nodeID string, execName string, project string, domain string) *AdminFetcherExtInterface_FetchNodeExecutionData {
-	c := _m.On("FetchNodeExecutionData", ctx, nodeID, execName, project, domain)
-	return &AdminFetcherExtInterface_FetchNodeExecutionData{Call: c}
+	c_call := _m.On("FetchNodeExecutionData", ctx, nodeID, execName, project, domain)
+	return &AdminFetcherExtInterface_FetchNodeExecutionData{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDataMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchNodeExecutionData {
-	c := _m.On("FetchNodeExecutionData", matchers...)
-	return &AdminFetcherExtInterface_FetchNodeExecutionData{Call: c}
+	c_call := _m.On("FetchNodeExecutionData", matchers...)
+	return &AdminFetcherExtInterface_FetchNodeExecutionData{Call: c_call}
 }
 
 // FetchNodeExecutionData provides a mock function with given fields: ctx, nodeID, execName, project, domain
@@ -390,13 +390,13 @@ func (_m AdminFetcherExtInterface_FetchNodeExecutionDetails) Return(_a0 *admin.N
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string, uniqueParentID string) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
-	c := _m.On("FetchNodeExecutionDetails", ctx, name, project, domain, uniqueParentID)
-	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
+	c_call := _m.On("FetchNodeExecutionDetails", ctx, name, project, domain, uniqueParentID)
+	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetailsMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
-	c := _m.On("FetchNodeExecutionDetails", matchers...)
-	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
+	c_call := _m.On("FetchNodeExecutionDetails", matchers...)
+	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c_call}
 }
 
 // FetchNodeExecutionDetails provides a mock function with given fields: ctx, name, project, domain, uniqueParentID
@@ -431,13 +431,13 @@ func (_m AdminFetcherExtInterface_FetchProjectDomainAttributes) Return(_a0 *admi
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchProjectDomainAttributes(ctx context.Context, project string, domain string, rsType admin.MatchableResource) *AdminFetcherExtInterface_FetchProjectDomainAttributes {
-	c := _m.On("FetchProjectDomainAttributes", ctx, project, domain, rsType)
-	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c}
+	c_call := _m.On("FetchProjectDomainAttributes", ctx, project, domain, rsType)
+	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchProjectDomainAttributesMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchProjectDomainAttributes {
-	c := _m.On("FetchProjectDomainAttributes", matchers...)
-	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c}
+	c_call := _m.On("FetchProjectDomainAttributes", matchers...)
+	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c_call}
 }
 
 // FetchProjectDomainAttributes provides a mock function with given fields: ctx, project, domain, rsType
@@ -472,13 +472,13 @@ func (_m AdminFetcherExtInterface_FetchTaskExecutionsOnNode) Return(_a0 *admin.T
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskExecutionsOnNode(ctx context.Context, nodeID string, execName string, project string, domain string) *AdminFetcherExtInterface_FetchTaskExecutionsOnNode {
-	c := _m.On("FetchTaskExecutionsOnNode", ctx, nodeID, execName, project, domain)
-	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c}
+	c_call := _m.On("FetchTaskExecutionsOnNode", ctx, nodeID, execName, project, domain)
+	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskExecutionsOnNodeMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchTaskExecutionsOnNode {
-	c := _m.On("FetchTaskExecutionsOnNode", matchers...)
-	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c}
+	c_call := _m.On("FetchTaskExecutionsOnNode", matchers...)
+	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c_call}
 }
 
 // FetchTaskExecutionsOnNode provides a mock function with given fields: ctx, nodeID, execName, project, domain
@@ -513,13 +513,13 @@ func (_m AdminFetcherExtInterface_FetchTaskLatestVersion) Return(_a0 *admin.Task
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchTaskLatestVersion {
-	c := _m.On("FetchTaskLatestVersion", ctx, name, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchTaskLatestVersion{Call: c}
+	c_call := _m.On("FetchTaskLatestVersion", ctx, name, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchTaskLatestVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskLatestVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchTaskLatestVersion {
-	c := _m.On("FetchTaskLatestVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchTaskLatestVersion{Call: c}
+	c_call := _m.On("FetchTaskLatestVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchTaskLatestVersion{Call: c_call}
 }
 
 // FetchTaskLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
@@ -554,13 +554,13 @@ func (_m AdminFetcherExtInterface_FetchTaskVersion) Return(_a0 *admin.Task, _a1 
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskVersion(ctx context.Context, name string, version string, project string, domain string) *AdminFetcherExtInterface_FetchTaskVersion {
-	c := _m.On("FetchTaskVersion", ctx, name, version, project, domain)
-	return &AdminFetcherExtInterface_FetchTaskVersion{Call: c}
+	c_call := _m.On("FetchTaskVersion", ctx, name, version, project, domain)
+	return &AdminFetcherExtInterface_FetchTaskVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchTaskVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchTaskVersion {
-	c := _m.On("FetchTaskVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchTaskVersion{Call: c}
+	c_call := _m.On("FetchTaskVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchTaskVersion{Call: c_call}
 }
 
 // FetchTaskVersion provides a mock function with given fields: ctx, name, version, project, domain
@@ -595,13 +595,13 @@ func (_m AdminFetcherExtInterface_FetchWorkflowAttributes) Return(_a0 *admin.Wor
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowAttributes(ctx context.Context, project string, domain string, name string, rsType admin.MatchableResource) *AdminFetcherExtInterface_FetchWorkflowAttributes {
-	c := _m.On("FetchWorkflowAttributes", ctx, project, domain, name, rsType)
-	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c}
+	c_call := _m.On("FetchWorkflowAttributes", ctx, project, domain, name, rsType)
+	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowAttributesMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowAttributes {
-	c := _m.On("FetchWorkflowAttributes", matchers...)
-	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c}
+	c_call := _m.On("FetchWorkflowAttributes", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c_call}
 }
 
 // FetchWorkflowAttributes provides a mock function with given fields: ctx, project, domain, name, rsType
@@ -636,13 +636,13 @@ func (_m AdminFetcherExtInterface_FetchWorkflowLatestVersion) Return(_a0 *admin.
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
-	c := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain, filter)
-	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c}
+	c_call := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain, filter)
+	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
-	c := _m.On("FetchWorkflowLatestVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c}
+	c_call := _m.On("FetchWorkflowLatestVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
 // FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
@@ -677,13 +677,13 @@ func (_m AdminFetcherExtInterface_FetchWorkflowVersion) Return(_a0 *admin.Workfl
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowVersion(ctx context.Context, name string, version string, project string, domain string) *AdminFetcherExtInterface_FetchWorkflowVersion {
-	c := _m.On("FetchWorkflowVersion", ctx, name, version, project, domain)
-	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c}
+	c_call := _m.On("FetchWorkflowVersion", ctx, name, version, project, domain)
+	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnFetchWorkflowVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowVersion {
-	c := _m.On("FetchWorkflowVersion", matchers...)
-	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c}
+	c_call := _m.On("FetchWorkflowVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c_call}
 }
 
 // FetchWorkflowVersion provides a mock function with given fields: ctx, name, version, project, domain
@@ -718,13 +718,13 @@ func (_m AdminFetcherExtInterface_ListExecution) Return(_a0 *admin.ExecutionList
 }
 
 func (_m *AdminFetcherExtInterface) OnListExecution(ctx context.Context, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_ListExecution {
-	c := _m.On("ListExecution", ctx, project, domain, filter)
-	return &AdminFetcherExtInterface_ListExecution{Call: c}
+	c_call := _m.On("ListExecution", ctx, project, domain, filter)
+	return &AdminFetcherExtInterface_ListExecution{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnListExecutionMatch(matchers ...interface{}) *AdminFetcherExtInterface_ListExecution {
-	c := _m.On("ListExecution", matchers...)
-	return &AdminFetcherExtInterface_ListExecution{Call: c}
+	c_call := _m.On("ListExecution", matchers...)
+	return &AdminFetcherExtInterface_ListExecution{Call: c_call}
 }
 
 // ListExecution provides a mock function with given fields: ctx, project, domain, filter
@@ -759,13 +759,13 @@ func (_m AdminFetcherExtInterface_ListProjects) Return(_a0 *admin.Projects, _a1 
 }
 
 func (_m *AdminFetcherExtInterface) OnListProjects(ctx context.Context, filter filters.Filters) *AdminFetcherExtInterface_ListProjects {
-	c := _m.On("ListProjects", ctx, filter)
-	return &AdminFetcherExtInterface_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", ctx, filter)
+	return &AdminFetcherExtInterface_ListProjects{Call: c_call}
 }
 
 func (_m *AdminFetcherExtInterface) OnListProjectsMatch(matchers ...interface{}) *AdminFetcherExtInterface_ListProjects {
-	c := _m.On("ListProjects", matchers...)
-	return &AdminFetcherExtInterface_ListProjects{Call: c}
+	c_call := _m.On("ListProjects", matchers...)
+	return &AdminFetcherExtInterface_ListProjects{Call: c_call}
 }
 
 // ListProjects provides a mock function with given fields: ctx, filter

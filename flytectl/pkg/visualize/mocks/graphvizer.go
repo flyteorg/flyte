@@ -21,13 +21,13 @@ func (_m Graphvizer_AddAttr) Return(_a0 error) *Graphvizer_AddAttr {
 }
 
 func (_m *Graphvizer) OnAddAttr(parentGraph string, field string, value string) *Graphvizer_AddAttr {
-	c := _m.On("AddAttr", parentGraph, field, value)
-	return &Graphvizer_AddAttr{Call: c}
+	c_call := _m.On("AddAttr", parentGraph, field, value)
+	return &Graphvizer_AddAttr{Call: c_call}
 }
 
 func (_m *Graphvizer) OnAddAttrMatch(matchers ...interface{}) *Graphvizer_AddAttr {
-	c := _m.On("AddAttr", matchers...)
-	return &Graphvizer_AddAttr{Call: c}
+	c_call := _m.On("AddAttr", matchers...)
+	return &Graphvizer_AddAttr{Call: c_call}
 }
 
 // AddAttr provides a mock function with given fields: parentGraph, field, value
@@ -53,13 +53,13 @@ func (_m Graphvizer_AddEdge) Return(_a0 error) *Graphvizer_AddEdge {
 }
 
 func (_m *Graphvizer) OnAddEdge(src string, dst string, directed bool, attrs map[string]string) *Graphvizer_AddEdge {
-	c := _m.On("AddEdge", src, dst, directed, attrs)
-	return &Graphvizer_AddEdge{Call: c}
+	c_call := _m.On("AddEdge", src, dst, directed, attrs)
+	return &Graphvizer_AddEdge{Call: c_call}
 }
 
 func (_m *Graphvizer) OnAddEdgeMatch(matchers ...interface{}) *Graphvizer_AddEdge {
-	c := _m.On("AddEdge", matchers...)
-	return &Graphvizer_AddEdge{Call: c}
+	c_call := _m.On("AddEdge", matchers...)
+	return &Graphvizer_AddEdge{Call: c_call}
 }
 
 // AddEdge provides a mock function with given fields: src, dst, directed, attrs
@@ -85,13 +85,13 @@ func (_m Graphvizer_AddNode) Return(_a0 error) *Graphvizer_AddNode {
 }
 
 func (_m *Graphvizer) OnAddNode(parentGraph string, name string, attrs map[string]string) *Graphvizer_AddNode {
-	c := _m.On("AddNode", parentGraph, name, attrs)
-	return &Graphvizer_AddNode{Call: c}
+	c_call := _m.On("AddNode", parentGraph, name, attrs)
+	return &Graphvizer_AddNode{Call: c_call}
 }
 
 func (_m *Graphvizer) OnAddNodeMatch(matchers ...interface{}) *Graphvizer_AddNode {
-	c := _m.On("AddNode", matchers...)
-	return &Graphvizer_AddNode{Call: c}
+	c_call := _m.On("AddNode", matchers...)
+	return &Graphvizer_AddNode{Call: c_call}
 }
 
 // AddNode provides a mock function with given fields: parentGraph, name, attrs
@@ -117,13 +117,13 @@ func (_m Graphvizer_AddSubGraph) Return(_a0 error) *Graphvizer_AddSubGraph {
 }
 
 func (_m *Graphvizer) OnAddSubGraph(parentGraph string, name string, attrs map[string]string) *Graphvizer_AddSubGraph {
-	c := _m.On("AddSubGraph", parentGraph, name, attrs)
-	return &Graphvizer_AddSubGraph{Call: c}
+	c_call := _m.On("AddSubGraph", parentGraph, name, attrs)
+	return &Graphvizer_AddSubGraph{Call: c_call}
 }
 
 func (_m *Graphvizer) OnAddSubGraphMatch(matchers ...interface{}) *Graphvizer_AddSubGraph {
-	c := _m.On("AddSubGraph", matchers...)
-	return &Graphvizer_AddSubGraph{Call: c}
+	c_call := _m.On("AddSubGraph", matchers...)
+	return &Graphvizer_AddSubGraph{Call: c_call}
 }
 
 // AddSubGraph provides a mock function with given fields: parentGraph, name, attrs
@@ -149,13 +149,13 @@ func (_m Graphvizer_DoesEdgeExist) Return(_a0 bool) *Graphvizer_DoesEdgeExist {
 }
 
 func (_m *Graphvizer) OnDoesEdgeExist(src string, dest string) *Graphvizer_DoesEdgeExist {
-	c := _m.On("DoesEdgeExist", src, dest)
-	return &Graphvizer_DoesEdgeExist{Call: c}
+	c_call := _m.On("DoesEdgeExist", src, dest)
+	return &Graphvizer_DoesEdgeExist{Call: c_call}
 }
 
 func (_m *Graphvizer) OnDoesEdgeExistMatch(matchers ...interface{}) *Graphvizer_DoesEdgeExist {
-	c := _m.On("DoesEdgeExist", matchers...)
-	return &Graphvizer_DoesEdgeExist{Call: c}
+	c_call := _m.On("DoesEdgeExist", matchers...)
+	return &Graphvizer_DoesEdgeExist{Call: c_call}
 }
 
 // DoesEdgeExist provides a mock function with given fields: src, dest
@@ -181,13 +181,13 @@ func (_m Graphvizer_GetEdge) Return(_a0 *gographviz.Edge) *Graphvizer_GetEdge {
 }
 
 func (_m *Graphvizer) OnGetEdge(src string, dest string) *Graphvizer_GetEdge {
-	c := _m.On("GetEdge", src, dest)
-	return &Graphvizer_GetEdge{Call: c}
+	c_call := _m.On("GetEdge", src, dest)
+	return &Graphvizer_GetEdge{Call: c_call}
 }
 
 func (_m *Graphvizer) OnGetEdgeMatch(matchers ...interface{}) *Graphvizer_GetEdge {
-	c := _m.On("GetEdge", matchers...)
-	return &Graphvizer_GetEdge{Call: c}
+	c_call := _m.On("GetEdge", matchers...)
+	return &Graphvizer_GetEdge{Call: c_call}
 }
 
 // GetEdge provides a mock function with given fields: src, dest
@@ -215,13 +215,13 @@ func (_m Graphvizer_GetNode) Return(_a0 *gographviz.Node) *Graphvizer_GetNode {
 }
 
 func (_m *Graphvizer) OnGetNode(key string) *Graphvizer_GetNode {
-	c := _m.On("GetNode", key)
-	return &Graphvizer_GetNode{Call: c}
+	c_call := _m.On("GetNode", key)
+	return &Graphvizer_GetNode{Call: c_call}
 }
 
 func (_m *Graphvizer) OnGetNodeMatch(matchers ...interface{}) *Graphvizer_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &Graphvizer_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &Graphvizer_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: key
@@ -249,13 +249,13 @@ func (_m Graphvizer_SetName) Return(_a0 error) *Graphvizer_SetName {
 }
 
 func (_m *Graphvizer) OnSetName(name string) *Graphvizer_SetName {
-	c := _m.On("SetName", name)
-	return &Graphvizer_SetName{Call: c}
+	c_call := _m.On("SetName", name)
+	return &Graphvizer_SetName{Call: c_call}
 }
 
 func (_m *Graphvizer) OnSetNameMatch(matchers ...interface{}) *Graphvizer_SetName {
-	c := _m.On("SetName", matchers...)
-	return &Graphvizer_SetName{Call: c}
+	c_call := _m.On("SetName", matchers...)
+	return &Graphvizer_SetName{Call: c_call}
 }
 
 // SetName provides a mock function with given fields: name

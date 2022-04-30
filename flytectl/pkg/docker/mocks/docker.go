@@ -32,13 +32,13 @@ func (_m Docker_ContainerCreate) Return(_a0 container.ContainerCreateCreatedBody
 }
 
 func (_m *Docker) OnContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *v1.Platform, containerName string) *Docker_ContainerCreate {
-	c := _m.On("ContainerCreate", ctx, config, hostConfig, networkingConfig, platform, containerName)
-	return &Docker_ContainerCreate{Call: c}
+	c_call := _m.On("ContainerCreate", ctx, config, hostConfig, networkingConfig, platform, containerName)
+	return &Docker_ContainerCreate{Call: c_call}
 }
 
 func (_m *Docker) OnContainerCreateMatch(matchers ...interface{}) *Docker_ContainerCreate {
-	c := _m.On("ContainerCreate", matchers...)
-	return &Docker_ContainerCreate{Call: c}
+	c_call := _m.On("ContainerCreate", matchers...)
+	return &Docker_ContainerCreate{Call: c_call}
 }
 
 // ContainerCreate provides a mock function with given fields: ctx, config, hostConfig, networkingConfig, platform, containerName
@@ -71,13 +71,13 @@ func (_m Docker_ContainerExecAttach) Return(_a0 types.HijackedResponse, _a1 erro
 }
 
 func (_m *Docker) OnContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) *Docker_ContainerExecAttach {
-	c := _m.On("ContainerExecAttach", ctx, execID, config)
-	return &Docker_ContainerExecAttach{Call: c}
+	c_call := _m.On("ContainerExecAttach", ctx, execID, config)
+	return &Docker_ContainerExecAttach{Call: c_call}
 }
 
 func (_m *Docker) OnContainerExecAttachMatch(matchers ...interface{}) *Docker_ContainerExecAttach {
-	c := _m.On("ContainerExecAttach", matchers...)
-	return &Docker_ContainerExecAttach{Call: c}
+	c_call := _m.On("ContainerExecAttach", matchers...)
+	return &Docker_ContainerExecAttach{Call: c_call}
 }
 
 // ContainerExecAttach provides a mock function with given fields: ctx, execID, config
@@ -110,13 +110,13 @@ func (_m Docker_ContainerExecCreate) Return(_a0 types.IDResponse, _a1 error) *Do
 }
 
 func (_m *Docker) OnContainerExecCreate(ctx context.Context, _a1 string, config types.ExecConfig) *Docker_ContainerExecCreate {
-	c := _m.On("ContainerExecCreate", ctx, _a1, config)
-	return &Docker_ContainerExecCreate{Call: c}
+	c_call := _m.On("ContainerExecCreate", ctx, _a1, config)
+	return &Docker_ContainerExecCreate{Call: c_call}
 }
 
 func (_m *Docker) OnContainerExecCreateMatch(matchers ...interface{}) *Docker_ContainerExecCreate {
-	c := _m.On("ContainerExecCreate", matchers...)
-	return &Docker_ContainerExecCreate{Call: c}
+	c_call := _m.On("ContainerExecCreate", matchers...)
+	return &Docker_ContainerExecCreate{Call: c_call}
 }
 
 // ContainerExecCreate provides a mock function with given fields: ctx, _a1, config
@@ -149,13 +149,13 @@ func (_m Docker_ContainerExecInspect) Return(_a0 types.ContainerExecInspect, _a1
 }
 
 func (_m *Docker) OnContainerExecInspect(ctx context.Context, execID string) *Docker_ContainerExecInspect {
-	c := _m.On("ContainerExecInspect", ctx, execID)
-	return &Docker_ContainerExecInspect{Call: c}
+	c_call := _m.On("ContainerExecInspect", ctx, execID)
+	return &Docker_ContainerExecInspect{Call: c_call}
 }
 
 func (_m *Docker) OnContainerExecInspectMatch(matchers ...interface{}) *Docker_ContainerExecInspect {
-	c := _m.On("ContainerExecInspect", matchers...)
-	return &Docker_ContainerExecInspect{Call: c}
+	c_call := _m.On("ContainerExecInspect", matchers...)
+	return &Docker_ContainerExecInspect{Call: c_call}
 }
 
 // ContainerExecInspect provides a mock function with given fields: ctx, execID
@@ -188,13 +188,13 @@ func (_m Docker_ContainerList) Return(_a0 []types.Container, _a1 error) *Docker_
 }
 
 func (_m *Docker) OnContainerList(ctx context.Context, options types.ContainerListOptions) *Docker_ContainerList {
-	c := _m.On("ContainerList", ctx, options)
-	return &Docker_ContainerList{Call: c}
+	c_call := _m.On("ContainerList", ctx, options)
+	return &Docker_ContainerList{Call: c_call}
 }
 
 func (_m *Docker) OnContainerListMatch(matchers ...interface{}) *Docker_ContainerList {
-	c := _m.On("ContainerList", matchers...)
-	return &Docker_ContainerList{Call: c}
+	c_call := _m.On("ContainerList", matchers...)
+	return &Docker_ContainerList{Call: c_call}
 }
 
 // ContainerList provides a mock function with given fields: ctx, options
@@ -229,13 +229,13 @@ func (_m Docker_ContainerLogs) Return(_a0 io.ReadCloser, _a1 error) *Docker_Cont
 }
 
 func (_m *Docker) OnContainerLogs(ctx context.Context, _a1 string, options types.ContainerLogsOptions) *Docker_ContainerLogs {
-	c := _m.On("ContainerLogs", ctx, _a1, options)
-	return &Docker_ContainerLogs{Call: c}
+	c_call := _m.On("ContainerLogs", ctx, _a1, options)
+	return &Docker_ContainerLogs{Call: c_call}
 }
 
 func (_m *Docker) OnContainerLogsMatch(matchers ...interface{}) *Docker_ContainerLogs {
-	c := _m.On("ContainerLogs", matchers...)
-	return &Docker_ContainerLogs{Call: c}
+	c_call := _m.On("ContainerLogs", matchers...)
+	return &Docker_ContainerLogs{Call: c_call}
 }
 
 // ContainerLogs provides a mock function with given fields: ctx, _a1, options
@@ -270,13 +270,13 @@ func (_m Docker_ContainerRemove) Return(_a0 error) *Docker_ContainerRemove {
 }
 
 func (_m *Docker) OnContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) *Docker_ContainerRemove {
-	c := _m.On("ContainerRemove", ctx, containerID, options)
-	return &Docker_ContainerRemove{Call: c}
+	c_call := _m.On("ContainerRemove", ctx, containerID, options)
+	return &Docker_ContainerRemove{Call: c_call}
 }
 
 func (_m *Docker) OnContainerRemoveMatch(matchers ...interface{}) *Docker_ContainerRemove {
-	c := _m.On("ContainerRemove", matchers...)
-	return &Docker_ContainerRemove{Call: c}
+	c_call := _m.On("ContainerRemove", matchers...)
+	return &Docker_ContainerRemove{Call: c_call}
 }
 
 // ContainerRemove provides a mock function with given fields: ctx, containerID, options
@@ -302,13 +302,13 @@ func (_m Docker_ContainerStart) Return(_a0 error) *Docker_ContainerStart {
 }
 
 func (_m *Docker) OnContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) *Docker_ContainerStart {
-	c := _m.On("ContainerStart", ctx, containerID, options)
-	return &Docker_ContainerStart{Call: c}
+	c_call := _m.On("ContainerStart", ctx, containerID, options)
+	return &Docker_ContainerStart{Call: c_call}
 }
 
 func (_m *Docker) OnContainerStartMatch(matchers ...interface{}) *Docker_ContainerStart {
-	c := _m.On("ContainerStart", matchers...)
-	return &Docker_ContainerStart{Call: c}
+	c_call := _m.On("ContainerStart", matchers...)
+	return &Docker_ContainerStart{Call: c_call}
 }
 
 // ContainerStart provides a mock function with given fields: ctx, containerID, options
@@ -334,13 +334,13 @@ func (_m Docker_ContainerWait) Return(_a0 <-chan container.ContainerWaitOKBody, 
 }
 
 func (_m *Docker) OnContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) *Docker_ContainerWait {
-	c := _m.On("ContainerWait", ctx, containerID, condition)
-	return &Docker_ContainerWait{Call: c}
+	c_call := _m.On("ContainerWait", ctx, containerID, condition)
+	return &Docker_ContainerWait{Call: c_call}
 }
 
 func (_m *Docker) OnContainerWaitMatch(matchers ...interface{}) *Docker_ContainerWait {
-	c := _m.On("ContainerWait", matchers...)
-	return &Docker_ContainerWait{Call: c}
+	c_call := _m.On("ContainerWait", matchers...)
+	return &Docker_ContainerWait{Call: c_call}
 }
 
 // ContainerWait provides a mock function with given fields: ctx, containerID, condition
@@ -377,13 +377,13 @@ func (_m Docker_ImageList) Return(_a0 []types.ImageSummary, _a1 error) *Docker_I
 }
 
 func (_m *Docker) OnImageList(ctx context.Context, listOption types.ImageListOptions) *Docker_ImageList {
-	c := _m.On("ImageList", ctx, listOption)
-	return &Docker_ImageList{Call: c}
+	c_call := _m.On("ImageList", ctx, listOption)
+	return &Docker_ImageList{Call: c_call}
 }
 
 func (_m *Docker) OnImageListMatch(matchers ...interface{}) *Docker_ImageList {
-	c := _m.On("ImageList", matchers...)
-	return &Docker_ImageList{Call: c}
+	c_call := _m.On("ImageList", matchers...)
+	return &Docker_ImageList{Call: c_call}
 }
 
 // ImageList provides a mock function with given fields: ctx, listOption
@@ -418,13 +418,13 @@ func (_m Docker_ImagePull) Return(_a0 io.ReadCloser, _a1 error) *Docker_ImagePul
 }
 
 func (_m *Docker) OnImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) *Docker_ImagePull {
-	c := _m.On("ImagePull", ctx, refStr, options)
-	return &Docker_ImagePull{Call: c}
+	c_call := _m.On("ImagePull", ctx, refStr, options)
+	return &Docker_ImagePull{Call: c_call}
 }
 
 func (_m *Docker) OnImagePullMatch(matchers ...interface{}) *Docker_ImagePull {
-	c := _m.On("ImagePull", matchers...)
-	return &Docker_ImagePull{Call: c}
+	c_call := _m.On("ImagePull", matchers...)
+	return &Docker_ImagePull{Call: c_call}
 }
 
 // ImagePull provides a mock function with given fields: ctx, refStr, options

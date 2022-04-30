@@ -182,7 +182,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 		Host:     "localhost:30081",
 		Insecure: true,
 	}
-	if err := configutil.SetupConfig(configutil.FlytectlConfig, configutil.GetSandboxTemplate(), templateValues); err != nil {
+	if err := configutil.SetupConfig(configutil.FlytectlConfig, configutil.GetTemplate(), templateValues); err != nil {
 		return nil, err
 	}
 
