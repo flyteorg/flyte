@@ -86,7 +86,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,
-		Interruptibe:      interruptible,
+		Interruptible:     interruptible,
 	}
 
 	switch v := n.GetTarget().(type) {

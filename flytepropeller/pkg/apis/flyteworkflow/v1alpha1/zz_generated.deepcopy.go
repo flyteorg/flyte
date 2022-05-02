@@ -473,8 +473,8 @@ func (in *NodeSpec) DeepCopyInto(out *NodeSpec) {
 		*out = new(metav1.Duration)
 		**out = **in
 	}
-	if in.Interruptibe != nil {
-		in, out := &in.Interruptibe, &out.Interruptibe
+	if in.Interruptible != nil {
+		in, out := &in.Interruptible, &out.Interruptible
 		*out = new(bool)
 		**out = **in
 	}
