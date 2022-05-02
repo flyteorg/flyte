@@ -7,7 +7,8 @@ Flyte UI is a web-based user interface for Flyte. It helps interact with Flyte o
 
 With Flyte UI, you can:
 
-* Launch tasks and workflows
+* Launch tasks 
+* Launch workflows
 * View Versioned Tasks and Workflows
 * Trigger Versioned Tasks and Workflows
 * Inspect Executions through Inputs, Outputs, Logs, and Graphs

@@ -15,7 +15,7 @@ Characteristics
 #. Standard `cron <https://en.wikipedia.org/wiki/Cron#CRON_expression>`__ support
 #. Independently scalable
 #. Small memory footprint
-#. Schedules run as lightweight Go routines
+#. Schedules run as lightweight goroutines
 #. Fault tolerant and available
 #. Support in sandbox environment
 
@@ -33,7 +33,7 @@ The API is similar to a launchplan, ensuring that only one schedule is active fo
 Scheduler
 ---------
 
-This component is a singleton and is responsible for reading the schedules from the DB and running them at the cadence defined by the schedule. The lowest granularity supported is `minutes` for scheduling through both cron and fixed rate schedulers. The scheduler can run in one replica, two at the most during redeployment. Multiple replicas will only duplicate the work, since each execution for a scheduleTime will have a unique identifier derived from the schedule name and the time of the schedule. The idempotency aspect of the admin for the same identifier prevents duplication on the admin side. The scheduler runs continuously in a loop reading the updated schedule entries in the data store and adding or removing the schedules. Removing a schedule will not alter the in-flight Go routines launched by the scheduler. Thus, the behavior of these executions is undefined.
+This component is a singleton and is responsible for reading the schedules from the DB and running them at the cadence defined by the schedule. The lowest granularity supported is `minutes` for scheduling through both cron and fixed rate schedulers. The scheduler can run in one replica, two at the most during redeployment. Multiple replicas will only duplicate the work, since each execution for a scheduleTime will have a unique identifier derived from the schedule name and the time of the schedule. The idempotency aspect of the admin for the same identifier prevents duplication on the admin side. The scheduler runs continuously in a loop reading the updated schedule entries in the data store and adding or removing the schedules. Removing a schedule will not alter the in-flight goroutines launched by the scheduler. Thus, the behavior of these executions is undefined.
 
 
 Snapshoter
@@ -49,12 +49,12 @@ Any failure in catching up is considered a hard failure and stops the scheduler.
 GOCronWrapper
 *************
 
-This component is responsible for locking in the time for the scheduled job to be invoked and adding those to the cron scheduler. It is a wrapper around `this framework <https://github.com/robfig/cron/v3>`__ for fixed rate and cron schedules that creates in-memory representation of the scheduled job functions. The scheduler schedules a function with scheduleTime parameters. When this scheduled function is invoked, the scheduleTime parameters provide the current schedule time used by the scheduler. This scheduler supports standard cron scheduling which has 5 `fields <https://en.wikipedia.org/wiki/Cron>`__. It requires 5 entries representing `minute`, `hour`, `day of month`, `month` and `day of week`, in that order.
+This component is responsible for locking in the time for the scheduled job to be invoked and adding those to the cron scheduler. It is a wrapper around `this framework <https://github.com/robfig/cron/v3>`__ for fixed rate and cron schedules that creates in-memory representation of the scheduled job functions. The scheduler schedules a function with scheduleTime parameters. When this scheduled function is invoked, the scheduleTime parameters provide the current schedule time used by the scheduler. This scheduler supports standard cron scheduling which has 5 `fields <https://en.wikipedia.org/wiki/Cron>`__. It requires 5 entries representing ``minute``, ``hour``, ``day of month``, ``month`` and ``day of week``, in that order.
 
 Job Executor
 ************
 
-This component is responsible in sending the scheduled executions to FlyteAdmin. The job function accepts the scheduleTime and the schedule used to create an execution requests the admin. Each job function is tied to the schedule, which is executed in separate Go routine in accordance to the schedule cadence.
+The job executor component is responsible for sending the scheduled executions to FlyteAdmin. The job function accepts ``scheduleTime`` and the schedule which is used to create an execution request to the admin. Each job function is tied to the schedule which is executed in a separate goroutine in accordance with the schedule cadence.
 
 Monitoring
 ----------

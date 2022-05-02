@@ -4,7 +4,7 @@
 FlyteConsole
 #############
 
-This is the web UI for the Flyte platform. The results of running FlyteConsole are displayed in this graph, explained below:
+FlyteConsole is the web UI for the Flyte platform. Here's a video that dives into the graph UX:
 
 .. youtube:: 7YSc-QHk_Ec
 
@@ -74,9 +74,9 @@ Development
 Storybook
 ==========
 
-This project supports `Storybook <https://storybook.js.org/>`_.
-Component stories live next to the components they test, in a ``__stories__``
-directory, with the filename pattern ``{Component}.stories.tsx``.
+FlyteConsole uses `Storybook <https://storybook.js.org/>`__.
+Component stories live next to the components they test in the ``__stories__``
+directory with the filename pattern ``{Component}.stories.tsx``.
 
 You can run storybook with ``npm run storybook``, and view the stories at http://localhost:9001.
 

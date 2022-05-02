@@ -37,7 +37,7 @@ Dynamic Tasks
 "Dynamic tasks" is a misnomer. 
 Flyte is one-of-a-kind workflow engine that ships with the concept of truly `Dynamic Workflows <https://blog.flyte.org/dynamic-workflows-in-flyte>`__!
 Users can generate workflows in reaction to user inputs or computed values at runtime. 
-These executions are evaluated to generate a static graph before execution commences. Such static graphs are shareable, and reproducible without any external infrastructure.
+These executions are evaluated to generate a static graph before execution.
 
 Extending Task
 ---------------
@@ -46,10 +46,10 @@ Plugins
 ^^^^^^^
 
 Flyte exposes an extensible model to express tasks in an execution-independent language. 
-It contains first-class task plugins (For example: `Papermill <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-papermill/flytekitplugins/papermill/task.py>`__, 
+It contains first-class task plugins (for example: `Papermill <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-papermill/flytekitplugins/papermill/task.py>`__, 
 `Great Expectations <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-greatexpectations/flytekitplugins/great_expectations/task.py>`__, and :ref:`more <integrations>`.) 
 that execute the Flyte tasks. 
-Almost any action can be implemented and introduced into Flyte as a "Plugin", that includes.
+Almost any action can be implemented and introduced into Flyte as a "Plugin", which includes:
 
 - Tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake, etc.
 - Tasks that run executions on compute engines like Spark, Flink, AWS Sagemaker, AWS Batch, Kubernetes pods, jobs, etc.
@@ -106,11 +106,11 @@ System retry can be of two types:
 
 **Timeouts**
   
-To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout mechanism is handled `TaskMetadata <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.
+To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout can be handled in the `TaskMetadata <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.
 
 
 Caching/Memoization
 ^^^^^^^^^^^^^^^^^^^
 
-Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example: If you are debugging your code and wish to run it multiple times, you can re-use the output instead of re-computing it.
+Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can re-use the output instead of re-computing it.
 For more information on memoization, refer to the :std:ref:`Caching Example <cookbook:sphx_glr_auto_core_flyte_basics_task_cache.py>`.

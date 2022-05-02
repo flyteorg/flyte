@@ -220,9 +220,9 @@ These :std:ref:`events <protos/docs/event/event:flyteidl/event/event.proto>` inc
 
 and contain information about respective phase transitions, phase transition time and optional output data if the event concerns a terminal phase change.
 
-These events are the **only** way to update an execution. No raw Update endpoint exists.
+These events provide the **only** way to update an execution. No raw update endpoint exists.
 
-To track the lifecycle of an execution admin, store attributes such as `duration`, and `timestamp` at which an execution transitioned to running, and end time.
+To track the lifecycle of an execution, admin and store attributes such as `duration` and `timestamp` at which an execution transitioned to running and end time are used.
 
 For debugging purposes, admin also stores Workflow and Node execution events in its database, but does not currently expose them through an API. Because array tasks can yield many executions, admin does **not** store TaskExecutionEvents.
 

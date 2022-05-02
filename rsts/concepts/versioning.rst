@@ -3,14 +3,14 @@
 Versions
 ========
 
-One of the most important features and reasons for design decisions in Flyte is the need for machine learning and data practitioners to experiment.
+One of the most important features and reasons for certain design decisions in Flyte is the need for machine learning and data practitioners to experiment.
 When users experiment, they do so in isolation and try multiple iterations.
 Unlike traditional software, the users must conduct multiple experiments concurrently with different environments, algorithms, etc.
 This may happen when multiple data scientists simultaneously iterate on the same workflow/pipeline.
 
-The cost of creating an independent infrastructure for each version is enormous but undesirable.
+The cost of creating an independent infrastructure for each version is enormous and undesirable.
 It is beneficial to share the same centralized infrastructure, where the burden of maintaining the infrastructure is with a central infrastructure team,
-whereas the users can use it independently. This improves the cost of operation, since the same infrastructure can be reused by multiple teams.
+while the users can use it independently. This improves the cost of operation since the same infrastructure can be reused by multiple teams.
 
 Versioned workflows help users quickly reproduce prior results or identify the source of previous successful experiments.
 
@@ -20,7 +20,7 @@ Why Do You Need Versioning?
 Versioning is required to:
 
 - Work on the same project concurrently and identify the version/experiment that was successful.
-- Capture the environment for a version and independently launch its environment.
+- Capture the environment for a version and independently launch it.
 - Visualize prior runs and tie them to experiment results.
 - Rollback to production deployments in case of failures with ease.
 - Execute multiple experiments in production, which may use different training or data processing algorithms.
@@ -29,17 +29,16 @@ Versioning is required to:
 Operational Benefits of Completely Versioned Workflows/Pipelines
 -------------------------------------------------------------------
 
-The entire workflow in Flyte is versioned and all tasks and entities are immutable which makes it possible to completely change
-the structure of a workflow between versions, without worrying about the consequences for the pipelines in production. This hermetic property makes it effortless to manage and deploy new workflow versions. This is important for workflows that are long-running. Flyte guarantees that if a workflow execution is in progress
-and another new workflow version has been activated, the execution of the old version continues unhindered.
+The entire workflow in Flyte is versioned and all tasks and entities are immutable which makes it possible to completely change the structure of a workflow between versions, without worrying about the consequences for the pipelines in production. 
+This hermetic property makes it effortless to manage and deploy new workflow versions and is important for workflows that are long-running. 
+If a workflow execution is in progress and another new workflow version has been activated, Flyte guarantees that the execution of the old version continues unhindered.
 
-Another questions we address here is: What if there was a bug in the previous version that needs to be fixed, and run the previous executions? 
-Fixing bugs involves code changes and this may affect the workflow structure. 
-
-Flyte addresses this using 2 properties:
+Now consider the scenario where there's a requirement to run all the previous executions if there's a bug that needs to be fixed.
+Fixing bugs involves code changes, which may affect the workflow structure. Simply fixing the bug in the task may not solve the problem.
+Flyte addresses this using two properties:
 
 1. Since the entire workflow is versioned, changing the structure has no impact on the existing execution, and the workflow state won't be corrupted.
-2. Flyte provides caching/memoization of outputs. As long as the tasks and their behavior have not changed, it is possible to move them around and still recover their previous outputs, without having to rerun these tasks. This strategy will work even ff the workflow changes were only in a task.
+2. Flyte provides caching/memoization of outputs. As long as the tasks and their behavior have not changed, it is possible to move them around and still recover their previous outputs, without having to rerun the tasks. This strategy will work even if the workflow changes are in a task.
 
 Let us take a sample workflow:
 
@@ -71,17 +70,18 @@ Why Is Versioning Hard?
 Git has become the defacto-standard in version control for code, making it easy to work on branches, merge them, and revert unwanted changes.
 But achieving this for a live (running) algorithm usually requires the entire infrastructure to be associated and potentially re-created for every execution.
 
-How Is Versioning Associated to Reproducibility?
-------------------------------------------------
+How Is Versioning Tied to Reproducibility?
+------------------------------------------
 
 Workflows can be reproduced without explicit versioning within the system.
-To reproduce a past experiment, users need to identify the source code, and resurrect any dependencies that the code may have used (For example: TensorFlow 1.x instead of TensorFlow 2.x, or specific Python libraries).
+To reproduce a past experiment, users need to identify the source code and resurrect any dependencies that the code may have used (for example, TensorFlow 1.x instead of TensorFlow 2.x, or specific Python libraries).
 It is also required to instantiate the infrastructure that the previous version may have used. If not recorded, ensure that the previously used dataset (say) can be reconstructed.
-From the first principles, if reproducibility is one of the most important concerns, then one would capture all these variables and provide them in an easy-to-use method.
+It is also required to instantiate the infrastructure that the previous version may have used. If not recorded, you'll have to ensure that the previously used dataset (say) can be reconstructed.
 
 This is exactly how Flyte was conceived!
 
-In Flyte, every task is versioned, and it precisely captures the dependency set. For external tasks, memoization is recommended so that the constructed dataset can BE cached on the Flyte side. This way, one can guarantee reproducible behaviour from the external systems.
+In Flyte, every task is versioned, and it precisely captures the dependency set. For external tasks, memoization is recommended so that the constructed dataset can be cached on the Flyte side. This way, one can guarantee reproducible behavior from the external systems.
+
 Moreover, every piece of code is registered with the version of the code that was used to create the instance.
 Therefore, users can easily construct the data lineage for all the parts of the workflow.
 
