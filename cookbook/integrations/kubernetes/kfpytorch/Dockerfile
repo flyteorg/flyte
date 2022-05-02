@@ -21,8 +21,7 @@ ENV PATH $PATH:/opt/google-cloud-sdk/bin
 WORKDIR /root
 
 # Install gcc , g++ and make
-RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list \
-    && apt-get update && apt-get install --no-install-recommends -y gcc g++
+RUN apt-get update && apt-get install --no-install-recommends -y gcc g++
 RUN echo 'installing make' \
     && apt-get install make
 
