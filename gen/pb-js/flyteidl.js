@@ -23922,6 +23922,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number|null} [maxParallelism] ExecutionSpec maxParallelism
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] ExecutionSpec rawOutputDataConfig
              * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] ExecutionSpec clusterAssignment
+             * @property {google.protobuf.IBoolValue|null} [interruptible] ExecutionSpec interruptible
              */
 
             /**
@@ -24043,6 +24044,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             ExecutionSpec.prototype.clusterAssignment = null;
 
+            /**
+             * ExecutionSpec interruptible.
+             * @member {google.protobuf.IBoolValue|null|undefined} interruptible
+             * @memberof flyteidl.admin.ExecutionSpec
+             * @instance
+             */
+            ExecutionSpec.prototype.interruptible = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -24107,6 +24116,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                 if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
                     $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    $root.google.protobuf.BoolValue.encode(message.interruptible, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                 return writer;
             };
 
@@ -24166,6 +24177,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 20:
                         message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                        break;
+                    case 21:
+                        message.interruptible = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -24254,6 +24268,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
                     if (error)
                         return "clusterAssignment." + error;
+                }
+                if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
+                    let error = $root.google.protobuf.BoolValue.verify(message.interruptible);
+                    if (error)
+                        return "interruptible." + error;
                 }
                 return null;
             };
@@ -25827,6 +25846,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] LaunchPlanSpec qualityOfService
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] LaunchPlanSpec rawOutputDataConfig
              * @property {number|null} [maxParallelism] LaunchPlanSpec maxParallelism
+             * @property {google.protobuf.IBoolValue|null} [interruptible] LaunchPlanSpec interruptible
              */
 
             /**
@@ -25949,6 +25969,14 @@ export const flyteidl = $root.flyteidl = (() => {
             LaunchPlanSpec.prototype.maxParallelism = 0;
 
             /**
+             * LaunchPlanSpec interruptible.
+             * @member {google.protobuf.IBoolValue|null|undefined} interruptible
+             * @memberof flyteidl.admin.LaunchPlanSpec
+             * @instance
+             */
+            LaunchPlanSpec.prototype.interruptible = null;
+
+            /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.LaunchPlanSpec
@@ -25998,6 +26026,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
                     writer.uint32(/* id 18, wireType 0 =*/144).int32(message.maxParallelism);
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    $root.google.protobuf.BoolValue.encode(message.interruptible, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                 return writer;
             };
 
@@ -26057,6 +26087,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 18:
                         message.maxParallelism = reader.int32();
+                        break;
+                    case 19:
+                        message.interruptible = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -26138,6 +26171,11 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
                     if (!$util.isInteger(message.maxParallelism))
                         return "maxParallelism: integer expected";
+                if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
+                    let error = $root.google.protobuf.BoolValue.verify(message.interruptible);
+                    if (error)
+                        return "interruptible." + error;
+                }
                 return null;
             };
 
@@ -28448,6 +28486,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] WorkflowExecutionConfig rawOutputDataConfig
              * @property {flyteidl.admin.ILabels|null} [labels] WorkflowExecutionConfig labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] WorkflowExecutionConfig annotations
+             * @property {google.protobuf.IBoolValue|null} [interruptible] WorkflowExecutionConfig interruptible
              */
 
             /**
@@ -28506,6 +28545,14 @@ export const flyteidl = $root.flyteidl = (() => {
             WorkflowExecutionConfig.prototype.annotations = null;
 
             /**
+             * WorkflowExecutionConfig interruptible.
+             * @member {google.protobuf.IBoolValue|null|undefined} interruptible
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.interruptible = null;
+
+            /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.WorkflowExecutionConfig
@@ -28539,6 +28586,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 if (message.annotations != null && message.hasOwnProperty("annotations"))
                     $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    $root.google.protobuf.BoolValue.encode(message.interruptible, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                 return writer;
             };
 
@@ -28574,6 +28623,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 5:
                         message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
+                        break;
+                    case 6:
+                        message.interruptible = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -28616,6 +28668,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.Annotations.verify(message.annotations);
                     if (error)
                         return "annotations." + error;
+                }
+                if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
+                    let error = $root.google.protobuf.BoolValue.verify(message.interruptible);
+                    if (error)
+                        return "interruptible." + error;
                 }
                 return null;
             };
@@ -41244,6 +41301,996 @@ export const google = $root.google = (() => {
             };
 
             return ListValue;
+        })();
+
+        protobuf.DoubleValue = (function() {
+
+            /**
+             * Properties of a DoubleValue.
+             * @memberof google.protobuf
+             * @interface IDoubleValue
+             * @property {number|null} [value] DoubleValue value
+             */
+
+            /**
+             * Constructs a new DoubleValue.
+             * @memberof google.protobuf
+             * @classdesc Represents a DoubleValue.
+             * @implements IDoubleValue
+             * @constructor
+             * @param {google.protobuf.IDoubleValue=} [properties] Properties to set
+             */
+            function DoubleValue(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * DoubleValue value.
+             * @member {number} value
+             * @memberof google.protobuf.DoubleValue
+             * @instance
+             */
+            DoubleValue.prototype.value = 0;
+
+            /**
+             * Creates a new DoubleValue instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.DoubleValue
+             * @static
+             * @param {google.protobuf.IDoubleValue=} [properties] Properties to set
+             * @returns {google.protobuf.DoubleValue} DoubleValue instance
+             */
+            DoubleValue.create = function create(properties) {
+                return new DoubleValue(properties);
+            };
+
+            /**
+             * Encodes the specified DoubleValue message. Does not implicitly {@link google.protobuf.DoubleValue.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.DoubleValue
+             * @static
+             * @param {google.protobuf.IDoubleValue} message DoubleValue message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            DoubleValue.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 1 =*/9).double(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a DoubleValue message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.DoubleValue
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.DoubleValue} DoubleValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            DoubleValue.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.DoubleValue();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.double();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a DoubleValue message.
+             * @function verify
+             * @memberof google.protobuf.DoubleValue
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            DoubleValue.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (typeof message.value !== "number")
+                        return "value: number expected";
+                return null;
+            };
+
+            return DoubleValue;
+        })();
+
+        protobuf.FloatValue = (function() {
+
+            /**
+             * Properties of a FloatValue.
+             * @memberof google.protobuf
+             * @interface IFloatValue
+             * @property {number|null} [value] FloatValue value
+             */
+
+            /**
+             * Constructs a new FloatValue.
+             * @memberof google.protobuf
+             * @classdesc Represents a FloatValue.
+             * @implements IFloatValue
+             * @constructor
+             * @param {google.protobuf.IFloatValue=} [properties] Properties to set
+             */
+            function FloatValue(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * FloatValue value.
+             * @member {number} value
+             * @memberof google.protobuf.FloatValue
+             * @instance
+             */
+            FloatValue.prototype.value = 0;
+
+            /**
+             * Creates a new FloatValue instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.FloatValue
+             * @static
+             * @param {google.protobuf.IFloatValue=} [properties] Properties to set
+             * @returns {google.protobuf.FloatValue} FloatValue instance
+             */
+            FloatValue.create = function create(properties) {
+                return new FloatValue(properties);
+            };
+
+            /**
+             * Encodes the specified FloatValue message. Does not implicitly {@link google.protobuf.FloatValue.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.FloatValue
+             * @static
+             * @param {google.protobuf.IFloatValue} message FloatValue message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            FloatValue.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 5 =*/13).float(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a FloatValue message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.FloatValue
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.FloatValue} FloatValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            FloatValue.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.FloatValue();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.float();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a FloatValue message.
+             * @function verify
+             * @memberof google.protobuf.FloatValue
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            FloatValue.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (typeof message.value !== "number")
+                        return "value: number expected";
+                return null;
+            };
+
+            return FloatValue;
+        })();
+
+        protobuf.Int64Value = (function() {
+
+            /**
+             * Properties of an Int64Value.
+             * @memberof google.protobuf
+             * @interface IInt64Value
+             * @property {Long|null} [value] Int64Value value
+             */
+
+            /**
+             * Constructs a new Int64Value.
+             * @memberof google.protobuf
+             * @classdesc Represents an Int64Value.
+             * @implements IInt64Value
+             * @constructor
+             * @param {google.protobuf.IInt64Value=} [properties] Properties to set
+             */
+            function Int64Value(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Int64Value value.
+             * @member {Long} value
+             * @memberof google.protobuf.Int64Value
+             * @instance
+             */
+            Int64Value.prototype.value = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+            /**
+             * Creates a new Int64Value instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.Int64Value
+             * @static
+             * @param {google.protobuf.IInt64Value=} [properties] Properties to set
+             * @returns {google.protobuf.Int64Value} Int64Value instance
+             */
+            Int64Value.create = function create(properties) {
+                return new Int64Value(properties);
+            };
+
+            /**
+             * Encodes the specified Int64Value message. Does not implicitly {@link google.protobuf.Int64Value.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.Int64Value
+             * @static
+             * @param {google.protobuf.IInt64Value} message Int64Value message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Int64Value.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int64(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes an Int64Value message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.Int64Value
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.Int64Value} Int64Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Int64Value.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Int64Value();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.int64();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an Int64Value message.
+             * @function verify
+             * @memberof google.protobuf.Int64Value
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Int64Value.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!$util.isInteger(message.value) && !(message.value && $util.isInteger(message.value.low) && $util.isInteger(message.value.high)))
+                        return "value: integer|Long expected";
+                return null;
+            };
+
+            return Int64Value;
+        })();
+
+        protobuf.UInt64Value = (function() {
+
+            /**
+             * Properties of a UInt64Value.
+             * @memberof google.protobuf
+             * @interface IUInt64Value
+             * @property {Long|null} [value] UInt64Value value
+             */
+
+            /**
+             * Constructs a new UInt64Value.
+             * @memberof google.protobuf
+             * @classdesc Represents a UInt64Value.
+             * @implements IUInt64Value
+             * @constructor
+             * @param {google.protobuf.IUInt64Value=} [properties] Properties to set
+             */
+            function UInt64Value(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * UInt64Value value.
+             * @member {Long} value
+             * @memberof google.protobuf.UInt64Value
+             * @instance
+             */
+            UInt64Value.prototype.value = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+
+            /**
+             * Creates a new UInt64Value instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.UInt64Value
+             * @static
+             * @param {google.protobuf.IUInt64Value=} [properties] Properties to set
+             * @returns {google.protobuf.UInt64Value} UInt64Value instance
+             */
+            UInt64Value.create = function create(properties) {
+                return new UInt64Value(properties);
+            };
+
+            /**
+             * Encodes the specified UInt64Value message. Does not implicitly {@link google.protobuf.UInt64Value.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.UInt64Value
+             * @static
+             * @param {google.protobuf.IUInt64Value} message UInt64Value message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            UInt64Value.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).uint64(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a UInt64Value message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.UInt64Value
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.UInt64Value} UInt64Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            UInt64Value.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.UInt64Value();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.uint64();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a UInt64Value message.
+             * @function verify
+             * @memberof google.protobuf.UInt64Value
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            UInt64Value.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!$util.isInteger(message.value) && !(message.value && $util.isInteger(message.value.low) && $util.isInteger(message.value.high)))
+                        return "value: integer|Long expected";
+                return null;
+            };
+
+            return UInt64Value;
+        })();
+
+        protobuf.Int32Value = (function() {
+
+            /**
+             * Properties of an Int32Value.
+             * @memberof google.protobuf
+             * @interface IInt32Value
+             * @property {number|null} [value] Int32Value value
+             */
+
+            /**
+             * Constructs a new Int32Value.
+             * @memberof google.protobuf
+             * @classdesc Represents an Int32Value.
+             * @implements IInt32Value
+             * @constructor
+             * @param {google.protobuf.IInt32Value=} [properties] Properties to set
+             */
+            function Int32Value(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Int32Value value.
+             * @member {number} value
+             * @memberof google.protobuf.Int32Value
+             * @instance
+             */
+            Int32Value.prototype.value = 0;
+
+            /**
+             * Creates a new Int32Value instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.Int32Value
+             * @static
+             * @param {google.protobuf.IInt32Value=} [properties] Properties to set
+             * @returns {google.protobuf.Int32Value} Int32Value instance
+             */
+            Int32Value.create = function create(properties) {
+                return new Int32Value(properties);
+            };
+
+            /**
+             * Encodes the specified Int32Value message. Does not implicitly {@link google.protobuf.Int32Value.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.Int32Value
+             * @static
+             * @param {google.protobuf.IInt32Value} message Int32Value message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Int32Value.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes an Int32Value message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.Int32Value
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.Int32Value} Int32Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Int32Value.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Int32Value();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an Int32Value message.
+             * @function verify
+             * @memberof google.protobuf.Int32Value
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Int32Value.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!$util.isInteger(message.value))
+                        return "value: integer expected";
+                return null;
+            };
+
+            return Int32Value;
+        })();
+
+        protobuf.UInt32Value = (function() {
+
+            /**
+             * Properties of a UInt32Value.
+             * @memberof google.protobuf
+             * @interface IUInt32Value
+             * @property {number|null} [value] UInt32Value value
+             */
+
+            /**
+             * Constructs a new UInt32Value.
+             * @memberof google.protobuf
+             * @classdesc Represents a UInt32Value.
+             * @implements IUInt32Value
+             * @constructor
+             * @param {google.protobuf.IUInt32Value=} [properties] Properties to set
+             */
+            function UInt32Value(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * UInt32Value value.
+             * @member {number} value
+             * @memberof google.protobuf.UInt32Value
+             * @instance
+             */
+            UInt32Value.prototype.value = 0;
+
+            /**
+             * Creates a new UInt32Value instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.UInt32Value
+             * @static
+             * @param {google.protobuf.IUInt32Value=} [properties] Properties to set
+             * @returns {google.protobuf.UInt32Value} UInt32Value instance
+             */
+            UInt32Value.create = function create(properties) {
+                return new UInt32Value(properties);
+            };
+
+            /**
+             * Encodes the specified UInt32Value message. Does not implicitly {@link google.protobuf.UInt32Value.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.UInt32Value
+             * @static
+             * @param {google.protobuf.IUInt32Value} message UInt32Value message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            UInt32Value.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a UInt32Value message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.UInt32Value
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.UInt32Value} UInt32Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            UInt32Value.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.UInt32Value();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.uint32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a UInt32Value message.
+             * @function verify
+             * @memberof google.protobuf.UInt32Value
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            UInt32Value.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!$util.isInteger(message.value))
+                        return "value: integer expected";
+                return null;
+            };
+
+            return UInt32Value;
+        })();
+
+        protobuf.BoolValue = (function() {
+
+            /**
+             * Properties of a BoolValue.
+             * @memberof google.protobuf
+             * @interface IBoolValue
+             * @property {boolean|null} [value] BoolValue value
+             */
+
+            /**
+             * Constructs a new BoolValue.
+             * @memberof google.protobuf
+             * @classdesc Represents a BoolValue.
+             * @implements IBoolValue
+             * @constructor
+             * @param {google.protobuf.IBoolValue=} [properties] Properties to set
+             */
+            function BoolValue(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * BoolValue value.
+             * @member {boolean} value
+             * @memberof google.protobuf.BoolValue
+             * @instance
+             */
+            BoolValue.prototype.value = false;
+
+            /**
+             * Creates a new BoolValue instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.BoolValue
+             * @static
+             * @param {google.protobuf.IBoolValue=} [properties] Properties to set
+             * @returns {google.protobuf.BoolValue} BoolValue instance
+             */
+            BoolValue.create = function create(properties) {
+                return new BoolValue(properties);
+            };
+
+            /**
+             * Encodes the specified BoolValue message. Does not implicitly {@link google.protobuf.BoolValue.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.BoolValue
+             * @static
+             * @param {google.protobuf.IBoolValue} message BoolValue message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            BoolValue.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).bool(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a BoolValue message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.BoolValue
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.BoolValue} BoolValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            BoolValue.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.BoolValue();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.bool();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a BoolValue message.
+             * @function verify
+             * @memberof google.protobuf.BoolValue
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            BoolValue.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (typeof message.value !== "boolean")
+                        return "value: boolean expected";
+                return null;
+            };
+
+            return BoolValue;
+        })();
+
+        protobuf.StringValue = (function() {
+
+            /**
+             * Properties of a StringValue.
+             * @memberof google.protobuf
+             * @interface IStringValue
+             * @property {string|null} [value] StringValue value
+             */
+
+            /**
+             * Constructs a new StringValue.
+             * @memberof google.protobuf
+             * @classdesc Represents a StringValue.
+             * @implements IStringValue
+             * @constructor
+             * @param {google.protobuf.IStringValue=} [properties] Properties to set
+             */
+            function StringValue(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * StringValue value.
+             * @member {string} value
+             * @memberof google.protobuf.StringValue
+             * @instance
+             */
+            StringValue.prototype.value = "";
+
+            /**
+             * Creates a new StringValue instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.StringValue
+             * @static
+             * @param {google.protobuf.IStringValue=} [properties] Properties to set
+             * @returns {google.protobuf.StringValue} StringValue instance
+             */
+            StringValue.create = function create(properties) {
+                return new StringValue(properties);
+            };
+
+            /**
+             * Encodes the specified StringValue message. Does not implicitly {@link google.protobuf.StringValue.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.StringValue
+             * @static
+             * @param {google.protobuf.IStringValue} message StringValue message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            StringValue.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a StringValue message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.StringValue
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.StringValue} StringValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            StringValue.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.StringValue();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a StringValue message.
+             * @function verify
+             * @memberof google.protobuf.StringValue
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            StringValue.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!$util.isString(message.value))
+                        return "value: string expected";
+                return null;
+            };
+
+            return StringValue;
+        })();
+
+        protobuf.BytesValue = (function() {
+
+            /**
+             * Properties of a BytesValue.
+             * @memberof google.protobuf
+             * @interface IBytesValue
+             * @property {Uint8Array|null} [value] BytesValue value
+             */
+
+            /**
+             * Constructs a new BytesValue.
+             * @memberof google.protobuf
+             * @classdesc Represents a BytesValue.
+             * @implements IBytesValue
+             * @constructor
+             * @param {google.protobuf.IBytesValue=} [properties] Properties to set
+             */
+            function BytesValue(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * BytesValue value.
+             * @member {Uint8Array} value
+             * @memberof google.protobuf.BytesValue
+             * @instance
+             */
+            BytesValue.prototype.value = $util.newBuffer([]);
+
+            /**
+             * Creates a new BytesValue instance using the specified properties.
+             * @function create
+             * @memberof google.protobuf.BytesValue
+             * @static
+             * @param {google.protobuf.IBytesValue=} [properties] Properties to set
+             * @returns {google.protobuf.BytesValue} BytesValue instance
+             */
+            BytesValue.create = function create(properties) {
+                return new BytesValue(properties);
+            };
+
+            /**
+             * Encodes the specified BytesValue message. Does not implicitly {@link google.protobuf.BytesValue.verify|verify} messages.
+             * @function encode
+             * @memberof google.protobuf.BytesValue
+             * @static
+             * @param {google.protobuf.IBytesValue} message BytesValue message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            BytesValue.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.value);
+                return writer;
+            };
+
+            /**
+             * Decodes a BytesValue message from the specified reader or buffer.
+             * @function decode
+             * @memberof google.protobuf.BytesValue
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {google.protobuf.BytesValue} BytesValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            BytesValue.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.BytesValue();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.value = reader.bytes();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a BytesValue message.
+             * @function verify
+             * @memberof google.protobuf.BytesValue
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            BytesValue.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.value != null && message.hasOwnProperty("value"))
+                    if (!(message.value && typeof message.value.length === "number" || $util.isString(message.value)))
+                        return "value: buffer expected";
+                return null;
+            };
+
+            return BytesValue;
         })();
 
         protobuf.FileDescriptorSet = (function() {

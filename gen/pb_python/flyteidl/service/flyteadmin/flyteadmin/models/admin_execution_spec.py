@@ -55,7 +55,8 @@ class AdminExecutionSpec(object):
         'quality_of_service': 'CoreQualityOfService',
         'max_parallelism': 'int',
         'raw_output_data_config': 'AdminRawOutputDataConfig',
-        'cluster_assignment': 'AdminClusterAssignment'
+        'cluster_assignment': 'AdminClusterAssignment',
+        'interruptible': 'bool'
     }
 
     attribute_map = {
@@ -71,10 +72,11 @@ class AdminExecutionSpec(object):
         'quality_of_service': 'quality_of_service',
         'max_parallelism': 'max_parallelism',
         'raw_output_data_config': 'raw_output_data_config',
-        'cluster_assignment': 'cluster_assignment'
+        'cluster_assignment': 'cluster_assignment',
+        'interruptible': 'interruptible'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -90,6 +92,7 @@ class AdminExecutionSpec(object):
         self._max_parallelism = None
         self._raw_output_data_config = None
         self._cluster_assignment = None
+        self._interruptible = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -118,6 +121,8 @@ class AdminExecutionSpec(object):
             self.raw_output_data_config = raw_output_data_config
         if cluster_assignment is not None:
             self.cluster_assignment = cluster_assignment
+        if interruptible is not None:
+            self.interruptible = interruptible
 
     @property
     def launch_plan(self):
@@ -409,6 +414,29 @@ class AdminExecutionSpec(object):
         """
 
         self._cluster_assignment = cluster_assignment
+
+    @property
+    def interruptible(self):
+        """Gets the interruptible of this AdminExecutionSpec.  # noqa: E501
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :return: The interruptible of this AdminExecutionSpec.  # noqa: E501
+        :rtype: bool
+        """
+        return self._interruptible
+
+    @interruptible.setter
+    def interruptible(self, interruptible):
+        """Sets the interruptible of this AdminExecutionSpec.
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :param interruptible: The interruptible of this AdminExecutionSpec.  # noqa: E501
+        :type: bool
+        """
+
+        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""

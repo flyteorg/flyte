@@ -32,4 +32,6 @@ type AdminLaunchPlanSpec struct {
 	RawOutputDataConfig *AdminRawOutputDataConfig `json:"raw_output_data_config,omitempty"`
 	// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.
 	MaxParallelism int32 `json:"max_parallelism,omitempty"`
+	// Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.
+	Interruptible bool `json:"interruptible,omitempty"`
 }

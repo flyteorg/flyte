@@ -40,7 +40,8 @@ class AdminWorkflowExecutionConfig(object):
         'security_context': 'CoreSecurityContext',
         'raw_output_data_config': 'AdminRawOutputDataConfig',
         'labels': 'AdminLabels',
-        'annotations': 'AdminAnnotations'
+        'annotations': 'AdminAnnotations',
+        'interruptible': 'bool'
     }
 
     attribute_map = {
@@ -48,10 +49,11 @@ class AdminWorkflowExecutionConfig(object):
         'security_context': 'security_context',
         'raw_output_data_config': 'raw_output_data_config',
         'labels': 'labels',
-        'annotations': 'annotations'
+        'annotations': 'annotations',
+        'interruptible': 'interruptible'
     }
 
-    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None):  # noqa: E501
+    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None, interruptible=None):  # noqa: E501
         """AdminWorkflowExecutionConfig - a model defined in Swagger"""  # noqa: E501
 
         self._max_parallelism = None
@@ -59,6 +61,7 @@ class AdminWorkflowExecutionConfig(object):
         self._raw_output_data_config = None
         self._labels = None
         self._annotations = None
+        self._interruptible = None
         self.discriminator = None
 
         if max_parallelism is not None:
@@ -71,6 +74,8 @@ class AdminWorkflowExecutionConfig(object):
             self.labels = labels
         if annotations is not None:
             self.annotations = annotations
+        if interruptible is not None:
+            self.interruptible = interruptible
 
     @property
     def max_parallelism(self):
@@ -186,6 +191,29 @@ class AdminWorkflowExecutionConfig(object):
         """
 
         self._annotations = annotations
+
+    @property
+    def interruptible(self):
+        """Gets the interruptible of this AdminWorkflowExecutionConfig.  # noqa: E501
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :return: The interruptible of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :rtype: bool
+        """
+        return self._interruptible
+
+    @interruptible.setter
+    def interruptible(self, interruptible):
+        """Sets the interruptible of this AdminWorkflowExecutionConfig.
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :param interruptible: The interruptible of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :type: bool
+        """
+
+        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""
