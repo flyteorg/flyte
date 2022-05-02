@@ -517,6 +517,7 @@
         "Storage": "0",
         "GPU": "0"
       }
-    }
+    },
+    "Interruptible": null
   }
 }

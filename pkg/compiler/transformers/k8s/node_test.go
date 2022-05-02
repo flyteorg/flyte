@@ -65,7 +65,7 @@ func TestBuildNodeSpec(t *testing.T) {
 		specs, ok := buildNodeSpec(n.GetCoreNode(), tasks, errs)
 		assert.Len(t, specs, expectedInnerNodesCount)
 		spec := specs[0]
-		assert.Nil(t, spec.Interruptibe)
+		assert.Nil(t, spec.Interruptible)
 		assert.False(t, errs.HasErrors())
 		assert.True(t, ok)
 		assert.NotNil(t, spec)

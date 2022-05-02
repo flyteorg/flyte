@@ -113,8 +113,8 @@ func TestBuildFlyteWorkflow(t *testing.T) {
 		},
 		nil, nil, "")
 	assert.Equal(t, true, wf.NodeDefaults.Interruptible)
-	assert.True(t, *wf.WorkflowSpec.Nodes["n_1"].Interruptibe)
-	assert.Nil(t, wf.WorkflowSpec.Nodes[common.StartNodeID].Interruptibe)
+	assert.True(t, *wf.WorkflowSpec.Nodes["n_1"].Interruptible)
+	assert.Nil(t, wf.WorkflowSpec.Nodes[common.StartNodeID].Interruptible)
 	assert.Equal(t, "wf-1", wf.Labels[WorkflowNameLabel])
 	assert.Equal(t, "4", wf.Labels[ShardKeyLabel])
 	assert.NoError(t, err)

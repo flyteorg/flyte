@@ -28,6 +28,8 @@ type ExecutionConfig struct {
 	// Defines the resource requests and limits specified for tasks run as part of this execution that ought to be
 	// applied at execution time.
 	TaskResources TaskResources
+	// Defines whether a workflow has been flagged as interruptible.
+	Interruptible *bool
 }
 
 type TaskPluginOverride struct {

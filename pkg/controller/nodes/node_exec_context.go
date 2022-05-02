@@ -26,7 +26,7 @@ const NodeInterruptibleLabel = "interruptible"
 type nodeExecMetadata struct {
 	v1alpha1.Meta
 	nodeExecID                    *core.NodeExecutionIdentifier
-	interrutptible                bool
+	interruptible                 bool
 	interruptibleFailureThreshold uint32
 	nodeLabels                    map[string]string
 }
@@ -44,7 +44,7 @@ func (e nodeExecMetadata) GetOwnerID() types.NamespacedName {
 }
 
 func (e nodeExecMetadata) IsInterruptible() bool {
-	return e.interrutptible
+	return e.interruptible
 }
 
 func (e nodeExecMetadata) GetInterruptibleFailureThreshold() uint32 {
@@ -151,7 +151,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 			NodeId:      node.GetID(),
 			ExecutionId: execContext.GetExecutionID().WorkflowExecutionIdentifier,
 		},
-		interrutptible:                interruptible,
+		interruptible:                 interruptible,
 		interruptibleFailureThreshold: interruptibleFailureThreshold,
 	}
 
