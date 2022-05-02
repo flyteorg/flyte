@@ -119,13 +119,20 @@ export const ExpandableMonospaceText: React.FC<ExpandableMonospaceTextProps> = (
 }) => {
   const [expanded, setExpanded] = React.useState(initialExpansionState);
   const styles = useExpandableMonospaceTextStyles();
-  const onClickExpand = () => {
+  const onClickExpand = (e: React.MouseEvent<HTMLElement>) => {
+    // prevent the parent row body onClick event trigger
+    e.stopPropagation();
+
     setExpanded(!expanded);
     if (onExpandCollapse) {
       onExpandCollapse(!expanded);
     }
   };
-  const onClickCopy = () => copyToClipboard(text);
+  const onClickCopy = (e: React.MouseEvent<HTMLElement>) => {
+    // prevent the parent row body onClick event trigger
+    e.stopPropagation();
+    copyToClipboard(text);
+  };
 
   const expandButtonText = expanded ? 'Collapse' : 'Click to expand inline';
 

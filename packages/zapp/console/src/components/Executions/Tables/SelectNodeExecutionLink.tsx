@@ -12,8 +12,14 @@ export const SelectNodeExecutionLink: React.FC<{
   linkText: string;
   state: NodeExecutionsTableState;
 }> = ({ className, execution, linkText, state }) => {
-  // use null in case if there is no execution provied - to close panel
-  const onClick = () => state.setSelectedExecution(execution?.id ?? null);
+  // open the side panel for selected execution's detail
+  const onClick = (e: React.MouseEvent<HTMLElement>) => {
+    // prevent the parent row body onClick event trigger
+    e.stopPropagation();
+    // use null in case if there is no execution provided - when it is null will close panel
+    state.setSelectedExecution(execution?.id ?? null);
+  };
+
   return (
     <Link component="button" className={className} onClick={onClick} variant="body1">
       {linkText}

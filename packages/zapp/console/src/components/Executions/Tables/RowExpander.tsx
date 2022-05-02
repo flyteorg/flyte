@@ -14,7 +14,11 @@ export const RowExpander: React.FC<{
     disableTouchRipple={true}
     size="small"
     title={titleStrings.expandRow}
-    onClick={onClick}
+    onClick={(e: React.MouseEvent<HTMLElement>) => {
+      // prevent the parent row body onClick event trigger
+      e.stopPropagation();
+      onClick();
+    }}
   >
     {expanded ? <ExpandMore /> : <ChevronRight />}
   </IconButton>

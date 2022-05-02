@@ -98,6 +98,9 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
       backgroundColor: listhoverColor,
     },
   },
+  clickableRow: {
+    cursor: 'pointer',
+  },
   rowContent: {},
   rowColumns: {
     alignItems: 'center',
