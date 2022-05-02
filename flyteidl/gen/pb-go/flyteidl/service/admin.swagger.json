@@ -3577,6 +3577,11 @@
         "cluster_assignment": {
           "$ref": "#/definitions/adminClusterAssignment",
           "description": "Controls how to select an available cluster on which this execution should run."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -3837,6 +3842,11 @@
           "type": "integer",
           "format": "int32",
           "description": "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.\nThis is useful to achieve fairness. Note: MapTasks are regarded as one unit,\nand parallelism/concurrency of MapTasks is independent from this."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -4923,6 +4933,11 @@
         "annotations": {
           "$ref": "#/definitions/adminAnnotations",
           "description": "Custom annotations to be applied to a triggered execution resource."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."

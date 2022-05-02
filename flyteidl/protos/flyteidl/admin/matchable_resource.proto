@@ -7,6 +7,7 @@ import "flyteidl/admin/common.proto";
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/security.proto";
+import "google/protobuf/wrappers.proto";
 
 // Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 // based on matching tags.
@@ -116,6 +117,12 @@ message WorkflowExecutionConfig {
 
   // Custom annotations to be applied to a triggered execution resource.
   Annotations annotations = 5;
+
+  // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+  // Omitting this field uses the workflow's value as a default.
+  // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+  // around the bool field.
+  google.protobuf.BoolValue interruptible = 6;
 }
 
 // Generic container for encapsulating all types of the above attributes messages.

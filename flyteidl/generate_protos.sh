@@ -36,8 +36,8 @@ protoc --doc_out=protos/docs/core --doc_opt=restructuredtext,core.rst -I=tmp/doc
 admin_proto_files=`ls protos/flyteidl/admin/*.proto |xargs`
 # Remove any currently generated file
 ls -d protos/docs/admin/* | grep -v index.rst | xargs rm
-# Use the list to generate the RST files required for sphinx conversion
-protoc --doc_out=protos/docs/admin --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,admin.rst -I=tmp/doc_gen_deps -I=protos `echo $admin_proto_files` tmp/doc_gen_deps/google/protobuf/duration.proto
+# Use the list to generate the RST files required for sphinx conversion. Additionally generate for google.protobuf.[duration | wrappers].
+protoc --doc_out=protos/docs/admin --doc_opt=protos/docs/withoutscalar_restructuredtext.tmpl,admin.rst -I=tmp/doc_gen_deps -I=protos `echo $admin_proto_files` tmp/doc_gen_deps/google/protobuf/duration.proto tmp/doc_gen_deps/google/protobuf/wrappers.proto
 
 # Get list of proto files in datacatlog directory
 datacatalog_proto_files=`ls protos/flyteidl/datacatalog/*.proto |xargs`

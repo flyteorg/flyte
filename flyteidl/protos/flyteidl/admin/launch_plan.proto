@@ -11,6 +11,7 @@ import "flyteidl/core/security.proto";
 import "flyteidl/admin/schedule.proto";
 import "flyteidl/admin/common.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 // Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 // to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
@@ -118,6 +119,12 @@ message LaunchPlanSpec {
     // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
     // and parallelism/concurrency of MapTasks is independent from this.
     int32 max_parallelism = 18;
+
+    // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    // Omitting this field uses the workflow's value as a default.
+    // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    // around the bool field.
+    google.protobuf.BoolValue interruptible = 19;
 }
 
 // Values computed by the flyte platform after launch plan registration.
