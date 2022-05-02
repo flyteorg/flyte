@@ -11,6 +11,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 // Request to launch an execution with the given project, domain and optionally-assigned name.
 message ExecutionCreateRequest {
@@ -289,6 +290,12 @@ message ExecutionSpec {
 
     // Controls how to select an available cluster on which this execution should run.
     ClusterAssignment cluster_assignment = 20;
+
+    // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    // Omitting this field uses the workflow's value as a default.
+    // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    // around the bool field.
+    google.protobuf.BoolValue interruptible = 21;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

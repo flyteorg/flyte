@@ -16865,6 +16865,40 @@ public final class ExecutionOuterClass {
      */
     flyteidl.admin.ClusterAssignmentOuterClass.ClusterAssignmentOrBuilder getClusterAssignmentOrBuilder();
 
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    boolean hasInterruptible();
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    com.google.protobuf.BoolValue getInterruptible();
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    com.google.protobuf.BoolValueOrBuilder getInterruptibleOrBuilder();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -17061,6 +17095,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(clusterAssignment_);
                 clusterAssignment_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 170: {
+              com.google.protobuf.BoolValue.Builder subBuilder = null;
+              if (interruptible_ != null) {
+                subBuilder = interruptible_.toBuilder();
+              }
+              interruptible_ = input.readMessage(com.google.protobuf.BoolValue.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(interruptible_);
+                interruptible_ = subBuilder.buildPartial();
               }
 
               break;
@@ -17542,6 +17589,48 @@ public final class ExecutionOuterClass {
       return getClusterAssignment();
     }
 
+    public static final int INTERRUPTIBLE_FIELD_NUMBER = 21;
+    private com.google.protobuf.BoolValue interruptible_;
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    public boolean hasInterruptible() {
+      return interruptible_ != null;
+    }
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    public com.google.protobuf.BoolValue getInterruptible() {
+      return interruptible_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : interruptible_;
+    }
+    /**
+     * <pre>
+     * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+     * Omitting this field uses the workflow's value as a default.
+     * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+     * around the bool field.
+     * </pre>
+     *
+     * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+     */
+    public com.google.protobuf.BoolValueOrBuilder getInterruptibleOrBuilder() {
+      return getInterruptible();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -17595,6 +17684,9 @@ public final class ExecutionOuterClass {
       }
       if (clusterAssignment_ != null) {
         output.writeMessage(20, getClusterAssignment());
+      }
+      if (interruptible_ != null) {
+        output.writeMessage(21, getInterruptible());
       }
       unknownFields.writeTo(output);
     }
@@ -17657,6 +17749,10 @@ public final class ExecutionOuterClass {
       if (clusterAssignment_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(20, getClusterAssignment());
+      }
+      if (interruptible_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, getInterruptible());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -17725,6 +17821,11 @@ public final class ExecutionOuterClass {
         if (!getClusterAssignment()
             .equals(other.getClusterAssignment())) return false;
       }
+      if (hasInterruptible() != other.hasInterruptible()) return false;
+      if (hasInterruptible()) {
+        if (!getInterruptible()
+            .equals(other.getInterruptible())) return false;
+      }
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -17790,6 +17891,10 @@ public final class ExecutionOuterClass {
       if (hasClusterAssignment()) {
         hash = (37 * hash) + CLUSTER_ASSIGNMENT_FIELD_NUMBER;
         hash = (53 * hash) + getClusterAssignment().hashCode();
+      }
+      if (hasInterruptible()) {
+        hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
+        hash = (53 * hash) + getInterruptible().hashCode();
       }
       switch (notificationOverridesCase_) {
         case 5:
@@ -18004,6 +18109,12 @@ public final class ExecutionOuterClass {
           clusterAssignment_ = null;
           clusterAssignmentBuilder_ = null;
         }
+        if (interruptibleBuilder_ == null) {
+          interruptible_ = null;
+        } else {
+          interruptible_ = null;
+          interruptibleBuilder_ = null;
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -18093,6 +18204,11 @@ public final class ExecutionOuterClass {
         } else {
           result.clusterAssignment_ = clusterAssignmentBuilder_.build();
         }
+        if (interruptibleBuilder_ == null) {
+          result.interruptible_ = interruptible_;
+        } else {
+          result.interruptible_ = interruptibleBuilder_.build();
+        }
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -18174,6 +18290,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasClusterAssignment()) {
           mergeClusterAssignment(other.getClusterAssignment());
+        }
+        if (other.hasInterruptible()) {
+          mergeInterruptible(other.getInterruptible());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -20045,6 +20164,186 @@ public final class ExecutionOuterClass {
           clusterAssignment_ = null;
         }
         return clusterAssignmentBuilder_;
+      }
+
+      private com.google.protobuf.BoolValue interruptible_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> interruptibleBuilder_;
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public boolean hasInterruptible() {
+        return interruptibleBuilder_ != null || interruptible_ != null;
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public com.google.protobuf.BoolValue getInterruptible() {
+        if (interruptibleBuilder_ == null) {
+          return interruptible_ == null ? com.google.protobuf.BoolValue.getDefaultInstance() : interruptible_;
+        } else {
+          return interruptibleBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public Builder setInterruptible(com.google.protobuf.BoolValue value) {
+        if (interruptibleBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          interruptible_ = value;
+          onChanged();
+        } else {
+          interruptibleBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public Builder setInterruptible(
+          com.google.protobuf.BoolValue.Builder builderForValue) {
+        if (interruptibleBuilder_ == null) {
+          interruptible_ = builderForValue.build();
+          onChanged();
+        } else {
+          interruptibleBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public Builder mergeInterruptible(com.google.protobuf.BoolValue value) {
+        if (interruptibleBuilder_ == null) {
+          if (interruptible_ != null) {
+            interruptible_ =
+              com.google.protobuf.BoolValue.newBuilder(interruptible_).mergeFrom(value).buildPartial();
+          } else {
+            interruptible_ = value;
+          }
+          onChanged();
+        } else {
+          interruptibleBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public Builder clearInterruptible() {
+        if (interruptibleBuilder_ == null) {
+          interruptible_ = null;
+          onChanged();
+        } else {
+          interruptible_ = null;
+          interruptibleBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public com.google.protobuf.BoolValue.Builder getInterruptibleBuilder() {
+        
+        onChanged();
+        return getInterruptibleFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      public com.google.protobuf.BoolValueOrBuilder getInterruptibleOrBuilder() {
+        if (interruptibleBuilder_ != null) {
+          return interruptibleBuilder_.getMessageOrBuilder();
+        } else {
+          return interruptible_ == null ?
+              com.google.protobuf.BoolValue.getDefaultInstance() : interruptible_;
+        }
+      }
+      /**
+       * <pre>
+       * Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+       * Omitting this field uses the workflow's value as a default.
+       * As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+       * around the bool field.
+       * </pre>
+       *
+       * <code>.google.protobuf.BoolValue interruptible = 21;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder> 
+          getInterruptibleFieldBuilder() {
+        if (interruptibleBuilder_ == null) {
+          interruptibleBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.BoolValue, com.google.protobuf.BoolValue.Builder, com.google.protobuf.BoolValueOrBuilder>(
+                  getInterruptible(),
+                  getParentForChildren(),
+                  isClean());
+          interruptible_ = null;
+        }
+        return interruptibleBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -25812,104 +26111,106 @@ public final class ExecutionOuterClass {
       "ore/execution.proto\032\036flyteidl/core/ident" +
       "ifier.proto\032\034flyteidl/core/security.prot" +
       "o\032\036google/protobuf/duration.proto\032\037googl" +
-      "e/protobuf/timestamp.proto\"\237\001\n\026Execution" +
-      "CreateRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain" +
-      "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.fly" +
-      "teidl.admin.ExecutionSpec\022)\n\006inputs\030\005 \001(" +
-      "\0132\031.flyteidl.core.LiteralMap\"`\n\030Executio" +
-      "nRelaunchRequest\0226\n\002id\030\001 \001(\0132*.flyteidl." +
-      "core.WorkflowExecutionIdentifier\022\014\n\004name" +
-      "\030\003 \001(\t\"\224\001\n\027ExecutionRecoverRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003 \001" +
-      "(\0132!.flyteidl.admin.ExecutionMetadata\"Q\n" +
-      "\027ExecutionCreateResponse\0226\n\002id\030\001 \001(\0132*.f" +
-      "lyteidl.core.WorkflowExecutionIdentifier" +
-      "\"U\n\033WorkflowExecutionGetRequest\0226\n\002id\030\001 " +
-      "\001(\0132*.flyteidl.core.WorkflowExecutionIde" +
-      "ntifier\"\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.flyt" +
-      "eidl.core.WorkflowExecutionIdentifier\022+\n" +
-      "\004spec\030\002 \001(\0132\035.flyteidl.admin.ExecutionSp" +
-      "ec\0221\n\007closure\030\003 \001(\0132 .flyteidl.admin.Exe" +
-      "cutionClosure\"M\n\rExecutionList\022-\n\nexecut" +
-      "ions\030\001 \003(\0132\031.flyteidl.admin.Execution\022\r\n" +
-      "\005token\030\002 \001(\t\"X\n\016LiteralMapBlob\022/\n\006values" +
-      "\030\001 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\022" +
-      "\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbortMetadata\022" +
-      "\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020Ex" +
-      "ecutionClosure\0225\n\007outputs\030\001 \001(\0132\036.flytei" +
-      "dl.admin.LiteralMapBlobB\002\030\001H\000\022.\n\005error\030\002" +
-      " \001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\031\n" +
-      "\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_metada" +
-      "ta\030\014 \001(\0132\035.flyteidl.admin.AbortMetadataH" +
-      "\000\0224\n\013output_data\030\r \001(\0132\031.flyteidl.core.L" +
-      "iteralMapB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001(\013" +
-      "2\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005phase" +
-      "\030\004 \001(\0162&.flyteidl.core.WorkflowExecution" +
-      ".Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google.prot" +
-      "obuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.googl" +
-      "e.protobuf.Duration\022.\n\ncreated_at\030\007 \001(\0132" +
-      "\032.google.protobuf.Timestamp\022.\n\nupdated_a" +
-      "t\030\010 \001(\0132\032.google.protobuf.Timestamp\0223\n\rn" +
-      "otifications\030\t \003(\0132\034.flyteidl.admin.Noti" +
-      "fication\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl" +
-      ".core.Identifier\022I\n\024state_change_details" +
-      "\030\016 \001(\0132+.flyteidl.admin.ExecutionStateCh" +
-      "angeDetailsB\017\n\routput_result\"+\n\016SystemMe" +
-      "tadata\022\031\n\021execution_cluster\030\001 \001(\t\"\332\003\n\021Ex" +
-      "ecutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl" +
-      ".admin.ExecutionMetadata.ExecutionMode\022\021" +
-      "\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014sc" +
-      "heduled_at\030\004 \001(\0132\032.google.protobuf.Times" +
-      "tamp\022E\n\025parent_node_execution\030\005 \001(\0132&.fl" +
-      "yteidl.core.NodeExecutionIdentifier\022G\n\023r" +
-      "eference_execution\030\020 \001(\0132*.flyteidl.core" +
-      ".WorkflowExecutionIdentifier\0227\n\017system_m" +
-      "etadata\030\021 \001(\0132\036.flyteidl.admin.SystemMet" +
-      "adata\"g\n\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSC" +
-      "HEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016C" +
-      "HILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notifi" +
-      "cationList\0223\n\rnotifications\030\001 \003(\0132\034.flyt" +
-      "eidl.admin.Notification\"\264\005\n\rExecutionSpe" +
-      "c\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core.I" +
-      "dentifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.cor" +
-      "e.LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.fly" +
-      "teidl.admin.ExecutionMetadata\0229\n\rnotific" +
-      "ations\030\005 \001(\0132 .flyteidl.admin.Notificati" +
-      "onListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006label" +
-      "s\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013annot" +
-      "ations\030\010 \001(\0132\033.flyteidl.admin.Annotation" +
-      "s\0228\n\020security_context\030\n \001(\0132\036.flyteidl.c" +
-      "ore.SecurityContext\022/\n\tauth_role\030\020 \001(\0132\030" +
-      ".flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality_" +
-      "of_service\030\021 \001(\0132\037.flyteidl.core.Quality" +
-      "OfService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026ra" +
-      "w_output_data_config\030\023 \001(\0132#.flyteidl.ad" +
-      "min.RawOutputDataConfig\022=\n\022cluster_assig" +
-      "nment\030\024 \001(\0132!.flyteidl.admin.ClusterAssi" +
-      "gnmentB\030\n\026notification_overridesJ\004\010\004\020\005\"b" +
-      "\n\031ExecutionTerminateRequest\0226\n\002id\030\001 \001(\0132" +
-      "*.flyteidl.core.WorkflowExecutionIdentif" +
-      "ier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminate" +
-      "Response\"Y\n\037WorkflowExecutionGetDataRequ" +
-      "est\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow" +
-      "ExecutionIdentifier\"\336\001\n WorkflowExecutio" +
-      "nGetDataResponse\022,\n\007outputs\030\001 \001(\0132\027.flyt" +
-      "eidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027" +
-      ".flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_inpu" +
-      "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014f" +
-      "ull_outputs\030\004 \001(\0132\031.flyteidl.core.Litera" +
-      "lMap\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001" +
+      "e/protobuf/timestamp.proto\032\036google/proto" +
+      "buf/wrappers.proto\"\237\001\n\026ExecutionCreateRe" +
+      "quest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014" +
+      "\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.flyteidl.ad" +
+      "min.ExecutionSpec\022)\n\006inputs\030\005 \001(\0132\031.flyt" +
+      "eidl.core.LiteralMap\"`\n\030ExecutionRelaunc" +
+      "hRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wor" +
+      "kflowExecutionIdentifier\022\014\n\004name\030\003 \001(\t\"\224" +
+      "\001\n\027ExecutionRecoverRequest\0226\n\002id\030\001 \001(\0132*" +
+      ".flyteidl.core.WorkflowExecutionIdentifi" +
+      "er\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003 \001(\0132!.fly" +
+      "teidl.admin.ExecutionMetadata\"Q\n\027Executi" +
+      "onCreateResponse\0226\n\002id\030\001 \001(\0132*.flyteidl." +
+      "core.WorkflowExecutionIdentifier\"U\n\033Work" +
+      "flowExecutionGetRequest\0226\n\002id\030\001 \001(\0132*.fl" +
+      "yteidl.core.WorkflowExecutionIdentifier\"" +
+      "\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.flyteidl.cor" +
+      "e.WorkflowExecutionIdentifier\022+\n\004spec\030\002 " +
+      "\001(\0132\035.flyteidl.admin.ExecutionSpec\0221\n\007cl" +
+      "osure\030\003 \001(\0132 .flyteidl.admin.ExecutionCl" +
+      "osure\"M\n\rExecutionList\022-\n\nexecutions\030\001 \003" +
+      "(\0132\031.flyteidl.admin.Execution\022\r\n\005token\030\002" +
+      " \001(\t\"X\n\016LiteralMapBlob\022/\n\006values\030\001 \001(\0132\031" +
+      ".flyteidl.core.LiteralMapB\002\030\001H\000\022\r\n\003uri\030\002" +
+      " \001(\tH\000B\006\n\004data\"1\n\rAbortMetadata\022\r\n\005cause" +
+      "\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020ExecutionC" +
+      "losure\0225\n\007outputs\030\001 \001(\0132\036.flyteidl.admin" +
+      ".LiteralMapBlobB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.f" +
+      "lyteidl.core.ExecutionErrorH\000\022\031\n\013abort_c" +
+      "ause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_metadata\030\014 \001(\013" +
+      "2\035.flyteidl.admin.AbortMetadataH\000\0224\n\013out" +
+      "put_data\030\r \001(\0132\031.flyteidl.core.LiteralMa" +
+      "pB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001(\0132\031.flyte" +
+      "idl.core.LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162&" +
+      ".flyteidl.core.WorkflowExecution.Phase\022." +
+      "\n\nstarted_at\030\005 \001(\0132\032.google.protobuf.Tim" +
+      "estamp\022+\n\010duration\030\006 \001(\0132\031.google.protob" +
+      "uf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.google" +
+      ".protobuf.Timestamp\022.\n\nupdated_at\030\010 \001(\0132" +
+      "\032.google.protobuf.Timestamp\0223\n\rnotificat" +
+      "ions\030\t \003(\0132\034.flyteidl.admin.Notification" +
+      "\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.core.Id" +
+      "entifier\022I\n\024state_change_details\030\016 \001(\0132+" +
+      ".flyteidl.admin.ExecutionStateChangeDeta" +
+      "ilsB\017\n\routput_result\"+\n\016SystemMetadata\022\031" +
+      "\n\021execution_cluster\030\001 \001(\t\"\332\003\n\021ExecutionM" +
+      "etadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.admin.E" +
+      "xecutionMetadata.ExecutionMode\022\021\n\tprinci" +
+      "pal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014scheduled_" +
+      "at\030\004 \001(\0132\032.google.protobuf.Timestamp\022E\n\025" +
+      "parent_node_execution\030\005 \001(\0132&.flyteidl.c" +
+      "ore.NodeExecutionIdentifier\022G\n\023reference" +
+      "_execution\030\020 \001(\0132*.flyteidl.core.Workflo" +
+      "wExecutionIdentifier\0227\n\017system_metadata\030" +
+      "\021 \001(\0132\036.flyteidl.admin.SystemMetadata\"g\n" +
+      "\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020" +
+      "\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WOR" +
+      "KFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationLi" +
+      "st\0223\n\rnotifications\030\001 \003(\0132\034.flyteidl.adm" +
+      "in.Notification\"\347\005\n\rExecutionSpec\022.\n\013lau" +
+      "nch_plan\030\001 \001(\0132\031.flyteidl.core.Identifie" +
+      "r\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core.Litera" +
+      "lMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.ad" +
+      "min.ExecutionMetadata\0229\n\rnotifications\030\005" +
+      " \001(\0132 .flyteidl.admin.NotificationListH\000" +
+      "\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132" +
+      "\026.flyteidl.admin.Labels\0220\n\013annotations\030\010" +
+      " \001(\0132\033.flyteidl.admin.Annotations\0228\n\020sec" +
+      "urity_context\030\n \001(\0132\036.flyteidl.core.Secu" +
+      "rityContext\022/\n\tauth_role\030\020 \001(\0132\030.flyteid" +
+      "l.admin.AuthRoleB\002\030\001\022;\n\022quality_of_servi" +
+      "ce\030\021 \001(\0132\037.flyteidl.core.QualityOfServic" +
+      "e\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw_output" +
+      "_data_config\030\023 \001(\0132#.flyteidl.admin.RawO" +
+      "utputDataConfig\022=\n\022cluster_assignment\030\024 " +
+      "\001(\0132!.flyteidl.admin.ClusterAssignment\0221" +
+      "\n\rinterruptible\030\025 \001(\0132\032.google.protobuf." +
+      "BoolValueB\030\n\026notification_overridesJ\004\010\004\020" +
+      "\005\"b\n\031ExecutionTerminateRequest\0226\n\002id\030\001 \001" +
       "(\0132*.flyteidl.core.WorkflowExecutionIden" +
-      "tifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.E" +
-      "xecutionState\"\220\001\n\033ExecutionStateChangeDe" +
-      "tails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Ex" +
-      "ecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.goog" +
-      "le.protobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t" +
-      "\"\031\n\027ExecutionUpdateResponse*>\n\016Execution" +
-      "State\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXECUTION" +
-      "_ARCHIVED\020\001B7Z5github.com/flyteorg/flyte" +
-      "idl/gen/pb-go/flyteidl/adminb\006proto3"
+      "tifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTermin" +
+      "ateResponse\"Y\n\037WorkflowExecutionGetDataR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\"\336\001\n WorkflowExecu" +
+      "tionGetDataResponse\022,\n\007outputs\030\001 \001(\0132\027.f" +
+      "lyteidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001(" +
+      "\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_i" +
+      "nputs\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/" +
+      "\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Lit" +
+      "eralMap\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030" +
+      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
+      "dentifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admi" +
+      "n.ExecutionState\"\220\001\n\033ExecutionStateChang" +
+      "eDetails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin" +
+      ".ExecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.g" +
+      "oogle.protobuf.Timestamp\022\021\n\tprincipal\030\003 " +
+      "\001(\t\"\031\n\027ExecutionUpdateResponse*>\n\016Execut" +
+      "ionState\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXECUT" +
+      "ION_ARCHIVED\020\001B7Z5github.com/flyteorg/fl" +
+      "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -25930,6 +26231,7 @@ public final class ExecutionOuterClass {
           flyteidl.core.Security.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
+          com.google.protobuf.WrappersProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_ExecutionCreateRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -26014,7 +26316,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "Interruptible", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
@@ -26065,6 +26367,7 @@ public final class ExecutionOuterClass {
     flyteidl.core.Security.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
+    com.google.protobuf.WrappersProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

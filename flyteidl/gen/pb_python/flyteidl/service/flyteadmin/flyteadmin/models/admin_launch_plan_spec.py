@@ -55,7 +55,8 @@ class AdminLaunchPlanSpec(object):
         'security_context': 'CoreSecurityContext',
         'quality_of_service': 'CoreQualityOfService',
         'raw_output_data_config': 'AdminRawOutputDataConfig',
-        'max_parallelism': 'int'
+        'max_parallelism': 'int',
+        'interruptible': 'bool'
     }
 
     attribute_map = {
@@ -71,10 +72,11 @@ class AdminLaunchPlanSpec(object):
         'security_context': 'security_context',
         'quality_of_service': 'quality_of_service',
         'raw_output_data_config': 'raw_output_data_config',
-        'max_parallelism': 'max_parallelism'
+        'max_parallelism': 'max_parallelism',
+        'interruptible': 'interruptible'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -90,6 +92,7 @@ class AdminLaunchPlanSpec(object):
         self._quality_of_service = None
         self._raw_output_data_config = None
         self._max_parallelism = None
+        self._interruptible = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -118,6 +121,8 @@ class AdminLaunchPlanSpec(object):
             self.raw_output_data_config = raw_output_data_config
         if max_parallelism is not None:
             self.max_parallelism = max_parallelism
+        if interruptible is not None:
+            self.interruptible = interruptible
 
     @property
     def workflow_id(self):
@@ -407,6 +412,29 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._max_parallelism = max_parallelism
+
+    @property
+    def interruptible(self):
+        """Gets the interruptible of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :return: The interruptible of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: bool
+        """
+        return self._interruptible
+
+    @interruptible.setter
+    def interruptible(self, interruptible):
+        """Sets the interruptible of this AdminLaunchPlanSpec.
+
+        Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.  # noqa: E501
+
+        :param interruptible: The interruptible of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: bool
+        """
+
+        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -40,6 +40,7 @@
 #include "flyteidl/admin/schedule.pb.h"
 #include "flyteidl/admin/common.pb.h"
 #include <google/protobuf/timestamp.pb.h>
+#include <google/protobuf/wrappers.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto
@@ -980,6 +981,15 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::RawOutputDataConfig* mutable_raw_output_data_config();
   void set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config);
 
+  // .google.protobuf.BoolValue interruptible = 19;
+  bool has_interruptible() const;
+  void clear_interruptible();
+  static const int kInterruptibleFieldNumber = 19;
+  const ::google::protobuf::BoolValue& interruptible() const;
+  ::google::protobuf::BoolValue* release_interruptible();
+  ::google::protobuf::BoolValue* mutable_interruptible();
+  void set_allocated_interruptible(::google::protobuf::BoolValue* interruptible);
+
   // int32 max_parallelism = 18;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 18;
@@ -1003,6 +1013,7 @@ class LaunchPlanSpec final :
   ::flyteidl::core::SecurityContext* security_context_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
+  ::google::protobuf::BoolValue* interruptible_;
   ::google::protobuf::int32 max_parallelism_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
@@ -2831,6 +2842,52 @@ inline void LaunchPlanSpec::set_max_parallelism(::google::protobuf::int32 value)
   
   max_parallelism_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.LaunchPlanSpec.max_parallelism)
+}
+
+// .google.protobuf.BoolValue interruptible = 19;
+inline bool LaunchPlanSpec::has_interruptible() const {
+  return this != internal_default_instance() && interruptible_ != nullptr;
+}
+inline const ::google::protobuf::BoolValue& LaunchPlanSpec::interruptible() const {
+  const ::google::protobuf::BoolValue* p = interruptible_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.interruptible)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::BoolValue*>(
+      &::google::protobuf::_BoolValue_default_instance_);
+}
+inline ::google::protobuf::BoolValue* LaunchPlanSpec::release_interruptible() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.interruptible)
+  
+  ::google::protobuf::BoolValue* temp = interruptible_;
+  interruptible_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::BoolValue* LaunchPlanSpec::mutable_interruptible() {
+  
+  if (interruptible_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::BoolValue>(GetArenaNoVirtual());
+    interruptible_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.interruptible)
+  return interruptible_;
+}
+inline void LaunchPlanSpec::set_allocated_interruptible(::google::protobuf::BoolValue* interruptible) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(interruptible_);
+  }
+  if (interruptible) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(interruptible)->GetArena();
+    if (message_arena != submessage_arena) {
+      interruptible = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, interruptible, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  interruptible_ = interruptible;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.interruptible)
 }
 
 // -------------------------------------------------------------------

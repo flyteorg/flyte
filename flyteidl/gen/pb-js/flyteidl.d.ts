@@ -10002,6 +10002,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec clusterAssignment */
             clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** ExecutionSpec interruptible */
+            interruptible?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -10051,6 +10054,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec clusterAssignment. */
             public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** ExecutionSpec interruptible. */
+            public interruptible?: (google.protobuf.IBoolValue|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -10819,6 +10825,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec maxParallelism */
             maxParallelism?: (number|null);
+
+            /** LaunchPlanSpec interruptible */
+            interruptible?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -10868,6 +10877,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec maxParallelism. */
             public maxParallelism: number;
+
+            /** LaunchPlanSpec interruptible. */
+            public interruptible?: (google.protobuf.IBoolValue|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
@@ -11908,6 +11920,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig annotations */
             annotations?: (flyteidl.admin.IAnnotations|null);
+
+            /** WorkflowExecutionConfig interruptible */
+            interruptible?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -11933,6 +11948,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig annotations. */
             public annotations?: (flyteidl.admin.IAnnotations|null);
+
+            /** WorkflowExecutionConfig interruptible. */
+            public interruptible?: (google.protobuf.IBoolValue|null);
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.
@@ -17710,6 +17728,474 @@ export namespace google {
 
             /**
              * Verifies a ListValue message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DoubleValue. */
+        interface IDoubleValue {
+
+            /** DoubleValue value */
+            value?: (number|null);
+        }
+
+        /** Represents a DoubleValue. */
+        class DoubleValue implements IDoubleValue {
+
+            /**
+             * Constructs a new DoubleValue.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IDoubleValue);
+
+            /** DoubleValue value. */
+            public value: number;
+
+            /**
+             * Creates a new DoubleValue instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DoubleValue instance
+             */
+            public static create(properties?: google.protobuf.IDoubleValue): google.protobuf.DoubleValue;
+
+            /**
+             * Encodes the specified DoubleValue message. Does not implicitly {@link google.protobuf.DoubleValue.verify|verify} messages.
+             * @param message DoubleValue message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IDoubleValue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DoubleValue message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DoubleValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.DoubleValue;
+
+            /**
+             * Verifies a DoubleValue message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a FloatValue. */
+        interface IFloatValue {
+
+            /** FloatValue value */
+            value?: (number|null);
+        }
+
+        /** Represents a FloatValue. */
+        class FloatValue implements IFloatValue {
+
+            /**
+             * Constructs a new FloatValue.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IFloatValue);
+
+            /** FloatValue value. */
+            public value: number;
+
+            /**
+             * Creates a new FloatValue instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns FloatValue instance
+             */
+            public static create(properties?: google.protobuf.IFloatValue): google.protobuf.FloatValue;
+
+            /**
+             * Encodes the specified FloatValue message. Does not implicitly {@link google.protobuf.FloatValue.verify|verify} messages.
+             * @param message FloatValue message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IFloatValue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a FloatValue message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns FloatValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.FloatValue;
+
+            /**
+             * Verifies a FloatValue message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Int64Value. */
+        interface IInt64Value {
+
+            /** Int64Value value */
+            value?: (Long|null);
+        }
+
+        /** Represents an Int64Value. */
+        class Int64Value implements IInt64Value {
+
+            /**
+             * Constructs a new Int64Value.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IInt64Value);
+
+            /** Int64Value value. */
+            public value: Long;
+
+            /**
+             * Creates a new Int64Value instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Int64Value instance
+             */
+            public static create(properties?: google.protobuf.IInt64Value): google.protobuf.Int64Value;
+
+            /**
+             * Encodes the specified Int64Value message. Does not implicitly {@link google.protobuf.Int64Value.verify|verify} messages.
+             * @param message Int64Value message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IInt64Value, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Int64Value message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Int64Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.Int64Value;
+
+            /**
+             * Verifies an Int64Value message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a UInt64Value. */
+        interface IUInt64Value {
+
+            /** UInt64Value value */
+            value?: (Long|null);
+        }
+
+        /** Represents a UInt64Value. */
+        class UInt64Value implements IUInt64Value {
+
+            /**
+             * Constructs a new UInt64Value.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IUInt64Value);
+
+            /** UInt64Value value. */
+            public value: Long;
+
+            /**
+             * Creates a new UInt64Value instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UInt64Value instance
+             */
+            public static create(properties?: google.protobuf.IUInt64Value): google.protobuf.UInt64Value;
+
+            /**
+             * Encodes the specified UInt64Value message. Does not implicitly {@link google.protobuf.UInt64Value.verify|verify} messages.
+             * @param message UInt64Value message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IUInt64Value, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a UInt64Value message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UInt64Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.UInt64Value;
+
+            /**
+             * Verifies a UInt64Value message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Int32Value. */
+        interface IInt32Value {
+
+            /** Int32Value value */
+            value?: (number|null);
+        }
+
+        /** Represents an Int32Value. */
+        class Int32Value implements IInt32Value {
+
+            /**
+             * Constructs a new Int32Value.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IInt32Value);
+
+            /** Int32Value value. */
+            public value: number;
+
+            /**
+             * Creates a new Int32Value instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Int32Value instance
+             */
+            public static create(properties?: google.protobuf.IInt32Value): google.protobuf.Int32Value;
+
+            /**
+             * Encodes the specified Int32Value message. Does not implicitly {@link google.protobuf.Int32Value.verify|verify} messages.
+             * @param message Int32Value message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IInt32Value, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Int32Value message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Int32Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.Int32Value;
+
+            /**
+             * Verifies an Int32Value message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a UInt32Value. */
+        interface IUInt32Value {
+
+            /** UInt32Value value */
+            value?: (number|null);
+        }
+
+        /** Represents a UInt32Value. */
+        class UInt32Value implements IUInt32Value {
+
+            /**
+             * Constructs a new UInt32Value.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IUInt32Value);
+
+            /** UInt32Value value. */
+            public value: number;
+
+            /**
+             * Creates a new UInt32Value instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UInt32Value instance
+             */
+            public static create(properties?: google.protobuf.IUInt32Value): google.protobuf.UInt32Value;
+
+            /**
+             * Encodes the specified UInt32Value message. Does not implicitly {@link google.protobuf.UInt32Value.verify|verify} messages.
+             * @param message UInt32Value message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IUInt32Value, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a UInt32Value message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UInt32Value
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.UInt32Value;
+
+            /**
+             * Verifies a UInt32Value message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a BoolValue. */
+        interface IBoolValue {
+
+            /** BoolValue value */
+            value?: (boolean|null);
+        }
+
+        /** Represents a BoolValue. */
+        class BoolValue implements IBoolValue {
+
+            /**
+             * Constructs a new BoolValue.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IBoolValue);
+
+            /** BoolValue value. */
+            public value: boolean;
+
+            /**
+             * Creates a new BoolValue instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns BoolValue instance
+             */
+            public static create(properties?: google.protobuf.IBoolValue): google.protobuf.BoolValue;
+
+            /**
+             * Encodes the specified BoolValue message. Does not implicitly {@link google.protobuf.BoolValue.verify|verify} messages.
+             * @param message BoolValue message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IBoolValue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a BoolValue message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns BoolValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.BoolValue;
+
+            /**
+             * Verifies a BoolValue message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a StringValue. */
+        interface IStringValue {
+
+            /** StringValue value */
+            value?: (string|null);
+        }
+
+        /** Represents a StringValue. */
+        class StringValue implements IStringValue {
+
+            /**
+             * Constructs a new StringValue.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IStringValue);
+
+            /** StringValue value. */
+            public value: string;
+
+            /**
+             * Creates a new StringValue instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns StringValue instance
+             */
+            public static create(properties?: google.protobuf.IStringValue): google.protobuf.StringValue;
+
+            /**
+             * Encodes the specified StringValue message. Does not implicitly {@link google.protobuf.StringValue.verify|verify} messages.
+             * @param message StringValue message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IStringValue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a StringValue message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns StringValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.StringValue;
+
+            /**
+             * Verifies a StringValue message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a BytesValue. */
+        interface IBytesValue {
+
+            /** BytesValue value */
+            value?: (Uint8Array|null);
+        }
+
+        /** Represents a BytesValue. */
+        class BytesValue implements IBytesValue {
+
+            /**
+             * Constructs a new BytesValue.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: google.protobuf.IBytesValue);
+
+            /** BytesValue value. */
+            public value: Uint8Array;
+
+            /**
+             * Creates a new BytesValue instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns BytesValue instance
+             */
+            public static create(properties?: google.protobuf.IBytesValue): google.protobuf.BytesValue;
+
+            /**
+             * Encodes the specified BytesValue message. Does not implicitly {@link google.protobuf.BytesValue.verify|verify} messages.
+             * @param message BytesValue message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: google.protobuf.IBytesValue, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a BytesValue message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns BytesValue
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.BytesValue;
+
+            /**
+             * Verifies a BytesValue message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

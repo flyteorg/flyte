@@ -1179,6 +1179,7 @@ of an execution as it progresses across phase changes.
    "max_parallelism", ":ref:`ref_int32`", "", "Controls the maximum number of task nodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this."
    "raw_output_data_config", ":ref:`ref_flyteidl.admin.RawOutputDataConfig`", "", "User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.). This should be a prefix like s3://my-bucket/my-data"
    "cluster_assignment", ":ref:`ref_flyteidl.admin.ClusterAssignment`", "", "Controls how to select an available cluster on which this execution should run."
+   "interruptible", ":ref:`ref_google.protobuf.BoolValue`", "", "Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field."
 
 
 
@@ -1706,6 +1707,7 @@ User-provided launch plan definition and configuration values.
    "quality_of_service", ":ref:`ref_flyteidl.core.QualityOfService`", "", "Indicates the runtime priority of the execution."
    "raw_output_data_config", ":ref:`ref_flyteidl.admin.RawOutputDataConfig`", "", "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
    "max_parallelism", ":ref:`ref_int32`", "", "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this."
+   "interruptible", ":ref:`ref_google.protobuf.BoolValue`", "", "Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field."
 
 
 
@@ -2084,6 +2086,7 @@ Adds defaults for customizable workflow-execution specifications and overrides.
    "raw_output_data_config", ":ref:`ref_flyteidl.admin.RawOutputDataConfig`", "", "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
    "labels", ":ref:`ref_flyteidl.admin.Labels`", "", "Custom labels to be applied to a triggered execution resource."
    "annotations", ":ref:`ref_flyteidl.admin.Annotations`", "", "Custom annotations to be applied to a triggered execution resource."
+   "interruptible", ":ref:`ref_google.protobuf.BoolValue`", "", "Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field."
 
 
 
@@ -3749,6 +3752,231 @@ microsecond should be expressed in JSON format as "3.000001s".
 
    "seconds", ":ref:`ref_int64`", "", "Signed seconds of the span of time. Must be from -315,576,000,000 to +315,576,000,000 inclusive. Note: these bounds are computed from: 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years"
    "nanos", ":ref:`ref_int32`", "", "Signed fractions of a second at nanosecond resolution of the span of time. Durations less than one second are represented with a 0 `seconds` field and a positive or negative `nanos` field. For durations of one second or more, a non-zero value for the `nanos` field must be of the same sign as the `seconds` field. Must be from -999,999,999 to +999,999,999 inclusive."
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+
+.. _ref_google/protobuf/wrappers.proto:
+
+google/protobuf/wrappers.proto
+==================================================================
+
+
+
+
+
+.. _ref_google.protobuf.BoolValue:
+
+BoolValue
+------------------------------------------------------------------
+
+Wrapper message for `bool`.
+
+The JSON representation for `BoolValue` is JSON `true` and `false`.
+
+
+
+.. csv-table:: BoolValue type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_bool`", "", "The bool value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.BytesValue:
+
+BytesValue
+------------------------------------------------------------------
+
+Wrapper message for `bytes`.
+
+The JSON representation for `BytesValue` is JSON string.
+
+
+
+.. csv-table:: BytesValue type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_bytes`", "", "The bytes value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.DoubleValue:
+
+DoubleValue
+------------------------------------------------------------------
+
+Wrapper message for `double`.
+
+The JSON representation for `DoubleValue` is JSON number.
+
+
+
+.. csv-table:: DoubleValue type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_double`", "", "The double value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.FloatValue:
+
+FloatValue
+------------------------------------------------------------------
+
+Wrapper message for `float`.
+
+The JSON representation for `FloatValue` is JSON number.
+
+
+
+.. csv-table:: FloatValue type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_float`", "", "The float value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.Int32Value:
+
+Int32Value
+------------------------------------------------------------------
+
+Wrapper message for `int32`.
+
+The JSON representation for `Int32Value` is JSON number.
+
+
+
+.. csv-table:: Int32Value type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_int32`", "", "The int32 value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.Int64Value:
+
+Int64Value
+------------------------------------------------------------------
+
+Wrapper message for `int64`.
+
+The JSON representation for `Int64Value` is JSON string.
+
+
+
+.. csv-table:: Int64Value type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_int64`", "", "The int64 value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.StringValue:
+
+StringValue
+------------------------------------------------------------------
+
+Wrapper message for `string`.
+
+The JSON representation for `StringValue` is JSON string.
+
+
+
+.. csv-table:: StringValue type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_string`", "", "The string value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.UInt32Value:
+
+UInt32Value
+------------------------------------------------------------------
+
+Wrapper message for `uint32`.
+
+The JSON representation for `UInt32Value` is JSON number.
+
+
+
+.. csv-table:: UInt32Value type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_uint32`", "", "The uint32 value."
+
+
+
+
+
+
+
+.. _ref_google.protobuf.UInt64Value:
+
+UInt64Value
+------------------------------------------------------------------
+
+Wrapper message for `uint64`.
+
+The JSON representation for `UInt64Value` is JSON string.
+
+
+
+.. csv-table:: UInt64Value type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_uint64`", "", "The uint64 value."
 
 
 
