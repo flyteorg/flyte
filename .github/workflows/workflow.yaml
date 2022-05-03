@@ -48,8 +48,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: calculate-pre-reqs
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+    - name: set env variables
+      shell: bash
+      run: |
+        pwd
+#    - name: Checkout repo
+#      uses: actions/checkout@v3
     - name: set env variables
       shell: bash
       run: |
@@ -222,7 +226,7 @@ jobs:
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
-        cd opta/aws
+        cd  /home/runner/work/flyte/flyte/opta/aws/
         opta destroy -c ./flyte.yaml --auto-approve 
     - name: DESTROY OPTA ENV
       shell: bash
