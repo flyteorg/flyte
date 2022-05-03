@@ -21,7 +21,7 @@ export const NavBar = (props: NavBarProps) => {
       elevation={0}
       id="navbar"
       position="fixed"
-      className={props.className}
+      className={props.className as string}
     >
       <Toolbar id={navBarContentId}>
         {/* {content} */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import { NavBar, add } from './index';
 
@@ -10,7 +10,7 @@ describe('add function', () => {
 
   it('NavBar contains correct text', () => {
     render(<NavBar />);
-    const text = screen.getByText("It's me - Navigation Bar");
+    const text = screen.getByText('NASTYA IS HERE');
     expect(text).toBeInTheDocument();
   });
 });

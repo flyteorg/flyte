@@ -22,8 +22,9 @@
         "build:storybook": "build-storybook",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "storybook": "start-storybook -p 6006",
-        "test": "cd packages/zapp/console && yarn test && cd ../../../",
-        "test-coverage": "bash -c 'pushd packages/zapp/console && yarn test-coverage && popd'"
+        "test": "NODE_ENV=test jest",
+        "test:clear": "jest --clearCache",
+        "test-coverage": "NODE_ENV=test jest --coverage"
     },
     "husky": {
         "hooks": {
@@ -54,6 +55,11 @@
         "@storybook/manager-webpack5": "^6.4.19",
         "@storybook/react": "^6.4.19",
         "@storybook/testing-library": "^0.0.9",
+        "@testing-library/jest-dom": "^5.5.0",
+        "@testing-library/react": "^10.0.3",
+        "@testing-library/react-hooks": "^7.0.2",
+        "ts-jest": "^26.3.0",
+        "jest": "^26.0.0",
         "react-hot-loader": "^4.1.2"
     }
 }
