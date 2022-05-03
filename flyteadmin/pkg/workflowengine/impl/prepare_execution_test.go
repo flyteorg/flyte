@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
@@ -146,6 +147,15 @@ func TestAddExecutionOverrides(t *testing.T) {
 			GPU:              resource.MustParse("1"),
 		}, workflow.ExecutionConfig.TaskResources.Limits)
 	})
+	t.Run("interruptible", func(t *testing.T) {
+		workflowExecutionConfig := &admin.WorkflowExecutionConfig{
+			Interruptible: &wrappers.BoolValue{Value: true},
+		}
+		workflow := &v1alpha1.FlyteWorkflow{}
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
+		assert.NotNil(t, workflow.ExecutionConfig.Interruptible)
+		assert.True(t, *workflow.ExecutionConfig.Interruptible)
+	})
 }
 
 func TestPrepareFlyteWorkflow(t *testing.T) {
@@ -187,6 +197,7 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			},
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				MaxParallelism: 50,
+				Interruptible:  &wrappers.BoolValue{Value: true},
 			},
 			RecoveryExecution: recoveryNodeExecutionID,
 			EventVersion:      1,
@@ -218,6 +229,8 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 	}, flyteWorkflow.ExecutionConfig.TaskPluginImpls)
 	assert.Equal(t, flyteWorkflow.ServiceAccountName, testK8sServiceAccountSc)
 	assert.Equal(t, flyteWorkflow.ExecutionConfig.MaxParallelism, uint32(50))
+	assert.NotNil(t, flyteWorkflow.ExecutionConfig.Interruptible)
+	assert.True(t, *flyteWorkflow.ExecutionConfig.Interruptible)
 	assert.True(t, proto.Equal(recoveryNodeExecutionID, flyteWorkflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
 	assert.Equal(t, flyteWorkflow.WorkflowMeta.EventVersion, v1alpha1.EventVersion(1))
 	assert.Equal(t, flyteWorkflow.RawOutputDataConfig, v1alpha1.RawOutputDataConfig{

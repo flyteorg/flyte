@@ -76,7 +76,7 @@ func (m *AdminService) ListNodeExecutionsForTask(
 	// to the request.
 	if request.TaskExecutionId != nil && request.TaskExecutionId.TaskId != nil &&
 		request.TaskExecutionId.TaskId.ResourceType == core.ResourceType_UNSPECIFIED {
-		logger.Info(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
+		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.TaskExecutionId.TaskId.ResourceType = core.ResourceType_TASK
 	}
 	var response *admin.NodeExecutionList

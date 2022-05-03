@@ -30,9 +30,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/auth"
 
@@ -60,6 +59,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -186,6 +186,27 @@ func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 		return lpModel, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+}
+
+func setDefaultTaskCallbackForExecTest(repository interfaces.Repository) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
+		return models.Task{
+			TaskKey: models.TaskKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			BaseModel: models.BaseModel{
+				ID:        uint(123),
+				CreatedAt: testutils.MockCreatedAtValue,
+			},
+			Closure: testutils.GetTaskClosureBytes(),
+			Digest:  []byte(input.Name),
+			Type:    "python",
+		}, nil
+	}
+	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
 }
 
 func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
@@ -887,6 +908,109 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 	assert.Equal(t, expectedResponse, response)
 }
 
+func TestCreateExecutionInterruptible(t *testing.T) {
+	enable := true
+	disable := false
+	tests := []struct {
+		name          string
+		task          bool
+		interruptible *bool
+		want          bool
+	}{
+		{
+			name:          "LaunchPlanDefault",
+			task:          false,
+			interruptible: nil,
+			want:          false,
+		},
+		{
+			name:          "LaunchPlanDisable",
+			task:          false,
+			interruptible: &disable,
+			want:          false,
+		},
+		{
+			name:          "LaunchPlanEnable",
+			task:          false,
+			interruptible: &enable,
+			want:          true,
+		},
+		{
+			name:          "TaskDefault",
+			task:          true,
+			interruptible: nil,
+			want:          false,
+		},
+		{
+			name:          "TaskDisable",
+			task:          true,
+			interruptible: &disable,
+			want:          false,
+		},
+		{
+			name:          "TaskEnable",
+			task:          true,
+			interruptible: &enable,
+			want:          true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			request := testutils.GetExecutionRequest()
+			if tt.task {
+				request.Spec.LaunchPlan.ResourceType = core.ResourceType_TASK
+			}
+			if tt.interruptible == nil {
+				request.Spec.Interruptible = nil
+			} else {
+				request.Spec.Interruptible = &wrappers.BoolValue{Value: *tt.interruptible}
+			}
+
+			repository := getMockRepositoryForExecTest()
+			setDefaultLpCallbackForExecTest(repository)
+			setDefaultTaskCallbackForExecTest(repository)
+
+			exCreateFunc := func(ctx context.Context, input models.Execution) error {
+				var spec admin.ExecutionSpec
+				err := proto.Unmarshal(input.Spec, &spec)
+				assert.Nil(t, err)
+
+				if tt.task {
+					assert.Equal(t, uint(0), input.LaunchPlanID)
+					assert.NotEqual(t, uint(0), input.TaskID)
+				} else {
+					assert.NotEqual(t, uint(0), input.LaunchPlanID)
+					assert.Equal(t, uint(0), input.TaskID)
+				}
+
+				if tt.interruptible == nil {
+					assert.Nil(t, spec.GetInterruptible())
+				} else {
+					assert.NotNil(t, spec.GetInterruptible())
+					assert.Equal(t, *tt.interruptible, spec.GetInterruptible().GetValue())
+				}
+
+				return nil
+			}
+
+			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+			mockExecutor := workflowengineMocks.WorkflowExecutor{}
+			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+			mockExecutor.OnID().Return("testMockExecutor")
+			r := plugins.NewRegistry()
+			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func makeExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -929,6 +1053,43 @@ func makeLegacyExecutionGetFunc(
 				ID: uint(8),
 			},
 			Spec:         getLegacySpecBytes(),
+			Phase:        core.WorkflowExecution_QUEUED.String(),
+			Closure:      closureBytes,
+			LaunchPlanID: uint(1),
+			WorkflowID:   uint(2),
+			StartedAt:    startTime,
+			Cluster:      testCluster,
+		}, nil
+	}
+}
+
+func makeExecutionInterruptibleGetFunc(
+	t *testing.T, closureBytes []byte, startTime *time.Time, interruptible *bool) repositoryMocks.GetExecutionFunc {
+	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "name", input.Name)
+
+		request := testutils.GetExecutionRequest()
+		if interruptible == nil {
+			request.Spec.Interruptible = nil
+		} else {
+			request.Spec.Interruptible = &wrappers.BoolValue{Value: *interruptible}
+		}
+
+		specBytes, err := proto.Marshal(request.Spec)
+		assert.Nil(t, err)
+
+		return models.Execution{
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			BaseModel: models.BaseModel{
+				ID: uint(8),
+			},
+			Spec:         specBytes,
 			Phase:        core.WorkflowExecution_QUEUED.String(),
 			Closure:      closureBytes,
 			LaunchPlanID: uint(1),
@@ -1076,6 +1237,57 @@ func TestRelaunchExecution_CreateFailure(t *testing.T) {
 
 	// And verify response.
 	assert.EqualError(t, err, expectedErr.Error())
+}
+
+func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
+	// Set up mocks.
+	repository := getMockRepositoryForExecTest()
+	setDefaultLpCallbackForExecTest(repository)
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.OnID().Return("testMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	startTime := time.Now()
+	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	existingClosure := admin.ExecutionClosure{
+		Phase:     core.WorkflowExecution_RUNNING,
+		StartedAt: startTimeProto,
+	}
+	existingClosureBytes, _ := proto.Marshal(&existingClosure)
+	interruptible := true
+	executionGetFunc := makeExecutionInterruptibleGetFunc(t, existingClosureBytes, &startTime, &interruptible)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+
+	var createCalled bool
+	exCreateFunc := func(ctx context.Context, input models.Execution) error {
+		createCalled = true
+		assert.Equal(t, "relaunchy", input.Name)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, uint(8), input.SourceExecutionID)
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(input.Spec, &spec)
+		assert.Nil(t, err)
+		assert.Equal(t, admin.ExecutionMetadata_RELAUNCH, spec.Metadata.Mode)
+		assert.Equal(t, int32(admin.ExecutionMetadata_RELAUNCH), input.Mode)
+		assert.NotNil(t, spec.GetInterruptible())
+		assert.True(t, spec.GetInterruptible().GetValue())
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+
+	_, err := execManager.RelaunchExecution(context.Background(), admin.ExecutionRelaunchRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Name: "relaunchy",
+	}, requestedAt)
+	assert.Nil(t, err)
+	assert.True(t, createCalled)
 }
 
 func TestRecoverExecution(t *testing.T) {
@@ -1313,6 +1525,69 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 
 	// And verify response.
 	assert.EqualError(t, err, "Unable to read WorkflowClosure from location s3://flyte/metadata/admin/remote closure id : foo")
+}
+
+func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
+	// Set up mocks.
+	repository := getMockRepositoryForExecTest()
+	setDefaultLpCallbackForExecTest(repository)
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.OnID().Return("testMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	startTime := time.Now()
+	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	existingClosure := admin.ExecutionClosure{
+		Phase:     core.WorkflowExecution_SUCCEEDED,
+		StartedAt: startTimeProto,
+	}
+	existingClosureBytes, _ := proto.Marshal(&existingClosure)
+	interruptible := true
+	executionGetFunc := makeExecutionInterruptibleGetFunc(t, existingClosureBytes, &startTime, &interruptible)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+
+	var createCalled bool
+	exCreateFunc := func(ctx context.Context, input models.Execution) error {
+		createCalled = true
+		assert.Equal(t, "recovered", input.Name)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, uint(8), input.SourceExecutionID)
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(input.Spec, &spec)
+		assert.Nil(t, err)
+		assert.Equal(t, admin.ExecutionMetadata_RECOVERED, spec.Metadata.Mode)
+		assert.Equal(t, int32(admin.ExecutionMetadata_RECOVERED), input.Mode)
+		assert.NotNil(t, spec.GetInterruptible())
+		assert.True(t, spec.GetInterruptible().GetValue())
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+
+	// Issue request.
+	response, err := execManager.RecoverExecution(context.Background(), admin.ExecutionRecoverRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Name: "recovered",
+	}, requestedAt)
+
+	// And verify response.
+	assert.Nil(t, err)
+
+	expectedResponse := &admin.ExecutionCreateResponse{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "recovered",
+		},
+	}
+	assert.True(t, createCalled)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateWorkflowEvent(t *testing.T) {
@@ -2296,7 +2571,6 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 	workflowRequest := admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_FAILED,
-			//ExecutionId: "1234",
 			OutputResult: &event.WorkflowExecutionEvent_Error{
 				Error: &core.ExecutionError{
 					Code:    "CodeBad",
@@ -2378,7 +2652,6 @@ func TestExecutionManager_PublishNotificationsTransformError(t *testing.T) {
 	workflowRequest := admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_FAILED,
-			//ExecutionId: "1234",
 			OutputResult: &event.WorkflowExecutionEvent_Error{
 				Error: &core.ExecutionError{
 					Code:    "CodeBad",
@@ -2437,7 +2710,6 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 	workflowRequest := admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_FAILED,
-			//ExecutionId: "1234",
 			OutputResult: &event.WorkflowExecutionEvent_Error{
 				Error: &core.ExecutionError{
 					Code:    "CodeBad",

@@ -40,7 +40,7 @@ func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGet
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
 	if request.Id != nil && request.Id.ResourceType == core.ResourceType_UNSPECIFIED {
-		logger.Info(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
+		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.ResourceType = core.ResourceType_WORKFLOW
 	}
 	var response *admin.Workflow
