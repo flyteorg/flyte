@@ -227,20 +227,17 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                   name: spark-role
                   namespace: {{ namespace }}
                 rules:
-                  - apiGroups:
-                  - ""
+                - apiGroups: ["*"]
                   resources:
                   - pods
                   verbs:
                   - '*'
-                  - apiGroups:
-                  - ""
+                - apiGroups: ["*"]
                   resources:
                   - services
                   verbs:
                   - '*'
-                  - apiGroups:
-                  - ""
+                - apiGroups: ["*"]
                   resources:
                   - configmaps
                   verbs:
