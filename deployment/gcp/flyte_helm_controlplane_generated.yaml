@@ -941,6 +941,8 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
         spec:
           containers:
           - command:
