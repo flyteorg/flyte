@@ -1,6 +1,6 @@
 environments:
   - name: default
-    path: "./env.yaml" # NOTE: relative path to environment
+    path: env.yaml
     variables:
       region: <region>
       account_id: <account_id>

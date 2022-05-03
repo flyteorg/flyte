@@ -215,6 +215,7 @@ jobs:
       run: |
         echo `pwd`
         cd /home/runner/work/flyte/flyte/opta/aws/
+        echo `pwd`
         echo `ls`
         opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
