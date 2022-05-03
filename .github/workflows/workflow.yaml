@@ -207,7 +207,7 @@ jobs:
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
     - uses: actions/download-artifact@v3
-      id: download yamls
+      id: download-yamls
       with:
         path: ./opta/aws
     - name: DESTROY FLYTE Opta
