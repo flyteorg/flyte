@@ -208,6 +208,11 @@ jobs:
       with:
         name: opta-env
         path: /home/runner/work/flyte/flyte/opta/aws
+    - name: TREE
+      shell: bash
+      run: |
+        sudo apt-get -y install tree
+        tree
     - name: MV YAMLS
       shell: bash
       run: |
@@ -216,7 +221,12 @@ jobs:
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
+        echo `pwd`
         cd /home/runner/work/flyte/flyte/opta/aws/
+        echo `pwd`
+        echo `ls`
+        sudo apt-get -y install tree
+        tree
         opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
       shell: bash
