@@ -120,7 +120,6 @@ jobs:
     - name: set flyte variables
       shell: bash
       run: |
-        pwd
         sed -i "s/<unique_bucket_name>/${{ env.FLYTE_STORAGE_BUCKET }}/" ./opta/aws/flyte.yaml
         sed -i "s/<region>/${{ env.AWS_REGION }}/" ./opta/aws/flyte.yaml
         sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" ./opta/aws/flyte.yaml
@@ -128,7 +127,6 @@ jobs:
     - name: view flyte.yaml
       shell: bash
       run: |
-        pwd
         cat ./opta/aws/flyte.yaml
     - name: Archive env artifact
       uses: actions/upload-artifact@v3
@@ -217,6 +215,8 @@ jobs:
         cd /home/runner/work/flyte/flyte/opta/aws/
         echo `pwd`
         echo `ls`
+        sudo apt-get -y install tree
+        tree 
         opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
       shell: bash
