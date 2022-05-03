@@ -207,8 +207,9 @@ jobs:
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
-        cat /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-        cd  /home/runner/work/flyte/flyte/opta/aws/
+        echo `pwd`
+        cd /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+        echo `ls`
         opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
       shell: bash
