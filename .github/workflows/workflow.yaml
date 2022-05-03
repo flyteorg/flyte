@@ -48,10 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: calculate-pre-reqs
     steps:
-    - name: set env variables
+    - name: pwd
       shell: bash
       run: |
         pwd
+    - name: ls
+      shell: bash
+      run: |
+        ls
 #    - name: Checkout repo
 #      uses: actions/checkout@v3
     - name: set env variables
