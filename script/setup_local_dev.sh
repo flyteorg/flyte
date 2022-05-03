@@ -6,7 +6,7 @@
 
 : "${K3D_VERSION:="v4.4.8"}" # version of k3d to install, empty value uses latest one available. currently pinned to latest known working (due to unresolved port mapping issue: https://github.com/k3d-io/k3d/issues/380)
 : "${K3D_INSTALL_URL:="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"}" # URL to k3d installer script
-: "${K3S_VERSION:="v1.22.8-k3s1"}" # version of k3s to run in k3d cluster, empty value uses default specified by k3d install
+: "${K3S_VERSION:="v1.21.1-k3s1"}" # version of k3s to run in k3d cluster, empty value uses default specified by k3d install
 : "${K3D_CLUSTER_NAME:="flyte"}" # name of k3d cluster to be used
 : "${K3D_KUBECONFIG_FILE_PATH:="${HOME}/.k3d/kubeconfig-${K3D_CLUSTER_NAME}.yaml"}" # file path to store kubeconfig file for k3d cluster at
 
