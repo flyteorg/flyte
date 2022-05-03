@@ -211,7 +211,6 @@ jobs:
         name: env.yaml
         path: /home/runner/work/flyte/flyte/opta/aws/env.yaml
     - name: DESTROY FLYTE Opta
-    - name: DESTROY FLYTE Opta
       shell: bash
       run: |
         echo `pwd`
