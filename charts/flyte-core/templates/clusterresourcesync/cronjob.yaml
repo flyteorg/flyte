@@ -10,10 +10,11 @@ spec:
   jobTemplate:
     spec:
       template:
-        {{- with .Values.flyteadmin.podAnnotations }}
         metadata:
-          annotations: {{ tpl (toYaml .) $ | nindent 12 }}
-        {{- end }}
+          annotations:
+            {{- with .Values.flyteadmin.podAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           containers:
           - command:
