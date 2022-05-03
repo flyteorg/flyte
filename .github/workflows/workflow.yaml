@@ -140,7 +140,7 @@ jobs:
       shell: bash
       run: |
         cd opta/aws
-        opta apply -c ./flyte.yaml --auto-approve
+        opta apply -c flyte.yaml --auto-approve
         sudo rm flyte.yaml
         sudo rm env.yaml
     - name: Setup flytectl
@@ -207,8 +207,9 @@ jobs:
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
+        cat /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
         cd  /home/runner/work/flyte/flyte/opta/aws/
-        opta destroy -c ./flyte.yaml --auto-approve 
+        opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
       shell: bash
       run: |
