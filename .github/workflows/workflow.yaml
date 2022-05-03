@@ -60,7 +60,7 @@ jobs:
     - name: Archive env artifact
       uses: actions/upload-artifact@v3
       with:
-        name: env.yaml
+        name: opta-env
         path: |
           ./opta/aws/env.yaml
     - name: Configure AWS credentials
@@ -131,7 +131,7 @@ jobs:
     - name: Archive env artifact
       uses: actions/upload-artifact@v3
       with:
-        name: flyte.yaml
+        name: opta-flyte
         path: |
           ./opta/aws/flyte.yaml
     - name: OPTA APPLY FLYTE
@@ -201,22 +201,22 @@ jobs:
     - uses: actions/download-artifact@v3
       id: download-flyte-yaml
       with:
-        name: flyte.yaml
-        path: /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+        name: opta-flyte
+        path: /home/runner/work/flyte/flyte/opta/aws
     - uses: actions/download-artifact@v3
       id: download-env-yamls
       with:
-        name: env.yaml
-        path: /home/runner/work/flyte/flyte/opta/aws/env.yaml
+        name: opta-env
+        path: /home/runner/work/flyte/flyte/opta/aws
+    - name: MV YAMLS
+      shell: bash
+      run: |
+        mv /home/runner/work/flyte/flyte/opta/aws/opta-env/env.yaml /home/runner/work/flyte/flyte/opta/aws/env.yaml
+        mv /home/runner/work/flyte/flyte/opta/aws/flyte-env/flyte.yaml /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
-        echo `pwd`
         cd /home/runner/work/flyte/flyte/opta/aws/
-        echo `pwd`
-        echo `ls`
-        sudo apt-get -y install tree
-        tree 
         opta destroy -c flyte.yaml --auto-approve
     - name: DESTROY OPTA ENV
       shell: bash
