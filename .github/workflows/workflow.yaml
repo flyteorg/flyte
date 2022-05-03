@@ -125,6 +125,7 @@ jobs:
     - name: set flyte variables
       shell: bash
       run: |
+        pwd
         sed -i "s/<unique_bucket_name>/${{ env.FLYTE_STORAGE_BUCKET }}/" ./opta/aws/flyte.yaml
         sed -i "s/<region>/${{ env.AWS_REGION }}/" ./opta/aws/flyte.yaml
         sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" ./opta/aws/flyte.yaml
@@ -132,6 +133,7 @@ jobs:
     - name: view flyte.yaml
       shell: bash
       run: |
+        pwd
         cat ./opta/aws/flyte.yaml
 #    - name: STORE flyte.yaml
 #      shell: bash
@@ -142,12 +144,17 @@ jobs:
       with:
         name: env.yaml
         path: |
-          ./opta/aws/flyte.yamls
+          ./opta/aws/flyte.yaml
     - name: OPTA APPLY FLYTE
       shell: bash
       run: |
+        pwd
         cd opta/aws
         opta apply -c ./flyte.yaml --auto-approve
+        ls
+        pwd
+        rm flyte.yaml
+        rm env.yaml
     - uses: actions/checkout@v2
     - name: Setup flytectl
       uses: unionai/flytectl-setup-action@v0.0.1
