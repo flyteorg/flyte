@@ -155,10 +155,9 @@ jobs:
         set +x
         ls
         pwd
-        rm flyte.yaml
-        rm env.yaml
+        sudo rm flyte.yaml
+        sudo rm env.yaml
         ls
-    - uses: actions/checkout@v2
     - name: Setup flytectl
       uses: unionai/flytectl-setup-action@v0.0.1
     - name: see files
