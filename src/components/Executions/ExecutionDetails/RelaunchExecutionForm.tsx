@@ -35,6 +35,7 @@ function useRelaunchWorkflowFormState({ execution }: RelaunchExecutionFormProps)
             annotations,
             authRole,
             securityContext,
+            interruptible,
           },
         } = execution;
 
@@ -59,6 +60,7 @@ function useRelaunchWorkflowFormState({ execution }: RelaunchExecutionFormProps)
           annotations,
           authRole,
           securityContext,
+          interruptible,
         };
       },
     },
@@ -74,7 +76,7 @@ function useRelaunchTaskFormState({ execution }: RelaunchExecutionFormProps) {
       defaultValue: {} as TaskInitialLaunchParameters,
       doFetch: async (execution) => {
         const {
-          spec: { authRole, launchPlan: taskId },
+          spec: { authRole, launchPlan: taskId, interruptible },
         } = execution;
         const task = await apiContext.getTask(taskId);
         const inputDefinitions = getTaskInputs(task);
@@ -85,7 +87,7 @@ function useRelaunchTaskFormState({ execution }: RelaunchExecutionFormProps) {
           },
           apiContext,
         );
-        return { authRole, values, taskId };
+        return { authRole, values, taskId, interruptible };
       },
     },
     execution,

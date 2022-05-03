@@ -9,7 +9,7 @@ import {
 } from 'components/Launch/LaunchForm/utils';
 import { mockSimpleVariables } from 'components/Launch/LaunchForm/__mocks__/mockInputs';
 import { primitiveLiteral } from 'components/Launch/LaunchForm/__mocks__/utils';
-import { Admin } from 'flyteidl';
+import { Admin, Protobuf } from 'flyteidl';
 import { LiteralMap, ResourceType, Variable } from 'models/Common/types';
 import { getExecutionData } from 'models/Execution/api';
 import { Execution, ExecutionData } from 'models/Execution/types';
@@ -155,6 +155,39 @@ describe('RelaunchExecutionForm', () => {
         }),
       });
     });
+
+    it('should not set interruptible value if not provided', async () => {
+      delete execution.spec.interruptible;
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: undefined,
+        }),
+      });
+    });
+
+    it('should have correct interruptible value if override is enabled', async () => {
+      execution.spec.interruptible = Protobuf.BoolValue.create({ value: true });
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: Protobuf.BoolValue.create({ value: true }),
+        }),
+      });
+    });
+
+    it('should have correct interruptible value if override is disabled', async () => {
+      execution.spec.interruptible = Protobuf.BoolValue.create({ value: false });
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: Protobuf.BoolValue.create({ value: false }),
+        }),
+      });
+    });
   });
 
   describe('Launch form with full inputs', () => {
@@ -253,6 +286,39 @@ describe('RelaunchExecutionForm', () => {
       checkLaunchFormProps({
         initialParameters: expect.objectContaining({
           values,
+        }),
+      });
+    });
+
+    it('should not set interruptible value if not provided', async () => {
+      delete execution.spec.interruptible;
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: undefined,
+        }),
+      });
+    });
+
+    it('should have correct interruptible value if override is enabled', async () => {
+      execution.spec.interruptible = Protobuf.BoolValue.create({ value: true });
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: Protobuf.BoolValue.create({ value: true }),
+        }),
+      });
+    });
+
+    it('should have correct interruptible value if override is disabled', async () => {
+      execution.spec.interruptible = Protobuf.BoolValue.create({ value: false });
+      const { getByText } = renderForm();
+      await waitFor(() => expect(getByText(mockContentString)));
+      checkLaunchFormProps({
+        initialParameters: expect.objectContaining({
+          interruptible: Protobuf.BoolValue.create({ value: false }),
         }),
       });
     });

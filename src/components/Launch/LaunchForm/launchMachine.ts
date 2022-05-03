@@ -1,4 +1,4 @@
-import { Admin, Core } from 'flyteidl';
+import { Admin, Core, Protobuf } from 'flyteidl';
 import { Identifier, NamedEntityIdentifier } from 'models/Common/types';
 import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { LaunchPlan } from 'models/Launch/types';
@@ -82,6 +82,7 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
   labels?: Admin.ILabels | null;
   annotations?: Admin.IAnnotations | null;
   securityContext?: Core.ISecurityContext | null;
+  interruptible?: Protobuf.IBoolValue | null;
 }
 
 export interface TaskLaunchContext extends BaseLaunchContext {
@@ -89,6 +90,7 @@ export interface TaskLaunchContext extends BaseLaunchContext {
   preferredTaskId?: Identifier;
   taskVersion?: Identifier;
   taskVersionOptions?: Task[];
+  interruptible?: Protobuf.IBoolValue | null;
 }
 
 export enum LaunchState {

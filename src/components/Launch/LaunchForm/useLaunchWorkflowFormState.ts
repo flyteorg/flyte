@@ -25,6 +25,7 @@ import {
   LaunchWorkflowFormState,
   ParsedInput,
   LaunchRoles,
+  LaunchInterruptibleInputRef,
 } from './types';
 import { useWorkflowSourceSelectorState } from './useWorkflowSourceSelectorState';
 import { getUnsupportedRequiredInputs } from './utils';
@@ -154,6 +155,7 @@ async function submit(
   formInputsRef: RefObject<LaunchFormInputsRef>,
   roleInputRef: RefObject<LaunchRoleInputRef>,
   advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>,
+  interruptibleInputRef: RefObject<LaunchInterruptibleInputRef>,
   { launchPlan, referenceExecutionId, workflowVersion }: WorkflowLaunchContext,
 ) {
   if (!launchPlan) {
@@ -170,6 +172,7 @@ async function submit(
   const literals = formInputsRef.current.getValues();
   const { disableAll, labels, annotations, maxParallelism, rawOutputDataConfig } =
     advancedOptionsRef.current?.getValues() || {};
+  const interruptible = interruptibleInputRef.current?.getValue();
   const launchPlanId = launchPlan.id;
   const { domain, project } = workflowVersion;
 
@@ -185,6 +188,7 @@ async function submit(
     project,
     referenceExecutionId,
     inputs: { literals },
+    interruptible,
   });
   const newExecutionId = response.id as WorkflowExecutionIdentifier;
   if (!newExecutionId) {
@@ -197,7 +201,8 @@ async function submit(
 async function validate(
   formInputsRef: RefObject<LaunchFormInputsRef>,
   roleInputRef: RefObject<LaunchRoleInputRef>,
-  advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>,
+  _advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>,
+  _interruptibleInputRef: RefObject<LaunchInterruptibleInputRef>,
 ) {
   if (roleInputRef.current === null) {
     throw new Error('Unexpected empty role input ref');
@@ -214,13 +219,31 @@ function getServices(
   formInputsRef: RefObject<LaunchFormInputsRef>,
   roleInputRef: RefObject<LaunchRoleInputRef>,
   advancedOptionsRef: RefObject<LaunchAdvancedOptionsRef>,
+  interruptibleInputRef: RefObject<LaunchInterruptibleInputRef>,
 ) {
   return {
     loadWorkflowVersions: partial(loadWorkflowVersions, apiContext),
     loadLaunchPlans: partial(loadLaunchPlans, apiContext),
     loadInputs: partial(loadInputs, apiContext),
-    submit: partial(submit, apiContext, formInputsRef, roleInputRef, advancedOptionsRef),
-    validate: partial(validate, formInputsRef, roleInputRef, advancedOptionsRef),
+    // lodash's partial function only has typings for one function and 4 arguments, the added interruptibleInputRef
+    // caused a typing issue (although the underlying implemententation would've worked fine). Thus, the call
+    // to partial has been replaced with an arrow function passing all other values, leading to similar results.
+    submit: (launchContext: WorkflowLaunchContext) =>
+      submit(
+        apiContext,
+        formInputsRef,
+        roleInputRef,
+        advancedOptionsRef,
+        interruptibleInputRef,
+        launchContext,
+      ),
+    validate: partial(
+      validate,
+      formInputsRef,
+      roleInputRef,
+      advancedOptionsRef,
+      interruptibleInputRef,
+    ),
   };
 }
 
@@ -245,16 +268,25 @@ export function useLaunchWorkflowFormState({
     labels,
     annotations,
     securityContext,
+    interruptible,
   } = initialParameters;
 
   const apiContext = useAPIContext();
   const formInputsRef = useRef<LaunchFormInputsRef>(null);
   const roleInputRef = useRef<LaunchRoleInputRef>(null);
   const advancedOptionsRef = useRef<LaunchAdvancedOptionsRef>(null);
+  const interruptibleInputRef = useRef<LaunchInterruptibleInputRef>(null);
 
   const services = useMemo(
-    () => getServices(apiContext, formInputsRef, roleInputRef, advancedOptionsRef),
-    [apiContext, formInputsRef, roleInputRef, advancedOptionsRef],
+    () =>
+      getServices(
+        apiContext,
+        formInputsRef,
+        roleInputRef,
+        advancedOptionsRef,
+        interruptibleInputRef,
+      ),
+    [apiContext, formInputsRef, roleInputRef, advancedOptionsRef, interruptibleInputRef],
   );
 
   const [state, sendEvent, service] = useMachine<
@@ -277,6 +309,7 @@ export function useLaunchWorkflowFormState({
       rawOutputDataConfig,
       labels,
       annotations,
+      interruptible,
     },
   });
 
@@ -387,6 +420,7 @@ export function useLaunchWorkflowFormState({
     advancedOptionsRef,
     formInputsRef,
     roleInputRef,
+    interruptibleInputRef: interruptibleInputRef,
     state,
     service,
     workflowSourceSelectorState,

@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import { dashedValueString } from 'common/constants';
+import { Protobuf } from 'flyteidl';
 import { Execution, WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
@@ -11,6 +12,7 @@ import { ExecutionMetadata } from '../ExecutionMetadata';
 const clusterTestId = `metadata-${ExecutionMetadataLabels.cluster}`;
 const startTimeTestId = `metadata-${ExecutionMetadataLabels.time}`;
 const durationTestId = `metadata-${ExecutionMetadataLabels.duration}`;
+const interruptibleTestId = `metadata-${ExecutionMetadataLabels.interruptible}`;
 
 jest.mock('models/Launch/api', () => ({
   getLaunchPlan: jest.fn(() => Promise.resolve({ spec: {} })),
@@ -74,5 +76,23 @@ describe('ExecutionMetadata', () => {
       'href',
       Routes.ExecutionDetails.makeUrl(referenceExecution),
     );
+  });
+
+  it('shows true if execution was marked as interruptible', () => {
+    execution.spec.interruptible = Protobuf.BoolValue.create({ value: true });
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(interruptibleTestId)).toHaveTextContent('true');
+  });
+
+  it('shows false if execution was not marked as interruptible', () => {
+    execution.spec.interruptible = Protobuf.BoolValue.create({ value: false });
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(interruptibleTestId)).toHaveTextContent('false');
+  });
+
+  it('shows dashes if no interruptible value is found in execution spec', () => {
+    delete execution.spec.interruptible;
+    const { getByTestId } = renderMetadata();
+    expect(getByTestId(interruptibleTestId)).toHaveTextContent(dashedValueString);
   });
 });

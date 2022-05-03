@@ -10,6 +10,7 @@ export const formStrings = {
   title: 'Create New Execution',
   workflowVersion: 'Workflow Version',
   launchPlan: 'Launch Plan',
+  interruptible: 'Interruptible',
 };
 
 export const AuthRoleStrings: { [k in AuthRoleTypes]: AuthRoleMeta } = {

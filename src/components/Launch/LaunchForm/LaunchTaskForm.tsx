@@ -7,6 +7,7 @@ import { LaunchFormHeader } from './LaunchFormHeader';
 import { LaunchFormInputs } from './LaunchFormInputs';
 import { LaunchState } from './launchMachine';
 import { LaunchRoleInput } from './LaunchRoleInput';
+import { LaunchInterruptibleInput } from './LaunchInterruptibleInput';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
 import { BaseInterpretedLaunchState, BaseLaunchService, LaunchTaskFormProps } from './types';
@@ -15,8 +16,14 @@ import { isEnterInputsState } from './utils';
 
 /** Renders the form for initiating a Launch request based on a Task */
 export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
-  const { formInputsRef, roleInputRef, state, service, taskSourceSelectorState } =
-    useLaunchTaskFormState(props);
+  const {
+    formInputsRef,
+    roleInputRef,
+    interruptibleInputRef,
+    state,
+    service,
+    taskSourceSelectorState,
+  } = useLaunchTaskFormState(props);
   const styles = useStyles();
   const baseState = state as BaseInterpretedLaunchState;
   const baseService = service as BaseLaunchService;
@@ -63,6 +70,10 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
           />
         ) : null}
         <LaunchFormInputs key={formKey} ref={formInputsRef} state={baseState} variant="task" />
+        <LaunchInterruptibleInput
+          initialValue={state.context.interruptible}
+          ref={interruptibleInputRef}
+        />
       </DialogContent>
       <LaunchFormActions state={baseState} service={baseService} onClose={props.onClose} />
     </>

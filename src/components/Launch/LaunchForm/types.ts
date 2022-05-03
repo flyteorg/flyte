@@ -1,4 +1,4 @@
-import { Admin, Core } from 'flyteidl';
+import { Admin, Core, Protobuf } from 'flyteidl';
 import {
   BlobDimensionality,
   Identifier,
@@ -60,6 +60,7 @@ export interface WorkflowInitialLaunchParameters extends BaseInitialLaunchParame
   rawOutputDataConfig?: Admin.IRawOutputDataConfig | null;
   labels?: Admin.ILabels | null;
   annotations?: Admin.IAnnotations | null;
+  interruptible?: Protobuf.IBoolValue | null;
 }
 
 export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
@@ -71,6 +72,7 @@ export interface TaskInitialLaunchParameters extends BaseInitialLaunchParameters
   taskId?: Identifier;
   authRole?: Admin.IAuthRole;
   securityContext?: Core.ISecurityContext;
+  interruptible?: Protobuf.IBoolValue | null;
 }
 export interface LaunchTaskFormProps extends BaseLaunchFormProps {
   taskId: NamedEntityIdentifier;
@@ -93,6 +95,12 @@ export interface LaunchRoleInputRef {
   getValue(): LaunchRoles;
   validate(): boolean;
 }
+
+export interface LaunchInterruptibleInputRef {
+  getValue(): Protobuf.IBoolValue | null | undefined;
+  validate(): boolean;
+}
+
 export interface LaunchAdvancedOptionsRef {
   getValues(): Admin.IExecutionSpec;
   validate(): boolean;
@@ -119,6 +127,7 @@ export interface LaunchWorkflowFormState {
   advancedOptionsRef: React.RefObject<LaunchAdvancedOptionsRef>;
   formInputsRef: React.RefObject<LaunchFormInputsRef>;
   roleInputRef: React.RefObject<LaunchRoleInputRef>;
+  interruptibleInputRef: React.RefObject<LaunchInterruptibleInputRef>;
   state: State<WorkflowLaunchContext, WorkflowLaunchEvent, any, WorkflowLaunchTypestate>;
   service: Interpreter<WorkflowLaunchContext, any, WorkflowLaunchEvent, WorkflowLaunchTypestate>;
   workflowSourceSelectorState: WorkflowSourceSelectorState;
@@ -127,6 +136,7 @@ export interface LaunchWorkflowFormState {
 export interface LaunchTaskFormState {
   formInputsRef: React.RefObject<LaunchFormInputsRef>;
   roleInputRef: React.RefObject<LaunchRoleInputRef>;
+  interruptibleInputRef: React.RefObject<LaunchInterruptibleInputRef>;
   state: State<TaskLaunchContext, TaskLaunchEvent, any, TaskLaunchTypestate>;
   service: Interpreter<TaskLaunchContext, any, TaskLaunchEvent, TaskLaunchTypestate>;
   taskSourceSelectorState: TaskSourceSelectorState;

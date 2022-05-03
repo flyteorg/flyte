@@ -11,7 +11,7 @@ import {
 import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { muiTheme } from 'components/Theme/muiTheme';
-import { Core } from 'flyteidl';
+import { Core, Protobuf } from 'flyteidl';
 import { cloneDeep, get } from 'lodash';
 import * as Long from 'long';
 import { RequestConfig } from 'models/AdminEntity/types';
@@ -752,6 +752,151 @@ describe('LaunchForm: Workflow', () => {
 
         await waitFor(() => queryByText(binaryInputName, { exact: false }));
         expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
+      });
+    });
+
+    describe('Interruptible', () => {
+      it('should render checkbox', async () => {
+        const { getByLabelText } = renderForm();
+        const inputElement = await waitFor(() =>
+          getByLabelText(formStrings.interruptible, { exact: false }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+      });
+
+      it('should use initial values when provided', async () => {
+        const initialParameters: WorkflowInitialLaunchParameters = {
+          workflowId: mockWorkflowVersions[2].id,
+          interruptible: Protobuf.BoolValue.create({ value: true }),
+        };
+
+        const { getByLabelText } = renderForm({
+          initialParameters,
+        });
+
+        const inputElement = await waitFor(() =>
+          getByLabelText(formStrings.interruptible, { exact: false }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).toBeChecked();
+      });
+
+      it('should cycle between states correctly when clicked', async () => {
+        const { getByLabelText } = renderForm();
+
+        let inputElement = await waitFor(() =>
+          getByLabelText(`${formStrings.interruptible} (no override)`, { exact: true }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'true');
+
+        fireEvent.click(inputElement);
+        inputElement = await waitFor(() =>
+          getByLabelText(`${formStrings.interruptible} (enabled)`, { exact: true }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'false');
+
+        fireEvent.click(inputElement);
+        inputElement = await waitFor(() =>
+          getByLabelText(`${formStrings.interruptible} (disabled)`, { exact: true }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'false');
+
+        fireEvent.click(inputElement);
+        inputElement = await waitFor(() =>
+          getByLabelText(`${formStrings.interruptible} (no override)`, { exact: true }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'true');
+      });
+
+      it('should submit without interruptible override set', async () => {
+        const { container, getByLabelText } = renderForm();
+
+        const inputElement = await waitFor(() =>
+          getByLabelText(formStrings.interruptible, { exact: false }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'true');
+
+        const integerInput = getByLabelText(integerInputName, {
+          exact: false,
+        });
+        fireEvent.change(integerInput, { target: { value: '123' } });
+        await waitFor(() => expect(integerInput).toBeValid());
+        fireEvent.click(getSubmitButton(container));
+
+        await waitFor(() =>
+          expect(mockCreateWorkflowExecution).toHaveBeenCalledWith(
+            expect.objectContaining({
+              interruptible: null,
+            }),
+          ),
+        );
+      });
+
+      it('should submit with interruptible override enabled', async () => {
+        const initialParameters: WorkflowInitialLaunchParameters = {
+          interruptible: Protobuf.BoolValue.create({ value: true }),
+        };
+        const { container, getByLabelText } = renderForm({ initialParameters });
+
+        const inputElement = await waitFor(() =>
+          getByLabelText(formStrings.interruptible, { exact: false }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'false');
+
+        const integerInput = getByLabelText(integerInputName, {
+          exact: false,
+        });
+        fireEvent.change(integerInput, { target: { value: '123' } });
+        fireEvent.click(getSubmitButton(container));
+
+        await waitFor(() =>
+          expect(mockCreateWorkflowExecution).toHaveBeenCalledWith(
+            expect.objectContaining({
+              interruptible: Protobuf.BoolValue.create({ value: true }),
+            }),
+          ),
+        );
+      });
+
+      it('should submit with interruptible override disabled', async () => {
+        const initialParameters: WorkflowInitialLaunchParameters = {
+          interruptible: Protobuf.BoolValue.create({ value: false }),
+        };
+        const { container, getByLabelText } = renderForm({ initialParameters });
+
+        const inputElement = await waitFor(() =>
+          getByLabelText(formStrings.interruptible, { exact: false }),
+        );
+        expect(inputElement).toBeInTheDocument();
+        expect(inputElement).not.toBeChecked();
+        expect(inputElement).toHaveAttribute('data-indeterminate', 'false');
+
+        const integerInput = getByLabelText(integerInputName, {
+          exact: false,
+        });
+        fireEvent.change(integerInput, { target: { value: '123' } });
+        fireEvent.click(getSubmitButton(container));
+
+        await waitFor(() =>
+          expect(mockCreateWorkflowExecution).toHaveBeenCalledWith(
+            expect.objectContaining({
+              interruptible: Protobuf.BoolValue.create({ value: false }),
+            }),
+          ),
+        );
       });
     });
   });
