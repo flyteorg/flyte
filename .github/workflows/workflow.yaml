@@ -151,10 +151,13 @@ jobs:
         pwd
         cd opta/aws
         opta apply -c ./flyte.yaml --auto-approve
+        echo ""
+        set +x
         ls
         pwd
         rm flyte.yaml
         rm env.yaml
+        ls
     - uses: actions/checkout@v2
     - name: Setup flytectl
       uses: unionai/flytectl-setup-action@v0.0.1
