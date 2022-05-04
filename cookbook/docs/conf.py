@@ -60,8 +60,7 @@ class CustomSorter(FileNameSortKey):
         # Type System
         "flyte_python_types.py",
         "schema.py",
-        "structured_dataset.py"
-        "typed_schema.py",
+        "structured_dataset.py" "typed_schema.py",
         "custom_objects.py",
         "enums.py",
         "lp_schedules.py",
@@ -127,9 +126,7 @@ class CustomSorter(FileNameSortKey):
         ## GCP
         # TODO
         ## External Services
-        "hive.py"
-        "snowflake.py"
-        "bigquery.py"
+        "hive.py" "snowflake.py" "bigquery.py"
         # Extending Flyte
         "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
         "custom_types.py",
@@ -347,7 +344,7 @@ ignore_py_files = [
 sphinx_gallery_conf = {
     "examples_dirs": examples_dirs,
     "gallery_dirs": gallery_dirs,
-    "ignore_pattern": f"({'|'.join(ignore_py_files)})\.py",
+    "ignore_pattern": f"({'|'.join(ignore_py_files)})\.py",  # noqa: W605
     # "subsection_order": ExplicitOrder(
     #     [
     #         "../core/basic",

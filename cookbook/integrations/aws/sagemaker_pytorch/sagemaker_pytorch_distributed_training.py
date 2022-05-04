@@ -353,7 +353,9 @@ def download_test_data(training_dir):
             input_content_type=InputContentType.TEXT_CSV,
         ),
         training_job_resource_config=TrainingJobResourceConfig(
-            instance_type="ml.p3.8xlarge", instance_count=2, volume_size_in_gb=25,
+            instance_type="ml.p3.8xlarge",
+            instance_count=2,
+            volume_size_in_gb=25,
         ),
     ),
     cache_version="1.0",

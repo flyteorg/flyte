@@ -14,7 +14,6 @@ from functools import partial, wraps
 
 from flytekit import task, workflow
 
-
 logger = logging.getLogger(__file__)
 
 
@@ -24,6 +23,7 @@ logger = logging.getLogger(__file__)
 # ^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Here we define decorator that logs the input and output information of a decorated task.
+
 
 def log_io(fn):
     @wraps(fn)
@@ -41,6 +41,7 @@ def log_io(fn):
 #
 # .. note::
 #    The order of invoking the decorators is important. ``@task`` should always be the outer-most decorator.
+
 
 @task
 @log_io
@@ -61,12 +62,15 @@ def t1(x: int) -> int:
 # .. note::
 #    The ``validate_output`` output uses :py:func:`~functools.partial` to implement parameterized decorators.
 
+
 def validate_output(fn=None, *, floor=0):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if out <= floor:
-            raise ValueError(f"output of task {fn.__name__} must be a positive number, found {out}")
+            raise ValueError(
+                f"output of task {fn.__name__} must be a positive number, found {out}"
+            )
         return out
 
     if fn is None:
@@ -74,8 +78,10 @@ def validate_output(fn=None, *, floor=0):
 
     return wrapper
 
+
 # %%
 # Now let's define a function that uses both the logging and validator decorators:
+
 
 @task
 @log_io
@@ -86,6 +92,7 @@ def t2(x: int) -> int:
 
 # %%
 # Finally, we compose a workflow that calls ``t1`` and ``t2``.
+
 
 @workflow
 def wf(x: int) -> int:

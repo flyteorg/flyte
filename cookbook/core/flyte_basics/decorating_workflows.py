@@ -20,9 +20,10 @@ training runs.
 """
 
 from functools import partial, wraps
+from unittest.mock import MagicMock
 
 import flytekit
-from flytekit import task, workflow, FlyteContextManager
+from flytekit import FlyteContextManager, task, workflow
 from flytekit.core.node_creation import create_node
 
 # %%
@@ -30,7 +31,6 @@ from flytekit.core.node_creation import create_node
 # :py:class:`unittest.mock.MagicMock` class to create a fake external service that we want to initialize at the
 # beginning of our workflow and finish at the end.
 
-from unittest.mock import MagicMock
 
 external_service = MagicMock()
 
@@ -56,6 +56,7 @@ def teardown():
 # ^^^^^^^^^^^^^^^^^^
 #
 # Next we create the decorator that we'll use to wrap our workflow function.
+
 
 def setup_teardown(fn=None, *, before, after):
     @wraps(fn)
@@ -93,6 +94,7 @@ def setup_teardown(fn=None, *, before, after):
 
     return wrapper
 
+
 # %%
 # There are a few key pieces to note in the ``setup_teardown`` decorator above:
 #
@@ -112,6 +114,7 @@ def setup_teardown(fn=None, *, before, after):
 #
 # Now let's define two tasks that will constitute the workflow
 
+
 @task
 def t1(x: float) -> float:
     return x - 1
@@ -119,10 +122,12 @@ def t1(x: float) -> float:
 
 @task
 def t2(x: float) -> float:
-    return x ** 2
+    return x**2
+
 
 # %%
 # And then create our decorated workflow:
+
 
 @workflow
 @setup_teardown(before=setup, after=teardown)

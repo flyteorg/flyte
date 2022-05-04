@@ -17,9 +17,9 @@ Please refer to the :std:ref:`registration docs <flyte:divedeep-registration>` f
 Now, let's get started with a simple workflow.
 """
 import typing
+from typing import Tuple
 
 from flytekit import task, workflow
-from typing import Tuple
 
 
 @task
@@ -52,7 +52,7 @@ def my_wf(a: int, b: str) -> Tuple[int, str]:
 # workflow is executed.
 #
 # A workflow can be executed locally where the evaluation will happen immediately, or using the CLI, UI, etc., which will trigger an evaluation.
-# Although Flyte workflows decorated with ``@workflow`` look like Python functions, they are actually python-esque, Domain Specific Language (DSL) entities 
+# Although Flyte workflows decorated with ``@workflow`` look like Python functions, they are actually python-esque, Domain Specific Language (DSL) entities
 # that recognize the ``@task`` decorators. When a workflow encounters a ``@task``-decorated Python function, it creates a
 # :py:class:`flytekit.core.promise.Promise` object. This promise doesn't contain the actual output of the task, and is only fulfilled at execution time.
 #

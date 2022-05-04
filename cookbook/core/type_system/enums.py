@@ -16,9 +16,10 @@ the values.
 and the Enum types are not optional. So when defining enums, design them well to always make the first value as a
 valid default.
 """
-from flytekit import task, workflow
-from typing import Tuple
 from enum import Enum
+from typing import Tuple
+
+from flytekit import task, workflow
 
 
 # %%

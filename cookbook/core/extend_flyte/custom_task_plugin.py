@@ -6,7 +6,7 @@ Writing Your Own Flytekit Task Plugins
 
 Flytekit is designed to be extremely extensible. You can add new task-types that are useful only for your use-cases.
 Flyte does come with the capability of extending the backend, but that is only required if you want the capability to be
-extended to all users of Flyte, or there is a cost/visibility benefit of doing so. 
+extended to all users of Flyte, or there is a cost/visibility benefit of doing so.
 
 The following demo shows how to build Flyte container task extensions, with an SQLAlchemy extension as an example:
 
@@ -59,7 +59,10 @@ class WaitForObjectStoreFile(PythonTask):
     _VAR_NAME: str = "path"
 
     def __init__(
-        self, name: str, poll_interval: timedelta = timedelta(seconds=10), **kwargs,
+        self,
+        name: str,
+        poll_interval: timedelta = timedelta(seconds=10),
+        **kwargs,
     ):
         super(WaitForObjectStoreFile, self).__init__(
             task_type="object-store-sensor",

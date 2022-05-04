@@ -12,7 +12,7 @@ To make this work, it is essential that the examples are written with comments f
  - The example directory should have a README.rst.
  - The example itself should have a header comment, which should have a heading
    as well.
- - Docs interspersed in the example should preceed with `# %%` comment and then
+ - Docs interspersed in the example should proceed with `# %%` comment and then
    multiline comments should not have blank spaces between them.
   ```rst
   # %%

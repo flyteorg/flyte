@@ -14,16 +14,15 @@ Let's get started with an example!
 # %%
 # First, we load the libraries.
 import os
-
-from flytekitplugins.kftensorflow import TfJob
-from flytekit import task, workflow, Resources
-
-import tensorflow_datasets as tfds
-import tensorflow as tf
-from typing import NamedTuple, Tuple
-from flytekit.types.directory import FlyteDirectory
 from dataclasses import dataclass
+from typing import NamedTuple, Tuple
+
+import tensorflow as tf
+import tensorflow_datasets as tfds
 from dataclasses_json import dataclass_json
+from flytekit import Resources, task, workflow
+from flytekit.types.directory import FlyteDirectory
+from flytekitplugins.kftensorflow import TfJob
 
 # %%
 # We define ``MODEL_FILE_PATH`` indicating where to store the model file.
@@ -31,6 +30,8 @@ MODEL_FILE_PATH = "saved_model/"
 
 # %%
 # We initialize a data class to store the hyperparameters.
+
+
 @dataclass_json
 @dataclass
 class Hyperparameters(object):

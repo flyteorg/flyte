@@ -22,10 +22,10 @@ Where:
 2. Flyte will apply labels and annotations that are referenced to all secrets the task is requesting access to.
 3. Flyte will send a POST request to ApiServer to create the object.
 4. Before persisting the Pod, ApiServer will invoke all registered Pod Webhooks. Flyte's Pod Webhook will be called.
-5. Flyte Pod Webhook will then, using the labels and annotiations attached in step 2, lookup globally mounted secrets for each of the requested secrets. 
+5. Flyte Pod Webhook will then, using the labels and annotiations attached in step 2, lookup globally mounted secrets for each of the requested secrets.
 6. If found, Pod Webhook will mount them directly in the Pod. If not found, it will inject the appropriate annotations to load the secrets for K8s (or Vault or Confidant or any other secret management system plugin configured) into the task pod.
 
-Once the secret is injected into the task pod, Flytekit can read it using the secret manager (see examples below). 
+Once the secret is injected into the task pod, Flytekit can read it using the secret manager (see examples below).
 
 The webhook is included in all overlays in the Flytekit repo. The deployment file creates (mainly) two things; a Job and a Deployment.
 
@@ -35,41 +35,41 @@ The webhook is included in all overlays in the Flytekit repo. The deployment fil
 Secret Discovery
 ----------------
 
-Flyte identifies secrets using a secret group and a secret key. 
+Flyte identifies secrets using a secret group and a secret key.
 In a task decorator you request a secret like this: ``@task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME)])``
 Flytekit provides a shorthand for loading the requested secret inside a task: ``secret = flytekit.current_context().secrets.get(SECRET_GROUP, SECRET_NAME)``
-See the python examples further down for more details on how to request and use secrets in a task. 
+See the python examples further down for more details on how to request and use secrets in a task.
 
 Flytekit relies on the following environment variables to load secrets (defined `here <https://github.com/flyteorg/flytekit/blob/master/flytekit/configuration/secrets.py>`_). When running tasks and workflows locally you should make sure to store your secrets accordingly or to modify these:
 - FLYTE_SECRETS_DEFAULT_DIR - The directory Flytekit searches for secret files, default: "/etc/secrets"
 - FLYTE_SECRETS_FILE_PREFIX - a common file prefix for Flyte secrets, default: ""
 - FLYTE_SECRETS_ENV_PREFIX - a common env var prefix for Flyte secrets, default: "_FSEC_"
 
-When running a workflow on a Flyte cluster, the configured secret manager will use the secret Group and Key to try and retrieve a secret. 
+When running a workflow on a Flyte cluster, the configured secret manager will use the secret Group and Key to try and retrieve a secret.
 If successful, it will make the secret available as either file or environment variable and will if necessary modify the above variables automatically so that the task can load and use the secrets.
 
 Configuring a secret management system plugin into use
 ------------------------------------------------------
 
-When a task requests a secret Flytepropeller will try to retrieve secrets in the following order: 1.) checking for global secrets (secrets mounted as files or environment variables on the flyte-pod-webhook pod) and 2.) checking with an additional configurable secret manager. 
-Note that the global secrets take precedence over any secret discoverable by the secret manager plugins. 
+When a task requests a secret Flytepropeller will try to retrieve secrets in the following order: 1.) checking for global secrets (secrets mounted as files or environment variables on the flyte-pod-webhook pod) and 2.) checking with an additional configurable secret manager.
+Note that the global secrets take precedence over any secret discoverable by the secret manager plugins.
 
-The following additional secret managers are available at the time of writing: 
+The following additional secret managers are available at the time of writing:
 - `K8s secrets <https://kubernetes.io/docs/concepts/configuration/secret/>`_ (default) - flyte-pod-webhook will try to look for a K8s secret named after the secret Group and retrieve the value for the secret Key.
 - AWS Secret Manager - flyte-pod-webhook will add the AWS Secret Manager sidecar container to a task Pod which will mount the secret.
 - `Vault Agent Injector <https://www.vaultproject.io/docs/platform/k8s/injector>`_ - flyte-pod-webhook will annotate the task Pod with the respective Vault annotations that trigger an existing Vault Agent Injector to retrieve the specified secret Key from a vault path defined as secret Group.
 
-You can configure the additional secret manager by defining `secretManagerType` to be either 'K8s', 'AWS' or 'Vault' in 
+You can configure the additional secret manager by defining `secretManagerType` to be either 'K8s', 'AWS' or 'Vault' in
 the `core config <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/propeller/core.yaml#L34>` of the Flytepropeller.
 
 When using the K8s secret manager plugin (enabled by default), the secrets need to be available in the same namespace as the task execution
-(for example `flytesnacks-development`). K8s secrets can be mounted as either files or injected as environment variables into the task pod, 
-so if you need to make larger files available to the task, then this might be the better option. 
-Furthermore, this method also allows you to have separate credentials for different domains but still using the same name for the secret. 
-The `group` of the secret request corresponds to the K8s secret name, while the `name` of the request corresponds to the key of the specific entry in the secret.    
+(for example `flytesnacks-development`). K8s secrets can be mounted as either files or injected as environment variables into the task pod,
+so if you need to make larger files available to the task, then this might be the better option.
+Furthermore, this method also allows you to have separate credentials for different domains but still using the same name for the secret.
+The `group` of the secret request corresponds to the K8s secret name, while the `name` of the request corresponds to the key of the specific entry in the secret.
 
 When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster (`step-by-step tutorial <https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar>`_).
-Vault secrets can only be mounted as files and will become available under "/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME". Vault comes with `two versions <https://www.vaultproject.io/docs/secrets/kv>`_ of the key-value secret store. 
+Vault secrets can only be mounted as files and will become available under "/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME". Vault comes with `two versions <https://www.vaultproject.io/docs/secrets/kv>`_ of the key-value secret store.
 By default the Vault secret manager will try to retrieve Version 2 secrets. You can specify the KV version by setting webhook.vaultSecretManager.kvVersion in the configmap. Note that the version number needs to be an explicit string (e.g. "1").
 You can also configure the Vault role under which Flyte will try to read the secret by setting webhook.vaultSecretManager.role (default: "flyte").
 
@@ -84,12 +84,14 @@ or injected into a file.
 
 # %%
 import os
-import flytekit
 from typing import Tuple
+
+import flytekit
 
 # %%
 # Flytekit exposes a type/class called Secrets. It can be imported as follows.
 from flytekit import Secret, task, workflow
+from flytekit.testing import SecretsManager
 
 # %%
 # Secrets consists of a name and an enum that indicates how the secrets will be accessed. If the mounting_requirement is
@@ -106,10 +108,10 @@ SECRET_GROUP = "user-info"
 
 
 # %%
-# Now declare the secret in the requests. The request tells Flyte to make the secret available to the task. The secret can 
-# then be accessed inside the task using the :py:class:`flytekit.ExecutionParameters`, through the global flytekit 
-# context as shown below. At runtime, flytekit looks inside the task pod for an environment variable or a mounted file with 
-# a predefined name/path and loads the value. 
+# Now declare the secret in the requests. The request tells Flyte to make the secret available to the task. The secret can
+# then be accessed inside the task using the :py:class:`flytekit.ExecutionParameters`, through the global flytekit
+# context as shown below. At runtime, flytekit looks inside the task pod for an environment variable or a mounted file with
+# a predefined name/path and loads the value.
 @task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME)])
 def secret_task() -> str:
     secret_val = flytekit.current_context().secrets.get(SECRET_GROUP, SECRET_NAME)
@@ -138,9 +140,15 @@ PASSWORD_SECRET = "password"
 # %%
 # The Secret structure allows passing two fields, matching the key and the group, as previously described:
 @task(
-    secret_requests=[Secret(key=USERNAME_SECRET, group=SECRET_GROUP), Secret(key=PASSWORD_SECRET, group=SECRET_GROUP)])
+    secret_requests=[
+        Secret(key=USERNAME_SECRET, group=SECRET_GROUP),
+        Secret(key=PASSWORD_SECRET, group=SECRET_GROUP),
+    ]
+)
 def user_info_task() -> Tuple[str, str]:
-    secret_username = flytekit.current_context().secrets.get(SECRET_GROUP, USERNAME_SECRET)
+    secret_username = flytekit.current_context().secrets.get(
+        SECRET_GROUP, USERNAME_SECRET
+    )
     secret_pwd = flytekit.current_context().secrets.get(SECRET_GROUP, PASSWORD_SECRET)
     # Please do not print the secret value, this is just a demonstration.
     print(f"{secret_username}={secret_pwd}")
@@ -153,7 +161,15 @@ def user_info_task() -> Tuple[str, str]:
 # keys (certs etc). Another reason may be that a dependent library necessitates that the secret be available as a file.
 # In these scenarios you can specify the mount_requirement. In the following example we force the mounting to be
 # an Env variable
-@task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME, mount_requirement=Secret.MountType.ENV_VAR)])
+@task(
+    secret_requests=[
+        Secret(
+            group=SECRET_GROUP,
+            key=SECRET_NAME,
+            mount_requirement=Secret.MountType.ENV_VAR,
+        )
+    ]
+)
 def secret_file_task() -> Tuple[str, str]:
     # SM here is a handle to the secrets manager
     sm = flytekit.current_context().secrets
@@ -176,13 +192,16 @@ def my_secret_workflow() -> Tuple[str, str, str, str, str]:
 # %%
 # The simplest way to test Secret accessibility is to export the secret as an environment variable. There are some
 # helper methods available to do so
-from flytekit.testing import SecretsManager
 
 if __name__ == "__main__":
     sec = SecretsManager()
     os.environ[sec.get_secrets_env_var(SECRET_GROUP, SECRET_NAME)] = "value"
-    os.environ[sec.get_secrets_env_var(SECRET_GROUP, USERNAME_SECRET)] = "username_value"
-    os.environ[sec.get_secrets_env_var(SECRET_GROUP, PASSWORD_SECRET)] = "password_value"
+    os.environ[
+        sec.get_secrets_env_var(SECRET_GROUP, USERNAME_SECRET)
+    ] = "username_value"
+    os.environ[
+        sec.get_secrets_env_var(SECRET_GROUP, PASSWORD_SECRET)
+    ] = "password_value"
     x, y, z, f, s = my_secret_workflow()
     assert x == "value"
     assert y == "username_value"

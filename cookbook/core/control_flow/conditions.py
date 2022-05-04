@@ -47,10 +47,10 @@ def double(n: float) -> float:
 def multiplier(my_input: float) -> float:
     return (
         conditional("fractions")
-            .if_((my_input >= 0.1) & (my_input <= 1.0))
-            .then(double(n=my_input))
-            .else_()
-            .then(square(n=my_input))
+        .if_((my_input >= 0.1) & (my_input <= 1.0))
+        .then(double(n=my_input))
+        .else_()
+        .then(square(n=my_input))
     )
 
 
@@ -73,12 +73,12 @@ if __name__ == "__main__":
 def multiplier_2(my_input: float) -> float:
     return (
         conditional("fractions")
-            .if_((my_input > 0.1) & (my_input < 1.0))
-            .then(double(n=my_input))
-            .elif_((my_input > 1.0) & (my_input <= 10.0))
-            .then(square(n=my_input))
-            .else_()
-            .fail("The input must be between 0 and 10")
+        .if_((my_input > 0.1) & (my_input < 1.0))
+        .then(double(n=my_input))
+        .elif_((my_input > 1.0) & (my_input <= 10.0))
+        .then(square(n=my_input))
+        .else_()
+        .fail("The input must be between 0 and 10")
     )
 
 
@@ -94,12 +94,12 @@ if __name__ == "__main__":
 def multiplier_3(my_input: float) -> float:
     result = (
         conditional("fractions")
-            .if_((my_input > 0.1) & (my_input < 1.0))
-            .then(double(n=my_input))
-            .elif_((my_input > 1.0) & (my_input < 10.0))
-            .then(square(n=my_input))
-            .else_()
-            .fail("The input must be between 0 and 10")
+        .if_((my_input > 0.1) & (my_input < 1.0))
+        .then(double(n=my_input))
+        .elif_((my_input > 1.0) & (my_input < 10.0))
+        .then(square(n=my_input))
+        .else_()
+        .fail("The input must be between 0 and 10")
     )
 
     # the 'result' will either be the output of `double` or `square`. If none of the conditions is true,
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 #
 # .. note::
 #
-#    How do output values get these methods? 
+#    How do output values get these methods?
 #    In a workflow, no output can be accessed directly. The inputs and outputs are auto-wrapped in a special object called :py:class:`flytekit.extend.Promise`.
 #
 # In this example, we create a biased coin whose seed can be controlled.
@@ -179,7 +179,9 @@ if __name__ == "__main__":
     print("Running basic_boolean_wf a few times")
     for i in range(0, 5):
         print(f"Basic boolean wf output {basic_boolean_wf()}")
-        print(f"Boolean input {True if i < 2 else False}, workflow output {bool_input_wf(b=True if i < 2 else False)}")
+        print(
+            f"Boolean input {True if i < 2 else False}, workflow output {bool_input_wf(b=True if i < 2 else False)}"
+        )
 
 
 # %%
@@ -192,20 +194,20 @@ if __name__ == "__main__":
 def nested_conditions(my_input: float) -> float:
     return (
         conditional("fractions")
-            .if_((my_input > 0.1) & (my_input < 1.0))
-            .then(
+        .if_((my_input > 0.1) & (my_input < 1.0))
+        .then(
             conditional("inner_fractions")
-                .if_(my_input < 0.5)
-                .then(double(n=my_input))
-                .elif_((my_input > 0.5) & (my_input < 0.7))
-                .then(square(n=my_input))
-                .else_()
-                .fail("Only <0.7 allowed")
-        )
-            .elif_((my_input > 1.0) & (my_input < 10.0))
+            .if_(my_input < 0.5)
+            .then(double(n=my_input))
+            .elif_((my_input > 0.5) & (my_input < 0.7))
             .then(square(n=my_input))
             .else_()
-            .then(double(n=my_input))
+            .fail("Only <0.7 allowed")
+        )
+        .elif_((my_input > 1.0) & (my_input < 10.0))
+        .then(square(n=my_input))
+        .else_()
+        .then(double(n=my_input))
     )
 
 
@@ -246,10 +248,10 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
     is_heads = coin_toss(seed=seed)
     res = (
         conditional("double_or_square")
-            .if_(is_heads.is_true())
-            .then(square(n=my_input))
-            .else_()
-            .then(calc_sum(a=my_input, b=my_input))
+        .if_(is_heads.is_true())
+        .then(square(n=my_input))
+        .else_()
+        .then(calc_sum(a=my_input, b=my_input))
     )
 
     # Regardless of the result, call ``double`` before
@@ -261,6 +263,8 @@ def consume_outputs(my_input: float, seed: int = 5) -> float:
 # The workflow can be executed locally.
 if __name__ == "__main__":
     print(
-        f"consume_outputs(0.4) with default seed=5. This should return output of calc_sum => {consume_outputs(my_input=0.4)}")
+        f"consume_outputs(0.4) with default seed=5. This should return output of calc_sum => {consume_outputs(my_input=0.4)}"
+    )
     print(
-        f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}")
+        f"consume_outputs(0.4, seed=7), this should return output of square => {consume_outputs(my_input=0.4, seed=7)}"
+    )

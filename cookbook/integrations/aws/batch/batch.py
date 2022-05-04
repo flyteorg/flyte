@@ -6,9 +6,8 @@ With AWS Batch, there is no need to install and manage batch computing software 
  that you use to run your jobs, allowing you to focus on analyzing results and solving problems.
 """
 
-from flytekitplugins.awsbatch import AWSBatchConfig
 from flytekit import task, workflow
-
+from flytekitplugins.awsbatch import AWSBatchConfig
 
 # %%
 # Use this to configure SubmitJobInput for a AWS batch job. Task's marked with this will automatically execute

@@ -4,18 +4,19 @@
 Predicting House Price in a Region Using XGBoost
 ------------------------------------------------
 
-`XGBoost <https://xgboost.readthedocs.io/en/latest/>`__ is an optimized distributed gradient boosting library designed to be efficient, flexible, and portable. 
+`XGBoost <https://xgboost.readthedocs.io/en/latest/>`__ is an optimized distributed gradient boosting library designed to be efficient, flexible, and portable.
 It uses `gradient boosting <https://en.wikipedia.org/wiki/Gradient_boosting>`__ technique to implement Machine Learning algorithms.
 
 In this tutorial, we will understand how to predict house prices using XGBoost, and Flyte.
 
-We will split the generated dataset into train, test and validation set. 
+We will split the generated dataset into train, test and validation set.
 
 Next, we will create three Flyte tasks, that will:
 
 1. Generate house details, and split the dataset.
 2. Train the model using XGBoost.
 3. Generate predictions.
+
 
 Let's get started with the example!
 
@@ -30,20 +31,21 @@ Let's get started with the example!
 #       pip install joblib
 #       pip install xgboost
 
+import os
+
 # %%
 # First, let's import the required packages into the environment.
 import typing
+from typing import Tuple
 
-import os
 import flytekit
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from xgboost import XGBRegressor
 from flytekit import Resources, task, workflow
 from flytekit.types.file import JoblibSerializedFile
-from typing import Tuple
+from sklearn.model_selection import train_test_split
+from xgboost import XGBRegressor
 
 # %%
 # We initialize a variable to represent columns in the dataset. The other variables help generate the dataset.
@@ -66,6 +68,8 @@ SPLIT_RATIOS = [0.6, 0.3, 0.1]
 # =====================
 #
 # We define a function to compute the price of a house based on multiple factors (``number of bedrooms``, ``number of bathrooms``, ``area``, ``garage space``, and ``year built``).
+
+
 def gen_price(house) -> int:
     _base_price = int(house["SQUARE_FEET"] * 150)
     _price = int(
@@ -93,7 +97,7 @@ def gen_houses(num_houses) -> pd.DataFrame:
             "YEAR_BUILT": min(MAX_YEAR, int(np.random.normal(1995, 10))),
         }
         _price = gen_price(_house)
-        # column names/features 
+        # column names/features
         _house_list.append(
             [
                 _price,
@@ -105,12 +109,13 @@ def gen_houses(num_houses) -> pd.DataFrame:
                 _house["GARAGE_SPACES"],
             ]
         )
-    # convert the list to a DataFrame    
+    # convert the list to a DataFrame
     _df = pd.DataFrame(
         _house_list,
         columns=COLUMNS,
     )
     return _df
+
 
 # %%
 # Data Preprocessing and Splitting
@@ -122,16 +127,16 @@ def split_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
     seed = seed
-    val_size = split[1]  # 0.3 
-    test_size = split[2] # 0.1
+    val_size = split[1]  # 0.3
+    test_size = split[2]  # 0.1
 
     num_samples = df.shape[0]
     # retain the features, skip the target column
-    x1 = df.values[:num_samples, 1:]  
+    x1 = df.values[:num_samples, 1:]
     # retain the target column
-    y1 = df.values[:num_samples, :1]  
+    y1 = df.values[:num_samples, :1]
 
-    # divide the features and target column into random train and test subsets, based on `test_size` 
+    # divide the features and target column into random train and test subsets, based on `test_size`
     x_train, x_test, y_train, y_test = train_test_split(
         x1, y1, test_size=test_size, random_state=seed
     )
@@ -139,7 +144,7 @@ def split_data(
     x_train, x_val, y_train, y_val = train_test_split(
         x_train,
         y_train,
-        test_size=(val_size / (1 - test_size)), # here, `test_size` computes to 0.3
+        test_size=(val_size / (1 - test_size)),  # here, `test_size` computes to 0.3
         random_state=seed,
     )
 
@@ -164,6 +169,7 @@ def split_data(
         ),
     )
 
+
 # %%
 # Next, we create a ``NamedTuple`` to map a variable name to its respective data type.
 dataset = typing.NamedTuple(
@@ -175,10 +181,13 @@ dataset = typing.NamedTuple(
 
 # %%
 # We define a task to call the aforementioned functions.
+
+
 @task(cache=True, cache_version="0.1", limits=Resources(mem="600Mi"))
 def generate_and_split_data(number_of_houses: int, seed: int) -> dataset:
     _houses = gen_houses(number_of_houses)
     return split_data(_houses, seed, split=SPLIT_RATIOS)
+
 
 # %%
 # Training

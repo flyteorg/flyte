@@ -15,9 +15,9 @@ avoid mis-use and potentially affecting the overall stability of the system.
 import typing
 from datetime import datetime
 from random import random, seed
+from typing import Tuple
 
 from flytekit import conditional, dynamic, task, workflow
-from typing import Tuple
 
 # seed random number generator
 seed(datetime.now().microsecond)
@@ -26,11 +26,12 @@ seed(datetime.now().microsecond)
 # %%
 # A simple split function that divides a list into two halves.
 
+
 @task
 def split(numbers: typing.List[int]) -> Tuple[typing.List[int], typing.List[int], int]:
     return (
-        numbers[0:int(len(numbers) / 2)],
-        numbers[int(len(numbers) / 2):],
+        numbers[0 : int(len(numbers) / 2)],
+        numbers[int(len(numbers) / 2) :],
         int(len(numbers) / 2),
     )
 
@@ -124,8 +125,7 @@ def generate_inputs(numbers_count: int) -> typing.List[int]:
 # %%
 # The entire workflow can be executed locally as follows...
 if __name__ == "__main__":
-    print(f"Running Merge Sort Locally...")
     count = 20
     x = generate_inputs(count)
     print(x)
-    print(merge_sort(numbers=x, numbers_count=count))
+    print(f"Running Merge Sort Locally...{merge_sort(numbers=x, numbers_count=count)}")

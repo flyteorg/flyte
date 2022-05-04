@@ -163,7 +163,7 @@ Execute Your Re-deployed Workflow
 Finally, you can execute the updated workflow programmatically with ``flytectl``.
 
 To pass arguments to the workflow, update the execution spec file that we previously generated in the
-:ref:`Deploying to the Coud <larger_apps_deploy>` step.
+:ref:`Deploying to the Cloud <larger_apps_deploy>` step.
 
 Generate an execution spec file. This will prompt you to overwrite and answer 'y' on it.
 

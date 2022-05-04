@@ -18,18 +18,19 @@ pipeline utilizing "Feast". Here is the step-by-step process:
 """
 
 import logging
+import random
 import typing
 
 # %%
 # Let's import the libraries.
 from datetime import datetime, timedelta
-import random
 
 import boto3
 import joblib
 import pandas as pd
 from feast import Entity, Feature, FeatureStore, FeatureView, FileSource, ValueType
-from flytekit import task, workflow, TaskMetadata, Resources
+from feast_dataobjects import FeatureStore, FeatureStoreConfig  # noqa : F811
+from flytekit import Resources, TaskMetadata, task, workflow
 from flytekit.configuration.internal import AWS
 from flytekit.extras.sqlite3.task import SQLite3Config, SQLite3Task
 from flytekit.types.file import JoblibSerializedFile
@@ -37,7 +38,6 @@ from flytekit.types.schema import FlyteSchema
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 
-from feast_dataobjects import FeatureStore, FeatureStoreConfig
 from .feature_eng_tasks import mean_median_imputer, univariate_selection
 
 logger = logging.getLogger(__file__)

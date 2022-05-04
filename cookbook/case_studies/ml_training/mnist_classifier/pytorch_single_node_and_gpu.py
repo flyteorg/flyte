@@ -10,7 +10,7 @@ As long as the Docker image is built correctly with the right version of the GPU
 provisioned to have GPU machines, Flyte will execute the task on a node that has GPU(s).
 
 Currently, Flyte does not provide any specific task type for PyTorch (though it is entirely possible to provide a task-type
-that supports *PyTorch-Ignite* or *PyTorch Lightening* support, but this is not critical). One can request for a GPU, simply
+that supports *PyTorch-Ignite* or *PyTorch Lightning* support, but this is not critical). One can request for a GPU, simply
 by setting GPU="1" resource request and then at runtime, the GPU will be provisioned.
 
 In this example, we'll see how we can create any PyTorch model, train it using Flyte and a specialized container. The following video will outline the basics of this process.
@@ -52,7 +52,10 @@ LOG_IMAGES_PER_BATCH = 32
 # We'll call this function in the ``pytorch_mnist_task`` defined below.
 def wandb_setup():
     wandb.login()
-    wandb.init(project="mnist-single-node-single-gpu", entity=os.environ.get("WANDB_USERNAME", "my-user-name"))
+    wandb.init(
+        project="mnist-single-node-single-gpu",
+        entity=os.environ.get("WANDB_USERNAME", "my-user-name"),
+    )
 
 
 # %%
@@ -84,6 +87,7 @@ class Net(nn.Module):
 # %%
 # The Data Loader
 # ===============
+
 
 def mnist_dataloader(batch_size, train=True, **kwargs):
     return torch.utils.data.DataLoader(
@@ -188,9 +192,15 @@ def test(model, device, test_loader):
         for images, targets in test_loader:
             images, targets = images.to(device), targets.to(device)  # device conversion
             outputs = model(images)  # forward pass -- generate predictions
-            test_loss += F.nll_loss(outputs, targets, reduction="sum").item()  # sum up batch loss
-            _, predicted = torch.max(outputs.data, 1)  # get the index of the max log-probability
-            correct += (predicted == targets).sum().item()  # compare predictions to true label
+            test_loss += F.nll_loss(
+                outputs, targets, reduction="sum"
+            ).item()  # sum up batch loss
+            _, predicted = torch.max(
+                outputs.data, 1
+            )  # get the index of the max log-probability
+            correct += (
+                (predicted == targets).sum().item()
+            )  # compare predictions to true label
 
             # log predictions to the ``wandb`` table
             if log_counter < NUM_BATCHES_TO_LOG:
@@ -206,7 +216,9 @@ def test(model, device, test_loader):
     accuracy = float(correct) / len(test_loader.dataset)
 
     # log the average loss, accuracy, and table
-    wandb.log({"test_loss": test_loss, "accuracy": accuracy, "mnist_predictions": my_table})
+    wandb.log(
+        {"test_loss": test_loss, "accuracy": accuracy, "mnist_predictions": my_table}
+    )
 
     return accuracy
 
@@ -343,7 +355,9 @@ def pytorch_training_wf(
 # It is possible to run the model locally with almost no modifications (as long as the code takes care of resolving
 # if the code is distributed or not). This is how we can do it:
 if __name__ == "__main__":
-    model, accuracies = pytorch_training_wf(hp=Hyperparameters(epochs=10, batch_size=128))
+    model, accuracies = pytorch_training_wf(
+        hp=Hyperparameters(epochs=10, batch_size=128)
+    )
     print(f"Model: {model}, Accuracies: {accuracies}")
 
 # %%

@@ -15,7 +15,7 @@ ifdef SANDBOX
 # The url for Flyte Control plane
 export FLYTE_HOST ?= localhost:30081
 
-# Overrides s3 url. This is solely needed for SANDBOX deployments. Shouldn't be overriden in production AWS S3.
+# Overrides s3 url. This is solely needed for SANDBOX deployments. Shouldn't be overridden in production AWS S3.
 export FLYTE_AWS_ENDPOINT ?= http://localhost:30084/
 
 # Used to authenticate to s3. For a production AWS S3, it's discouraged to use keys and key ids.

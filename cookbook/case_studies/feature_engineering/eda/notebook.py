@@ -2,8 +2,8 @@
 Flyte Pipeline in One Jupyter Notebook
 =======================================
 
-In this example, we will implement a simple pipeline that takes hyperparameters, does EDA, feature engineering, and measures the Gradient 
-Boosting model's performace using mean absolute error (MAE), all in one notebook.
+In this example, we will implement a simple pipeline that takes hyperparameters, does EDA, feature engineering, and measures the Gradient
+Boosting model's performance using mean absolute error (MAE), all in one notebook.
 """
 
 # %%
@@ -15,7 +15,7 @@ from flytekit import Resources, kwtypes, workflow
 from flytekitplugins.papermill import NotebookTask
 
 # %%
-# We define a ``NotebookTask`` to run the `Jupyter notebook 
+# We define a ``NotebookTask`` to run the `Jupyter notebook
 # <https://github.com/flyteorg/flytesnacks/blob/master/cookbook/case_studies/feature_engineering/eda/supermarket_regression.ipynb>`__.
 #
 # .. list-table:: ``NotebookTask`` Parameters
@@ -49,6 +49,8 @@ nb = NotebookTask(
 
 # %%
 # Since a task need not be defined, we create a ``workflow`` and return the MAE score.
+
+
 @workflow
 def notebook_wf(
     n_estimators: int = 150,

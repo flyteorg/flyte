@@ -38,7 +38,7 @@ import os
 import time
 from typing import List
 
-from flytekit import task, workflow, Resources
+from flytekit import Resources, TaskMetadata, dynamic, map_task, task, workflow
 from flytekitplugins.pod import Pod
 from kubernetes.client.models import (
     V1Container,
@@ -53,6 +53,8 @@ _SHARED_DATA_PATH = "/data/message.txt"
 
 # %%
 # We define a simple pod spec with two containers.
+
+
 def generate_pod_spec_for_task():
 
     # Primary containers do not require us to specify an image, the default image built for Flyte tasks will get used.
@@ -126,7 +128,6 @@ def pod_workflow() -> str:
 #
 # To use pod task as part of map task, we send pod task definition to :py:func:`~flytekit:flytekit.map_task`.
 # This will run pod task across a collection of inputs.
-from flytekit import map_task, TaskMetadata
 
 
 @task(
@@ -151,7 +152,7 @@ from flytekit import map_task, TaskMetadata
                         limits={"cpu": ".5", "memory": "500Mi"},
                     ),
                 )
-            ]
+            ],
         ),
         primary_container_name="primary",
     )
@@ -180,7 +181,6 @@ def my_map_workflow(a: List[int]) -> str:
 # ====================
 #
 # To use pod task a dynamic task, simply pass the pod task config to an annotated dynamic task.
-from flytekit import dynamic
 
 
 @task
@@ -209,7 +209,7 @@ def my_dynamic_pod_task(val: int) -> str:
 
 
 @workflow
-def my_dynamic_pod_task_workflow(val: int=6) -> str:
+def my_dynamic_pod_task_workflow(val: int = 6) -> str:
     s = my_dynamic_pod_task(val=val)
     return s
 

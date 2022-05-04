@@ -10,6 +10,7 @@ Watch a demo of sandbox creation and a sample execution of the pima diabetes pip
 import typing
 from collections import OrderedDict
 from dataclasses import dataclass
+from typing import Tuple
 
 import joblib
 import pandas as pd
@@ -20,7 +21,6 @@ from flytekit.types.schema import FlyteSchema
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
-from typing import Tuple
 
 # %%
 # Since we are working with a specific dataset, we will create a strictly typed schema for the dataset.
@@ -158,7 +158,8 @@ def fit(
 
 @task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def predict(
-    x: FlyteSchema[FEATURE_COLUMNS], model_ser: FlyteFile[MODELSER_JOBLIB],
+    x: FlyteSchema[FEATURE_COLUMNS],
+    model_ser: FlyteFile[MODELSER_JOBLIB],
 ) -> FlyteSchema[CLASSES_COLUMNS]:
     """
     Given a any trained model, serialized using joblib (this method can be shared!) and features, this method returns
@@ -207,7 +208,11 @@ def diabetes_xgboost_model(
     x_train, x_test, y_train, y_test = split_traintest_dataset(
         dataset=dataset, seed=seed, test_split_ratio=test_split_ratio
     )
-    model = fit(x=x_train, y=y_train, hyperparams=XGBoostModelHyperparams(max_depth=4),)
+    model = fit(
+        x=x_train,
+        y=y_train,
+        hyperparams=XGBoostModelHyperparams(max_depth=4),
+    )
     predictions = predict(x=x_test, model_ser=model.model)
     return model.model, score(predictions=predictions, y=y_test)
 

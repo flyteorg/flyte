@@ -28,6 +28,7 @@ import typing
 
 from flytekit import dynamic, task, workflow
 
+
 # %%
 # Next, we write a task that returns the index of a character (A-Z/a-z is equivalent to 0 to 25).
 @task
@@ -79,8 +80,8 @@ def derive_count(freq1: typing.List[int], freq2: typing.List[int]) -> int:
 # At execution (run) time, Flytekit runs the compilation step, and produces
 # a ``WorkflowTemplate`` (from the dynamic workflow), which Flytekit then passes back to Flyte Propeller for further running, exactly how sub-workflows are handled.
 #
-# .. note:: 
-#    The dynamic pattern isn't the most efficient method to iterate over a list. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_ 
+# .. note::
+#    The dynamic pattern isn't the most efficient method to iterate over a list. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_
 # might be more efficient in certain cases. But they only work for Python tasks (tasks decorated with the @task decorator) not SQL/Spark/etc,.
 #
 # We now define a dynamic workflow that encapsulates the above mentioned points.
@@ -91,21 +92,21 @@ def count_characters(s1: str, s2: str) -> int:
 
     # s1 and s2 are accessible
 
-    # initiliaze an empty list consisting of 26 empty slots corresponding to every alphabet (lower and upper case)
+    # initialize an empty list consisting of 26 empty slots corresponding to every alphabet (lower and upper case)
     freq1 = [0] * 26
     freq2 = [0] * 26
 
     # looping through the string s1
     for i in range(len(s1)):
 
-        # index and freq1 are not accesible as they are promises
+        # index and freq1 are not accessible as they are promises
         index = return_index(character=s1[i])
         freq1 = update_list(freq_list=freq1, list_index=index)
 
     # looping through the string s2
     for i in range(len(s2)):
 
-        # index and freq2 are not accesible as they are promises
+        # index and freq2 are not accessible as they are promises
         index = return_index(character=s2[i])
         freq2 = update_list(freq_list=freq2, list_index=index)
 

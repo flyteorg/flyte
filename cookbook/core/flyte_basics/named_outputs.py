@@ -15,7 +15,6 @@ import typing
 
 from flytekit import task, workflow
 
-
 # %%
 # Named outputs can be declared inline as in the following task signature.
 #
@@ -52,6 +51,7 @@ wf_outputs = typing.NamedTuple("OP2", greet1=str, greet2=str)
 #
 #    Note that we are de-referencing the individual task execution outputs because named-outputs use NamedTuple
 #    which are tuples that need to be de-referenced.
+
 
 @workflow
 def my_wf() -> wf_outputs:

@@ -23,19 +23,18 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-
-from flytekit import task, workflow, kwtypes, FlyteContext, StructuredDatasetType
+from flytekit import FlyteContext, StructuredDatasetType, kwtypes, task, workflow
 from flytekit.models import literals
 from flytekit.models.literals import StructuredDatasetMetadata
 from flytekit.types.schema import FlyteSchema
 from flytekit.types.structured.structured_dataset import (
-    StructuredDataset,
-    StructuredDatasetEncoder,
-    StructuredDatasetDecoder,
-    StructuredDatasetTransformerEngine,
+    LOCAL,
     PARQUET,
     S3,
-    LOCAL,
+    StructuredDataset,
+    StructuredDatasetDecoder,
+    StructuredDatasetEncoder,
+    StructuredDatasetTransformerEngine,
 )
 
 try:
@@ -161,6 +160,8 @@ for protocol in [LOCAL, S3]:
 # %%
 # Let's define a task to test the above functionality.
 # We open a structured dataset of type ``numpy.ndarray`` and serialize it again.
+
+
 @task
 def to_numpy(
     ds: Annotated[StructuredDataset, subset_cols]
@@ -193,6 +194,6 @@ def schema_compatibility_wf(a: int) -> Annotated[StructuredDataset, subset_cols]
 # You can run the code locally as follows:
 if __name__ == "__main__":
     numpy_array_one = pandas_compatibility_wf(a=42).open(np.ndarray).all()
-    print(f"pandas DataFrame compatibility check output: ", numpy_array_one)
+    print(f"pandas DataFrame compatibility check output: {numpy_array_one}")
     numpy_array_two = schema_compatibility_wf(a=42).open(np.ndarray).all()
-    print(f"Schema compatibility check output: ", numpy_array_two)
+    print(f"Schema compatibility check output: {numpy_array_two}")

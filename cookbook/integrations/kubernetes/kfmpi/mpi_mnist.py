@@ -11,12 +11,13 @@ import os
 import pathlib
 
 import flytekit
-import tensorflow as tf
 import horovod.tensorflow as hvd
-from flytekit import task, workflow, Resources
-from flytekit.types.directory import FlyteDirectory
+import tensorflow as tf
+from flytekit import Resources, task, workflow
 from flytekit.core.base_task import IgnoreOutputs
+from flytekit.types.directory import FlyteDirectory
 from flytekitplugins.kfmpi import MPIJob
+
 
 # %%
 # We define a training step that will be called from the training loop.
@@ -47,6 +48,7 @@ def training_step(images, labels, first_batch, mnist_model, loss, opt):
 
     return loss_value
 
+
 # %%
 # We define an MPIJob-enabled task. The configuration given in the MPIJob constructor will be used to set up the distributed training environment.
 #
@@ -66,10 +68,12 @@ def training_step(images, labels, first_batch, mnist_model, loss, opt):
     retries=3,
     cache=True,
     cache_version="0.1",
-    requests=Resources(cpu='1', mem="600Mi"),
-    limits=Resources(cpu='2'),
+    requests=Resources(cpu="1", mem="600Mi"),
+    limits=Resources(cpu="2"),
 )
-def horovod_train_task(batch_size: int, buffer_size: int, dataset_size: int) -> FlyteDirectory:
+def horovod_train_task(
+    batch_size: int, buffer_size: int, dataset_size: int
+) -> FlyteDirectory:
     """
     :param batch_size: Represents the number of consecutive elements of this dataset to combine in a single batch.
     :param buffer_size: Defines the size of the buffer used to hold elements of the dataset used for training.
@@ -78,25 +82,30 @@ def horovod_train_task(batch_size: int, buffer_size: int, dataset_size: int) -> 
     """
     hvd.init()
 
-    (mnist_images, mnist_labels), _ = \
-        tf.keras.datasets.mnist.load_data(path='mnist-%d.npz' % hvd.rank())
+    (mnist_images, mnist_labels), _ = tf.keras.datasets.mnist.load_data(
+        path="mnist-%d.npz" % hvd.rank()
+    )
 
     dataset = tf.data.Dataset.from_tensor_slices(
-        (tf.cast(mnist_images[..., tf.newaxis] / 255.0, tf.float32),
-         tf.cast(mnist_labels, tf.int64))
+        (
+            tf.cast(mnist_images[..., tf.newaxis] / 255.0, tf.float32),
+            tf.cast(mnist_labels, tf.int64),
+        )
     )
     dataset = dataset.repeat().shuffle(buffer_size).batch(batch_size)
 
-    mnist_model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, [3, 3], activation='relu'),
-        tf.keras.layers.Conv2D(64, [3, 3], activation='relu'),
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-        tf.keras.layers.Dropout(0.25),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(10, activation='softmax')
-    ])
+    mnist_model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Conv2D(32, [3, 3], activation="relu"),
+            tf.keras.layers.Conv2D(64, [3, 3], activation="relu"),
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            tf.keras.layers.Dropout(0.25),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(128, activation="relu"),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(10, activation="softmax"),
+        ]
+    )
     loss = tf.losses.SparseCategoricalCrossentropy()
 
     # Horovod: adjust learning rate based on number of GPUs.
@@ -112,7 +121,7 @@ def horovod_train_task(batch_size: int, buffer_size: int, dataset_size: int) -> 
         loss_value = training_step(images, labels, batch == 0, mnist_model, loss, opt)
 
         if batch % 10 == 0 and hvd.local_rank() == 0:
-            print('Step #%d\tLoss: %.6f' % (batch, loss_value))
+            print("Step #%d\tLoss: %.6f" % (batch, loss_value))
 
     if hvd.rank() != 0:
         raise IgnoreOutputs("I am not rank 0")
@@ -122,22 +131,34 @@ def horovod_train_task(batch_size: int, buffer_size: int, dataset_size: int) -> 
     checkpoint.save(checkpoint_prefix)
 
     tf.keras.models.save_model(
-        mnist_model, str(working_dir), overwrite=True, include_optimizer=True, save_format=None,
-        signatures=None, options=None, save_traces=True
+        mnist_model,
+        str(working_dir),
+        overwrite=True,
+        include_optimizer=True,
+        save_format=None,
+        signatures=None,
+        options=None,
+        save_traces=True,
     )
     return FlyteDirectory(path=str(working_dir))
+
 
 # %%
 # Lastly, we can call the workflow and run the example.
 @workflow
-def horovod_training_wf(batch_size: int = 128, buffer_size: int = 10000, dataset_size: int = 10000) -> FlyteDirectory:
+def horovod_training_wf(
+    batch_size: int = 128, buffer_size: int = 10000, dataset_size: int = 10000
+) -> FlyteDirectory:
     """
     :param batch_size: Represents the number of consecutive elements of this dataset to combine in a single batch.
     :param buffer_size: Defines the size of the buffer used to hold elements of the dataset used for training.
     :param dataset_size: The number of elements of this dataset that should be taken to form the new dataset when
         running batched training.
     """
-    return horovod_train_task(batch_size=batch_size, buffer_size=buffer_size, dataset_size=dataset_size)
+    return horovod_train_task(
+        batch_size=batch_size, buffer_size=buffer_size, dataset_size=dataset_size
+    )
+
 
 if __name__ == "__main__":
     model, plot, logs = horovod_training_wf()

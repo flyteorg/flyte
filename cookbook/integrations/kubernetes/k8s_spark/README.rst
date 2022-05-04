@@ -74,7 +74,7 @@ Step 2: Environment Setup
 
 #. Build Spark image correctly as explained in :ref:`spark-docker-image`.
 
-#. Enable Spark plugin for Flyte refering to the :ref:`spark-examples` section. Additionally, Flyte uses the SparkOperator to run Spark Jobs and separate K8s Service Account/Role per namespace, which are created as part of the standard Flyte deployment.
+#. Enable Spark plugin for Flyte referring to the :ref:`spark-examples` section. Additionally, Flyte uses the SparkOperator to run Spark Jobs and separate K8s Service Account/Role per namespace, which are created as part of the standard Flyte deployment.
 
 #. Ensure you have enough resources on your K8s cluster. Based on the resources required for your Spark job (across drivers/executors), you may have to tweak resource quotas for the namespace.
 

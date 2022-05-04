@@ -5,13 +5,13 @@ This script shows an example of how to simply convert your tensorflow training s
 with very few modifications.
 """
 import typing
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from flytekit import task, workflow
 from flytekit.types.directory import TensorboardLogs
-from typing import Tuple
 
 # %%
 # Training Algorithm
@@ -85,7 +85,9 @@ def normalize_img(image, label):
             input_content_type=InputContentType.TEXT_CSV,
         ),
         training_job_resource_config=TrainingJobResourceConfig(
-            instance_type="ml.m4.xlarge", instance_count=1, volume_size_in_gb=25,
+            instance_type="ml.m4.xlarge",
+            instance_count=1,
+            volume_size_in_gb=25,
         ),
     ),
     cache_version="1.0",
@@ -132,7 +134,10 @@ def custom_training_task(epochs: int, batch_size: int) -> TrainingOutputs:
     tb_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
 
     history = model.fit(
-        ds_train, epochs=epochs, validation_data=ds_test, callbacks=[tb_callback],
+        ds_train,
+        epochs=epochs,
+        validation_data=ds_test,
+        callbacks=[tb_callback],
     )
 
     serialized_model = "my_model.h5"
@@ -194,9 +199,9 @@ def mnist_trainer(
 # %%
 # As long as you have tensorflow setup locally, it will run like a regular python script.
 if __name__ == "__main__":
-    model, accurracy, loss, logs = mnist_trainer()
+    model, accuracy, loss, logs = mnist_trainer()
     print(
-        f"Model: {model}, Accuracy PNG: {accurracy}, loss PNG: {loss}, Tensorboard Log Dir: {logs}"
+        f"Model: {model}, Accuracy PNG: {accuracy}, loss PNG: {loss}, Tensorboard Log Dir: {logs}"
     )
 
 # %%
@@ -220,6 +225,6 @@ if __name__ == "__main__":
 #
 #
 # If running remotely (executing on Flyte hosted environment), the workflow execution outputs can be retrieved.
-# 
+#
 # You can retrieve the outputs - which will be a path to a blob store like S3, GCS, minio, etc. Tensorboad can be
 # pointed to on your local laptop to visualize the results.

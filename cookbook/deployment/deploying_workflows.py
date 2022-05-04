@@ -19,7 +19,7 @@ Using remote Flyte gives you the ability to:
 
 - Use caching to avoid calling the same task with the same inputs (for the same version)
 - Portability: You can reference pre-registered entities under any domain or project within your workflow code
-- Sharable executions: you can easily share links to your executions with your teammates
+- Shareable executions: you can easily share links to your executions with your teammates
 
 Please refer to the :doc:`Getting Started <flyte:getting_started>` for details on getting started with the Flyte installation.
 
@@ -99,7 +99,7 @@ The make target is a handy wrapper around the following:
 In-container serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigourous, serialization should be done within the container for the following reasons.
+Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigorous, serialization should be done within the container for the following reasons.
 
 1. It ensures that the versions of all libraries used at execution time on the Flyte platform, are the same that are used during serialization.
 2. Since serialization runs part of flytekit, it helps ensure that your container is set up correctly.

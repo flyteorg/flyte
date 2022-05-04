@@ -2,9 +2,9 @@
 EDA and Feature Engineering in One Jupyter Notebook and Modeling in the Other
 =============================================================================
 
-In this example, we will implement a simple pipeline that takes hyperparameters, does EDA, feature engineering 
-(step 1: EDA and feature engineering in notebook), and measures the Gradient Boosting model's performace using mean absolute error 
-(MAE) (step 2: Modeling in notebook). 
+In this example, we will implement a simple pipeline that takes hyperparameters, does EDA, feature engineering
+(step 1: EDA and feature engineering in notebook), and measures the Gradient Boosting model's performance using mean absolute error
+(MAE) (step 2: Modeling in notebook).
 """
 
 # %%
@@ -17,7 +17,7 @@ from flytekit import Resources, kwtypes, workflow
 from flytekitplugins.papermill import NotebookTask
 
 # %%
-# We define a ``NotebookTask`` to run the `Jupyter notebook 
+# We define a ``NotebookTask`` to run the `Jupyter notebook
 # <https://github.com/flyteorg/flytesnacks/blob/master/cookbook/case_studies/feature_engineering/eda/supermarket_regression_1.ipynb>`__ (EDA).
 # This notebook returns ``dummified_data`` and ``dataset`` as the outputs.
 #
@@ -35,8 +35,8 @@ nb_1 = NotebookTask(
 )
 
 # %%
-# We define a ``NotebookTask`` to run the `Jupyter notebook 
-# <https://github.com/flyteorg/flytesnacks/blob/master/cookbook/case_studies/feature_engineering/eda/supermarket_regression_2.ipynb>`__ 
+# We define a ``NotebookTask`` to run the `Jupyter notebook
+# <https://github.com/flyteorg/flytesnacks/blob/master/cookbook/case_studies/feature_engineering/eda/supermarket_regression_2.ipynb>`__
 # (Modeling).
 #
 # This notebook returns ``mae_score`` as the output.
@@ -60,6 +60,8 @@ nb_2 = NotebookTask(
 
 # %%
 # We define a ``Workflow`` to run the notebook tasks.
+
+
 @workflow
 def notebook_wf(
     n_estimators: int = 150,

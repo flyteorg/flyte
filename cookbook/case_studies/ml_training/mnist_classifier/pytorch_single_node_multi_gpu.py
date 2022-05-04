@@ -33,13 +33,15 @@ import torch.nn.functional as F
 import wandb
 from flytekit import Resources, task, workflow
 from flytekit.types.file import PythonPickledFile
+
 # %%
 # We'll re-use certain classes and functions from the
 # :ref:`single node and gpu tutorial <pytorch_single_node_and_gpu>`
 # such as the ``Net`` model architecture, ``Hyperparameters``, and ``log_test_predictions``.
-from mnist_classifier.pytorch_single_node_and_gpu import Net, Hyperparameters, log_test_predictions
+from mnist_classifier.pytorch_single_node_and_gpu import Hyperparameters, Net, log_test_predictions
 from torch import distributed as dist
-from torch import nn, multiprocessing as mp, optim
+from torch import multiprocessing as mp
+from torch import nn, optim
 from torchvision import datasets, transforms
 
 # %%
@@ -67,7 +69,10 @@ LOG_IMAGES_PER_BATCH = 32
 # We'll call this function in the ``pytorch_mnist_task`` defined below.
 def wandb_setup():
     wandb.login()
-    wandb.init(project="mnist-single-node-multi-gpu", entity=os.environ.get("WANDB_USERNAME", "my-user-name"))
+    wandb.init(
+        project="mnist-single-node-multi-gpu",
+        entity=os.environ.get("WANDB_USERNAME", "my-user-name"),
+    )
 
 
 # %%
@@ -95,17 +100,32 @@ def download_mnist(data_dir):
 #
 # This function will be called in the training function to be distributed across all available GPUs. Note that
 # we set ``download=False`` here to avoid race conditions as mentioned above.
-def mnist_dataloader(data_dir, batch_size, train=True, distributed=False, rank=None, world_size=None, **kwargs):
+def mnist_dataloader(
+    data_dir,
+    batch_size,
+    train=True,
+    distributed=False,
+    rank=None,
+    world_size=None,
+    **kwargs,
+):
     dataset = datasets.MNIST(
         data_dir,
         train=train,
         download=False,
-        transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307), (0.3081))]),
+        transform=transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize((0.1307), (0.3081))]
+        ),
     )
     if distributed:
-        assert rank is not None, "rank needs to be specified when doing distributed training."
+        assert (
+            rank is not None
+        ), "rank needs to be specified when doing distributed training."
         sampler = torch.utils.data.distributed.DistributedSampler(
-            dataset, rank=rank, num_replicas=1 if world_size is None else world_size, shuffle=True
+            dataset,
+            rank=rank,
+            num_replicas=1 if world_size is None else world_size,
+            shuffle=True,
         )
     else:
         sampler = None
@@ -178,19 +198,27 @@ def test(model, rank, test_loader):
     with torch.no_grad():
 
         # loop through the test data loader
-        total = 0.
+        total = 0.0
         for images, targets in test_loader:
             total += len(targets)
             images, targets = images.to(rank), targets.to(rank)  # device conversion
             outputs = model(images)  # forward pass -- generate predictions
-            test_loss += F.nll_loss(outputs, targets, reduction="sum").item()  # sum up batch loss
-            _, predicted = torch.max(outputs.data, 1)  # get the index of the max log-probability
-            correct += (predicted == targets).sum().item()  # compare predictions to true label
+            test_loss += F.nll_loss(
+                outputs, targets, reduction="sum"
+            ).item()  # sum up batch loss
+            _, predicted = torch.max(
+                outputs.data, 1
+            )  # get the index of the max log-probability
+            correct += (
+                (predicted == targets).sum().item()
+            )  # compare predictions to true label
 
             # log predictions to the ``wandb`` table
             if log_counter < NUM_BATCHES_TO_LOG:
                 if rank == 0:
-                    log_test_predictions(images, targets, outputs, predicted, my_table, log_counter)
+                    log_test_predictions(
+                        images, targets, outputs, predicted, my_table, log_counter
+                    )
                 log_counter += 1
 
     # compute the average loss
@@ -200,7 +228,13 @@ def test(model, rank, test_loader):
     if rank == 0:
         print("\ntest_loss={:.4f}\naccuracy={:.4f}\n".format(test_loss, accuracy))
         # log the average loss, accuracy, and table
-        wandb.log({"test_loss": test_loss, "accuracy": accuracy, "mnist_predictions": my_table})
+        wandb.log(
+            {
+                "test_loss": test_loss,
+                "accuracy": accuracy,
+                "mnist_predictions": my_table,
+            }
+        )
 
     return accuracy
 
@@ -223,6 +257,7 @@ TrainingOutputs = typing.NamedTuple(
 # ``dist_setup`` is a helper function that instantiates a distributed environment. We're pointing all of the
 # processes across all available GPUs to the address of the main process.
 
+
 def dist_setup(rank, world_size, backend):
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "8888"
@@ -244,6 +279,7 @@ ACCURACIES_FILE = "./mnist_cnn_accuracies.json"
 # - save the trained model to disk
 # - keep track of validation metrics
 
+
 def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
     # store the hyperparameters' config in ``wandb``
     if rank == 0:
@@ -264,16 +300,26 @@ def train_mnist(rank: int, world_size: int, hp: Hyperparameters):
     kwargs = {"num_workers": 0, "pin_memory": True} if use_cuda else {}
     print("Getting data loaders")
     training_data_loader = mnist_dataloader(
-        DATA_DIR, hp.batch_size, train=True, distributed=use_cuda, rank=rank, world_size=world_size, **kwargs
+        DATA_DIR,
+        hp.batch_size,
+        train=True,
+        distributed=use_cuda,
+        rank=rank,
+        world_size=world_size,
+        **kwargs,
     )
-    test_data_loader = mnist_dataloader(DATA_DIR, hp.test_batch_size, train=False, **kwargs)
+    test_data_loader = mnist_dataloader(
+        DATA_DIR, hp.test_batch_size, train=False, **kwargs
+    )
 
     # define the distributed model and optimizer
     print("Defining model")
     model = Net().cuda(rank)
     model = nn.parallel.DistributedDataParallel(model, device_ids=[rank])
 
-    optimizer = optim.SGD(model.parameters(), lr=hp.learning_rate, momentum=hp.sgd_momentum)
+    optimizer = optim.SGD(
+        model.parameters(), lr=hp.learning_rate, momentum=hp.sgd_momentum
+    )
 
     # train the model: run multiple epochs and capture the accuracies for each epoch
     print(f"Training for {hp.epochs} epochs")
@@ -349,8 +395,12 @@ else:
     retries=2,
     cache=True,
     cache_version="1.2",
-    requests=Resources(gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage),
-    limits=Resources(gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage),
+    requests=Resources(
+        gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage
+    ),
+    limits=Resources(
+        gpu=gpu, mem=mem, storage=storage, ephemeral_storage=ephemeral_storage
+    ),
 )
 def pytorch_mnist_task(hp: Hyperparameters) -> TrainingOutputs:
     print("Start MNIST training:")
@@ -375,7 +425,9 @@ def pytorch_mnist_task(hp: Hyperparameters) -> TrainingOutputs:
 # %%
 # Finally, we define a workflow to run the training algorithm. We return the model and accuracies.
 @workflow
-def pytorch_training_wf(hp: Hyperparameters = Hyperparameters(epochs=10, batch_size=128)) -> TrainingOutputs:
+def pytorch_training_wf(
+    hp: Hyperparameters = Hyperparameters(epochs=10, batch_size=128)
+) -> TrainingOutputs:
     return pytorch_mnist_task(hp=hp)
 
 
@@ -386,7 +438,9 @@ def pytorch_training_wf(hp: Hyperparameters = Hyperparameters(epochs=10, batch_s
 # It is possible to run the model locally with almost no modifications (as long as the code takes care of resolving
 # if the code is distributed or not). This is how to do it:
 if __name__ == "__main__":
-    model, accuracies = pytorch_training_wf(hp=Hyperparameters(epochs=10, batch_size=128))
+    model, accuracies = pytorch_training_wf(
+        hp=Hyperparameters(epochs=10, batch_size=128)
+    )
     print(f"Model: {model}, Accuracies: {accuracies}")
 
 # %%

@@ -9,11 +9,10 @@ import os
 import sys
 import typing
 
-from dolt_integrations.core import NewBranch
-from flytekitplugins.dolt.schema import DoltConfig, DoltTable
-from flytekit import task, workflow
 import pandas as pd
-
+from dolt_integrations.core import NewBranch
+from flytekit import task, workflow
+from flytekitplugins.dolt.schema import DoltConfig, DoltTable
 
 # %%
 # A Simple Workflow
@@ -34,11 +33,10 @@ import pandas as pd
 
 doltdb_path = os.path.join(os.path.dirname(__file__), "foo")
 
+
 def generate_confs(a: int) -> typing.Tuple[DoltConfig, DoltConfig, DoltConfig]:
     users_conf = DoltConfig(
-        db_path=doltdb_path,
-        tablename="users",
-        branch_conf=NewBranch(f"run/a_is_{a}")
+        db_path=doltdb_path, tablename="users", branch_conf=NewBranch(f"run/a_is_{a}")
     )
 
     query_users = DoltTable(
@@ -57,6 +55,7 @@ def generate_confs(a: int) -> typing.Tuple[DoltConfig, DoltConfig, DoltConfig]:
 
     return users_conf, query_users, big_users_conf
 
+
 # %%
 # .. tip ::
 #   A ``DoltTable`` is an  extension of ``DoltConfig`` that wraps a ``pandas.DataFrame`` -- accessible via the ``DoltTable.data``
@@ -74,32 +73,42 @@ def generate_confs(a: int) -> typing.Tuple[DoltConfig, DoltConfig, DoltConfig]:
 # Return types of ``DoltTable`` save the ``data`` to the
 # Dolt database given a connection configuration.
 
+
 @task
 def get_confs(a: int) -> typing.Tuple[DoltConfig, DoltTable, DoltConfig]:
     return generate_confs(a)
 
+
 @task
 def populate_users(a: int, conf: DoltConfig) -> DoltTable:
-    users = [("George", a), ("Alice", a*2), ("Stephanie", a*3)]
+    users = [("George", a), ("Alice", a * 2), ("Stephanie", a * 3)]
     df = pd.DataFrame(users, columns=["name", "count"])
     return DoltTable(data=df, config=conf)
 
+
 @task
-def filter_users(a: int, all_users: DoltTable, filtered_users: DoltTable, conf: DoltConfig) -> DoltTable:
+def filter_users(
+    a: int, all_users: DoltTable, filtered_users: DoltTable, conf: DoltConfig
+) -> DoltTable:
     usernames = filtered_users.data[["name"]]
     return DoltTable(data=usernames, config=conf)
+
 
 @task
 def count_users(users: DoltTable) -> int:
     return users.data.shape[0]
 
+
 @workflow
 def wf(a: int) -> int:
     user_conf, query_conf, big_user_conf = get_confs(a=a)
     users = populate_users(a=a, conf=user_conf)
-    big_users = filter_users(a=a, all_users=users, filtered_users=query_conf, conf=big_user_conf)
+    big_users = filter_users(
+        a=a, all_users=users, filtered_users=query_conf, conf=big_user_conf
+    )
     big_user_cnt = count_users(users=big_users)
     return big_user_cnt
+
 
 if __name__ == "__main__":
     print(f"Running {__file__} main...")
@@ -109,9 +118,9 @@ if __name__ == "__main__":
     result = wf(a=a)
     print(f"Running wf(), returns int\n{result}\n{type(result)}")
 
-# %% 
+# %%
 # We will run this workflow twice:
-# 
+#
 # .. prompt:: $
 #
 #   python branch_example.py 2

@@ -27,18 +27,9 @@ import tempfile
 import typing
 from typing import Type
 
-from flytekit import (
-    Blob,
-    BlobMetadata,
-    BlobType,
-    FlyteContext,
-    Literal,
-    LiteralType,
-    Scalar,
-    task,
-    workflow,
-)
+from flytekit import Blob, BlobMetadata, BlobType, FlyteContext, Literal, LiteralType, Scalar, task, workflow
 from flytekit.extend import TypeEngine, TypeTransformer
+
 
 # %%
 # .. note::

@@ -22,9 +22,11 @@ Notifications
 # the :py:class:`flytekit:flytekit.Email`, :py:class:`flytekit:flytekit.PagerDuty`, or :py:class:`flytekit:flytekit.Slack`
 # objects can be used in the construction of a :py:class:`flytekit:flytekit.LaunchPlan`.
 
+from datetime import timedelta
+
 # %%
 # Consider the following example workflow:
-from flytekit import Email, LaunchPlan, task, workflow, WorkflowExecutionPhase
+from flytekit import Email, FixedRate, LaunchPlan, PagerDuty, Slack, WorkflowExecutionPhase, task, workflow
 
 
 @task
@@ -37,9 +39,10 @@ def int_doubler_wf(a: int) -> str:
     doubled = double_int_and_print(a=a)
     return doubled
 
+
 # %%
 # Here are three scenarios that can help deepen your understanding of how notifications work:
-# 
+#
 # 1. Launch Plan triggers email notifications when the workflow execution reaches the ``SUCCEEDED`` phase.
 int_doubler_wf_lp = LaunchPlan.get_or_create(
     name="int_doubler_wf",
@@ -55,9 +58,7 @@ int_doubler_wf_lp = LaunchPlan.get_or_create(
 
 # %%
 # 2. Notifications shine when used for scheduled workflows to alert for failures.
-from datetime import timedelta
 
-from flytekit import FixedRate, PagerDuty
 
 int_doubler_wf_scheduled_lp = LaunchPlan.get_or_create(
     name="int_doubler_wf_scheduled",
@@ -75,7 +76,6 @@ int_doubler_wf_scheduled_lp = LaunchPlan.get_or_create(
 
 # %%
 # 3. Notifications can be combined with different permutations of terminal phases and recipient targets.
-from flytekit import Slack
 
 wacky_int_doubler_lp = LaunchPlan.get_or_create(
     name="wacky_int_doubler",
@@ -122,7 +122,7 @@ wacky_int_doubler_lp = LaunchPlan.get_or_create(
 # ======
 #
 # To publish notifications, you'll need to set up an `SNS topic <https://aws.amazon.com/sns/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc>`_.
-# 
+#
 # To process notifications, you'll need to set up an `AWS SQS <https://aws.amazon.com/sqs/>`_ queue to consume notification events. This queue must be configured as a subscription to your SNS topic you created above.
 #
 # To publish notifications, you'll need a `verified SES email address <https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-addresses-and-domains.html>`_ which will be used to send notification emails and alerts using email APIs.
@@ -134,7 +134,7 @@ wacky_int_doubler_lp = LaunchPlan.get_or_create(
 # .. code-block:: bash
 #
 #    notifications:
-#      type: "aws"
+#      type: "aws"      # noqa: F821
 #      region: "us-east-1"
 #      publisher:
 #        topicName: "arn:aws:sns:us-east-1:{{ YOUR ACCOUNT ID }}:{{ YOUR TOPIC }}"
@@ -162,4 +162,3 @@ wacky_int_doubler_lp = LaunchPlan.get_or_create(
 #     * **body**: Configurable email body used in notifications.
 #
 # The complete set of parameters that can be used for email templating are checked in `here <https://github.com/flyteorg/flyteadmin/blob/a84223dab00dfa52d8ba1ed2d057e77b6c6ab6a7/pkg/async/notifications/email.go#L18,L30>`_.
-

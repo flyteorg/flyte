@@ -26,7 +26,6 @@ import flytekit
 from flytekit import task, workflow
 from flytekit.types.file import FlyteFile
 
-
 # %%
 # Next, we write a task that accepts a ``FlyteFile``, a list of column names,
 # and a list of column names to normalize, then outputs a csv file of only
@@ -39,6 +38,7 @@ from flytekit.types.file import FlyteFile
 #   ``FlyteFile[typing.TypeVar("jpeg")]``). The format is entirely optional,
 #   and if not specified, defaults to ``""``.
 
+
 @task
 def normalize_columns(
     csv_url: FlyteFile,
@@ -48,7 +48,7 @@ def normalize_columns(
 ) -> FlyteFile:
     # read the data from the raw csv file
     parsed_data = defaultdict(list)
-    with open(csv_url, newline='\n') as input_file:
+    with open(csv_url, newline="\n") as input_file:
         reader = csv.DictReader(input_file, fieldnames=column_names)
         for row in (x for i, x in enumerate(reader) if i > 0):
             for column in columns_to_normalize:
@@ -94,6 +94,7 @@ def normalize_columns(
 # the workflow. This is passed to the ``location`` input of the task. If it's not an empty string, the task attempts to
 # upload its file to that location.
 
+
 @workflow
 def normalize_csv_file(
     csv_url: FlyteFile,
@@ -125,7 +126,9 @@ if __name__ == "__main__":
         ),
     ]
     print(f"Running {__file__} main...")
-    for index, (csv_url, column_names, columns_to_normalize) in enumerate(default_files):        
+    for index, (csv_url, column_names, columns_to_normalize) in enumerate(
+        default_files
+    ):
         normalized_columns = normalize_csv_file(
             csv_url=csv_url,
             column_names=column_names,

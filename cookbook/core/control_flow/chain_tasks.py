@@ -9,15 +9,18 @@ You may want to call this function to specify dependencies between tasks that do
 In this example, let's enforce an order for ``read()`` to happen after ``write()``.
 """
 
+import pandas as pd
+
 # %%
 # First, we import the necessary dependencies.
 from flytekit import task, workflow
 from flytekit.core.node_creation import create_node
-import pandas as pd
 
 DATABASE = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
 # %%
 # We define a ``read()`` task to read from the file.
+
+
 @task
 def read() -> pd.DataFrame:
     data = pd.read_csv(DATABASE)
@@ -29,7 +32,7 @@ def read() -> pd.DataFrame:
 @task
 def write():
     # dummy code
-    df = pd.DataFrame(
+    df = pd.DataFrame(  # noqa : F841
         data={
             "sepal_length": [5.3],
             "sepal_width": [3.8],

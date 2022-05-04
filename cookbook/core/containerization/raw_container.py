@@ -12,9 +12,8 @@ The data is written as separate files, one per input variable. The format of the
 Refer to the raw protocol to understand how to leverage this.
 """
 import logging
-from typing import Tuple, Any, Mapping, List, Set
-from flytekit import task, workflow
-from flytekit import ContainerTask, kwtypes, workflow
+
+from flytekit import ContainerTask, kwtypes, task, workflow
 
 logger = logging.getLogger(__file__)
 

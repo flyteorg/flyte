@@ -16,11 +16,16 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 
 """
 
-# %%
-# 
-# For any :py:func:`flytekit.task` in Flyte, there is always one required import, which is:
-from flytekit import task
+import time
 
+import pandas
+
+# %%
+#
+# For any :py:func:`flytekit.task` in Flyte, there is always one required import, which is:
+from flytekit import HashMethod, task, workflow
+from flytekit.core.node_creation import create_node
+from typing_extensions import Annotated
 
 # %%
 # Task caching is disabled by default to avoid unintended consequences of caching tasks with side effects. To enable caching and control its behavior, use the ``cache`` and ``cache_version`` parameters when constructing a task.
@@ -28,6 +33,8 @@ from flytekit import task
 # ``cache_version`` field indicates that the task functionality has changed.
 # Bumping the ``cache_version`` is akin to invalidating the cache.
 # Flyte users can manually update this version and Flyte will cache the next execution instead of relying on the old cache.
+
+
 @task(cache=True, cache_version="1.0")
 def square(n: int) -> int:
     """
@@ -152,29 +159,28 @@ def square(n: int) -> int:
 # %%
 # Here's a complete example of the feature:
 
-import pandas
-import time
-from typing_extensions import Annotated
-
-from flytekit import HashMethod, workflow
-from flytekit.core.node_creation import create_node
-
 
 def hash_pandas_dataframe(df: pandas.DataFrame) -> str:
     return str(pandas.util.hash_pandas_object(df))
 
+
 @task
-def uncached_data_reading_task() -> Annotated[pandas.DataFrame, HashMethod(hash_pandas_dataframe)]:
+def uncached_data_reading_task() -> Annotated[
+    pandas.DataFrame, HashMethod(hash_pandas_dataframe)
+]:
     return pandas.DataFrame({"column_1": [1, 2, 3]})
+
 
 @task(cache=True, cache_version="1.0")
 def cached_data_processing_task(df: pandas.DataFrame) -> pandas.DataFrame:
     time.sleep(1)
     return df * 2
 
+
 @task
 def compare_dataframes(df1: pandas.DataFrame, df2: pandas.DataFrame):
     assert df1.equals(df2)
+
 
 @workflow
 def cached_dataframe_wf():
@@ -192,5 +198,5 @@ def cached_dataframe_wf():
 
 
 if __name__ == "__main__":
-    print(f"Running cached_dataframe_wf once")
     df1 = cached_dataframe_wf()
+    print(f"Running cached_dataframe_wf once : {df1}")

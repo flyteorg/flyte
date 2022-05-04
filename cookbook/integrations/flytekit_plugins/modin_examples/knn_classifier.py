@@ -25,14 +25,14 @@ Let's dive right in!
 # Let's import the necessary dependencies.
 from typing import List, NamedTuple
 
-import flytekitplugins.modin
+import flytekitplugins.modin  # noqa: F401
 import modin.pandas
 import ray
 from flytekit import task, workflow
 from sklearn.datasets import load_wine
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 
 ray.shutdown()  # close previous instance of ray (if any)
 ray.init(num_cpus=2)  # open a new instance of ray

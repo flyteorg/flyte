@@ -11,7 +11,7 @@ import pandas
 from flytekit import kwtypes, task, workflow
 
 # %%
-# Flytekit consists of some pre-built type extenstions, one of them is the FlyteSchema type
+# Flytekit consists of some pre-built type extensions, one of them is the FlyteSchema type
 from flytekit.types.schema import FlyteSchema
 
 # %%
@@ -52,7 +52,7 @@ def wf() -> FlyteSchema[kwtypes(x=int)]:
 
 
 # %%
-# Local execution will convert the data to and from the serialized representation thus, mimicing a complete distributed
+# Local execution will convert the data to and from the serialized representation thus, mimicking a complete distributed
 # execution.
 if __name__ == "__main__":
     print(f"Running {__file__} main...")

@@ -54,4 +54,4 @@ if __name__ == "__main__":
     This workflow can be run locally. During local execution also,
     the custom object (People) will be marshalled to and from python pickle.
     """
-    welcome(name='Foo')
+    welcome(name="Foo")

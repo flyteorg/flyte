@@ -16,7 +16,6 @@ from flytekit.extras.tasks.shell import OutputLocation, ShellTask
 from flytekit.types.directory import FlyteDirectory
 from flytekit.types.file import FlyteFile
 
-
 t1 = ShellTask(
     name="task_1",
     debug=True,
@@ -32,9 +31,7 @@ t1 = ShellTask(
     fi
     """,
     inputs=kwtypes(x=FlyteFile),
-    output_locs=[
-        OutputLocation(var="i", var_type=FlyteFile, location="{inputs.x}")
-    ],
+    output_locs=[OutputLocation(var="i", var_type=FlyteFile, location="{inputs.x}")],
 )
 
 

@@ -4,7 +4,7 @@ Intratask Checkpoints
 
 .. note::
 
-  This feature is available from Flytekit version 0.30.0b6+ and needs a Flyte backend version of atleast 0.19.0+.
+  This feature is available from Flytekit version 0.30.0b6+ and needs a Flyte backend version of at least 0.19.0+.
 
 A checkpoint recovers a task from a previous failure by recording the state of a task before the failure and
 resuming from the latest recorded state.
@@ -39,18 +39,17 @@ e.g., less than 10 minutes, the potential of failure is insignificant and task-b
 significant fault-tolerance to ensure successful completion.
 
 But as the time for a task increases, the cost of re-running it increases, and reduces the chances of successful
-completion. This is where Flyte's intra-task checkpointing truly shines. 
+completion. This is where Flyte's intra-task checkpointing truly shines.
 
 Let's look at an example of how to develop tasks which utilize intra-task checkpointing. It only provides the low-level API, though. We intend to integrate
 higher-level checkpointing APIs available in popular training frameworks like Keras, Pytorch, Scikit-learn, and
 big-data frameworks like Spark and Flink to supercharge their fault-tolerance.
 """
 
-from flytekit import task, workflow, current_context
+from flytekit import current_context, task, workflow
 from flytekit.exceptions.user import FlyteRecoverableException
 
-
-RETRIES=3
+RETRIES = 3
 
 
 # %%
@@ -75,7 +74,9 @@ def use_checkpoint(n_iterations: int) -> int:
         # simulate a deterministic failure, for demonstration. We want to show how it eventually completes within
         # the given retries
         if i > start and i % failure_interval == 0:
-            raise FlyteRecoverableException(f"Failed at iteration {start}, failure_interval {failure_interval}")
+            raise FlyteRecoverableException(
+                f"Failed at iteration {start}, failure_interval {failure_interval}"
+            )
         # save progress state. It is also entirely possible save state every few intervals.
         cp.write(f"{i + 1}".encode())
 
@@ -83,7 +84,7 @@ def use_checkpoint(n_iterations: int) -> int:
 
 
 # %%
-# The workflow here simply calls the task. The task itself 
+# The workflow here simply calls the task. The task itself
 # will be retried for the :ref:`FlyteRecoverableException <flytekit:exception_handling>`.
 #
 @workflow
@@ -91,11 +92,11 @@ def example(n_iterations: int) -> int:
     return use_checkpoint(n_iterations=n_iterations)
 
 
-#%%
+# %%
 # The checkpoint is stored locally, but it is not used since retries are not supported.
 if __name__ == "__main__":
     try:
         example(n_iterations=10)
-    except RuntimeError as e:
+    except RuntimeError as e:  # noqa : F841
         # no retries are performed, so an exception is expected when run locally.
         pass

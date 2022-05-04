@@ -30,13 +30,14 @@ def download_files(csv_urls: List[str]) -> FlyteDirectory:
     working_dir = flytekit.current_context().working_directory
     local_dir = Path(os.path.join(working_dir, "csv_files"))
     local_dir.mkdir(exist_ok=True)
-    
+
     # get the number of digits needed to preserve the order of files in the local directory
     zfill_len = len(str(len(csv_urls)))
     for idx, remote_location in enumerate(csv_urls):
         local_image = os.path.join(
             # prefix the file name with the index location of the file in the original csv_urls list
-            local_dir, f"{str(idx).zfill(zfill_len)}_{os.path.basename(remote_location)}"
+            local_dir,
+            f"{str(idx).zfill(zfill_len)}_{os.path.basename(remote_location)}",
         )
         urllib.request.urlretrieve(remote_location, local_image)
     return FlyteDirectory(path=str(local_dir))
@@ -50,6 +51,7 @@ def download_files(csv_urls: List[str]) -> FlyteDirectory:
 #    demonstrates how Flyte tasks are simply entrypoints of execution, which can themselves call
 #    other functions and routines that are written in pure python.
 
+
 def normalize_columns(
     local_csv_file: str,
     column_names: List[str],
@@ -57,7 +59,7 @@ def normalize_columns(
 ):
     # read the data from the raw csv file
     parsed_data = defaultdict(list)
-    with open(local_csv_file, newline='\n') as input_file:
+    with open(local_csv_file, newline="\n") as input_file:
         reader = csv.DictReader(input_file, fieldnames=column_names)
         for row in (x for i, x in enumerate(reader) if i > 0):
             for column in columns_to_normalize:
@@ -82,6 +84,7 @@ def normalize_columns(
 # Now we define a task that accepts the previously downloaded folder, along with some metadata about the
 # column names of each file in the directory and the column names that we want to normalize.
 
+
 @task
 def normalize_all_files(
     csv_files_dir: FlyteDirectory,
@@ -102,6 +105,7 @@ def normalize_all_files(
 # Then we compose all of the above tasks into a workflow. This workflow accepts a list
 # of url strings pointing to a remote location containing a csv file, a list of column names
 # associated with each csv file, and a list of columns that we want to normalize.
+
 
 @workflow
 def download_and_normalize_csv_files(
@@ -139,7 +143,4 @@ if __name__ == "__main__":
         columns_metadata=columns_metadata,
         columns_to_normalize_metadata=columns_to_normalize_metadata,
     )
-    print(
-        f"Running download_and_normalize_csv_files on {csv_urls}: "
-        f"{directory}"
-    )
+    print(f"Running download_and_normalize_csv_files on {csv_urls}: " f"{directory}")

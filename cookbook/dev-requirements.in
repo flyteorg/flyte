@@ -11,11 +11,16 @@
 -r ./case_studies/ml_training/mnist_classifier/requirements.in
 -r ./case_studies/ml_training/pima_diabetes/requirements.in
 
-black==19.10b0
+black==22.3.0
 coverage
 flake8
+pre-commit
 flake8-black
 flake8-isort
+codespell
 isort
 mock
 pytest
+mypy
+google-cloud-bigquery
+google-cloud-bigquery-storage

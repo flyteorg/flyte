@@ -27,7 +27,7 @@ NO_IMPUTATION_COLS = [
 
 
 # %%
-# We define a ``mean_median_imputer`` task to fill in the missing values of the dataset, for which we use the 
+# We define a ``mean_median_imputer`` task to fill in the missing values of the dataset, for which we use the
 # `SimpleImputer <https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html>`__ class from the ``scikit-learn`` library.
 @task(cache=True, cache_version="1.0")
 def mean_median_imputer(
@@ -53,7 +53,7 @@ def mean_median_imputer(
 
 # %%
 # Let's define the other task called ``univariate_selection`` that does feature selection.
-# The `SelectKBest <https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest>`__ method removes all 
+# The `SelectKBest <https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html#sklearn.feature_selection.SelectKBest>`__ method removes all
 # but the highest scoring features (DataFrame columns).
 @task(cache=True, cache_version="1.0")
 def univariate_selection(

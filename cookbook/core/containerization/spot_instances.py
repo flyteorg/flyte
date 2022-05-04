@@ -34,7 +34,7 @@ Using Spot/Preemptible Instances
 # What Are Interruptible Tasks?
 # =============================
 #
-# If specified, the ``interruptible flag`` is added to the task definition and signals to the Flyte engine that it may be scheduled on machines that may be preempted, such as AWS spot instances. This is low-hanging fruit for any cost-savings initiative. 
+# If specified, the ``interruptible flag`` is added to the task definition and signals to the Flyte engine that it may be scheduled on machines that may be preempted, such as AWS spot instances. This is low-hanging fruit for any cost-savings initiative.
 #
 # Setting Interruptible
 # ^^^^^^^^^^^^^^^^^^^^^

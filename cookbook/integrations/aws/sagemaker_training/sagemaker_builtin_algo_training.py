@@ -79,7 +79,9 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
     task_config=SagemakerTrainingJobConfig(
         algorithm_specification=alg_spec,
         training_job_resource_config=TrainingJobResourceConfig(
-            instance_type="ml.m4.xlarge", instance_count=1, volume_size_in_gb=25,
+            instance_type="ml.m4.xlarge",
+            instance_count=1,
+            volume_size_in_gb=25,
         ),
     ),
     metadata=TaskMetadata(cache_version="1.0", cache=True),
@@ -106,7 +108,9 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
 # and split it and uploaded to an s3 bucket:
 def execute_training():
     xgboost_train_task(
-        static_hyperparameters=xgboost_hyperparameters, train="", validation="",
+        static_hyperparameters=xgboost_hyperparameters,
+        train="",
+        validation="",
     )
 
 

@@ -14,17 +14,12 @@ the :py:class:`RuntimeBatchRequest <great_expectations.core.batch.RuntimeBatchRe
 # %%
 # First, let's import the required libraries.
 import os
-import typing
 
 import pandas as pd
 from flytekit import Resources, task, workflow
 from flytekit.types.file import CSVFile
 from flytekit.types.schema import FlyteSchema
-from flytekitplugins.great_expectations import (
-    BatchRequestConfig,
-    GreatExpectationsFlyteConfig,
-    GreatExpectationsType,
-)
+from flytekitplugins.great_expectations import BatchRequestConfig, GreatExpectationsFlyteConfig, GreatExpectationsType
 
 # %%
 # .. note::
@@ -46,21 +41,23 @@ CONTEXT_ROOT_DIR = "greatexpectations/great_expectations"
 # The directory that's being used is defined in ``my_assets``. You can find ``my_assets`` in the Great Expectations config file.
 #
 # The parameters within the ``data_connector_query`` convey that we're fetching all those files that have "2019" and "01" in the file names.
+
+
 @task(limits=Resources(mem="500Mi"))
 def simple_task(
     directory: GreatExpectationsType[
         str,
         GreatExpectationsFlyteConfig(
-            datasource_name="data",
-            expectation_suite_name="test.demo",
-            data_connector_name="my_data_connector",
+            datasource_name="data",  # noqa: F821
+            expectation_suite_name="test.demo",  # noqa: F821
+            data_connector_name="my_data_connector",  # noqa: F821
             batch_request_config=BatchRequestConfig(
                 data_connector_query={
-                    "batch_filter_parameters": {
-                        "year": "2019",
-                        "month": "01",  # noqa: F722
+                    "batch_filter_parameters": {  # noqa: F821
+                        "year": "2019",  # noqa: F821
+                        "month": "01",  # noqa: F821, F722
                     },
-                    "limit": 10,
+                    "limit": 10,  # noqa: F821
                 },
             ),
             context_root_dir=CONTEXT_ROOT_DIR,
@@ -97,6 +94,8 @@ great_expectations_config = GreatExpectationsFlyteConfig(
 #
 # The first value that's being sent within ``GreatExpectationsType`` is ``CSVFile`` (this is a pre-formatted FlyteFile type).
 # This means that we want to validate the ``FlyteFile`` data.
+
+
 @task(limits=Resources(mem="500Mi"))
 def file_task(
     dataset: GreatExpectationsType[CSVFile, great_expectations_config]
@@ -122,12 +121,14 @@ def file_wf() -> pd.DataFrame:
 @task(limits=Resources(mem="500Mi"))
 def schema_task(
     dataframe: GreatExpectationsType[
-        FlyteSchema,
-        GreatExpectationsFlyteConfig(
-            datasource_name="data",
-            expectation_suite_name="test.demo",
-            data_connector_name="data_flytetype_data_connector",
-            batch_request_config=BatchRequestConfig(data_connector_query={"limit": 10}),
+        FlyteSchema,  # noqa: F821
+        GreatExpectationsFlyteConfig(  # noqa: F821
+            datasource_name="data",  # noqa: F821
+            expectation_suite_name="test.demo",  # noqa: F821
+            data_connector_name="data_flytetype_data_connector",  # noqa: F821
+            batch_request_config=BatchRequestConfig(
+                data_connector_query={"limit": 10}  # noqa : F841
+            ),  # noqa: F821
             local_file_path="/tmp/test.parquet",  # noqa: F722
             context_root_dir=CONTEXT_ROOT_DIR,
         ),
