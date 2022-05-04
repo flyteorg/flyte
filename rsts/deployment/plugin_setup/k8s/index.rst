@@ -178,65 +178,213 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
 .. tabbed:: Spark Operator
 
-  * Enable Spark backend plugin
+  .. tabbed:: Sandbox
+
+    Since sandbox uses minio, it needs additional configuration.
 
     .. code-block:: yaml
 
-       cluster_resource_manager:
-         # -- Enables the Cluster resource manager component
-         enabled: true
-         # -- Configmap for ClusterResource parameters
-         config:
-           # -- ClusterResource parameters
-           # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
-           cluster_resources:
-             refreshInterval: 5m
-             templatePath: "/etc/flyte/clusterresource/templates"
-             customData:
-               - production:
-                   - projectQuotaCpu:
-                       value: "5"
-                   - projectQuotaMemory:
-                       value: "4000Mi"
-               - staging:
-                   - projectQuotaCpu:
-                       value: "2"
-                   - projectQuotaMemory:
-                       value: "3000Mi"
-               - development:
-                   - projectQuotaCpu:
-                       value: "4"
-                   - projectQuotaMemory:
-                       value: "3000Mi"
-             refresh: 5m
+      cluster_resource_manager:
+        # -- Enables the Cluster resource manager component
+        enabled: true
+        # -- Configmap for ClusterResource parameters
+        config:
+          # -- ClusterResource parameters
+          # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
+          cluster_resources:
+            refreshInterval: 5m
+            templatePath: "/etc/flyte/clusterresource/templates"
+            customData:
+              - production:
+                  - projectQuotaCpu:
+                      value: "5"
+                  - projectQuotaMemory:
+                      value: "4000Mi"
+              - staging:
+                  - projectQuotaCpu:
+                      value: "2"
+                  - projectQuotaMemory:
+                      value: "3000Mi"
+              - development:
+                  - projectQuotaCpu:
+                      value: "4"
+                  - projectQuotaMemory:
+                      value: "5000Mi"
+            refresh: 5m
 
-         # -- Resource templates that should be applied
-         templates:
-           # -- Template for namespaces resources
-           - key: aa_namespace
-             value: |
-               apiVersion: v1
-               kind: Namespace
-               metadata:
-                 name: {{ namespace }}
-               spec:
-                 finalizers:
-                 - kubernetes
+        # -- Resource templates that should be applied
+        templates:
+          # -- Template for namespaces resources
+          - key: aa_namespace
+            value: |
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: {{ namespace }}
+              spec:
+                finalizers:
+                - kubernetes
 
-           - key: ab_project_resource_quota
-             value: |
-               apiVersion: v1
-               kind: ResourceQuota
-               metadata:
-                 name: project-quota
-                 namespace: {{ namespace }}
-               spec:
-                 hard:
-                   limits.cpu: {{ projectQuotaCpu }}
-                   limits.memory: {{ projectQuotaMemory }}
+          - key: ab_project_resource_quota
+            value: |
+              apiVersion: v1
+              kind: ResourceQuota
+              metadata:
+                name: project-quota
+                namespace: {{ namespace }}
+              spec:
+                hard:
+                  limits.cpu: {{ projectQuotaCpu }}
+                  limits.memory: {{ projectQuotaMemory }}
 
-           - key: ac_spark_role
-             value: |
+          - key: ac_spark_role
+            value: |
+              apiVersion: rbac.authorization.k8s.io/v1beta1
+              kind: Role
+              metadata:
+                name: spark-role
+                namespace: {{ namespace }}
+              rules:
+              - apiGroups: ["*"]
+                resources: ["pods"]
+                verbs: ["*"]
+              - apiGroups: ["*"]
+                resources: ["services"]
+                verbs: ["*"]
+              - apiGroups: ["*"]
+                resources: ["configmaps", "persistentvolumeclaims"]
+                verbs: ["*"]
+
+          - key: ad_spark_service_account
+            value: |
+              apiVersion: v1
+              kind: ServiceAccount
+              metadata:
+                name: spark
+                namespace: {{ namespace }}
+
+          - key: ae_spark_role_binding
+            value: |
+              apiVersion: rbac.authorization.k8s.io/v1beta1
+              kind: RoleBinding
+              metadata:
+                name: spark-role-binding
+                namespace: {{ namespace }}
+              roleRef:
+                apiGroup: rbac.authorization.k8s.io
+                kind: Role
+                name: spark-role
+              subjects:
+              - kind: ServiceAccount
+                name: spark
+                namespace: {{ namespace }}
+
+      sparkoperator:
+        enabled: true
+        plugin_config:
+          plugins:
+            spark:
+              # -- Spark default configuration
+              spark-config-default:
+                # We override the default credentials chain provider for Hadoop so that
+                # it can use the serviceAccount based IAM role or ec2 metadata based.
+                # This is more in line with how AWS works
+                - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+                - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte.svc.cluster.local:9000"
+                - spark.hadoop.fs.s3a.access.key: "minio"
+                - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+                - spark.hadoop.fs.s3a.path.style.access: "true"
+                - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+                - spark.kubernetes.allocation.batch.size: "50"
+                - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+                - spark.excludeOnFailure.enabled: "true"
+                - spark.excludeOnFailure.timeout: "5m"
+                - spark.task.maxfailures: "8"
+      configmap:
+        enabled_plugins:
+          # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+          tasks:
+            # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+            task-plugins:
+              # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+              # plugins
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - spark
+              default-for-task-types:
+                container: container
+                sidecar: sidecar
+                container_array: k8s-array
+                spark: spark
+
+  .. tabbed:: AWS
+
+    .. code-block:: yaml
+
+      cluster_resource_manager:
+        # -- Enables the Cluster resource manager component
+        enabled: true
+        # -- Configmap for ClusterResource parameters
+        config:
+          # -- ClusterResource parameters
+          # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
+          cluster_resources:
+            refreshInterval: 5m
+            templatePath: "/etc/flyte/clusterresource/templates"
+            customData:
+              - production:
+                  - projectQuotaCpu:
+                      value: "5"
+                  - projectQuotaMemory:
+                      value: "4000Mi"
+              - staging:
+                  - projectQuotaCpu:
+                      value: "2"
+                  - projectQuotaMemory:
+                      value: "3000Mi"
+              - development:
+                  - projectQuotaCpu:
+                      value: "4"
+                  - projectQuotaMemory:
+                      value: "3000Mi"
+            refresh: 5m
+
+        # -- Resource templates that should be applied
+        templates:
+          # -- Template for namespaces resources
+          - key: aa_namespace
+            value: |
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: {{ namespace }}
+              spec:
+                finalizers:
+                - kubernetes
+
+          - key: ab_project_resource_quota
+            value: |
+              apiVersion: v1
+              kind: ResourceQuota
+              metadata:
+                name: project-quota
+                namespace: {{ namespace }}
+              spec:
+                hard:
+                  limits.cpu: {{ projectQuotaCpu }}
+                  limits.memory: {{ projectQuotaMemory }}
+
+          - key: ac_spark_role
+            value: |
                 apiVersion: rbac.authorization.k8s.io/v1beta1
                 kind: Role
                 metadata:
@@ -259,16 +407,16 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                   verbs:
                   - '*'
 
-           - key: ad_spark_service_account
-             value: |
+          - key: ad_spark_service_account
+            value: |
                 apiVersion: v1
                 kind: ServiceAccount
                 metadata:
                   name: spark
                   namespace: {{ namespace }}
 
-           - key: ae_spark_role_binding
-             value: |
+          - key: ae_spark_role_binding
+            value: |
                 apiVersion: rbac.authorization.k8s.io/v1beta1
                 kind: RoleBinding
                 metadata:
@@ -283,48 +431,50 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                   name: spark
                   namespace: {{ namespace }}
 
-       sparkoperator:
-         enabled: true
-         plugin_config:
-           plugins:
-             spark:
-               # -- Spark default configuration
-               spark-config-default:
-                 # We override the default credentials chain provider for Hadoop so that
-                 # it can use the serviceAccount based IAM role or ec2 metadata based.
-                 # This is more in line with how AWS works
-                 - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-                 - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-                 - spark.kubernetes.allocation.batch.size: "50"
-                 - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                 - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                 - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                 - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                 - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-                 - spark.blacklist.enabled: "true"
-                 - spark.blacklist.timeout: "5m"
-                 - spark.task.maxfailures: "8"
-       configmap:
-         enabled_plugins:
-           # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
-           tasks:
-             # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
-             task-plugins:
-               # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
-               # plugins
-               enabled-plugins:
-                 - container
-                 - sidecar
-                 - k8s-array
-                 - spark
-               default-for-task-types:
-                 container: container
-                 sidecar: sidecar
-                 container_array: k8s-array
-                 spark: spark
+      sparkoperator:
+        enabled: true
+        plugin_config:
+          plugins:
+            spark:
+              # -- Spark default configuration
+              spark-config-default:
+                # We override the default credentials chain provider for Hadoop so that
+                # it can use the serviceAccount based IAM role or ec2 metadata based.
+                # This is more in line with how AWS works
+                - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+                - spark.kubernetes.allocation.batch.size: "50"
+                - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+                - spark.blacklist.enabled: "true"
+                - spark.blacklist.timeout: "5m"
+                - spark.task.maxfailures: "8"
+      configmap:
+        enabled_plugins:
+          # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+          tasks:
+            # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+            task-plugins:
+              # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+              # plugins
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - spark
+              default-for-task-types:
+                container: container
+                sidecar: sidecar
+                container_array: k8s-array
+                spark: spark
+
+
 
 5. Upgrade the Flyte Helm release.
 
