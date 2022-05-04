@@ -26,11 +26,14 @@ ENV VENV /opt/venv
 RUN python3 -m venv ${VENV}
 ENV PATH="${VENV}/bin:$PATH"
 
+RUN pip3 install wheel
+
 # Install Python dependencies
 COPY k8s_spark/requirements.txt /root
 RUN pip install -r /root/requirements.txt
 
 RUN flytekit_install_spark3.sh
+
 # Adding Tini support for the spark pods
 RUN wget  https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
     cp tini /sbin/tini && cp tini /usr/bin/tini && \
