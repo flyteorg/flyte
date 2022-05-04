@@ -452,8 +452,8 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                 - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
                 - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
                 - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-                - spark.blacklist.enabled: "true"
-                - spark.blacklist.timeout: "5m"
+                - spark.excludeOnFailure.enabled: "true"
+                - spark.excludeOnFailure.timeout: "5m"
                 - spark.task.maxfailures: "8"
       configmap:
         enabled_plugins:
@@ -473,8 +473,6 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                 sidecar: sidecar
                 container_array: k8s-array
                 spark: spark
-
-
 
 5. Upgrade the Flyte Helm release.
 
