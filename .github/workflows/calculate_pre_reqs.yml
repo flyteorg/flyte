@@ -1,18 +1,25 @@
 on:
   workflow_call:
+    inputs:
+      mode:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
     outputs:
       mode:
         description: "mode ( nightly or release )"
-        value: ${{ jobs.example_job.outputs.mode }}
+        value: ${{ jobs.calculate-pre-reqs.outputs.mode }}
       components_version:
         description: "components version"
-        value: ${{ jobs.example_job.outputs.components_version }}
+        value: ${{ jobs.calculate-pre-reqs.outputs.components_version }}
       badge_version:
         description: "badge version"
-        value: ${{ jobs.example_job.outputs.badge_version }}
+        value: ${{ jobs.calculate-pre-reqs.outputs.badge_version }}
       flytesnacks_latest:
         description: "latest flytesnacks version"
-        value: ${{ jobs.example_job.outputs.flytesnacks_latest }}
+        value: ${{ jobs.calculate-pre-reqs.outputs.flytesnacks_latest }}
 
 jobs:
   calculate-pre-reqs:
@@ -22,7 +29,7 @@ jobs:
       - name: Set inputs defaults (needed for scheduled runs)
         id: set-inputs-default
         run: |
-          COMPONENTS_VERSION=${{ github.event.inputs.components_version || 'latest' }}
+          COMPONENTS_VERSION=${{ inputs.components_version || 'latest' }}
           echo ::set-output name=components_version::${COMPONENTS_VERSION}
 
           MODE=${{ inputs.mode || 'nightly' }}
@@ -33,7 +40,7 @@ jobs:
       - name: Determine Badge version
         id: parse-badge-version
         run: |
-          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ github.event.inputs.components_version }})
+          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ inputs.components_version }})
           echo "::set-output name=badge_version::${BADGE_VERSION}"
       - name: Parse latest flytesnacks version
         id: parse-flytesnacks-version
