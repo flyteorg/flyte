@@ -1,5 +1,18 @@
 on:
   workflow_call:
+    outputs:
+      mode:
+        description: "description"
+        value: ${{ jobs.example_job.outputs.mode }}
+      components_version:
+        description: "description"
+        value: ${{ jobs.example_job.outputs.components_version }}
+      badge_version:
+        description: "description"
+        value: ${{ jobs.example_job.outputs.badge_version }}
+      flytesnacks_latest:
+        description: "description"
+        value: ${{ jobs.example_job.outputs.flytesnacks_latest }}
 
 jobs:
   calculate-pre-reqs:
