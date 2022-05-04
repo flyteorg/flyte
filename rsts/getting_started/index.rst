@@ -238,7 +238,7 @@ What's Next?
 
 This guide demonstrated how you can quickly iterate on self-contained scripts using ``pyflyte run``.
 
-- To learn more about Flyte's features such as caching, conditionals, specifying resources requirements, and scheduling
+- To learn more about Flyte's features such as caching, conditionals, specifying resource requirements, and scheduling
   workflows, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
 - To learn more about how to organize, package, and register workflows for larger projects, see the guide for
   :ref:`Building Large Apps <cookbook:larger_apps>`.
