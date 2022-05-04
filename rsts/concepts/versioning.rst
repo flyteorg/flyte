@@ -33,8 +33,9 @@ The entire workflow in Flyte is versioned and all tasks and entities are immutab
 This hermetic property makes it effortless to manage and deploy new workflow versions and is important for workflows that are long-running. 
 If a workflow execution is in progress and another new workflow version has been activated, Flyte guarantees that the execution of the old version continues unhindered.
 
-Now consider the scenario where there's a requirement to run all the previous executions if there's a bug that needs to be fixed.
-Fixing bugs involves code changes, which may affect the workflow structure. Simply fixing the bug in the task may not solve the problem.
+Consider a scenario where you need to run all the previous executions if there's a bug to be fixed.
+Simply fixing the bug in the task may not solve the problem.
+Moreover, fixing bugs involves code changes, which may affect the workflow structure.
 Flyte addresses this using two properties:
 
 1. Since the entire workflow is versioned, changing the structure has no impact on the existing execution, and the workflow state won't be corrupted.
