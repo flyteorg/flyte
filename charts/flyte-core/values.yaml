@@ -702,6 +702,8 @@ cluster_resource_manager:
   standaloneDeployment: false
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Annotations for ClusterResource pods
+  podAnnotations: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters

@@ -359,6 +359,8 @@ cluster_resource_manager:
   enabled: true
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Annotations for ClusterResource pods
+  podAnnotations: {}
   config:
     cluster_resources:
       # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints

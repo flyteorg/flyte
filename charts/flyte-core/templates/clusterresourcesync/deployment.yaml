@@ -4,13 +4,19 @@ kind: Deployment
 metadata:
   name: syncresources
   namespace: {{ template "flyte.namespace" . }}
-  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+  labels: {{ include "flyteclusterresourcesync.labels" . | nindent 4 }}
 spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "flyteclusterresourcesync.selectorLabels" . | nindent 6 }}
   template:
-    {{- with .Values.flyteadmin.podAnnotations }}
     metadata:
-      annotations: {{ tpl (toYaml .) $ | nindent 12 }}
-    {{- end }}
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/clusterresourcesync/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.cluster_resource_manager.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
     spec:
       containers:
         - command:

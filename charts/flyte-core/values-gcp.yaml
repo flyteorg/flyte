@@ -315,6 +315,8 @@ cluster_resource_manager:
   enabled: true
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Annotations for ClusterResource pods
+  podAnnotations: {}
   config:
     cluster_resources:
       # -- How frequently to run the sync process

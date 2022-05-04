@@ -979,12 +979,25 @@ metadata:
   name: syncresources
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/name: flyteclusterresourcesync
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyteclusterresourcesync
+      app.kubernetes.io/instance: flyte
   template:
+    metadata:
+      annotations:
+        configChecksum: "3bb88d73a5d3ea730bc64e7e4479be9cf69e68733bc462c064973be81f8d182"
+      labels: 
+        app.kubernetes.io/name: flyteclusterresourcesync
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-core-v0.1.10
+        app.kubernetes.io/managed-by: Helm
     spec:
       containers:
         - command:
