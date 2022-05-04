@@ -16,6 +16,7 @@ on:
         description: "Version used by all components. Leave as latest for the nightly runs and pick a flyte release version in case of a release test (e.g. the full string \"v0.18.2\")"
         required: true
         default: "latest"
+        type: string
 
 permissions:
   id-token: write
