@@ -24,7 +24,7 @@
 set -e
 
 HAS_CURL="$(type "curl" &> /dev/null && echo true || echo false)"
-HAS_WGET="$(type "curl" &> /dev/null && echo true || echo false)"
+HAS_WGET="$(type "wget" &> /dev/null && echo true || echo false)"
 
 if [ "${HAS_CURL}" != "true" ] && [ "${HAS_WGET}" != "true" ]; then
   echo "Either curl or wget is required"
