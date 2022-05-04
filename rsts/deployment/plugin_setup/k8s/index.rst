@@ -409,27 +409,27 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
           - key: ad_spark_service_account
             value: |
-                apiVersion: v1
-                kind: ServiceAccount
-                metadata:
-                  name: spark
-                  namespace: {{ namespace }}
+              apiVersion: v1
+              kind: ServiceAccount
+              metadata:
+                name: spark
+                namespace: {{ namespace }}
 
           - key: ae_spark_role_binding
             value: |
-                apiVersion: rbac.authorization.k8s.io/v1beta1
-                kind: RoleBinding
-                metadata:
-                  name: spark-role-binding
-                  namespace: {{ namespace }}
-                roleRef:
-                  apiGroup: rbac.authorization.k8s.io
-                  kind: Role
-                  name: spark-role
-                subjects:
-                - kind: ServiceAccount
-                  name: spark
-                  namespace: {{ namespace }}
+              apiVersion: rbac.authorization.k8s.io/v1beta1
+              kind: RoleBinding
+              metadata:
+                name: spark-role-binding
+                namespace: {{ namespace }}
+              roleRef:
+                apiGroup: rbac.authorization.k8s.io
+                kind: Role
+                name: spark-role
+              subjects:
+              - kind: ServiceAccount
+                name: spark
+                namespace: {{ namespace }}
 
       sparkoperator:
         enabled: true
