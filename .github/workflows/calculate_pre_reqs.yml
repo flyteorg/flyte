@@ -1,12 +1,5 @@
 on:
   workflow_call:
-    inputs:
-      mode:
-        type: string
-        required: false
-      components_version:
-        type: string
-        required: false
     outputs:
       mode:
         description: "mode ( nightly or release )"
@@ -29,7 +22,7 @@ jobs:
       - name: Set inputs defaults (needed for scheduled runs)
         id: set-inputs-default
         run: |
-          COMPONENTS_VERSION=${{ inputs.components_version || 'latest' }}
+          COMPONENTS_VERSION=${{ github.event.inputs.components_version || 'latest' }}
           echo ::set-output name=components_version::${COMPONENTS_VERSION}
 
           MODE=${{ inputs.mode || 'nightly' }}
@@ -40,7 +33,7 @@ jobs:
       - name: Determine Badge version
         id: parse-badge-version
         run: |
-          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ inputs.components_version }})
+          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ github.event.inputs.components_version }})
           echo "::set-output name=badge_version::${BADGE_VERSION}"
       - name: Parse latest flytesnacks version
         id: parse-flytesnacks-version
