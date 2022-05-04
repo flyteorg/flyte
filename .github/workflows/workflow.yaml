@@ -213,11 +213,6 @@ jobs:
       run: |
         sudo apt-get -y install tree
         tree
-    - name: MV YAMLS
-      shell: bash
-      run: |
-        mv /home/runner/work/flyte/flyte/opta/aws/opta-env/env.yaml /home/runner/work/flyte/flyte/opta/aws/env.yaml
-        mv /home/runner/work/flyte/flyte/opta/aws/flyte-env/flyte.yaml /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
