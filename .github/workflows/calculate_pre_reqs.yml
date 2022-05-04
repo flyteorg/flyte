@@ -4,7 +4,7 @@ on:
       mode:
         type: string
         required: false
-      version:
+      components_version:
         type: string
         required: false
     outputs:
