@@ -194,7 +194,6 @@ data:
             value: 3000Mi
         - gsa:
             value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
-      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -278,7 +277,6 @@ data:
             value: 3000Mi
         - gsa:
             value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
-      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -552,7 +550,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5a0ed2ad63abfcfe3ab6c31516ab0e0c3d2b54e73d2105aa75d58510e437d75"
+        configChecksum: "f81062eaca7dec8812f9c768242a69dfd51b2022e1112c32fe12beecf48c513"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -685,6 +683,53 @@ spec:
               matchLabels:
                 app.kubernetes.io/name: flyteadmin
             topologyKey: kubernetes.io/hostname
+---
+# Source: flyte-core/templates/clusterresourcesync/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncresources
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: '*/1 * * * *'
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - flyteadmin
+            - --config
+            - /etc/flyte/config/*.yaml
+            - clusterresource
+            - sync
+            image: "cr.flyte.org/flyteorg/flyteadmin:v1.0.0"
+            imagePullPolicy: "IfNotPresent"
+            name: sync-cluster-resources
+            volumeMounts:
+            - mountPath: /etc/db
+              name: db-pass
+            - mountPath: /etc/flyte/clusterresource/templates
+              name: resource-templates
+            - mountPath: /etc/flyte/config
+              name: config-volume
+          restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
+          volumes:
+          - name: db-pass
+            secret:
+              secretName: db-pass
+          - configMap:
+              name: clusterresource-template
+            name: resource-templates
+          - configMap:
+              name: flyte-clusterresourcesync-config
+            name: config-volume
 ---
 # Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1
@@ -857,7 +902,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5a0ed2ad63abfcfe3ab6c31516ab0e0c3d2b54e73d2105aa75d58510e437d75"
+        configChecksum: "f81062eaca7dec8812f9c768242a69dfd51b2022e1112c32fe12beecf48c513"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -924,53 +969,6 @@ spec:
         - name: auth
           secret:
             secretName: flyte-secret-auth
----
-# Source: flyte-core/templates/clusterresourcesync/cronjob.yaml
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: syncresources
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-core-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  schedule: '*/1 * * * *'
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - command:
-            - flyteadmin
-            - --config
-            - /etc/flyte/config/*.yaml
-            - clusterresource
-            - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v1.0.0"
-            imagePullPolicy: "IfNotPresent"
-            name: sync-cluster-resources
-            volumeMounts:
-            - mountPath: /etc/db
-              name: db-pass
-            - mountPath: /etc/flyte/clusterresource/templates
-              name: resource-templates
-            - mountPath: /etc/flyte/config
-              name: config-volume
-          restartPolicy: OnFailure
-          serviceAccountName: flyteadmin
-          volumes:
-          - name: db-pass
-            secret:
-              secretName: db-pass
-          - configMap:
-              name: clusterresource-template
-            name: resource-templates
-          - configMap:
-              name: flyte-clusterresourcesync-config
-            name: config-volume
 ---
 # Source: flyte-core/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1

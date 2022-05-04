@@ -313,10 +313,14 @@ configmap:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
-  # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
-  standalone_deploy: false
+  # -- Service account name to run with
+  service_account_name: flyteadmin
   config:
     cluster_resources:
+      refreshInterval: 5m
+      templatePath: "/etc/flyte/clusterresource/templates"
+      # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+      standaloneDeployment: false
       customData:
         - production:
             - projectQuotaCpu:

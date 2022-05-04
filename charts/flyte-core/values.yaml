@@ -699,6 +699,7 @@ external_events:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  standaloneDeployment: false
   # -- Service account name to run with
   service_account_name: flyteadmin
   # -- Configmap for ClusterResource parameters
@@ -726,7 +727,6 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
-      refresh: 5m
 
   # -- Resource templates that should be applied
   templates:

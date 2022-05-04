@@ -1,0 +1,51 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncresources
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+spec:
+  template:
+    {{- with .Values.flyteadmin.podAnnotations }}
+    metadata:
+      annotations: {{ tpl (toYaml .) $ | nindent 12 }}
+    {{- end }}
+    spec:
+      containers:
+      - command:
+        - flyteadmin
+        - --config
+        - {{ .Values.flyteadmin.configPath }}
+        - clusterresource
+        - run
+        image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+        imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
+        name: sync-cluster-resources
+        volumeMounts:
+        {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
+        {{- include "databaseSecret.volumeMount" . | nindent 12 }}
+        {{- else }}
+        - name: auth
+          mountPath: /etc/secrets/
+        {{- end }}
+        - mountPath: /etc/flyte/clusterresource/templates
+          name: resource-templates
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      restartPolicy: OnFailure
+      serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
+      volumes:  {{- include "databaseSecret.volume" . | nindent 10 }}
+      - configMap:
+          name: clusterresource-template
+        name: resource-templates
+      - configMap:
+          name: flyte-clusterresourcesync-config
+        name: config-volume
+      {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+      {{- end }}
+
+  {{- end }}
