@@ -696,40 +696,36 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
-  schedule: '*/1 * * * *'
-  jobTemplate:
+  template:
     spec:
-      template:
-        spec:
-          containers:
-          - command:
+      containers:
+        - command:
             - flyteadmin
             - --config
             - /etc/flyte/config/*.yaml
             - clusterresource
-            - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v1.0.0"
-            imagePullPolicy: "IfNotPresent"
-            name: sync-cluster-resources
-            volumeMounts:
-            - mountPath: /etc/db
-              name: db-pass
-            - mountPath: /etc/flyte/clusterresource/templates
-              name: resource-templates
-            - mountPath: /etc/flyte/config
-              name: config-volume
-          restartPolicy: OnFailure
-          serviceAccountName: flyteadmin
-          volumes:
-          - name: db-pass
-            secret:
-              secretName: db-pass
-          - configMap:
-              name: clusterresource-template
+            - run
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.0.0"
+          imagePullPolicy: "IfNotPresent"
+          name: sync-cluster-resources
+          volumeMounts:
+          - mountPath: /etc/db
+            name: db-pass
+          - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
-          - configMap:
-              name: flyte-clusterresourcesync-config
+          - mountPath: /etc/flyte/config
             name: config-volume
+      serviceAccountName: flyteadmin
+      volumes:
+        - name: db-pass
+          secret:
+            secretName: db-pass
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
+        - configMap:
+            name: flyte-clusterresourcesync-config
+          name: config-volume
 ---
 # Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1
