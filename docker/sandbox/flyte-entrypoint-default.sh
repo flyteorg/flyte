@@ -36,6 +36,7 @@ K3S_PID=$!
 timeout 600 sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
 echo "Done."
 
+echo "Deploying Flyte..."
 FLYTE_VERSION=${FLYTE_VERSION:-latest}
 if [[ $FLYTE_VERSION = "latest" ]]
 then
@@ -43,16 +44,16 @@ then
 fi
 
 # Deploy flyte
-echo "Deploying Flyte..."
+helm repo add flyteorg https://flyteorg.github.io/flyte
+
+echo "Deploying Flyte-deps..."
 version=""
-charts="/flyteorg/share/flyte"
+charts="/flyteorg/share/flyte-deps"
 
 if [[ $FLYTE_TEST = "release" ]]
 then
-  helm repo add flyteorg https://flyteorg.github.io/flyte
-  helm fetch flyteorg/flyte --version=$FLYTE_VERSION
   version="--version $FLYTE_VERSION"
-  charts="flyteorg/flyte"
+  charts="flyteorg/flyte-deps"
 fi
 
 if [[ $FLYTE_TEST = "local" ]]
@@ -60,7 +61,23 @@ then
   helm dep update $charts
 fi
 
-helm upgrade -n flyte --create-namespace flyte $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install $version
+helm upgrade -n flyte --create-namespace flyte-deps $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install $version --set webhook.enabled=false,contour.enabled=true --wait
+
+version=""
+charts="/flyteorg/share/flyte-core"
+
+if [[ $FLYTE_TEST = "release" ]]
+then
+  version="--version $FLYTE_VERSION"
+  charts="flyteorg/flyte-core"
+fi
+
+if [[ $FLYTE_TEST = "local" ]]
+then
+  helm dep update $charts
+fi
+
+helm upgrade -n flyte --create-namespace flyte-core $charts --kubeconfig /etc/rancher/k3s/k3s.yaml --install $version -f /flyteorg/share/flyte-core/values-sandbox.yaml
 
 wait-for-flyte.sh
 
