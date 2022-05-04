@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - opta-aws
+
 permissions:
   id-token: write
   contents: read
@@ -67,9 +68,11 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         # This aws account should have admin permissions
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
         aws-region: ${{ env.AWS_REGION }}
+        role-session-name: ApplySession
     - name: SETUP AND APPLY OPTA
       shell: bash
       run: |
@@ -213,6 +216,15 @@ jobs:
       run: |
         sudo apt-get -y install tree
         tree
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        # This aws account should have admin permissions
+        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: DestroySession
     - name: DESTROY FLYTE Opta
       shell: bash
       run: |
