@@ -75,7 +75,6 @@ How Is Versioning Tied to Reproducibility?
 
 Workflows can be reproduced without explicit versioning within the system.
 To reproduce a past experiment, users need to identify the source code and resurrect any dependencies that the code may have used (for example, TensorFlow 1.x instead of TensorFlow 2.x, or specific Python libraries).
-It is also required to instantiate the infrastructure that the previous version may have used. If not recorded, ensure that the previously used dataset (say) can be reconstructed.
 It is also required to instantiate the infrastructure that the previous version may have used. If not recorded, you'll have to ensure that the previously used dataset (say) can be reconstructed.
 
 This is exactly how Flyte was conceived!
