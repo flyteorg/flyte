@@ -3,9 +3,6 @@ flyteadmin:
 
 cluster_resource_manager:
   enabled: false
-  config:
-    cluster_resources:
-      standaloneDeployment: false
 
 workflow_scheduler:
   enabled: false

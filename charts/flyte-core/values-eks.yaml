@@ -352,38 +352,41 @@ workflow_notifications:
           Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
           {{ error }}
 
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
-  standaloneDeployment: true
   # -- Service account name to run with
-  katrina: elsie
   service_account_name: flyteadmin
-  # -- Configmap for ClusterResource parameters
   config:
-    # -- ClusterResource parameters
-    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
     cluster_resources:
-      refreshInterval: 5m
-      templatePath: "/etc/flyte/clusterresource/templates"
       # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
       standaloneDeployment: false
+      # -- How frequently to run the sync process
+      refresh: 5m
       customData:
         - production:
             - projectQuotaCpu:
                 value: "5"
             - projectQuotaMemory:
                 value: "4000Mi"
+            - defaultIamRole:
+                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
+            - defaultIamRole:
+                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+            - defaultIamRole:
+                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
 
   templates:
     # -- Template for namespaces resources

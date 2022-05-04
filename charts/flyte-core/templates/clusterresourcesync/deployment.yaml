@@ -46,5 +46,4 @@ spec:
         secret:
           secretName: flyte-secret-auth
       {{- end }}
-
   {{- end }}

@@ -317,6 +317,7 @@ cluster_resource_manager:
   service_account_name: flyteadmin
   config:
     cluster_resources:
+      # -- How frequently to run the sync process
       refreshInterval: 5m
       templatePath: "/etc/flyte/clusterresource/templates"
       # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
