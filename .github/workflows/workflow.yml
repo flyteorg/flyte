@@ -2,6 +2,20 @@ on:
   push:
     branches:
       - opta-aws
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Mode of operation (either nightly or release)"
+        required: true
+        default: "nightly"
+        type: choice
+        options:
+          - nightly
+          - release
+      components_version:
+        description: "Version used by all components. Leave as latest for the nightly runs and pick a flyte release version in case of a release test (e.g. the full string \"v0.18.2\")"
+        required: true
+        default: "latest"
 
 permissions:
   id-token: write
@@ -16,7 +30,10 @@ env:
 
 jobs:
   calculate-pre-reqs:
-    uses: brucearctor/flyte/.github/workflows/testing_calculate_pre_reqs.yml@opta-aws
+    uses: brucearctor/flyte/.github/workflows/calculate_pre_reqs.yml@opta-aws
+    with:
+      mode: ${{ github.event.inputs.mode }}
+      components_version: ${{ github.event.inputs.components_version }}
   run-testing-workflows:
     runs-on: ubuntu-latest
     needs: calculate-pre-reqs

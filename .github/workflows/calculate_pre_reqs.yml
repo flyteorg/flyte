@@ -1,17 +1,24 @@
 on:
   workflow_call:
+    inputs:
+      mode:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
     outputs:
       mode:
-        description: "description"
+        description: "mode ( nightly or release )"
         value: ${{ jobs.example_job.outputs.mode }}
       components_version:
-        description: "description"
+        description: "components version"
         value: ${{ jobs.example_job.outputs.components_version }}
       badge_version:
-        description: "description"
+        description: "badge version"
         value: ${{ jobs.example_job.outputs.badge_version }}
       flytesnacks_latest:
-        description: "description"
+        description: "latest flytesnacks version"
         value: ${{ jobs.example_job.outputs.flytesnacks_latest }}
 
 jobs:
@@ -22,10 +29,10 @@ jobs:
       - name: Set inputs defaults (needed for scheduled runs)
         id: set-inputs-default
         run: |
-          COMPONENTS_VERSION=${{ github.event.inputs.components_version || 'latest' }}
+          COMPONENTS_VERSION=${{ inputs.components_version || 'latest' }}
           echo ::set-output name=components_version::${COMPONENTS_VERSION}
 
-          MODE=${{ github.event.inputs.mode || 'nightly' }}
+          MODE=${{ inputs.mode || 'nightly' }}
           echo "::set-output name=mode::${MODE}"
           # We use the mode in the subsequent next step to determine the badge version. Github has a specific syntax to define environment variables
           # as defined in https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions).
@@ -33,7 +40,7 @@ jobs:
       - name: Determine Badge version
         id: parse-badge-version
         run: |
-          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ github.event.inputs.components_version }})
+          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ inputs.components_version }})
           echo "::set-output name=badge_version::${BADGE_VERSION}"
       - name: Parse latest flytesnacks version
         id: parse-flytesnacks-version
