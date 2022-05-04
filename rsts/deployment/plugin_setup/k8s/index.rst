@@ -385,27 +385,27 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
           - key: ac_spark_role
             value: |
-                apiVersion: rbac.authorization.k8s.io/v1beta1
-                kind: Role
-                metadata:
-                  name: spark-role
-                  namespace: {{ namespace }}
-                rules:
-                - apiGroups: ["*"]
-                  resources:
-                  - pods
-                  verbs:
-                  - '*'
-                - apiGroups: ["*"]
-                  resources:
-                  - services
-                  verbs:
-                  - '*'
-                - apiGroups: ["*"]
-                  resources:
-                  - configmaps
-                  verbs:
-                  - '*'
+              apiVersion: rbac.authorization.k8s.io/v1beta1
+              kind: Role
+              metadata:
+                name: spark-role
+                namespace: {{ namespace }}
+              rules:
+              - apiGroups: ["*"]
+                resources:
+                - pods
+                verbs:
+                - '*'
+              - apiGroups: ["*"]
+                resources:
+                - services
+                verbs:
+                - '*'
+              - apiGroups: ["*"]
+                resources:
+                - configmaps
+                verbs:
+                - '*'
 
           - key: ad_spark_service_account
             value: |
