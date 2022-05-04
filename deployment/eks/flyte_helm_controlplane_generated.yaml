@@ -173,16 +173,23 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -248,16 +255,23 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -531,7 +545,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f83313b5da6c6505ad5d3730a545aaa382ce3cc22c2e77b7d45e79cee505057"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -879,7 +893,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f83313b5da6c6505ad5d3730a545aaa382ce3cc22c2e77b7d45e79cee505057"
+        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
