@@ -34,6 +34,11 @@ jobs:
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           aws-region: ${{ inputs.aws-region }}
           role-session-name: DestroySession
+      - name: SETUP OPTA
+        shell: bash
+        run: |
+          sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
+          /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
       - name: DESTROY FLYTE Opta
         shell: bash
         run: |
