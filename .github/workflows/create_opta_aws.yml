@@ -1,19 +1,5 @@
 on:
   workflow_call:
-    inputs:
-      aws-region:
-        type: string
-        required: true
-      your-company:
-        type: string
-        required: true
-      env-name:
-        type: string
-        required: true
-    outputs:
-      dns:
-        type: string
-        description: "dns of loadbalancer/endpoint"
 
 jobs:
   destroy-cluster:
@@ -22,7 +8,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        # move the below to CI helper?
       - name: set env variables
         shell: bash
         run: |
