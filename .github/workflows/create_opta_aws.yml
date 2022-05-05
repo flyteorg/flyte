@@ -62,3 +62,5 @@ jobs:
           echo ""
           echo $DNS
           echo "::set-output name=dns::${DNS}"
+      outputs:
+        dns: ${{ steps.output-dns.outputs.dns }}
