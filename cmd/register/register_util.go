@@ -656,7 +656,7 @@ func filterExampleFromRelease(releases *github.RepositoryRelease) []*github.Rele
 
 func getAllExample(repository, version string, repoService g.GHRepoService) ([]*github.ReleaseAsset, *github.RepositoryRelease, error) {
 	if len(version) > 0 {
-		release, err := g.GetReleaseByTag(version, repository, repoService)
+		release, err := g.GetReleaseByTag(repository, version, repoService)
 		if err != nil {
 			return nil, nil, err
 		}
