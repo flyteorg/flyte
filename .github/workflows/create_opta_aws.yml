@@ -10,6 +10,9 @@ on:
       env-name:
         type: string
         required: true
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
     outputs:
       dns:
         description: "dns of loadbalancer/endpoint"

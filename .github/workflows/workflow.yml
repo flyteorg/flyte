@@ -54,6 +54,7 @@ jobs:
       aws-region: "${{ needs.set-env-vars.outputs.aws-region }}"
       your-company: "${{ needs.set-env-vars.outputs.your-company }}"
       env-name: "${{ needs.set-env-vars.outputs.env-name }}"
+    secrets: inherit
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
