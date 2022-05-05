@@ -38,8 +38,8 @@ jobs:
        shell: bash
        run: |
          echo "::set-output name=aws_region::$AWS_REGION"
-         echo "::set-output name=your_company::YOUR_COMPANY"
-         echo "::set-output name=env_name::ENV_NAME"
+         echo "::set-output name=your_company::$YOUR_COMPANY"
+         echo "::set-output name=env_name::$ENV_NAME"
     outputs:
       aws-region: ${{ steps.set-env-vars.outputs.aws_region }}
       your-company: ${{ steps.set-env-vars.outputs.your_company }}
