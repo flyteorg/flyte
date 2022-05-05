@@ -20,73 +20,43 @@ jobs:
     name: Create AWS OPTA
     runs-on: ubuntu-latest
     steps:
-      - name: Set inputs defaults (needed for scheduled runs)
-        id: set-inputs-default
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        # move the below to CI helper?
+      - name: set env variables
+        shell: bash
         run: |
-          COMPONENTS_VERSION=${{ inputs.components_version || 'latest' }}
-          echo ::set-output name=components_version::${COMPONENTS_VERSION}
-
-          MODE=${{ inputs.mode || 'nightly' }}
-          echo "::set-output name=mode::${MODE}"
-          # We use the mode in the subsequent next step to determine the badge version. Github has a specific syntax to define environment variables
-          # as defined in https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions).
-          echo "'MODE='$MODE >> $GITHUB_ENV"
-      - name: Determine Badge version
-        id: parse-badge-version
+          sed -i "s/<env_name>/${{ inputs.env-name }}/" ./opta/aws/env.yaml
+          sed -i "s/<your_company>/${{ inputs.your-company }}/" ./opta/aws/env.yaml
+          sed -i "s/<region>/${{ inputs.aws-region }}/" ./opta/aws/env.yaml
+          sed -i "s/<account_id>/${{ secrets.AWS_ACCOUNT_ID }}/" ./opta/aws/env.yaml
+      - name: Archive env artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: opta-env
+          path: |
+            ./opta/aws/env.yaml
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
+          aws-region:  ${{ inputs.aws-region }}
+          role-session-name: ApplySession
+      - name: SETUP AND APPLY OPTA
+        shell: bash
         run: |
-          BADGE_VERSION=$([ ${{ env.MODE }} == "nightly" ] && echo nightly || echo ${{ inputs.components_version }})
-          echo "::set-output name=badge_version::${BADGE_VERSION}"
-      - name: Parse latest flytesnacks version
-        id: parse-flytesnacks-version
+          sudo chmod +x .github/scripts/ci_helper.sh
+          .github/scripts/ci_helper.sh setup_opta
+          opta apply -c ./opta/aws/env.yaml --auto-approve
+          opta output -c ./opta/aws/env.yaml
+      - name: OPTA DNS
+        id: opta-dns
+        shell: bash
         run: |
-          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
-          echo "::set-output name=flytesnacks_latest::${LATEST_VERSION}"
+          cat ./opta/aws/env.yaml
+          DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
+          echo ""
+          echo $DNS
+          echo "::set-output name=dns::${DNS}"
       outputs:
         dns: ${{ steps.output-dns.outputs.dns }}
-
-
-##jobs:
-##  create-aws-opta:
-##    name: Create AWS OPTA
-##    runs-on: ubuntu-latest
-##    steps:
-##      - name: Checkout repo
-##        uses: actions/checkout@v3
-##        # move the below to CI helper?
-##      - name: set env variables
-##        shell: bash
-##        run: |
-##          sed -i "s/<env_name>/${{ inputs.env-name }}/" ./opta/aws/env.yaml
-##          sed -i "s/<your_company>/${{ inputs.your-company }}/" ./opta/aws/env.yaml
-##          sed -i "s/<region>/${{ inputs.aws-region }}/" ./opta/aws/env.yaml
-##          sed -i "s/<account_id>/${{ secrets.AWS_ACCOUNT_ID }}/" ./opta/aws/env.yaml
-##      - name: Archive env artifact
-##        uses: actions/upload-artifact@v3
-##        with:
-##          name: opta-env
-##          path: |
-##            ./opta/aws/env.yaml
-##      - name: Configure AWS credentials
-##        uses: aws-actions/configure-aws-credentials@v1
-##        with:
-##          role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-##          aws-region:  ${{ inputs.aws-region }}
-##          role-session-name: ApplySession
-##      - name: SETUP AND APPLY OPTA
-##        shell: bash
-##        run: |
-##          sudo chmod +x .github/scripts/ci_helper.sh
-##          .github/scripts/ci_helper.sh setup_opta
-##          opta apply -c ./opta/aws/env.yaml --auto-approve
-##          opta output -c ./opta/aws/env.yaml
-##      - name: OPTA DNS
-##        id: opta-dns
-##        shell: bash
-##        run: |
-##          cat ./opta/aws/env.yaml
-##          DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
-##          echo ""
-##          echo $DNS
-##          echo "::set-output name=dns::${DNS}"
-##      outputs:
-##        dns: ${{ steps.output-dns.outputs.dns }}
