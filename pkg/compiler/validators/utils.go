@@ -3,8 +3,11 @@ package validators
 import (
 	"fmt"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -153,87 +156,65 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 	return res, nil
 }
 
-// Gets LiteralType for literal, nil if the value of literal is unknown, or type None if the literal is a non-homogeneous
-// type.
+func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
+	innerType := make([]*core.LiteralType, 0, 1)
+	innerTypeSet := sets.NewString()
+	for _, x := range literals {
+		otherType := LiteralTypeForLiteral(x)
+		otherTypeKey := otherType.String()
+
+		if !innerTypeSet.Has(otherTypeKey) {
+			innerType = append(innerType, otherType)
+			innerTypeSet.Insert(otherTypeKey)
+		}
+	}
+
+	if len(innerType) == 0 {
+		return &core.LiteralType{
+			Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
+		}
+	} else if len(innerType) == 1 {
+		return innerType[0]
+	}
+
+	// sort inner types to ensure consistent union types are generated
+	slices.SortFunc(innerType, func(a, b *core.LiteralType) bool { return a.String() < b.String() })
+
+	return &core.LiteralType{
+		Type: &core.LiteralType_UnionType{
+			UnionType: &core.UnionType{
+				Variants: innerType,
+			},
+		},
+	}
+}
+
+// LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
+// type None if the literal is a non-homogeneous type.
 func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 	switch l.GetValue().(type) {
 	case *core.Literal_Scalar:
 		return literalTypeForScalar(l.GetScalar())
 	case *core.Literal_Collection:
-		if len(l.GetCollection().Literals) == 0 {
-			return &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
+		return &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: literalTypeForLiterals(l.GetCollection().Literals),
+			},
 		}
-
-		// Ensure literal collection types are homogeneous.
-		var innerType *core.LiteralType
-		for _, x := range l.GetCollection().Literals {
-			otherType := LiteralTypeForLiteral(x)
-			if innerType != nil && !AreTypesCastable(otherType, innerType) {
-				return &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
-			}
-
-			innerType = otherType
-		}
-
-		return &core.LiteralType{Type: &core.LiteralType_CollectionType{CollectionType: innerType}}
 	case *core.Literal_Map:
-		if len(l.GetMap().Literals) == 0 {
-			return &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
+		return &core.LiteralType{
+			Type: &core.LiteralType_MapValueType{
+				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
+			},
 		}
-
-		// Ensure literal map types are homogeneous.
-		var innerType *core.LiteralType
-		for _, x := range l.GetMap().Literals {
-			otherType := LiteralTypeForLiteral(x)
-			if innerType != nil && !AreTypesCastable(otherType, innerType) {
-				return &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
-			}
-
-			innerType = otherType
-		}
-
-		return &core.LiteralType{Type: &core.LiteralType_MapValueType{MapValueType: innerType}}
 	}
 
 	return nil
 }
 
-// Converts a literal to a non-promise binding data.
-func LiteralToBinding(l *core.Literal) *core.BindingData {
-	switch l.GetValue().(type) {
-	case *core.Literal_Scalar:
-		return &core.BindingData{
-			Value: &core.BindingData_Scalar{
-				Scalar: l.GetScalar(),
-			},
-		}
-	case *core.Literal_Collection:
-		x := make([]*core.BindingData, 0, len(l.GetCollection().Literals))
-		for _, sub := range l.GetCollection().Literals {
-			x = append(x, LiteralToBinding(sub))
-		}
-
-		return &core.BindingData{
-			Value: &core.BindingData_Collection{
-				Collection: &core.BindingDataCollection{
-					Bindings: x,
-				},
-			},
-		}
-	case *core.Literal_Map:
-		x := make(map[string]*core.BindingData, len(l.GetMap().Literals))
-		for key, val := range l.GetMap().Literals {
-			x[key] = LiteralToBinding(val)
-		}
-
-		return &core.BindingData{
-			Value: &core.BindingData_Map{
-				Map: &core.BindingDataMap{
-					Bindings: x,
-				},
-			},
-		}
+func GetTagForType(x *core.LiteralType) string {
+	if x.GetStructure() == nil {
+		return ""
 	}
-
-	return nil
+	return x.GetStructure().GetTag()
 }

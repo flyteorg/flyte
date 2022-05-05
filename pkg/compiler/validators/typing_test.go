@@ -349,6 +349,26 @@ func TestCollectionCasting(t *testing.T) {
 		assert.True(t, castable, "[Integer] should be castable to [Integer].")
 	})
 
+	t.Run("Empty collection", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_CollectionType{
+					CollectionType: &core.LiteralType{
+						Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_CollectionType{
+					CollectionType: &core.LiteralType{
+						Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "[] should be castable to [Integer].")
+	})
+
 	t.Run("SingleIntegerCollectionToSingleFloatCollection", func(t *testing.T) {
 		castable := AreTypesCastable(
 			&core.LiteralType{
@@ -471,6 +491,27 @@ func TestMapCasting(t *testing.T) {
 			},
 		)
 		assert.False(t, castable, "{k: Integer} should not be castable to {k: Float}")
+	})
+
+	t.Run("ScalarIntegerMapToScalarFloatMap", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_MapValueType{
+					MapValueType: &core.LiteralType{
+						Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_MapValueType{
+					MapValueType: &core.LiteralType{
+						Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+					},
+				},
+			},
+		)
+
+		assert.True(t, castable, "{k: None} should be castable to {k: Float}")
 	})
 
 	t.Run("ScalarStructToStruct", func(t *testing.T) {

@@ -13,7 +13,7 @@ type Variable struct {
 	Index *int
 }
 
-// Parses var names
+// ParseVarName parses var names
 func ParseVarName(varName string) (v Variable, err error) {
 	allMatches := arrayVarMatcher.FindAllStringSubmatch(varName, -1)
 	if len(allMatches) != 1 {

@@ -14,6 +14,46 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+// LiteralToBinding converts a literal to a non-promise binding data.
+func LiteralToBinding(l *core.Literal) *core.BindingData {
+	switch l.GetValue().(type) {
+	case *core.Literal_Scalar:
+		return &core.BindingData{
+			Value: &core.BindingData_Scalar{
+				Scalar: l.GetScalar(),
+			},
+		}
+	case *core.Literal_Collection:
+		x := make([]*core.BindingData, 0, len(l.GetCollection().Literals))
+		for _, sub := range l.GetCollection().Literals {
+			x = append(x, LiteralToBinding(sub))
+		}
+
+		return &core.BindingData{
+			Value: &core.BindingData_Collection{
+				Collection: &core.BindingDataCollection{
+					Bindings: x,
+				},
+			},
+		}
+	case *core.Literal_Map:
+		x := make(map[string]*core.BindingData, len(l.GetMap().Literals))
+		for key, val := range l.GetMap().Literals {
+			x[key] = LiteralToBinding(val)
+		}
+
+		return &core.BindingData{
+			Value: &core.BindingData_Map{
+				Map: &core.BindingDataMap{
+					Bindings: x,
+				},
+			},
+		}
+	}
+
+	return nil
+}
+
 func TestValidateBindings(t *testing.T) {
 	t.Run("Empty", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
