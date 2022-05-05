@@ -34,12 +34,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: set env variables
-       id: set-env-var
+       id: set-aws-region
        shell: bash
        run: |
          echo "::set-output name=aws_region::$AWS_REGION"
     outputs:
-      aws-region: ${{ steps.set-env-var.aws_region }}
+      aws-region: ${{ steps.set-aws-region.aws_region }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -55,6 +55,12 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
+    - name: see vars
+      env:
+        AWSREGION:  "${{ needs.set-env-vars.outputs.aws-region }}"
+      shell: bash
+      run: |
+        echo $AWSREGION
     - name: set env variables
       shell: bash
       run: |
@@ -116,7 +122,7 @@ jobs:
         LANG: en_US.UTF-8
         LANGUAGE: en_US.UTF-8
         ENV:  "${{ needs.calculate-pre-reqs.outputs.mode }}"
-        FLYTEADMIN_TAG: "$${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        FLYTEADMIN_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         DATACATALOG_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         FLYTECONSOLE_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
         FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
@@ -201,16 +207,12 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-    - name: see files
-      shell: bash
-      run: |
-        echo "${{ needs.set-env-vars.outputs.aws-region }}"
   destroy-cluster:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
     with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+      aws-region: "${{ needs.set-env-vars.outputs.aws-region }}"
     needs:
       - set-env-vars
       - calculate-pre-reqs
