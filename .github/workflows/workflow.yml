@@ -193,42 +193,7 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
-    - uses: actions/download-artifact@v3
-      id: download-flyte-yaml
-      with:
-        name: opta-flyte
-        path: /home/runner/work/flyte/flyte/opta/aws
-    - uses: actions/download-artifact@v3
-      id: download-env-yamls
-      with:
-        name: opta-env
-        path: /home/runner/work/flyte/flyte/opta/aws
-    - name: TREE
-      shell: bash
-      run: |
-        sudo apt-get -y install tree
-        tree
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        # This aws account should have admin permissions
-        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-        aws-region: ${{ env.AWS_REGION }}
-        role-session-name: DestroySession
-    - name: DESTROY FLYTE Opta
-      shell: bash
-      run: |
-        echo `pwd`
-        cd /home/runner/work/flyte/flyte/opta/aws/
-        echo `pwd`
-        echo `ls`
-        sudo apt-get -y install tree
-        tree
-        opta destroy -c flyte.yaml --auto-approve
-    - name: DESTROY OPTA ENV
-      shell: bash
-      run: |
-        cat ./opta/aws/env.yaml
-        opta destroy -c ./opta/aws/env.yaml --auto-approve
+  destroy-cluster:
+    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
+    uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
