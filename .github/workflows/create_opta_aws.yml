@@ -20,14 +20,16 @@ jobs:
     name: Create AWS OPTA
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
         # move the below to CI helper?
       - name: set env variables
         shell: bash
         run: |
-          sed -i "s/<env_name>/${{ inputs.env-name }}/" ./opta/aws/env.yaml
-          sed -i "s/<your_company>/${{ inputs.your-company }}/" ./opta/aws/env.yaml
-          sed -i "s/<region>/${{ inputs.aws-region }}/" ./opta/aws/env.yaml
-          sed -i "s/<account_id>/${{ secrets.AWS_ACCOUNT_ID }}/" ./opta/aws/env.yaml
+          sed -i "s/<env_name>/${{ inputs.env-name }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
+          sed -i "s/<your_company>/${{ inputs.your-company }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
+          sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
+          sed -i "s/<account_id>/${{ secrets.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: Archive env artifact
         uses: actions/upload-artifact@v3
         with:
@@ -43,16 +45,16 @@ jobs:
       - name: SETUP AND APPLY OPTA
         shell: bash
         run: |
-          sudo chmod +x .github/scripts/ci_helper.sh
-          .github/scripts/ci_helper.sh setup_opta
-          opta apply -c ./opta/aws/env.yaml --auto-approve
-          opta output -c ./opta/aws/env.yaml
+          sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
+          /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
+          opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
+          opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: OPTA DNS
         id: opta-dns
         shell: bash
         run: |
-          cat ./opta/aws/env.yaml
-          DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
+          cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
+          DNS=$(opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
           echo ""
           echo $DNS
           echo "::set-output name=dns::${DNS}"
