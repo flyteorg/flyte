@@ -1,15 +1,5 @@
 on:
   workflow_call:
-    inputs:
-      aws-region:
-        type: string
-        required: true
-      your-company:
-        type: string
-        required: true
-      env-name:
-        type: string
-        required: true
     outputs:
       dns:
         description: "dns of loadbalancer/endpoint"
