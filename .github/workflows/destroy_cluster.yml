@@ -1,5 +1,9 @@
 on:
   workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        required: false
 
 jobs:
   destroy-cluster:
@@ -26,7 +30,7 @@ jobs:
         with:
           # This aws account should have admin permissions ...?
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ inputs.aws-region }}
           role-session-name: DestroySession
       - name: DESTROY FLYTE Opta
         shell: bash
