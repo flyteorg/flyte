@@ -201,4 +201,4 @@ jobs:
       - calculate-pre-reqs
       - run-testing-workflows
     with:
-      aws-region: ${{ env.AWS_REGION }}
+      awsregion: ${{ env.AWS_REGION }}

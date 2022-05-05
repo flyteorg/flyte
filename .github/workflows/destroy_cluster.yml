@@ -1,7 +1,7 @@
 on:
   workflow_call:
     inputs:
-      aws-region:
+      awsregion:
         type: string
         required: false
 
