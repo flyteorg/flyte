@@ -15,6 +15,18 @@ builds:
       - linux
       - windows
       - darwin
+  - id: flytescheduler
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/scheduler/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
+    binary: flytescheduler
+    goos:
+      - linux
+      - windows
+      - darwin
 archives:
   - id: flyteadmin-archive
     name_template: |-
@@ -26,6 +38,7 @@ archives:
       {{- end -}}
     builds:
       - flyteadmin
+      - flytescheduler
     replacements:
       386: i386
       amd64: x86_64
