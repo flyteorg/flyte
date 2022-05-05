@@ -37,9 +37,9 @@ jobs:
        id: set-env-var
        shell: bash
        run: |
-         echo "::set-output name=aws-region::$AWS_REGION"
+         echo "::set-output name=aws_region::$AWS_REGION"
     outputs:
-      aws-region: ${{ steps.set-env-var.aws-region }}
+      aws-region: ${{ steps.set-env-var.aws_region }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -150,10 +150,6 @@ jobs:
         sudo rm env.yaml
     - name: Setup flytectl
       uses: unionai-oss/flytectl-setup-action@v0.0.1
-    - name: see files
-      shell: bash
-      run: |
-        ls 
     - name: update configs
       env:
         DNS: ${{ steps.opta-dns.outputs.dns }}
@@ -205,6 +201,10 @@ jobs:
         echo "$badges"  # for debugging purposes
         echo ::set-output name=badges::${badges}
     # TODO: Add a slack update after tests run
+    - name: see files
+      shell: bash
+      run: |
+        echo "${{ needs.set-env-vars.outputs.aws-region }}"
   destroy-cluster:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
