@@ -51,9 +51,9 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/careate_opta_aws.yml@main
     uses: brucearctor/flyte/.github/workflows/create_opta_aws.yml@opta-aws
     with:
-      aws_region: "${{ needs.set-env-vars.outputs.aws-region }}"
-      your_company: "${{ needs.set-env-vars.outputs.your-company }}"
-      env_name: "${{ needs.set-env-vars.outputs.env-name }}"
+      aws-region: "${{ needs.set-env-vars.outputs.aws-region }}"
+      your-company: "${{ needs.set-env-vars.outputs.your-company }}"
+      env-name: "${{ needs.set-env-vars.outputs.env-name }}"
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
