@@ -39,7 +39,7 @@ jobs:
        run: |
          echo "::set-output name=aws_region::$AWS_REGION"
     outputs:
-      aws-region: ${{ steps.set-aws-region.aws_region }}
+      aws_region: ${{ steps.set-aws-region.aws_region }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -57,10 +57,10 @@ jobs:
       uses: actions/checkout@v3
     - name: see vars
       env:
-        AWSREGION:  "${{ needs.set-env-vars.outputs.aws-region }}"
+        AWSREGION:  "${{ needs.set-env-vars.outputs.aws_region }}"
       shell: bash
       run: |
-        echo $AWSREGION
+        echo "$AWSREGION"
     - name: set env variables
       shell: bash
       run: |
@@ -212,7 +212,7 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
     with:
-      aws-region: "${{ needs.set-env-vars.outputs.aws-region }}"
+      aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
     needs:
       - set-env-vars
       - calculate-pre-reqs
