@@ -34,12 +34,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: set env variables
-       id: set-aws-region
+       id: set-env-vars
        shell: bash
        run: |
          echo "::set-output name=aws_region::$AWS_REGION"
+         echo "::set-output name=your_company::YOUR_COMPANY"
+         echo "::set-output name=env_name::ENV_NAME"
     outputs:
-      aws_region: ${{ steps.set-aws-region.outputs.aws_region }}
+      aws_region: ${{ steps.set-env-vars.outputs.aws_region }}
+      your_company: ${{ steps.set-env-vars.outputs.your_company }}
+      env_name: ${{ steps.set-env-vars.outputs.env_name }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -47,58 +51,23 @@ jobs:
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
+  create-opta-aws:
+    needs:
+      - set-env-vars
+    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+    # likely: flyteorg/flyte.github/workflows/careate_opta_aws.yml@main
+    uses: brucearctor/flyte/.github/workflows/create_opta_aws.yml@opta-aws
+    with:
+      aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
+      your-company: "${{ needs.set-env-vars.outputs.your_company }}"
+      env-name: "${{ needs.set-env-vars.outputs.env_name }}"
   run-testing-workflows:
     runs-on: ubuntu-latest
     needs:
       - set-env-vars
       - calculate-pre-reqs
+      - create-opta-aws
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-    - name: see vars
-      env:
-        AWSREGION:  "${{ needs.set-env-vars.outputs.aws_region }}"
-      shell: bash
-      run: |
-        echo "$AWSREGION"
-    - name: set env variables
-      shell: bash
-      run: |
-        sed -i "s/<env_name>/$ENV_NAME/" ./opta/aws/env.yaml
-        sed -i "s/<your_company>/$YOUR_COMPANY/" ./opta/aws/env.yaml
-        sed -i "s/<region>/$AWS_REGION/" ./opta/aws/env.yaml
-        sed -i "s/<account_id>/$AWS_ACCOUNT_ID/" ./opta/aws/env.yaml
-    - name: Archive env artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: opta-env
-        path: |
-          ./opta/aws/env.yaml
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        # This aws account should have admin permissions
-        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-        aws-region: ${{ env.AWS_REGION }}
-        role-session-name: ApplySession
-    - name: SETUP AND APPLY OPTA
-      shell: bash
-      run: |
-        sudo chmod +x .github/scripts/ci_helper.sh
-        .github/scripts/ci_helper.sh setup_opta
-        opta apply -c ./opta/aws/env.yaml --auto-approve 
-        opta output -c ./opta/aws/env.yaml
-    - name: OPTA DNS 
-      id: opta-dns
-      shell: bash
-      run: |
-        cat ./opta/aws/env.yaml
-        DNS=$(opta output -c ./opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
-        echo ""
-        echo $DNS
-        echo "::set-output name=dns::${DNS}"
     - uses: azure/setup-helm@v1
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2

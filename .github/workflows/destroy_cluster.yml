@@ -22,11 +22,6 @@ jobs:
         with:
           name: opta-env
           path: /home/runner/work/flyte/flyte/opta/cloud
-      - name: TREE
-        shell: bash
-        run: |
-          sudo apt-get -y install tree
-          tree
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -34,7 +29,7 @@ jobs:
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           aws-region: ${{ inputs.aws-region }}
           role-session-name: DestroySession
-      - name: SETUP OPTA
+      - name: SETUP AND DESTROY OPTA
         shell: bash
         run: |
           sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
@@ -42,12 +37,7 @@ jobs:
       - name: DESTROY FLYTE Opta
         shell: bash
         run: |
-          echo `pwd`
           cd /home/runner/work/flyte/flyte/opta/cloud/
-          echo `pwd`
-          echo `ls`
-          sudo apt-get -y install tree
-          tree
           opta destroy -c flyte.yaml --auto-approve
       - name: DESTROY OPTA ENV
         shell: bash
