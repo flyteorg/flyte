@@ -86,4 +86,4 @@ help: ## List available commands and their usage
 
 .PHONY: setup_local_dev
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
-	bash script/setup_local_dev.sh
+	@bash script/setup_local_dev.sh

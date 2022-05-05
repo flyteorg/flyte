@@ -4,7 +4,7 @@
 : "${ENSURE_KUBECTL:="false"}" # will ensure kubectl is installed if set to "true"
 : "${ENSURE_HELM:="false"}" # will ensure helm is installed if set to "true"
 
-: "${K3D_VERSION:="v4.4.8"}" # version of k3d to install, empty value uses latest one available. currently pinned to latest known working (due to unresolved port mapping issue: https://github.com/k3d-io/k3d/issues/380)
+: "${K3D_VERSION:="v5.4.1"}" # version of k3d to install, empty value uses latest one available
 : "${K3D_INSTALL_URL:="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"}" # URL to k3d installer script
 : "${K3S_VERSION:="v1.21.1-k3s1"}" # version of k3s to run in k3d cluster, empty value uses default specified by k3d install
 : "${K3D_CLUSTER_NAME:="flyte"}" # name of k3d cluster to be used
@@ -132,7 +132,8 @@ else
     IMAGE_ARG="--image rancher/k3s:${K3S_VERSION}"
   fi
 
-  k3d cluster create -p "30082:30082" -p "30084:30084" -p "30089:30089" --no-lb --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable=servicelb' ${IMAGE_ARG} $K3D_CLUSTER_NAME
+  # shellcheck disable=SC2086
+  k3d cluster create -p "30082:30082@server:0" -p "30084:30084@server:0" -p "30089:30089@server:0" ${IMAGE_ARG} $K3D_CLUSTER_NAME
 fi
 
 if [ -f "${K3D_KUBECONFIG_FILE_PATH}" ]; then
@@ -140,6 +141,7 @@ if [ -f "${K3D_KUBECONFIG_FILE_PATH}" ]; then
 else
   echo -e "\nExporting k3d kubeconfig to ${K3D_KUBECONFIG_FILE_PATH}"
   k3d kubeconfig get $K3D_CLUSTER_NAME > "${K3D_KUBECONFIG_FILE_PATH}"
+  chmod 600 "${K3D_KUBECONFIG_FILE_PATH}"
 fi
 
 echo -e "\nSetting kubeconfig and kubectl context"
