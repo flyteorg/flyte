@@ -16,8 +16,8 @@ on:
         value: ${{ jobs.create-aws-opta.outputs.dns }}
 
 jobs:
-  calculate-pre-reqs:
-    name: Calculate pre-requirements
+  create-aws-opta:
+    name: Create AWS OPTA
     runs-on: ubuntu-latest
     steps:
       - name: Set inputs defaults (needed for scheduled runs)
@@ -41,29 +41,10 @@ jobs:
         run: |
           LATEST_VERSION=$(curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
           echo "::set-output name=flytesnacks_latest::${LATEST_VERSION}"
-    outputs:
-      mode: ${{ steps.set-inputs-default.outputs.mode }}
-      components_version: ${{ steps.set-inputs-default.outputs.components_version }}
-      badge_version: ${{ steps.parse-badge-version.outputs.badge_version }}
-      flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
+      outputs:
+        dns: ${{ steps.output-dns.outputs.dns }}
 
-#on:
-#  workflow_call:
-#    inputs:
-#      aws_region:
-#        type: string
-#        required: true
-#      your_company:
-#        type: string
-#        required: true
-#      env_name:
-#        type: string
-#        required: true
-#    outputs:
-#      dns:
-#        description: "dns of loadbalancer/endpoint"
-#        value: ${{ jobs.create-aws-opta.outputs.dns }}
-#
+
 ##jobs:
 ##  create-aws-opta:
 ##    name: Create AWS OPTA
