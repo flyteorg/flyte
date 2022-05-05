@@ -458,7 +458,7 @@ func TestGetAllFlytesnacksExample(t *testing.T) {
 		mockGh := &ghMocks.GHRepoService{}
 		tag := "v0.15.0"
 		sandboxManifest := "flyte_sandbox_manifest.tgz"
-		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, tag).Return(&github.RepositoryRelease{
 			TagName: &tag,
 			Assets: []*github.ReleaseAsset{{
 				Name: &sandboxManifest,
