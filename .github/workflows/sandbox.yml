@@ -25,6 +25,13 @@ jobs:
           else
             echo ::set-output name=flyte_version::latest
           fi
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.FLYTE_BOT_PAT }}
+          repository: flyteorg/flyteorg.github.io
+          event-type: release
+          client-payload: '{"tag": "1.0.0"}'
       - name: Prepare DIND Image Names
         id: dind-names
         uses: docker/metadata-action@v3
