@@ -1,5 +1,19 @@
 on:
   workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        required: true
+      your-company:
+        type: string
+        required: true
+      env-name:
+        type: string
+        required: true
+    outputs:
+      dns:
+        description: "dns of loadbalancer/endpoint"
+        value: ${{ jobs.create-aws-opta.outputs.dns }}
 
 jobs:
   create-aws-opta:
@@ -35,8 +49,8 @@ jobs:
           .github/scripts/ci_helper.sh setup_opta
           opta apply -c ./opta/aws/env.yaml --auto-approve
           opta output -c ./opta/aws/env.yaml
-      - name: Output DNS
-        id: output-dns
+      - name: OPTA DNS
+        id: opta-dns
         shell: bash
         run: |
           cat ./opta/aws/env.yaml
