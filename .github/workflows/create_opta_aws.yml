@@ -22,8 +22,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        # move the below to CI helper?
       - name: set env variables
-        # MAYBE MOVE THIS TO CI_HELPER?
         shell: bash
         run: |
           sed -i "s/<env_name>/${{ inputs.env-name }}/" ./opta/aws/env.yaml
@@ -39,9 +39,6 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          # This aws account should have admin permissions
-          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           aws-region:  ${{ inputs.aws-region }}
           role-session-name: ApplySession
