@@ -1,13 +1,13 @@
 on:
   workflow_call:
     inputs:
-      aws_region:
+      aws-region:
         type: string
         required: true
-      your_company:
+      your-company:
         type: string
         required: true
-      env_name:
+      env-name:
         type: string
         required: true
     outputs:

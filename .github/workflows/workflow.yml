@@ -41,9 +41,9 @@ jobs:
          echo "::set-output name=your_company::YOUR_COMPANY"
          echo "::set-output name=env_name::ENV_NAME"
     outputs:
-      aws_region: ${{ steps.set-env-vars.outputs.aws_region }}
-      your_company: ${{ steps.set-env-vars.outputs.your_company }}
-      env_name: ${{ steps.set-env-vars.outputs.env_name }}
+      aws-region: ${{ steps.set-env-vars.outputs.aws_region }}
+      your-company: ${{ steps.set-env-vars.outputs.your_company }}
+      env-name: ${{ steps.set-env-vars.outputs.env_name }}
   create-opta-aws:
     needs:
       - set-env-vars
@@ -51,9 +51,9 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/careate_opta_aws.yml@main
     uses: brucearctor/flyte/.github/workflows/create_opta_aws.yml@opta-aws
     with:
-      aws_region: "${{ needs.set-env-vars.outputs.aws_region }}"
-      your_company: "${{ needs.set-env-vars.outputs.your_company }}"
-      env_name: "${{ needs.set-env-vars.outputs.env_name }}"
+      aws_region: "${{ needs.set-env-vars.outputs.aws-region }}"
+      your_company: "${{ needs.set-env-vars.outputs.your-company }}"
+      env_name: "${{ needs.set-env-vars.outputs.env-name }}"
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
