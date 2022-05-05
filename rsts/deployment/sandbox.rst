@@ -5,7 +5,7 @@ Sandbox Overview
 ###################
 
 .. warning::
-    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
+    Don't use sandbox deployment for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
 
 
 **********************
@@ -55,7 +55,7 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
     #. A Sandbox deployment takes over the entire cluster
     #. It needs special cluster roles that will need access to create namespaces, pods, etc.
-    #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the :ref:`deployment` guides.
+    #. To productionize your Flyte deployment, check the rest of the :ref:`deployment` guides.
 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_k8s_cluster.png
@@ -64,8 +64,8 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
 .. _deploy-sandbox-local:
 
-Deploy Flyte Sandbox environment laptop / workstation / single machine
-=======================================================================
+Deploy Flyte Sandbox environment laptop/workstation/single machine
+==================================================================
 
 Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
