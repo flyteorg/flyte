@@ -20,6 +20,12 @@ jobs:
     name: Create AWS OPTA
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
+          aws-region: ${{ inputs.aws-region }}
+          role-session-name: ApplySession
       - name: Checkout repo
         uses: actions/checkout@v3
         # move the below to CI helper?
@@ -30,23 +36,22 @@ jobs:
           sed -i "s/<your_company>/${{ inputs.your-company }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
           sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
           sed -i "s/<account_id>/${{ secrets.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/env.yaml
+      - name: cat aws env
+        shell: bash
+        run: |
+          cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: Archive env artifact
         uses: actions/upload-artifact@v3
         with:
           name: opta-env
           path: |
             ./opta/aws/env.yaml
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-          aws-region:  ${{ inputs.aws-region }}
-          role-session-name: ApplySession
       - name: SETUP AND APPLY OPTA
         shell: bash
         run: |
           sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
+          cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
           opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
           opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: OPTA DNS
