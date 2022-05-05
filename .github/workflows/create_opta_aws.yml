@@ -1,13 +1,28 @@
 on:
   workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        required: true
+      your-company:
+        type: string
+        required: true
+      env-name:
+        type: string
+        required: true
+    outputs:
+      dns:
+        description: "dns of loadbalancer/endpoint"
+        value: ${{ jobs.create-aws-opta.outputs.dns }}
 
 jobs:
-  destroy-cluster:
-    name: Destroy Cluster
+  create-aws-opta:
+    name: Create AWS OPTA
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        # move the below to CI helper?
       - name: set env variables
         shell: bash
         run: |
