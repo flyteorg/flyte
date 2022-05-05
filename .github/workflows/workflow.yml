@@ -44,13 +44,6 @@ jobs:
       aws_region: ${{ steps.set-env-vars.outputs.aws_region }}
       your_company: ${{ steps.set-env-vars.outputs.your_company }}
       env_name: ${{ steps.set-env-vars.outputs.env_name }}
-  calculate-pre-reqs:
-    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
-    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
-    uses: brucearctor/flyte/.github/workflows/calculate_pre_reqs.yml@opta-aws
-    with:
-      mode: ${{ github.event.inputs.mode }}
-      components_version: ${{ github.event.inputs.components_version }}
   create-opta-aws:
     needs:
       - set-env-vars
@@ -61,6 +54,13 @@ jobs:
       aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
       your-company: "${{ needs.set-env-vars.outputs.your_company }}"
       env-name: "${{ needs.set-env-vars.outputs.env_name }}"
+  calculate-pre-reqs:
+    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
+    uses: brucearctor/flyte/.github/workflows/calculate_pre_reqs.yml@opta-aws
+    with:
+      mode: ${{ github.event.inputs.mode }}
+      components_version: ${{ github.event.inputs.components_version }}
   run-testing-workflows:
     runs-on: ubuntu-latest
     needs:
