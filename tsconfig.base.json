@@ -46,16 +46,5 @@
             "@flyteconsole/*": ["./packages/plugins/*/src", "./packages/zapp/*/src"]
         }
     },
-    "exclude": [
-        "**/node_modules",
-        "**/dist",
-        "**/lib",
-        "**/src/**/*.spec.*",
-        "**/src/**/*.test.*",
-        "**/src/**/*.stories.*",
-        // old code patterns
-        "**/__mocks__",
-        "**/test",
-        "**/mocks"
-    ]
+    "exclude": ["**/node_modules", "**/dist", "**/lib"]
 }

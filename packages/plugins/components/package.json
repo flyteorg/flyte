@@ -13,8 +13,8 @@
     },
     "scripts": {
         "build": "yarn build:esm && yarn build:cjs",
-        "build:esm": "tsc --module esnext --outDir lib/esm",
-        "build:cjs": "tsc",
+        "build:esm": "tsc --module esnext --outDir lib/esm --project ./tsconfig.build.json",
+        "build:cjs": "tsc --project ./tsconfig.build.json",
         "test": "NODE_ENV=test jest"
     },
     "dependencies": {

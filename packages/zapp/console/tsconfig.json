@@ -12,5 +12,9 @@
         "noImplicitOverride": false
     },
     "references": [{ "path": "../../plugins/components" }],
-    "include": ["src/**/*"]
+    "include": [
+        "src/**/*",
+        // TODO: *.json could be removed when tsconfig.build.json would be properly consumed by webpack
+        "src/**/*.json"
+    ]
 }

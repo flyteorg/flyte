@@ -9,7 +9,7 @@ export default {
   component: NavBar,
 } as ComponentMeta<typeof NavBar>;
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((_theme: Theme) => ({
   updatedOne: {
     backgroundColor: 'lightblue',
     color: 'black',

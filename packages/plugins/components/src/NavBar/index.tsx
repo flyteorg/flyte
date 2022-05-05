@@ -7,7 +7,7 @@ import { DefaultNavBarContent } from './defaultContent';
 
 export const navBarContentId = 'nav-bar-content';
 
-interface NavBarProps {
+export interface NavBarProps {
   useCustomContent?: boolean; // rename to show that it is a backNavigation
   className?: string;
 }

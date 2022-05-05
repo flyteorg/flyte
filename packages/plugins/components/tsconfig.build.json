@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "exclude": [
+        // files excluded from the build, we can not put it inro default tsconfig
+        // as it will screw VSCode IntelliSence
+        "**/test",
+        "**/mocks",
+        "**/__mocks__",
+        "**/__stories__",
+        "src/**/*.spec.*",
+        "src/**/*.test.*",
+        "src/**/*.mock.*",
+        "src/**/*.stories.*"
+    ]
+}
