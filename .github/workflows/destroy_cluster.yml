@@ -52,5 +52,5 @@ jobs:
       - name: DESTROY OPTA ENV
         shell: bash
         run: |
-          cat ./opta/aws/env.yaml
-          opta destroy -c ./opta/aws/env.yaml --auto-approve
+          cd /home/runner/work/flyte/flyte/opta/cloud/
+          opta destroy -c env.yaml --auto-approve
