@@ -15,9 +15,8 @@ on:
         type: string
         description: "dns of loadbalancer/endpoint"
 
-
 jobs:
-  destroy-cluster:
+  create-opta-aws:
     name: Create Opta Env
     runs-on: ubuntu-latest
     steps:
