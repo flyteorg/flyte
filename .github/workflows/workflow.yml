@@ -197,8 +197,8 @@ jobs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
+    with:
+      aws-region: $AWS_REGION
     needs:
       - calculate-pre-reqs
       - run-testing-workflows
-    with:
-      awsregion: ${{ env.AWS_REGION }}
