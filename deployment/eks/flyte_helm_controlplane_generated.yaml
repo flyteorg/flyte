@@ -189,7 +189,6 @@ data:
             value: 3000Mi
         - defaultIamRole:
             value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
-      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -271,7 +270,6 @@ data:
             value: 3000Mi
         - defaultIamRole:
             value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
-      refresh: 5m
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
@@ -545,7 +543,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
+        configChecksum: "8fe342456c4babd05de9f8f3a07e00d38268cc4e92b6985ff2d0b3a667b04c1"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -699,7 +697,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "3bb88d73a5d3ea730bc64e7e4479be9cf69e68733bc462c064973be81f8d182"
+        configChecksum: "96ecbccfd19ea2e8268104eae476320f13d53bfa83ddae7ac29d072b3fbc238"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -906,7 +904,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "4f536df83bbc98fc04c02240c9e6b2f8916ba7d1809d5e74510c73b5031c16b"
+        configChecksum: "8fe342456c4babd05de9f8f3a07e00d38268cc4e92b6985ff2d0b3a667b04c1"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
