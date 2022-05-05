@@ -496,26 +496,26 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development --version latest
 
 .. tabbed:: TensorFlow Operator
 
     .. code-block:: bash
 
        # TODO: https://github.com/flyteorg/flyte/issues/1757
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.2.225/<TODO>.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kftensorflow.tar.gz --archive -p flytesnacks -d development --version latest
 
 .. tabbed:: MPI Operator
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development --version latest
 
 .. tabbed:: Spark Operator
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-kubernetes-k8s_spark.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-k8s_spark.tar.gz --archive -p flytesnacks -d development --version latest
 
 
 7. Launch an execution
@@ -524,6 +524,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
   * Navigate to the Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the relevant workflow
   * Click on `Launch` to open up a launch form
+  * Give **spark** as the service account if launching a spark example
   * Submit the form to launch an execution
 
 .. tabbed:: Flytectl
@@ -534,7 +535,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
         .. code-block:: bash
 
-           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/config.yaml
+           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development kfpytorch.pytorch_mnist.pytorch_training_wf  --latest --execFile exec_spec.yaml
 
       * Launch! 🚀
 
@@ -548,7 +549,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
         .. code-block:: bash
 
-           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development <TODO: https://github.com/flyteorg/flyte/issues/1757>  --latest --execFile exec_spec.yaml --config ~/.flyte/config.yaml
+           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development <TODO: https://github.com/flyteorg/flyte/issues/1757>  --latest --execFile exec_spec.yaml
 
       * Launch! 🚀
 
@@ -562,7 +563,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
         .. code-block:: bash
 
-           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/config.yaml
+           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
 
       * Launch! 🚀
 
@@ -576,7 +577,9 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
         .. code-block:: bash
 
-           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development k8s_spark.pyspark_pi.my_spark  --latest --execFile exec_spec.yaml --config ~/.flyte/config.yaml
+           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development k8s_spark.pyspark_pi.my_spark  --latest --execFile exec_spec.yaml
+
+      * Fill in the ``kubeServiceAcct`` as **spark** in the ``exec_spec.yaml`` file
 
       * Launch! 🚀
 
