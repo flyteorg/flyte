@@ -1,9 +1,5 @@
 on:
   workflow_call:
-    outputs:
-      dns:
-        description: "dns of loadbalancer/endpoint"
-        value: ${{ jobs.create-aws-opta.outputs.dns }}
 
 jobs:
   create-aws-opta:
