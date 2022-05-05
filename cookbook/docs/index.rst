@@ -189,3 +189,4 @@ Table of Contents
    auto/integrations/aws/athena/index
    auto/integrations/external_services/hive/index
    auto/integrations/external_services/snowflake/index
+   auto/integrations/gcp/bigquery/index
