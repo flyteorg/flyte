@@ -32,6 +32,8 @@ jobs:
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           aws-region: ${{ inputs.aws-region }}
           role-session-name: DestroySession
+      - name: Checkout repo
+        uses: actions/checkout@v3
       - name: DESTROY FLYTE Opta
         shell: bash
         run: |
