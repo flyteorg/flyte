@@ -12,7 +12,7 @@ jobs:
           name: opta-flyte
           path: /home/runner/work/flyte/flyte/opta/cloud
       - uses: actions/download-artifact@v3
-        id: download-env-yamls
+        id: download-env-yaml
         with:
           name: opta-env
           path: /home/runner/work/flyte/flyte/opta/cloud

@@ -137,7 +137,7 @@ jobs:
         sudo rm flyte.yaml
         sudo rm env.yaml
     - name: Setup flytectl
-      uses: unionai/flytectl-setup-action@v0.0.1
+      uses: unionai-oss/flytectl-setup-action@v0.0.1
     - name: see files
       shell: bash
       run: |
@@ -197,3 +197,6 @@ jobs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
+    needs:
+      - calculate-pre-reqs
+      - run-testing-workflows
