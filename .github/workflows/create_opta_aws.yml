@@ -49,8 +49,8 @@ jobs:
           .github/scripts/ci_helper.sh setup_opta
           opta apply -c ./opta/aws/env.yaml --auto-approve
           opta output -c ./opta/aws/env.yaml
-      - name: OPTA DNS
-        id: opta-dns
+      - name: Output DNS
+        id: output-dns
         shell: bash
         run: |
           cat ./opta/aws/env.yaml
