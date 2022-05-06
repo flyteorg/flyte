@@ -64,7 +64,7 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
 .. _deploy-sandbox-local:
 
-Deploy Flyte Sandbox environment laptop / workstation / single machine
+Deploy Flyte Sandbox environment on laptop/workstation/single machine
 =======================================================================
 
 
@@ -72,7 +72,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     brew install kubectl
 
-Recommend using ``flytectl sandbox start`` as describe in :ref:`getting-started`
+Recommended using ``flytectl sandbox start`` as described in :ref:`getting-started`
 
 .. prompt:: bash $
 
@@ -102,11 +102,11 @@ We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with 
 Flyte configuration on your remote cluster.
 
 
-#. Add Helm repo for flyte 
+#. Add Helm repo for flyte ::
 
     helm repo add flyteorg https://helm.flyte.org
 
-#. Install Flyte dependency helm chart(It will install the minio,postgres,kubernetes-dashboard and contour) ::
+#. Install Flyte dependency helm chart (this will install the minio, Postgres, Kubernetes-dashboard, and contour) ::
 
     helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace --set webhook.enabled=false,minio.service.type=LoadBalancer,contour.enabled=true,contour.envoy.service.type=LoadBalancer,kubernetes-dashboard.service.type=LoadBalancer
 
@@ -130,11 +130,11 @@ Flyte configuration on your remote cluster.
 
 #. Open the Kubernetes dashboard http://<K8S_DASHBOARD_URL>.
 
-#. You can port-forward to connect postgres using ::
+#. Port-forward to connect Postgres using the following command: ::
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
     
-#. Now use these credentials for postgres
+#. Use the following credentials for Postgres:
 
    .. code-block::
 
