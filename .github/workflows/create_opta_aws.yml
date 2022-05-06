@@ -37,6 +37,11 @@ jobs:
           role-session-name: ApplySession
       - name: Checkout repo
         uses: actions/checkout@v3
+      - name: tree
+        shell: bash
+        run: |
+          sudo apt-get install tree
+          tree
         # move the below to CI helper?
       - name: set env variables
         shell: bash
@@ -85,27 +90,6 @@ jobs:
           name: opta-flyte
           path: |
             /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          # TODO: ROLE TO BE SECRET?
-          role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-          aws-region: ${{ inputs.aws-region }}
-          role-session-name: ApplySession
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        id: download-flyte-yaml
-        name: download env yaml
-        with:
-          name: opta-flyte
-          path: /home/runner/work/flyte/flyte/opta/cloud
-      - uses: actions/download-artifact@v3
-        name: download env yaml
-        id: download-env-yaml
-        with:
-          name: opta-env
-          path: /home/runner/work/flyte/flyte/opta/cloud
       - uses: azure/setup-helm@v1
       - name: Update Helm Chart dependencies
         uses: WyriHaximus/github-action-helm3@v2
