@@ -85,7 +85,7 @@ jobs:
       - create-opta-aws
       - prep-aws-flyte
     with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
+      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
       mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
   mor-flo:
@@ -152,7 +152,7 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
     with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
+      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
     needs:
       - set-env-vars
       - calculate-pre-reqs
