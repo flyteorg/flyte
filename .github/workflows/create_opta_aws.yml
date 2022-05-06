@@ -44,6 +44,11 @@ jobs:
           sudo apt-get install tree
           tree
         # move the below to CI helper?
+      - uses: azure/setup-helm@v1
+      - name: Update Helm Chart dependencies
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/Chart.yaml
       - name: set env variables
         shell: bash
         run: |
@@ -91,11 +96,6 @@ jobs:
           name: opta-flyte
           path: |
             /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-      - uses: azure/setup-helm@v1
-      - name: Update Helm Chart dependencies
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/Chart.yaml
       - name: Pin terraform version
         uses: hashicorp/setup-terraform@v1
         with:
@@ -125,9 +125,7 @@ jobs:
       - name: SETUP OPTA & APPLY FLYTE
         shell: bash
         run: |
-          sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
-          /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
-          cd /home/runner/work/flyte/flyte/opta/cloud
+          cd /home/runner/work/flyte/flyte/opta/aws
           opta apply -c flyte.yaml --auto-approve
     outputs:
       dns: ${{ steps.output-dns.outputs.dns }}
