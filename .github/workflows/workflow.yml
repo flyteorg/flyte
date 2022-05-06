@@ -85,7 +85,7 @@ jobs:
       - create-opta-aws
     with:
       mode: "${{ needs.calculate-pre-reqs.outputs.mode }}"
-      components-version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+      components_version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
   mor-flo:
     runs-on: ubuntu-latest
     steps:
