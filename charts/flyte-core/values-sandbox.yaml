@@ -60,7 +60,7 @@ configmap:
         default-env-vars:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte.svc.cluster.local:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
-          - FLYTE_AWS_SECRET_ACCESS_KEY: flyte
+          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         default-memory: 200Mi
 
   remoteData:
