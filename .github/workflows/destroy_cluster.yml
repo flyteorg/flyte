@@ -5,8 +5,6 @@ on:
         type: string
         required: false
     secrets:
-      AWS_ACCOUNT_ID:
-        required: false
       AWS_ACCESS_KEY:
         required: true
       AWS_SECRET_ACCESS_KEY:
@@ -34,9 +32,9 @@ jobs:
           # This aws account should have admin permissions ...?
           #role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           #role-session-name: DestroySession
+          aws-region: ${{ inputs.aws-region }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ inputs.aws-region }}
       - name: SETUP AND DESTROY OPTA
         shell: bash
         run: |
