@@ -35,6 +35,8 @@ jobs:
           role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
           aws-region: ${{ inputs.aws-region }}
           role-session-name: ApplySession
+        # move the below to CI helper?
+      - uses: azure/setup-helm@v1
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: tree
@@ -43,12 +45,10 @@ jobs:
           pwd
           sudo apt-get install tree
           tree
-        # move the below to CI helper?
-      - uses: azure/setup-helm@v1
       - name: Update Helm Chart dependencies
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/Chart.yaml
+          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/
       - name: set env variables
         shell: bash
         run: |
