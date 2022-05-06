@@ -76,13 +76,10 @@ jobs:
     - name: Setup flytectl
       uses: unionai-oss/flytectl-setup-action@v0.0.1
     - name: update configs
-      env:
-        DNS: ${{ needs.create-aws-opta.outputs.dns }}
       shell: bash
       run: |
-        echo $DNS
-        sed -i "s/<dns_of_cluster>/$DNS/" .github/ci_config/config.yaml
-        sed -i "s/<dns_of_cluster>/$DNS/" .github/ci_config/config
+        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config
     - name: see config files
       shell: bash
       run: |

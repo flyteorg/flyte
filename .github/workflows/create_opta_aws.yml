@@ -84,7 +84,7 @@ jobs:
           sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
           sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
           sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-          sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+          sed -i "s/<cluster_ingress>/${{ steps.output-dns.outputs.dns }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
       - name: Archive env artifact
         uses: actions/upload-artifact@v3
         with:
