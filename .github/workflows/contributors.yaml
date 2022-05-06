@@ -12,7 +12,7 @@ jobs:
       - name: GitHub Contributors Action
         uses: hyperledger-tooling/github-contributors-action@main
         env:
-          GITHUB_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_AUTH_TOKEN: "${{ secrets.FLYTE_BOT_PAT }}"
           SOURCE_GITHUB_REPOSITORY: flyteorg
           CONTRIBUTORS_SECTION_PATTERN: <!-- CONTRIBUTORS START -->
           CONTRIBUTORS_SECTION_END_PATTERN: <!-- CONTRIBUTORS END -->

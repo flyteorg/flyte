@@ -16,7 +16,7 @@ jobs:
           id: github-project-issue-to-sheets
           uses: EngHabu/github-project-issue-to-sheets@master
           env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           with:
             google-api-service-account-credentials: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_DATA }}
             document-id: '1vNb7ktLhL-ugL_ohNDFGUDpw71Av8VVC3hhiq1h8mto'
