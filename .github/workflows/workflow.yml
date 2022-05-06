@@ -84,16 +84,20 @@ jobs:
       - calculate-pre-reqs
       - create-opta-aws
     with:
-      mode: "${{ needs.calculate-pre-reqs.outputs.mode }}"
-      components_version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
+      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
   mor-flo:
+    needs:
+      - create-opta-aws
+      - create-opta-flyte
     runs-on: ubuntu-latest
     steps:
     - name: Setup flytectl
       uses: unionai-oss/flytectl-setup-action@v0.0.1
     - name: update configs
       env:
-        DNS: ${{ steps.opta-dns.outputs.dns }}
+        DNS: ${{ needs.create-aws-opta.outputs.dns }}
       shell: bash
       run: |
         echo $DNS
@@ -151,5 +155,6 @@ jobs:
     needs:
       - set-env-vars
       - calculate-pre-reqs
+      - create-opta-aws
       - create-opta-flyte
       - mor-flo
