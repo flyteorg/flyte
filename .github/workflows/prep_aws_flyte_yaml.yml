@@ -21,22 +21,24 @@ on:
         description: "dns of loadbalancer/endpoint"
         value: ${{ jobs.create-aws-opta.outputs.dns }}
 
-
-
-  - name: set flyte variables
-  shell: bash
-  run: |
-    sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" ./opta/aws/flyte.yaml
-    sed -i "s/<region>/${{ inputs.aws-region }}/" ./opta/aws/flyte.yaml
-    sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" ./opta/aws/flyte.yaml
-    sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" ./opta/aws/flyte.yaml
-- name: view flyte.yaml
-  shell: bash
-  run: |
-    cat ./opta/aws/flyte.yaml
-- name: Archive env artifact
-  uses: actions/upload-artifact@v3
-  with:
-    name: opta-flyte
-    path: |
-      ./opta/aws/flyte.yaml
+jobs:
+  do-job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: set flyte variables
+      shell: bash
+      run: |
+        sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+        sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+        sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+    - name: view flyte.yaml
+      shell: bash
+      run: |
+        cat /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+    - name: Archive env artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: opta-flyte
+        path: |
+          /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
