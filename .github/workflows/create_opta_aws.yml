@@ -59,7 +59,7 @@ jobs:
           opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
           opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: OPTA DNS
-        id: opta-dns
+        id: output-dns
         shell: bash
         run: |
           cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
