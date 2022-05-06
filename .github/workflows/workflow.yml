@@ -113,7 +113,7 @@ jobs:
     uses: brucearctor/flyte/.github/workflows/prep_aws_flyte_yaml.yml@opta-aws
     with:
       aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
-      flyte-storage-bucket: "${{ needs.set-env-vars.flyte-bucket }}"
+      flyte-storage-bucket: "${{ needs.set-env-vars.outputs.flyte-bucket }}"
       dns: "${{ needs.create-aws-opta.outputs.dns }}"
     secrets: inherit
   additiona-workflo:
