@@ -94,7 +94,6 @@ jobs:
   mor-flo:
     needs:
       - create-opta-aws
-      - create-opta-flyte
     runs-on: ubuntu-latest
     steps:
     - name: Setup flytectl
@@ -160,5 +159,4 @@ jobs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
-      - create-opta-flyte
       - mor-flo
