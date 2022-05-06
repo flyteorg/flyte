@@ -3,13 +3,13 @@
 What is Data Catalog?
 =====================
 
-`Data Catalog <https://github.com/flyteorg/datacatalog>`__ is a service for indexing parameterized, strongly-typed data artifacts across revisions. It allows for clients to query artifacts based on meta information and tags.
+`DataCatalog <https://github.com/flyteorg/datacatalog>`__ is a service to index parameterized, strongly-typed data artifacts across revisions. It allows clients to query artifacts based on meta information and tags.
 
 
 How Flyte Memoizes Task Executions on Data Catalog
 --------------------------------------------------
 
-Flyte ``memoizes task executions`` by creating artifacts in Data Catalog and associating meta information regarding the execution with the artifact. Let's walk through what happens when a task execution is cached on Data Catalog.
+Flyte `memoizes task executions` by creating artifacts in DataCatalog and associating meta information regarding the execution with the artifact. Let's walk through what happens when a task execution is cached on DataCatalog.
 
 Every task instance is represented as a DataSet:
 
@@ -38,7 +38,7 @@ Every task execution is represented as an Artifact in the Dataset above:
        value: <offloaded storage location of the literal>
     }
 
-To retrieve the Artifact, we tag the Artifact with a hash of the input values for the memoized task execution.
+To retrieve the Artifact, tag the Artifact with a hash of the input values for the memoized task execution:
 
 .. code-block:: javascript
 
@@ -52,10 +52,10 @@ When caching an execution, FlytePropeller will:
 2. Create an artifact that represents the execution, along with the artifact data that represents the execution output.
 3. Tag the artifact with a unique hash of the input values.
 
-When checking to see if the task execution is memoized, Flyte Propeller will:
+To ensure that the task execution is memoized, Flyte Propeller will:
 
 1. Compute the tag by computing the hash of the input.
 2. Check if a tagged artifact exists with that hash.
 
-    a. If it does, we have a cache hit and the Propeller can skip the task execution.
-    b. If an artifact is not associated with the tag, Flyte Propeller needs to run the task.
+   - If it exists, we have a cache hit and the Propeller can skip the task execution.
+   - If an artifact is not associated with the tag, Propeller needs to run the task.

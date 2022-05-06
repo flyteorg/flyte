@@ -88,14 +88,14 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
 
 .. prompt:: bash $
 
-  pyflyte run example.py:wf --n 500 --mean 42 --sigma 2
+  pyflyte run example.py wf --n 500 --mean 42 --sigma 2
 
 .. dropdown:: :fa:`info-circle` Why use ``pyflyte run`` rather than ``python example.py``?
     :title: text-muted
     :animate: fade-in-slide-down
 
     ``pyflyte run`` enables you to execute a specific workflow in your python script using the syntax
-    ``pyflyte run <path/to/script.py>:<workflow_function_name>``.
+    ``pyflyte run <path/to/script.py> <workflow_function_name>``.
 
     Key-word arguments can be supplied to ``pyflyte run`` by passing in options in the format ``--kwarg value``, and in
     the case of ``snake_case_arg`` argument names, you can pass in options in the form of ``--snake-case-arg value``.
@@ -155,9 +155,6 @@ Start a Flyte demonstration environment on your local machine:
    .. code-block::
    
       👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
-      Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable
-      export KUBECONFIG=$KUBECONFIG:/Users/<username>/.kube/config:/Users/<username>/.flyte/k3s/k3s.yaml
-      export FLYTECTL_CONFIG=/Users/<username>/.flyte/config-sandbox.yaml
 
 .. note::
 
@@ -183,7 +180,7 @@ Then run the same Workflow on the Flyte cluster:
 
 .. prompt:: bash $
 
-  pyflyte run --remote example.py:wf --n 500 --mean 42 --sigma 2
+  pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2
 
 .. div:: shadow p-3 mb-8 rounded
 
@@ -215,9 +212,7 @@ Inspect the Results
 Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to Flyte Console, the web UI
 used to manage Flyte entities such as tasks, workflows, and executions.
 
-.. video:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.mp4
-   :width: 100%
-   :autoplay:
+.. image:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.gif
 
 .. note::
 
@@ -243,7 +238,7 @@ What's Next?
 
 This guide demonstrated how you can quickly iterate on self-contained scripts using ``pyflyte run``.
 
-- To learn more about Flyte's features such as caching, conditionals, specifying resources requirements, and scheduling
+- To learn more about Flyte's features such as caching, conditionals, specifying resource requirements, and scheduling
   workflows, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
 - To learn more about how to organize, package, and register workflows for larger projects, see the guide for
   :ref:`Building Large Apps <cookbook:larger_apps>`.

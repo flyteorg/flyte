@@ -1769,6 +1769,16 @@ annotations (map[string]string)
   null
   
 
+interruptible (bool)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 assumableIamRole (string)
 --------------------------------------------------------------------------------
 
@@ -3110,6 +3120,18 @@ Unique cluster id running this flytepropeller instance with which to annotate ex
 .. code-block:: yaml
 
   propeller
+  
+
+create-flyteworkflow-crd (bool)
+--------------------------------------------------------------------------------
+
+Enable creation of the FlyteWorkflow CRD on startup
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig

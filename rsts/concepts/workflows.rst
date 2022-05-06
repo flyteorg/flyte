@@ -4,13 +4,13 @@ Workflows
 =========
 
 A workflow is a directed acyclic graph (DAG) of units of work encapsulated by :ref:`nodes <divedeep-nodes>`.
-Specific instantiations of a workflow (commonly with bound input arguments) are referred to as **workflow executions**,
+Specific instantiations of a workflow (commonly bound with input arguments) are referred to as **workflow executions**,
 or just executions. In other words, a workflow is a template for an ordered task execution.
 
-Flyte workflows are defined in ``protobuf`` and the Flytekit SDK facilitates writing workflows. Users can define workflows as a collection of nodes.
-Nodes within a workflow can produce outputs that subsequent nodes consume as inputs. These dependencies dictate the workflow structure.
+Flyte workflows are defined in ``protobuf`` and the flytekit SDK facilitates writing workflows. Users can define workflows as a collection of nodes.
+Nodes within a workflow can produce outputs that subsequent nodes could consume as inputs. These dependencies dictate the structure of the workflow.
 
-Workflows written using the SDK do not need to explicitly define nodes to enclose execution units (tasks, sub-workflows, launch plans);
+Workflows written using the SDK don't need to explicitly define nodes to enclose execution units (tasks, sub-workflows, launch plans);
 they will be injected by the SDK and captured at registration time.
 
 Structure
@@ -25,7 +25,7 @@ Workflow structure is flexible because:
 - A single workflow can contain any combination of task types.
 - A workflow can contain a single functional node.
 - A workflow can contain multiple nodes in all sorts of arrangements.
-- A workflow can launch other workflows as well.
+- A workflow can launch other workflows.
 
 At execution time, node executions are triggered as soon as their inputs are available.
 
@@ -37,7 +37,7 @@ Flyte-Specific Structure
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 During :ref:`registration <divedeep-registration>`, Flyte validates the workflow structure and saves the workflow.
-The registration process updates the workflow graph too.
+The registration process updates the workflow graph.
 A compiled workflow will always have a start and end node injected into the workflow graph.
 In addition, a failure handler will catch and process execution failures.
 
@@ -45,5 +45,5 @@ Versioning
 ----------
 
 Like :ref:`tasks <divedeep-tasks>`, workflows are versioned too. Registered workflows are immutable, i.e., an instance of a
-workflow defined by a specific project-domain-name-version combination can't be updated.
+workflow defined by a specific {Project, Domain, Name, Version} combination can't be updated.
 Tasks referenced in a workflow version are immutable and are tied to specific tasks' versions.
