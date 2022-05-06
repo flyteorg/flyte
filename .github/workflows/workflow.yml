@@ -102,7 +102,7 @@ jobs:
       run: |
         .github/scripts/ci_helper.sh prepare_flyte_release_build
         .github/scripts/ci_helper.sh prepare_helm_chart
-  run-mor-workflows:
+  prep-aws-flyte:
     needs:
       - set-env-vars
       - calculate-pre-reqs
@@ -111,9 +111,9 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/prep_aws_flyte_yaml.yml@opta-aws
     with:
-      aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
-      flyte-storage-bucket: "${{ needs.set-env-vars.outputs.flyte-bucket }}"
-      dns: "${{ needs.create-aws-opta.outputs.dns }}"
+      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
+      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
+      dns: ${{ needs.create-aws-opta.outputs.dns }}
     secrets: inherit
   additiona-workflo:
     runs-on: ubuntu-latest
