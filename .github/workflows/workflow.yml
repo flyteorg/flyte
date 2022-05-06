@@ -83,10 +83,11 @@ jobs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
+      - prep-aws-flyte
     with:
+      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
       mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
   mor-flo:
     needs:
       - create-opta-aws

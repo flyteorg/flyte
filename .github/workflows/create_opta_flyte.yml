@@ -7,13 +7,13 @@ on:
       components_version:
         type: string
         required: true
-      aws-region:
+      aws_region:
         type: string
         required: true
 
 jobs:
   create-opta-flyte:
-    name: Create FLYTE OPTA
+    name: Create OPTA FLYTE
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
