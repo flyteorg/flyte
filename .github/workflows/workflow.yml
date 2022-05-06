@@ -64,50 +64,9 @@ jobs:
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
-  run-testing-workflows:
-    runs-on: ubuntu-latest
-    needs:
-      - set-env-vars
-      - calculate-pre-reqs
-      - create-opta-aws
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-    - uses: azure/setup-helm@v1
-    - name: Update Helm Chart dependencies
-      uses: WyriHaximus/github-action-helm3@v2
-      with:
-        exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/
-    - name: Pin terraform version
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.0
-        terraform_wrapper: false
-    - name: Pin Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - uses: actions/setup-node@v2
-      with:
-        node-version: "16.8.0"
-    - name: Prepare opta changes
-      env:
-        LC_ALL: en_US.UTF-8
-        LANG: en_US.UTF-8
-        LANGUAGE: en_US.UTF-8
-        ENV:  "${{ needs.calculate-pre-reqs.outputs.mode }}"
-        FLYTEADMIN_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        DATACATALOG_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        FLYTECONSOLE_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        OPTA_ENVIRONMENT: "${{ needs.calculate-pre-reqs.outputs.mode }}"
-      run: |
-        .github/scripts/ci_helper.sh prepare_flyte_release_build
-        .github/scripts/ci_helper.sh prepare_helm_chart
   prep-aws-flyte:
     needs:
       - set-env-vars
-      - calculate-pre-reqs
       - create-opta-aws
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -118,17 +77,15 @@ jobs:
       dns: ${{ needs.create-aws-opta.outputs.dns }}
     secrets: inherit
   additiona-workflo:
-    runs-on: ubuntu-latest
+    # TODO: UPDATE REPO
+    uses: brucearctor/flyte/.github/workflows/create_opta_flyte.yml@opta-aws
     needs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
+  mor-flo:
+    runs-on: ubuntu-latest
     steps:
-    - name: OPTA APPLY FLYTE
-      shell: bash
-      run: |
-        cd opta/aws
-        opta apply -c flyte.yaml --auto-approve
     - name: Setup flytectl
       uses: unionai-oss/flytectl-setup-action@v0.0.1
     - name: update configs
