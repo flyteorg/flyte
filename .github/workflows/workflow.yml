@@ -67,33 +67,10 @@ jobs:
       mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
     secrets: inherit
-#  prep-aws-flyte:
-#    needs:
-#      - set-env-vars
-#      - create-opta-aws
-#    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
-#    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
-#    uses: brucearctor/flyte/.github/workflows/prep_aws_flyte_yaml.yml@opta-aws
-#    with:
-#      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
-#      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
-#      dns: ${{ needs.create-aws-opta.outputs.dns }}
-#    secrets: inherit
-#  create-opta-flyte:
-#    # TODO: UPDATE REPO
-#    uses: brucearctor/flyte/.github/workflows/create_opta_flyte.yml@opta-aws
-#    needs:
-#      - set-env-vars
-#      - calculate-pre-reqs
-#      - create-opta-aws
-#      #- prep-aws-flyte
-#    with:
-#      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-#      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
-#      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
   mor-flo:
     needs:
       - create-opta-aws
+      - calculate-pre-reqs
     runs-on: ubuntu-latest
     steps:
     - name: Setup flytectl
@@ -127,7 +104,7 @@ jobs:
         config: .github/ci_config/config.yaml
     - name: Setup Flytekit
       env:
-        DNS: ${{ steps.opta-dns.outputs.dns }}
+        DNS: ${{ needs.create-aws-opta.outputs.dns }}
       shell: bash
       run: |
         python -m pip install --upgrade pip
