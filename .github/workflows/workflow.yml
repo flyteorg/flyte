@@ -76,13 +76,16 @@ jobs:
       flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
       dns: ${{ needs.create-aws-opta.outputs.dns }}
     secrets: inherit
-  additiona-workflo:
+  create-opta-flyte:
     # TODO: UPDATE REPO
     uses: brucearctor/flyte/.github/workflows/create_opta_flyte.yml@opta-aws
     needs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
+    with:
+      mode: "${{ needs.calculate-pre-reqs.outputs.mode }}"
+      components-version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
   mor-flo:
     runs-on: ubuntu-latest
     steps:
@@ -103,7 +106,7 @@ jobs:
         cat .github/ci_config/config
     - name: check version
       env:
-        OMG_VERSION: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        OMG_VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
       shell: bash
       run: |
         echo $OMG_VERSION
@@ -112,7 +115,7 @@ jobs:
       with:
         flytesnacks: true
         project: flytesnacks
-        version: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
         domain: development
         config: .github/ci_config/config.yaml
     - name: Setup Flytekit
@@ -127,7 +130,7 @@ jobs:
     - name: Run tests
       id: run-tests
       env:
-        VERSION: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
+        VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
         PRIORITIES: P0,P1
         # TODO REMOVE BELOW FLYTE_SDK_USE_STRUCTURED_DATASET ONCE ON v1
         FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
@@ -144,7 +147,7 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
     with:
-      aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
+      aws-region: ${{ needs.set-env-vars.outputs.aws_region }}
     needs:
       - set-env-vars
       - calculate-pre-reqs

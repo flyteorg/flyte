@@ -7,10 +7,6 @@ on:
       components_version:
         type: string
         required: true
-      env-name:
-        type: string
-        required: true
-
 
 jobs:
   create-opta-flyte:
@@ -62,7 +58,7 @@ jobs:
           LANGUAGE: en_US.UTF-8
           ENV: "${{ inputs.mode }}"
           FLYTEADMIN_TAG: "${{ inputs.components_version }}"
-          DATACATALOG_TAG: "${{inputs..components_version }}"
+          DATACATALOG_TAG: "${{inputs.components_version }}"
           FLYTECONSOLE_TAG: "${{ inputs.components_version }}"
           FLYTEPROPELLER_TAG: "${{ inputs.components_version }}"
           OPTA_ENVIRONMENT: "${{ inputs.mode }}"
