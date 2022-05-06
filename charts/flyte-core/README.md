@@ -4,13 +4,13 @@
 
 A Helm chart for Flyte core
 
-### SANDBOX INSTALLATION:
+### Flyte INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
-- Install Flyte sandbox:
+- Install Flyte:
 
 ```bash
 helm repo add flyte https://flyteorg.github.io/flyte
-helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte
+helm install -n flyte -f values-eks.yaml --create-namespace flyte flyte/flyte-core
 ```
 
 Customize your installation by changing settings in a new file `values-sandbox.yaml`.
@@ -18,17 +18,17 @@ You can use the helm diff plugin to review any value changes you've made to your
 
 ```bash
 helm plugin install https://github.com/databus23/helm-diff
-helm diff upgrade -f values-sandbox.yaml flyte .
+helm diff upgrade -f values-eks.yaml flyte .
 ```
 
 Then apply your changes:
 ```bash
-helm upgrade -f values-sandbox.yaml flyte .
+helm upgrade -f values-eks.yaml flyte .
 ```
 
 #### Alternative: Generate raw kubernetes yaml with helm template
-- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
-- Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-eks.yaml > flyte_generated_eks.yaml`
+- Deploy the manifest `kubectl apply -f flyte_generated_eks.yaml`
 
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
 - If running on minikube, get flyte host using `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
