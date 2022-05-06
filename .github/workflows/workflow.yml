@@ -46,19 +46,6 @@ jobs:
       your-company: ${{ steps.set-env-vars.outputs.your_company }}
       env-name: ${{ steps.set-env-vars.outputs.env_name }}
       flyte-bucket: ${{ steps.set-env-vars.output.flyte_storage_bucket }}
-  create-opta-aws:
-    needs:
-      - set-env-vars
-    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
-    # likely: flyteorg/flyte.github/workflows/careate_opta_aws.yml@main
-    uses: brucearctor/flyte/.github/workflows/create_opta_aws.yml@opta-aws
-    with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-      your-company: ${{ needs.set-env-vars.outputs.your-company }}
-      env-name: ${{ needs.set-env-vars.outputs.env-name }}
-      mode: ${{ github.event.inputs.mode }}
-      components_version: ${{ github.event.inputs.components_version }}
-    secrets: inherit
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
@@ -66,6 +53,20 @@ jobs:
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
+  create-opta-aws:
+    needs:
+      - set-env-vars
+      - calculate-pre-reqs
+    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+    # likely: flyteorg/flyte.github/workflows/careate_opta_aws.yml@main
+    uses: brucearctor/flyte/.github/workflows/create_opta_aws.yml@opta-aws
+    with:
+      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+      your-company: ${{ needs.set-env-vars.outputs.your-company }}
+      env-name: ${{ needs.set-env-vars.outputs.env-name }}
+      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
+      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+    secrets: inherit
 #  prep-aws-flyte:
 #    needs:
 #      - set-env-vars
@@ -78,18 +79,18 @@ jobs:
 #      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
 #      dns: ${{ needs.create-aws-opta.outputs.dns }}
 #    secrets: inherit
-  create-opta-flyte:
-    # TODO: UPDATE REPO
-    uses: brucearctor/flyte/.github/workflows/create_opta_flyte.yml@opta-aws
-    needs:
-      - set-env-vars
-      - calculate-pre-reqs
-      - create-opta-aws
-      #- prep-aws-flyte
-    with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
-      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+#  create-opta-flyte:
+#    # TODO: UPDATE REPO
+#    uses: brucearctor/flyte/.github/workflows/create_opta_flyte.yml@opta-aws
+#    needs:
+#      - set-env-vars
+#      - calculate-pre-reqs
+#      - create-opta-aws
+#      #- prep-aws-flyte
+#    with:
+#      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+#      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
+#      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
   mor-flo:
     needs:
       - create-opta-aws
