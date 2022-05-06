@@ -70,38 +70,7 @@ jobs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
-    steps:
-    - uses: azure/setup-helm@v1
-    - name: Update Helm Chart dependencies
-      uses: WyriHaximus/github-action-helm3@v2
-      with:
-        exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/
-    - name: Pin terraform version
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.0
-        terraform_wrapper: false
-    - name: Pin Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - uses: actions/setup-node@v2
-      with:
-        node-version: "16.8.0"
-    - name: Prepare opta changes
-      env:
-        LC_ALL: en_US.UTF-8
-        LANG: en_US.UTF-8
-        LANGUAGE: en_US.UTF-8
-        ENV:  "${{ needs.calculate-pre-reqs.outputs.mode }}"
-        FLYTEADMIN_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        DATACATALOG_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        FLYTECONSOLE_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        FLYTEPROPELLER_TAG: "${{ needs.calculate-pre-reqs.outputs.components_version }}"
-        OPTA_ENVIRONMENT: "${{ needs.calculate-pre-reqs.outputs.mode }}"
-      run: |
-        .github/scripts/ci_helper.sh prepare_flyte_release_build
-        .github/scripts/ci_helper.sh prepare_helm_chart
+
   prep-aws-flyte:
     needs:
       - set-env-vars

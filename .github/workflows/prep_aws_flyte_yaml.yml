@@ -18,6 +18,8 @@ jobs:
   do-job:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
     - name: set flyte variables
       shell: bash
       run: |
