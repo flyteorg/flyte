@@ -1,0 +1,42 @@
+on:
+  workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        required: true
+      your-company:
+        type: string
+        required: true
+      env-name:
+        type: string
+        required: true
+      flyte-storage-bucket:
+        type: string
+        required: true
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+    outputs:
+      dns:
+        description: "dns of loadbalancer/endpoint"
+        value: ${{ jobs.create-aws-opta.outputs.dns }}
+
+
+
+  - name: set flyte variables
+  shell: bash
+  run: |
+    sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" ./opta/aws/flyte.yaml
+    sed -i "s/<region>/${{ inputs.aws-region }}/" ./opta/aws/flyte.yaml
+    sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" ./opta/aws/flyte.yaml
+    sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" ./opta/aws/flyte.yaml
+- name: view flyte.yaml
+  shell: bash
+  run: |
+    cat ./opta/aws/flyte.yaml
+- name: Archive env artifact
+  uses: actions/upload-artifact@v3
+  with:
+    name: opta-flyte
+    path: |
+      ./opta/aws/flyte.yaml

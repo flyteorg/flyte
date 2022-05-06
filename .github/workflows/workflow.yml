@@ -73,7 +73,7 @@ jobs:
     - name: Update Helm Chart dependencies
       uses: WyriHaximus/github-action-helm3@v2
       with:
-        exec: helm dep update ./opta/helm/
+        exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/
     - name: Pin terraform version
       uses: hashicorp/setup-terraform@v1
       with:
@@ -100,30 +100,25 @@ jobs:
       run: |
         .github/scripts/ci_helper.sh prepare_flyte_release_build
         .github/scripts/ci_helper.sh prepare_helm_chart
-    - name: set flyte variables
-      shell: bash
-      run: |
-        sed -i "s/<unique_bucket_name>/${{ env.FLYTE_STORAGE_BUCKET }}/" ./opta/aws/flyte.yaml
-        sed -i "s/<region>/${{ env.AWS_REGION }}/" ./opta/aws/flyte.yaml
-        sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" ./opta/aws/flyte.yaml
-        sed -i "s/<cluster_ingress>/${{ steps.opta-dns.outputs.dns }}/" ./opta/aws/flyte.yaml
-    - name: view flyte.yaml
-      shell: bash
-      run: |
-        cat ./opta/aws/flyte.yaml
-    - name: Archive env artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: opta-flyte
-        path: |
-          ./opta/aws/flyte.yaml
+  run-mor-workflows:
+    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
+    uses: brucearctor/flyte/.github/workflows/prep_aws_flyte_yaml.yml@opta-aws
+    with:
+      mode: ${{ github.event.inputs.mode }}
+      components_version: ${{ github.event.inputs.components_version }}
+  additiona-workflo:
+    runs-on: ubuntu-latest
+    needs:
+      - set-env-vars
+      - calculate-pre-reqs
+      - create-opta-aws
+    steps:
     - name: OPTA APPLY FLYTE
       shell: bash
       run: |
         cd opta/aws
         opta apply -c flyte.yaml --auto-approve
-        sudo rm flyte.yaml
-        sudo rm env.yaml
     - name: Setup flytectl
       uses: unionai-oss/flytectl-setup-action@v0.0.1
     - name: update configs
