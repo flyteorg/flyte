@@ -1,8 +1,9 @@
 import { storiesOf } from '@storybook/react';
 import { LiteralCollection } from 'models/Common/types';
 import * as React from 'react';
-import { LiteralValue } from '../LiteralValue';
-import { CardDecorator } from './CardDecorator';
+import { Card, CardContent } from '@material-ui/core';
+import { LiteralMapViewer } from '../LiteralMapViewer';
+import { DeprecatedLiteralMapViewer } from '../DeprecatedLiteralMapViewer';
 import {
   binaryLiterals,
   blobLiterals,
@@ -13,10 +14,31 @@ import {
 } from './literalValues';
 
 const stories = storiesOf('Literals/Collection', module);
-stories.addDecorator(CardDecorator);
 
 function renderCollection(label: string, collection: LiteralCollection) {
-  return <LiteralValue label={label} literal={{ collection, value: 'collection', hash: '' }} />;
+  const map = { literals: { [label]: { collection, value: 'collection' } } };
+  return (
+    <>
+      <div style={{ display: 'flex' }}>
+        <div style={{ marginRight: '16px' }}>
+          OLD
+          <Card>
+            <CardContent>
+              <DeprecatedLiteralMapViewer map={map} />
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          NEW
+          <Card>
+            <CardContent>
+              <LiteralMapViewer map={map} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
+  );
 }
 
 stories.add('Binary', () =>

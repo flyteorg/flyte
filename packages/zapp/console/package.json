@@ -47,6 +47,7 @@
         "react-chartjs-2": "^4.0.0",
         "react-flow-renderer": "10.1.1",
         "react-ga4": "^1.4.1",
+        "react-json-view": "^1.21.3",
         "react-transition-group": "^2.3.1",
         "serve-static": "^1.12.3",
         "tslib": "^1.9.0"

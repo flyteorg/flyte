@@ -1,8 +1,8 @@
-import { stringifyValue } from 'common/utils';
-import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
+import { ReactJsonViewWrapper } from 'components/common/ReactJsonView';
 
 export const DumpJSON: React.FC<{ value: any }> = ({ value }) => {
-  const commonStyles = useCommonStyles();
-  return <div className={commonStyles.codeBlock}>{stringifyValue(value)}</div>;
+  return (
+    <ReactJsonViewWrapper src={value} />
+  );
 };

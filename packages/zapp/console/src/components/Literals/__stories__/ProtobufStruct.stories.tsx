@@ -1,23 +1,41 @@
 import { storiesOf } from '@storybook/react';
 import { ProtobufListValue, ProtobufStruct } from 'models/Common/types';
 import * as React from 'react';
-import { LiteralValue } from '../LiteralValue';
-import { CardDecorator } from './CardDecorator';
+import { Card, CardContent } from '@material-ui/core';
 import { protobufValues } from './protobufValues';
+import { LiteralMapViewer } from '../LiteralMapViewer';
+
+import { DeprecatedLiteralMapViewer } from '../DeprecatedLiteralMapViewer';
 
 const stories = storiesOf('Literals/ProtobufStruct', module);
-stories.addDecorator(CardDecorator);
 
 function renderStruct(label: string, struct: ProtobufStruct) {
+  const map = {
+    literals: {
+      [label]: { scalar: { value: 'generic', generic: struct }, value: 'scalar' },
+    },
+  };
   return (
-    <LiteralValue
-      label={label}
-      literal={{
-        scalar: { value: 'generic', generic: struct },
-        value: 'scalar',
-        hash: '',
-      }}
-    />
+    <>
+      <div style={{ display: 'flex' }}>
+        <div style={{ marginRight: '16px' }}>
+          OLD
+          <Card>
+            <CardContent>
+              <DeprecatedLiteralMapViewer map={map} />
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          NEW
+          <Card>
+            <CardContent>
+              <LiteralMapViewer map={map} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -30,7 +48,6 @@ stories.add('list', () =>
         kind: 'listValue',
         listValue: {
           values: [
-            ...Object.values(protobufValues),
             {
               kind: 'structValue',
               structValue: { fields: protobufValues },

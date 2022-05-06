@@ -1,7 +1,7 @@
 import { Literal, LiteralCollection, LiteralMap, Scalar } from 'models/Common/types';
 import * as React from 'react';
 import { LiteralCollectionViewer } from './LiteralCollectionViewer';
-import { LiteralMapViewer } from './LiteralMapViewer';
+import { DeprecatedLiteralMapViewer } from './DeprecatedLiteralMapViewer';
 import { ScalarValue } from './Scalar/ScalarValue';
 import { useLiteralStyles } from './styles';
 import { UnsupportedType } from './UnsupportedType';
@@ -27,7 +27,7 @@ export const LiteralValue: React.FC<{
       return (
         <>
           <ValueLabel label={label} />
-          <LiteralMapViewer
+          <DeprecatedLiteralMapViewer
             className={literalStyles.nestedContainer}
             map={literal.map as LiteralMap}
             showBrackets={true}
