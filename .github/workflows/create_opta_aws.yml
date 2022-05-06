@@ -40,6 +40,7 @@ jobs:
       - name: tree
         shell: bash
         run: |
+          pwd
           sudo apt-get install tree
           tree
         # move the below to CI helper?
@@ -128,8 +129,5 @@ jobs:
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
           cd /home/runner/work/flyte/flyte/opta/cloud
           opta apply -c flyte.yaml --auto-approve
-
-
-
     outputs:
       dns: ${{ steps.output-dns.outputs.dns }}
