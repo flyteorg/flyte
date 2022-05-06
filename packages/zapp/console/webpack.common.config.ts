@@ -16,11 +16,15 @@ export const serviceName = process.env.SERVICE_NAME || 'not set';
 /** Absolute path to webpack output folder */
 export const dist = path.join(__dirname, 'dist');
 
+/** Absolute path to build specific tsconfig */
+export const configFile = path.resolve(__dirname, './tsconfig.build.json');
+
 // Report current configuration
 console.log(chalk.cyan('Exporting Webpack config with following configurations:'));
 console.log(chalk.blue('Environment:'), chalk.green(env.NODE_ENV));
 console.log(chalk.blue('Output directory:'), chalk.green(path.resolve(dist)));
 console.log(chalk.blue('Public path:'), chalk.green(publicPath));
+console.log(chalk.yellow('TSconfig file used for build:'), chalk.green(configFile));
 
 /** Adds sourcemap support */
 export const sourceMapRule: webpack.RuleSetRule = {
@@ -71,8 +75,12 @@ export const limitChunksPlugin = new webpack.optimize.LimitChunkCountPlugin({
 const typescriptRule = {
   test: /\.tsx?$/,
   exclude: /node_modules/,
-  // include: path.resolve(__dirname, 'src'), // narusina - check with Carina as we need to remove it for micropackages structure
-  use: [{ loader: 'ts-loader', options: { transpileOnly: true } }],
+  loader: 'ts-loader',
+  options: {
+    configFile,
+    // disable type checker - as it's done by ForkTsCheckerWebpackPlugin
+    transpileOnly: true,
+  },
 };
 
 const resolve = {
@@ -121,7 +129,7 @@ export const clientConfig: webpack.Configuration = {
     chunkFilename: '[name]-[chunkhash].chunk.js',
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ typescript: { configFile } }),
     favIconPlugin,
     statsWriterPlugin,
     getDefinePlugin(false),
@@ -149,7 +157,11 @@ export const serverConfig: webpack.Configuration = {
     libraryTarget: 'commonjs2',
     clean: true,
   },
-  plugins: [limitChunksPlugin, new ForkTsCheckerWebpackPlugin(), getDefinePlugin(true)],
+  plugins: [
+    limitChunksPlugin,
+    new ForkTsCheckerWebpackPlugin({ typescript: { configFile } }),
+    getDefinePlugin(true),
+  ],
 };
 
 export const clientEnv = JSON.stringify(processEnv);
