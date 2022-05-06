@@ -11,10 +11,10 @@ spec:
     spec:
       template:
         metadata:
+          {{- with .Values.flyteadmin.podAnnotations }}
           annotations:
-            {{- with .Values.flyteadmin.podAnnotations }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- end }}
         spec:
           containers:
           - command:

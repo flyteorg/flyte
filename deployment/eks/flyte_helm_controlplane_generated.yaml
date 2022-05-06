@@ -935,7 +935,6 @@ spec:
     spec:
       template:
         metadata:
-          annotations:
         spec:
           containers:
           - command:
