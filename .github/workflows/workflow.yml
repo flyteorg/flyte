@@ -148,4 +148,5 @@ jobs:
     needs:
       - set-env-vars
       - calculate-pre-reqs
-      - run-testing-workflows
+      - additiona-workflo
+      - mor-flo
