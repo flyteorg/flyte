@@ -76,6 +76,14 @@ jobs:
           docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:latest
           docker push ghcr.io/flyteorg/${{ matrix.component }}-release:latest
 
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.FLYTE_BOT_PAT }}
+          repository: flyteorg/flyteorg.github.io
+          event-type: release
+          client-payload: '{"tag": "${{ steps.set_version.outputs.version }}"}'
+
   helm-release:
     name: Flyte helm release
     runs-on: ubuntu-latest

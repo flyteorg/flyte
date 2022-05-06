@@ -1,21 +1,21 @@
 .. _divedeep-console:
 
 #############
-Flyte Console
+FlyteConsole
 #############
 
-This is the web UI for the Flyte platform. The results of running Flyte Console are displayed in this graph, explained below:
+FlyteConsole is the web UI for the Flyte platform. Here's a video that dives into the graph UX:
 
 .. youtube:: 7YSc-QHk_Ec
 
 *********************
-Running flyteconsole
+Running FlyteConsole
 *********************
 
 =====================
 Install Dependencies
 =====================
-Running flyteconsole locally requires `NodeJS <https://nodejs.org>`_ and
+Running FlyteConsole locally requires `NodeJS <https://nodejs.org>`_ and
 `yarn <https://yarnpkg.com>`_. Once these are installed, all of the dependencies
 can be installed by running ``yarn`` in the project directory.
 
@@ -26,7 +26,7 @@ Before we can run the server, we need to set up an environment variable or two.
 
 ``ADMIN_API_URL`` (default: `window.location.origin <https://developer.mozilla.org/en-US/docs/Web/API/Window/location>`_)
 
-The Flyte console displays information fetched from the FlyteAdmin API. This
+FlyteConsole displays information fetched from the FlyteAdmin API. This
 environment variable specifies the host prefix used in constructing API requests.
 
 .. NOTE::
@@ -36,15 +36,15 @@ environment variable specifies the host prefix used in constructing API requests
 This value will be combined with a suffix (such as ``/api/v1``) to construct the
 final URL used in an API request.
 
-*Default Behavior*
+**Default Behavior**
 
-In most cases, ``flyteconsole`` will be hosted in the same cluster as the Admin
+In most cases, ``FlyteConsole`` is hosted in the same cluster as the Admin
 API, meaning that the domain used to access the console is the same as that used to
 access the API. For this reason, if no value is set for ``ADMIN_API_URL``, the
 default behavior is to use the value of `window.location.origin`.
 
 
-``BASE_URL`` (default: ``undefined``)
+**``BASE_URL`` (default: ``undefined``)**
 
 This allows running the console at a prefix on the target host. This is
 necessary when hosting the API and console on the same domain (with prefixes of
@@ -52,7 +52,7 @@ necessary when hosting the API and console on the same domain (with prefixes of
 usually not needed, so the default behavior is to run without a prefix.
 
 
-``CORS_PROXY_PREFIX`` (default: ``/cors_proxy``)
+**``CORS_PROXY_PREFIX`` (default: ``/cors_proxy``)**
 
 Sets the local endpoint for `CORS request proxying <cors-proxy_>`_.
 
@@ -74,9 +74,9 @@ Development
 Storybook
 ==========
 
-This project has support for `Storybook <https://storybook.js.org/>`_.
-Component stories live next to the components they test, in a ``__stories__``
-directory, with the filename pattern ``{Component}.stories.tsx``.
+FlyteConsole uses `Storybook <https://storybook.js.org/>`__.
+Component stories live next to the components they test in the ``__stories__``
+directory with the filename pattern ``{Component}.stories.tsx``.
 
 You can run storybook with ``npm run storybook``, and view the stories at http://localhost:9001.
 
@@ -86,8 +86,8 @@ Protobuf and the Network tab
 
 Communication with the FlyteAdmin API is done using Protobuf as the
 request/response format. Protobuf is a binary format, which means looking at
-responses in the Network tab won't be very helpful. To make debugging easier,
-each network request is logged to the console with it's URL followed by the
+responses in the Network tab won't be helpful. To make debugging easier,
+each network request is logged to the console with its URL, followed by the
 decoded Protobuf payload. You must have debug output enabled (on by default in
 development) to see these messages.
 
@@ -111,13 +111,12 @@ Admin API requests).
 CORS Proxying
 ==============
 
-In the common hosting arrangement, all API requests will be to the same origin
+In the common hosting arrangement, all API requests are made to the same origin
 serving the client application, making CORS unnecessary. For any requests which
 do not share the same ``origin`` value, the client application will route
 requests through a special endpoint on the NodeJS server. One example would be
-hosting the Admin API on a different domain than the console. Another example is
-when fetching execution data from external storage such as S3. This is done to
-minimize the amount of extra configuration required for ingress to the Admin API
+hosting the Admin API on a different domain than the console. Another example is fetching execution data from external storage such as S3. This is done to
+minimize the extra configuration required for ingress to the Admin API
 and data storage, as well as to simplify local development of the console without
 the need to grant CORS access to ``localhost``.
 

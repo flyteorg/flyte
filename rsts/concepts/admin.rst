@@ -7,10 +7,10 @@ FlyteAdmin
 Admin Structure
 ===============
 
-FlyteAdmin serves as the main Flyte API to process all client requests to the system. Clients include the Flyte Console, which calls:
+FlyteAdmin serves as the main Flyte API to process all client requests to the system. Clients include the FlyteConsole, which calls:
 
 1. FlyteAdmin to list the workflows, get execution details, etc.
-2. Flytekit that in turn calls FlyteAdmin to register, launch workflows, etc.
+2. Flytekit, which in turn calls FlyteAdmin to register, launch workflows, etc.
 
 Below, we'll dive into each component defined in admin in more detail.
 
@@ -19,7 +19,7 @@ RPC
 ---
 
 FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gateway>`__ library to serve incoming gRPC and HTTP requests with identical handlers.
-See the admin service :std:ref:`definition <protos/docs/service/service:flyteidl/service/admin.proto>` for a more detailed API overview, including request and response entities. 
+Refer to the admin service :std:ref:`definition <protos/docs/service/service:flyteidl/service/admin.proto>` for a detailed API overview, including request and response entities. 
 The RPC handlers are thin shims that enforce request structure validation and call out to the appropriate :ref:`manager <divedeep-admin-manager>` methods to process requests.
 
 You can find a detailed explanation of the service in the :ref:`admin service <divedeep-admin-service>` page.
@@ -66,7 +66,7 @@ implementation.  You can find the actual code for issuing queries with gorm in t
 
 Models
 ++++++
-Database models are defined in the `models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/models>`__ directory and correspond 1:1 with database tables [0]_.
+Database models are defined in the `models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/models>`__ directory and correspond 1:1 with the database tables [0]_.
 
 The full set of database tables includes:
 
@@ -99,7 +99,7 @@ Asynchronous Components
 Notifications and schedules are handled by async routines that are responsible for enqueuing and subsequently processing dequeued messages.
 
 FlyteAdmin uses the `gizmo toolkit <https://github.com/nytimes/gizmo>`__ to abstract queueing implementation. Gizmo's
-`pubsub <https://github.com/nytimes/gizmo#pubsub>`__ library offers implementations for Amazon SNS/SQS, Google's Pubsub, Kafka topics, and publishing over HTTP.
+`pubsub <https://github.com/nytimes/gizmo#pubsub>`__ library offers implementations for Amazon SNS/SQS, Google Pubsub, Kafka topics, and publishing over HTTP.
 
 For the sandbox development, no-op implementations of the notifications and schedule handlers are used to remove external cloud dependencies.
 
@@ -132,7 +132,7 @@ Values specific to the FlyteAdmin application, including task, workflow registra
 Workflow engine
 ----------------
 
-This directory contains interfaces to build and execute workflows leveraging FlytePropeller compiler and client components.
+This directory contains the interfaces to build and execute workflows leveraging FlytePropeller compiler and client components.
 
 .. [0] Given the unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
 
@@ -170,7 +170,7 @@ that consists of a project, domain, name, and version specification. These entit
 version must be re-registered with a unique and new version identifier attribute.
 
 One caveat is that the launch plan can toggle between :std:ref:`ACTIVE and INACTIVE <protos/docs/admin/admin:launchplan>` states.
-At a given point in time, only one launch plan version across a shared project, domain and name specification can be active. The state affects the scheduled launch plans only.
+At a given point in time, only one launch plan version across a shared {Project, Domain, Name} specification can be active. The state affects the scheduled launch plans only.
 An inactive launch plan can be used to launch individual executions. However, only an active launch plan runs on a schedule (given it has a schedule defined).
 
 
@@ -184,8 +184,8 @@ The named entity also includes metadata, which are mutable attributes about the 
 
 This metadata includes:
 
-- Description: a human-readable description for the Named Entity collection
-- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain
+- Description: a human-readable description for the Named Entity collection.
+- State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain.
 
 Permitted operations include:
 
@@ -210,7 +210,7 @@ Permitted operations include:
 - Get
 - List
 
-After an execution begins, FlytePropeller monitors the execution and sends events which admin uses to update the above executions. 
+After an execution begins, FlytePropeller monitors the execution and sends the events which the admin uses to update the above executions. 
 
 These :std:ref:`events <protos/docs/event/event:flyteidl/event/event.proto>` include
 
@@ -218,19 +218,18 @@ These :std:ref:`events <protos/docs/event/event:flyteidl/event/event.proto>` inc
 - NodeExecutionEvent
 - TaskExecutionEvent
 
-and include information about respective phase transitions, phase transition time and optional output data if the event concerns a terminal phase change.
+and contain information about respective phase transitions, phase transition time and optional output data if the event concerns a terminal phase change.
 
-These events are the **only** way to update an execution. No raw Update endpoint exists.
+These events provide the **only** way to update an execution. No raw update endpoint exists.
 
-To track the lifecycle of an execution admin, store attributes such as duration, timestamp at which an execution transitioned to running, and end time.
+To track the lifecycle of an execution, admin and store attributes such as `duration` and `timestamp` at which an execution transitioned to running and end time are used.
 
-For debug purposes admin also stores Workflow and Node execution events in its database, but does not currently expose them through an API. Because array tasks can yield very many executions,
-admin does **not** store TaskExecutionEvents.
+For debugging purposes, admin also stores Workflow and Node execution events in its database, but does not currently expose them through an API. Because array tasks can yield many executions, admin does **not** store TaskExecutionEvents.
 
 
 Platform entities
 +++++++++++++++++
-Projects: like named entities, projects have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
+Projects: Like named entities, projects have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
 
 Permitted project operations include:
 
@@ -292,7 +291,7 @@ For example, multiple filters would be appended to an http request like::
 
  ?filters=ne(version, TheWorst)+eq(workflow.name, workflow) 
 
-Timestamp fields use the ``RFC3339Nano`` spec (e.g., "2006-01-02T15:04:05.999999999Z07:00") 
+Timestamp fields use the ``RFC3339Nano`` spec (For example: "2006-01-02T15:04:05.999999999Z07:00") 
 
 The fully supported set of filter functions are 
 
@@ -339,12 +338,12 @@ Filterable fields vary based on entity types:
   - created_at  
   - updated_at  
   - workflows.{any workflow field above} (for example: workflow.domain) 
-  - state (you must use the integer enum, e.g., 1)  
+  - state (you must use the integer enum, for example: 1)  
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - Named Entity Metadata
 
-  - state (you must use the integer enum, e.g., 1)  
+  - state (you must use the integer enum, for example: 1)  
      - States are defined in :std:ref:`namedentitystate <protos/docs/admin/admin:namedentitystate>`.
      
 - Executions (Workflow executions)  
@@ -354,12 +353,12 @@ Filterable fields vary based on entity types:
   - name  
   - workflow.{any workflow field above} (for example: workflow.domain)  
   - launch_plan.{any launch plan field above} (for example: launch_plan.name) 
-  - phase (you must use the upper-cased string name, e.g., ``RUNNING``) 
+  - phase (you must use the upper-cased string name, for example: ``RUNNING``) 
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at  
   - execution_updated_at  
   - duration (in seconds) 
-  - mode (you must use the integer enum e.g., 1)  
+  - mode (you must use the integer enum, for example: 1)  
      - Modes are defined in :std:ref:`executionmode <protos/docs/admin/admin:executionmetadata.executionmode>`.
   - user (authenticated user or role from flytekit config)
 
@@ -367,7 +366,7 @@ Filterable fields vary based on entity types:
 
   - node_id 
   - execution.{any execution field above} (for example: execution.domain) 
-  - phase (you must use the upper-cased string name e.g., ``QUEUED``) 
+  - phase (you must use the upper-cased string name, for example: ``QUEUED``) 
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at  
   - node_execution_created_at 
@@ -380,7 +379,7 @@ Filterable fields vary based on entity types:
   - task.{any task field above} (for example: task.version) 
   - execution.{any execution field above} (for example: execution.domain) 
   - node_execution.{any node execution field above} (for example: node_execution.phase) 
-  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)  
+  - phase (you must use the upper-cased string name, for example: ``SUCCEEDED``)  
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at  
   - task_execution_created_at 
@@ -390,7 +389,7 @@ Filterable fields vary based on entity types:
 Putting It All Together 
 ----------------------- 
 
-If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, you coul something like:
+If you wish to query specific executions that were launched using a specific launch plan for a workflow with specific attributes, use:
 
 ::  
 
@@ -440,7 +439,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - version 
   - created_at  
   - updated_at  
-  - state (you must use the integer enum e.g., 1) 
+  - state (you must use the integer enum, for example: 1) 
      - States are defined in :std:ref:`launchplanstate <protos/docs/admin/admin:launchplanstate>`.
      
 - ListWorkflowIds 
@@ -453,19 +452,19 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - project 
   - domain  
   - name  
-  - phase (you must use the upper-cased string name e.g., ``RUNNING``)  
+  - phase (you must use the upper-cased string name, for example: ``RUNNING``)  
      - Phases are defined in :std:ref:`workflowexecution.phase <protos/docs/core/core:workflowexecution.phase>`.
   - execution_created_at  
   - execution_updated_at  
   - duration (in seconds) 
-  - mode (you must use the integer enum e.g., 1)  
+  - mode (you must use the integer enum, for example: 1)  
      - Modes are defined :std:ref:`execution.proto <protos/docs/admin/admin:executionmetadata.executionmode>`.
      
 - ListNodeExecutions  
 
   - node_id 
   - retry_attempt 
-  - phase (you must use the upper-cased string name e.g., ``QUEUED``) 
+  - phase (you must use the upper-cased string name, for example: ``QUEUED``) 
      - Phases are defined in :std:ref:`nodeexecution.phase <protos/docs/core/core:nodeexecution.phase>`.
   - started_at  
   - node_execution_created_at 
@@ -475,7 +474,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 - ListTaskExecutions  
 
   - retry_attempt 
-  - phase (you must use the upper-cased string name e.g., ``SUCCEEDED``)  
+  - phase (you must use the upper-cased string name, for example: ``SUCCEEDED``)  
      - Phases are defined in :std:ref:`taskexecution.phase <protos/docs/core/core:taskexecution.phase>`.
   - started_at  
   - task_execution_created_at 
@@ -485,7 +484,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 Sorting syntax  
 --------------  
 
-Adding sorting to a request requires specifying the ``key``, e.g., the attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default. 
+Adding sorting to a request requires specifying the ``key``. For example: The attribute you wish to sort on. Sorting can also optionally specify the direction (one of ``ASCENDING`` or ``DESCENDING``) where ``DESCENDING`` is the default. 
 
 Example sorting HTTP parameter: 
 
