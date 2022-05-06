@@ -1,0 +1,55 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncresources
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteclusterresourcesync.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "flyteclusterresourcesync.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.cluster_resource_manager.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+        configChecksum: {{ include (print .Template.BasePath "/clusterresourcesync/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+      {{- end }}
+      labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - command:
+            - flyteadmin
+            - --config
+            - {{ .Values.flyteadmin.configPath }}
+            - clusterresource
+            - run
+          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+          imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
+          name: sync-cluster-resources
+          volumeMounts:
+          {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
+          {{- include "databaseSecret.volumeMount" . | nindent 10 }}
+          {{- else }}
+          - name: auth
+            mountPath: /etc/secrets/
+          {{- end }}
+          - mountPath: /etc/flyte/clusterresource/templates
+            name: resource-templates
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
+      volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
+        - configMap:
+            name: flyte-clusterresourcesync-config
+          name: config-volume
+      {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+      {{- end }}
+  {{- end }}
