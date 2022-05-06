@@ -485,7 +485,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
+  - name: http
+    port: 80
     protocol: TCP
     targetPort: 8080
   selector: 
@@ -934,6 +935,7 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
         spec:
           containers:
           - command:
