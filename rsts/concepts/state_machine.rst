@@ -28,7 +28,7 @@ High Level Overview of How a Workflow Progresses to Success
      NodeSuccess --> Success
 
 
-This state diagram illustrates a very high-level, simplistic view of the state transitions that a workflow with a single task and node would go through as the observer observes success.
+This state diagram illustrates a high-level, simplistic view of the state transitions that a workflow with a single task and node would go through as the user observes success.
 
 The following sections explain the various observable (and some hidden) states for workflow, node, and task state transitions.
 
@@ -58,32 +58,14 @@ Workflow States
      Aborting--> |On successful event send to Admin| Aborted
 
 A workflow always starts in the ``Ready`` state and ends either in ``Failed``, ``Succeeded``, or ``Aborted`` state.
-Any system error within a state causes a retry on that state. These retries are capped by **system retries** which eventually lead to an ``Aborted`` state if the failure persists.
-
-.. note::
-    System retry can be of two types:
-
-    - **Downstream System Retry**: When a downstream system (or service) fails, or remote service is not contactable, 
-      the failure is retried against the number of retries set 
-      `here <https://github.com/flyteorg/flytepropeller/blob/6a14e7fbffe89786fb1d8cde22715f93c2f3aff5/pkg/controller/config/config.go#L192>`__. 
-      This performs end-to-end system retry against the node whenever the task fails with a system error. This is useful when the downstream 
-      service throws a 500 error, abrupt network failure, etc.
-    - **Transient Failure Retry**: This retry mechanism offers resiliency against transient failures, which are opaque to the user. 
-      It is tracked across the entire duration of execution. It helps Flyte entities and the additional services 
-      connected to Flyte like S3, to continue operating despite a system failure. Indeed, all transient failures are handled gracefully 
-      by Flyte! Moreover, in case of a transient failure retry, Flyte does not necessarily retry the entire task. “Retrying an entire 
-      task” means that the entire pod associated with Flyte task would be rerun with a clean slate; instead, it just retries the atomic operation. 
-      For example, Flyte tries to persist the state until it can, exhausts the max retries, and backs off. To set a transient failure 
-      retry:
-
-      - Update `MaxWorkflowRetries <https://github.com/flyteorg/flytepropeller/blob/f1b0163b0b88200b38a5d49af955490e5c98681d/pkg/controller/config/config.go#L55>`__ in the propeller configuration
-      - Or update `max-workflow-retries <https://github.com/flyteorg/flyte/blob/33f179b807093dcad2f37bde832869103bdf5182/charts/flyte/values-sandbox.yaml#L143>`__ in helm
+Any system error within a state causes a retry on that state. These retries are capped by :ref:`system retries <system-retry>` which eventually lead to an ``Aborted`` state if the failure persists.
 
 Every transition between states is recorded in FlyteAdmin using :std:ref:`workflowexecutionevent <flyteidl:protos/docs/event/event:workflowexecutionevent>`.
 
 The phases in the above state diagram are captured in the admin database as specified here :std:ref:`workflowexecution.phase <flyteidl:protos/docs/core/core:workflowexecution.phase>` and are sent as a part of the Execution event.
 
 The state machine specification for the illustration can be found `here <https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBBYm9ydGVkIDogT24gc3lzdGVtIGVycm9ycyBtb3JlIHRoYW4gdGhyZXNob2xkXG4gICAgWypdIC0tPiBSZWFkeVxuICAgIFJlYWR5IC0tPiBSdW5uaW5nIDogV3JpdGUgaW5wdXRzIHRvIHdvcmtmbG93XG4gICAgUnVubmluZyAtLT4gUnVubmluZyA6IE9uIHN5c3RlbSBlcnJvclxuICAgIFJ1bm5pbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBhbGwgTm9kZXMgU3VjY2Vzc1xuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRlZCA6IE9uIHN1Y2Nlc3NmdWwgZXZlbnQgc2VuZCB0byBBZG1pblxuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBzeXN0ZW0gZXJyb3JcbiAgICBSZWFkeSAtLT4gRmFpbGluZyA6IE9uIHByZWNvbmRpdGlvbiBmYWlsdXJlXG4gICAgUnVubmluZyAtLT4gRmFpbGluZyA6IE9uIGFueSBOb2RlIEZhaWx1cmVcbiAgICBSZWFkeSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgUnVubmluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgU3VjY2VlZGluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG5cbiAgICBGYWlsaW5nIC0tPiBIYW5kbGVGYWlsdXJlTm9kZSA6IElmIEZhaWx1cmUgbm9kZSBleGlzdHNcbiAgICBGYWlsaW5nIC0tPiBBYm9ydGVkIDogT24gdXNlciBpbml0aWF0ZWQgYWJvcnRcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gRmFpbGVkIDogT24gY29tcGxldGluZyBmYWlsdXJlIG5vZGVcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgRmFpbGluZyAtLT4gRmFpbGVkIDogT24gc3VjY2Vzc2Z1bCBzZW5kIG9mIEZhaWx1cmUgbm9kZVxuICAgICIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ>`__.
+
 
 Node States
 ===========

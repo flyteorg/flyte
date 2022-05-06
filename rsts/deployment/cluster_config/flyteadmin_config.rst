@@ -1769,6 +1769,16 @@ annotations (map[string]string)
   null
   
 
+interruptible (bool)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 assumableIamRole (string)
 --------------------------------------------------------------------------------
 

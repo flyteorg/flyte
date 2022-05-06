@@ -21,18 +21,18 @@ The illustration above refers to a simple workflow, with 2 nodes N1 & N2. This c
 
 Acceptance Latency
 ====================
-Every workflow starts in the ``Acceptance`` phase. Acceptance refers to the time between FlyteAdmin receiving an execution request and Flyte Propeller evaluating the first round of workflow.
+Every workflow starts in the ``Acceptance`` phase. Acceptance refers to the time between FlyteAdmin receiving an execution request and FlytePropeller evaluating the first round of workflow.
 Usually, within this phase, the K8s queuing latency is the largest contributor to latency where the overall acceptance latency of <5s is desirable.
 
 Transition Latency
 ===================
-Transition latency refers to the time between successive node executions, i.e., between N1 & N2. For the first node ``N1`` this latency also encapsulates executing the start node. 
+Transition latency refers to the time between successive node executions, that is, between ``N1`` and ``N2``. For the first node ``N1``, this latency also encapsulates executing the start node. 
 
-Similarly, the last node also encapsulates executing end node as well. ``Start Node`` and ``End Node`` are capstones inserted to mark the beginning and end of the DAG.
+Similarly, the last node also encapsulates executing end node. ``Start Node`` and ``End Node`` are capstones inserted to mark the beginning and end of the DAG.
 
 The latency involves time consumed to:
 
-#. Gather outputs for a node after the node completes.
+#. Gather outputs for a node after the node completes execution.
 #. Send an observation event to FlyteAdmin. Failing to do so will be regarded as an error and will be tried until it succeeds or system max retries are exhausted (the number of max system retries is configured to be 30 by default and can be altered per deployment).
 #. Persist data to Kubernetes.
 #. Receive the persisted object back from Kubernetes (as this process is eventually consistent using informer caches).
