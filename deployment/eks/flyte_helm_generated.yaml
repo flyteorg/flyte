@@ -1423,6 +1423,7 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
         spec:
           containers:
           - command:
