@@ -112,12 +112,10 @@ jobs:
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/prep_aws_flyte_yaml.yml@opta-aws
     with:
-      aws-region: "${{ steps.set-env-vars.outputs.aws_region }}"
-      flyte-storage-bucket: "
+      aws-region: "${{ needs.set-env-vars.outputs.aws_region }}"
+      flyte-storage-bucket: "${{ needs.set-env-vars.flyte-bucket }}"
       dns: "${{ needs.create-aws-opta.outputs.dns }}"
     secrets: inherit
-
-
   additiona-workflo:
     runs-on: ubuntu-latest
     needs:
