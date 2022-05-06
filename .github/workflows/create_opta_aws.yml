@@ -95,7 +95,7 @@ jobs:
       - name: Update Helm Chart dependencies
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/
+          exec: helm dep update /home/runner/work/flyte/flyte/opta/helm/Chart.yaml
       - name: Pin terraform version
         uses: hashicorp/setup-terraform@v1
         with:
