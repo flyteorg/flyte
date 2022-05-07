@@ -44,6 +44,21 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteclusterresourcesync.name" -}}
+flyteclusterresourcesync
+{{- end -}}
+
+{{- define "flyteclusterresourcesync.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flyteclusterresourcesync.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "flyteclusterresourcesync.labels" -}}
+{{ include "flyteclusterresourcesync.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
 {{- define "datacatalog.name" -}}
 datacatalog
 {{- end -}}

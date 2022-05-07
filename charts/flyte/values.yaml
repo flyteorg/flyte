@@ -604,12 +604,16 @@ flyte:
   cluster_resource_manager:
     # -- Enables the Cluster resource manager component
     enabled: true
+    # -- Service account name to run with
+    service_account_name: flyteadmin
     config:
       # -- ClusterResource parameters
       # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
       cluster_resources:
         refreshInterval: 5m
         templatePath: "/etc/flyte/clusterresource/templates"
+        # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+        standaloneDeployment: false
         customData:
           - production:
               - projectQuotaCpu:

@@ -4579,6 +4579,57 @@ spec:
           secret:
             secretName: flyte-admin-secrets
 ---
+# Source: flyte/charts/flyte/templates/clusterresourcesync/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncresources
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteclusterresourcesync
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyteclusterresourcesync
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: flyteclusterresourcesync
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - command:
+            - flyteadmin
+            - --config
+            - /etc/flyte/config/*.yaml
+            - clusterresource
+            - run
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          imagePullPolicy: "IfNotPresent"
+          name: sync-cluster-resources
+          volumeMounts:
+          
+          - mountPath: /etc/flyte/clusterresource/templates
+            name: resource-templates
+          - mountPath: /etc/flyte/config
+            name: config-volume
+      serviceAccountName: flyteadmin
+      volumes:
+        
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
+        - configMap:
+            name: flyte-clusterresourcesync-config
+          name: config-volume
+---
 # Source: flyte/charts/flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -5210,51 +5261,6 @@ spec:
           requests:
             cpu: 10m
             memory: 128Mi
----
-# Source: flyte/charts/flyte/templates/clusterresourcesync/cronjob.yaml
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: syncresources
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: flyteadmin
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  schedule: '*/1 * * * *'
-  jobTemplate:
-    spec:
-      template:
-        metadata:
-        spec:
-          containers:
-          - command:
-            - flyteadmin
-            - --config
-            - /etc/flyte/config/*.yaml
-            - clusterresource
-            - sync
-            image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
-            imagePullPolicy: "IfNotPresent"
-            name: sync-cluster-resources
-            volumeMounts:
-            
-            - mountPath: /etc/flyte/clusterresource/templates
-              name: resource-templates
-            - mountPath: /etc/flyte/config
-              name: config-volume
-          restartPolicy: OnFailure
-          serviceAccountName: flyteadmin
-          volumes:
-          
-          - configMap:
-              name: clusterresource-template
-            name: resource-templates
-          - configMap:
-              name: flyte-clusterresourcesync-config
-            name: config-volume
 ---
 # Source: flyte/charts/flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1
