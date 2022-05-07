@@ -118,11 +118,11 @@ Flyte configuration on your remote cluster.
 
     kubect get pods -n flyte
 
-.. note::
+    .. note::
 
-    Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
+        Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
 
-#.  Get the URL of the ingress service ::
+#. Get the URL of the ingress service ::
 
     kubect get ingress -n flyte
 
