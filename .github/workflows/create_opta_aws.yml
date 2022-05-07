@@ -62,7 +62,7 @@ jobs:
           sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
           cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
-          #opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
+          opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
           opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: OPTA DNS
         id: output-dns
@@ -127,6 +127,6 @@ jobs:
         shell: bash
         run: |
           cd /home/runner/work/flyte/flyte/opta/aws
-          #opta apply -c flyte.yaml --auto-approve
+          opta apply -c flyte.yaml --auto-approve
     outputs:
       dns: ${{ steps.output-dns.outputs.dns }}
