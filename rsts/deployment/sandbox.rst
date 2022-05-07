@@ -114,13 +114,17 @@ Flyte configuration on your remote cluster.
 
     helm install flyte flyteorg/flyte-core -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml --wait
 
-#. Verify Flyte deployment ::
+#. Verify Flyte deployment using the following command ::
 
     kubect get pods -n flyte
 
-#. Get Flyte deployment URL ::
+.. note::
 
-    kubect get service -n flyte
+    Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
+
+#.  Get the URL of the ingress service ::
+
+    kubect get ingress -n flyte
 
 #. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
 
