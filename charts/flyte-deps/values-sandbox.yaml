@@ -1,0 +1,18 @@
+webhook:
+  enabled: false
+
+minio:
+  service:
+    type: LoadBalancer
+
+contour:
+  enabled: true
+  envoy:
+    service:
+      type: LoadBalancer
+
+kubernetes-dashboard:
+  service:
+    type: LoadBalancer
+    externalPort: 30082
+    nodePort: 30082

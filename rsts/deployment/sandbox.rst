@@ -108,7 +108,7 @@ Flyte configuration on your remote cluster.
 
 #. Install Flyte dependency helm chart (this will install the minio, Postgres, Kubernetes-dashboard, and contour) ::
 
-    helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace --set webhook.enabled=false,minio.service.type=LoadBalancer,contour.enabled=true,contour.envoy.service.type=LoadBalancer,kubernetes-dashboard.service.type=LoadBalancer
+    helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml
 
 #. Install flyte-core chart ::
 
@@ -118,9 +118,9 @@ Flyte configuration on your remote cluster.
 
     kubect get pods -n flyte
 
-    .. note::
+.. note::
 
-        Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
+    Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
 
 #. Get the URL of the ingress service ::
 
