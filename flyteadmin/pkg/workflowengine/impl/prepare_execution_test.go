@@ -71,6 +71,7 @@ func TestAddPermissions(t *testing.T) {
 			roleNameKey: testRole,
 		})
 		assert.Equal(t, testK8sServiceAccount, flyteWf.ServiceAccountName)
+		assert.True(t, proto.Equal(&flyteWf.SecurityContext, securityCtxFromAuth))
 	})
 
 	t.Run("override using security ctx", func(t *testing.T) {
@@ -80,6 +81,7 @@ func TestAddPermissions(t *testing.T) {
 			roleNameKey: testRoleSc,
 		})
 		assert.Equal(t, testK8sServiceAccountSc, flyteWf.ServiceAccountName)
+		assert.True(t, proto.Equal(&flyteWf.SecurityContext, securityCtx))
 	})
 }
 
