@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -29,7 +28,7 @@ func GetDbForTest(t *testing.T) *gorm.DB {
 	mocket.Catcher.Register()
 	db, err := gorm.Open(postgres.New(postgres.Config{DriverName: mocket.DriverName}))
 	if err != nil {
-		t.Fatal(fmt.Sprintf("Failed to open mock db with err %v", err))
+		t.Fatalf("Failed to open mock db with err %v", err)
 	}
 	return db
 }

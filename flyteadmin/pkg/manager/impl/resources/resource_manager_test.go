@@ -2,7 +2,6 @@ package resources
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -130,7 +129,7 @@ func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
 				} else if override.TaskType == "hive" {
 					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
 				} else {
-					t.Error(fmt.Sprintf("Unexpected task type [%s] plugin override committed to db", override.TaskType))
+					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
 				}
 			}
 			createOrUpdateCalled = true
@@ -301,7 +300,7 @@ func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
 				} else if override.TaskType == "hive" {
 					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
 				} else {
-					t.Error(fmt.Sprintf("Unexpected task type [%s] plugin override committed to db", override.TaskType))
+					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
 				}
 			}
 			createOrUpdateCalled = true

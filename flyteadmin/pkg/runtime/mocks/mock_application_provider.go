@@ -2,10 +2,11 @@ package mocks
 
 import (
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/database"
 )
 
 type MockApplicationProvider struct {
-	dbConfig             interfaces.DbConfig
+	dbConfig             database.DbConfig
 	topLevelConfig       interfaces.ApplicationConfig
 	schedulerConfig      interfaces.SchedulerConfig
 	remoteDataConfig     interfaces.RemoteDataConfig
@@ -15,11 +16,11 @@ type MockApplicationProvider struct {
 	cloudEventConfig     interfaces.CloudEventsConfig
 }
 
-func (p *MockApplicationProvider) GetDbConfig() *interfaces.DbConfig {
+func (p *MockApplicationProvider) GetDbConfig() *database.DbConfig {
 	return &p.dbConfig
 }
 
-func (p *MockApplicationProvider) SetDbConfig(dbConfig interfaces.DbConfig) {
+func (p *MockApplicationProvider) SetDbConfig(dbConfig database.DbConfig) {
 	p.dbConfig = dbConfig
 }
 

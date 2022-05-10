@@ -67,11 +67,11 @@ func TestPostgresConfig(t *testing.T) {
 
 	configProvider := NewConfigurationProvider()
 	dbConfig := configProvider.ApplicationConfiguration().GetDbConfig()
-	assert.Equal(t, 5432, dbConfig.PostgresConfig.Port)
-	assert.Equal(t, "postgres", dbConfig.PostgresConfig.Host)
-	assert.Equal(t, "postgres", dbConfig.PostgresConfig.User)
-	assert.Equal(t, "postgres", dbConfig.PostgresConfig.DbName)
-	assert.Equal(t, "sslmode=disable", dbConfig.PostgresConfig.ExtraOptions)
+	assert.Equal(t, 5432, dbConfig.Postgres.Port)
+	assert.Equal(t, "postgres", dbConfig.Postgres.Host)
+	assert.Equal(t, "postgres", dbConfig.Postgres.User)
+	assert.Equal(t, "postgres", dbConfig.Postgres.DbName)
+	assert.Equal(t, "sslmode=disable", dbConfig.Postgres.ExtraOptions)
 }
 
 func TestSqliteConfig(t *testing.T) {
@@ -80,5 +80,5 @@ func TestSqliteConfig(t *testing.T) {
 
 	configProvider := NewConfigurationProvider()
 	dbConfig := configProvider.ApplicationConfiguration().GetDbConfig()
-	assert.Equal(t, "admin.db", dbConfig.SQLiteConfig.File)
+	assert.Equal(t, "admin.db", dbConfig.SQLite.File)
 }

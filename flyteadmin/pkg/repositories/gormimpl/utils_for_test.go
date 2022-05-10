@@ -2,7 +2,6 @@
 package gormimpl
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -24,7 +23,7 @@ func GetDbForTest(t *testing.T) *gorm.DB {
 	mocket.Catcher.Register()
 	db, err := gorm.Open(postgres.New(postgres.Config{DriverName: mocket.DriverName}))
 	if err != nil {
-		t.Fatal(fmt.Sprintf("Failed to open mock db with err %v", err))
+		t.Fatalf("Failed to open mock db with err %v", err)
 	}
 	return db
 }
