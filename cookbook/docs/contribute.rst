@@ -49,7 +49,28 @@ Below you’ll find instructions that will hopefully guide you through how to co
         ``flytectl sandbox exec -- docker build . --tag "core:v2" -f core/Dockerfile``, 
         ``pyflyte --pkgs core package --image core:v2 -f``, and 
         ``flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v2``.
-        6. Refer to `this doc <https://docs.flyte.org/en/latest/getting_started_iterate.html#bonus-build-deploy-your-application-fast-er>`__ if the code in itself is updated and requirements.txt is the same.
+        6. Refer to `this doc <https://docs.flyte.org/projects/cookbook/en/latest/auto/larger_apps/larger_apps_iterate.html#quickly-re-deploy-your-application>`__ if the code in itself is updated and requirements.txt is the same.
+
+
+Pre-commit hooks
+^^^^^^^^^^^^^^^^
+
+We use `pre-commit <https://pre-commit.com/>`__ to automate linting and code formatting on every commit.
+Configured hooks include `black <https://github.com/psf/black>`__, `isort <https://github.com/PyCQA/isort>`__, `flake8 <https://github.com/PyCQA/flake8>`__ and linters to ensure newlines are added to the end of files, and there is proper spacing in files.
+
+We run all those hooks in CI, but if you want to run them locally on every commit, run `pre-commit install` after installing the dev environment requirements. In case you want to disable `pre-commit` hooks locally, run `pre-commit uninstall`. More info `here <https://pre-commit.com/>`__.
+
+
+Formatting
+^^^^^^^^^^
+
+We use `black <https://github.com/psf/black>`__ and `isort <https://github.com/PyCQA/isort>`__ to autoformat code. They are configured as git hooks in `pre-commit`. Run ``make fmt`` to format your code.
+
+Spell-checking
+^^^^^^^^^^^^^^
+
+We use `codespell <https://github.com/codespell-project/codespell>`__ to catch common misspellings. Run ``make spellcheck`` to spell-check the changes.
+
 
 📝 Contribute to Documentation
 ==============================
