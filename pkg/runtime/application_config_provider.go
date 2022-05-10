@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"fmt"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
@@ -83,18 +81,8 @@ var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.Clou
 // Implementation of an interfaces.ApplicationConfiguration
 type ApplicationConfigurationProvider struct{}
 
-func (p *ApplicationConfigurationProvider) GetDbConfig() *interfaces.DbConfig {
-	databaseConfig := database.GetConfig()
-	switch {
-	case !databaseConfig.SQLite.IsEmpty():
-		sqliteConfig := interfaces.SQLiteConfig(databaseConfig.SQLite)
-		return &interfaces.DbConfig{SQLiteConfig: &sqliteConfig}
-	case !databaseConfig.Postgres.IsEmpty():
-		postgresConfig := interfaces.PostgresConfig(databaseConfig.Postgres)
-		return &interfaces.DbConfig{PostgresConfig: &postgresConfig}
-	default:
-		panic(fmt.Errorf("database config cannot be empty"))
-	}
+func (p *ApplicationConfigurationProvider) GetDbConfig() *database.DbConfig {
+	return database.GetConfig()
 }
 
 func (p *ApplicationConfigurationProvider) GetTopLevelConfig() *interfaces.ApplicationConfig {

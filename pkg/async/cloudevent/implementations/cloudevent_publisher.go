@@ -46,20 +46,20 @@ func (p *Publisher) Publish(ctx context.Context, notificationType string, msg pr
 	var phase string
 	var eventTime time.Time
 
-	switch msg.(type) {
+	switch msgType := msg.(type) {
 	case *admin.WorkflowExecutionEventRequest:
-		e := msg.(*admin.WorkflowExecutionEventRequest).Event
+		e := msgType.Event
 		executionID = e.ExecutionId.String()
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 	case *admin.TaskExecutionEventRequest:
-		e := msg.(*admin.TaskExecutionEventRequest).Event
+		e := msgType.Event
 		executionID = e.TaskId.String()
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 	case *admin.NodeExecutionEventRequest:
-		e := msg.(*admin.NodeExecutionEventRequest).Event
-		executionID = msg.(*admin.NodeExecutionEventRequest).Event.Id.String()
+		e := msgType.Event
+		executionID = msgType.Event.Id.String()
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 	default:

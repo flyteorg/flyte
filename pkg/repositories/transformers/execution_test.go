@@ -2,7 +2,6 @@ package transformers
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"strings"
 	"testing"
@@ -458,7 +457,7 @@ func TestSetExecutionAborted(t *testing.T) {
 	var actualClosure admin.ExecutionClosure
 	err = proto.Unmarshal(existingModel.Closure, &actualClosure)
 	if err != nil {
-		t.Fatal(fmt.Sprintf("Failed to marshal execution closure: %v", err))
+		t.Fatalf("Failed to marshal execution closure: %v", err)
 	}
 	assert.True(t, proto.Equal(&admin.ExecutionClosure{
 		OutputResult: &admin.ExecutionClosure_AbortMetadata{

@@ -5,6 +5,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/database"
 	"github.com/golang/protobuf/ptypes/wrappers"
 
 	"golang.org/x/time/rate"
@@ -500,7 +501,7 @@ type DomainsConfig = []Domain
 
 // Defines the interface to return top-level config structs necessary to start up a flyteadmin application.
 type ApplicationConfiguration interface {
-	GetDbConfig() *DbConfig
+	GetDbConfig() *database.DbConfig
 	GetTopLevelConfig() *ApplicationConfig
 	GetSchedulerConfig() *SchedulerConfig
 	GetRemoteDataConfig() *RemoteDataConfig
