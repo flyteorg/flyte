@@ -129,7 +129,7 @@ jobs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
     uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
-    with:s
+    with:
       aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
     secrets: inherit
     needs:
