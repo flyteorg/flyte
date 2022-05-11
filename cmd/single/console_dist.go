@@ -19,7 +19,7 @@ var consoleHandlers = map[string]handlerFunc{
 	consoleRoot: func(writer http.ResponseWriter, request *http.Request) {
 		consoleHandler.ServeHTTP(writer, request)
 	},
-	onsoleRoot + "/": func(writer http.ResponseWriter, request *http.Request) {
+	consoleRoot + "/": func(writer http.ResponseWriter, request *http.Request) {
 		consoleHandler.ServeHTTP(writer, request)
 	},
 }
