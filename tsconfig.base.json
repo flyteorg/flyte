@@ -12,17 +12,15 @@
         "importHelpers": true,
 
         "jsx": "react",
-        "lib": ["es6", "es2021", "dom", "dom.iterable"],
-        // TODO: switch target to "esnext" when babel would be removed.
-        "target": "es6",
+        "lib": ["dom", "dom.iterable", "es6", "es2021"],
+        "target": "esnext",
         "module": "commonjs",
         "moduleResolution": "node",
-        "types": ["node", "webpack-env", "jest", "@testing-library/jest-dom"],
+        // "esModuleInterop": true
 
         "isolatedModules": true,
         "declaration": true,
         "declarationMap": true,
-        "downlevelIteration": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noImplicitAny": true,
@@ -32,7 +30,6 @@
         "useUnknownInCatchVariables": false,
 
         // More strict rules
-        "exactOptionalPropertyTypes": true,
         "noUncheckedIndexedAccess": false,
         "noPropertyAccessFromIndexSignature": false,
         "noImplicitOverride": true,
@@ -41,9 +38,13 @@
         "sourceMap": true,
         "composite": true,
         "baseUrl": ".",
-        "outDir": "./dist",
         "paths": {
-            "@flyteconsole/*": ["./packages/plugins/*/src", "./packages/zapp/*/src"]
+            "@flyteconsole/*": [
+                "./packages/basics/*/src",
+                "./packages/composites/*/src",
+                "./packages/plugins/*/src",
+                "./packages/zapp/*/src"
+            ]
         }
     },
     "exclude": ["**/node_modules", "**/dist", "**/lib"]

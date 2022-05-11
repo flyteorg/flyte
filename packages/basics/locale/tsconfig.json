@@ -4,6 +4,5 @@
         "rootDir": "./src",
         "outDir": "./dist"
     },
-    "references": [{ "path": "../../basics/locale" }, { "path": "../../composites/ui-atoms" }],
     "include": ["src/**/*"]
 }

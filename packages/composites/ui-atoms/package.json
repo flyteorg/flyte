@@ -1,7 +1,7 @@
 {
-    "name": "@flyteconsole/components",
+    "name": "@flyteconsole/ui-atoms",
     "version": "0.0.1-rc.2",
-    "description": "Flyteconsole Components module, which is published as npm package and can be consumed by 3rd parties",
+    "description": "Flyteconsole UI atoms, which didn't plan to be published and would be consumed as is internally",
     "main": "./dist/index.js",
     "module": "./lib/esm/index.js",
     "types": "./lib/esm/index.d.ts",
@@ -13,8 +13,8 @@
     },
     "scripts": {
         "build": "yarn build:esm && yarn build:cjs",
-        "build:esm": "tsc --module esnext --outDir lib/esm --project ./tsconfig.build.json",
-        "build:cjs": "tsc --project ./tsconfig.build.json",
+        "build:esm": "tsc --module esnext --outDir lib/esm",
+        "build:cjs": "tsc",
         "test": "NODE_ENV=test jest"
     },
     "dependencies": {

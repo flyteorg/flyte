@@ -1,4 +1,4 @@
-import { createLocalizedString } from 'basics/Locale';
+import { createLocalizedString } from '@flyteconsole/locale';
 import { dateFromNow } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { Protobuf } from 'flyteidl';
@@ -10,7 +10,7 @@ const str = {
   tableLabel_duration: 'duration',
   tableLabel_actions: '',
   cancelAction: 'Cancel',
-  inputOutputTooltip: 'View Inputs &amp; Outputs',
+  inputOutputTooltip: 'View Inputs & Outputs',
   launchPlanTooltip: 'View Launch Plan',
   archiveAction: (isArchived: boolean) => (isArchived ? 'Unarchive' : 'Archive'),
   archiveSuccess: (isArchived: boolean) =>
@@ -22,5 +22,5 @@ const str = {
   },
 };
 
-export { patternKey } from 'basics/Locale';
+export { patternKey } from '@flyteconsole/locale';
 export default createLocalizedString(str);

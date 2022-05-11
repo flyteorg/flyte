@@ -1,21 +1,3 @@
 {
-    "files": [],
-    "include": [],
-    "compilerOptions": {
-        // compilerOptions here used for jest setup only -
-        // all packages are using tsconfig.base.json as a baseline
-        "jsx": "react",
-        "lib": ["dom", "esnext"],
-        "module": "esnext",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "baseUrl": "./",
-        "paths": {
-            "@flyteconsole/*": ["./packages/plugins/*/src", "./packages/zapp/*/src"]
-        }
-    },
-    "references": [
-        { "path": "./packages/plugins/components" },
-        { "path": "./packages/zapp/console" }
-    ]
+    "extends": "./tsconfig.base.json"
 }

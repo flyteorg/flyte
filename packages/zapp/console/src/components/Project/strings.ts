@@ -1,4 +1,4 @@
-import { createLocalizedString } from 'basics/Locale';
+import { createLocalizedString } from '@flyteconsole/locale';
 
 const str = {
   allExecutionsTitle: 'All Executions in the Project',
@@ -7,5 +7,5 @@ const str = {
   workflowsTotal: (n: number) => `${n} Workflows`,
 };
 
-export { patternKey } from 'basics/Locale';
+export { patternKey } from '@flyteconsole/locale';
 export default createLocalizedString(str);

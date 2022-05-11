@@ -11,5 +11,6 @@
         "src/**/*.test.*",
         "src/**/*.mock.*",
         "src/**/*.stories.*"
-    ]
+    ],
+    "references": [{ "path": "../../basics/locale" }, { "path": "../../composites/ui-atoms" }]
 }

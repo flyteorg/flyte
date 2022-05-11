@@ -7,7 +7,12 @@ module.exports = {
   verbose: false,
 
   setupFilesAfterEnv: ['./script/test/jest-setup.ts'],
-  projects: ['<rootDir>/packages/zapp/console', '<rootDir>/packages/plugins/components'],
+  projects: [
+    '<rootDir>/packages/basics/locale',
+    '<rootDir>/packages/composites/ui-atoms',
+    '<rootDir>/packages/plugins/components',
+    '<rootDir>/packages/zapp/console',
+  ],
 
   coverageDirectory: '<rootDir>/.coverage',
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*/*.stories.{ts,tsx}', '!**/*/*.mocks.{ts,tsx}'],

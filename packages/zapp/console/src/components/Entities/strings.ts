@@ -1,4 +1,4 @@
-import { createLocalizedString } from 'basics/Locale';
+import { createLocalizedString } from '@flyteconsole/locale';
 import { startCase } from 'lodash';
 
 const str = {
@@ -12,5 +12,5 @@ const str = {
   noSchedules: (typeString: string) => `This ${typeString} has no schedules.`,
 };
 
-export { patternKey } from 'basics/Locale';
+export { patternKey } from '@flyteconsole/locale';
 export default createLocalizedString(str);

@@ -1,4 +1,4 @@
-import { createLocalizedString } from 'basics/Locale';
+import { createLocalizedString } from '@flyteconsole/locale';
 
 const str = {
   annotationsHeader: 'Annotations',
@@ -14,5 +14,5 @@ const str = {
   noMatchingResults: 'No matching results',
 };
 
-export { patternKey } from 'basics/Locale';
+export { patternKey } from '@flyteconsole/locale';
 export default createLocalizedString(str);

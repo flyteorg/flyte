@@ -4,7 +4,7 @@ import { ProjectDetails } from 'components/Project/ProjectDetails';
 import { SelectProject } from 'components/SelectProject/SelectProject';
 import { TaskDetails } from 'components/Task/TaskDetails';
 import { WorkflowDetails } from 'components/Workflow/WorkflowDetails';
-import { WorkflowVersionDetails } from '../components/Workflow/WorkflowVersionDetails';
+import { WorkflowVersionDetails } from 'components/Workflow/WorkflowVersionDetails';
 
 /** Indexes the components for each defined route. These are done separately to avoid circular references
  * in components which include the Routes dictionary

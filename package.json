@@ -61,5 +61,15 @@
         "ts-jest": "^26.3.0",
         "jest": "^26.0.0",
         "react-hot-loader": "^4.1.2"
+    },
+    "resolutions": {
+        "@babel/cli": "~7.16.0",
+        "@babel/core": "~7.16.12",
+        "@babel/plugin-proposal-class-properties": "~7.16.7",
+        "@babel/plugin-proposal-decorators": "~7.16.7",
+        "@babel/plugin-proposal-object-rest-spread": "~7.16.7",
+        "@babel/preset-env": "~7.16.11",
+        "@babel/preset-react": "~7.16.7",
+        "@babel/preset-typescript": "~7.16.7"
     }
 }

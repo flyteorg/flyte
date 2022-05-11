@@ -92,6 +92,8 @@ const resolve = {
   mainFields: ['browser', 'module', 'main'],
   /** allow to resolve local packages to it's source code */
   alias: {
+    '@flyteconsole/locale': path.resolve(__dirname, '../../basics/locale/src'),
+    '@flyteconsole/ui-atoms': path.resolve(__dirname, '../../composites/ui-atoms/src'),
     '@flyteconsole/components': path.resolve(__dirname, '../../plugins/components/src'),
   },
 };
@@ -129,7 +131,7 @@ export const clientConfig: webpack.Configuration = {
     chunkFilename: '[name]-[chunkhash].chunk.js',
   },
   plugins: [
-    new ForkTsCheckerWebpackPlugin({ typescript: { configFile } }),
+    new ForkTsCheckerWebpackPlugin({ typescript: { configFile, build: true } }),
     favIconPlugin,
     statsWriterPlugin,
     getDefinePlugin(false),
@@ -159,7 +161,7 @@ export const serverConfig: webpack.Configuration = {
   },
   plugins: [
     limitChunksPlugin,
-    new ForkTsCheckerWebpackPlugin({ typescript: { configFile } }),
+    new ForkTsCheckerWebpackPlugin({ typescript: { configFile, build: true } }),
     getDefinePlugin(true),
   ],
 };

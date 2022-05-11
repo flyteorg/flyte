@@ -2,12 +2,12 @@ import * as React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
-import { NavBar } from '.';
+import { SampleComponent } from '.';
 
 export default {
-  title: 'Primitives/NavBar',
-  component: NavBar,
-} as ComponentMeta<typeof NavBar>;
+  title: 'Components/Sample',
+  component: SampleComponent,
+} as ComponentMeta<typeof SampleComponent>;
 
 const useStyles = makeStyles((_theme: Theme) => ({
   updatedOne: {
@@ -20,15 +20,15 @@ const useStyles = makeStyles((_theme: Theme) => ({
   },
 }));
 
-const Template: ComponentStory<typeof NavBar> = () => <NavBar />;
+const Template: ComponentStory<typeof SampleComponent> = () => <SampleComponent />;
 export const Primary = Template.bind({});
 
-export const Secondary: ComponentStory<typeof NavBar> = () => {
+export const Secondary: ComponentStory<typeof SampleComponent> = () => {
   const styles = useStyles();
-  return <NavBar className={styles.updatedOne} />;
+  return <SampleComponent className={styles.updatedOne} />;
 };
 
-export const Tertiary: ComponentStory<typeof NavBar> = () => {
+export const Tertiary: ComponentStory<typeof SampleComponent> = () => {
   const styles = useStyles();
-  return <NavBar className={styles.updatedTwo} />;
+  return <SampleComponent className={styles.updatedTwo} />;
 };

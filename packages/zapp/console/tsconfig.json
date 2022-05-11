@@ -3,14 +3,24 @@
     "compilerOptions": {
         "baseUrl": "./src",
         "outDir": "./dist",
+        "paths": {
+            "@flyteconsole/*": [
+                "../../../basics/*/src",
+                "../../../composites/*/src",
+                "../../../plugins/*/src"
+            ]
+        },
 
         // TODO: this items should be removed when violations are fixed:
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "noImplicitAny": false,
-        "exactOptionalPropertyTypes": false,
         "noImplicitOverride": false
     },
-    "references": [{ "path": "../../plugins/components" }],
+    "references": [
+        { "path": "../../basics/locale" },
+        { "path": "../../composites/ui-atoms" },
+        { "path": "../../plugins/components" }
+    ],
     "include": ["src/**/*"]
 }
