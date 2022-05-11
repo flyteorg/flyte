@@ -150,7 +150,7 @@ var startCmd = &cobra.Command{
 			g.Go(func() error {
 				err := startAdmin(childCtx, cfg.Admin)
 				if err != nil {
-					logger.Errorf(childCtx, "Failed to start Admin, err: %v", err)
+					logger.Panicf(childCtx, "Failed to start Admin, err: %v", err)
 					return err
 				}
 				return nil
@@ -161,7 +161,7 @@ var startCmd = &cobra.Command{
 			g.Go(func() error {
 				err := startPropeller(childCtx, cfg.Propeller)
 				if err != nil {
-					logger.Errorf(childCtx, "Failed to start Propeller, err: %v", err)
+					logger.Panicf(childCtx, "Failed to start Propeller, err: %v", err)
 					return err
 				}
 				return nil
@@ -172,7 +172,7 @@ var startCmd = &cobra.Command{
 			g.Go(func() error {
 				err := startDataCatalog(childCtx, cfg.DataCatalog)
 				if err != nil {
-					logger.Errorf(childCtx, "Failed to start Datacatalog, err: %v", err)
+					logger.Panicf(childCtx, "Failed to start Datacatalog, err: %v", err)
 					return err
 				}
 				return nil

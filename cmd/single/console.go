@@ -1,13 +1,9 @@
 package single
 
 import (
-	"embed"
 	"net/http"
 	"strings"
 )
-
-//go:embed dist/*
-var console embed.FS
 
 const consoleRoot = "/console"
 const assetsDir = "assets"
