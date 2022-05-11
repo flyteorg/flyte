@@ -115,5 +115,10 @@ func TestVersionUtilFunc(t *testing.T) {
 		err := getVersion(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})
-
+	t.Run("ClientSet is empty", func(t *testing.T) {
+		ctx := context.Background()
+		cmdCtx := cmdCore.CommandContext{}
+		err := getVersion(ctx, []string{}, cmdCtx)
+		assert.Nil(t, err)
+	})
 }

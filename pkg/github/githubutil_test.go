@@ -186,7 +186,7 @@ func TestGetUpgradeMessage(t *testing.T) {
 	version = "v0.2.09"
 	message, err = GetUpgradeMessage(version, darwin)
 	assert.Nil(t, err)
-	assert.Equal(t, 63, len(message))
+	assert.Equal(t, 0, len(message))
 
 	version = "v"
 	message, err = GetUpgradeMessage(version, darwin)
