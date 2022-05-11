@@ -168,8 +168,10 @@ func GetUpgradeMessage(latest string, goos platformutil.Platform) (string, error
 	if err != nil {
 		return "", err
 	}
-	message := fmt.Sprintf(commonMessage, stdlibversion.Version, latest)
+
+	var message string
 	if isGreater {
+		message = fmt.Sprintf(commonMessage, stdlibversion.Version, latest)
 		symlink, err := CheckBrewInstall(goos)
 		if err != nil {
 			return "", err
