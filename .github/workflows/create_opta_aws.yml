@@ -73,17 +73,24 @@ jobs:
           echo ""
           echo $DNS
           echo "::set-output name=dns::${DNS}"
-      - uses: azure/setup-helm@v1
-      - name: Update Helm Chart dependencies
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          exec: helm dep update /home/runner/work/flyte/flyte/charts/flyte-core/
-      - name: tree
+      - name: tree1
         shell: bash
         run: |
           pwd
           sudo apt-get install tree
           tree
+      - uses: azure/setup-helm@v1
+      - name: tree2
+        shell: bash
+        run: |
+          pwd
+          sudo apt-get install tree
+          tree
+      - name: Update Helm Chart dependencies
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm dep update /home/runner/work/flyte/flyte/charts/flyte-core/
+
       - name: set flyte variables
         shell: bash
         run: |
