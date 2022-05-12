@@ -58,3 +58,27 @@ There are two options to fix this:
 
 #. Switch to a full external OAuth Provider (okta, GCP cloud identity, keycloak, Azure AD, etc.).
 #. Use a CA-certified SSL cert.
+
+********************************************************
+Running flyteadmin and flyteconsole on different domains
+********************************************************
+In some cases when flyteadmin and flyteconsole are running on different domains then you would need to allow the flyteadmin's domain to allow cross origin request from the flyteconsole's domain
+This can be done by changing the flyteadmin config in the following manner
+
+#. Assuming <flyte-admin-domain> is the domain which will be get request
+#. And <flyte-console-domain> is the domain which will be sending the request as the originator
+
+   .. code-block::
+
+             security:
+               allowCors: true
+               ......
+               allowedOrigins:
+               - 'https://<flyte-console-domain>'
+               ......
+
+#. And then rollout admin
+
+   .. prompt:: bash
+
+      kubectl rollout restart deployment/flyteadmin -n <flyte-admin-domain>
