@@ -127,15 +127,15 @@ jobs:
 #        echo "$badges"  # for debugging purposes
 #        echo ::set-output name=badges::${badges}
 #    # TODO: Add a slack update after tests run
-  destroy-cluster:
-    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
-    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
-    uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
-    with:
-      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-    secrets: inherit
-    needs:
-      - set-env-vars
-      - calculate-pre-reqs
-      - create-opta-aws
-      #- mor-flo
+#  destroy-cluster:
+#    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
+#    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
+#    uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
+#    with:
+#      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+#    secrets: inherit
+#    needs:
+#      - set-env-vars
+#      - calculate-pre-reqs
+#      - create-opta-aws
+#      #- mor-flo

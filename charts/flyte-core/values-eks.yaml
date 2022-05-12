@@ -31,6 +31,16 @@ flyteadmin:
       ephemeral-storage: 200Mi
       memory: 200Mi
 
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
+
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -64,6 +74,13 @@ datacatalog:
       cpu: 500m
       ephemeral-storage: 200Mi
       memory: 200Mi
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -113,6 +130,15 @@ flyteconsole:
   resources:
     limits:
       cpu: 250m
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -325,7 +351,6 @@ workflow_notifications:
           Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
           Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
           {{ error }}
-
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
@@ -369,7 +394,6 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
-
     # -- Patch default service account
     - key: aab_default_service_account
       value: |
@@ -380,7 +404,6 @@ cluster_resource_manager:
           namespace: {{ namespace }}
           annotations:
             eks.amazonaws.com/role-arn: {{ defaultIamRole }}
-
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
@@ -392,12 +415,10 @@ cluster_resource_manager:
           hard:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
-
-
-
 #
 # SPARKOPERATOR
 #
 
 sparkoperator:
   enabled: false
+  
