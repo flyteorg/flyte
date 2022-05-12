@@ -76,7 +76,7 @@ This can be done by changing the flyteadmin config in the following manner
       kubectl edit deployment flyteconsole -n <flyteconsole-ns>
 
    .. code-block::
-      .......
+
       - env:
         - name: ENABLE_GA
           value: "true"
