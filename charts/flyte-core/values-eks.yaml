@@ -31,16 +31,6 @@ flyteadmin:
       ephemeral-storage: 200Mi
       memory: 200Mi
 
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-      # TODO alter domain
-      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
-    type: LoadBalancer
-    loadBalancerSourceRanges:
-      # TODO change source ip range if desired
-      - 0.0.0.0/0
-
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -74,13 +64,6 @@ datacatalog:
       cpu: 500m
       ephemeral-storage: 200Mi
       memory: 200Mi
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-    type: LoadBalancer
-    loadBalancerSourceRanges:
-      # TODO change source ip range if desired
-      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -130,15 +113,6 @@ flyteconsole:
   resources:
     limits:
       cpu: 250m
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-      # TODO alter domain
-      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
-    type: LoadBalancer
-    loadBalancerSourceRanges:
-      # TODO change source ip range if desired
-      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
