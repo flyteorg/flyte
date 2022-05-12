@@ -90,6 +90,8 @@ flyte:
   admin:
     disableClusterResourceManager: true
     disableScheduler: true
+  propeller:
+    disableWebhook: true
 task_resources:
   defaults:
     cpu: 500m
