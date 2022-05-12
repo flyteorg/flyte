@@ -15,7 +15,7 @@ const (
 
 var defaultConfig = &DbConfig{
 	MaxIdleConnections: 10,
-	MaxOpenConnections: 1000,
+	MaxOpenConnections: 100,
 	ConnMaxLifeTime:    config.Duration{Duration: time.Hour},
 	Postgres: PostgresConfig{
 		Port:         5432,
