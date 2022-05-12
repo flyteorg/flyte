@@ -12,6 +12,7 @@
 1. Wait for endtoend tests to finish then Merge PR.
 ## Create a release
 1. Run [Create Flyte Release workflow](https://github.com/flyteorg/flyte/actions/workflows/create_release.yml):
-   It will create a tag and then publish all deployment manifest in github release and will create a discussion thread in github release 
+   It will create a tag and then publish all deployment manifest in github release and will create a discussion thread in github release
+1. Kick off a run of the functional tests in https://github.com/unionai/genesis-device/actions/workflows/update_cluster_and_run_tests.yml
 1. Close the milestone
 1. Ping #core (slack channel) to: Send announcements about the milestone with the contents of the CHANGELOG to all social channels..
