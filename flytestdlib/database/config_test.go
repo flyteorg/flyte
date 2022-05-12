@@ -22,7 +22,7 @@ func TestParseDatabaseConfig(t *testing.T) {
 	assert.NoError(t, accessor.UpdateConfig(context.Background()))
 
 	assert.Equal(t, false, GetConfig().EnableForeignKeyConstraintWhenMigrating)
-	assert.Equal(t, 1000, GetConfig().MaxOpenConnections)
+	assert.Equal(t, 100, GetConfig().MaxOpenConnections)
 	assert.Equal(t, 10, GetConfig().MaxIdleConnections)
 	assert.Equal(t, config.Duration{Duration: 3600000000000}, GetConfig().ConnMaxLifeTime)
 
