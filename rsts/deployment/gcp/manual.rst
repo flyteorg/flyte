@@ -137,6 +137,7 @@ Development
    * storage.objects.get
    * storage.objects.getIamPolicy
    * storage.objects.update
+   * iam.serviceAccounts.signBlob
 * Create a new role FlyteSchedulerRole with following permissions
    * storage.buckets.get
    * storage.objects.create
