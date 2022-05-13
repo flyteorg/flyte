@@ -3,14 +3,17 @@ import { useState, useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer';
 import { dTypes } from 'models/Graph/types';
 import CachedOutlined from '@material-ui/icons/CachedOutlined';
-import { CatalogCacheStatus } from 'models/Execution/enums';
+import { CatalogCacheStatus, TaskExecutionPhase } from 'models/Execution/enums';
 import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
+import { RENDER_ORDER } from 'components/Executions/TaskExecutionsList/constants';
+import { whiteColor } from 'components/Theme/constants';
 import {
   COLOR_TASK_TYPE,
   COLOR_GRAPH_BACKGROUND,
   getGraphHandleStyle,
   getGraphNodeStyle,
   getNestedContainerStyle,
+  getStatusColor,
 } from './utils';
 import { RFHandleProps } from './types';
 
@@ -200,6 +203,55 @@ export const ReactFlowStaticNode = ({ data }: any) => {
 };
 
 /**
+ * Component that renders a map task item within the mapped node.
+ * @param props.numberOfTasks number of tasks of certain completion phase
+ * @param props.color string value of color of the block
+ * @param props.phase phase of the current map task item
+ * @param props.onPhaseSelectionChanged callback from the parent component
+ */
+
+interface TaskPhaseItemProps {
+  numberOfTasks: number;
+  color: string;
+  phase: TaskExecutionPhase;
+  setSelectedPhase: (phase: TaskExecutionPhase) => void;
+  setSelectedNode: (val: boolean) => void;
+}
+
+const TaskPhaseItem = ({
+  numberOfTasks,
+  color,
+  phase,
+  setSelectedPhase,
+  setSelectedNode,
+}: TaskPhaseItemProps) => {
+  const taskPhaseStyles: React.CSSProperties = {
+    borderRadius: '2px',
+    backgroundColor: color,
+    color: whiteColor,
+    margin: '0 1px',
+    padding: '0 2px',
+    fontSize: '8px',
+    lineHeight: '14px',
+    minWidth: '14px',
+    textAlign: 'center',
+    cursor: 'pointer',
+  };
+
+  const handleMapTaskClick = (e) => {
+    e.stopPropagation();
+    setSelectedNode(true);
+    setSelectedPhase(phase);
+  };
+
+  return (
+    <div style={taskPhaseStyles} onClick={handleMapTaskClick}>
+      ×{numberOfTasks}
+    </div>
+  );
+};
+
+/**
  * Custom component used by ReactFlow.  Renders a label (text)
  * and any edge handles.
  * @param props.data data property of ReactFlowGraphNodeData
@@ -208,14 +260,18 @@ export const ReactFlowStaticNode = ({ data }: any) => {
 export const ReactFlowCustomTaskNode = ({ data }: any) => {
   const styles = getGraphNodeStyle(data.nodeType, data.nodeExecutionStatus);
   const onNodeSelectionChanged = data.onNodeSelectionChanged;
-  const [selectedNode, setSelectedNode] = useState(false);
+  const onPhaseSelectionChanged = data.onPhaseSelectionChanged;
+  const [selectedNode, setSelectedNode] = useState<boolean>(false);
+  const [selectedPhase, setSelectedPhase] = useState<TaskExecutionPhase | undefined>(undefined);
 
   useEffect(() => {
     if (selectedNode === true) {
       onNodeSelectionChanged(selectedNode);
       setSelectedNode(false);
+      onPhaseSelectionChanged(selectedPhase);
+      setSelectedPhase(selectedPhase);
     }
-  }, [selectedNode, onNodeSelectionChanged]);
+  }, [selectedNode, onNodeSelectionChanged, selectedPhase, onPhaseSelectionChanged]);
 
   const taskContainerStyle: React.CSSProperties = {
     position: 'absolute',
@@ -229,6 +285,20 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
     padding: '.1rem .2rem',
     fontSize: '.3rem',
   };
+  const mapTaskContainerStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: '-.82rem',
+    zIndex: 0,
+    right: '.15rem',
+  };
+  const taskNameStyle: React.CSSProperties = {
+    backgroundColor: getStatusColor(data.nodeExecutionStatus),
+    color: 'white',
+    padding: '.1rem .2rem',
+    fontSize: '.4rem',
+    borderRadius: '.15rem',
+  };
+
   const cacheIconStyles: React.CSSProperties = {
     width: '8px',
     height: '8px',
@@ -236,15 +306,27 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
     marginTop: '1px',
     color: COLOR_GRAPH_BACKGROUND,
   };
+  const mapTaskWrapper: React.CSSProperties = {
+    display: 'flex',
+  };
 
-  const handleClick = (_e) => {
+  const handleNodeClick = (_e) => {
     setSelectedNode(true);
+    setSelectedPhase(undefined);
   };
 
   const renderTaskType = () => {
     return (
       <div style={taskContainerStyle}>
         <div style={taskTypeStyle}>{data.taskType}</div>
+      </div>
+    );
+  };
+
+  const renderTaskName = () => {
+    return (
+      <div style={mapTaskContainerStyle}>
+        <div style={taskNameStyle}>{data.text}</div>
       </div>
     );
   };
@@ -260,11 +342,35 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
     }
   };
 
+  const renderTaskPhases = (logsByPhase) => {
+    return (
+      <div style={mapTaskWrapper}>
+        {RENDER_ORDER.map((phase, id) => {
+          if (!logsByPhase.has(phase)) {
+            return null;
+          }
+
+          const key = `${id}-${phase}`;
+          return (
+            <TaskPhaseItem
+              numberOfTasks={logsByPhase.get(phase).length}
+              color={getStatusColor(phase)}
+              phase={phase}
+              setSelectedPhase={setSelectedPhase}
+              setSelectedNode={setSelectedNode}
+              key={key}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div onClick={handleClick}>
-      {data.taskType ? renderTaskType() : null}
+    <div onClick={handleNodeClick}>
+      {data.nodeLogsByPhase ? renderTaskName() : data.taskType ? renderTaskType() : null}
       <div style={styles}>
-        {data.text}
+        {data.nodeLogsByPhase ? renderTaskPhases(data.nodeLogsByPhase) : data.text}
         {renderCacheIcon(data.cacheStatus)}
       </div>
       {renderDefaultHandles(

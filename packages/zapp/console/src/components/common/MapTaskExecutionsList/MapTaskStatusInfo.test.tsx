@@ -14,15 +14,15 @@ const taskLogs = [
 
 describe('MapTaskStatusInfo', () => {
   it('Phase and amount of links rendered correctly', async () => {
-    const status = TaskExecutionPhase.RUNNING;
-    const phaseData = getTaskExecutionPhaseConstants(status);
+    const phase = TaskExecutionPhase.RUNNING;
+    const phaseData = getTaskExecutionPhaseConstants(phase);
 
     const { queryByText, getByTitle } = render(
-      <MapTaskStatusInfo taskLogs={taskLogs} status={status} expanded={false} />,
+      <MapTaskStatusInfo taskLogs={taskLogs} phase={phase} isExpanded={false} />,
     );
 
     expect(queryByText(phaseData.text)).toBeInTheDocument();
-    expect(queryByText(`x${taskLogs.length}`)).toBeInTheDocument();
+    expect(queryByText(`×${taskLogs.length}`)).toBeInTheDocument();
     expect(queryByText('Logs')).not.toBeInTheDocument();
 
     // Expand item - see logs section
@@ -34,15 +34,15 @@ describe('MapTaskStatusInfo', () => {
   });
 
   it('Phase with no links show proper texts when opened', () => {
-    const status = TaskExecutionPhase.ABORTED;
-    const phaseData = getTaskExecutionPhaseConstants(status);
+    const phase = TaskExecutionPhase.ABORTED;
+    const phaseData = getTaskExecutionPhaseConstants(phase);
 
     const { queryByText } = render(
-      <MapTaskStatusInfo taskLogs={[]} status={status} expanded={true} />,
+      <MapTaskStatusInfo taskLogs={[]} phase={phase} isExpanded={true} />,
     );
 
     expect(queryByText(phaseData.text)).toBeInTheDocument();
-    expect(queryByText(`x0`)).toBeInTheDocument();
+    expect(queryByText(`×0`)).toBeInTheDocument();
     expect(queryByText(noLogsFoundString)).toBeInTheDocument();
   });
 });

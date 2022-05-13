@@ -5,6 +5,7 @@ import { NonIdealState } from 'components/common/NonIdealState';
 import { WaitForData } from 'components/common/WaitForData';
 import { NodeExecution, TaskExecution } from 'models/Execution/types';
 import { isMapTaskType } from 'models/Task/utils';
+import { TaskExecutionPhase } from 'models/Execution/enums';
 import { useTaskExecutions, useTaskExecutionsRefresher } from '../useTaskExecutions';
 import { MapTaskExecutionsListItem } from './MapTaskExecutionListItem';
 import { TaskExecutionsListItem } from './TaskExecutionsListItem';
@@ -18,11 +19,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface TaskExecutionsListProps {
   nodeExecution: NodeExecution;
+  phase?: TaskExecutionPhase;
 }
 
 export const TaskExecutionsListContent: React.FC<{
   taskExecutions: TaskExecution[];
-}> = ({ taskExecutions }) => {
+  phase?: TaskExecutionPhase;
+}> = ({ taskExecutions, phase }) => {
   const styles = useStyles();
   if (!taskExecutions.length) {
     return (
@@ -45,6 +48,7 @@ export const TaskExecutionsListContent: React.FC<{
             key={getUniqueTaskExecutionName(taskExecution)}
             taskExecution={taskExecution}
             showAttempts={taskExecutions.length > 1}
+            selectedPhase={phase}
           />
         ) : (
           <TaskExecutionsListItem
@@ -59,13 +63,13 @@ export const TaskExecutionsListContent: React.FC<{
 
 /** Renders a vertical list of task execution records with horizontal separators
  */
-export const TaskExecutionsList: React.FC<TaskExecutionsListProps> = ({ nodeExecution }) => {
+export const TaskExecutionsList: React.FC<TaskExecutionsListProps> = ({ nodeExecution, phase }) => {
   const taskExecutions = useTaskExecutions(nodeExecution.id);
   useTaskExecutionsRefresher(nodeExecution, taskExecutions);
 
   return (
     <WaitForData {...taskExecutions}>
-      <TaskExecutionsListContent taskExecutions={taskExecutions.value} />
+      <TaskExecutionsListContent taskExecutions={taskExecutions.value} phase={phase} />
     </WaitForData>
   );
 };

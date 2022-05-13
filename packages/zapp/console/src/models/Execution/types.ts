@@ -1,4 +1,4 @@
-import { Admin, Core, Protobuf } from 'flyteidl';
+import { Admin, Core, Event, Protobuf } from 'flyteidl';
 import { Identifier, LiteralMap, LiteralMapBlob, TaskLog, UrlBlob } from 'models/Common/types';
 import { CompiledWorkflow } from 'models/Workflow/types';
 import {
@@ -10,6 +10,8 @@ import {
 
 export type WorkflowExecutionIdentifier = RequiredNonNullable<Core.IWorkflowExecutionIdentifier>;
 export type ExecutionError = RequiredNonNullable<Core.IExecutionError>;
+export type ExternalResource = Event.IExternalResourceInfo;
+export type LogsByPhase = Map<TaskExecutionPhase, Core.ITaskLog[]>;
 
 export interface BaseExecutionClosure {
   createdAt: Protobuf.ITimestamp;
@@ -124,6 +126,7 @@ export interface TaskExecutionClosure extends Admin.ITaskExecutionClosure {
   outputUri: string;
   phase: TaskExecutionPhase;
   startedAt?: Protobuf.ITimestamp;
+  eventVersion?: number;
 }
 
 /** Execution data */

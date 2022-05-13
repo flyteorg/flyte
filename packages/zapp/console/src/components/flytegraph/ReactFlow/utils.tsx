@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeExecutionPhase } from 'models/Execution/enums';
+import { NodeExecutionPhase, TaskExecutionPhase } from 'models/Execution/enums';
 import { dTypes } from 'models/Graph/types';
 import { CSSProperties } from 'react';
 import { RFBackgroundProps } from './types';
@@ -103,7 +103,9 @@ export const nodePhaseColorMapping = {
  * @param nodeExecutionStatus
  * @returns
  */
-export const getStatusColor = (nodeExecutionStatus: NodeExecutionPhase): string => {
+export const getStatusColor = (
+  nodeExecutionStatus: NodeExecutionPhase | TaskExecutionPhase,
+): string => {
   if (nodePhaseColorMapping[nodeExecutionStatus]) {
     return nodePhaseColorMapping[nodeExecutionStatus].color;
   } else {

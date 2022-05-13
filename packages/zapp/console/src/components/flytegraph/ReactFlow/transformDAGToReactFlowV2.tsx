@@ -1,7 +1,8 @@
 import { dEdge, dNode, dTypes } from 'models/Graph/types';
 import { Edge, Node, Position } from 'react-flow-renderer';
-import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
+import { CatalogCacheStatus, NodeExecutionPhase, TaskExecutionPhase } from 'models/Execution/enums';
 import { createDebugLogger } from 'common/log';
+import { LogsByPhase } from 'models/Execution/types';
 import { ReactFlowGraphConfig } from './utils';
 import { ConvertDagProps } from './types';
 
@@ -45,6 +46,7 @@ interface BuildDataProps {
   node: dNode;
   nodeExecutionsById: any;
   onNodeSelectionChanged: any;
+  onPhaseSelectionChanged: any;
   onAddNestedView: any;
   onRemoveNestedView: any;
   rootParentNode: dNode;
@@ -55,6 +57,7 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
     node,
     nodeExecutionsById,
     onNodeSelectionChanged,
+    onPhaseSelectionChanged,
     onAddNestedView,
     onRemoveNestedView,
     rootParentNode,
@@ -77,9 +80,10 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
   };
   const nodeExecutionStatus = mapNodeExecutionStatus();
 
-  // nodeExecutionsById null check is required as on first render it can be undefined
+  const nodeLogsByPhase: LogsByPhase = nodeExecutionsById?.[node.scopedId]?.logsByPhase;
+
   const cacheStatus: CatalogCacheStatus =
-  nodeExecutionsById?.[scopedId]?.closure.taskNodeMetadata?.cacheStatus ??
+    nodeExecutionsById?.[scopedId]?.closure.taskNodeMetadata?.cacheStatus ??
     CatalogCacheStatus.CACHE_DISABLED;
 
   const dataProps = {
@@ -89,10 +93,16 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
     nodeType,
     scopedId,
     taskType,
+    nodeLogsByPhase,
     cacheStatus,
     onNodeSelectionChanged: () => {
       if (onNodeSelectionChanged) {
         onNodeSelectionChanged([scopedId]);
+      }
+    },
+    onPhaseSelectionChanged: (phase: TaskExecutionPhase) => {
+      if (onPhaseSelectionChanged) {
+        onPhaseSelectionChanged(phase);
       }
     },
     onAddNestedView: () => {
@@ -188,6 +198,7 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
   const {
     nodeExecutionsById,
     onNodeSelectionChanged,
+    onPhaseSelectionChanged,
     onAddNestedView,
     onRemoveNestedView,
     currentNestedView,
@@ -196,6 +207,7 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
   const nodeDataProps = {
     nodeExecutionsById,
     onNodeSelectionChanged,
+    onPhaseSelectionChanged,
     onAddNestedView,
     onRemoveNestedView,
     currentNestedView,
@@ -215,54 +227,56 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
   const parse = (props: ParseProps) => {
     const { contextNode, contextParent, rootParentNode, nodeDataProps } = props;
     let context: ReactFlowGraph | null = null;
-    contextNode.nodes.filter(n => !!n).map((node: dNode) => {
-      /* Case: node has children => recurse */
-      if (nodeHasChildren(node)) {
-        if (rootParentNode) {
-          parse({
-            contextNode: node,
-            contextParent: node,
-            rootParentNode: rootParentNode,
-            nodeDataProps: nodeDataProps,
-          });
-        } else {
-          parse({
-            contextNode: node,
-            contextParent: node,
-            rootParentNode: node,
-            nodeDataProps: nodeDataProps,
-          });
+    contextNode.nodes
+      .filter((n) => !!n)
+      .map((node: dNode) => {
+        /* Case: node has children => recurse */
+        if (nodeHasChildren(node)) {
+          if (rootParentNode) {
+            parse({
+              contextNode: node,
+              contextParent: node,
+              rootParentNode: rootParentNode,
+              nodeDataProps: nodeDataProps,
+            });
+          } else {
+            parse({
+              contextNode: node,
+              contextParent: node,
+              rootParentNode: node,
+              nodeDataProps: nodeDataProps,
+            });
+          }
         }
-      }
 
-      if (rootParentNode) {
-        const rootParentId = rootParentNode.scopedId;
-        const contextParentId = contextParent?.scopedId;
-        rootParentMap[rootParentId] = rootParentMap[rootParentId] || {};
-        rootParentMap[rootParentId][contextParentId] = rootParentMap[rootParentId][
-          contextParentId
-        ] || {
-          nodes: {},
-          edges: {},
-        };
-        context = rootParentMap[rootParentId][contextParentId] as ReactFlowGraph;
-        const reactFlowNode = buildReactFlowNode({
-          node: node,
-          dataProps: nodeDataProps,
-          rootParentNode: rootParentNode,
-          parentNode: contextParent,
-          typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
-        });
-        context.nodes[reactFlowNode.id] = reactFlowNode;
-      } else {
-        const reactFlowNode = buildReactFlowNode({
-          node: node,
-          dataProps: nodeDataProps,
-          typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
-        });
-        root.nodes[reactFlowNode.id] = reactFlowNode;
-      }
-    });
+        if (rootParentNode) {
+          const rootParentId = rootParentNode.scopedId;
+          const contextParentId = contextParent?.scopedId;
+          rootParentMap[rootParentId] = rootParentMap[rootParentId] || {};
+          rootParentMap[rootParentId][contextParentId] = rootParentMap[rootParentId][
+            contextParentId
+          ] || {
+            nodes: {},
+            edges: {},
+          };
+          context = rootParentMap[rootParentId][contextParentId] as ReactFlowGraph;
+          const reactFlowNode = buildReactFlowNode({
+            node: node,
+            dataProps: nodeDataProps,
+            rootParentNode: rootParentNode,
+            parentNode: contextParent,
+            typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
+          });
+          context.nodes[reactFlowNode.id] = reactFlowNode;
+        } else {
+          const reactFlowNode = buildReactFlowNode({
+            node: node,
+            dataProps: nodeDataProps,
+            typeOverride: isStaticGraph === true ? dTypes.staticNode : undefined,
+          });
+          root.nodes[reactFlowNode.id] = reactFlowNode;
+        }
+      });
     contextNode.edges.map((edge: dEdge) => {
       const reactFlowEdge = buildReactFlowEdge({ edge, rootParentNode });
       if (rootParentNode && context) {

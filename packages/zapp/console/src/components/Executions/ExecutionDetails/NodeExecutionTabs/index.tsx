@@ -7,6 +7,7 @@ import { useTabState } from 'components/hooks/useTabState';
 import { PanelSection } from 'components/common/PanelSection';
 import { DumpJSON } from 'components/common/DumpJSON';
 import { isMapTaskType } from 'models/Task/utils';
+import { TaskExecutionPhase } from 'models/Execution/enums';
 import { TaskExecutionsList } from '../../TaskExecutionsList/TaskExecutionsList';
 import { NodeExecutionInputs } from './NodeExecutionInputs';
 import { NodeExecutionOutputs } from './NodeExecutionOutputs';
@@ -39,8 +40,10 @@ const defaultTab = tabIds.executions;
 
 export const NodeExecutionTabs: React.FC<{
   nodeExecution: NodeExecution;
+  shouldShowTaskDetails: boolean;
+  phase?: TaskExecutionPhase;
   taskTemplate?: TaskTemplate | null;
-}> = ({ nodeExecution, taskTemplate }) => {
+}> = ({ nodeExecution, shouldShowTaskDetails, taskTemplate, phase }) => {
   const styles = useStyles();
   const tabState = useTabState(tabIds, defaultTab);
 
@@ -55,7 +58,7 @@ export const NodeExecutionTabs: React.FC<{
   let tabContent: JSX.Element | null = null;
   switch (tabState.value) {
     case tabIds.executions: {
-      tabContent = <TaskExecutionsList nodeExecution={nodeExecution} />;
+      tabContent = <TaskExecutionsList nodeExecution={nodeExecution} phase={phase} />;
       break;
     }
     case tabIds.inputs: {
@@ -76,7 +79,12 @@ export const NodeExecutionTabs: React.FC<{
     }
   }
 
-  const executionLabel = isMapTaskType(taskTemplate?.type) ? 'Map Execution' : 'Executions';
+  const executionLabel = isMapTaskType(taskTemplate?.type)
+    ? shouldShowTaskDetails
+      ? 'Execution'
+      : 'Map Execution'
+    : 'Executions';
+
   return (
     <>
       <Tabs {...tabState} className={styles.tabs}>

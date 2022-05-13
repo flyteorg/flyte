@@ -11,6 +11,7 @@ import { TaskExecutionDetails } from './TaskExecutionDetails';
 import { TaskExecutionError } from './TaskExecutionError';
 import { TaskExecutionLogs } from './TaskExecutionLogs';
 import { formatRetryAttempt, getGroupedLogs } from './utils';
+import { RENDER_ORDER } from './constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
   detailsLink: {
@@ -33,23 +34,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface MapTaskExecutionsListItemProps {
   taskExecution: TaskExecution;
   showAttempts: boolean;
+  selectedPhase?: TaskExecutionPhase;
 }
-
-const RENDER_ORDER: TaskExecutionPhase[] = [
-  TaskExecutionPhase.UNDEFINED,
-  TaskExecutionPhase.INITIALIZING,
-  TaskExecutionPhase.WAITING_FOR_RESOURCES,
-  TaskExecutionPhase.QUEUED,
-  TaskExecutionPhase.RUNNING,
-  TaskExecutionPhase.SUCCEEDED,
-  TaskExecutionPhase.ABORTED,
-  TaskExecutionPhase.FAILED,
-];
 
 /** Renders an individual `TaskExecution` record as part of a list */
 export const MapTaskExecutionsListItem: React.FC<MapTaskExecutionsListItemProps> = ({
   taskExecution,
   showAttempts,
+  selectedPhase,
 }) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
@@ -57,16 +49,7 @@ export const MapTaskExecutionsListItem: React.FC<MapTaskExecutionsListItemProps>
   const { closure } = taskExecution;
   const taskHasStarted = closure.phase >= TaskExecutionPhase.QUEUED;
   const headerText = formatRetryAttempt(taskExecution.id.retryAttempt);
-  const logsInfo = getGroupedLogs(closure.metadata?.externalResources ?? []);
-
-  // Set UI elements in a proper rendering order
-  const logsSections: JSX.Element[] = [];
-  for (const key of RENDER_ORDER) {
-    const values = logsInfo.get(key);
-    if (values) {
-      logsSections.push(<MapTaskStatusInfo status={key} taskLogs={values} expanded={false} />);
-    }
-  }
+  const logsByPhase = getGroupedLogs(closure.metadata?.externalResources ?? []);
 
   return (
     <PanelSection>
@@ -94,7 +77,21 @@ export const MapTaskExecutionsListItem: React.FC<MapTaskExecutionsListItemProps>
         </section>
       ) : null}
       {/* child/array logs separated by subtasks phase */}
-      {logsSections}
+      {RENDER_ORDER.map((phase, id) => {
+        const logs = logsByPhase.get(phase);
+        if (!logs) {
+          return null;
+        }
+        const key = `${id}-${phase}`;
+        return (
+          <MapTaskStatusInfo
+            phase={phase}
+            taskLogs={logs}
+            isExpanded={selectedPhase === phase}
+            key={key}
+          />
+        );
+      })}
 
       {/* If map task is actively started - show 'started' and 'run time' details */}
       {taskHasStarted && (

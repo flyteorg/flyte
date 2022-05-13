@@ -17,6 +17,24 @@ const nodeExecutionStatusChanged = (previous, nodeExecutionsById) => {
   return false;
 };
 
+const nodeExecutionLogsChanged = (previous, nodeExecutionsById) => {
+  for (const exe in nodeExecutionsById) {
+    const oldLogs = previous[exe]?.logsByPhase ?? new Map();
+    const newLogs = nodeExecutionsById[exe]?.logsByPhase ?? new Map();
+    if (oldLogs.size !== newLogs.size) {
+      return true;
+    }
+    for (const phase in newLogs) {
+      const oldNumOfLogs = oldLogs.get(phase)?.length ?? 0;
+      const newNumOfLogs = newLogs.get(phase)?.length ?? 0;
+      if (oldNumOfLogs !== newNumOfLogs) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 const graphNodeCountChanged = (previous, data) => {
   if (previous.nodes.length !== data.nodes.length) {
     return true;
@@ -26,13 +44,20 @@ const graphNodeCountChanged = (previous, data) => {
 };
 
 const ReactFlowGraphComponent = (props) => {
-  const { data, onNodeSelectionChanged, nodeExecutionsById, dynamicWorkflows } = props;
+  const {
+    data,
+    onNodeSelectionChanged,
+    onPhaseSelectionChanged,
+    nodeExecutionsById,
+    dynamicWorkflows,
+  } = props;
   const [state, setState] = useState({
-    data: data,
-    dynamicWorkflows: dynamicWorkflows,
+    data,
+    dynamicWorkflows,
     currentNestedView: {},
-    nodeExecutionsById: nodeExecutionsById,
-    onNodeSelectionChanged: onNodeSelectionChanged,
+    nodeExecutionsById,
+    onNodeSelectionChanged,
+    onPhaseSelectionChanged,
     rfGraphJson: null,
   });
 
@@ -50,7 +75,7 @@ const ReactFlowGraphComponent = (props) => {
   const onRemoveNestedView = (viewParent, viewIndex) => {
     const currentNestedView: any = { ...state.currentNestedView };
     currentNestedView[viewParent] = currentNestedView[viewParent]?.filter(
-      (item, i) => i <= viewIndex,
+      (_item, i) => i <= viewIndex,
     );
     if (currentNestedView[viewParent]?.length < 1) {
       delete currentNestedView[viewParent];
@@ -66,8 +91,9 @@ const ReactFlowGraphComponent = (props) => {
       root: state.data,
       nodeExecutionsById: state.nodeExecutionsById,
       onNodeSelectionChanged: state.onNodeSelectionChanged,
-      onAddNestedView: onAddNestedView,
-      onRemoveNestedView: onRemoveNestedView,
+      onPhaseSelectionChanged: state.onPhaseSelectionChanged,
+      onAddNestedView,
+      onRemoveNestedView,
       currentNestedView: state.currentNestedView,
       maxRenderDepth: 1,
     } as ConvertDagProps);
@@ -79,7 +105,7 @@ const ReactFlowGraphComponent = (props) => {
       ...state,
       rfGraphJson: newRFGraphData,
     }));
-  }, [state.currentNestedView]);
+  }, [state.currentNestedView, state.nodeExecutionsById]);
 
   useEffect(() => {
     if (graphNodeCountChanged(state.data, data)) {
@@ -88,10 +114,13 @@ const ReactFlowGraphComponent = (props) => {
         data: data,
       }));
     }
-    if (nodeExecutionStatusChanged(state.nodeExecutionsById, nodeExecutionsById)) {
+    if (
+      nodeExecutionStatusChanged(state.nodeExecutionsById, nodeExecutionsById) ||
+      nodeExecutionLogsChanged(state.nodeExecutionsById, nodeExecutionsById)
+    ) {
       setState((state) => ({
         ...state,
-        nodeExecutionsById: nodeExecutionsById,
+        nodeExecutionsById,
       }));
     }
   }, [data, nodeExecutionsById]);
@@ -99,9 +128,10 @@ const ReactFlowGraphComponent = (props) => {
   useEffect(() => {
     setState((state) => ({
       ...state,
-      onNodeSelectionChanged: onNodeSelectionChanged,
+      onNodeSelectionChanged,
+      onPhaseSelectionChanged,
     }));
-  }, [onNodeSelectionChanged]);
+  }, [onNodeSelectionChanged, onPhaseSelectionChanged]);
 
   const backgroundStyle = getRFBackground().nested;
 
@@ -118,7 +148,7 @@ const ReactFlowGraphComponent = (props) => {
       backgroundStyle,
       rfGraphJson: state.rfGraphJson,
       type: RFGraphTypes.main,
-      nodeExecutionsById: nodeExecutionsById,
+      nodeExecutionsById,
       currentNestedView: state.currentNestedView,
     };
     return (

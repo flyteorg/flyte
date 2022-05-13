@@ -37,19 +37,19 @@ const useStyles = makeStyles((_theme: Theme) => ({
 
 interface MapTaskStatusInfoProps {
   taskLogs: Core.ITaskLog[];
-  status: TaskExecutionPhase;
-  expanded: boolean;
+  phase: TaskExecutionPhase;
+  isExpanded: boolean;
 }
 
-export const MapTaskStatusInfo = (props: MapTaskStatusInfoProps) => {
-  const [expanded, setExpanded] = useState(props.expanded);
+export const MapTaskStatusInfo = ({ taskLogs, phase, isExpanded }: MapTaskStatusInfoProps) => {
+  const [expanded, setExpanded] = useState(isExpanded);
   const styles = useStyles();
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
-  const phaseData = getTaskExecutionPhaseConstants(props.status);
+  const phaseData = getTaskExecutionPhaseConstants(phase);
   return (
     <div className={styles.mainWrapper}>
       <div className={styles.headerWrapper}>
@@ -58,11 +58,11 @@ export const MapTaskStatusInfo = (props: MapTaskStatusInfoProps) => {
         <Typography variant="body2" className={styles.title}>
           {phaseData.text}
         </Typography>
-        <span>{`x${props.taskLogs.length}`}</span>
+        <span>{`×${taskLogs.length}`}</span>
       </div>
       {expanded && (
         <div className={styles.logs}>
-          <TaskLogList logs={props.taskLogs} />
+          <TaskLogList logs={taskLogs} />
         </div>
       )}
     </div>
