@@ -297,7 +297,7 @@ def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImageFile:
 # the serialize model
 @workflow
 def pytorch_training_wf(
-    hp: Hyperparameters,
+    hp: Hyperparameters = Hyperparameters(epochs=2, batch_size=128),
 ) -> Tuple[PythonPickledFile, PNGImageFile, TensorboardLogs]:
     accuracies, model, logs = mnist_pytorch_job(hp=hp)
     plot = plot_accuracy(epoch_accuracies=accuracies)
