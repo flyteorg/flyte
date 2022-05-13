@@ -7,14 +7,14 @@
         "**/mocks",
         "**/__mocks__",
         "**/__stories__",
-        "src/**/*.spec.*",
-        "src/**/*.test.*",
-        "src/**/*.mock.*",
-        "src/**/*.stories.*"
+        "**/*.spec.*",
+        "**/*.test.*",
+        "**/*.mock.*",
+        "**/*.stories.*"
     ],
     "references": [
-        { "path": "../../basics/locale" },
-        { "path": "../../composites/ui-atoms" },
-        { "path": "../../plugins/components" }
+        { "path": "../../basics/locale/tsconfig.build.json" },
+        { "path": "../../composites/ui-atoms/tsconfig.build.json" },
+        { "path": "../../plugins/components/tsconfig.build.json" }
     ]
 }

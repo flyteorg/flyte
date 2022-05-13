@@ -1,8 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosTransformer } from 'axios';
 import * as camelcaseKeys from 'camelcase-keys';
 import * as snakecaseKeys from 'snakecase-keys';
-import { isObject } from 'util';
 import { LiteralMapBlob, ResourceType, SystemStatus } from './types';
+
+// recommended util.d.ts implementation
+const isObject = (value: unknown): boolean => {
+  return value !== null && typeof value === 'object';
+};
 
 export const endpointPrefixes = {
   execution: '/executions',

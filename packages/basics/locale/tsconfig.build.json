@@ -11,9 +11,5 @@
         "**/*.test.*",
         "**/*.mock.*",
         "**/*.stories.*"
-    ],
-    "references": [
-        { "path": "../../basics/locale/tsconfig.build.json" },
-        { "path": "../../composites/ui-atoms/tsconfig.build.json" }
     ]
 }
