@@ -127,7 +127,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
        .. code-block:: python
 
           if __name__ == "__main__":
-              from argpase import ArgumentParser
+              from argparse import ArgumentParser
 
               parser = ArgumentParser()
               parser.add_argument("--n", type=int)
