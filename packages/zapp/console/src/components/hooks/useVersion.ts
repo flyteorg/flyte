@@ -16,10 +16,10 @@ function useVersion() {
 export function useAdminVersion() {
   const version = useVersion();
 
-  const controlPlaneVersion = version?.value?.controlPlaneVersion;
-  const adminVersion = controlPlaneVersion
-    ? controlPlaneVersion.Version?.slice(1, controlPlaneVersion.Version?.indexOf('-'))
-    : null;
+  const cpVersion = version?.value?.controlPlaneVersion;
+
+  // Remove letter "v" from version string, if it's in the beginning
+  const adminVersion = cpVersion?.Version?.replace(/^v/, '') ?? null;
 
   return { adminVersion };
 }
