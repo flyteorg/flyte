@@ -188,7 +188,7 @@ def score(
     # evaluate predictions
     acc = accuracy_score(y_df, pred_df)
     print("Accuracy: %.2f%%" % (acc * 100.0))
-    return acc
+    return float(acc)
 
 
 # %%
