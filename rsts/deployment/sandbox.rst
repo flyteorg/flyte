@@ -114,13 +114,9 @@ Flyte configuration on your remote cluster.
 
     helm install flyte flyteorg/flyte-core -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml --wait
 
-#. Verify Flyte deployment using the following command ::
+#. Make sure all pods are in Running condition, If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller, Verify Flyte deployment using the following command ::
 
     kubect get pods -n flyte
-
-.. note::
-
-    Make sure all pods are in Running condition. If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller.
 
 #. Get the URL of the ingress service ::
 
@@ -130,6 +126,10 @@ Flyte configuration on your remote cluster.
 
     flytectl config init --host='<CONTOUR_URL>' --insecure
 
+#. Get Minio & Kubernetes dashboard LB Url by running ::
+
+    kubectl get service -n flyte
+
 #. Open the minio console http://<MINIO_URL>. Your minio username is `minio` and password is `miniostorage`.
 
 #. Open the Kubernetes dashboard http://<K8S_DASHBOARD_URL>.
@@ -138,7 +138,7 @@ Flyte configuration on your remote cluster.
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
     
-#. Use the following credentials for Postgres:
+#. Use the following credentials for Postgres ::
 
    .. code-block::
 
