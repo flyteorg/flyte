@@ -1,13 +1,9 @@
 package single
 
 import (
-	"embed"
 	"net/http"
 	"strings"
 )
-
-//go:embed dist/*
-var console embed.FS
 
 const consoleRoot = "/console"
 const assetsDir = "assets"
@@ -47,20 +43,5 @@ func (f consoleFS) Open(name string) (http.File, error) {
 // GetConsoleHandlers returns a set of handlers that can be added to the Server mux and can handle all console related
 // requests
 func GetConsoleHandlers() map[string]func(http.ResponseWriter, *http.Request) {
-	handlers := make(map[string]func(http.ResponseWriter, *http.Request))
-	// Serves console
-	consoleHandler := http.FileServer(consoleFS{fs: http.FS(console)})
-
-	// This is the base handle for "/console"
-	handlers[consoleRoot] = func(writer http.ResponseWriter, request *http.Request) {
-		consoleHandler.ServeHTTP(writer, request)
-	}
-
-	// this is the root handler for any pattern that matches "/console/
-	// http.mux needs a trailing "/" to allow longest pattern matching.
-	// For the previous handler "/console" the mux will only consider exact match
-	handlers[consoleRoot+"/"] = func(writer http.ResponseWriter, request *http.Request) {
-		consoleHandler.ServeHTTP(writer, request)
-	}
-	return handlers
+	return consoleHandlers
 }
