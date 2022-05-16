@@ -17,7 +17,6 @@ Before diving into an example use case that explains how DevOps could power Flyt
 
 .. note::
 Currently, Flyte does not support the promotion of workflows across various stages (development, staging, production). This promotion process is expected to be handled externally through CI/CD process.
-Here's an example case study.
 
 Case Study: MLOps at Lyft
 =========================
