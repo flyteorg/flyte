@@ -108,7 +108,7 @@ Flyte configuration on your remote cluster.
 
 #. Install Flyte dependency helm chart (this will install the minio, Postgres, Kubernetes-dashboard, and contour) ::
 
-    helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml
+    helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-deps/values-sandbox.yaml
 
 #. Install flyte-core chart ::
 
@@ -126,7 +126,7 @@ Flyte configuration on your remote cluster.
 
     flytectl config init --host='<CONTOUR_URL>' --insecure
 
-#. Get Minio & Kubernetes dashboard LB Url by running ::
+#. Get Minio & Kubernetes dashboard LB URL by running ::
 
     kubectl get service -n flyte
 
