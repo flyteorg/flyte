@@ -83,6 +83,7 @@ RUN addgroup -S docker
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
+ENV POD_NAMESPACE "flyte"
 
 # Declare volumes for k3s
 VOLUME /var/lib/kubelet

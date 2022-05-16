@@ -10,7 +10,8 @@ webhook:
   certDir: /tmp/k8s-webhook-server/serving-certs
   serviceName: flyte-pod-webhook
   localCert: true
-  servicePort: 9443
+  servicePort: 30090
+  ListenPort: 30090
 tasks:
   task-plugins:
     enabled-plugins:
