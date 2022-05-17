@@ -10,7 +10,7 @@ import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
 import { useAdminVersion } from 'components/hooks/useVersion';
 import { env } from 'common/env';
 import { UserInformation } from './UserInformation';
-import { OnlyMine } from './OnlyMine/OnlyMine';
+import { OnlyMine } from './OnlyMine';
 import t, { patternKey } from './strings';
 
 const { version: platformVersion } = require('../../../package.json');

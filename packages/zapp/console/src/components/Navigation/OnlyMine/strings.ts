@@ -1,4 +1,4 @@
-import { createLocalizedString } from 'basics/Locale';
+import { createLocalizedString } from '@flyteconsole/locale';
 
 const str = {
   onlyMine_popup_label: 'execution id',
