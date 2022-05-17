@@ -123,6 +123,7 @@ func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, erro
 		"0.0.0.0:30086:30086", // K8s cluster
 		"0.0.0.0:30088:30088", // Minio Console Port
 		"0.0.0.0:30089:30089", // Postgres Port
+		"0.0.0.0:30090:30090", // Webhook service
 	})
 }
 
