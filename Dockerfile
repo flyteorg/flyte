@@ -12,7 +12,9 @@ RUN mkdir /artifacts
 # Pull GRPC health probe binary for liveness and readiness checks
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
     wget -qO/artifacts/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /artifacts/grpc_health_probe
+    chmod +x /artifacts/grpc_health_probe && \
+    echo 'ded15e598d887ccc47bf2321371950bbf930f5e4856b9f75712ce4b2b5120480  /artifacts/grpc_health_probe' > .grpc_checksum && \
+    sha256sum -c .grpc_checksum
 
 # COPY only the go mod files for efficient caching
 COPY go.mod go.sum /go/src/github.com/flyteorg/flyteadmin/
