@@ -856,8 +856,8 @@ func TestFinalize(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		o := &v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "abc",
-				Namespace: "xyz",
+				Name:      tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
 			},
 		}
 
@@ -894,8 +894,8 @@ func TestFinalize(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		o := &v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "abc",
-				Namespace: "xyz",
+				Name:      tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
 			},
 		}
 
