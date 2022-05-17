@@ -407,41 +407,36 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	var o client.Object
 	var nsName k8stypes.NamespacedName
 	cfg := config.GetK8sPluginConfig()
-	if cfg.InjectFinalizer || cfg.DeleteResourceOnFinalize {
-		o, err = e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
-		if err != nil {
-			// This will recurrent, so we will skip further finalize
-			logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
-			return nil
-		}
 
-		e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
-		nsName = k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
+	o, err = e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+	if err != nil {
+		// This will recurrent, so we will skip further finalize
+		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		return nil
 	}
 
-	// In InjectFinalizer is on, it means we may have added the finalizers when we launched this resource. Attempt to
-	// clear them to allow the object to be deleted/garbage collected. If InjectFinalizer was turned on (through config)
-	// after the resource was created, we will not find any finalizers to clear and the object may have already been
-	// deleted at this point. Therefore, account for these cases and do not consider them errors.
-	if cfg.InjectFinalizer {
-		// Attempt to get resource from informer cache, if not found, retrieve it from API server.
-		if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
-			if IsK8sObjectNotExists(err) {
-				return nil
-			}
-			// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
-			// Pod does not exist error. This should be retried using the retry policy
-			logger.Warningf(ctx, "Failed in finalizing get Resource with name: %v. Error: %v", nsName, err)
-			return err
-		}
+	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	nsName = k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 
-		// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
-		// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
-		// the same event (idempotent) and then come here again...
-		err = e.ClearFinalizers(ctx, o)
-		if err != nil {
-			errs.Append(err)
+	// Attempt to cleanup finalizers so that the object may be deleted/garbage collected. We try to clear them for all
+	// objects, regardless of whether or not InjectFinalizer is configured to handle all cases where InjectFinalizer is
+	// enabled/disabled during object execution.
+	if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
+		if IsK8sObjectNotExists(err) {
+			return nil
 		}
+		// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
+		// Pod does not exist error. This should be retried using the retry policy
+		logger.Warningf(ctx, "Failed in finalizing get Resource with name: %v. Error: %v", nsName, err)
+		return err
+	}
+
+	// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
+	// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
+	// the same event (idempotent) and then come here again...
+	err = e.ClearFinalizers(ctx, o)
+	if err != nil {
+		errs.Append(err)
 	}
 
 	// If we should delete the resource when finalize is called, do a best effort delete.
