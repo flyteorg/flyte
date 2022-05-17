@@ -60,7 +60,6 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
       showErrors: false,
       cdnReact,
       cdnReactDOM,
-      clientEnv: common.clientEnv,
     }),
   ],
   externals: {

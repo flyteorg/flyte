@@ -1,6 +1,9 @@
+import * as cheerio from 'cheerio';
 import * as express from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
+
+const { processEnv } = require('../env');
 
 interface ServerRendererArguments {
   currentDirectory: string;
@@ -17,6 +20,12 @@ export default function serverRenderer({ currentDirectory }: ServerRendererArgum
       throw new ReferenceError('Could not find index.html to render');
     }
 
-    res.status(200).send(html);
+    // populate the app content...
+    const $ = cheerio.load(html);
+
+    // Populate process.env into window.env
+    $('head').append($(`<script>window.env = ${JSON.stringify(processEnv)}</script>`));
+
+    res.status(200).send($.html());
   };
 }

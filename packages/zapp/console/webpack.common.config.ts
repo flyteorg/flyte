@@ -166,6 +166,4 @@ export const serverConfig: webpack.Configuration = {
   ],
 };
 
-export const clientEnv = JSON.stringify(processEnv);
-
 export default { clientConfig, serverConfig };

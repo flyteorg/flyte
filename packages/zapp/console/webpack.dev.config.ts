@@ -68,7 +68,6 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
       minify: false,
       hash: false,
       showErrors: true,
-      clientEnv: common.clientEnv,
     }),
   ],
 });

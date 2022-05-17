@@ -34,6 +34,7 @@
         "chalk": "^2.0.1",
         "chart.js": "^3.6.2",
         "chartjs-plugin-datalabels": "^2.0.0",
+        "cheerio": "1.0.0-rc.2",
         "cookie-parser": "^1.4.3",
         "dagre-d3": "^0.6.4",
         "dotenv": "^5.0.1",
