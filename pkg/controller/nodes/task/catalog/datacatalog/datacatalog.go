@@ -11,7 +11,9 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -377,9 +379,14 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-	retryInterceptor := grpc.WithUnaryInterceptor(grpcRetry.UnaryClientInterceptor(grpcOptions...))
+	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
-	opts = append(opts, retryInterceptor)
+	finalUnaryInterceptor := grpcMiddleware.ChainUnaryClient(
+		grpcPrometheus.UnaryClientInterceptor,
+		retryInterceptor,
+	)
+
+	opts = append(opts, grpc.WithUnaryInterceptor(finalUnaryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return nil, err
