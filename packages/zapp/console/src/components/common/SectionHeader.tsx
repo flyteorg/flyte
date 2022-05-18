@@ -6,7 +6,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginBottom: theme.spacing(1),
   },
-  title: {},
 }));
 
 export interface SectionHeaderProps {
@@ -17,9 +16,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle })
   const styles = useStyles();
   return (
     <header className={styles.container}>
-      <Typography variant="h6" className={styles.title}>
-        {title}
-      </Typography>
+      <Typography variant="h6">{title}</Typography>
       {!!subtitle && <Typography variant="body2">{subtitle}</Typography>}
     </header>
   );

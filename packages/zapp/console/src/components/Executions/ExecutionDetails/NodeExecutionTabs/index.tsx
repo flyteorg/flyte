@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Tab, Tabs } from '@material-ui/core';
-import { NodeExecution } from 'models/Execution/types';
+import { MapTaskExecution, NodeExecution } from 'models/Execution/types';
 import { TaskTemplate } from 'models/Task/types';
 import { useTabState } from 'components/hooks/useTabState';
 import { PanelSection } from 'components/common/PanelSection';
 import { DumpJSON } from 'components/common/DumpJSON';
 import { isMapTaskType } from 'models/Task/utils';
 import { TaskExecutionPhase } from 'models/Execution/enums';
+import { MapTaskExecutionDetails } from 'components/Executions/TaskExecutionsList/MapTaskExecutionDetails';
 import { TaskVersionDetailsLink } from 'components/Entities/VersionDetails/VersionDetailsLink';
 import { Identifier } from 'models/Common/types';
 import { TaskExecutionsList } from '../../TaskExecutionsList/TaskExecutionsList';
@@ -42,10 +43,11 @@ const defaultTab = tabIds.executions;
 
 export const NodeExecutionTabs: React.FC<{
   nodeExecution: NodeExecution;
-  shouldShowTaskDetails: boolean;
+  selectedTaskExecution: MapTaskExecution | null;
+  onTaskSelected: (val: MapTaskExecution) => void;
   phase?: TaskExecutionPhase;
   taskTemplate?: TaskTemplate | null;
-}> = ({ nodeExecution, shouldShowTaskDetails, taskTemplate, phase }) => {
+}> = ({ nodeExecution, selectedTaskExecution, onTaskSelected, taskTemplate, phase }) => {
   const styles = useStyles();
   const tabState = useTabState(tabIds, defaultTab);
 
@@ -60,7 +62,15 @@ export const NodeExecutionTabs: React.FC<{
   let tabContent: JSX.Element | null = null;
   switch (tabState.value) {
     case tabIds.executions: {
-      tabContent = <TaskExecutionsList nodeExecution={nodeExecution} phase={phase} />;
+      tabContent = selectedTaskExecution ? (
+        <MapTaskExecutionDetails taskExecution={selectedTaskExecution} />
+      ) : (
+        <TaskExecutionsList
+          nodeExecution={nodeExecution}
+          onTaskSelected={onTaskSelected}
+          phase={phase}
+        />
+      );
       break;
     }
     case tabIds.inputs: {
@@ -82,11 +92,8 @@ export const NodeExecutionTabs: React.FC<{
     }
   }
 
-  const executionLabel = isMapTaskType(taskTemplate?.type)
-    ? shouldShowTaskDetails
-      ? 'Execution'
-      : 'Map Execution'
-    : 'Executions';
+  const executionLabel =
+    isMapTaskType(taskTemplate?.type) && !selectedTaskExecution ? 'Map Execution' : 'Executions';
 
   return (
     <>

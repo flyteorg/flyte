@@ -46,7 +46,8 @@ interface BuildDataProps {
   node: dNode;
   nodeExecutionsById: any;
   onNodeSelectionChanged: any;
-  onPhaseSelectionChanged: any;
+  onPhaseSelectionChanged: (phase: TaskExecutionPhase) => void;
+  selectedPhase: TaskExecutionPhase;
   onAddNestedView: any;
   onRemoveNestedView: any;
   rootParentNode: dNode;
@@ -58,6 +59,7 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
     nodeExecutionsById,
     onNodeSelectionChanged,
     onPhaseSelectionChanged,
+    selectedPhase,
     onAddNestedView,
     onRemoveNestedView,
     rootParentNode,
@@ -95,6 +97,7 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
     taskType,
     nodeLogsByPhase,
     cacheStatus,
+    selectedPhase,
     onNodeSelectionChanged: () => {
       if (onNodeSelectionChanged) {
         onNodeSelectionChanged([scopedId]);
@@ -199,6 +202,7 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
     nodeExecutionsById,
     onNodeSelectionChanged,
     onPhaseSelectionChanged,
+    selectedPhase,
     onAddNestedView,
     onRemoveNestedView,
     currentNestedView,
@@ -208,6 +212,7 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
     nodeExecutionsById,
     onNodeSelectionChanged,
     onPhaseSelectionChanged,
+    selectedPhase,
     onAddNestedView,
     onRemoveNestedView,
     currentNestedView,

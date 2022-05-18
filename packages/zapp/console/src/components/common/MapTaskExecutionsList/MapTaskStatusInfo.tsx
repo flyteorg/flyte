@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { RowExpander } from 'components/Executions/Tables/RowExpander';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { getTaskExecutionPhaseConstants } from 'components/Executions/utils';
-import { TaskLogList } from 'components/Executions/TaskExecutionsList/TaskExecutionLogs';
 import { Core } from 'flyteidl';
+import { MapTaskExecution, TaskExecution } from 'models/Execution/types';
+import { TaskNameList } from './TaskNameList';
 
 const useStyles = makeStyles((_theme: Theme) => ({
   mainWrapper: {
@@ -36,20 +37,33 @@ const useStyles = makeStyles((_theme: Theme) => ({
 }));
 
 interface MapTaskStatusInfoProps {
+  taskExecution: TaskExecution;
   taskLogs: Core.ITaskLog[];
   phase: TaskExecutionPhase;
-  isExpanded: boolean;
+  selectedPhase?: TaskExecutionPhase;
+  onTaskSelected: (val: MapTaskExecution) => void;
 }
 
-export const MapTaskStatusInfo = ({ taskLogs, phase, isExpanded }: MapTaskStatusInfoProps) => {
-  const [expanded, setExpanded] = useState(isExpanded);
+export const MapTaskStatusInfo = ({
+  taskExecution,
+  taskLogs,
+  phase,
+  selectedPhase,
+  onTaskSelected,
+}: MapTaskStatusInfoProps) => {
+  const [expanded, setExpanded] = useState<boolean>(selectedPhase === phase);
   const styles = useStyles();
+
+  const phaseData = getTaskExecutionPhaseConstants(phase);
+
+  useEffect(() => {
+    setExpanded(selectedPhase === phase);
+  }, [selectedPhase, phase]);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
-  const phaseData = getTaskExecutionPhaseConstants(phase);
   return (
     <div className={styles.mainWrapper}>
       <div className={styles.headerWrapper}>
@@ -62,7 +76,11 @@ export const MapTaskStatusInfo = ({ taskLogs, phase, isExpanded }: MapTaskStatus
       </div>
       {expanded && (
         <div className={styles.logs}>
-          <TaskLogList logs={taskLogs} />
+          <TaskNameList
+            taskExecution={taskExecution}
+            logs={taskLogs}
+            onTaskSelected={onTaskSelected}
+          />
         </div>
       )}
     </div>

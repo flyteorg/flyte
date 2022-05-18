@@ -2,40 +2,38 @@ import { unknownValueString } from 'common/constants';
 import { dateWithFromNow, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { DetailsGroup } from 'components/common/DetailsGroup';
-import { TaskExecution } from 'models/Execution/types';
 import * as React from 'react';
+import { Protobuf } from 'flyteidl';
 
 /** Renders the less important details for a `TaskExecution` as a `DetailsGroup`
  */
 export const TaskExecutionDetails: React.FC<{
-  taskExecution: TaskExecution;
-}> = ({ taskExecution }) => {
-  const labelWidthGridUnits = taskExecution.closure.startedAt ? 7 : 10;
+  startedAt?: Protobuf.ITimestamp;
+  updatedAt?: Protobuf.ITimestamp | null;
+  duration?: Protobuf.Duration;
+}> = ({ startedAt, duration, updatedAt }) => {
+  const labelWidthGridUnits = startedAt ? 7 : 10;
   const detailItems = React.useMemo(() => {
-    if (taskExecution.closure.startedAt) {
+    if (startedAt) {
       return [
         {
           name: 'started',
-          content: dateWithFromNow(timestampToDate(taskExecution.closure.startedAt)),
+          content: dateWithFromNow(timestampToDate(startedAt)),
         },
         {
           name: 'run time',
-          content: taskExecution.closure.duration
-            ? protobufDurationToHMS(taskExecution.closure.duration)
-            : unknownValueString,
+          content: duration ? protobufDurationToHMS(duration) : unknownValueString,
         },
       ];
     } else {
       return [
         {
           name: 'last updated',
-          content: taskExecution.closure.updatedAt
-            ? dateWithFromNow(timestampToDate(taskExecution.closure.updatedAt))
-            : unknownValueString,
+          content: updatedAt ? dateWithFromNow(timestampToDate(updatedAt)) : unknownValueString,
         },
       ];
     }
-  }, [taskExecution]);
+  }, [startedAt, duration, updatedAt]);
 
   return (
     <section>

@@ -21,7 +21,7 @@ describe('TaskExecutionsList', () => {
           listTaskExecutions: mockListTaskExecutions,
         })}
       >
-        <TaskExecutionsList nodeExecution={nodeExecution} />
+        <TaskExecutionsList nodeExecution={nodeExecution} onTaskSelected={jest.fn()} />
       </APIContext.Provider>,
     );
   beforeEach(() => {

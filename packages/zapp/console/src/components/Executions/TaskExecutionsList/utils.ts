@@ -1,6 +1,6 @@
-import { LogsByPhase, TaskExecution } from 'models/Execution/types';
+import { ExternalResource, LogsByPhase, TaskExecution } from 'models/Execution/types';
 import { leftPaddedNumber } from 'common/formatters';
-import { Event } from 'flyteidl';
+import { Core, Event } from 'flyteidl';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 
 /** Generates a unique name for a task execution, suitable for display in a
@@ -61,3 +61,62 @@ export const getGroupedLogs = (resources: Event.IExternalResourceInfo[]): LogsBy
 
   return logsByPhase;
 };
+
+export const getTaskRetryAtemptsForIndex = (
+  resources: ExternalResource[],
+  taskIndex: number | null,
+): ExternalResource[] => {
+  // check spesifically for null values, to make sure we're not skipping logs for 0 index
+  if (taskIndex === null) {
+    return [];
+  }
+
+  const filtered = resources.filter((a) => {
+    const index = a.index ?? 0;
+    return index === taskIndex;
+  });
+
+  // sort output sample [0-2, 0-1, 0, 1, 2], where 0-1 means index = 0 retry = 1
+  filtered.sort((a, b) => {
+    const aIndex = a.index ?? 0;
+    const bIndex = b.index ?? 0;
+    if (aIndex !== bIndex) {
+      // return smaller index first
+      return aIndex - bIndex;
+    }
+
+    const aRetry = a.retryAttempt ?? 0;
+    const bRetry = b.retryAttempt ?? 0;
+    return bRetry - aRetry;
+  });
+  return filtered;
+};
+
+export function getTaskIndex(
+  taskExecution: TaskExecution,
+  selectedLog: Core.ITaskLog,
+): number | null {
+  const externalResources = taskExecution.closure.metadata?.externalResources ?? [];
+  for (const item of externalResources) {
+    const logs = item.logs ?? [];
+    for (const log of logs) {
+      if (log.uri) {
+        if (log.name === selectedLog.name && log.uri === selectedLog.uri) {
+          return item.index ?? 0;
+        }
+      } else if (log.name === selectedLog.name) {
+        return item.index ?? 0;
+      }
+    }
+  }
+
+  return null;
+}
+
+export function getTaskLogName(taskName: string, taskLogName: string): string {
+  const lastDotIndex = taskName.lastIndexOf('.');
+  const prefix = lastDotIndex !== -1 ? taskName.slice(lastDotIndex + 1) : taskName;
+  const firstDahIndex = taskLogName.indexOf('-');
+  const suffix = firstDahIndex !== -1 ? taskLogName.slice(firstDahIndex) : '';
+  return `${prefix}${suffix}`;
+}

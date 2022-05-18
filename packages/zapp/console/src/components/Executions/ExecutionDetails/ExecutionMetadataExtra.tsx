@@ -9,14 +9,12 @@ import { LaunchPlanSpec } from 'models/Launch/types';
 import { dashedValueString } from 'common/constants';
 import { ExecutionMetadataLabels } from './constants';
 
-const useStyles = makeStyles((theme: Theme) => {
-  return {
-    detailItem: {
-      flexShrink: 0,
-      marginLeft: theme.spacing(4),
-    },
-  };
-});
+const useStyles = makeStyles((theme: Theme) => ({
+  detailItem: {
+    flexShrink: 0,
+    marginLeft: theme.spacing(4),
+  },
+}));
 
 interface DetailItem {
   className?: string;

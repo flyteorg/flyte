@@ -6,6 +6,7 @@ import { createMockNodeExecutions } from 'models/Execution/__mocks__/mockNodeExe
 import { TaskType } from 'models/Task/constants';
 import { createMockWorkflow } from 'models/__mocks__/workflowData';
 import * as React from 'react';
+import { mockExecution as mockTaskExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import { NodeExecutionTabs } from '../index';
 
 const getMockNodeExecution = () => createMockNodeExecutions(1).executions[0];
@@ -20,26 +21,28 @@ describe('NodeExecutionTabs', () => {
   const mockUseTabState = useTabState as jest.Mock<any>;
   mockUseTabState.mockReturnValue({ onChange: jest.fn(), value: 'executions' });
   describe('with map tasks', () => {
-    it('should display proper tab name when it was provided and shouldShow is TRUE', async () => {
+    it('should display proper tab name when it was provided and shouldShow is TRUE', () => {
       const { queryByText, queryAllByRole } = render(
         <NodeExecutionTabs
           nodeExecution={nodeExecution}
-          shouldShowTaskDetails={true}
+          selectedTaskExecution={{ ...mockTaskExecution, taskIndex: 0 }}
           phase={phase}
           taskTemplate={taskTemplate}
+          onTaskSelected={jest.fn()}
         />,
       );
       expect(queryAllByRole('tab')).toHaveLength(4);
-      expect(queryByText('Execution')).toBeInTheDocument();
+      expect(queryByText('Executions')).toBeInTheDocument();
     });
 
-    it('should display proper tab name when it was provided and shouldShow is FALSE', async () => {
+    it('should display proper tab name when it was provided and shouldShow is FALSE', () => {
       const { queryByText, queryAllByRole } = render(
         <NodeExecutionTabs
           nodeExecution={nodeExecution}
-          shouldShowTaskDetails={false}
+          selectedTaskExecution={null}
           phase={phase}
           taskTemplate={taskTemplate}
+          onTaskSelected={jest.fn()}
         />,
       );
 
@@ -49,9 +52,13 @@ describe('NodeExecutionTabs', () => {
   });
 
   describe('without map tasks', () => {
-    it('should display proper tab name when mapTask was not provided', async () => {
+    it('should display proper tab name when mapTask was not provided', () => {
       const { queryAllByRole, queryByText } = render(
-        <NodeExecutionTabs nodeExecution={nodeExecution} shouldShowTaskDetails={false} />,
+        <NodeExecutionTabs
+          nodeExecution={nodeExecution}
+          selectedTaskExecution={null}
+          onTaskSelected={jest.fn()}
+        />,
       );
 
       expect(queryAllByRole('tab')).toHaveLength(3);

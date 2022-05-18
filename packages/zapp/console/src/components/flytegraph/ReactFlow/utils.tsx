@@ -104,9 +104,9 @@ export const nodePhaseColorMapping = {
  * @returns
  */
 export const getStatusColor = (
-  nodeExecutionStatus: NodeExecutionPhase | TaskExecutionPhase,
+  nodeExecutionStatus?: NodeExecutionPhase | TaskExecutionPhase,
 ): string => {
-  if (nodePhaseColorMapping[nodeExecutionStatus]) {
+  if (nodeExecutionStatus && nodePhaseColorMapping[nodeExecutionStatus]) {
     return nodePhaseColorMapping[nodeExecutionStatus].color;
   } else {
     /** @TODO decide what we want default color to be */

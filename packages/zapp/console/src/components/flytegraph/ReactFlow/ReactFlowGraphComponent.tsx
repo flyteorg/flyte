@@ -48,6 +48,8 @@ const ReactFlowGraphComponent = (props) => {
     data,
     onNodeSelectionChanged,
     onPhaseSelectionChanged,
+    selectedPhase,
+    isDetailsTabClosed,
     nodeExecutionsById,
     dynamicWorkflows,
   } = props;
@@ -56,6 +58,7 @@ const ReactFlowGraphComponent = (props) => {
     dynamicWorkflows,
     currentNestedView: {},
     nodeExecutionsById,
+    selectedPhase,
     onNodeSelectionChanged,
     onPhaseSelectionChanged,
     rfGraphJson: null,
@@ -92,6 +95,7 @@ const ReactFlowGraphComponent = (props) => {
       nodeExecutionsById: state.nodeExecutionsById,
       onNodeSelectionChanged: state.onNodeSelectionChanged,
       onPhaseSelectionChanged: state.onPhaseSelectionChanged,
+      selectedPhase,
       onAddNestedView,
       onRemoveNestedView,
       currentNestedView: state.currentNestedView,
@@ -105,7 +109,7 @@ const ReactFlowGraphComponent = (props) => {
       ...state,
       rfGraphJson: newRFGraphData,
     }));
-  }, [state.currentNestedView, state.nodeExecutionsById]);
+  }, [state.currentNestedView, state.nodeExecutionsById, isDetailsTabClosed]);
 
   useEffect(() => {
     if (graphNodeCountChanged(state.data, data)) {
@@ -130,8 +134,9 @@ const ReactFlowGraphComponent = (props) => {
       ...state,
       onNodeSelectionChanged,
       onPhaseSelectionChanged,
+      selectedPhase,
     }));
-  }, [onNodeSelectionChanged, onPhaseSelectionChanged]);
+  }, [onNodeSelectionChanged, onPhaseSelectionChanged, selectedPhase]);
 
   const backgroundStyle = getRFBackground().nested;
 

@@ -3,7 +3,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { noExecutionsFoundString } from 'common/constants';
 import { NonIdealState } from 'components/common/NonIdealState';
 import { WaitForData } from 'components/common/WaitForData';
-import { NodeExecution, TaskExecution } from 'models/Execution/types';
+import { MapTaskExecution, NodeExecution, TaskExecution } from 'models/Execution/types';
 import { isMapTaskType } from 'models/Task/utils';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { useTaskExecutions, useTaskExecutionsRefresher } from '../useTaskExecutions';
@@ -19,13 +19,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface TaskExecutionsListProps {
   nodeExecution: NodeExecution;
+  onTaskSelected: (val: MapTaskExecution) => void;
   phase?: TaskExecutionPhase;
 }
 
 export const TaskExecutionsListContent: React.FC<{
   taskExecutions: TaskExecution[];
+  onTaskSelected: (val: MapTaskExecution) => void;
   phase?: TaskExecutionPhase;
-}> = ({ taskExecutions, phase }) => {
+}> = ({ taskExecutions, onTaskSelected, phase }) => {
   const styles = useStyles();
   if (!taskExecutions.length) {
     return (
@@ -49,6 +51,7 @@ export const TaskExecutionsListContent: React.FC<{
             taskExecution={taskExecution}
             showAttempts={taskExecutions.length > 1}
             selectedPhase={phase}
+            onTaskSelected={onTaskSelected}
           />
         ) : (
           <TaskExecutionsListItem
@@ -63,13 +66,21 @@ export const TaskExecutionsListContent: React.FC<{
 
 /** Renders a vertical list of task execution records with horizontal separators
  */
-export const TaskExecutionsList: React.FC<TaskExecutionsListProps> = ({ nodeExecution, phase }) => {
+export const TaskExecutionsList: React.FC<TaskExecutionsListProps> = ({
+  nodeExecution,
+  onTaskSelected,
+  phase,
+}) => {
   const taskExecutions = useTaskExecutions(nodeExecution.id);
   useTaskExecutionsRefresher(nodeExecution, taskExecutions);
 
   return (
     <WaitForData {...taskExecutions}>
-      <TaskExecutionsListContent taskExecutions={taskExecutions.value} phase={phase} />
+      <TaskExecutionsListContent
+        taskExecutions={taskExecutions.value}
+        onTaskSelected={onTaskSelected}
+        phase={phase}
+      />
     </WaitForData>
   );
 };

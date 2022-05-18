@@ -9,7 +9,7 @@ import { ExternalResource, LogsByPhase, NodeExecution } from 'models/Execution/t
 import { endNodeId, startNodeId } from 'models/Node/constants';
 import { Workflow, WorkflowId } from 'models/Workflow/types';
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { NodeExecutionsContext } from '../contexts';
 import { getGroupedLogs } from '../TaskExecutionsList/utils';
@@ -72,14 +72,25 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
         }
     : null;
 
-  const onCloseDetailsPanel = () => setSelectedNodes([]);
+  const onCloseDetailsPanel = () => {
+    setSelectedPhase(undefined);
+    setIsDetailsTabClosed(true);
+    setSelectedNodes([]);
+  };
 
   const [selectedPhase, setSelectedPhase] = useState<TaskExecutionPhase | undefined>(undefined);
+  const [isDetailsTabClosed, setIsDetailsTabClosed] = useState<boolean>(!selectedExecution);
+
+  useEffect(() => {
+    setIsDetailsTabClosed(!selectedExecution);
+  }, [selectedExecution]);
 
   const renderGraph = (workflow: Workflow) => (
     <WorkflowGraph
       onNodeSelectionChanged={onNodeSelectionChanged}
+      selectedPhase={selectedPhase}
       onPhaseSelectionChanged={setSelectedPhase}
+      isDetailsTabClosed={isDetailsTabClosed}
       nodeExecutionsById={nodeExecutionsById}
       workflow={workflow}
     />
@@ -92,7 +103,7 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
           {renderGraph}
         </WaitForQuery>
       </NodeExecutionsContext.Provider>
-      <DetailsPanel open={selectedExecution !== null} onClose={onCloseDetailsPanel}>
+      <DetailsPanel open={!!selectedExecution} onClose={onCloseDetailsPanel}>
         {selectedExecution && (
           <NodeExecutionDetailsPanelContent
             onClose={onCloseDetailsPanel}

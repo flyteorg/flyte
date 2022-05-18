@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { TaskExecutionPhase } from 'models/Execution/enums';
+import { mockExecution as mockTaskExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import { MapTaskStatusInfo } from './MapTaskStatusInfo';
 import { PanelViewDecorator } from '../__stories__/Decorators';
 
@@ -17,19 +18,24 @@ const Template: ComponentStory<typeof MapTaskStatusInfo> = (args) => (
 export const Default = Template.bind({});
 Default.decorators = [(Story) => PanelViewDecorator(Story)];
 Default.args = {
+  taskExecution: mockTaskExecution,
   taskLogs: [
+    // logs without URI should be black and not clickable
     { uri: '#', name: 'Kubernetes Logs #0-0' },
     { uri: '#', name: 'Kubernetes Logs #0-1' },
-    { uri: '#', name: 'Kubernetes Logs #0-2' },
-    { uri: '#', name: 'Kubernetes Logs #0-3' },
+    { name: 'Kubernetes Logs #0-2' },
+    { name: 'Kubernetes Logs #0-3' },
     { uri: '#', name: 'Kubernetes Logs #0-4' },
   ],
-  status: TaskExecutionPhase.QUEUED,
-  expanded: true,
+  phase: TaskExecutionPhase.QUEUED,
+  selectedPhase: TaskExecutionPhase.QUEUED,
+  onTaskSelected: () => {},
 };
 
 export const AllSpace = Template.bind({});
 AllSpace.args = {
+  taskExecution: mockTaskExecution,
   taskLogs: [],
-  status: TaskExecutionPhase.SUCCEEDED,
+  phase: TaskExecutionPhase.SUCCEEDED,
+  onTaskSelected: () => {},
 };

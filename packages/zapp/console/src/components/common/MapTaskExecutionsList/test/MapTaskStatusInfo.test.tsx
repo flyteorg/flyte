@@ -3,8 +3,13 @@ import { noLogsFoundString } from 'components/Executions/constants';
 import { getTaskExecutionPhaseConstants } from 'components/Executions/utils';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
+import { mockExecution as mockTaskExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 
-import { MapTaskStatusInfo } from './MapTaskStatusInfo';
+import {
+  getTaskLogName,
+  getUniqueTaskExecutionName,
+} from 'components/Executions/TaskExecutionsList/utils';
+import { MapTaskStatusInfo } from '../MapTaskStatusInfo';
 
 const taskLogs = [
   { uri: '#', name: 'Kubernetes Logs #0-0' },
@@ -18,7 +23,12 @@ describe('MapTaskStatusInfo', () => {
     const phaseData = getTaskExecutionPhaseConstants(phase);
 
     const { queryByText, getByTitle } = render(
-      <MapTaskStatusInfo taskLogs={taskLogs} phase={phase} isExpanded={false} />,
+      <MapTaskStatusInfo
+        taskLogs={taskLogs}
+        phase={phase}
+        taskExecution={mockTaskExecution}
+        onTaskSelected={jest.fn()}
+      />,
     );
 
     expect(queryByText(phaseData.text)).toBeInTheDocument();
@@ -29,7 +39,9 @@ describe('MapTaskStatusInfo', () => {
     const buttonEl = getByTitle('Expand row');
     fireEvent.click(buttonEl);
     await waitFor(() => {
-      expect(queryByText(taskLogs[0].name)).toBeInTheDocument();
+      const taskName = getUniqueTaskExecutionName(mockTaskExecution);
+      const taskLogName = getTaskLogName(taskName, taskLogs[0].name);
+      expect(queryByText(taskLogName)).toBeInTheDocument();
     });
   });
 
@@ -38,7 +50,13 @@ describe('MapTaskStatusInfo', () => {
     const phaseData = getTaskExecutionPhaseConstants(phase);
 
     const { queryByText } = render(
-      <MapTaskStatusInfo taskLogs={[]} phase={phase} isExpanded={true} />,
+      <MapTaskStatusInfo
+        taskLogs={[]}
+        phase={phase}
+        selectedPhase={phase}
+        taskExecution={mockTaskExecution}
+        onTaskSelected={jest.fn()}
+      />,
     );
 
     expect(queryByText(phaseData.text)).toBeInTheDocument();

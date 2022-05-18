@@ -16,6 +16,8 @@ import { transformerWorkflowToDag } from './transformerWorkflowToDag';
 export interface WorkflowGraphProps {
   onNodeSelectionChanged: (selectedNodes: string[]) => void;
   onPhaseSelectionChanged: (phase: TaskExecutionPhase) => void;
+  selectedPhase?: TaskExecutionPhase;
+  isDetailsTabClosed: boolean;
   workflow: Workflow;
   nodeExecutionsById?: any;
 }
@@ -56,7 +58,14 @@ export interface DynamicWorkflowMapping {
   dynamicExecutions: any[];
 }
 export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
-  const { onNodeSelectionChanged, onPhaseSelectionChanged, nodeExecutionsById, workflow } = props;
+  const {
+    onNodeSelectionChanged,
+    onPhaseSelectionChanged,
+    selectedPhase,
+    isDetailsTabClosed,
+    nodeExecutionsById,
+    workflow,
+  } = props;
   const { dag, staticExecutionIdsMap, error } = workflowToDag(workflow);
   /**
    * Note:
@@ -113,6 +122,8 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = (props) => {
         data={merged}
         onNodeSelectionChanged={onNodeSelectionChanged}
         onPhaseSelectionChanged={onPhaseSelectionChanged}
+        selectedPhase={selectedPhase}
+        isDetailsTabClosed={isDetailsTabClosed}
       />
     );
   };

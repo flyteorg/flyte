@@ -64,7 +64,7 @@ type ExecutionStatusBadgeProps =
   | NodeExecutionStatusBadgeProps
   | TaskExecutionStatusBadgeProps;
 
-function getPhaseConstants(
+export function getPhaseConstants(
   type: 'workflow' | 'node' | 'task',
   phase: WorkflowExecutionPhase | NodeExecutionPhase | TaskExecutionPhase,
 ) {
