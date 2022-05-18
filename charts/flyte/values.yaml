@@ -16,7 +16,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.1.2 # FLYTEADMIN_TAG
+      tag: v1.1.5 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
@@ -84,7 +84,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v1.1.2 # FLYTESCHEDULER_TAG
+      tag: v1.1.5 # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
