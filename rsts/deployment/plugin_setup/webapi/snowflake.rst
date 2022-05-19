@@ -88,18 +88,9 @@ Replace ``<JWT_TOKEN>`` with your JWT token.
 
 6. Upgrade the Flyte Helm release.
 
-.. tabbed:: Sandbox
+.. code-block:: bash
 
-    .. code-block:: bash
-
-       helm upgrade -n flyte -f values-override.yaml flyteorg/flyte --kubeconfig=~/.flyte/k3s/k3s.yaml
-
-.. tabbed:: AWS/GCP
-
-    .. code-block:: bash
-
-        helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
-
+    helm upgrade -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml flyteorg/flyte-core
 
 7. Register the Snowflake plugin example.
 

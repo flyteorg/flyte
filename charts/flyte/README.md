@@ -13,6 +13,8 @@ A Helm chart for Flyte Sandbox
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.1.15 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
+**NOTE:** Flyte sandbox helm chart is depricated, From now follow the sandbox [docs](https://docs.flyte.org/en/latest/deployment/sandbox.html) for installing it on cloud
+
 ### SANDBOX INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
 - Install Flyte sandbox:
