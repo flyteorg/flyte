@@ -62,6 +62,7 @@ func registerFilesSetup() {
 	rconfig.DefaultFilesConfig.AssumableIamRole = ""
 	rconfig.DefaultFilesConfig.K8sServiceAccount = ""
 	rconfig.DefaultFilesConfig.OutputLocationPrefix = ""
+	rconfig.DefaultFilesConfig.EnableSchedule = true
 }
 
 func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
@@ -476,7 +477,7 @@ func TestRegister(t *testing.T) {
 		s := setup()
 		registerFilesSetup()
 		node := &admin.NodeExecution{}
-		err := register(s.Ctx, node, s.CmdCtx, rconfig.DefaultFilesConfig.DryRun)
+		err := register(s.Ctx, node, s.CmdCtx, rconfig.DefaultFilesConfig.DryRun, rconfig.DefaultFilesConfig.EnableSchedule)
 		assert.NotNil(t, err)
 	})
 }

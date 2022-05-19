@@ -52,7 +52,6 @@ Options
   -h, --help          help for init
       --host string   Endpoint of flyte admin
       --insecure      Enable insecure mode
-      --storage       Enable storage provider config
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,6 +86,7 @@ Options inherited from parent commands
       --files.continueOnError                      Continue on error when registering files.
       --files.destinationDirectory string          Location of source code in container.
       --files.dryRun                               Execute command without making any modifications.
+      --files.enableSchedule                       Enable the schedule if the files contain schedulable launchplan.
       --files.force                                Force use of version number on entities registered with flyte.
       --files.k8ServiceAccount string              Deprecated. Please use --K8sServiceAccount
       --files.k8sServiceAccount string             Custom kubernetes service account auth role to register launch plans with.

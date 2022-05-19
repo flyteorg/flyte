@@ -61,5 +61,6 @@ func (cfg FilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultFilesConfig.DeprecatedSourceUploadPath, fmt.Sprintf("%v%v", prefix, "sourceUploadPath"), DefaultFilesConfig.DeprecatedSourceUploadPath, "Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.")
 	cmdFlags.StringVar(&DefaultFilesConfig.DestinationDirectory, fmt.Sprintf("%v%v", prefix, "destinationDirectory"), DefaultFilesConfig.DestinationDirectory, "Location of source code in container.")
 	cmdFlags.BoolVar(&DefaultFilesConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultFilesConfig.DryRun, "Execute command without making any modifications.")
+	cmdFlags.BoolVar(&DefaultFilesConfig.EnableSchedule, fmt.Sprintf("%v%v", prefix, "enableSchedule"), DefaultFilesConfig.EnableSchedule, "Enable the schedule if the files contain schedulable launchplan.")
 	return cmdFlags
 }

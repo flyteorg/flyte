@@ -35,11 +35,13 @@ var completionCmd = &cobra.Command{
 	To load completions for each session:
 
 	- Linux
+
 	::
 
 	$ flytectl completion bash > /etc/bash_completion.d/flytectl
 
 	- macOS
+
 	::
 
 	$ flytectl completion bash > /usr/local/etc/bash_completion.d/flytectl
@@ -61,6 +63,7 @@ var completionCmd = &cobra.Command{
 		Start a new shell for this setup to take effect.
 
 - fish
+
 	::
 
 	$ flytectl completion fish | source
@@ -72,6 +75,7 @@ var completionCmd = &cobra.Command{
 	$ flytectl completion fish > ~/.config/fish/completions/flytectl.fish
 
 - PowerShell
+
 	::
 
 	 PS> flytectl completion powershell | Out-String | Invoke-Expression

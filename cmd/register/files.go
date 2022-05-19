@@ -102,6 +102,12 @@ Override Destination dir of source code in container during registration:
 ::
 
  flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError --version v2 --destinationDirectory "/root" 
+
+Enable schedule for the launchplans part of the serialized protobuf files:
+
+::
+
+ flytectl register file  _pb_output/* -d development  -p flytesnacks --version v2 --enableSchedule
 	
 Usage
 `

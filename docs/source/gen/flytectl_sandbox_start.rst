@@ -19,11 +19,13 @@ Starts the sandbox cluster without any source code:
  flytectl sandbox start
 
 Mounts your source code repository inside the sandbox:
+
 ::
 
  flytectl sandbox start --source=$HOME/flyteorg/flytesnacks
 
 Runs a specific version of Flyte. Flytectl sandbox only supports Flyte version available in the Github release, https://github.com/flyteorg/flyte/tags.
+
 ::
 
  flytectl sandbox start  --version=v0.14.0
@@ -124,6 +126,7 @@ Options inherited from parent commands
       --files.continueOnError                      Continue on error when registering files.
       --files.destinationDirectory string          Location of source code in container.
       --files.dryRun                               Execute command without making any modifications.
+      --files.enableSchedule                       Enable the schedule if the files contain schedulable launchplan.
       --files.force                                Force use of version number on entities registered with flyte.
       --files.k8ServiceAccount string              Deprecated. Please use --K8sServiceAccount
       --files.k8sServiceAccount string             Custom kubernetes service account auth role to register launch plans with.

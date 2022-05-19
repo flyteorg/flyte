@@ -8,4 +8,5 @@ It specifies the actions to be performed on the 'execution' resource.
     
     gen/flytectl_create_execution
     gen/flytectl_get_execution
+    gen/flytectl_update_execution
     gen/flytectl_delete_execution

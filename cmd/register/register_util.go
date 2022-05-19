@@ -125,7 +125,7 @@ func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (
 
 }
 
-func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext, dryRun bool) error {
+func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext, dryRun, enableSchedule bool) error {
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
@@ -144,7 +144,23 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				},
 				Spec: launchPlan.Spec,
 			})
-		return err
+		if err != nil {
+			return err
+		}
+		// Activate the launchplan
+		if enableSchedule {
+			_, err = cmdCtx.AdminClient().UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
+				Id: &core.Identifier{
+					Project: config.GetConfig().Project,
+					Domain:  config.GetConfig().Domain,
+					Name:    launchPlan.Id.Name,
+					Version: launchPlan.Id.Version,
+				},
+				State: admin.LaunchPlanState_ACTIVE,
+			})
+			return err
+		}
+		return nil
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		if dryRun {
@@ -581,7 +597,7 @@ func registerFile(ctx context.Context, fileName string, registerResults []Result
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
 	}
-	if err := register(ctx, spec, cmdCtx, config.DryRun); err != nil {
+	if err := register(ctx, spec, cmdCtx, config.DryRun, config.EnableSchedule); err != nil {
 		// If error is AlreadyExists then dont consider this to be an error but just a warning state
 		if grpcError := status.Code(err); grpcError == codes.AlreadyExists {
 			registerResult = Result{Name: fileName, Status: "Success", Info: fmt.Sprintf("%v", grpcError.String())}
