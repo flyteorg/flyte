@@ -4,7 +4,7 @@ import { noExecutionsFoundString } from 'common/constants';
 import { NonIdealState } from 'components/common/NonIdealState';
 import { WaitForData } from 'components/common/WaitForData';
 import { MapTaskExecution, NodeExecution, TaskExecution } from 'models/Execution/types';
-import { isMapTaskType } from 'models/Task/utils';
+import { isMapTaskV1 } from 'models/Task/utils';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { useTaskExecutions, useTaskExecutionsRefresher } from '../useTaskExecutions';
 import { MapTaskExecutionsListItem } from './MapTaskExecutionListItem';
@@ -42,9 +42,14 @@ export const TaskExecutionsListContent: React.FC<{
   return (
     <>
       {taskExecutions.map((taskExecution) => {
-        const taskType = taskExecution.closure.taskType ?? undefined;
-        const useNewMapTaskView =
-          isMapTaskType(taskType) && taskExecution.closure.metadata?.externalResources;
+        const {
+          closure: { taskType, metadata, eventVersion = 0 },
+        } = taskExecution;
+        const useNewMapTaskView = isMapTaskV1(
+          eventVersion,
+          metadata?.externalResources?.length ?? 0,
+          taskType ?? undefined,
+        );
         return useNewMapTaskView ? (
           <MapTaskExecutionsListItem
             key={getUniqueTaskExecutionName(taskExecution)}

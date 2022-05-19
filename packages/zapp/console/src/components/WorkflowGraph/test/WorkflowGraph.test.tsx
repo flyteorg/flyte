@@ -28,6 +28,7 @@ describe('WorkflowGraph', () => {
             onPhaseSelectionChanged={jest.fn}
             workflow={workflow}
             nodeExecutionsById={nodeExecutionsById}
+            isDetailsTabClosed={true}
           />
         </QueryClientProvider>,
       );

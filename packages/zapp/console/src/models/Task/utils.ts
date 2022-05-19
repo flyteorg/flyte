@@ -24,3 +24,12 @@ export function isMapTaskType(taskType?: string): boolean {
     taskType === TaskType.ARRAY_K8S
   );
 }
+
+/** Returns true if tasks schema is treated as a map task AND eventVersion >= 1 AND externalResources array length > 0 */
+export function isMapTaskV1(
+  eventVersion: number,
+  externalResourcesLength: number,
+  taskType?: string,
+): boolean {
+  return isMapTaskType(taskType) && eventVersion >= 1 && externalResourcesLength > 0;
+}
