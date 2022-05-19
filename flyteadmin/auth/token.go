@@ -111,10 +111,10 @@ func GRPCGetIdentityFromIDToken(ctx context.Context, clientID string, provider *
 	}
 
 	meta := metautils.ExtractIncoming(ctx)
-	userInfoStr := meta.Get(UserInfoMDKey)
+	userInfoDecoded, _ := DecodeFromBase64(meta.Get(UserInfoMDKey))
 	userInfo := &service.UserInfoResponse{}
-	if len(userInfoStr) > 0 {
-		err = json.Unmarshal([]byte(userInfoStr), userInfo)
+	if len(userInfoDecoded) > 0 {
+		err = json.Unmarshal(userInfoDecoded, userInfo)
 		if err != nil {
 			logger.Infof(ctx, "Could not unmarshal user info from metadata %v", err)
 		}
