@@ -70,6 +70,7 @@
         "@babel/plugin-proposal-object-rest-spread": "~7.16.7",
         "@babel/preset-env": "~7.16.11",
         "@babel/preset-react": "~7.16.7",
-        "@babel/preset-typescript": "~7.16.7"
+        "@babel/preset-typescript": "~7.16.7",
+        "minimist": "1.2.6"
     }
 }
