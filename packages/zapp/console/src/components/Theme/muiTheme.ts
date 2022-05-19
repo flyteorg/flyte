@@ -71,9 +71,14 @@ const theme = createMuiTheme({
       fontFamily: bodyFontFamily,
     },
     h3: {
-      fontSize: '1.25rem',
+      fontSize: '16px',
       fontWeight: 'bold',
-      lineHeight: 1.35,
+      lineHeight: '22px',
+    },
+    h4: {
+      fontSize: '14px',
+      fontWeight: 'bold',
+      lineHeight: '20px',
     },
     h6: {
       fontSize: '.875rem',

@@ -1,8 +1,9 @@
 import { getCacheKey } from 'components/Cache/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
-import { Identifier } from 'models/Common/types';
+import { Identifier, ResourceType } from 'models/Common/types';
 import { Workflow, WorkflowClosure } from 'models/Workflow/types';
+import { testDomain, testProject } from 'mocks/data/constants';
 import * as simpleClosure from './simpleWorkflowClosure.json';
 
 const decodedClosure = Admin.WorkflowClosure.create(
@@ -12,8 +13,9 @@ const decodedClosure = Admin.WorkflowClosure.create(
 const workflowId: (name: string, version: string) => Identifier = (name, version) => ({
   name,
   version,
-  project: 'flyte',
-  domain: 'development',
+  project: testProject,
+  domain: testDomain,
+  resourceType: ResourceType.WORKFLOW,
 });
 
 export const createMockWorkflow: (name: string, version?: string) => Workflow = (

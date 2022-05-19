@@ -9,11 +9,18 @@ import { identifierToString } from 'models/Common/utils';
 import { LaunchPlan } from 'models/Launch/types';
 import * as React from 'react';
 import { entityStrings } from './constants';
-import t from './strings';
+import t, { patternKey } from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
+  header: {
+    marginBottom: theme.spacing(1),
+  },
   schedulesContainer: {
     marginTop: theme.spacing(1),
+  },
+  divider: {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    marginBottom: theme.spacing(1),
   },
 }));
 
@@ -45,13 +52,17 @@ export const EntitySchedules: React.FC<{
   return (
     <>
       <WaitForData {...scheduledLaunchPlans} spinnerVariant="none">
-        <Typography variant="h6">{t('schedulesHeader')}</Typography>
+        <Typography className={styles.header} variant="h3">
+          {t('schedulesHeader')}
+        </Typography>
+        <div className={styles.divider} />
+
         <div className={styles.schedulesContainer}>
           {scheduledLaunchPlans.value.length > 0 ? (
             <RenderSchedules launchPlans={scheduledLaunchPlans.value} />
           ) : (
             <Typography variant="body2" className={commonStyles.hintText}>
-              {t('noSchedules', entityStrings[id.resourceType])}
+              {t(patternKey('noSchedules', entityStrings[id.resourceType]))}
             </Typography>
           )}
         </div>

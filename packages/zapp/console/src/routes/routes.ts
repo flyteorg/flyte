@@ -62,11 +62,21 @@ export class Routes {
     path: `${projectDomainBasePath}/workflows/:workflowName`,
   };
 
-  // Workflow Version Details
-  static WorkflowVersionDetails = {
-    makeUrl: (project: string, domain: string, workflowName: string, version: string) =>
-      makeProjectDomainBoundPath(project, domain, `/workflows/${workflowName}/version/${version}`),
-    path: `${projectDomainBasePath}/workflows/:workflowName/version/:workflowVersion`,
+  // Entity Version Details
+  static EntityVersionDetails = {
+    makeUrl: (
+      project: string,
+      domain: string,
+      entityName: string,
+      entityType: string,
+      version: string,
+    ) =>
+      makeProjectDomainBoundPath(
+        project,
+        domain,
+        `/${entityType}/${entityName}/version/${version}`,
+      ),
+    path: `${projectDomainBasePath}/:entityType/:entityName/version/:entityVersion`,
   };
 
   // Tasks

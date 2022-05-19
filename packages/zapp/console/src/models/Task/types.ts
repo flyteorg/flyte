@@ -26,6 +26,7 @@ export interface TaskTemplate extends Core.ITaskTemplate {
   id: Identifier;
   interface?: TypedInterface;
   metadata?: TaskMetadata;
+  closure?: TaskClosure;
   type: string;
 }
 

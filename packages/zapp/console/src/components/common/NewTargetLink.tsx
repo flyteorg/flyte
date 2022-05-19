@@ -27,22 +27,21 @@ export const NewTargetLink: React.FC<NewTargetLinkProps> = (props) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
-  const link = (
-    <Link {...otherProps} target="_blank" rel="noopener noreferrer">
-      {children}
-    </Link>
-  );
-
   const icon = external ? <OpenInNew className={commonStyles.iconRight} /> : null;
-  return inline ? (
-    <span>
-      {link}
-      {icon}
-    </span>
-  ) : (
-    <div className={classnames(styles.externalBlockContainer, className)}>
-      {link}
-      {icon}
-    </div>
+
+  return (
+    <Link {...otherProps} target="_blank" rel="noopener noreferrer">
+      {inline ? (
+        <span>
+          {children}
+          {icon}
+        </span>
+      ) : (
+        <div className={classnames(styles.externalBlockContainer, className)}>
+          {children}
+          {icon}
+        </div>
+      )}
+    </Link>
   );
 };

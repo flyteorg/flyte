@@ -1,25 +1,27 @@
 import classnames from 'classnames';
-import { noWorkflowVersionsFoundString } from 'common/constants';
+import { noVersionsFoundString } from 'common/constants';
 import { useCommonStyles } from 'components/common/styles';
 import { ListProps } from 'components/common/types';
 import PaginatedDataList from 'components/Tables/PaginatedDataList';
 import { Workflow } from 'models/Workflow/types';
-import { Identifier } from 'models/Common/types';
+import { Identifier, ResourceType } from 'models/Common/types';
 import * as React from 'react';
 import { useParams } from 'react-router';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
+import { entityStrings } from 'components/Entities/constants';
 import { useExecutionTableStyles } from './styles';
 import { useWorkflowExecutionsTableState } from './useWorkflowExecutionTableState';
 import { useWorkflowVersionsTableColumns } from './useWorkflowVersionsTableColumns';
 import { WorkflowVersionRow } from './WorkflowVersionRow';
 
-interface WorkflowVersionsTableProps extends ListProps<Workflow> {
+interface EntityVersionsTableProps extends ListProps<Workflow> {
   versionView?: boolean;
+  resourceType: ResourceType;
 }
 
-interface WorkflowVersionRouteParams {
-  workflowVersion: string;
+interface EntityVersionRouteParams {
+  entityVersion: string;
 }
 
 /**
@@ -27,21 +29,27 @@ interface WorkflowVersionRouteParams {
  * @param props
  * @constructor
  */
-export const WorkflowVersionsTable: React.FC<WorkflowVersionsTableProps> = (props) => {
-  const { value: workflows, versionView } = props;
+export const EntityVersionsTable: React.FC<EntityVersionsTableProps> = (props) => {
+  const { value: versions, versionView, resourceType } = props;
   const state = useWorkflowExecutionsTableState();
   const commonStyles = useCommonStyles();
   const tableStyles = useExecutionTableStyles();
-  const { workflowVersion } = useParams<WorkflowVersionRouteParams>();
+  const { entityVersion } = useParams<EntityVersionRouteParams>();
 
   const columns = useWorkflowVersionsTableColumns();
 
-  const retry = () => props.fetch();
-
   const handleClickRow = React.useCallback(
-    ({ project, name, domain, version }: Identifier) =>
+    ({ project, name, domain, version, resourceType = ResourceType.UNSPECIFIED }: Identifier) =>
       () => {
-        history.push(Routes.WorkflowVersionDetails.makeUrl(project, domain, name, version));
+        history.push(
+          Routes.EntityVersionDetails.makeUrl(
+            project,
+            domain,
+            name,
+            entityStrings[resourceType],
+            version,
+          ),
+        );
       },
     [],
   );
@@ -52,8 +60,8 @@ export const WorkflowVersionsTable: React.FC<WorkflowVersionsTableProps> = (prop
       workflow={row}
       state={state}
       versionView={versionView}
-      onClick={versionView ? handleClickRow(row.id) : undefined}
-      isChecked={workflowVersion === row.id.version}
+      onClick={handleClickRow({ ...row.id, resourceType })}
+      isChecked={entityVersion === row.id.version}
       key={`workflow-version-row-${row.id.version}`}
     />
   );
@@ -62,11 +70,11 @@ export const WorkflowVersionsTable: React.FC<WorkflowVersionsTableProps> = (prop
     <div className={classnames(tableStyles.tableContainer, commonStyles.flexFill)}>
       <PaginatedDataList
         columns={columns}
-        data={workflows}
+        data={versions}
         rowRenderer={rowRenderer}
-        totalRows={workflows.length}
+        totalRows={versions.length}
         showRadioButton={versionView}
-        noDataString={noWorkflowVersionsFoundString}
+        noDataString={noVersionsFoundString}
         fillEmptyRows={false}
       />
     </div>

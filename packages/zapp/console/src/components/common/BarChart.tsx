@@ -146,7 +146,7 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   return (
     <div>
-      <Typography className={styles.title} variant="h6">
+      <Typography className={styles.title} variant="h3">
         {title}
       </Typography>
       <div className={styles.chartContainer}>

@@ -1,8 +1,9 @@
 import { getCacheKey } from 'components/Cache/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
-import { Identifier } from 'models/Common/types';
+import { Identifier, ResourceType } from 'models/Common/types';
 import { Task, TaskClosure } from 'models/Task/types';
+import { testDomain, testProject } from 'mocks/data/constants';
 import * as simpleClosure from './simpleTaskClosure.json';
 
 const decodedClosure = Admin.TaskClosure.create(
@@ -12,8 +13,9 @@ const decodedClosure = Admin.TaskClosure.create(
 const taskId: (name: string, version: string) => Identifier = (name, version) => ({
   name,
   version,
-  project: 'flyte',
-  domain: 'development',
+  project: testProject,
+  domain: testDomain,
+  resourceType: ResourceType.TASK,
 });
 
 export const createMockTask: (name: string, version?: string) => Task = (

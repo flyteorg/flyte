@@ -10,12 +10,23 @@ export const entityStrings: EntityStringMap = {
   [ResourceType.WORKFLOW]: 'workflow',
 };
 
+type TypeNameToEntityResourceType = { [key: string]: ResourceType };
+
+export const typeNameToEntityResource: TypeNameToEntityResourceType = {
+  ['dataset']: ResourceType.DATASET,
+  ['launch plan']: ResourceType.LAUNCH_PLAN,
+  ['task']: ResourceType.TASK,
+  ['item']: ResourceType.UNSPECIFIED,
+  ['workflow']: ResourceType.WORKFLOW,
+};
+
 interface EntitySectionsFlags {
   description?: boolean;
   executions?: boolean;
   launch?: boolean;
   schedules?: boolean;
   versions?: boolean;
+  descriptionInputsAndOutputs?: boolean;
 }
 
 export const entitySections: { [k in ResourceType]: EntitySectionsFlags } = {
@@ -26,7 +37,13 @@ export const entitySections: { [k in ResourceType]: EntitySectionsFlags } = {
     launch: true,
     schedules: true,
   },
-  [ResourceType.TASK]: { description: true, executions: true, launch: true },
+  [ResourceType.TASK]: {
+    description: true,
+    executions: true,
+    launch: true,
+    versions: true,
+    descriptionInputsAndOutputs: true,
+  },
   [ResourceType.UNSPECIFIED]: { description: true },
   [ResourceType.WORKFLOW]: {
     description: true,

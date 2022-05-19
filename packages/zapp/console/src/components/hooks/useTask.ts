@@ -18,7 +18,7 @@ export function useTaskTemplate(id: Identifier): FetchableData<TaskTemplate> {
       useCache: true,
       debugName: 'TaskTemplate',
       defaultValue: {} as TaskTemplate,
-      doFetch: async (taskId) => (await getTask(taskId)).closure.compiledTask.template,
+      doFetch: async (taskId) => (await getTask(taskId)) as TaskTemplate,
     },
     id,
   );

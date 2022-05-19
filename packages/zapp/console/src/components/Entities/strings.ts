@@ -1,15 +1,30 @@
 import { createLocalizedString } from '@flyteconsole/locale';
-import { startCase } from 'lodash';
 
 const str = {
-  allExecutionsChartTitle: 'All Executions in the Workflow',
-  workflowVersionsTitle: 'Recent Workflow Versions',
   viewAll: 'View All',
   schedulesHeader: 'Schedules',
   collapseButton: (showAll: boolean) => (showAll ? 'Collapse' : 'Expand'),
-  launchStrings: (typeString: string) => `Launch ${startCase(typeString)}`,
-  noDescription: (typeString: string) => `This ${typeString} has no description.`,
-  noSchedules: (typeString: string) => `This ${typeString} has no schedules.`,
+  launchStrings_workflow: 'Launch Workflow',
+  launchStrings_task: 'Launch Task',
+  noDescription_workflow: 'This workflow has no description.',
+  noDescription_task: 'This task has no description.',
+  noSchedules_workflow: 'This workflow has no schedules.',
+  noSchedules_task: 'This task has no schedules.',
+  allExecutionsChartTitle_workflow: 'All Executions in the Workflow',
+  allExecutionsChartTitle_task: 'All Execuations in the Task',
+  versionsTitle_workflow: 'Recent Workflow Versions',
+  versionsTitle_task: 'Recent Task Versions',
+  details_task: 'Task Details',
+  inputsFieldName: 'Inputs',
+  outputsFieldName: 'Outputs',
+  imageFieldName: 'Image',
+  envVarsFieldName: 'Env Vars',
+  commandsFieldName: 'Commands',
+  empty: 'Empty',
+  key: 'Key',
+  value: 'Value',
+  basicInformation: 'Basic Information',
+  description: 'Description',
 };
 
 export { patternKey } from '@flyteconsole/locale';

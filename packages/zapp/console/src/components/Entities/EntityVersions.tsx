@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Routes } from 'routes/routes';
 import { history } from 'routes/history';
 import Typography from '@material-ui/core/Typography';
 import { IconButton, makeStyles, Theme } from '@material-ui/core';
@@ -7,16 +6,16 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { LocalCacheItem, useLocalCache } from 'basics/LocalCache';
 import { WaitForData } from 'components/common/WaitForData';
-import { WorkflowVersionsTable } from 'components/Executions/Tables/WorkflowVersionsTable';
+import { EntityVersionsTable } from 'components/Executions/Tables/EntityVersionsTable';
 import { isLoadingState } from 'components/hooks/fetchMachine';
-import { useWorkflowVersions } from 'components/hooks/useWorkflowVersions';
+import { useEntityVersions } from 'components/hooks/Entity/useEntityVersions';
 import { interactiveTextColor } from 'components/Theme/constants';
 import { SortDirection } from 'models/AdminEntity/types';
-import { ResourceIdentifier } from 'models/Common/types';
+import { Identifier, ResourceIdentifier } from 'models/Common/types';
 import { executionSortFields } from 'models/Execution/constants';
-import { executionFilterGenerator } from './generators';
-import { WorkflowVersionsTablePageSize } from './constants';
-import t from './strings';
+import { executionFilterGenerator, versionDetailsUrlGenerator } from './generators';
+import { WorkflowVersionsTablePageSize, entityStrings } from './constants';
+import t, { patternKey } from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   headerContainer: {
@@ -64,8 +63,10 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
     [id, resourceType],
   );
 
-  const versions = useWorkflowVersions(
-    { domain, project },
+  // we are getting all the versions for this id
+  // so we don't want to specify which version
+  const versions = useEntityVersions(
+    { ...id, version: '' },
     {
       sort,
       filter: baseFilters,
@@ -76,12 +77,10 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
   const preventDefault = (e) => e.preventDefault();
   const handleViewAll = React.useCallback(() => {
     history.push(
-      Routes.WorkflowVersionDetails.makeUrl(
-        project,
-        domain,
-        name,
-        versions.value[0].id.version ?? '',
-      ),
+      versionDetailsUrlGenerator({
+        ...id,
+        version: versions.value[0].id.version ?? '',
+      } as Identifier),
     );
   }, [project, domain, name, versions]);
 
@@ -102,8 +101,8 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
           >
             {showTable ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
-          <Typography className={styles.header} variant="h6">
-            {t('workflowVersionsTitle')}
+          <Typography className={styles.header} variant="h3">
+            {t(patternKey('versionsTitle', entityStrings[id.resourceType]))}
           </Typography>
           <Typography className={styles.viewAll} variant="body1" onClick={handleViewAll}>
             {t('viewAll')}
@@ -112,10 +111,11 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
       )}
       <WaitForData {...versions}>
         {showTable || showAll ? (
-          <WorkflowVersionsTable
+          <EntityVersionsTable
             {...versions}
             isFetching={isLoadingState(versions.state)}
             versionView={showAll}
+            resourceType={resourceType}
           />
         ) : (
           <div className={styles.divider} />

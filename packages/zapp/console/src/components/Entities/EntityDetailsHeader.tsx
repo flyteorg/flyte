@@ -8,11 +8,10 @@ import { Project } from 'models/Project/types';
 import { getProjectDomain } from 'models/Project/utils';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Routes } from 'routes/routes';
 import { LaunchForm } from 'components/Launch/LaunchForm/LaunchForm';
-import { backUrlGenerator } from './generators';
+import { backUrlGenerator, backToDetailUrlGenerator } from './generators';
 import { entityStrings } from './constants';
-import t from './strings';
+import t, { patternKey } from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   headerContainer: {
@@ -77,7 +76,7 @@ export const EntityDetailsHeader: React.FC<EntityDetailsHeaderProps> = ({
             className={commonStyles.linkUnstyled}
             to={
               backToWorkflow
-                ? Routes.WorkflowDetails.makeUrl(id.project, id.domain, id.name)
+                ? backToDetailUrlGenerator[id.resourceType](id)
                 : backUrlGenerator[id.resourceType](id)
             }
           >
@@ -93,7 +92,7 @@ export const EntityDetailsHeader: React.FC<EntityDetailsHeaderProps> = ({
               onClick={() => setShowLaunchForm(true)}
               variant="contained"
             >
-              {t('launchStrings', entityStrings[id.resourceType])}
+              {t(patternKey('launchStrings', entityStrings[id.resourceType]))}
             </Button>
           ) : null}
         </div>

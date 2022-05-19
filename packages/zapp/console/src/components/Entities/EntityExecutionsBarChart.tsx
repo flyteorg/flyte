@@ -14,7 +14,8 @@ import {
   getWorkflowExecutionPhaseConstants,
   getWorkflowExecutionTimingMS,
 } from '../Executions/utils';
-import t from './strings';
+import t, { patternKey } from './strings';
+import { entityStrings } from './constants';
 
 export interface EntityExecutionsBarChartProps {
   id: ResourceIdentifier;
@@ -110,7 +111,7 @@ export const EntityExecutionsBarChart: React.FC<EntityExecutionsBarChartProps> =
   return (
     <WaitForData {...executions}>
       <BarChart
-        title={t('allExecutionsChartTitle')}
+        title={t(patternKey('allExecutionsChartTitle', entityStrings[id.resourceType]))}
         chartIds={chartIds}
         data={getExecutionTimeData(executions.value)}
         startDate={getStartExecutionTime(executions.value)}

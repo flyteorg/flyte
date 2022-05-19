@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& .object-key': {
       color: `${theme.palette.grey[500]} !important`,
     },
+    '& .node-ellipsis': {
+      color: `${theme.palette.grey[500]} !important`,
+    },
   },
 }));
 

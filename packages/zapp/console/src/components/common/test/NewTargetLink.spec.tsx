@@ -14,9 +14,8 @@ const renderExternalLink = () =>
   );
 
 test('renders a blank target link', () => {
-  const { getByText } = renderLink();
-  const anchor = getByText(linkText);
-  expect(anchor).toHaveAttribute('target', '_blank');
+  const { container } = renderLink();
+  expect(container.firstElementChild).toHaveAttribute('target', '_blank');
 });
 
 test('renders with additional icon for external links', () => {
