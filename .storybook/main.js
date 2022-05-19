@@ -29,6 +29,7 @@ module.exports = {
       '@flyteconsole/locale': path.resolve(__dirname, '../packages/basics/locale/src'),
       '@flyteconsole/ui-atoms': path.resolve(__dirname, '../packages/composites/ui-atoms/src'),
       '@flyteconsole/components': path.resolve(__dirname, '../packages/plugins/components/src'),
+      '@flyteconsole/flyte-api': path.resolve(__dirname, '../packages/plugins/flyte-api/src'),
     };
 
     return config;

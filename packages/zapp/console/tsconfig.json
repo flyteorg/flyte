@@ -20,7 +20,8 @@
     "references": [
         { "path": "../../basics/locale" },
         { "path": "../../composites/ui-atoms" },
-        { "path": "../../plugins/components" }
+        { "path": "../../plugins/components" },
+        { "path": "../../plugins/flyte-api" }
     ],
     "include": ["src/**/*"]
 }

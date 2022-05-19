@@ -8,10 +8,10 @@ module.exports = {
 
   setupFilesAfterEnv: ['./script/test/jest-setup.ts'],
   projects: [
-    '<rootDir>/packages/basics/locale',
-    '<rootDir>/packages/composites/ui-atoms',
-    '<rootDir>/packages/plugins/components',
-    '<rootDir>/packages/zapp/console',
+    '<rootDir>/packages/basics/*',
+    '<rootDir>/packages/composites/*',
+    '<rootDir>/packages/plugins/*',
+    '<rootDir>/packages/zapp/*',
   ],
 
   coverageDirectory: '<rootDir>/.coverage',

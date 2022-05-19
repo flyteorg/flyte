@@ -3,7 +3,7 @@
 import chalk from 'chalk';
 import * as path from 'path';
 import * as webpack from 'webpack';
-import { processEnv as env, ASSETS_PATH as publicPath, processEnv } from './env';
+import { processEnv as env, ASSETS_PATH as publicPath } from './env';
 
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const FavIconWebpackPlugin = require('favicons-webpack-plugin');
@@ -95,6 +95,7 @@ const resolve = {
     '@flyteconsole/locale': path.resolve(__dirname, '../../basics/locale/src'),
     '@flyteconsole/ui-atoms': path.resolve(__dirname, '../../composites/ui-atoms/src'),
     '@flyteconsole/components': path.resolve(__dirname, '../../plugins/components/src'),
+    '@flyteconsole/flyte-api': path.resolve(__dirname, '../../plugins/flyte-api/src'),
   },
 };
 

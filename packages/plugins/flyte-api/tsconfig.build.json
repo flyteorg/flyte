@@ -12,10 +12,5 @@
         "**/*.mock.*",
         "**/*.stories.*"
     ],
-    "references": [
-        { "path": "../../basics/locale/tsconfig.build.json" },
-        { "path": "../../composites/ui-atoms/tsconfig.build.json" },
-        { "path": "../../plugins/components/tsconfig.build.json" },
-        { "path": "../../plugins/flyte-api/tsconfig.build.json" }
-    ]
+    "references": []
 }
