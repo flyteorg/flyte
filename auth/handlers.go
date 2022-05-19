@@ -323,7 +323,7 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 		}
 
 		if len(raw) > 0 {
-			meta.Set(UserInfoMDKey, string(raw))
+			meta.Set(UserInfoMDKey, EncodeBase64(raw))
 		}
 
 		return meta

@@ -230,6 +230,7 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	req.AddCookie(&idCookie)
 
 	assert.Equal(t, "IDToken a.b.c", handler(ctx, req)["authorization"][0])
+	assert.Equal(t, "bnVsbA", handler(ctx, req).Get(UserInfoMDKey)[0])
 }
 
 func TestGetHTTPMetadataTaggingHandler(t *testing.T) {
