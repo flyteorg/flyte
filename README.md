@@ -61,6 +61,24 @@ For help with installing dependencies look into
 
 4. Explore your local copy at `http://localhost:3000`
 
+### Note: Python errors with OSX
+
+Recently OSX (12.3) removed python 2.7 from default installation and this can cause build errors for some users depending on it's setup. In this repository you can experience `env: python: No such file or directory` error from gyp ([node-gyp](https://github.com/nodejs/node-gyp)).
+The easiest way to fix it: 
+
+- Install the XCode Command Line Tools standalone by running `xcode-select --install` in the terminal
+
+OR
+
+``` bash
+   brew install python    # install python with brew
+   which python           # check if python path is properly defined
+   # if path not defined
+   where python3
+   # Take the version and location from above and run this command (replacing `/usr/bin/python3` with the location of your python instalation). This will symlink python to python3
+   ln -s /usr/bin/python3 /usr/local/bin/python 
+```
+
 ### Environment Variables
 
 * `ADMIN_API_URL` (default: [window.location.origin](https://developer.mozilla.org/en-US/docs/Web/API/Window/location>))
