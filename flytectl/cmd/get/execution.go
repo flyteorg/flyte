@@ -93,6 +93,7 @@ var hundredChars = 100
 var executionColumns = []printer.Column{
 	{Header: "Name", JSONPath: "$.id.name"},
 	{Header: "Launch Plan Name", JSONPath: "$.spec.launchPlan.name"},
+	{Header: "Version", JSONPath: "$.spec.launchPlan.version"},
 	{Header: "Type", JSONPath: "$.spec.launchPlan.resourceType"},
 	{Header: "Phase", JSONPath: "$.closure.phase"},
 	{Header: "Scheduled Time", JSONPath: "$.spec.metadata.scheduledAt"},

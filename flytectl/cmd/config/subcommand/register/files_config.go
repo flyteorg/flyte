@@ -26,6 +26,7 @@ type FilesConfig struct {
 	DeprecatedSourceUploadPath string `json:"sourceUploadPath" pflag:",Deprecated: Update flyte admin to avoid having to configure storage access from flytectl."`
 	DestinationDirectory       string `json:"destinationDirectory" pflag:",Location of source code in container."`
 	DryRun                     bool   `json:"dryRun" pflag:",Execute command without making any modifications."`
+	EnableSchedule             bool   `json:"enableSchedule" pflag:",Enable the schedule if the files contain schedulable launchplan."`
 }
 
 func GetConfig() *FilesConfig {
