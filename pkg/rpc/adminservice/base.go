@@ -5,10 +5,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
-
-	"github.com/flyteorg/flyteadmin/auth"
-
 	"github.com/flyteorg/flyteadmin/plugins"
 
 	"github.com/flyteorg/flyteadmin/pkg/async/cloudevent"
@@ -99,9 +95,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(execCluster, workflowBuilder)
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
-
-	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
-	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(auth.BlanketAuthorization))
 
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)

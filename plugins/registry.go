@@ -9,9 +9,8 @@ import (
 type PluginID = string
 
 const (
-	PluginIDWorkflowExecutor       PluginID = "WorkflowExecutor"
-	PluginIDDataProxy              PluginID = "DataProxy"
-	PluginIDUnaryServiceMiddleware PluginID = "UnaryServiceMiddleware"
+	PluginIDWorkflowExecutor PluginID = "WorkflowExecutor"
+	PluginIDDataProxy        PluginID = "DataProxy"
 )
 
 type AtomicRegistry struct {
