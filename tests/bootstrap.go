@@ -6,11 +6,10 @@ package tests
 import (
 	"context"
 	"fmt"
+
 	"github.com/flyteorg/flytestdlib/database"
 
 	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -34,9 +33,9 @@ func getDbConfig() *database.DbConfig {
 	}
 }
 
-func getLocalDbConfig() *runtimeInterfaces.DbConfig {
-	return &runtimeInterfaces.DbConfig{
-		PostgresConfig: &runtimeInterfaces.PostgresConfig{
+func getLocalDbConfig() *database.DbConfig {
+	return &database.DbConfig{
+		Postgres: database.PostgresConfig{
 			Host:   "localhost",
 			Port:   5432,
 			DbName: "flyteadmin",
