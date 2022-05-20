@@ -49,7 +49,7 @@ Once complete, run ``opta apply -c env.yaml`` and follow the prompts.
 2. DNS Delegation
 *****************
 Next, you will need to complete DNS delegation to set up public
-traffic access fully. You may find instructions on how to do so `here <https://docs.opta.dev/tutorials/ingress/>`__.
+traffic access fully. You may find instructions on how to do so `here <https://docs.opta.dev/features/dns-and-cert/dns>`__.
 
 3. Flyte Deployment
 *******************
