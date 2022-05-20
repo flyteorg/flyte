@@ -1,4 +1,4 @@
-git+https://github.com/flyteorg/furo@main
+git+https://github.com/flyteorg/furo@catchup-to-upstream
 sphinx
 sphinx-prompt
 sphinx-code-include
