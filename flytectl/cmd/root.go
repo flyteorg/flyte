@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flytectl/cmd/compile"
 	"github.com/flyteorg/flytectl/cmd/config"
 	configuration "github.com/flyteorg/flytectl/cmd/configuration"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -57,6 +58,8 @@ func newRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Output), "output", "o", printer.OutputFormatTABLE.String(), fmt.Sprintf("Specifies the output type - supported formats %s. NOTE: dot, doturl are only supported for Workflow", printer.OutputFormats()))
 
 	rootCmd.AddCommand(get.CreateGetCommand())
+	compileCmd := compile.CreateCompileCommand()
+	cmdCore.AddCommands(rootCmd, compileCmd)
 	rootCmd.AddCommand(create.RemoteCreateCommand())
 	rootCmd.AddCommand(update.CreateUpdateCommand())
 	rootCmd.AddCommand(register.RemoteRegisterCommand())

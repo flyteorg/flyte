@@ -20,7 +20,7 @@ jobs:
     name: Lint
     uses: flyteorg/flytetools/.github/workflows/lint.yml@master
     with:
-      go-version: 1.17
+      go-version: 1.18
 
   tests:
     name: Unit Tests
@@ -28,13 +28,13 @@ jobs:
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
     with:
-      go-version: 1.17
+      go-version: 1.18
 
   generate:
     name: Check Go Gennerate
     uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
     with:
-      go-version: 1.17
+      go-version: 1.18
 
   dry_run_goreleaser:
     name: Dry Run Goreleaser
@@ -52,7 +52,7 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.17'
+          go-version: '1.18'
       - name: Run GoReleaser dry run
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -74,7 +74,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.18
       - name: Build Flytectl binary
         run: make compile
       - name: Create a sandbox cluster
@@ -104,7 +104,7 @@ jobs:
           lfs: true
       - uses: actions/setup-go@v1
         with:
-          go-version: '1.17'
+          go-version: '1.18'
       - uses: actions/setup-python@v1
         with:
           python-version: 3.8
