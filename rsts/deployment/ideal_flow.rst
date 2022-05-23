@@ -1,6 +1,6 @@
 .. _ideal-flow:
 
-How to Streamline Your Flyte Workflows
+Streamlining Your Flyte Workflows
 --------------------------------------
 
 Flyte has a wide range of applications, including model training, data processing, ELT/ETL, and bioinformatics. 

@@ -1,7 +1,7 @@
 .. _deployment-cluster-config-auth-setup:
 
 ########################
-Authentication in Flyte
+Authenticating in Flyte
 ########################
 
 Flyte ships with a canonical implementation of OpenIDConnect client and OAuth2 Server, integrating seamlessly into an

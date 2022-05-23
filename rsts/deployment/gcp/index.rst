@@ -6,6 +6,7 @@ GCP
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: deployment-gcp-opta
        :type: ref
