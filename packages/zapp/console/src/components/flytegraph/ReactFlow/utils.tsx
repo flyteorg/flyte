@@ -154,6 +154,9 @@ export const getGraphNodeStyle = (
   type: dTypes,
   nodeExecutionStatus?: NodeExecutionPhase,
 ): CSSProperties => {
+  // getStatusColor accepts undefined, and falls back to default gray color
+  const nodePrimaryColor = getStatusColor(nodeExecutionStatus);
+
   /** Base styles for displaying graph nodes */
   const baseStyle = {
     boxShadow: '1px 3px 5px rgba(0,0,0,.2)',
@@ -161,7 +164,7 @@ export const getGraphNodeStyle = (
     fontSize: '.6rem',
     color: '#323232',
     borderRadius: '.25rem',
-    border: '.15rem solid #555',
+    border: `.15rem solid ${nodePrimaryColor}`,
     background: '#fff',
     minWidth: '.5rem',
     minHeight: '.5rem',
@@ -185,11 +188,6 @@ export const getGraphNodeStyle = (
     borderRadius: 'none',
     color: '#fff',
   };
-
-  let nodePrimaryColor = '';
-  if (nodeExecutionStatus) {
-    nodePrimaryColor = getStatusColor(nodeExecutionStatus);
-  }
 
   /** Override the base styles with node-type specific styles */
   const overrideStyles = {

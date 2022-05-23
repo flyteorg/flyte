@@ -146,6 +146,7 @@ const ReactFlowGraphComponent = (props) => {
     flexDirection: 'column',
     minHeight: '100px',
     minWidth: '200px',
+    height: '100%',
   };
 
   const renderGraph = () => {
