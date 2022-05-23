@@ -92,7 +92,7 @@ var projectColumns = []printer.Column{
 	{Header: "Additional Info", JSONPath: "$.Info"},
 }
 
-func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (proto.Message, error) {
+func UnMarshalContents(ctx context.Context, fileContents []byte, fname string) (proto.Message, error) {
 	workflowSpec := &admin.WorkflowSpec{}
 	errCollection := errors2.ErrorCollection{}
 	err := proto.Unmarshal(fileContents, workflowSpec)
@@ -482,7 +482,7 @@ Get serialize output file list from the args list.
 If the archive flag is on then download the archives to temp directory and extract it. In case of fast register it will also return the compressed source code
 The o/p of this function would be sorted list of the file locations.
 */
-func getSerializeOutputFiles(ctx context.Context, args []string, archive bool) ([]string, string, error) {
+func GetSerializeOutputFiles(ctx context.Context, args []string, archive bool) ([]string, string, error) {
 	if !archive {
 		/*
 		 * Sorting is required for non-archived case since its possible for the user to pass in a list of unordered
@@ -578,7 +578,7 @@ func registerFile(ctx context.Context, fileName string, registerResults []Result
 		registerResults = append(registerResults, Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error reading file due to %v", err)})
 		return registerResults, err
 	}
-	spec, err := unMarshalContents(ctx, fileContents, fileName)
+	spec, err := UnMarshalContents(ctx, fileContents, fileName)
 	if err != nil {
 		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error unmarshalling file due to %v", err)}
 		registerResults = append(registerResults, registerResult)
