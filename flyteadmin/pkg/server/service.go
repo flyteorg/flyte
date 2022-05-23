@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
 	runtime2 "github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
@@ -22,6 +25,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice"
+	runtimeIfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -51,6 +55,18 @@ func Serve(ctx context.Context, pluginRegistry *plugins.Registry, additionalHand
 	}
 
 	return serveGatewayInsecure(ctx, pluginRegistry, serverConfig, authConfig.GetConfig(), storage.GetConfig(), additionalHandlers, adminScope)
+}
+
+func SetMetricKeys(appConfig *runtimeIfaces.ApplicationConfig) {
+	var keys = make([]contextutils.Key, 0, len(appConfig.MetricKeys))
+	for _, keyName := range appConfig.MetricKeys {
+		key := contextutils.Key(keyName)
+		keys = append(keys, key)
+	}
+	logger.Infof(context.TODO(), "setting metrics keys to %+v", keys)
+	if len(keys) > 0 {
+		labeled.SetMetricKeys(keys...)
+	}
 }
 
 // Creates a new gRPC Server with all the configuration

@@ -3,14 +3,12 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/server"
+
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyteadmin/scheduler"
-	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/profutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 )
@@ -29,15 +27,15 @@ var schedulerRunCmd = &cobra.Command{
 				logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
 			}
 		}()
+
+		configuration := runtime.NewConfigurationProvider()
+		applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
+		server.SetMetricKeys(applicationConfiguration)
+
 		return scheduler.StartScheduler(ctx)
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(schedulerRunCmd)
-
-	// Set Keys
-	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
-		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/database"
 )
 
@@ -20,8 +21,12 @@ const KB = 1024
 const MB = KB * KB
 
 var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{
-	ProfilerPort:          metricPort,
-	MetricsScope:          "flyte:",
+	ProfilerPort: metricPort,
+	MetricsScope: "flyte:",
+	MetricKeys: []string{contextutils.ProjectKey.String(), contextutils.DomainKey.String(),
+		contextutils.WorkflowIDKey.String(), contextutils.TaskIDKey.String(), contextutils.PhaseKey.String(),
+		contextutils.TaskTypeKey.String(), common.RuntimeTypeKey.String(), common.RuntimeVersionKey.String(),
+		contextutils.AppNameKey.String()},
 	MetadataStoragePrefix: []string{"metadata", "admin"},
 	EventVersion:          2,
 	AsyncEventsBufferSize: 100,

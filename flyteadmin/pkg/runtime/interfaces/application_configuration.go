@@ -57,6 +57,8 @@ type ApplicationConfig struct {
 	RoleNameKey string `json:"roleNameKey"`
 	// Top-level name applied to all metrics emitted by the application.
 	MetricsScope string `json:"metricsScope"`
+	// Metrics labels applied to prometheus metrics emitted by the service
+	MetricKeys []string `json:"metricsKeys"`
 	// Determines which port the profiling server used for admin monitoring and application debugging uses.
 	ProfilerPort int `json:"profilerPort"`
 	// This defines the nested path on the configured external storage provider where workflow closures are remotely
