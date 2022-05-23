@@ -9,14 +9,12 @@ import (
 
 	_ "net/http/pprof" // Required to serve application.
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/server"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/spf13/cobra"
 
 	runtimeConfig "github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
@@ -36,6 +34,7 @@ var serveCmd = &cobra.Command{
 				logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
 			}
 		}()
+		server.SetMetricKeys(cfg.ApplicationConfiguration().GetTopLevelConfig())
 
 		return server.Serve(ctx, pluginRegistryStore.Load(), nil)
 	},
@@ -45,10 +44,4 @@ func init() {
 	// Command information
 	RootCmd.AddCommand(serveCmd)
 	RootCmd.AddCommand(secretsCmd)
-
-	// Set Keys
-	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
-		contextutils.TaskTypeKey, contextutils.PhaseKey, contextutils.LaunchPlanIDKey, common.ErrorKindKey, common.RuntimeTypeKey,
-		common.RuntimeVersionKey)
 }
