@@ -446,8 +446,8 @@ Search and replace the following:
      - Description
      - Sample Value
    * - ``<ACCOUNT_NUMBER>``
-     - The AWS Account ID
-     - ``173113148371``
+     - The AWS Account ID within quotation marks
+     - ``"173113148371"``
    * - ``<AWS_REGION>``
      - The region your EKS cluster is in
      - ``us-east-2``
@@ -607,8 +607,8 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
      show-source: true
      level: 0
     storage:
-      kind: s3
-      config:
+      type: s3
+      connection:
         auth_type: iam
         region: <REGION> # Example: us-east-2
       container: <ClusterName-Bucket> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
