@@ -1,0 +1,19 @@
+name: Create ephemeral cluster run tests and destroy all
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Mode of operation (either nightly or release)"
+        required: true
+        default: "nightly"
+        type: choice
+        options:
+          - nightly
+          - release
+      components_version:
+        description: "Version used by all components. Leave as latest for the nightly runs and pick a flyte release version in case of a release test (e.g. the full string \"v0.18.2\")"
+        required: true
+        default: "latest"
+  schedule:
+    - cron: "0 12 * * *"

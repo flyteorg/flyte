@@ -31,8 +31,9 @@ jobs:
         run: |
           COMPONENTS_VERSION=${{ inputs.components_version || 'latest' }}
           echo ::set-output name=components_version::${COMPONENTS_VERSION}
-
+          echo $COMPONENTS_VERSION
           MODE=${{ inputs.mode || 'nightly' }}
+          echo $MODE
           echo "::set-output name=mode::${MODE}"
           # We use the mode in the subsequent next step to determine the badge version. Github has a specific syntax to define environment variables
           # as defined in https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions).
