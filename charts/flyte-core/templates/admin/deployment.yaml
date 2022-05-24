@@ -111,6 +111,15 @@ spec:
         - containerPort: 8088
         - containerPort: 8089
         - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
+        readinessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 15
+        livenessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 20
+          periodSeconds: 5
         resources: {{ toYaml .Values.flyteadmin.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /srv/flyte

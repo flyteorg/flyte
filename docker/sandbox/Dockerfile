@@ -35,6 +35,7 @@ RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/inst
 # Copy flyte chart
 COPY charts/flyte/ /flyteorg/share/flyte
 COPY charts/flyte-core/ /flyteorg/share/flyte-core
+COPY charts/flyte-deps/ /flyteorg/share/flyte-deps
 
 # Copy scripts
 COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/

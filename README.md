@@ -290,10 +290,11 @@ Here are some resources to help you learn more about Flyte.
 
 ### Office Hours
 
-Ask us anything Flyte, weekly on Wednesdays:
+Ask us anything Flyte, Weekly on Wednesdays:
 
-- 7:00-7:30 am PT ([Invite and Zoom Link](https://www.addevent.com/event/zF10349020/))
-- 9:00-9:30 pm PT ([Invite and Zoom link](https://www.addevent.com/event/dQ10349168/))
+- Red Eye Flyte: 7:00-7:30 am PT ([Invite and Zoom Link](https://www.addevent.com/event/zF10349020/))
+- Mid-Day Office Hours: 1:30-2:00 pm PT ([Invite and Zoom Link](https://www.addevent.com/event/fW13717944/))  
+- Late Night MLOps: 9:00-9:30 pm PT ([Invite and Zoom link](https://www.addevent.com/event/dQ10349168/))
 
 ### Blog Posts
 

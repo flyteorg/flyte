@@ -855,7 +855,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -872,7 +872,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -886,7 +886,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -897,7 +897,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -920,13 +920,22 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
         - containerPort: 8088
         - containerPort: 8089
         - containerPort: 10254
+        readinessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 15
+        livenessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 20
+          periodSeconds: 5
         resources: 
           limits:
             cpu: 250m
@@ -1003,7 +1012,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:

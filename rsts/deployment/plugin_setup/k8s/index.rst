@@ -476,18 +476,9 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
 5. Upgrade the Flyte Helm release.
 
-.. tabbed:: Sandbox
+.. code-block:: bash
 
-    .. code-block:: bash
-
-       helm upgrade flyte flyteorg/flyte -f values-override.yaml -n flyte
-
-.. tabbed:: AWS/GCP
-
-    .. code-block:: bash
-
-        helm upgrade flyte flyteorg/flyte-core -f values-override.yaml -n flyte
-
+  helm upgrade flyte flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml -n flyte
 
 
 6. Register the plugin example.

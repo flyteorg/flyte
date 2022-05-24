@@ -1,7 +1,7 @@
 .. _deployment-sandbox:
 
 ###################
-Sandbox Overview
+Sandbox Deployment
 ###################
 
 .. warning::
@@ -64,103 +64,19 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
 .. _deploy-sandbox-local:
 
-Deploy Flyte Sandbox environment laptop / workstation / single machine
+Deploy Flyte Sandbox environment on laptop/workstation/single machine
 =======================================================================
+
 
 Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
     brew install kubectl
 
-.. tabbed:: Docker Image
+Recommended using ``flytectl sandbox start`` as described in :ref:`getting-started`
 
-    Recommend using ``flytectl sandbox`` as describe in :ref:`getting-started`
+.. prompt:: bash $
 
-    .. prompt:: bash $
-
-          docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30088:30088 cr.flyte.org/flyteorg/flyte-sandbox
-
-.. tabbed:: k3d
-
-    .. TODO::
-
-      Allow installing latest version of k3d once this `issue is fixed <https://github.com/rancher/k3d/issues/380>`__
-
-    #. Install k3d Using ``curl``::
-
-        curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.2.0 bash
-
-       Or Using ``wget`` ::
-
-        wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.2.0 bash
-
-
-    #. Start a new K3s cluster called Flyte ::
-
-        k3d cluster create flyte -p 30081:30081 --no-lb  --k3s-server-arg '–no-deploy=traefik' --k3s-server-arg '–no-deploy=servicelb'
-
-
-    #. Ensure the context is set to the new cluster::
-
-        kubectl config set-context flyte
-
-    #. Install Flyte::
-
-        kubectl create ns flyte
-        kubectl create -f  https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_helm_generated.yaml
-
-
-    #. Connect to `FlyteConsole <localhost:30081/console>`__
-    #. [Optional] You can delete the cluster once you are done with the tutorial using - ::
-
-        k3d cluster delete flyte
-
-    .. note::
-
-        #. Sometimes Flyteconsole will not open up. This is probably because your docker networking is impacted. One solution is to restart docker and repeat the previous steps.
-        #. To debug you can try a simple exercise - run nginx as follows::
-
-            docker run -it --rm -p 8083:80 nginx
-
-           Now connect to `locahost:8083 <localhost:8083>`__. If this does not work, then the networking is most probably impacted. Please restart docker daemon.
-
-.. tabbed:: Docker-Mac + K8s
-
-    .. TODO::
-
-        These instructions currently still rely on the old kustomize setup, and will be moved over to the Helm chart soon.
-
-    #. Install Docker for mac with Kubernetes as explained `here <https://www.docker.com/blog/docker-mac-kubernetes/>`_
-    #. Make sure Kubernetes is started and once started make sure your kubectx is set to the `docker-desktop` cluster, typically ::
-
-            kubectl config set-context docker-desktop
-
-    #. Install Flyte::
-
-        kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-
-    #. Connect to `FlyteConsole <localhost/console>`__
-
-.. tabbed::  Using Minikube (Not recommended)
-
-    .. TODO::
-
-        These instructions currently still rely on the old kustomize setup, and will be moved over to the Helm chart soon.
-
-    #. Install `Minikube <https://kubernetes.io/docs/tasks/tools/install-minikube/>`_
-
-    #. Install Flyte::
-
-        kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-
-    .. note::
-
-        - Minikube runs in a Virtual Machine on your host
-        - So if you try to access the flyte console on localhost, that will not work, because the Virtual Machine has a different IP address.
-        - Flyte runs within Kubernetes (minikube), so to access FlyteConsole, you cannot just use https://localhost:30081/console. You need to use the IP address of the minikube VM instead of the localhost
-        - Refer to https://kubernetes.io/docs/tutorials/hello-minikube/ to understand how to run a sample app on kubernetes using minikube and Katacoda. To  register workflows, tasks, etc. or use the CLI to query Flyte services, you have to use the IP address.
-        - If you are building an image locally and want to execute on Minikube hosted Flyte environment, please push the image to docker registry running on the Minikube VM.
-        - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more detailed information about this process. Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to a registry that is available to Kubernetes. In the minikube case, this registry is the one that is running on the VM.
-
+        docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30088:30088 cr.flyte.org/flyteorg/flyte-sandbox
 
 .. _deployment-sandbox-dedicated-k8s-cluster:
 
@@ -186,32 +102,43 @@ We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with 
 Flyte configuration on your remote cluster.
 
 
-#. The Flyte sandbox can be deployed via a helm chart. From the root dir of the flyte repo run ::
+#. Add Helm repo for flyte ::
 
-    helm repo add flyte https://flyteorg.github.io/flyte
-    helm install -n flyte -f values.yaml --create-namespace flyte flyte/flyte
+    helm repo add flyteorg https://helm.flyte.org
 
-#. For customizations instructions, see ``/charts/flyte/README.md`` in the flyte repo.
+#. Install Flyte dependency helm chart (this will install the minio, Postgres, Kubernetes-dashboard, and contour) ::
 
-#. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows ::
+    helm install -n flyte flyte-deps flyteorg/flyte-deps --create-namespace -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-deps/values-sandbox.yaml
 
-    kubectl port-forward --address 0.0.0.0 svc/flyte-contour-envoy 30081:80 -n flyte
+#. Install flyte-core chart ::
 
-#. Open the console http://localhost:30081/console.
+    helm install flyte flyteorg/flyte-core -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml --wait
+
+#. Make sure all pods are in Running condition, If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller, Verify Flyte deployment using the following command ::
+
+    kubect get pods -n flyte
+
+#. Get the URL of the ingress service ::
+
+    kubect get ingress -n flyte
 
 #. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
 
-    flytectl config init --host='localhost:30081' --insecure
+    flytectl config init --host='<CONTOUR_URL>' --insecure
 
-#. Open the minio console http://localhost:30088. Your minio username is `minio` and password is `miniostorage`.
+#. Get Minio & Kubernetes dashboard LB URL by running ::
 
-#. Open the Kubernetes dashboard http://localhost:30082.
+    kubectl get service -n flyte
 
-#. You can port-forward to connect postgres using ::
+#. Open the minio console http://<MINIO_URL>. Your minio username is `minio` and password is `miniostorage`.
+
+#. Open the Kubernetes dashboard http://<K8S_DASHBOARD_URL>.
+
+#. Port-forward to connect Postgres using the following command: ::
 
     kubectl port-forward --address 0.0.0.0 svc/postgres 5432:5432 -n flyte
 
-#. Now use these credentials for postgres
+#. Use the following credentials for Postgres :
 
    .. code-block::
 

@@ -1,6 +1,6 @@
 .. _deployment-cluster-config-general:
 
-Configuring Your Flyte Deployment
+Configuring Custom K8s Resources
 ----------------------------------
 
 ***************************
