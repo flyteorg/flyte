@@ -201,6 +201,7 @@ If you are using a customized Docker image, push the image to docker registry an
 Register the workflow, i.e upload the package to Flyte backend. Here, ``v1`` refers to the version and it is a good practice to match this with your project's version.
 
 .. prompt:: bash $
+
    flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
 
 Executing Workflows on a Flyte Cluster
