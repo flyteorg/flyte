@@ -1,0 +1,50 @@
+workflow:
+  id:
+    name: core.type_system.flyte_pickle.welcome
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        name:
+          description: name
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Blob:
+                format: PythonPickle
+            metadata:
+              python_class_name: People
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.type_system.flyte_pickle.greet
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: name
+      var: name
+    metadata:
+      InterruptibleValue: null
+      name: greet
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

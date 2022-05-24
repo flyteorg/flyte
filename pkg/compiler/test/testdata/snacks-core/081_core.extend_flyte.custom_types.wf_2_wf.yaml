@@ -1,0 +1,56 @@
+workflow:
+  id:
+    name: core.extend_flyte.custom_types.wf
+    resource_type: 2
+  interface:
+    inputs: {}
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.extend_flyte.custom_types.generate
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: generate
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.extend_flyte.custom_types.consume
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: d
+    metadata:
+      InterruptibleValue: null
+      name: consume
+      retries: {}
+    upstream_node_ids:
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: o0
+    var: o0

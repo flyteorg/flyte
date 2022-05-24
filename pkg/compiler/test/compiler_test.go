@@ -3,12 +3,15 @@ package test
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/flyteorg/flytepropeller/pkg/visualize"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -24,14 +27,12 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/visualize"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 )
 
 var update = flag.Bool("update", false, "Update .golden files")
-var reverse = flag.Bool("reverse", false, "Reverse .golden files")
 
 func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 	if iface == nil || iface.GetInputs() == nil {
@@ -40,8 +41,26 @@ func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 
 	res := make(map[string]*core.Literal, len(iface.GetInputs().Variables))
 	for inputName, inputVar := range iface.GetInputs().Variables {
-		val := coreutils.MustMakeDefaultLiteralForType(inputVar.Type)
-		res[inputName] = val
+		// A workaround because the coreutils don't support the "StructuredDataSet" type
+		if reflect.TypeOf(inputVar.Type.Type) == reflect.TypeOf(&core.LiteralType_StructuredDatasetType{}) {
+			res[inputName] = &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_StructuredDataset{
+							StructuredDataset: &core.StructuredDataset{
+								Metadata: &core.StructuredDatasetMetadata{
+									StructuredDatasetType: inputVar.Type.Type.(*core.LiteralType_StructuredDatasetType).StructuredDatasetType,
+								},
+							},
+						},
+					},
+				},
+			}
+		} else if reflect.TypeOf(inputVar.Type.Type) == reflect.TypeOf(&core.LiteralType_Simple{}) && inputVar.Type.GetSimple() == core.SimpleType_DATETIME {
+			res[inputName] = coreutils.MustMakeLiteral(time.UnixMicro(10))
+		} else {
+			res[inputName] = coreutils.MustMakeDefaultLiteralForType(inputVar.Type)
+		}
 	}
 
 	return &core.LiteralMap{
@@ -83,28 +102,6 @@ func mustCompileTasks(t *testing.T, tasks []*core.TaskTemplate) []*core.Compiled
 	}
 
 	return compiledTasks
-}
-
-func marshalProto(t *testing.T, filename string, p proto.Message) {
-	marshaller := &jsonpb.Marshaler{}
-	s, err := marshaller.MarshalToString(p)
-	assert.NoError(t, err)
-
-	if err != nil {
-		return
-	}
-
-	originalRaw, err := proto.Marshal(p)
-	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(strings.Replace(filename, filepath.Ext(filename), ".pb", 1), originalRaw, os.ModePerm))
-
-	m := map[string]interface{}{}
-	err = json.Unmarshal([]byte(s), &m)
-	assert.NoError(t, err)
-
-	b, err := yaml.Marshal(m)
-	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(strings.Replace(filename, filepath.Ext(filename), ".yaml", 1), b, os.ModePerm))
 }
 
 func TestDynamic(t *testing.T) {
@@ -161,13 +158,10 @@ func TestDynamic(t *testing.T) {
 				t.FailNow()
 			}
 
-			inputs := map[string]interface{}{}
-			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
-			}
+			inputs := makeDefaultInputs(compiledWfc.Primary.Template.Interface)
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
-				coreutils.MustMakeLiteral(inputs).GetMap(),
+				inputs,
 				&core.WorkflowExecutionIdentifier{
 					Project: "hello",
 					Domain:  "domain",
@@ -293,286 +287,219 @@ func assertNodeIDsInConnections(t testing.TB, nodeIDsWithDeps, allNodeIDs sets.S
 	return correct
 }
 
-func TestBranches(t *testing.T) {
-	errors.SetConfig(errors.Config{IncludeSource: true})
-	assert.NoError(t, filepath.Walk("testdata/branch", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			if filepath.Base(info.Name()) != "branch" {
-				return filepath.SkipDir
-			}
-
-			return nil
-		}
-
-		t.Run(path, func(t *testing.T) {
-			// If you want to debug a single use-case. Uncomment this line.
-			//if !strings.HasSuffix(path, "mycereal_condition_has_no_deps.json") {
-			//	t.SkipNow()
-			//}
-
-			raw, err := ioutil.ReadFile(path)
-			assert.NoError(t, err)
-			wf := &core.WorkflowClosure{}
-			if filepath.Ext(path) == ".json" {
-				err = jsonpb.UnmarshalString(string(raw), wf)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-			} else if filepath.Ext(path) == ".pb" {
-				m := &jsonpb.Marshaler{
-					Indent: "  ",
-				}
-
-				err = proto.Unmarshal(raw, wf)
-				if !assert.NoError(t, err) {
-					tsk := &admin.TaskSpec{}
-					if !assert.NoError(t, proto.Unmarshal(raw, tsk)) {
-						t.FailNow()
-					}
-
-					raw, _ := m.MarshalToString(tsk)
-					err = ioutil.WriteFile(strings.TrimSuffix(path, filepath.Ext(path))+"_task.json", []byte(raw), os.ModePerm)
-					if !assert.NoError(t, err) {
-						t.FailNow()
-					}
-
-					return
-				}
-
-				raw, err := m.MarshalToString(wf)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-
-				err = ioutil.WriteFile(strings.TrimSuffix(path, filepath.Ext(path))+".json", []byte(raw), os.ModePerm)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-			}
-
-			t.Log("Compiling Workflow")
-			compiledTasks := mustCompileTasks(t, wf.Tasks)
-			compiledWfc, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, compiledTasks,
-				[]common.InterfaceProvider{})
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
-
-			m := &jsonpb.Marshaler{
-				Indent: "  ",
-			}
-			rawStr, err := m.MarshalToString(compiledWfc)
-			if !assert.NoError(t, err) {
-				t.Fail()
-			}
-
-			compiledFilePath := filepath.Join(filepath.Dir(path), "compiled", filepath.Base(path))
-			if *update {
-				err = ioutil.WriteFile(compiledFilePath, []byte(rawStr), os.ModePerm)
-				if !assert.NoError(t, err) {
-					t.Fail()
-				}
-			} else {
-				goldenRaw, err := ioutil.ReadFile(compiledFilePath)
-				if !assert.NoError(t, err) {
-					t.Fail()
-				}
-
-				if diff := deep.Equal(rawStr, string(goldenRaw)); diff != nil {
-					t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
-				}
-			}
-
-			allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
-			nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
-			if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
-				t.FailNow()
-			}
-
-			inputs := map[string]interface{}{}
-			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
-			}
-
-			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
-				coreutils.MustMakeLiteral(inputs).GetMap(),
-				&core.WorkflowExecutionIdentifier{
-					Project: "hello",
-					Domain:  "domain",
-					Name:    "name",
-				},
-				"namespace")
-			if assert.NoError(t, err) {
-				raw, err := json.MarshalIndent(flyteWf, "", "  ")
-				if assert.NoError(t, err) {
-					assert.NotEmpty(t, raw)
-				}
-
-				k8sObjectFilepath := filepath.Join(filepath.Dir(path), "k8s", filepath.Base(path))
-				if *update {
-					err = ioutil.WriteFile(k8sObjectFilepath, raw, os.ModePerm)
-					if !assert.NoError(t, err) {
-						t.Fail()
-					}
-				} else {
-					goldenRaw, err := ioutil.ReadFile(k8sObjectFilepath)
-					if !assert.NoError(t, err) {
-						t.Fail()
-					}
-
-					if diff := deep.Equal(string(raw), string(goldenRaw)); diff != nil {
-						t.Errorf("K8sObject() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
-					}
-
-				}
-			}
-		})
-
-		return nil
-	}))
+func TestUseCases(t *testing.T) {
+	runCompileTest(t, "branch")
+	runCompileTest(t, "snacks-core")
 }
 
-func TestReverseEngineerFromYaml(t *testing.T) {
-	root := "testdata"
-	errors.SetConfig(errors.Config{IncludeSource: true})
-	assert.NoError(t, filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		if !strings.HasSuffix(path, ".yaml") {
-			return nil
-		}
-
-		if strings.HasSuffix(path, "-inputs.yaml") {
-			return nil
-		}
-
-		ext := ".yaml"
-
-		testName := strings.TrimLeft(path, root)
-		testName = strings.Trim(testName, string(os.PathSeparator))
-		testName = strings.TrimSuffix(testName, ext)
-		testName = strings.Replace(testName, string(os.PathSeparator), "_", -1)
-
-		t.Run(testName, func(t *testing.T) {
-			t.Log("Reading from file")
-			raw, err := ioutil.ReadFile(path)
-			assert.NoError(t, err)
-
-			raw, err = yaml.YAMLToJSON(raw)
-			assert.NoError(t, err)
-
-			t.Log("Unmarshalling Workflow Closure")
-			wf := &core.WorkflowClosure{}
-			err = jsonpb.UnmarshalString(string(raw), wf)
-			assert.NoError(t, err)
-			assert.NotNil(t, wf)
-			if err != nil {
-				return
-			}
-
-			t.Log("Compiling Workflow")
-			compiledWf, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, mustCompileTasks(t, wf.Tasks), []common.InterfaceProvider{})
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
-
-			inputs := makeDefaultInputs(compiledWf.Primary.Template.GetInterface())
-			if *reverse {
-				marshalProto(t, strings.Replace(path, ext, fmt.Sprintf("-inputs%v", ext), -1), inputs)
-			}
-
-			t.Log("Building k8s resource")
-			_, err = k8s.BuildFlyteWorkflow(compiledWf, inputs, nil, "")
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
-
-			dotFormat := visualize.ToGraphViz(compiledWf.Primary)
-			t.Logf("GraphViz Dot: %v\n", dotFormat)
-
-			if *reverse {
-				marshalProto(t, path, wf)
-			}
-		})
-
-		return nil
-	}))
+func protoMarshal(v any) ([]byte, error) {
+	m := jsonpb.Marshaler{}
+	str, err := m.MarshalToString(v.(proto.Message))
+	return []byte(str), err
 }
 
-func TestCompileAndBuild(t *testing.T) {
-	root := "testdata"
+func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path string) bool {
+	raw, err := f(obj)
+	if !assert.NoError(t, err) {
+		return false
+	}
+
+	if *update {
+		err = ioutil.WriteFile(path, raw, os.ModePerm)
+		if !assert.NoError(t, err) {
+			return false
+		}
+
+	} else {
+		goldenRaw, err := ioutil.ReadFile(path)
+		if !assert.NoError(t, err) {
+			return false
+		}
+
+		if diff := deep.Equal(string(raw), string(goldenRaw)); diff != nil {
+			t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, string(raw), string(goldenRaw))
+		}
+	}
+
+	return true
+}
+
+func runCompileTest(t *testing.T, dirName string) {
 	errors.SetConfig(errors.Config{IncludeSource: true})
-	assert.NoError(t, filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	// Compile Tasks
+	t.Run("tasks-"+dirName, func(t *testing.T) {
+		//t.Parallel()
+
+		paths, err := filepath.Glob("testdata/" + dirName + "/*.pb")
+		if !assert.NoError(t, err) {
+			t.FailNow()
 		}
 
-		if info.IsDir() {
-			return nil
-		}
-
-		if ext := filepath.Ext(path); ext != ".pb" {
-			return nil
-		}
-
-		if strings.HasSuffix(path, "-inputs.pb") {
-			return nil
-		}
-
-		testName := strings.TrimLeft(path, root)
-		testName = strings.Trim(testName, string(os.PathSeparator))
-		testName = strings.Trim(testName, filepath.Ext(testName))
-		testName = strings.Replace(testName, string(os.PathSeparator), "_", -1)
-
-		t.Run(testName, func(t *testing.T) {
-			t.Log("Reading from file")
-			raw, err := ioutil.ReadFile(path)
+		for _, p := range paths {
+			raw, err := ioutil.ReadFile(p)
 			assert.NoError(t, err)
+			tsk := &admin.TaskSpec{}
+			err = proto.Unmarshal(raw, tsk)
+			if err != nil {
+				t.Logf("Failed to parse %s as a Task, skipping: %v", p, err)
+				continue
+			}
 
-			t.Log("Unmarshalling Workflow Closure")
+			t.Run(p, func(t *testing.T) {
+				//t.Parallel()
+				if !storeOrDiff(t, yaml.Marshal, tsk, strings.TrimSuffix(p, filepath.Ext(p))+"_task.yaml") {
+					t.FailNow()
+				}
+
+				inputTask := tsk.Template
+				setDefaultFields(inputTask)
+				task, err := compiler.CompileTask(inputTask)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				if !storeOrDiff(t, yaml.Marshal, task, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.yaml")) {
+					t.FailNow()
+				}
+
+				if !storeOrDiff(t, protoMarshal, tsk, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.json")) {
+					t.FailNow()
+				}
+			})
+		}
+	})
+
+	// Load Compiled Tasks
+	paths, err := filepath.Glob(filepath.Join("testdata", dirName, "compiled", "*_task.json"))
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	compiledTasks := make(map[string]*core.CompiledTask, len(paths))
+	for _, f := range paths {
+		raw, err := ioutil.ReadFile(f)
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+
+		tsk := &core.CompiledTask{}
+		err = jsonpb.UnmarshalString(string(raw), tsk)
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+
+		compiledTasks[tsk.Template.Id.String()] = tsk
+	}
+
+	// Compile Workflows
+	t.Run("workflows-"+dirName, func(t *testing.T) {
+		//t.Parallel()
+
+		paths, err = filepath.Glob(filepath.Join("testdata", dirName, "*.pb"))
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+
+		for _, p := range paths {
+			raw, err := ioutil.ReadFile(p)
+			assert.NoError(t, err)
 			wf := &core.WorkflowClosure{}
 			err = proto.Unmarshal(raw, wf)
-			assert.NoError(t, err)
-			assert.NotNil(t, wf)
 			if err != nil {
-				return
+				t.Logf("Failed to parse %s as a WorkflowClosure, skipping: %v", p, err)
+				continue
 			}
 
-			t.Log("Compiling Workflow")
-			compiledWf, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, mustCompileTasks(t, wf.Tasks), []common.InterfaceProvider{})
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
+			t.Run(p, func(t *testing.T) {
+				//t.Parallel()
+				if !storeOrDiff(t, yaml.Marshal, wf, strings.TrimSuffix(p, filepath.Ext(p))+"_wf.yaml") {
+					t.FailNow()
+				}
 
-			inputs := makeDefaultInputs(compiledWf.Primary.Template.GetInterface())
-			if *update {
-				marshalProto(t, strings.Replace(path, filepath.Ext(path), fmt.Sprintf("-inputs%v", filepath.Ext(path)), -1), inputs)
-			}
+				inputWf := wf.Workflow
 
-			t.Log("Building k8s resource")
-			_, err = k8s.BuildFlyteWorkflow(compiledWf, inputs, nil, "")
-			assert.NoError(t, err)
-			if err != nil {
-				return
-			}
+				reqs, err := compiler.GetRequirements(inputWf, nil)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
 
-			dotFormat := visualize.ToGraphViz(compiledWf.Primary)
-			t.Logf("GraphViz Dot: %v\n", dotFormat)
+				tasks := make([]*core.CompiledTask, 0, len(reqs.GetRequiredTaskIds()))
 
-			if *update {
-				marshalProto(t, path, wf)
-			}
-		})
+				for _, taskID := range reqs.GetRequiredTaskIds() {
+					compiledTask, found := compiledTasks[taskID.String()]
+					if !assert.True(t, found, "Could not find compiled task %s", taskID) {
+						t.FailNow()
+					}
 
-		return nil
-	}))
+					tasks = append(tasks, compiledTask)
+				}
+
+				compiledWfc, err := compiler.CompileWorkflow(inputWf, []*core.WorkflowTemplate{}, tasks,
+					[]common.InterfaceProvider{})
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				if !storeOrDiff(t, yaml.Marshal, compiledWfc, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_wf.yaml")) {
+					t.FailNow()
+				}
+
+				if !storeOrDiff(t, protoMarshal, compiledWfc, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_wf.json")) {
+					t.FailNow()
+				}
+
+				allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
+				nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
+				if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
+					t.FailNow()
+				}
+			})
+		}
+	})
+
+	// Build K8s Workflows
+	t.Run("k8s-"+dirName, func(t *testing.T) {
+		//t.Parallel()
+
+		paths, err = filepath.Glob(filepath.Join("testdata", dirName, "compiled", "*_wf.json"))
+		if !assert.NoError(t, err) {
+			t.FailNow()
+		}
+
+		for _, p := range paths {
+			t.Run(p, func(t *testing.T) {
+				//t.Parallel()
+				raw, err := ioutil.ReadFile(p)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				compiledWfc := &core.CompiledWorkflowClosure{}
+				if !assert.NoError(t, jsonpb.UnmarshalString(string(raw), compiledWfc)) {
+					t.FailNow()
+				}
+
+				inputs := makeDefaultInputs(compiledWfc.Primary.Template.Interface)
+
+				dotFormat := visualize.ToGraphViz(compiledWfc.Primary)
+				t.Logf("GraphViz Dot: %v\n", dotFormat)
+
+				flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
+					inputs,
+					&core.WorkflowExecutionIdentifier{
+						Project: "hello",
+						Domain:  "domain",
+						Name:    "name",
+					},
+					"namespace")
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				if !storeOrDiff(t, yaml.Marshal, flyteWf, filepath.Join(filepath.Dir(filepath.Dir(p)), "k8s", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+".yaml")) {
+					t.FailNow()
+				}
+			})
+		}
+	})
 }

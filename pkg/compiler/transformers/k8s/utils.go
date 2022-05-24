@@ -89,3 +89,67 @@ func toBindingValueArray(bindings []*core.Binding) []*v1alpha1.Binding {
 func minInt(i, j int) int {
 	return int(math.Min(float64(i), float64(j)))
 }
+
+// StripTypeMetadata strips the type metadata from the given type.
+func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
+	if t == nil {
+		return nil
+	}
+
+	c := *t
+	c.Metadata = nil
+	c.Structure = nil
+	c.Annotation = nil
+
+	switch underlyingType := c.Type.(type) {
+	case *core.LiteralType_UnionType:
+		variants := make([]*core.LiteralType, 0, len(c.GetUnionType().Variants))
+		for _, variant := range c.GetUnionType().Variants {
+			variants = append(variants, StripTypeMetadata(variant))
+		}
+
+		underlyingType.UnionType.Variants = variants
+	case *core.LiteralType_MapValueType:
+		underlyingType.MapValueType = StripTypeMetadata(c.GetMapValueType())
+	case *core.LiteralType_CollectionType:
+		underlyingType.CollectionType = StripTypeMetadata(c.GetCollectionType())
+	case *core.LiteralType_StructuredDatasetType:
+		columns := make([]*core.StructuredDatasetType_DatasetColumn, 0, len(c.GetStructuredDatasetType().Columns))
+		for _, column := range c.GetStructuredDatasetType().Columns {
+			columns = append(columns, &core.StructuredDatasetType_DatasetColumn{
+				Name:        column.Name,
+				LiteralType: StripTypeMetadata(column.LiteralType),
+			})
+		}
+
+		underlyingType.StructuredDatasetType.Columns = columns
+	}
+
+	return &c
+}
+
+func StripInterfaceTypeMetadata(iface *core.TypedInterface) *core.TypedInterface {
+	if iface == nil {
+		return nil
+	}
+
+	newIface := *iface
+
+	if iface.Inputs != nil {
+		for name, i := range iface.Inputs.Variables {
+			i.Type = StripTypeMetadata(i.Type)
+			i.Description = ""
+			newIface.Inputs.Variables[name] = i
+		}
+	}
+
+	if iface.Outputs != nil {
+		for name, i := range iface.Outputs.Variables {
+			i.Type = StripTypeMetadata(i.Type)
+			i.Description = ""
+			iface.Outputs.Variables[name] = i
+		}
+	}
+
+	return &newIface
+}

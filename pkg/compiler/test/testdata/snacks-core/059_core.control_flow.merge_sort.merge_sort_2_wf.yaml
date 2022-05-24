@@ -1,0 +1,117 @@
+workflow:
+  id:
+    name: core.control_flow.merge_sort.merge_sort
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        numbers:
+          description: numbers
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 1
+        numbers_count:
+          description: numbers_count
+          type:
+            Type:
+              Simple: 1
+        run_local_at_count:
+          description: run_local_at_count
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 1
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      BranchNode:
+        if_else:
+          Default:
+            ElseNode:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.merge_sort.merge_sort_remotely
+                      resource_type: 1
+                  overrides: {}
+              id: n1
+              inputs:
+              - binding:
+                  Value:
+                    Promise:
+                      var: numbers
+                var: numbers
+              - binding:
+                  Value:
+                    Promise:
+                      var: run_local_at_count
+                var: run_local_at_count
+              metadata:
+                InterruptibleValue: null
+                name: merge_sort_remotely
+                retries: {}
+          case:
+            condition:
+              Expr:
+                Comparison:
+                  left_value:
+                    Val:
+                      Var: .numbers_count
+                  operator: 5
+                  right_value:
+                    Val:
+                      Var: .run_local_at_count
+            then_node:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.merge_sort.sort_locally
+                      resource_type: 1
+                  overrides: {}
+              id: n0
+              inputs:
+              - binding:
+                  Value:
+                    Promise:
+                      var: numbers
+                var: numbers
+              metadata:
+                InterruptibleValue: null
+                name: sort_locally
+                retries: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: numbers_count
+      var: .numbers_count
+    - binding:
+        Value:
+          Promise:
+            var: run_local_at_count
+      var: .run_local_at_count
+    metadata:
+      InterruptibleValue: null
+      name: terminal_case
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

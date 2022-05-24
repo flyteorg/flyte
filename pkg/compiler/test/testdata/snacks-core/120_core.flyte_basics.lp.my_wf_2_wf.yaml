@@ -1,0 +1,47 @@
+workflow:
+  id:
+    name: core.flyte_basics.lp.my_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        val:
+          description: val
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 1
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.lp.square
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: val
+      var: val
+    metadata:
+      InterruptibleValue: null
+      name: square
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

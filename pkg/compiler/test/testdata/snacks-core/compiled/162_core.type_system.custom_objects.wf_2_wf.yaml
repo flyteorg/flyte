@@ -1,0 +1,652 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - end-node
+        - n1
+      n1:
+        ids:
+        - end-node
+      n2:
+        ids:
+        - n4
+      n3:
+        ids:
+        - n4
+      n4:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+        - n2
+        - n3
+    upstream:
+      end-node:
+        ids:
+        - n0
+        - n1
+        - n4
+      n0:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - n0
+      n2:
+        ids:
+        - start-node
+      n3:
+        ids:
+        - start-node
+      n4:
+        ids:
+        - n2
+        - n3
+  template:
+    id:
+      name: core.type_system.custom_objects.wf
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 1
+          "y":
+            description: "y"
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/DatumSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  DatumSchema:
+                    additionalProperties: false
+                    properties:
+                      x:
+                        title: x
+                        type: integer
+                      "y":
+                        title: "y"
+                        type: string
+                      z:
+                        additionalProperties:
+                          title: z
+                          type: string
+                        title: z
+                        type: object
+                    type: object
+          o1:
+            description: o1
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/ResultSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  FlytedirectorySchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlytefileSchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlyteschemaSchema:
+                    additionalProperties: false
+                    properties:
+                      remote_path:
+                        title: remote_path
+                        type: string
+                    type: object
+                  ResultSchema:
+                    additionalProperties: false
+                    properties:
+                      directory:
+                        $ref: '#/definitions/FlytedirectorySchema'
+                        field_many: false
+                        type: object
+                      file:
+                        $ref: '#/definitions/FlytefileSchema'
+                        field_many: false
+                        type: object
+                      schema:
+                        $ref: '#/definitions/FlyteschemaSchema'
+                        field_many: false
+                        type: object
+                    type: object
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n4
+              var: o0
+        var: o0
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: o1
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.custom_objects.upload_result
+              resource_type: 1
+          overrides: {}
+      id: n0
+      metadata:
+        InterruptibleValue: null
+        name: upload_result
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.custom_objects.download_result
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: res
+      metadata:
+        InterruptibleValue: null
+        name: download_result
+        retries: {}
+      upstream_node_ids:
+      - n0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.custom_objects.stringify
+              resource_type: 1
+          overrides: {}
+      id: n2
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: x
+        var: x
+      metadata:
+        InterruptibleValue: null
+        name: stringify
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.custom_objects.stringify
+              resource_type: 1
+          overrides: {}
+      id: n3
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: "y"
+        var: x
+      metadata:
+        InterruptibleValue: null
+        name: stringify
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.custom_objects.add
+              resource_type: 1
+          overrides: {}
+      id: n4
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n2
+              var: o0
+        var: x
+      - binding:
+          Value:
+            Promise:
+              node_id: n3
+              var: o0
+        var: "y"
+      metadata:
+        InterruptibleValue: null
+        name: add
+        retries: {}
+      upstream_node_ids:
+      - n2
+      - n3
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n4
+            var: o0
+      var: o0
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: o1
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.custom_objects
+        - task-name
+        - add
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.custom_objects.add
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/DatumSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  DatumSchema:
+                    additionalProperties: false
+                    properties:
+                      x:
+                        title: x
+                        type: integer
+                      "y":
+                        title: "y"
+                        type: string
+                      z:
+                        additionalProperties:
+                          title: z
+                          type: string
+                        title: z
+                        type: object
+                    type: object
+          "y":
+            description: "y"
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/DatumSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  DatumSchema:
+                    additionalProperties: false
+                    properties:
+                      x:
+                        title: x
+                        type: integer
+                      "y":
+                        title: "y"
+                        type: string
+                      z:
+                        additionalProperties:
+                          title: z
+                          type: string
+                        title: z
+                        type: object
+                    type: object
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/DatumSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  DatumSchema:
+                    additionalProperties: false
+                    properties:
+                      x:
+                        title: x
+                        type: integer
+                      "y":
+                        title: "y"
+                        type: string
+                      z:
+                        additionalProperties:
+                          title: z
+                          type: string
+                        title: z
+                        type: object
+                    type: object
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.custom_objects
+        - task-name
+        - download_result
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.custom_objects.download_result
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          res:
+            description: res
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/ResultSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  FlytedirectorySchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlytefileSchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlyteschemaSchema:
+                    additionalProperties: false
+                    properties:
+                      remote_path:
+                        title: remote_path
+                        type: string
+                    type: object
+                  ResultSchema:
+                    additionalProperties: false
+                    properties:
+                      directory:
+                        $ref: '#/definitions/FlytedirectorySchema'
+                        field_many: false
+                        type: object
+                      file:
+                        $ref: '#/definitions/FlytefileSchema'
+                        field_many: false
+                        type: object
+                      schema:
+                        $ref: '#/definitions/FlyteschemaSchema'
+                        field_many: false
+                        type: object
+                    type: object
+      outputs: {}
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.custom_objects
+        - task-name
+        - stringify
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.custom_objects.stringify
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/DatumSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  DatumSchema:
+                    additionalProperties: false
+                    properties:
+                      x:
+                        title: x
+                        type: integer
+                      "y":
+                        title: "y"
+                        type: string
+                      z:
+                        additionalProperties:
+                          title: z
+                          type: string
+                        title: z
+                        type: object
+                    type: object
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.custom_objects
+        - task-name
+        - upload_result
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.custom_objects.upload_result
+      resource_type: 1
+    interface:
+      inputs: {}
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/ResultSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  FlytedirectorySchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlytefileSchema:
+                    additionalProperties: false
+                    properties:
+                      path:
+                        title: path
+                        type: string
+                    type: object
+                  FlyteschemaSchema:
+                    additionalProperties: false
+                    properties:
+                      remote_path:
+                        title: remote_path
+                        type: string
+                    type: object
+                  ResultSchema:
+                    additionalProperties: false
+                    properties:
+                      directory:
+                        $ref: '#/definitions/FlytedirectorySchema'
+                        field_many: false
+                        type: object
+                      file:
+                        $ref: '#/definitions/FlytefileSchema'
+                        field_many: false
+                        type: object
+                      schema:
+                        $ref: '#/definitions/FlyteschemaSchema'
+                        field_many: false
+                        type: object
+                    type: object
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task

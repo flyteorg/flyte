@@ -1,0 +1,186 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+    upstream:
+      end-node:
+        ids:
+        - n0
+      n0:
+        ids:
+        - start-node
+  template:
+    id:
+      name: core.flyte_basics.documented_workflow.numpy_docstring
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          data:
+            description: A data class pertaining to the new record to be stored in
+              the DataFrame
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/PandasdataSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  PandasdataSchema:
+                    additionalProperties: false
+                    properties:
+                      id:
+                        default: 3
+                        title: id
+                        type: integer
+                      name:
+                        default: Bonnie
+                        title: name
+                        type: string
+                    type: object
+          df:
+            description: Pandas DataFrame
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+      outputs:
+        variables:
+          o0:
+            description: Pandas DataFrame
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: o0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.flyte_basics.documented_workflow.add_data
+              resource_type: 1
+          overrides: {}
+      id: n0
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: data
+        var: data
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: df
+        var: df
+      metadata:
+        InterruptibleValue: null
+        name: add_data
+        retries: {}
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.flyte_basics.documented_workflow
+        - task-name
+        - add_data
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.flyte_basics.documented_workflow.add_data
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          data:
+            description: data
+            type:
+              Type:
+                Simple: 9
+              metadata:
+                $ref: '#/definitions/PandasdataSchema'
+                $schema: http://json-schema.org/draft-07/schema#
+                definitions:
+                  PandasdataSchema:
+                    additionalProperties: false
+                    properties:
+                      id:
+                        default: 3
+                        title: id
+                        type: integer
+                      name:
+                        default: Bonnie
+                        title: name
+                        type: string
+                    type: object
+          df:
+            description: df
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task

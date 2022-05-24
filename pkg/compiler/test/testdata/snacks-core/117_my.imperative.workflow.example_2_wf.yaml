@@ -1,0 +1,108 @@
+workflow:
+  id:
+    name: my.imperative.workflow.example
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        in1:
+          description: in1
+          type:
+            Type:
+              Simple: 3
+        in2:
+          description: in2
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        output_from_t1:
+          description: output_from_t1
+          type:
+            Type:
+              Simple: 3
+        output_list:
+          description: output_list
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.imperative_wf_style.t1
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: in1
+      var: a
+    metadata:
+      InterruptibleValue: null
+      name: t1
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.imperative_wf_style.t2
+            resource_type: 1
+        overrides: {}
+    id: n1
+    metadata:
+      InterruptibleValue: null
+      name: t2
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.imperative_wf_style.t3
+            resource_type: 1
+        overrides: {}
+    id: n2
+    inputs:
+    - binding:
+        Value:
+          Collection:
+            bindings:
+            - Value:
+                Promise:
+                  var: in1
+            - Value:
+                Promise:
+                  var: in2
+      var: a
+    metadata:
+      InterruptibleValue: null
+      name: t3
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: output_from_t1
+  - binding:
+      Value:
+        Collection:
+          bindings:
+          - Value:
+              Promise:
+                node_id: n0
+                var: o0
+          - Value:
+              Promise:
+                node_id: n2
+                var: o0
+    var: output_list

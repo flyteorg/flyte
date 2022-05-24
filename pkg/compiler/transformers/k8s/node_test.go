@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -215,20 +214,7 @@ func TestBuildTasks(t *testing.T) {
 
 	withoutAnnotations := make(map[string]*core.Variable)
 	withoutAnnotations["a"] = &core.Variable{
-		Type: &core.LiteralType{
-			Annotation: &core.TypeAnnotation{},
-		},
-	}
-
-	randomData, _ := structpb.NewStruct(map[string]interface{}{
-		"foo": "bar",
-	})
-
-	withAnnotations := make(map[string]*core.Variable)
-	withAnnotations["a"] = &core.Variable{
-		Type: &core.LiteralType{
-			Annotation: &core.TypeAnnotation{Annotations: randomData},
-		},
+		Type: &core.LiteralType{},
 	}
 
 	tasks := []*core.CompiledTask{
@@ -237,7 +223,7 @@ func TestBuildTasks(t *testing.T) {
 				Id: &core.Identifier{Name: "annotatedInput"},
 				Interface: &core.TypedInterface{
 					Inputs: &core.VariableMap{
-						Variables: withAnnotations,
+						Variables: withoutAnnotations,
 					},
 				},
 			},
@@ -257,7 +243,7 @@ func TestBuildTasks(t *testing.T) {
 				Id: &core.Identifier{Name: "annotatedOutput"},
 				Interface: &core.TypedInterface{
 					Outputs: &core.VariableMap{
-						Variables: withAnnotations,
+						Variables: withoutAnnotations,
 					},
 				},
 			},

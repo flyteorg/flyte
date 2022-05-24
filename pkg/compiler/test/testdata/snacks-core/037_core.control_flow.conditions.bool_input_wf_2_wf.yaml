@@ -1,0 +1,82 @@
+workflow:
+  id:
+    name: core.control_flow.conditions.bool_input_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        b:
+          description: b
+          type:
+            Type:
+              Simple: 4
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 1
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      BranchNode:
+        if_else:
+          Default:
+            ElseNode:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.conditions.failed
+                      resource_type: 1
+                  overrides: {}
+              id: n1
+              metadata:
+                InterruptibleValue: null
+                name: failed
+                retries: {}
+          case:
+            condition:
+              Expr:
+                Comparison:
+                  left_value:
+                    Val:
+                      Var: .b
+                  right_value:
+                    Val:
+                      Primitive:
+                        Value:
+                          Boolean: true
+            then_node:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.conditions.success
+                      resource_type: 1
+                  overrides: {}
+              id: n0
+              metadata:
+                InterruptibleValue: null
+                name: success
+                retries: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: .b
+    metadata:
+      InterruptibleValue: null
+      name: test
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

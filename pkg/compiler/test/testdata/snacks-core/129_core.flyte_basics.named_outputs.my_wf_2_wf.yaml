@@ -1,0 +1,58 @@
+workflow:
+  id:
+    name: core.flyte_basics.named_outputs.my_wf
+    resource_type: 2
+  interface:
+    inputs: {}
+    outputs:
+      variables:
+        greet1:
+          description: greet1
+          type:
+            Type:
+              Simple: 3
+        greet2:
+          description: greet2
+          type:
+            Type:
+              Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.named_outputs.say_hello
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: say_hello
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.named_outputs.say_hello
+            resource_type: 1
+        overrides: {}
+    id: n1
+    metadata:
+      InterruptibleValue: null
+      name: say_hello
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: greet
+    var: greet1
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: greet
+    var: greet2

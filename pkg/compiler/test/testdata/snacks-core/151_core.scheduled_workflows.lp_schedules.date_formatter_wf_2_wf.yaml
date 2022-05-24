@@ -1,0 +1,34 @@
+workflow:
+  id:
+    name: core.scheduled_workflows.lp_schedules.date_formatter_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        kickoff_time:
+          description: kickoff_time
+          type:
+            Type:
+              Simple: 5
+    outputs: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.scheduled_workflows.lp_schedules.format_date
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: kickoff_time
+      var: run_date
+    metadata:
+      InterruptibleValue: null
+      name: format_date
+      retries: {}

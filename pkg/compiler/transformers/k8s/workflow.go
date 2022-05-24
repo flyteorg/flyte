@@ -82,6 +82,8 @@ func WorkflowNameFromID(id string) string {
 
 func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTask, errs errors.CompileErrors) (
 	spec *v1alpha1.WorkflowSpec, err error) {
+	wf.Template.Interface = StripInterfaceTypeMetadata(wf.Template.Interface)
+
 	var failureN *v1alpha1.NodeSpec
 	if n := wf.Template.GetFailureNode(); n != nil {
 		nodes, ok := buildNodeSpec(n, tasks, errs.NewScope())
@@ -156,7 +158,7 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 	}
 }
 
-// Builds v1alpha1.FlyteWorkflow resource. Returned error, if not nil, is of type errors.CompilerErrors.
+// BuildFlyteWorkflow builds v1alpha1.FlyteWorkflow resource. Returned error, if not nil, is of type errors.CompilerErrors.
 func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap,
 	executionID *core.WorkflowExecutionIdentifier, namespace string) (*v1alpha1.FlyteWorkflow, error) {
 
@@ -166,11 +168,16 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		return nil, errs
 	}
 
+	for _, t := range wfClosure.Tasks {
+		t.Template.Interface = StripInterfaceTypeMetadata(t.Template.Interface)
+	}
+
 	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, errs
 	}
+
 	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
 	for _, subWf := range wfClosure.SubWorkflows {
 		spec, err := buildFlyteWorkflowSpec(subWf, wfClosure.Tasks, errs.NewScope())

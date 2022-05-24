@@ -1,0 +1,81 @@
+workflow:
+  id:
+    name: core.flyte_basics.files.normalize_csv_file
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        column_names:
+          description: column_names
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 3
+        columns_to_normalize:
+          description: columns_to_normalize
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 3
+        csv_url:
+          description: csv_url
+          type:
+            Type:
+              Blob: {}
+        output_location:
+          description: output_location
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Blob: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.files.normalize_columns
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: column_names
+      var: column_names
+    - binding:
+        Value:
+          Promise:
+            var: columns_to_normalize
+      var: columns_to_normalize
+    - binding:
+        Value:
+          Promise:
+            var: csv_url
+      var: csv_url
+    - binding:
+        Value:
+          Promise:
+            var: output_location
+      var: output_location
+    metadata:
+      InterruptibleValue: null
+      name: normalize_columns
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

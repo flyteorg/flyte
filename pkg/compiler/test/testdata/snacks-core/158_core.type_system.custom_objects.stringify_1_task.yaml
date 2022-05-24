@@ -1,0 +1,70 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.type_system.custom_objects
+      - task-name
+      - stringify
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+  id:
+    name: core.type_system.custom_objects.stringify
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        x:
+          description: x
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 9
+            metadata:
+              $ref: '#/definitions/DatumSchema'
+              $schema: http://json-schema.org/draft-07/schema#
+              definitions:
+                DatumSchema:
+                  additionalProperties: false
+                  properties:
+                    x:
+                      title: x
+                      type: integer
+                    "y":
+                      title: "y"
+                      type: string
+                    z:
+                      additionalProperties:
+                        title: z
+                        type: string
+                      title: z
+                      type: object
+                  type: object
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

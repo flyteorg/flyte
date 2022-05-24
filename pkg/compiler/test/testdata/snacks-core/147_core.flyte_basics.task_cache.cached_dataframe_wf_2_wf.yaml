@@ -1,0 +1,93 @@
+workflow:
+  id:
+    name: core.flyte_basics.task_cache.cached_dataframe_wf
+    resource_type: 2
+  interface:
+    inputs: {}
+    outputs: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.task_cache.uncached_data_reading_task
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: uncached_data_reading_task
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.task_cache.cached_data_processing_task
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: df
+    metadata:
+      InterruptibleValue: null
+      name: cached_data_processing_task
+      retries: {}
+    upstream_node_ids:
+    - n0
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.task_cache.cached_data_processing_task
+            resource_type: 1
+        overrides: {}
+    id: n2
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: df
+    metadata:
+      InterruptibleValue: null
+      name: cached_data_processing_task
+      retries: {}
+    upstream_node_ids:
+    - n0
+    - n1
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.task_cache.compare_dataframes
+            resource_type: 1
+        overrides: {}
+    id: n3
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: o0
+      var: df1
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: o0
+      var: df2
+    metadata:
+      InterruptibleValue: null
+      name: compare_dataframes
+      retries: {}
+    upstream_node_ids:
+    - n2
+    - n1

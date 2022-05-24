@@ -1,0 +1,69 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.containerization.multi_images
+      - task-name
+      - svm_predictor
+      image: ghcr.io/flyteorg/flytecookbook:multi-image-predict-98b125fd57d20594026941c2ebe7ef662e5acb7d6423660a65f493ca2d9aa267
+      resources: {}
+  id:
+    name: core.containerization.multi_images.svm_predictor
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        X_test:
+          description: X_test
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        X_train:
+          description: X_train
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        y_test:
+          description: y_test
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        y_train:
+          description: y_train
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 2
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

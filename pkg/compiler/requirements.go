@@ -9,24 +9,24 @@ import (
 type TaskIdentifier = common.Identifier
 type LaunchPlanRefIdentifier = common.Identifier
 
-// Represents the set of required resources for a given Workflow's execution. All of the resources should be loaded before
-// hand and passed to the compiler.
+// WorkflowExecutionRequirements represents the set of required resources for a given Workflow's execution. All the
+// resources should be loaded beforehand and passed to the compiler.
 type WorkflowExecutionRequirements struct {
 	taskIds       []TaskIdentifier
 	launchPlanIds []LaunchPlanRefIdentifier
 }
 
-// Gets a slice of required Task ids to load.
+// GetRequiredTaskIds gets a slice of required Task ids to load.
 func (g WorkflowExecutionRequirements) GetRequiredTaskIds() []TaskIdentifier {
 	return g.taskIds
 }
 
-// Gets a slice of required Workflow ids to load.
+// GetRequiredLaunchPlanIds gets a slice of required Workflow ids to load.
 func (g WorkflowExecutionRequirements) GetRequiredLaunchPlanIds() []LaunchPlanRefIdentifier {
 	return g.launchPlanIds
 }
 
-// Computes requirements for a given Workflow.
+// GetRequirements computes requirements for a given Workflow.
 func GetRequirements(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (reqs WorkflowExecutionRequirements, err error) {
 	errs := errors.NewCompileErrors()
 	compiledSubWfs := toCompiledWorkflows(subWfs...)
