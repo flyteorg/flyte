@@ -1,0 +1,47 @@
+workflow:
+  id:
+    name: core.control_flow.subworkflows.ext_workflow
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        my_input:
+          description: my_input
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 9
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.subworkflows.count_freq_words
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: my_input
+      var: input_string1
+    metadata:
+      InterruptibleValue: null
+      name: count_freq_words
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

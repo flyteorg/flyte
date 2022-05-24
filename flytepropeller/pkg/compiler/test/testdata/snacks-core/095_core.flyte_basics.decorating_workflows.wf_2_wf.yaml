@@ -1,0 +1,96 @@
+workflow:
+  id:
+    name: core.flyte_basics.decorating_workflows.wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        x:
+          description: x
+          type:
+            Type:
+              Simple: 2
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 2
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.decorating_workflows.setup
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: setup
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.decorating_workflows.t1
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: x
+      var: x
+    metadata:
+      InterruptibleValue: null
+      name: t1
+      retries: {}
+    upstream_node_ids:
+    - n0
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.decorating_workflows.t2
+            resource_type: 1
+        overrides: {}
+    id: n2
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: o0
+      var: x
+    metadata:
+      InterruptibleValue: null
+      name: t2
+      retries: {}
+    upstream_node_ids:
+    - n1
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.decorating_workflows.teardown
+            resource_type: 1
+        overrides: {}
+    id: n3
+    metadata:
+      InterruptibleValue: null
+      name: teardown
+      retries: {}
+    upstream_node_ids:
+    - n2
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n2
+          var: o0
+    var: o0

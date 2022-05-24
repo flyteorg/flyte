@@ -1,0 +1,87 @@
+workflow:
+  id:
+    name: core.type_system.enums.enum_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        c:
+          description: c
+          type:
+            Type:
+              EnumType:
+                values:
+                - red
+                - green
+                - blue
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              EnumType:
+                values:
+                - red
+                - green
+                - blue
+        o1:
+          description: o1
+          type:
+            Type:
+              Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.type_system.enums.enum_stringify
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: c
+      var: c
+    metadata:
+      InterruptibleValue: null
+      name: enum_stringify
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.type_system.enums.string_to_enum
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: c
+    metadata:
+      InterruptibleValue: null
+      name: string_to_enum
+      retries: {}
+    upstream_node_ids:
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: o0
+    var: o0
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o1

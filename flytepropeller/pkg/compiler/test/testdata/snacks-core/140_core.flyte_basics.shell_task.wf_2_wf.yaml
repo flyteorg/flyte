@@ -1,0 +1,118 @@
+workflow:
+  id:
+    name: core.flyte_basics.shell_task.wf
+    resource_type: 2
+  interface:
+    inputs: {}
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Blob: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.shell_task.create_entities
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: create_entities
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: task_1
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: x
+    metadata:
+      InterruptibleValue: null
+      name: task_1
+      retries: {}
+    upstream_node_ids:
+    - n0
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: task_2
+            resource_type: 1
+        overrides: {}
+    id: n2
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: i
+      var: x
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o1
+      var: "y"
+    metadata:
+      InterruptibleValue: null
+      name: task_2
+      retries: {}
+    upstream_node_ids:
+    - n1
+    - n0
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: task_3
+            resource_type: 1
+        overrides: {}
+    id: n3
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: x
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o1
+      var: "y"
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: j
+      var: z
+    metadata:
+      InterruptibleValue: null
+      name: task_3
+      retries: {}
+    upstream_node_ids:
+    - n2
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n3
+          var: k
+    var: o0

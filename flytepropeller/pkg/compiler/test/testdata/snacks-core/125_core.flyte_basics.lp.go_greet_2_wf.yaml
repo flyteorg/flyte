@@ -1,0 +1,67 @@
+workflow:
+  id:
+    name: core.flyte_basics.lp.go_greet
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        am:
+          description: am
+          type:
+            Type:
+              Simple: 4
+        day_of_week:
+          description: day_of_week
+          type:
+            Type:
+              Simple: 3
+        number:
+          description: number
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.lp.greet
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: am
+      var: am
+    - binding:
+        Value:
+          Promise:
+            var: day_of_week
+      var: day_of_week
+    - binding:
+        Value:
+          Promise:
+            var: number
+      var: number
+    metadata:
+      InterruptibleValue: null
+      name: greet
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

@@ -34,7 +34,7 @@ func findVariableByName(vars *core.VariableMap, name string) (variable *core.Var
 func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 	// TODO: Should we just pass the type information with the value?  That way we don't have to guess?
 	var literalType *core.LiteralType
-	switch scalar.GetValue().(type) {
+	switch v := scalar.GetValue().(type) {
 	case *core.Scalar_Primitive:
 		literalType = literalTypeForPrimitive(scalar.GetPrimitive())
 	case *core.Scalar_Blob:
@@ -52,6 +52,12 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 			},
 		}
 	case *core.Scalar_StructuredDataset:
+		if v.StructuredDataset == nil || v.StructuredDataset.Metadata == nil {
+			return &core.LiteralType{
+				Type: &core.LiteralType_StructuredDatasetType{},
+			}
+		}
+
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_StructuredDatasetType{
 				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType,

@@ -1,0 +1,351 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - n1
+      n1:
+        ids:
+        - n2
+      n2:
+        ids:
+        - end-node
+        - n3
+      n3:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+        - n1
+    upstream:
+      end-node:
+        ids:
+        - n2
+        - n3
+      n0:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - n0
+        - start-node
+      n2:
+        ids:
+        - n1
+      n3:
+        ids:
+        - n2
+  template:
+    id:
+      name: core.flyte_basics.decorating_workflows.wf
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n2
+              var: o0
+        var: o0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.flyte_basics.decorating_workflows.setup
+              resource_type: 1
+          overrides: {}
+      id: n0
+      metadata:
+        InterruptibleValue: null
+        name: setup
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.flyte_basics.decorating_workflows.t1
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: x
+        var: x
+      metadata:
+        InterruptibleValue: null
+        name: t1
+        retries: {}
+      upstream_node_ids:
+      - n0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.flyte_basics.decorating_workflows.t2
+              resource_type: 1
+          overrides: {}
+      id: n2
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: o0
+        var: x
+      metadata:
+        InterruptibleValue: null
+        name: t2
+        retries: {}
+      upstream_node_ids:
+      - n1
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.flyte_basics.decorating_workflows.teardown
+              resource_type: 1
+          overrides: {}
+      id: n3
+      metadata:
+        InterruptibleValue: null
+        name: teardown
+        retries: {}
+      upstream_node_ids:
+      - n2
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.flyte_basics.decorating_workflows
+        - task-name
+        - setup
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.flyte_basics.decorating_workflows.setup
+      resource_type: 1
+    interface:
+      inputs: {}
+      outputs: {}
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.flyte_basics.decorating_workflows
+        - task-name
+        - t1
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.flyte_basics.decorating_workflows.t1
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.flyte_basics.decorating_workflows
+        - task-name
+        - t2
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.flyte_basics.decorating_workflows.t2
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          x:
+            description: x
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.flyte_basics.decorating_workflows
+        - task-name
+        - teardown
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.flyte_basics.decorating_workflows.teardown
+      resource_type: 1
+    interface:
+      inputs: {}
+      outputs: {}
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task

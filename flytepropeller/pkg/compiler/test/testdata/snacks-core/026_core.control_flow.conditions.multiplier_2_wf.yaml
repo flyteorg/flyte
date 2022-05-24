@@ -1,0 +1,110 @@
+workflow:
+  id:
+    name: core.control_flow.conditions.multiplier
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        my_input:
+          description: my_input
+          type:
+            Type:
+              Simple: 2
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 2
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      BranchNode:
+        if_else:
+          Default:
+            ElseNode:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.conditions.square
+                      resource_type: 1
+                  overrides: {}
+              id: n1
+              inputs:
+              - binding:
+                  Value:
+                    Promise:
+                      var: my_input
+                var: "n"
+              metadata:
+                InterruptibleValue: null
+                name: square
+                retries: {}
+          case:
+            condition:
+              Expr:
+                Conjunction:
+                  left_expression:
+                    Expr:
+                      Comparison:
+                        left_value:
+                          Val:
+                            Var: .my_input
+                        operator: 3
+                        right_value:
+                          Val:
+                            Primitive:
+                              Value:
+                                FloatValue: 0.1
+                  right_expression:
+                    Expr:
+                      Comparison:
+                        left_value:
+                          Val:
+                            Var: .my_input
+                        operator: 5
+                        right_value:
+                          Val:
+                            Primitive:
+                              Value:
+                                FloatValue: 1
+            then_node:
+              Target:
+                TaskNode:
+                  Reference:
+                    ReferenceId:
+                      name: core.control_flow.conditions.double
+                      resource_type: 1
+                  overrides: {}
+              id: n0
+              inputs:
+              - binding:
+                  Value:
+                    Promise:
+                      var: my_input
+                var: "n"
+              metadata:
+                InterruptibleValue: null
+                name: double
+                retries: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: my_input
+      var: .my_input
+    metadata:
+      InterruptibleValue: null
+      name: fractions
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

@@ -1,4 +1,4 @@
-// This package provides compiler services for flyte workflows. It performs static analysis on the Workflow and produces
+// Package compiler provides compiler services for flyte workflows. It performs static analysis on the Workflow and produces
 // CompilerErrors for any detected issue. A flyte workflow should only be considered valid for execution if it passed through
 // the compiler first. The intended usage for the compiler is as follows:
 // 1) Call GetRequirements(...) and load/retrieve all tasks/workflows referenced in the response.
@@ -283,8 +283,8 @@ func (w workflowBuilder) validateAllRequirements(errs errors.CompileErrors) bool
 	return !errs.HasErrors()
 }
 
-// Compiles a flyte workflow a and all of its dependencies into a single executable Workflow. Refer to GetRequirements()
-// to obtain a list of launchplan and Task ids to load/compile first.
+// CompileWorkflow compiles a flyte workflow a and all of its dependencies into a single executable Workflow. Refer to
+// GetRequirements() to obtain a list of launchplan and Task ids to load/compile first.
 // Returns an executable Workflow (if no errors are found) or a list of errors that must be addressed before the Workflow
 // can be executed. Cast the error to errors.CompileErrors to inspect individual errors.
 func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask,
@@ -343,8 +343,10 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 			compiledTasks = append(compiledTasks, &core.CompiledTask{Template: t.GetCoreTask()})
 		}
 
+		coreWf := validatedWf.GetCoreWorkflow()
+
 		return &core.CompiledWorkflowClosure{
-			Primary:      validatedWf.GetCoreWorkflow(),
+			Primary:      coreWf,
 			Tasks:        compiledTasks,
 			SubWorkflows: compiledSubWorkflows,
 		}, nil

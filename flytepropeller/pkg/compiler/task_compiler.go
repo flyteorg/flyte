@@ -107,7 +107,7 @@ func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) com
 	return taskBuilder{flyteTask: task}
 }
 
-// Task compiler compiles a given Task into an executable Task. It validates all required parameters and ensures a Task
+// CompileTask compiles a given Task into an executable Task. It validates all required parameters and ensures a Task
 // is well-formed.
 func CompileTask(task *core.TaskTemplate) (*core.CompiledTask, error) {
 	errs := errors.NewCompileErrors()
