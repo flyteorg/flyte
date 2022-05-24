@@ -71,7 +71,9 @@ CatalogReservation
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -112,11 +114,17 @@ Indicates the status of a catalog reservation operation.
    "RESERVATION_RELEASED", "3", "Used to indicate that the reservation has been successfully released"
    "RESERVATION_FAILURE", "4", "Used to indicate that a reservation operation resulted in failure"
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -189,9 +197,9 @@ compiled subworkflows.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "primary", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "", "&#43;required"
-   "sub_workflows", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "repeated", "Guaranteed that there will only exist one and only one workflow with a given id, i.e., every sub workflow has a unique identifier. Also every enclosed subworkflow is used either by a primary workflow or by a subworkflow as an inlined workflow &#43;optional"
-   "tasks", ":ref:`ref_flyteidl.core.CompiledTask`", "repeated", "Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id &#43;required (at least 1)"
+   "primary", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "", "+required"
+   "sub_workflows", ":ref:`ref_flyteidl.core.CompiledWorkflow`", "repeated", "Guaranteed that there will only exist one and only one workflow with a given id, i.e., every sub workflow has a unique identifier. Also every enclosed subworkflow is used either by a primary workflow or by a subworkflow as an inlined workflow +optional"
+   "tasks", ":ref:`ref_flyteidl.core.CompiledTask`", "repeated", "Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id +required (at least 1)"
 
 
 
@@ -285,13 +293,21 @@ ConnectionSet.UpstreamEntry
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -389,13 +405,15 @@ Defines an operand to a comparison expression.
    :widths: auto
 
    "primitive", ":ref:`ref_flyteidl.core.Primitive`", "", "Can be a constant"
-   "var", ":ref:`ref_string`", "", "Or one of this node&#39;s input variables"
+   "var", ":ref:`ref_string`", "", "Or one of this node's input variables"
 
 
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -434,11 +452,17 @@ Order of evaluation is not important as the operators are Commutative
    "AND", "0", "Conjunction"
    "OR", "1", ""
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -466,7 +490,7 @@ Describes a set of tasks to execute and how the final outputs are produced.
    :widths: auto
 
    "nodes", ":ref:`ref_flyteidl.core.Node`", "repeated", "A collection of nodes to execute."
-   "min_successes", ":ref:`ref_int64`", "", "An absolute number of successful completions of nodes required to mark this job as succeeded. As soon as this criteria is met, the dynamic job will be marked as successful and outputs will be computed. If this number becomes impossible to reach (e.g. number of currently running tasks &#43; number of already succeeded tasks &lt; min_successes) the task will be aborted immediately and marked as failed. The default value of this field, if not specified, is the count of nodes repeated field."
+   "min_successes", ":ref:`ref_int64`", "", "An absolute number of successful completions of nodes required to mark this job as succeeded. As soon as this criteria is met, the dynamic job will be marked as successful and outputs will be computed. If this number becomes impossible to reach (e.g. number of currently running tasks + number of already succeeded tasks < min_successes) the task will be aborted immediately and marked as failed. The default value of this field, if not specified, is the count of nodes repeated field."
    "outputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "Describes how to bind the final output of the dynamic job from the outputs of executed nodes. The referenced ids in bindings should have the generated id for the subtask."
    "tasks", ":ref:`ref_flyteidl.core.TaskTemplate`", "repeated", "[Optional] A complete list of task specs referenced in nodes."
    "subworkflows", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "repeated", "[Optional] A complete list of task specs referenced in nodes."
@@ -475,13 +499,21 @@ Describes a set of tasks to execute and how the final outputs are produced.
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -540,7 +572,9 @@ failure reasons to the execution engine.
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -558,11 +592,17 @@ Defines a generic error type that dictates the behavior of the retry strategy.
    "NON_RECOVERABLE", "0", ""
    "RECOVERABLE", "1", ""
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -589,7 +629,7 @@ Represents the error message from the execution.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "code", ":ref:`ref_string`", "", "Error code indicates a grouping of a type of error. More Info: &lt;Link&gt;"
+   "code", ":ref:`ref_string`", "", "Error code indicates a grouping of a type of error. More Info: <Link>"
    "message", ":ref:`ref_string`", "", "Detailed description of the error - including stack trace."
    "error_uri", ":ref:`ref_string`", "", "Full error contents accessible via a URI"
    "kind", ":ref:`ref_flyteidl.core.ExecutionError.ErrorKind`", "", ""
@@ -709,7 +749,9 @@ Indicates various phases of Workflow Execution
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -834,11 +876,17 @@ WorkflowExecution.Phase
    "TIMED_OUT", "8", ""
    "ABORTING", "9", ""
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -943,7 +991,9 @@ Encapsulation of fields that uniquely identifies a Flyte workflow execution
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -964,11 +1014,17 @@ Indicates a resource type within Flyte.
    "LAUNCH_PLAN", "3", ""
    "DATASET", "4", "A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI and CLI to act on the objects in a similar manner to other Flyte objects"
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -996,9 +1052,9 @@ the special ability to have a default value or mark itself as required.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "var", ":ref:`ref_flyteidl.core.Variable`", "", "&#43;required Variable. Defines the type of the variable backing this parameter."
+   "var", ":ref:`ref_flyteidl.core.Variable`", "", "+required Variable. Defines the type of the variable backing this parameter."
    "default", ":ref:`ref_flyteidl.core.Literal`", "", "Defines a default value that has to match the variable type defined."
-   "required", ":ref:`ref_bool`", "", "&#43;optional, is this value required to be filled."
+   "required", ":ref:`ref_bool`", "", "+optional, is this value required to be filled."
 
 
 
@@ -1085,7 +1141,7 @@ Defines a strongly typed variable.
    :widths: auto
 
    "type", ":ref:`ref_flyteidl.core.LiteralType`", "", "Variable literal type."
-   "description", ":ref:`ref_string`", "", "&#43;optional string describing input variable"
+   "description", ":ref:`ref_string`", "", "+optional string describing input variable"
 
 
 
@@ -1134,13 +1190,21 @@ VariableMap.VariablesEntry
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -1160,7 +1224,7 @@ Binary
 ------------------------------------------------------------------
 
 A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
-It&#39;s strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
+It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
 
 
 
@@ -1346,7 +1410,7 @@ A generic key value pair.
    :widths: auto
 
    "key", ":ref:`ref_string`", "", "required."
-   "value", ":ref:`ref_string`", "", "&#43;optional."
+   "value", ":ref:`ref_string`", "", "+optional."
 
 
 
@@ -1575,7 +1639,7 @@ StructuredDatasetMetadata
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "structured_dataset_type", ":ref:`ref_flyteidl.core.StructuredDatasetType`", "", "Bundle the type information along with the literal. This is here because StructuredDatasets can often be more defined at run time than at compile time. That is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset, without any column information, but at run time, you might have that column information. flytekit python will copy this type information into the literal, from the type information, if not provided by the various plugins (encoders). Since this field is run time generated, it&#39;s not used for any type checking."
+   "structured_dataset_type", ":ref:`ref_flyteidl.core.StructuredDatasetType`", "", "Bundle the type information along with the literal. This is here because StructuredDatasets can often be more defined at run time than at compile time. That is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset, without any column information, but at run time, you might have that column information. flytekit python will copy this type information into the literal, from the type information, if not provided by the various plugins (encoders). Since this field is run time generated, it's not used for any type checking."
 
 
 
@@ -1639,13 +1703,21 @@ undefined since it can be assigned to a scalar of any LiteralType.
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -1664,7 +1736,7 @@ flyteidl/core/security.proto
 Identity
 ------------------------------------------------------------------
 
-Identity encapsulates the various security identities a task can run as. It&#39;s up to the underlying plugin to pick the
+Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the
 right identity for the execution environment.
 
 
@@ -1673,7 +1745,7 @@ right identity for the execution environment.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "iam_role", ":ref:`ref_string`", "", "iam_role references the fully qualified name of Identity &amp; Access Management role to impersonate."
+   "iam_role", ":ref:`ref_string`", "", "iam_role references the fully qualified name of Identity & Access Management role to impersonate."
    "k8s_service_account", ":ref:`ref_string`", "", "k8s_service_account references a kubernetes service account to impersonate."
    "oauth2_client", ":ref:`ref_flyteidl.core.OAuth2Client`", "", "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when making external calls."
 
@@ -1696,8 +1768,8 @@ OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "client_id", ":ref:`ref_string`", "", "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the secret requested matches the client_id indicated here. &#43;required"
-   "client_secret", ":ref:`ref_flyteidl.core.Secret`", "", "client_secret is a reference to the secret used to authenticate the OAuth2 client. &#43;required"
+   "client_id", ":ref:`ref_string`", "", "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the secret requested matches the client_id indicated here. +required"
+   "client_secret", ":ref:`ref_flyteidl.core.Secret`", "", "client_secret is a reference to the secret used to authenticate the OAuth2 client. +required"
 
 
 
@@ -1722,11 +1794,11 @@ are passed through file mounts.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "name", ":ref:`ref_string`", "", "name indicates a unique id for the token request within this task token requests. It&#39;ll be used as a suffix for environment variables and as a filename for mounting tokens as files. &#43;required"
-   "type", ":ref:`ref_flyteidl.core.OAuth2TokenRequest.Type`", "", "type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS. &#43;required"
-   "client", ":ref:`ref_flyteidl.core.OAuth2Client`", "", "client references the client_id/secret to use to request the OAuth2 token. &#43;required"
-   "idp_discovery_endpoint", ":ref:`ref_string`", "", "idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related information. &#43;optional"
-   "token_endpoint", ":ref:`ref_string`", "", "token_endpoint references the token issuance endpoint. If idp_discovery_endpoint is not provided, this parameter is mandatory. &#43;optional"
+   "name", ":ref:`ref_string`", "", "name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for environment variables and as a filename for mounting tokens as files. +required"
+   "type", ":ref:`ref_flyteidl.core.OAuth2TokenRequest.Type`", "", "type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS. +required"
+   "client", ":ref:`ref_flyteidl.core.OAuth2Client`", "", "client references the client_id/secret to use to request the OAuth2 token. +required"
+   "idp_discovery_endpoint", ":ref:`ref_string`", "", "idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related information. +optional"
+   "token_endpoint", ":ref:`ref_string`", "", "token_endpoint references the token issuance endpoint. If idp_discovery_endpoint is not provided, this parameter is mandatory. +optional"
 
 
 
@@ -1751,10 +1823,10 @@ are passed through file mounts.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "group", ":ref:`ref_string`", "", "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name. For AWS Secret Manager, this should be the name of the secret. &#43;required"
-   "group_version", ":ref:`ref_string`", "", "The group version to fetch. This is not supported in all secret management systems. It&#39;ll be ignored for the ones that do not support it. &#43;optional"
-   "key", ":ref:`ref_string`", "", "The name of the secret to mount. This has to match an existing secret in the system. It&#39;s up to the implementation of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should match one of the keys inside the secret. For AWS Secret Manager, it&#39;s ignored. &#43;optional"
-   "mount_requirement", ":ref:`ref_flyteidl.core.Secret.MountType`", "", "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail if the underlying key management system cannot satisfy that requirement. If not provided, the default location will depend on the key management system. &#43;optional"
+   "group", ":ref:`ref_string`", "", "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name. For AWS Secret Manager, this should be the name of the secret. +required"
+   "group_version", ":ref:`ref_string`", "", "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones that do not support it. +optional"
+   "key", ":ref:`ref_string`", "", "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should match one of the keys inside the secret. For AWS Secret Manager, it's ignored. +optional"
+   "mount_requirement", ":ref:`ref_flyteidl.core.Secret.MountType`", "", "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail if the underlying key management system cannot satisfy that requirement. If not provided, the default location will depend on the key management system. +optional"
 
 
 
@@ -1775,15 +1847,17 @@ SecurityContext holds security attributes that apply to tasks.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "run_as", ":ref:`ref_flyteidl.core.Identity`", "", "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it&#39;ll be up to the backend plugin to choose the appropriate identity for the execution engine the task will run on."
-   "secrets", ":ref:`ref_flyteidl.core.Secret`", "repeated", "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS Batch), it&#39;s the responsibility of the plugin to fetch the secret (which means propeller identity will need access to the secret) and to pass it to the remote execution engine."
-   "tokens", ":ref:`ref_flyteidl.core.OAuth2TokenRequest`", "repeated", "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS Batch), it&#39;s the responsibility of the plugin to fetch the secret (which means propeller identity will need access to the secret) and to pass it to the remote execution engine."
+   "run_as", ":ref:`ref_flyteidl.core.Identity`", "", "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the backend plugin to choose the appropriate identity for the execution engine the task will run on."
+   "secrets", ":ref:`ref_flyteidl.core.Secret`", "repeated", "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access to the secret) and to pass it to the remote execution engine."
+   "tokens", ":ref:`ref_flyteidl.core.OAuth2TokenRequest`", "repeated", "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access to the secret) and to pass it to the remote execution engine."
 
 
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -1817,11 +1891,17 @@ Secret.MountType
    "ENV_VAR", "1", "ENV_VAR indicates the secret needs to be mounted as an environment variable."
    "FILE", "2", "FILE indicates the secret needs to be mounted as a file."
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -1850,7 +1930,7 @@ Container
 
    "image", ":ref:`ref_string`", "", "Container image url. Eg: docker/redis:latest"
    "command", ":ref:`ref_string`", "repeated", "Command to be executed, if not provided, the default entrypoint in the container image will be used."
-   "args", ":ref:`ref_string`", "repeated", "These will default to Flyte given paths. If provided, the system will not append known paths. If the task still needs flyte&#39;s inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the system will populate these before executing the container."
+   "args", ":ref:`ref_string`", "repeated", "These will default to Flyte given paths. If provided, the system will not append known paths. If the task still needs flyte's inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the system will populate these before executing the container."
    "resources", ":ref:`ref_flyteidl.core.Resources`", "", "Container resources requirement as specified by the container engine."
    "env", ":ref:`ref_flyteidl.core.KeyValuePair`", "repeated", "Environment variables will be set as the container is starting up."
    "config", ":ref:`ref_flyteidl.core.KeyValuePair`", "repeated", "**Deprecated.** Allows extra configs to be available for the container. TODO: elaborate on how configs will become available. Deprecated, please use TaskTemplate.config instead."
@@ -1877,7 +1957,7 @@ Defines port properties for a container.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "container_port", ":ref:`ref_uint32`", "", "Number of port to expose on the pod&#39;s IP address. This must be a valid port number, 0 &lt; x &lt; 65536."
+   "container_port", ":ref:`ref_uint32`", "", "Number of port to expose on the pod's IP address. This must be a valid port number, 0 < x < 65536."
 
 
 
@@ -1901,7 +1981,7 @@ Any outputs generated by the user container - within output_path are automatical
    :widths: auto
 
    "enabled", ":ref:`ref_bool`", "", "Flag enables DataLoading Config. If this is not set, data loading will not be used!"
-   "input_path", ":ref:`ref_string`", "", "File system path (start at root). This folder will contain all the inputs exploded to a separate file. Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is &#34;/var/flyte/inputs&#34;, then the file system will look like /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format /var/flyte/inputs/y -&gt; Y is a file in Binary format /var/flyte/inputs/z/... -&gt; Note Z itself is a directory More information about the protocol - refer to docs #TODO reference docs here"
+   "input_path", ":ref:`ref_string`", "", "File system path (start at root). This folder will contain all the inputs exploded to a separate file. Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is '/var/flyte/inputs', then the file system will look like /var/flyte/inputs/inputs.<metadata format dependent -> .pb .json .yaml> -> Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations /var/flyte/inputs/x -> X is a file that contains the value of x (integer) in string format /var/flyte/inputs/y -> Y is a file in Binary format /var/flyte/inputs/z/... -> Note Z itself is a directory More information about the protocol - refer to docs #TODO reference docs here"
    "output_path", ":ref:`ref_string`", "", "File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file"
    "format", ":ref:`ref_flyteidl.core.DataLoadingConfig.LiteralMapFormat`", "", "In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values. This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding"
    "io_strategy", ":ref:`ref_flyteidl.core.IOStrategy`", "", ""
@@ -2082,7 +2162,7 @@ Runtime information. This is loosely defined to allow for extensibility.
 
    "type", ":ref:`ref_flyteidl.core.RuntimeMetadata.RuntimeType`", "", "Type of runtime."
    "version", ":ref:`ref_string`", "", "Version of the runtime. All versions should be backward compatible. However, certain cases call for version checks to ensure tighter validation or setting expectations."
-   "flavor", ":ref:`ref_string`", "", "&#43;optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
+   "flavor", ":ref:`ref_string`", "", "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
 
 
 
@@ -2103,7 +2183,7 @@ Sql represents a generic sql workload with a statement and dialect.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "statement", ":ref:`ref_string`", "", "The actual query to run, the query can have templated parameters. We use Flyte&#39;s Golang templating format for Query templating. Refer to the templating documentation. https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py For example, insert overwrite directory &#39;{{ .rawOutputDataPrefix }}&#39; stored as parquet select * from my_table where ds = &#39;{{ .Inputs.ds }}&#39;"
+   "statement", ":ref:`ref_string`", "", "The actual query to run, the query can have templated parameters. We use Flyte's Golang templating format for Query templating. Refer to the templating documentation. https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py For example, insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet select * from my_table where ds = '{{ .Inputs.ds }}'"
    "dialect", ":ref:`ref_flyteidl.core.Sql.Dialect`", "", ""
 
 
@@ -2125,7 +2205,7 @@ Task Metadata
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "discoverable", ":ref:`ref_bool`", "", "Indicates whether the system should attempt to lookup this task&#39;s output to avoid duplication of work."
+   "discoverable", ":ref:`ref_bool`", "", "Indicates whether the system should attempt to lookup this task's output to avoid duplication of work."
    "runtime", ":ref:`ref_flyteidl.core.RuntimeMetadata`", "", "Runtime information about the task."
    "timeout", ":ref:`ref_google.protobuf.Duration`", "", "The overall timeout of a task including user-triggered retries."
    "retries", ":ref:`ref_flyteidl.core.RetryStrategy`", "", "Number of retries per task."
@@ -2192,7 +2272,9 @@ TaskTemplate.ConfigEntry
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -2323,11 +2405,17 @@ We support the following dialect: ansi, hive.
    "HIVE", "2", ""
    "OTHER", "3", ""
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -2369,7 +2457,7 @@ EnumType
 ------------------------------------------------------------------
 
 Enables declaring enum types, with predefined string values
-For len(values) &gt; 0, the first value in the ordered list is regarded as the default value. If you wish
+For len(values) > 0, the first value in the ordered list is regarded as the default value. If you wish
 To provide no defaults, make the first value as undefined.
 
 
@@ -2604,7 +2692,7 @@ Defines a tagged union type, also known as a variant (and formally as the sum ty
 
 A sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag
 A value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by
-storing the varaint&#39;s tag with the literal value and can be examined in runtime.
+storing the varaint's tag with the literal value and can be examined in runtime.
 
 Type S is typically written as
 S := Apple A | Banana B | Cantaloupe C | ...
@@ -2626,7 +2714,9 @@ See also: https://en.wikipedia.org/wiki/Tagged_union
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -2688,11 +2778,17 @@ Define a set of simple types.
    "ERROR", "8", ""
    "STRUCT", "9", ""
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -2742,7 +2838,7 @@ runtime based on a series of conditions that get evaluated on various parameters
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "if_else", ":ref:`ref_flyteidl.core.IfElseBlock`", "", "&#43;required"
+   "if_else", ":ref:`ref_flyteidl.core.IfElseBlock`", "", "+required"
 
 
 
@@ -2786,8 +2882,8 @@ If no conditions were satisfied, the else_node or the error will execute.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "case", ":ref:`ref_flyteidl.core.IfBlock`", "", "&#43;required. First condition to evaluate."
-   "other", ":ref:`ref_flyteidl.core.IfBlock`", "repeated", "&#43;optional. Additional branches to evaluate."
+   "case", ":ref:`ref_flyteidl.core.IfBlock`", "", "+required. First condition to evaluate."
+   "other", ":ref:`ref_flyteidl.core.IfBlock`", "repeated", "+optional. Additional branches to evaluate."
    "else_node", ":ref:`ref_flyteidl.core.Node`", "", "The node to execute in case none of the branches were taken."
    "error", ":ref:`ref_flyteidl.core.Error`", "", "An error to throw in case none of the branches were taken."
 
@@ -2811,11 +2907,11 @@ node.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_string`", "", "A workflow-level unique identifier that identifies this node in the workflow. &#34;inputs&#34; and &#34;outputs&#34; are reserved node ids that cannot be used by other nodes."
+   "id", ":ref:`ref_string`", "", "A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved node ids that cannot be used by other nodes."
    "metadata", ":ref:`ref_flyteidl.core.NodeMetadata`", "", "Extra metadata about the node."
-   "inputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "Specifies how to bind the underlying interface&#39;s inputs. All required inputs specified in the underlying interface must be fulfilled."
-   "upstream_node_ids", ":ref:`ref_string`", "repeated", "&#43;optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field."
-   "output_aliases", ":ref:`ref_flyteidl.core.Alias`", "repeated", "&#43;optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes need to conform to the same interface (e.g. all branches in a branch node). Downstream nodes must refer to this nodes outputs using the alias if one&#39;s specified."
+   "inputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface must be fulfilled."
+   "upstream_node_ids", ":ref:`ref_string`", "repeated", "+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs field."
+   "output_aliases", ":ref:`ref_flyteidl.core.Alias`", "repeated", "+optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes need to conform to the same interface (e.g. all branches in a branch node). Downstream nodes must refer to this nodes outputs using the alias if one's specified."
    "task_node", ":ref:`ref_flyteidl.core.TaskNode`", "", "Information about the Task to execute in this node."
    "workflow_node", ":ref:`ref_flyteidl.core.WorkflowNode`", "", "Information about the Workflow to execute in this mode."
    "branch_node", ":ref:`ref_flyteidl.core.BranchNode`", "", "Information about the branch node to evaluate in this node."
@@ -2922,7 +3018,7 @@ WorkflowMetadataDefaults
 ------------------------------------------------------------------
 
 The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to
-a workflow&#39;s underlying entities (like tasks). For instance, &#39;interruptible&#39; has no meaning at the workflow layer, it
+a workflow's underlying entities (like tasks). For instance, 'interruptible' has no meaning at the workflow layer, it
 is only relevant when a task executes. The settings here are the defaults that are passed to all nodes
 unless explicitly overridden at the node layer.
 If you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be
@@ -2981,16 +3077,18 @@ directed acyclic graph.
    "id", ":ref:`ref_flyteidl.core.Identifier`", "", "A globally unique identifier for the workflow."
    "metadata", ":ref:`ref_flyteidl.core.WorkflowMetadata`", "", "Extra metadata about the workflow."
    "interface", ":ref:`ref_flyteidl.core.TypedInterface`", "", "Defines a strongly typed interface for the Workflow. This can include some optional parameters."
-   "nodes", ":ref:`ref_flyteidl.core.Node`", "repeated", "A list of nodes. In addition, &#34;globals&#34; is a special reserved node id that can be used to consume workflow inputs."
-   "outputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "A list of output bindings that specify how to construct workflow outputs. Bindings can pull node outputs or specify literals. All workflow outputs specified in the interface field must be bound in order for the workflow to be validated. A workflow has an implicit dependency on all of its nodes to execute successfully in order to bind final outputs. Most of these outputs will be Binding&#39;s with a BindingData of type OutputReference. That is, your workflow can just have an output of some constant (`Output(5)`), but usually, the workflow will be pulling outputs from the output of a task."
-   "failure_node", ":ref:`ref_flyteidl.core.Node`", "", "&#43;optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named &#34;error&#34; of type pb.lyft.flyte.core.Error."
+   "nodes", ":ref:`ref_flyteidl.core.Node`", "repeated", "A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs."
+   "outputs", ":ref:`ref_flyteidl.core.Binding`", "repeated", "A list of output bindings that specify how to construct workflow outputs. Bindings can pull node outputs or specify literals. All workflow outputs specified in the interface field must be bound in order for the workflow to be validated. A workflow has an implicit dependency on all of its nodes to execute successfully in order to bind final outputs. Most of these outputs will be Binding's with a BindingData of type OutputReference. That is, your workflow can just have an output of some constant (`Output(5)`), but usually, the workflow will be pulling outputs from the output of a task."
+   "failure_node", ":ref:`ref_flyteidl.core.Node`", "", "+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named 'error' of type pb.lyft.flyte.core.Error."
    "metadata_defaults", ":ref:`ref_flyteidl.core.WorkflowMetadataDefaults`", "", "workflow defaults"
 
 
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -3005,14 +3103,20 @@ Failure Handling Strategy
    :header: "Name", "Number", "Description"
    :widths: auto
 
-   "FAIL_IMMEDIATELY", "0", "FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It&#39;ll automatically abort all currently running nodes and clean up resources before finally marking the workflow executions as failed."
+   "FAIL_IMMEDIATELY", "0", "FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It'll automatically abort all currently running nodes and clean up resources before finally marking the workflow executions as failed."
    "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE", "1", "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will not alter the dependencies of the execution graph so any node that depend on the failed node will not be run. Other nodes that will be executed to completion before cleaning up resources and marking the workflow execution as failed."
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -3046,13 +3150,21 @@ Defines an enclosed package of workflow and tasks it references.
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -3077,7 +3189,7 @@ nanosecond resolution. The count is relative to an epoch at UTC midnight on
 January 1, 1970, in the proleptic Gregorian calendar which extends the
 Gregorian calendar backwards to year one.
 
-All minutes are 60 seconds long. Leap seconds are &#34;smeared&#34; so that no leap
+All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap
 second table is needed for interpretation, using a [24-hour linear
 smear](https://developers.google.com/time/smear).
 
@@ -3096,7 +3208,7 @@ Example 1: Compute Timestamp from POSIX `time()`.
 Example 2: Compute Timestamp from POSIX `gettimeofday()`.
 
     struct timeval tv;
-    gettimeofday(&amp;tv, NULL);
+    gettimeofday(&tv, NULL);
 
     Timestamp timestamp;
     timestamp.set_seconds(tv.tv_sec);
@@ -3105,8 +3217,8 @@ Example 2: Compute Timestamp from POSIX `gettimeofday()`.
 Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
 
     FILETIME ft;
-    GetSystemTimeAsFileTime(&amp;ft);
-    UINT64 ticks = (((UINT64)ft.dwHighDateTime) &lt;&lt; 32) | ft.dwLowDateTime;
+    GetSystemTimeAsFileTime(&ft);
+    UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
 
     // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
     // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
@@ -3140,16 +3252,16 @@ Example 6: Compute Timestamp from current time in Python.
 
 In JSON format, the Timestamp type is encoded as a string in the
 [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
-format is &#34;{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z&#34;
+format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
 where {year} is always expressed using four digits while {month}, {day},
 {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
 seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
-are optional. The &#34;Z&#34; suffix indicates the timezone (&#34;UTC&#34;); the timezone
+are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
 is required. A proto3 JSON serializer should always use UTC (as indicated by
-&#34;Z&#34;) when printing the Timestamp type and a proto3 JSON parser should be
+"Z") when printing the Timestamp type and a proto3 JSON parser should be
 able to accept both UTC and other timezones (as indicated by an offset).
 
-For example, &#34;2017-01-15T01:30:15.01Z&#34; encodes 15.01 seconds past
+For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past
 01:30 UTC on January 15, 2017.
 
 In JavaScript, one can convert a Date object to this format using the
@@ -3158,8 +3270,8 @@ standard
 method. In Python, a standard `datetime.datetime` object can be converted
 to this format using
 [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
-the time format spec &#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;. Likewise, in Java, one can use
-the Joda Time&#39;s [`ISODateTimeFormat.dateTime()`](
+the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
+the Joda Time's [`ISODateTimeFormat.dateTime()`](
 http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime%2D%2D
 ) to obtain a formatter capable of generating timestamps in this format.
 
@@ -3176,13 +3288,21 @@ http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.htm
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -3203,10 +3323,10 @@ Duration
 
 A Duration represents a signed, fixed-length span of time represented
 as a count of seconds and fractions of seconds at nanosecond
-resolution. It is independent of any calendar and concepts like &#34;day&#34;
-or &#34;month&#34;. It is related to Timestamp in that the difference between
+resolution. It is independent of any calendar and concepts like "day"
+or "month". It is related to Timestamp in that the difference between
 two Timestamp values is a Duration and it can be added or subtracted
-from a Timestamp. Range is approximately &#43;-10,000 years.
+from a Timestamp. Range is approximately +-10,000 years.
 
 # Examples
 
@@ -3219,28 +3339,28 @@ Example 1: Compute Duration from two Timestamps in pseudo code.
     duration.seconds = end.seconds - start.seconds;
     duration.nanos = end.nanos - start.nanos;
 
-    if (duration.seconds &lt; 0 &amp;&amp; duration.nanos &gt; 0) {
-      duration.seconds &#43;= 1;
+    if (duration.seconds < 0 && duration.nanos > 0) {
+      duration.seconds += 1;
       duration.nanos -= 1000000000;
-    } else if (duration.seconds &gt; 0 &amp;&amp; duration.nanos &lt; 0) {
+    } else if (duration.seconds > 0 && duration.nanos < 0) {
       duration.seconds -= 1;
-      duration.nanos &#43;= 1000000000;
+      duration.nanos += 1000000000;
     }
 
-Example 2: Compute Timestamp from Timestamp &#43; Duration in pseudo code.
+Example 2: Compute Timestamp from Timestamp + Duration in pseudo code.
 
     Timestamp start = ...;
     Duration duration = ...;
     Timestamp end = ...;
 
-    end.seconds = start.seconds &#43; duration.seconds;
-    end.nanos = start.nanos &#43; duration.nanos;
+    end.seconds = start.seconds + duration.seconds;
+    end.nanos = start.nanos + duration.nanos;
 
-    if (end.nanos &lt; 0) {
+    if (end.nanos < 0) {
       end.seconds -= 1;
-      end.nanos &#43;= 1000000000;
-    } else if (end.nanos &gt;= 1000000000) {
-      end.seconds &#43;= 1;
+      end.nanos += 1000000000;
+    } else if (end.nanos >= 1000000000) {
+      end.seconds += 1;
       end.nanos -= 1000000000;
     }
 
@@ -3253,12 +3373,12 @@ Example 3: Compute Duration from datetime.timedelta in Python.
 # JSON Mapping
 
 In JSON format, the Duration type is encoded as a string rather than an
-object, where the string ends in the suffix &#34;s&#34; (indicating seconds) and
+object, where the string ends in the suffix "s" (indicating seconds) and
 is preceded by the number of seconds, with nanoseconds expressed as
 fractional seconds. For example, 3 seconds with 0 nanoseconds should be
-encoded in JSON format as &#34;3s&#34;, while 3 seconds and 1 nanosecond should
-be expressed in JSON format as &#34;3.000000001s&#34;, and 3 seconds and 1
-microsecond should be expressed in JSON format as &#34;3.000001s&#34;.
+encoded in JSON format as "3s", while 3 seconds and 1 nanosecond should
+be expressed in JSON format as "3.000000001s", and 3 seconds and 1
+microsecond should be expressed in JSON format as "3.000001s".
 
 
 
@@ -3266,20 +3386,28 @@ microsecond should be expressed in JSON format as &#34;3.000001s&#34;.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "seconds", ":ref:`ref_int64`", "", "Signed seconds of the span of time. Must be from -315,576,000,000 to &#43;315,576,000,000 inclusive. Note: these bounds are computed from: 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years"
-   "nanos", ":ref:`ref_int32`", "", "Signed fractions of a second at nanosecond resolution of the span of time. Durations less than one second are represented with a 0 `seconds` field and a positive or negative `nanos` field. For durations of one second or more, a non-zero value for the `nanos` field must be of the same sign as the `seconds` field. Must be from -999,999,999 to &#43;999,999,999 inclusive."
+   "seconds", ":ref:`ref_int64`", "", "Signed seconds of the span of time. Must be from -315,576,000,000 to +315,576,000,000 inclusive. Note: these bounds are computed from: 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years"
+   "nanos", ":ref:`ref_int32`", "", "Signed fractions of a second at nanosecond resolution of the span of time. Durations less than one second are represented with a 0 `seconds` field and a positive or negative `nanos` field. For durations of one second or more, a non-zero value for the `nanos` field must be of the same sign as the `seconds` field. Must be from -999,999,999 to +999,999,999 inclusive."
 
 
 
 
 
- 
 
- 
+..
+   end messages
 
- 
 
- 
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -3395,7 +3523,9 @@ The JSON representation for `Value` is JSON value.
 
 
 
- 
+
+..
+   end messages
 
 
 
@@ -3415,11 +3545,17 @@ NullValue
 
    "NULL_VALUE", "0", "Null value."
 
- 
 
- 
+..
+   end enums
 
- 
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -3653,4 +3789,6 @@ May contain any arbitrary sequence of bytes.
 
    "bytes", "string", "ByteString", "str", "[]byte", "ByteString", "string", "String (ASCII-8BIT)"
 
- 
+
+..
+   end scalars

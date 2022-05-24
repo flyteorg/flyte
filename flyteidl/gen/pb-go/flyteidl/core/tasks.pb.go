@@ -949,7 +949,7 @@ type DataLoadingConfig struct {
 	// Flag enables DataLoading Config. If this is not set, data loading will not be used!
 	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	// File system path (start at root). This folder will contain all the inputs exploded to a separate file.
-	// Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+	// Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is '/var/flyte/inputs', then the file system will look like
 	// /var/flyte/inputs/inputs.<metadata format dependent -> .pb .json .yaml> -> Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations
 	// /var/flyte/inputs/x -> X is a file that contains the value of x (integer) in string format
 	// /var/flyte/inputs/y -> Y is a file in Binary format

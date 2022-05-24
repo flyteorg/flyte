@@ -11,7 +11,7 @@ package flyteadmin
 
 // A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch node.
 type CoreNode struct {
-	// A workflow-level unique identifier that identifies this node in the workflow. \"inputs\" and \"outputs\" are reserved node ids that cannot be used by other nodes.
+	// A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved node ids that cannot be used by other nodes.
 	Id string `json:"id,omitempty"`
 	// Extra metadata about the node.
 	Metadata *CoreNodeMetadata `json:"metadata,omitempty"`

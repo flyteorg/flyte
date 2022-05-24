@@ -157,7 +157,7 @@ class CoreWorkflowTemplate(object):
     def nodes(self):
         """Gets the nodes of this CoreWorkflowTemplate.  # noqa: E501
 
-        A list of nodes. In addition, \"globals\" is a special reserved node id that can be used to consume workflow inputs.  # noqa: E501
+        A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.  # noqa: E501
 
         :return: The nodes of this CoreWorkflowTemplate.  # noqa: E501
         :rtype: list[CoreNode]
@@ -168,7 +168,7 @@ class CoreWorkflowTemplate(object):
     def nodes(self, nodes):
         """Sets the nodes of this CoreWorkflowTemplate.
 
-        A list of nodes. In addition, \"globals\" is a special reserved node id that can be used to consume workflow inputs.  # noqa: E501
+        A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.  # noqa: E501
 
         :param nodes: The nodes of this CoreWorkflowTemplate.  # noqa: E501
         :type: list[CoreNode]
@@ -203,7 +203,7 @@ class CoreWorkflowTemplate(object):
     def failure_node(self):
         """Gets the failure_node of this CoreWorkflowTemplate.  # noqa: E501
 
-        +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named \"error\" of type pb.lyft.flyte.core.Error.  # noqa: E501
+        +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named 'error' of type pb.lyft.flyte.core.Error.  # noqa: E501
 
         :return: The failure_node of this CoreWorkflowTemplate.  # noqa: E501
         :rtype: CoreNode
@@ -214,7 +214,7 @@ class CoreWorkflowTemplate(object):
     def failure_node(self, failure_node):
         """Sets the failure_node of this CoreWorkflowTemplate.
 
-        +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named \"error\" of type pb.lyft.flyte.core.Error.  # noqa: E501
+        +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named 'error' of type pb.lyft.flyte.core.Error.  # noqa: E501
 
         :param failure_node: The failure_node of this CoreWorkflowTemplate.  # noqa: E501
         :type: CoreNode

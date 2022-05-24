@@ -7360,7 +7360,7 @@ public final class Workflow {
 
     /**
      * <pre>
-     * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+     * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
      * node ids that cannot be used by other nodes.
      * </pre>
      *
@@ -7369,7 +7369,7 @@ public final class Workflow {
     java.lang.String getId();
     /**
      * <pre>
-     * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+     * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
      * node ids that cannot be used by other nodes.
      * </pre>
      *
@@ -7848,7 +7848,7 @@ public final class Workflow {
     private volatile java.lang.Object id_;
     /**
      * <pre>
-     * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+     * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
      * node ids that cannot be used by other nodes.
      * </pre>
      *
@@ -7868,7 +7868,7 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+     * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
      * node ids that cannot be used by other nodes.
      * </pre>
      *
@@ -8811,7 +8811,7 @@ public final class Workflow {
       private java.lang.Object id_ = "";
       /**
        * <pre>
-       * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+       * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
        * node ids that cannot be used by other nodes.
        * </pre>
        *
@@ -8831,7 +8831,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+       * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
        * node ids that cannot be used by other nodes.
        * </pre>
        *
@@ -8852,7 +8852,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+       * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
        * node ids that cannot be used by other nodes.
        * </pre>
        *
@@ -8870,7 +8870,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+       * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
        * node ids that cannot be used by other nodes.
        * </pre>
        *
@@ -8884,7 +8884,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+       * A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
        * node ids that cannot be used by other nodes.
        * </pre>
        *
@@ -11977,7 +11977,7 @@ public final class Workflow {
 
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -11986,7 +11986,7 @@ public final class Workflow {
         getNodesList();
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -11994,7 +11994,7 @@ public final class Workflow {
     flyteidl.core.Workflow.Node getNodes(int index);
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12002,7 +12002,7 @@ public final class Workflow {
     int getNodesCount();
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12011,7 +12011,7 @@ public final class Workflow {
         getNodesOrBuilderList();
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12096,7 +12096,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -12106,7 +12106,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -12116,7 +12116,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -12420,7 +12420,7 @@ public final class Workflow {
     private java.util.List<flyteidl.core.Workflow.Node> nodes_;
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12430,7 +12430,7 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12441,7 +12441,7 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12451,7 +12451,7 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12461,7 +12461,7 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+     * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
      * </pre>
      *
      * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -12561,7 +12561,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -12573,7 +12573,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -12585,7 +12585,7 @@ public final class Workflow {
     /**
      * <pre>
      *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-     * The interface of this node must match the Workflow interface with an additional input named "error" of type
+     * The interface of this node must match the Workflow interface with an additional input named 'error' of type
      * pb.lyft.flyte.core.Error.
      * </pre>
      *
@@ -13655,7 +13655,7 @@ public final class Workflow {
 
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13669,7 +13669,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13683,7 +13683,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13697,7 +13697,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13718,7 +13718,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13736,7 +13736,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13756,7 +13756,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13777,7 +13777,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13795,7 +13795,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13813,7 +13813,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13832,7 +13832,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13849,7 +13849,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13866,7 +13866,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13877,7 +13877,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13891,7 +13891,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13906,7 +13906,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13917,7 +13917,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -13929,7 +13929,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+       * A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
        * </pre>
        *
        * <code>repeated .flyteidl.core.Node nodes = 4;</code>
@@ -14379,7 +14379,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14391,7 +14391,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14407,7 +14407,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14429,7 +14429,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14449,7 +14449,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14473,7 +14473,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14493,7 +14493,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14507,7 +14507,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *
@@ -14524,7 +14524,7 @@ public final class Workflow {
       /**
        * <pre>
        *+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-       * The interface of this node must match the Workflow interface with an additional input named "error" of type
+       * The interface of this node must match the Workflow interface with an additional input named 'error' of type
        * pb.lyft.flyte.core.Error.
        * </pre>
        *

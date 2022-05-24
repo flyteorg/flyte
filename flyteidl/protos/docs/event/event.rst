@@ -300,7 +300,9 @@ For Workflow Nodes we need to send information about the workflow that's launche
 
 
 
- <!-- end messages -->
+
+..
+   end messages
 
 
 
@@ -318,11 +320,17 @@ Includes the broad category of machine used for this specific task execution.
    "DEFAULT", "0", "The default instance class configured for the flyte application platform."
    "INTERRUPTIBLE", "1", "The instance class configured for interruptible tasks."
 
- <!-- end enums -->
 
- <!-- end HasExtensions -->
+..
+   end enums
 
- <!-- end services -->
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -446,13 +454,21 @@ http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.htm
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -543,13 +559,21 @@ microsecond should be expressed in JSON format as "3.000001s".
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -665,7 +689,9 @@ The JSON representation for `Value` is JSON value.
 
 
 
- <!-- end messages -->
+
+..
+   end messages
 
 
 
@@ -685,10 +711,16 @@ NullValue
 
    "NULL_VALUE", "0", "Null value."
 
- <!-- end enums -->
 
- <!-- end HasExtensions -->
+..
+   end enums
 
- <!-- end services -->
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 

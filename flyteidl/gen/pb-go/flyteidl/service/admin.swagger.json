@@ -5393,7 +5393,7 @@
         },
         "input_path": {
           "type": "string",
-          "title": "File system path (start at root). This folder will contain all the inputs exploded to a separate file.\nExample, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is \"/var/flyte/inputs\", then the file system will look like\n/var/flyte/inputs/inputs.\u003cmetadata format dependent -\u003e .pb .json .yaml\u003e -\u003e Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations\n/var/flyte/inputs/x -\u003e X is a file that contains the value of x (integer) in string format\n/var/flyte/inputs/y -\u003e Y is a file in Binary format\n/var/flyte/inputs/z/... -\u003e Note Z itself is a directory\nMore information about the protocol - refer to docs #TODO reference docs here"
+          "title": "File system path (start at root). This folder will contain all the inputs exploded to a separate file.\nExample, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is '/var/flyte/inputs', then the file system will look like\n/var/flyte/inputs/inputs.\u003cmetadata format dependent -\u003e .pb .json .yaml\u003e -\u003e Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations\n/var/flyte/inputs/x -\u003e X is a file that contains the value of x (integer) in string format\n/var/flyte/inputs/y -\u003e Y is a file in Binary format\n/var/flyte/inputs/z/... -\u003e Note Z itself is a directory\nMore information about the protocol - refer to docs #TODO reference docs here"
         },
         "output_path": {
           "type": "string",
@@ -5701,7 +5701,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "A workflow-level unique identifier that identifies this node in the workflow. \"inputs\" and \"outputs\" are reserved\nnode ids that cannot be used by other nodes."
+          "description": "A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved\nnode ids that cannot be used by other nodes."
         },
         "metadata": {
           "$ref": "#/definitions/coreNodeMetadata",
@@ -6533,7 +6533,7 @@
           "items": {
             "$ref": "#/definitions/coreNode"
           },
-          "description": "A list of nodes. In addition, \"globals\" is a special reserved node id that can be used to consume workflow inputs."
+          "description": "A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs."
         },
         "outputs": {
           "type": "array",
@@ -6544,7 +6544,7 @@
         },
         "failure_node": {
           "$ref": "#/definitions/coreNode",
-          "description": "+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.\nThe interface of this node must match the Workflow interface with an additional input named \"error\" of type\npb.lyft.flyte.core.Error."
+          "description": "+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.\nThe interface of this node must match the Workflow interface with an additional input named 'error' of type\npb.lyft.flyte.core.Error."
         },
         "metadata_defaults": {
           "$ref": "#/definitions/coreWorkflowMetadataDefaults",

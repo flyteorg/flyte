@@ -37,13 +37,21 @@ will be executed concurrently.
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -79,13 +87,21 @@ Custom proto for plugin that enables distributed training using https://github.c
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -122,13 +138,21 @@ of a Presto task's TaskTemplate
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -161,13 +185,21 @@ Custom proto for plugin that enables distributed training using https://github.c
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -248,13 +280,21 @@ of a hive task's TaskTemplate
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -336,13 +376,21 @@ SidecarJob.LabelsEntry
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -438,7 +486,9 @@ SparkJob.SparkConfEntry
 
 
 
- <!-- end messages -->
+
+..
+   end messages
 
 
 
@@ -458,11 +508,17 @@ SparkApplication.Type
    "SCALA", "2", ""
    "R", "3", ""
 
- <!-- end enums -->
 
- <!-- end HasExtensions -->
+..
+   end enums
 
- <!-- end services -->
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -497,13 +553,21 @@ Custom proto for plugin that enables distributed training using https://github.c
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -538,12 +602,20 @@ Represents an Execution that was launched and could be waited on.
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
