@@ -7,6 +7,7 @@ Web API Plugin Setup
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
 
     .. link-button:: deployment-plugin-setup-webapi-snowflake
