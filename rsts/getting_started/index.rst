@@ -185,6 +185,23 @@ Start a Flyte demonstration environment on your local machine:
     Most :doc:`integrations <cookbook:integrations>` are not directly installed in this environment, and it's not a great
     way to test the platform's performance.
 
+Packaging Workflows and Registration
+""""""""""""""""""""""""""""""""""""
+
+If you are using a customized Docker image, push the image to docker registry and ensure it can be accessed by a Flyte Kubernetes cluster. Package the workflow using the ``pyflyte`` cli bundled with Flytekit and upload it to the Flyte backend.
+
+.. tabs::
+   .. group-tab:: Flyte Sandbox
+      .. prompt:: bash $
+         pyflyte --pkgs flyte.workflows package --image "my_flyte_project:v1"
+   .. group-tab:: Remote Flyte Cluster
+      .. prompt:: bash $
+         pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
+
+Register the workflow, i.e upload the package to Flyte backend. Here, ``v1`` refers to the version and it is a good practice to match this with your project's version.
+
+.. prompt:: bash $
+   flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
 
 Executing Workflows on a Flyte Cluster
 """""""""""""""""""""""""""""""""""""""
