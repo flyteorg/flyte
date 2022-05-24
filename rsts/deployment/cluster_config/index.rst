@@ -119,7 +119,7 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-performance
        :type: ref
-       :text: Performance
+       :text: Optimizing Performance
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Improve the performance of the core Flyte engine.
