@@ -66,11 +66,11 @@ prepare_flyte_release_build () {
   else
     [ "${FLYTEPROPELLER_TAG}" == "latest" ] && FLYTEPROPELLER_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/$REPOSITORY/releases/latest" | jq -r .tag_name) || FLYTEPROPELLER_TAG=$FLYTEPROPELLER_TAG
   fi
-  sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," ./opta/aws/flyte.yaml
-  sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${FLYTEADMIN_TAG} # FLYTESCHEDULER_TAG," ./opta/aws/flyte.yaml
-  sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," ./opta/aws/flyte.yaml
-  sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," ./opta/aws/flyte.yaml
-  sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG," ./opta/aws/flyte.yaml
+  sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${FLYTEADMIN_TAG} # FLYTEADMIN_TAG," /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+  sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${FLYTEADMIN_TAG} # FLYTESCHEDULER_TAG," /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+  sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${DATACATALOG_TAG} # DATACATALOG_TAG," /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+  sed -i "s,tag:[^P]*# FLYTECONSOLE_TAG,tag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG," /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+  sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG," /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
 }
 
 install_flytekit () {

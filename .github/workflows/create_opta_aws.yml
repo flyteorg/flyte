@@ -114,12 +114,12 @@ jobs:
           LC_ALL: en_US.UTF-8
           LANG: en_US.UTF-8
           LANGUAGE: en_US.UTF-8
-          ENV: "${{ inputs.mode }}"
-          FLYTEADMIN_TAG: "${{ inputs.components_version }}"
-          DATACATALOG_TAG: "${{inputs.components_version }}"
-          FLYTECONSOLE_TAG: "${{ inputs.components_version }}"
-          FLYTEPROPELLER_TAG: "${{ inputs.components_version }}"
-          OPTA_ENVIRONMENT: "${{ inputs.mode }}"
+          ENV: ${{ inputs.mode }}
+          FLYTEADMIN_TAG: ${{ inputs.components_version }}
+          DATACATALOG_TAG: ${{inputs.components_version }}
+          FLYTECONSOLE_TAG: ${{ inputs.components_version }}
+          FLYTEPROPELLER_TAG: ${{ inputs.components_version }}
+          OPTA_ENVIRONMENT: ${{ inputs.mode }}
         run: |
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh prepare_flyte_release_build
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh prepare_helm_chart
