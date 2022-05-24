@@ -73,42 +73,42 @@ jobs:
           echo ""
           echo $DNS
           echo "::set-output name=dns::${DNS}"
-#      - uses: azure/setup-helm@v1
-#      - name: Update Helm Chart dependencies
-#        uses: WyriHaximus/github-action-helm3@v2
-#        with:
-#          exec: helm dep update ./charts/flyte-core/
-#      - name: tree
-#        shell: bash
-#        run: |
-#          pwd
-#          sudo apt-get install tree
-#          tree
-#      - name: set flyte variables
-#        shell: bash
-#        run: |
-#          sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#          sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#          sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#          sed -i "s/<cluster_ingress>/${{ steps.output-dns.outputs.dns }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#      - name: Archive env artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: opta-flyte
-#          path: |
-#            /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#      - name: Pin terraform version
-#        uses: hashicorp/setup-terraform@v1
-#        with:
-#          terraform_version: 1.0.0
-#          terraform_wrapper: false
-#      - name: Pin Python 3.8
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 3.8
-#      - uses: actions/setup-node@v2
-#        with:
-#          node-version: "16.8.0"
+      - uses: azure/setup-helm@v1
+      - name: Update Helm Chart dependencies
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm dep update ./charts/flyte-core/
+      - name: tree
+        shell: bash
+        run: |
+          pwd
+          sudo apt-get install tree
+          tree
+      - name: set flyte variables
+        shell: bash
+        run: |
+          sed -i "s/<unique_bucket_name>/${{ inputs.flyte-storage-bucket }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+          sed -i "s/<region>/${{ inputs.aws-region }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+          sed -i "s/<account_id>/${{ env.AWS_ACCOUNT_ID }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+          sed -i "s/<cluster_ingress>/${{ steps.output-dns.outputs.dns }}/" /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+      - name: Archive env artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: opta-flyte
+          path: |
+            /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
+      - name: Pin terraform version
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
+          terraform_wrapper: false
+      - name: Pin Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.8.0"
 #      - name: Prepare opta changes
 #        env:
 #          LC_ALL: en_US.UTF-8
@@ -123,10 +123,10 @@ jobs:
 #        run: |
 #          /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh prepare_flyte_release_build
 #          /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh prepare_helm_chart
-#      - name: SETUP OPTA & APPLY FLYTE
-#        shell: bash
-#        run: |
-#          cd /home/runner/work/flyte/flyte/opta/aws
-#          opta apply -c flyte.yaml --auto-approve
-#    outputs:
-#      dns: ${{ steps.output-dns.outputs.dns }}
+      - name: SETUP OPTA & APPLY FLYTE
+        shell: bash
+        run: |
+          cd /home/runner/work/flyte/flyte/opta/aws
+          opta apply -c flyte.yaml --auto-approve
+    outputs:
+      dns: ${{ steps.output-dns.outputs.dns }}
