@@ -789,7 +789,9 @@ Tag properties we can filter by
 
 
 
- <!-- end messages -->
+
+..
+   end messages
 
 
 
@@ -837,9 +839,13 @@ as use-cases come up we can add more operators, ex: gte, like, not eq etc.
 
    "EQUALS", "0", ""
 
- <!-- end enums -->
 
- <!-- end HasExtensions -->
+..
+   end enums
+
+
+..
+   end HasExtensions
 
 
 
@@ -865,7 +871,9 @@ Artifacts are associated with a Dataset, and can be tagged for retrieval.
    "ListDatasets", ":ref:`ref_datacatalog.ListDatasetsRequest`", ":ref:`ref_datacatalog.ListDatasetsResponse`", "Return a paginated list of datasets"
    "GetOrExtendReservation", ":ref:`ref_datacatalog.GetOrExtendReservationRequest`", ":ref:`ref_datacatalog.GetOrExtendReservationResponse`", "Attempts to get or extend a reservation for the corresponding artifact. If one already exists (ie. another entity owns the reservation) then that reservation is retrieved. Once you acquire a reservation, you need to periodically extend the reservation with an identical call. If the reservation is not extended before the defined expiration, it may be acquired by another task. Note: We may have multiple concurrent tasks with the same signature and the same input that try to populate the same artifact at the same time. Thus with reservation, only one task can run at a time, until the reservation expires. Note: If task A does not extend the reservation in time and the reservation expires, another task B may take over the reservation, resulting in two tasks A and B running in parallel. So a third task C may get the Artifact from A or B, whichever writes last."
    "ReleaseReservation", ":ref:`ref_datacatalog.ReleaseReservationRequest`", ":ref:`ref_datacatalog.ReleaseReservationResponse`", "Release the reservation when the task holding the spot fails so that the other tasks can grab the spot."
- <!-- end services -->
+
+..
+   end services
 
 
 
@@ -989,13 +997,21 @@ http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.htm
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -1086,13 +1102,21 @@ microsecond should be expressed in JSON format as "3.000001s".
 
 
 
- <!-- end messages -->
 
- <!-- end enums -->
+..
+   end messages
 
- <!-- end HasExtensions -->
 
- <!-- end services -->
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 
 
@@ -1208,7 +1232,9 @@ The JSON representation for `Value` is JSON value.
 
 
 
- <!-- end messages -->
+
+..
+   end messages
 
 
 
@@ -1228,10 +1254,16 @@ NullValue
 
    "NULL_VALUE", "0", "Null value."
 
- <!-- end enums -->
 
- <!-- end HasExtensions -->
+..
+   end enums
 
- <!-- end services -->
+
+..
+   end HasExtensions
+
+
+..
+   end services
 
 

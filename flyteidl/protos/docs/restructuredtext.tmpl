@@ -103,3 +103,27 @@ File-level Extensions
    end services
 
 {{end}}
+
+.. _ref_scala_types:
+
+Scalar Value Types
+==================
+
+{{range .Scalars}}
+
+.. _ref_{{.ProtoType}}:
+
+{{.ProtoType}}
+-----------------------------
+
+{{.Notes}}
+
+.. csv-table:: {{.ProtoType}} language representation
+   :header: ".proto Type", "C++", "Java", "Python", "Go", "C#", "PHP", "Ruby"
+   :widths: auto
+
+   "{{.ProtoType}}", "{{.CppType}}", "{{.JavaType}}", "{{.PythonType}}", "{{.GoType}}", "{{.CSharp}}", "{{.PhpType}}", "{{.RubyType}}"
+
+{{end}}
+..
+   end scalars

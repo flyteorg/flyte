@@ -550,7 +550,7 @@ func (m *Alias) GetAlias() string {
 // A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
 // node.
 type Node struct {
-	// A workflow-level unique identifier that identifies this node in the workflow. "inputs" and "outputs" are reserved
+	// A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
 	// node ids that cannot be used by other nodes.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Extra metadata about the node.
@@ -803,7 +803,7 @@ type WorkflowTemplate struct {
 	Metadata *WorkflowMetadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Defines a strongly typed interface for the Workflow. This can include some optional parameters.
 	Interface *TypedInterface `protobuf:"bytes,3,opt,name=interface,proto3" json:"interface,omitempty"`
-	// A list of nodes. In addition, "globals" is a special reserved node id that can be used to consume workflow inputs.
+	// A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
 	Nodes []*Node `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty"`
 	// A list of output bindings that specify how to construct workflow outputs. Bindings can pull node outputs or
 	// specify literals. All workflow outputs specified in the interface field must be bound in order for the workflow
@@ -814,7 +814,7 @@ type WorkflowTemplate struct {
 	// outputs from the output of a task.
 	Outputs []*Binding `protobuf:"bytes,5,rep,name=outputs,proto3" json:"outputs,omitempty"`
 	//+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
-	// The interface of this node must match the Workflow interface with an additional input named "error" of type
+	// The interface of this node must match the Workflow interface with an additional input named 'error' of type
 	// pb.lyft.flyte.core.Error.
 	FailureNode *Node `protobuf:"bytes,6,opt,name=failure_node,json=failureNode,proto3" json:"failure_node,omitempty"`
 	// workflow defaults
