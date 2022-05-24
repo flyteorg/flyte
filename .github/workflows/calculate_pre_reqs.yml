@@ -49,8 +49,6 @@ jobs:
           echo "::set-output name=flytesnacks_latest::${LATEST_VERSION}"
     outputs:
       mode: ${{ steps.set-inputs-default.outputs.mode }}
-      # TODO: REMOVE THE BELOW ...
-      components_version: v1.0.1
-      #components_version: ${{ steps.set-inputs-default.outputs.components_version }}
+      components_version: ${{ steps.set-inputs-default.outputs.components_version }}
       badge_version: ${{ steps.parse-badge-version.outputs.badge_version }}
       flytesnacks_latest: ${{ steps.parse-flytesnacks-version.outputs.flytesnacks_latest }}
