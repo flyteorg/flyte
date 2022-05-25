@@ -39,7 +39,7 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-core/templates/admin/secret-auth.yaml
+# Source: flyte-core/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -71,7 +71,7 @@ type: Opaque
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config
+  name: flyte-admin-clusters-config
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
@@ -79,9 +79,23 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  clusters: | 
-    clusterConfigs: []
-    labelClusterMap: {}
+  clusters.yaml: |
+    clusters:
+      clusterConfigs: []
+      labelClusterMap: {}
+---
+# Source: flyte-core/templates/admin/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-base-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -157,6 +171,7 @@ data:
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
       container: "<BUCKETNAME>"
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -354,6 +369,7 @@ data:
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
       container: "<BUCKETNAME>"
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
 ---
@@ -551,7 +567,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f81062eaca7dec8812f9c768242a69dfd51b2022e1112c32fe12beecf48c513"
+        configChecksum: "4d61eb5f51b3774591fe8432a2152cde3698d35de59f5a963548ca6f7ab58ac"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -576,7 +592,7 @@ spec:
           - mountPath: /etc/db
             name: db-pass
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
@@ -593,7 +609,7 @@ spec:
           - mountPath: /etc/db
             name: db-pass
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
@@ -609,7 +625,9 @@ spec:
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: clusters-config-volume
+          - mountPath: /etc/secrets/
+            name: admin-secrets
         - name: generate-secrets
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
@@ -619,10 +637,10 @@ spec:
                 "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - name: scratch
-              mountPath: /etc/scratch
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+            - mountPath: /etc/scratch
+              name: scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -665,9 +683,9 @@ spec:
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
-          name: config-volume
-        - name: auth
-          mountPath: /etc/secrets/
+          name: clusters-config-volume
+        - mountPath: /etc/secrets/
+          name: admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -678,12 +696,19 @@ spec:
         - emptyDir: {}
           name: scratch
         - configMap:
-            name: flyte-admin-config
-          name: config-volume
+            name: flyte-admin-base-config
+          name: base-config-volume
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+          name: clusters-config-volume
         - configMap:
             name: clusterresource-template
           name: resource-templates
-        - name: auth
+        - name: admin-secrets
           secret:
             secretName: flyte-admin-secrets
       affinity: 
@@ -830,7 +855,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a869b0be61ad92348342d7ca6a6b4a2b91dd59c1e9494bcc9272bd6cad79835"
+        configChecksum: "5decd5143258340704503cb1c89d283b3fa311a33792c0a2751edc6d21b1e94"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -921,7 +946,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f81062eaca7dec8812f9c768242a69dfd51b2022e1112c32fe12beecf48c513"
+        configChecksum: "4d61eb5f51b3774591fe8432a2152cde3698d35de59f5a963548ca6f7ab58ac"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

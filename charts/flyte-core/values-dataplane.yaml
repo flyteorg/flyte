@@ -1,5 +1,8 @@
 flyteadmin:
   enabled: false
+  serviceAccount:
+    # Ensure service account for (controlplane) flyteadmin to connect to (dataplane) flytepropeller exists
+    alwaysCreate: true
 
 cluster_resource_manager:
   enabled: false

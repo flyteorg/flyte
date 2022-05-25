@@ -61,7 +61,7 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 ---
-# Source: flyte-core/templates/admin/secret-auth.yaml
+# Source: flyte-core/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -102,7 +102,7 @@ type: Opaque
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config
+  name: flyte-admin-clusters-config
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
@@ -110,9 +110,23 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  clusters: | 
-    clusterConfigs: []
-    labelClusterMap: {}
+  clusters.yaml: |
+    clusters:
+      clusterConfigs: []
+      labelClusterMap: {}
+---
+# Source: flyte-core/templates/admin/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-base-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -183,6 +197,7 @@ data:
       connection:
         auth-type: iam
         region: <AWS_REGION>
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -372,6 +387,7 @@ data:
       connection:
         auth-type: iam
         region: <AWS_REGION>
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
 ---
@@ -517,6 +533,7 @@ data:
       connection:
         auth-type: iam
         region: <AWS_REGION>
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -868,7 +885,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8fe342456c4babd05de9f8f3a07e00d38268cc4e92b6985ff2d0b3a667b04c1"
+        configChecksum: "fcb5f0db4ca74ca6d3a0f2742622ff5129cf349082e305d9249e08a5c754ad9"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -893,7 +910,7 @@ spec:
           - mountPath: /etc/db
             name: db-pass
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
@@ -910,7 +927,7 @@ spec:
           - mountPath: /etc/db
             name: db-pass
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
@@ -926,7 +943,9 @@ spec:
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: clusters-config-volume
+          - mountPath: /etc/secrets/
+            name: admin-secrets
         - name: generate-secrets
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
@@ -936,10 +955,10 @@ spec:
                 "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - name: scratch
-              mountPath: /etc/scratch
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+            - mountPath: /etc/scratch
+              name: scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -982,9 +1001,9 @@ spec:
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
-          name: config-volume
-        - name: auth
-          mountPath: /etc/secrets/
+          name: clusters-config-volume
+        - mountPath: /etc/secrets/
+          name: admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -995,12 +1014,19 @@ spec:
         - emptyDir: {}
           name: scratch
         - configMap:
-            name: flyte-admin-config
-          name: config-volume
+            name: flyte-admin-base-config
+          name: base-config-volume
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+          name: clusters-config-volume
         - configMap:
             name: clusterresource-template
           name: resource-templates
-        - name: auth
+        - name: admin-secrets
           secret:
             secretName: flyte-admin-secrets
       affinity: 
@@ -1147,7 +1173,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "940a08491eb44bb4202fb0209dc0ac27f0141db9db7dd7e6883641369f9a593"
+        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1238,7 +1264,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8fe342456c4babd05de9f8f3a07e00d38268cc4e92b6985ff2d0b3a667b04c1"
+        configChecksum: "fcb5f0db4ca74ca6d3a0f2742622ff5129cf349082e305d9249e08a5c754ad9"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1326,7 +1352,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
+        configChecksum: "123b14fa527f432b1b68d510c4423ab76f657aec5cebb2f8b9c16f477d4bc39"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1407,7 +1433,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.4
       annotations:
-        configChecksum: "1f659fd7fa9b3bea0cd68eca58bc473547e87d14e9a146261e12b88187ecd36"
+        configChecksum: "123b14fa527f432b1b68d510c4423ab76f657aec5cebb2f8b9c16f477d4bc39"
     spec:
       securityContext:
         fsGroup: 65534

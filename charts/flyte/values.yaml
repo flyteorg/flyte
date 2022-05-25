@@ -61,8 +61,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Flyteadmin pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flyteadmin pods
     podAnnotations: {}
     # -- nodeSelector for Flyteadmin deployment
@@ -106,8 +106,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Flytescheduler pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flytescheduler pods
     podAnnotations: {}
     # -- nodeSelector for Flytescheduler deployment
@@ -155,8 +155,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Datacatalog pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Datacatalog pods
     podAnnotations: {}
     # -- nodeSelector for Datacatalog deployment
@@ -201,8 +201,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to FlytePropeller pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flytepropeller pods
     podAnnotations: {}
     # -- nodeSelector for Flytepropeller deployment
@@ -264,8 +264,8 @@ flyte:
 
       # -- Annotations for ServiceAccount attached to the webhook
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Service settings for the webhook
     service:
       annotations:
