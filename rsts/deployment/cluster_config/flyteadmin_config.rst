@@ -1698,6 +1698,24 @@ metricsScope (string)
   'flyte:'
   
 
+metricsKeys ([]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - project
+  - domain
+  - wf
+  - task
+  - phase
+  - tasktype
+  - runtime_type
+  - runtime_version
+  - app_name
+  
+
 profilerPort (int)
 --------------------------------------------------------------------------------
 
