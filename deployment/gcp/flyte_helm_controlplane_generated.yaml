@@ -713,6 +713,8 @@ spec:
       app.kubernetes.io/instance: flyte
   template:
     metadata:
+      annotations:
+        configChecksum: "2a1e5e5cff9966c9658d2b665fc4787ef644d6eb43b0954a3eb59df94c0c678"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte

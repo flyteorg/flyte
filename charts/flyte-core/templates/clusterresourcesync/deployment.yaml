@@ -11,11 +11,11 @@ spec:
     matchLabels: {{ include "flyteclusterresourcesync.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.cluster_resource_manager.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
         configChecksum: {{ include (print .Template.BasePath "/clusterresourcesync/configmap.yaml") . | sha256sum | trunc 63 | quote }}
-      {{- end }}
+        {{- with .Values.cluster_resource_manager.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
     spec:
       containers:
