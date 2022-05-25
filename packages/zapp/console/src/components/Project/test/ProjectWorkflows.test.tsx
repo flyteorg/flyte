@@ -1,8 +1,11 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { APIContext } from 'components/data/apiContext';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { FetchableData } from 'components/hooks/types';
+import { useUserProfile } from 'components/hooks/useUserProfile';
+import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
 import { FilterOperationName } from 'models/AdminEntity/types';
-import { getUserProfile, listNamedEntities } from 'models/Common/api';
+import { listNamedEntities } from 'models/Common/api';
 import { NamedEntity, UserProfile } from 'models/Common/types';
 import { NamedEntityState } from 'models/enums';
 import * as React from 'react';
@@ -16,6 +19,7 @@ const sampleUserProfile: UserProfile = {
   subject: 'subject',
 } as UserProfile;
 
+jest.mock('components/hooks/useUserProfile');
 jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
@@ -26,10 +30,11 @@ describe('ProjectWorkflows', () => {
   let workflowNames: NamedEntity[];
   let queryClient: QueryClient;
   let mockListNamedEntities: jest.Mock<ReturnType<typeof listNamedEntities>>;
-  let mockGetUserProfile: jest.Mock<ReturnType<typeof getUserProfile>>;
+
+  const mockUseUserProfile = useUserProfile as jest.Mock<FetchableData<UserProfile | null>>;
 
   beforeEach(() => {
-    mockGetUserProfile = jest.fn().mockResolvedValue(null);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(null, jest.fn()));
     queryClient = createTestQueryClient();
     workflowNames = ['MyWorkflow', 'MyOtherWorkflow'].map((name) =>
       createWorkflowName({ domain, name, project }),
@@ -41,10 +46,7 @@ describe('ProjectWorkflows', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <APIContext.Provider
-          value={mockAPIContextValue({
-            listNamedEntities: mockListNamedEntities,
-            getUserProfile: mockGetUserProfile,
-          })}
+          value={mockAPIContextValue({ listNamedEntities: mockListNamedEntities })}
         >
           <ProjectWorkflows projectId={project} domainId={domain} />
         </APIContext.Provider>
@@ -71,7 +73,7 @@ describe('ProjectWorkflows', () => {
   });
 
   it('should display checkbox if user login', async () => {
-    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(sampleUserProfile, jest.fn()));
     const { getAllByRole } = renderComponent();
     await waitFor(() => {});
     const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];
@@ -82,7 +84,7 @@ describe('ProjectWorkflows', () => {
 
   /** user doesn't have its own workflow */
   it('clicking show archived should hide active workflows', async () => {
-    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(sampleUserProfile, jest.fn()));
     const { getByText, queryByText, getAllByRole } = renderComponent();
     await waitFor(() => {});
     const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];

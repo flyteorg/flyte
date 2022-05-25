@@ -3,8 +3,8 @@
     "version": "0.0.1-rc.2",
     "description": "Flyteconsole Components module, which is published as npm package and can be consumed by 3rd parties",
     "main": "./dist/index.js",
-    "module": "./lib/esm/index.js",
-    "types": "./lib/esm/index.d.ts",
+    "module": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "license": "Apache-2.0",
     "private": false,
     "publishConfig": {
@@ -13,7 +13,7 @@
     },
     "scripts": {
         "build": "yarn build:esm && yarn build:cjs",
-        "build:esm": "tsc --module esnext --outDir lib/esm --project ./tsconfig.build.json",
+        "build:esm": "tsc --module esnext --outDir lib --project ./tsconfig.build.json",
         "build:cjs": "tsc --project ./tsconfig.build.json",
         "test": "NODE_ENV=test jest"
     },

@@ -1,21 +1,16 @@
-import axios from 'axios';
 import { env } from 'common/env';
-import { log } from 'common/log';
 import { Admin, Core } from 'flyteidl';
+import { getAxiosApiCall } from '@flyteconsole/flyte-api';
 import { getAdminEntity } from 'models/AdminEntity/AdminEntity';
 import { defaultPaginationConfig } from 'models/AdminEntity/constants';
-import { transformRequestError } from 'models/AdminEntity/transformRequestError';
 import { PaginatedEntityResponse, RequestConfig } from 'models/AdminEntity/types';
-import { adminApiUrl, getProfileUrl } from 'models/AdminEntity/utils';
-import { defaultAxiosConfig, defaultSystemStatus, identifierPrefixes } from './constants';
+import { defaultSystemStatus, identifierPrefixes } from './constants';
 import {
-  GetVersionResponse,
   IdentifierScope,
   NamedEntity,
   NamedEntityIdentifier,
   ResourceType,
   SystemStatus,
-  UserProfile,
 } from './types';
 import { makeIdentifierPath, makeNamedEntityPath } from './utils';
 
@@ -97,37 +92,6 @@ export const listNamedEntities = (input: ListNamedEntitiesInput, requestConfig?:
   );
 };
 
-/** Fetches the current user profile. NOTE: This will *not* fail in cases
- * where the user is not logged in or the session is expired. Admin does not
- * distinguish between these cases, so the profile will be `null` in both cases.
- * A value of `null` indicates that a redirect to the login endpoint is needed.
- */
-export const getUserProfile = async () => {
-  const path = getProfileUrl();
-  try {
-    const { data } = await axios.get<UserProfile>(path, defaultAxiosConfig);
-    return data;
-  } catch (e) {
-    const { message } = transformRequestError(e, path);
-    log.error(`Failed to fetch user profile: ${message}`);
-    return null;
-  }
-};
-
-/** Fetches the current admin version.
- */
-export const getVersion = async () => {
-  const path = adminApiUrl('/version');
-  try {
-    const { data } = await axios.get<GetVersionResponse>(path, defaultAxiosConfig);
-    return data;
-  } catch (e) {
-    const { message } = transformRequestError(e, path);
-    log.error(`Failed to fetch version: ${message}`);
-    return null;
-  }
-};
-
 /** If env.STATUS_URL is set, will issue a fetch to retrieve the current system
  * status. If not, will resolve immediately with a default value indicating
  * normal system status.
@@ -138,11 +102,10 @@ export const getSystemStatus = async () => {
   }
   const path = env.STATUS_URL;
 
-  try {
-    const { data } = await axios.get<SystemStatus>(path, defaultAxiosConfig);
-    return data;
-  } catch (e) {
-    const { message } = transformRequestError(e, path);
-    throw new Error(`Failed to fetch system status: ${message}`);
+  const result = await getAxiosApiCall<SystemStatus>(path);
+  if (!result) {
+    throw new Error('Failed to fetch system status');
   }
+
+  return result;
 };

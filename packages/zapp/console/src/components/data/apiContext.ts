@@ -1,4 +1,3 @@
-import { getLoginUrl } from 'models/AdminEntity/utils';
 import * as CommonAPI from 'models/Common/api';
 import * as ExecutionAPI from 'models/Execution/api';
 import * as LaunchAPI from 'models/Launch/api';
@@ -14,12 +13,8 @@ type APIFunctions = typeof CommonAPI &
   typeof TaskAPI &
   typeof WorkflowAPI;
 
-export interface LoginStatus {
-  expired: boolean;
-  setExpired(expired: boolean): void;
-}
 export interface APIContextValue extends APIFunctions {
-  loginStatus: LoginStatus;
+  // use API functions only, for now
 }
 
 export const defaultAPIContextValue = {
@@ -29,12 +24,6 @@ export const defaultAPIContextValue = {
   ...ProjectAPI,
   ...TaskAPI,
   ...WorkflowAPI,
-  loginStatus: {
-    expired: false,
-    setExpired: () => {
-      // do nothing
-    },
-  },
 };
 
 /** Exposes all of the model layer api functions for use by data fetching
@@ -43,26 +32,10 @@ export const defaultAPIContextValue = {
  */
 export const APIContext = React.createContext<APIContextValue>(defaultAPIContextValue);
 
-function useLoginStatus(): LoginStatus {
-  const [expired, setExpired] = React.useState(false);
-
-  // Whenever we detect expired credentials, trigger a login redirect automatically
-  React.useEffect(() => {
-    if (expired) {
-      window.location.href = getLoginUrl();
-    }
-  }, [expired]);
-  return {
-    expired,
-    setExpired,
-  };
-}
-
 /** Creates a state object that can be used as the value for APIContext.Provider */
 export function useAPIState(): APIContextValue {
   return {
     ...defaultAPIContextValue,
-    loginStatus: useLoginStatus(),
   };
 }
 

@@ -1,14 +1,16 @@
-import { useAPIContext } from 'components/data/apiContext';
+import { useFlyteApi, AdminEndpoint, getAxiosApiCall } from '@flyteconsole/flyte-api';
 import { GetVersionResponse } from 'models/Common/types';
 import { useFetchableData } from './useFetchableData';
 
 /** State hook that returns the version information */
 function useVersion() {
-  const { getVersion } = useAPIContext();
+  const { getAdminApiUrl } = useFlyteApi();
+  const versionPath = getAdminApiUrl(AdminEndpoint.Version);
+
   return useFetchableData<GetVersionResponse | null>({
     debugName: 'Version',
     defaultValue: null,
-    doFetch: getVersion,
+    doFetch: () => getAxiosApiCall(versionPath),
     useCache: true,
   });
 }

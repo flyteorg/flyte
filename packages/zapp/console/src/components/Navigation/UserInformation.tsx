@@ -1,9 +1,8 @@
 import * as React from 'react';
-import Link from '@material-ui/core/Link';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { useFlyteApi } from '@flyteconsole/flyte-api';
+import { Link, makeStyles, Theme } from '@material-ui/core';
 import { WaitForData } from 'components/common/WaitForData';
 import { useUserProfile } from 'components/hooks/useUserProfile';
-import { getLoginUrl } from 'models/AdminEntity/utils';
 import t from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -12,22 +11,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const LoginLink: React.FC = () => (
-  <Link href={getLoginUrl()} color="inherit">
-    {t('login')}
-  </Link>
-);
+const LoginLink = (props: { loginUrl: string }) => {
+  return (
+    <Link href={props.loginUrl} color="inherit">
+      {t('login')}
+    </Link>
+  );
+};
 
 /** Displays user info if logged in, or a login link otherwise. */
 export const UserInformation: React.FC<{}> = () => {
   const style = useStyles();
   const profile = useUserProfile();
+  const apiContext = useFlyteApi();
 
   return (
     <WaitForData spinnerVariant="none" {...profile}>
       <div className={style.container}>
         {!profile.value ? (
-          <LoginLink />
+          <LoginLink loginUrl={apiContext.getLoginUrl()} />
         ) : !profile.value.preferredUsername || profile.value.preferredUsername === '' ? (
           profile.value.name
         ) : (

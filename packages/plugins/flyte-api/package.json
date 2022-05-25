@@ -1,10 +1,10 @@
 {
     "name": "@flyteconsole/flyte-api",
-    "version": "0.0.1-rc.1",
+    "version": "0.0.2",
     "description": "FlyteConsole plugin to allow access FlyteAPI",
     "main": "./dist/index.js",
-    "module": "./lib/esm/index.js",
-    "types": "./lib/esm/index.d.ts",
+    "module": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "license": "Apache-2.0",
     "private": false,
     "publishConfig": {
@@ -12,15 +12,17 @@
         "registry": "https://registry.npmjs.org/"
     },
     "scripts": {
+        "clean": "rm -rf dist && rm -rf lib",
         "build": "yarn build:esm && yarn build:cjs",
-        "build:esm": "tsc --module esnext --outDir lib/esm --project ./tsconfig.build.json",
+        "build:esm": "tsc --module esnext --outDir lib --project ./tsconfig.build.json",
         "build:cjs": "tsc --project ./tsconfig.build.json",
+        "push:update": "yarn clean && yarn build && yarn publish",
         "test": "NODE_ENV=test jest"
     },
     "dependencies": {
-        "@material-ui/core": "^4.0.0",
-        "@material-ui/icons": "^4.0.0",
-        "classnames": "^2.3.1"
+        "axios": "^0.27.2",
+        "camelcase-keys": "^7.0.2",
+        "snakecase-keys": "^5.4.2"
     },
     "peerDependencies": {
         "react": "^16.13.1",

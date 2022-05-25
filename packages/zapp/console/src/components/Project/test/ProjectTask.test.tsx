@@ -1,8 +1,11 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { APIContext } from 'components/data/apiContext';
+import { useUserProfile } from 'components/hooks/useUserProfile';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { FetchableData } from 'components/hooks/types';
+import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
 import { FilterOperationName } from 'models/AdminEntity/types';
-import { getUserProfile, listNamedEntities } from 'models/Common/api';
+import { listNamedEntities } from 'models/Common/api';
 import {
   NamedEntity,
   NamedEntityIdentifier,
@@ -27,6 +30,7 @@ const sampleUserProfile: UserProfile = {
   subject: 'subject',
 } as UserProfile;
 
+jest.mock('components/hooks/useUserProfile');
 jest.mock('notistack', () => ({
   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
 }));
@@ -41,10 +45,10 @@ describe('ProjectTasks', () => {
   let tasks: NamedEntity[];
   let queryClient: QueryClient;
   let mockListNamedEntities: jest.Mock<ReturnType<typeof listNamedEntities>>;
-  let mockGetUserProfile: jest.Mock<ReturnType<typeof getUserProfile>>;
+  const mockUseUserProfile = useUserProfile as jest.Mock<FetchableData<UserProfile | null>>;
 
   beforeEach(() => {
-    mockGetUserProfile = jest.fn().mockResolvedValue(null);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(null, jest.fn()));
     queryClient = createTestQueryClient();
     tasks = ['MyTask', 'MyOtherTask'].map((name) => createTask({ domain, name, project }));
     mockListNamedEntities = jest.fn().mockResolvedValue({ entities: tasks });
@@ -60,10 +64,7 @@ describe('ProjectTasks', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <APIContext.Provider
-          value={mockAPIContextValue({
-            listNamedEntities: mockListNamedEntities,
-            getUserProfile: mockGetUserProfile,
-          })}
+          value={mockAPIContextValue({ listNamedEntities: mockListNamedEntities })}
         >
           <ProjectTasks projectId={project} domainId={domain} />
         </APIContext.Provider>
@@ -91,7 +92,7 @@ describe('ProjectTasks', () => {
   });
 
   it('should display checkbox if user login', async () => {
-    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(sampleUserProfile, jest.fn()));
     const { getAllByRole } = renderComponent();
     await waitFor(() => {});
     const checkboxes = getAllByRole(/checkbox/i) as HTMLInputElement[];
@@ -101,7 +102,7 @@ describe('ProjectTasks', () => {
   });
 
   it('should display archive button', async () => {
-    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(sampleUserProfile, jest.fn()));
     const { getByText, getAllByTitle, findAllByText } = renderComponent();
     await waitFor(() => {});
 
@@ -130,7 +131,7 @@ describe('ProjectTasks', () => {
   });
 
   it('clicking show archived should hide active tasks', async () => {
-    mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+    mockUseUserProfile.mockReturnValue(loadedFetchable(sampleUserProfile, jest.fn()));
     const { getByText, queryByText, getAllByRole } = renderComponent();
     await waitFor(() => {});
 

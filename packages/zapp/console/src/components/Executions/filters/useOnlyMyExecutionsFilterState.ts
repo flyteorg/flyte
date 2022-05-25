@@ -25,7 +25,7 @@ export function useOnlyMyExecutionsFilterState({
   initialValue,
 }: OnlyMyExecutionsFilterStateProps): OnlyMyExecutionsFilterState {
   const profile = useUserProfile();
-  const userId = profile.value?.subject ? profile.value.subject : '';
+  const userId = profile.value?.subject ?? '';
   const isFlagEnabled = useFeatureFlag(FeatureFlag.OnlyMine);
   const onlyMineExecutionsSelectedValue = useOnlyMineSelectedValue(OnlyMyFilter.OnlyMyExecutions);
   const [onlyMyExecutionsValue, setOnlyMyExecutionsValue] = useState<boolean>(

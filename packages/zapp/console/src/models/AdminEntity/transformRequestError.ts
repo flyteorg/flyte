@@ -8,7 +8,7 @@ function decodeErrorResponseMessage(error: AxiosError) {
   try {
     // probablly using a wrong decode type.. is there a decode type for the error message?
     const decodedErrorResponseMessage = decodeProtoResponse(
-      error.response?.data,
+      error.response?.data as any,
       Admin.RawOutputDataConfig,
     );
     if (decodedErrorResponseMessage && decodedErrorResponseMessage.outputLocationPrefix) {

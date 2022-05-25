@@ -1,10 +1,10 @@
 import { useMachine } from '@xstate/react';
+import { FlyteApiContextState, useFlyteApi } from '@flyteconsole/flyte-api';
 import { createDebugLogger } from 'common/log';
 import { CacheContext } from 'components/Cache/CacheContext';
 import { ValueCache } from 'components/Cache/createCache';
 import { getCacheKey } from 'components/Cache/utils';
 import { defaultStateMachineConfig } from 'components/common/constants';
-import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { NotAuthorizedError } from 'errors/fetchErrors';
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { fetchMachine } from './fetchMachine';
@@ -33,7 +33,7 @@ function isHashableInput(value: any): value is object | string {
 }
 
 interface CreateFetchFnConfig<T, DataType> {
-  apiContext: APIContextValue;
+  apiContext: FlyteApiContextState;
   cache: ValueCache;
   cacheKey?: string;
   debugName?: string;
@@ -110,7 +110,7 @@ export function useFetchableData<T extends object, DataType>(
   const cacheKey = isHashableInput(data) ? getCacheKey(data) : undefined;
   const contextCacheKey = useRef<string>();
   const cache = useContext(CacheContext);
-  const apiContext = useAPIContext();
+  const apiContext = useFlyteApi();
   const fetchFn = useMemo(
     () =>
       createFetchFn({

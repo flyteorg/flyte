@@ -3,8 +3,8 @@
     "version": "0.0.1-rc.2",
     "description": "Flyteconsole UI atoms, which didn't plan to be published and would be consumed as is internally",
     "main": "./dist/index.js",
-    "module": "./lib/esm/index.js",
-    "types": "./lib/esm/index.d.ts",
+    "module": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "license": "Apache-2.0",
     "private": false,
     "publishConfig": {
@@ -13,7 +13,7 @@
     },
     "scripts": {
         "build": "yarn build:esm && yarn build:cjs",
-        "build:esm": "tsc --module esnext --outDir lib/esm",
+        "build:esm": "tsc --module esnext --outDir lib",
         "build:cjs": "tsc",
         "test": "NODE_ENV=test jest"
     },
