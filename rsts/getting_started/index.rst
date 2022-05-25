@@ -220,6 +220,19 @@ Then run the same Workflow on the Flyte cluster:
        * If you want to use a custom image, use the ``--image`` flag and provide the fully qualified image name of your image.
        * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 
+Visualize the workflow
+""""""""""""""""""""""
+
+You can visualize the workflow without using the UI and the DAG can be rendered in the web browser.
+
+ .. prompt:: bash $
+    flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
+
+You can also view the workflow as a ``strict digraph`` on the command line.
+
+ .. prompt:: bash $
+    flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o dot
+    
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^^^^
 Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to Flyte Console, the web UI
