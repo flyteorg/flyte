@@ -225,15 +225,15 @@ Visualize the workflow
 
 You can visualize the workflow without using the UI and the DAG can be rendered in the web browser.
 
- .. prompt:: bash $
+.. prompt:: bash $
     
-   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
+  flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
 
 You can also view the workflow as a ``strict digraph`` on the command line.
 
- .. prompt:: bash $
+.. prompt:: bash $
     
-   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o dot
+  flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o dot
     
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^^^^
