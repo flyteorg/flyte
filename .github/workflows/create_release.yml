@@ -1,12 +1,10 @@
 name: Create a flyte release
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       version:
-#         description: "version name. example v0.1.1"
-#         required: true
 on:
-  pull_request
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version name. example v0.1.1"
+        required: true
 
 jobs:
   bump-version:
@@ -123,6 +121,7 @@ jobs:
         run: |
           make prepare_artifacts
           git stash
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -134,8 +133,7 @@ jobs:
   repository-dispatch:
     name: Repository Dispatch
     runs-on: ubuntu-latest
-    # needs: [bump-version, publish-flyte-component-image]
-    needs: [bump-version]
+    needs: [bump-version, publish-flyte-component-image]
     if: ${{ !contains('${{ needs.bump-version.outputs.version }}', 'b') }}
     steps:
       - name: Create an event for the release
