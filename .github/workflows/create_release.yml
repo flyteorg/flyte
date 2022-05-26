@@ -131,15 +131,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
 
-    repository-dispatch:
-      name: Repository Dispatch
-      runs-on: ubuntu-latest
-      needs: [bump-version]
-      if: contains(${{ needs.bump-version.outputs.version }}, "b")
-      steps:
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.FLYTE_BOT_PAT }}
-          repository: flyteorg/flyteorg.github.io
-          event-type: release
-          client-payload: '{"tag": "${{ needs.bump-version.outputs.version }}"}'
+  repository-dispatch:
+    name: Repository Dispatch
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    if: contains(${{ needs.bump-version.outputs.version }}, "b")
+    steps:
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.FLYTE_BOT_PAT }}
+        repository: flyteorg/flyteorg.github.io
+        event-type: release
+        client-payload: '{"tag": "${{ needs.bump-version.outputs.version }}"}'
