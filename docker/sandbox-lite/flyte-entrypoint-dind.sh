@@ -45,7 +45,7 @@ version=""
 if [[ $FLYTE_TEST = "release" ]]
 then
   helm repo add flyteorg https://flyteorg.github.io/flyte
-  helm fetch flyteorg/flyte --version=$FLYTE_VERSION
+  helm fetch flyteorg/flyte-deps --version=$FLYTE_VERSION
   version="--version $FLYTE_VERSION"
   charts="flyteorg/flyte-deps"
 fi
