@@ -6,6 +6,7 @@ import { LaunchPlan } from 'models/Launch/types';
 import { Task } from 'models/Task/types';
 import { Workflow } from 'models/Workflow/types';
 import * as moment from 'moment';
+import { LiteralValueMap } from 'components/Launch/LaunchForm/types';
 import { simpleTypeToInputType, typeLabels } from './constants';
 import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { typeIsSupported } from './inputHelpers/utils';
@@ -189,4 +190,23 @@ export function isEnterInputsState(state: BaseInterpretedLaunchState): boolean {
     LaunchState.SUBMIT_FAILED,
     LaunchState.SUBMIT_SUCCEEDED,
   ].some(state.matches);
+}
+
+export function literalsToLiteralValueMap(
+  literals: {
+    [k: string]: Core.ILiteral;
+  },
+  nameToTypeMap: Record<string, Variable>,
+): LiteralValueMap {
+  const literalValueMap: LiteralValueMap = new Map<string, Core.ILiteral>();
+
+  for (var i = 0; i < Object.keys(literals).length; i++) {
+    const name = Object.keys(literals)[i];
+    const type = nameToTypeMap[name].type;
+    const typeDefinition = getInputDefintionForLiteralType(type);
+    const inputKey = createInputCacheKey(name, typeDefinition);
+    literalValueMap.set(inputKey, literals[Object.keys(literals)[i]]);
+  }
+
+  return literalValueMap;
 }

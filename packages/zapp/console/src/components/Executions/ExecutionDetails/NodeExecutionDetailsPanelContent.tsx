@@ -41,6 +41,7 @@ import { getTaskExecutionDetailReasons } from './utils';
 import { ExpandableMonospaceText } from '../../common/ExpandableMonospaceText';
 import { fetchWorkflowExecution } from '../useWorkflowExecution';
 import { NodeExecutionTabs } from './NodeExecutionTabs';
+import { ExecutionDetailsActions } from './ExecutionDetailsActions';
 
 const useStyles = makeStyles((theme: Theme) => {
   const paddingVertical = `${theme.spacing(2)}px`;
@@ -90,6 +91,11 @@ const useStyles = makeStyles((theme: Theme) => {
       flexDirection: 'row',
       fontWeight: 'bold',
       justifyContent: 'space-between',
+      marginTop: theme.spacing(2),
+      paddingTop: theme.spacing(2),
+    },
+    actionsContainer: {
+      borderTop: `1px solid ${theme.palette.divider}`,
       marginTop: theme.spacing(2),
       paddingTop: theme.spacing(2),
     },
@@ -395,6 +401,13 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
           </Typography>
           {statusContent}
           {!dag && detailsContent}
+          {details && (
+            <ExecutionDetailsActions
+              className={styles.actionsContainer}
+              details={details}
+              nodeExecutionId={nodeExecutionId}
+            />
+          )}
         </div>
       </header>
       {dag ? <WorkflowTabs nodeId={nodeExecutionId.nodeId} dagData={dag} /> : tabsContent}

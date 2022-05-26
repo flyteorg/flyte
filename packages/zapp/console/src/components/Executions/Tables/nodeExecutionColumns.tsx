@@ -10,6 +10,7 @@ import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { getNodeExecutionTimingMS } from '../utils';
+import { NodeExecutionActions } from './NodeExecutionActions';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import { NodeExecutionCellRendererData, NodeExecutionColumnDefinition } from './types';
@@ -201,11 +202,11 @@ export function generateColumns(
     },
     {
       cellRenderer: ({ execution, state }) => (
-        <SelectNodeExecutionLink execution={execution} linkText="View Logs" state={state} />
+        <NodeExecutionActions execution={execution} state={state} />
       ),
       className: styles.columnLogs,
-      key: 'logs',
-      label: 'logs',
+      key: 'actions',
+      label: '',
     },
   ];
 }
