@@ -134,8 +134,9 @@ jobs:
   repository-dispatch:
     name: Repository Dispatch
     runs-on: ubuntu-latest
+    # needs: [bump-version, publish-flyte-component-image]
     needs: [bump-version]
-    if: "!contains(${{ needs.bump-version.outputs.version }}, 'b')"
+    if: "!contains('${{ needs.bump-version.outputs.version }}', 'b')"
     steps:
       - name: Create an event for the release
         uses: peter-evans/repository-dispatch@v2
