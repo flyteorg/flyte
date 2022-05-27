@@ -37,7 +37,7 @@ spec:
           name: run-migrations
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         {{- if .Values.flyteadmin.initialProjects }}
         - command:
           - flyteadmin
@@ -53,7 +53,7 @@ spec:
           name: seed-projects
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         {{- end }}
         {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
         - command:
@@ -69,7 +69,9 @@ spec:
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: clusters-config-volume
+          - mountPath: /etc/secrets/
+            name: admin-secrets
         {{- end }}
         - name: generate-secrets
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
@@ -80,10 +82,10 @@ spec:
                 "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - name: scratch
-              mountPath: /etc/scratch
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+            - mountPath: /etc/scratch
+              name: scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -125,9 +127,9 @@ spec:
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
-          name: config-volume
-        - name: auth
-          mountPath: /etc/secrets/
+          name: clusters-config-volume
+        - mountPath: /etc/secrets/
+          name: admin-secrets
         {{- with .Values.flyteadmin.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
@@ -138,14 +140,21 @@ spec:
         - emptyDir: {}
           name: scratch
         - configMap:
-            name: flyte-admin-config
-          name: config-volume
+            name: flyte-admin-base-config
+          name: base-config-volume
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+          name: clusters-config-volume
         {{- if .Values.cluster_resource_manager.enabled }}
         - configMap:
             name: clusterresource-template
           name: resource-templates
         {{- end }}
-        - name: auth
+        - name: admin-secrets
           secret:
             secretName: flyte-admin-secrets
         {{- with .Values.flyteadmin.additionalVolumes -}}

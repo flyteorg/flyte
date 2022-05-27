@@ -2,13 +2,23 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config
+  name: flyte-admin-clusters-config
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
 {{- with .Values.configmap.clusters }}
-  clusters: | {{ tpl (toYaml .) $ | nindent 4 }}
+  clusters.yaml: |
+    clusters:
+      {{- tpl (toYaml .) $ | nindent 6 }}
 {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-base-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
 {{- with .Values.db.admin }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
@@ -32,9 +42,9 @@ data:
   task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- if .Values.workflow_notifications.enabled }}
-{{- with .Values.workflow_notifications.config }}
+  {{- with .Values.workflow_notifications.config }}
   notifications.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.external_events.enable }}
 {{- with .Values.external_events }}
@@ -43,15 +53,13 @@ data:
 {{- end }}
 {{- end }}
 {{- if .Values.cluster_resource_manager.enabled }}
-{{- with .Values.cluster_resource_manager.config }}
+  {{- with .Values.cluster_resource_manager.config }}
   cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
 {{- end }}
-{{- end }}
-{{- if .Values.workflow_scheduler.enabled }}
-  {{- if eq .Values.workflow_scheduler.type "aws" }}
-{{- with .Values.workflow_scheduler.config }}
+{{- if and .Values.workflow_scheduler.enabled (eq .Values.workflow_scheduler.type "aws") }}
+  {{- with .Values.workflow_scheduler.config }}
   scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
   {{- end }}
 {{- end }}
 {{- end }}

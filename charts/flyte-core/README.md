@@ -115,10 +115,10 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
 | datacatalog.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
 | datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
-| datacatalog.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for Datacatalog |
+| datacatalog.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Datacatalog |
 | datacatalog.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
-| datacatalog.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| datacatalog.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
 | db.admin.database.dbname | string | `"flyteadmin"` |  |
 | db.admin.database.host | string | `"postgres"` |  |
@@ -139,7 +139,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v1.1.5"` |  |
+| flyteadmin.image.tag | string | `"v1.1.11"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -148,11 +148,12 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
 | flyteadmin.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
-| flyteadmin.serviceAccount | object | `{"annotations":{},"create":true,"createClusterRole":true,"imagePullSecrets":{}}` | Configuration for service accounts for FlyteAdmin |
+| flyteadmin.serviceAccount | object | `{"alwaysCreate":false,"annotations":{},"create":true,"createClusterRole":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlyteAdmin |
+| flyteadmin.serviceAccount.alwaysCreate | bool | `false` | Should a service account always be created for flyteadmin even without an actual flyteadmin deployment running (e.g. for multi-cluster setups) |
 | flyteadmin.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flyteadmin pods |
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
 | flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
-| flyteadmin.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
@@ -177,32 +178,32 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.1.1"` |  |
+| flytepropeller.image.tag | string | `"v1.1.4"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flytepropeller.priorityClassName | string | `""` | Sets priorityClassName for propeller pod(s). |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
-| flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for FlytePropeller |
+| flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlytePropeller |
 | flytepropeller.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to FlytePropeller pods |
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
-| flytepropeller.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| flytepropeller.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
 | flytescheduler.affinity | object | `{}` | affinity for Flytescheduler deployment |
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flytescheduler.image.tag | string | `"v1.1.5"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v1.1.11"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.priorityClassName | string | `""` | Sets priorityClassName for flyte scheduler pod(s). |
 | flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
 | flytescheduler.secrets | object | `{}` |  |
-| flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for Flytescheduler |
+| flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Flytescheduler |
 | flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
-| flytescheduler.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| flytescheduler.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
 | secrets.adminOauthClientCredentials.clientSecret | string | `"foobar"` |  |
@@ -211,17 +212,22 @@ helm install gateway bitnami/contour -n flyte
 | sparkoperator.enabled | bool | `false` | - enable or disable Sparkoperator deployment installation |
 | sparkoperator.plugin_config | object | `{"plugins":{"spark":{"spark-config-default":[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]}}}` | Spark plugin configuration |
 | sparkoperator.plugin_config.plugins.spark.spark-config-default | list | `[{"spark.hadoop.fs.s3a.aws.credentials.provider":"com.amazonaws.auth.DefaultAWSCredentialsProviderChain"},{"spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version":"2"},{"spark.kubernetes.allocation.batch.size":"50"},{"spark.hadoop.fs.s3a.acl.default":"BucketOwnerFullControl"},{"spark.hadoop.fs.s3n.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3n.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"},{"spark.hadoop.fs.AbstractFileSystem.s3a.impl":"org.apache.hadoop.fs.s3a.S3A"},{"spark.hadoop.fs.s3a.multipart.threshold":"536870912"},{"spark.blacklist.enabled":"true"},{"spark.blacklist.timeout":"5m"},{"spark.task.maxfailures":"8"}]` | Spark default configuration |
-| storage | object | `{"bucketName":"my-s3-bucket","custom":{},"gcs":null,"s3":{"region":"us-east-1"},"type":"sandbox"}` | ----------------------------------------------------  STORAGE SETTINGS  |
+| storage | object | `{"bucketName":"my-s3-bucket","custom":{},"enableMultiContainer":false,"gcs":null,"limits":{"maxDownloadMBs":10},"s3":{"accessKey":"","authType":"iam","region":"us-east-1","secretKey":""},"type":"sandbox"}` | ----------------------------------------------------  STORAGE SETTINGS  |
 | storage.bucketName | string | `"my-s3-bucket"` | bucketName defines the storage bucket flyte will use. Required for all types except for sandbox. |
 | storage.custom | object | `{}` | Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings. |
+| storage.enableMultiContainer | bool | `false` | toggles multi-container storage config |
 | storage.gcs | string | `nil` | settings for storage type gcs |
-| storage.s3 | object | `{"region":"us-east-1"}` | settings for storage type s3 |
+| storage.limits | object | `{"maxDownloadMBs":10}` | default limits being applied to storage config |
+| storage.s3 | object | `{"accessKey":"","authType":"iam","region":"us-east-1","secretKey":""}` | settings for storage type s3 |
+| storage.s3.accessKey | string | `""` | AWS IAM user access key ID to use for S3 bucket auth, only used if authType is set to accesskey |
+| storage.s3.authType | string | `"iam"` | type of authentication to use for S3 buckets, can either be iam or accesskey |
+| storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
 | webhook.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for the webhook |
-| webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for the webhook |
+| webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for the webhook |
 | webhook.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to the webhook |
 | webhook.serviceAccount.create | bool | `true` | Should a service account be created for the webhook |
-| webhook.serviceAccount.imagePullSecrets | object | `{}` | ImapgePullSecrets to automatically assign to the service account |
+| webhook.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler | object | `{"config":{},"enabled":false,"type":""}` | **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |

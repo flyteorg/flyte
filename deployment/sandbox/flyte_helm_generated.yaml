@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   name: flyte-kubernetes-dashboard
 ---
-# Source: flyte/charts/flyte/templates/admin/secret-auth.yaml
+# Source: flyte/charts/flyte/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -216,7 +216,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config
+  name: flyte-admin-clusters-config
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
@@ -224,9 +224,23 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  clusters: | 
-    clusterConfigs: []
-    labelClusterMap: {}
+  clusters.yaml: |
+    clusters:
+      clusterConfigs: []
+      labelClusterMap: {}
+---
+# Source: flyte/charts/flyte/templates/admin/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-base-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -310,6 +324,7 @@ data:
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -492,6 +507,7 @@ data:
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
 ---
@@ -651,6 +667,7 @@ data:
       signedUrl:
         stowConfigOverride:
           endpoint: http://localhost:30084
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -4458,7 +4475,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b87308c4bbf68e244f3faf0147c131249eb6f4a721115f5662c06fe82119dd1"
+        configChecksum: "dbdbc110b18fdd2da894e17110f758397b31a004272fcc0280b708273bd09a0"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -4476,13 +4493,13 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
           
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
@@ -4492,20 +4509,20 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
           
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: base-config-volume
         - command:
           - flyteadmin
           - --config
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -4513,9 +4530,11 @@ spec:
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
-            name: config-volume
+            name: clusters-config-volume
+          - mountPath: /etc/secrets/
+            name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -4523,10 +4542,10 @@ spec:
                 "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - name: scratch
-              mountPath: /etc/scratch
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+            - mountPath: /etc/scratch
+              name: scratch
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -4538,7 +4557,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -4568,9 +4587,9 @@ spec:
         - mountPath: /srv/flyte
           name: shared-data
         - mountPath: /etc/flyte/config
-          name: config-volume
-        - name: auth
-          mountPath: /etc/secrets/
+          name: clusters-config-volume
+        - mountPath: /etc/secrets/
+          name: admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         
@@ -4579,12 +4598,19 @@ spec:
         - emptyDir: {}
           name: scratch
         - configMap:
-            name: flyte-admin-config
-          name: config-volume
+            name: flyte-admin-base-config
+          name: base-config-volume
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+          name: clusters-config-volume
         - configMap:
             name: clusterresource-template
           name: resource-templates
-        - name: auth
+        - name: admin-secrets
           secret:
             secretName: flyte-admin-secrets
 ---
@@ -4607,6 +4633,8 @@ spec:
       app.kubernetes.io/instance: flyte
   template:
     metadata:
+      annotations:
+        configChecksum: "c9c09c6c4db7eb63d15b3c38ac229d0df28647bb980aaf23a0be22a37f33d94"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -4620,7 +4648,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.5"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.11"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -4717,7 +4745,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "78d2650a0a180b7051c177a7445099ab300ba4924a008d913377999d3b51dfe"
+        configChecksum: "8feeaa7f7ec6506426db0d3e3cda6bc3ac0049a7eeba49d6cce62b3e1c7c424"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -4797,7 +4825,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b87308c4bbf68e244f3faf0147c131249eb6f4a721115f5662c06fe82119dd1"
+        configChecksum: "dbdbc110b18fdd2da894e17110f758397b31a004272fcc0280b708273bd09a0"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -4814,7 +4842,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.5"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.11"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -4829,7 +4857,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.5"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.11"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -4881,7 +4909,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6756723e70d224ef8d0a589384fa43c050590ff735778c309c6c7fa31ff9a37"
+        configChecksum: "66eed8cb193fe41d8892fa81877986b3526748a09a463a47029b68702804815"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -4906,7 +4934,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -4952,9 +4980,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.1
+        app.kubernetes.io/version: v1.1.4
       annotations:
-        configChecksum: "6756723e70d224ef8d0a589384fa43c050590ff735778c309c6c7fa31ff9a37"
+        configChecksum: "66eed8cb193fe41d8892fa81877986b3526748a09a463a47029b68702804815"
     spec:
       securityContext:
         fsGroup: 65534
@@ -4963,7 +4991,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -4986,7 +5014,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

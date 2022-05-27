@@ -1,4 +1,18 @@
 ---
+# Source: flyte-core/templates/admin/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -160,6 +174,7 @@ data:
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/devstorage.read_write
       container: "<BUCKETNAME>"
+      enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -202,6 +217,36 @@ spec:
           type: object
           x-kubernetes-preserve-unknown-fields: true
           properties:
+---
+# Source: flyte-core/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-flyteadmin
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - ""
+  - flyte.lyft.com
+  - rbac.authorization.k8s.io
+  resources:
+  - configmaps
+  - flyteworkflows
+  - namespaces
+  - pods
+  - resourcequotas
+  - roles
+  - rolebindings
+  - secrets
+  - services
+  - serviceaccounts
+  - spark-role
+  verbs:
+  - '*'
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -297,6 +342,25 @@ rules:
       - update
       - patch
 ---
+# Source: flyte-core/templates/admin/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-flyteadmin-binding
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-flyteadmin
+subjects:
+- kind: ServiceAccount
+  name: flyteadmin
+  namespace: flyte
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -370,7 +434,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c764b73cca66a0760dcd8afa89a6b3e978e7ab5b48ca116b35c827599da4e9d"
+        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -395,7 +459,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -448,9 +512,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.1
+        app.kubernetes.io/version: v1.1.4
       annotations:
-        configChecksum: "c764b73cca66a0760dcd8afa89a6b3e978e7ab5b48ca116b35c827599da4e9d"
+        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
     spec:
       securityContext:
         fsGroup: 65534
@@ -459,7 +523,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -482,7 +546,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.1"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.4"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

@@ -148,8 +148,12 @@ storage:
   type: s3
   container: {{ .Values.storage.bucketName | quote }}
   connection:
-    auth-type: iam
+    auth-type: {{ .Values.storage.s3.authType }}
     region: {{ .Values.storage.s3.region }}
+    {{- if eq .Values.storage.s3.authType "accesskey" }}
+    access-key: {{ .Values.storage.s3.accessKey }}
+    secret-key: {{ .Values.storage.s3.secretKey }}
+    {{- end }}
 {{- else if eq .Values.storage.type "gcs" }}
   type: stow
   stow:
@@ -183,6 +187,7 @@ storage:
 
 {{- define "storage" -}}
 {{ include "storage.base" .}}
+  enable-multicontainer: {{ .Values.storage.enableMultiContainer }}
   limits:
-    maxDownloadMBs: 10
+    maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
 {{- end }}

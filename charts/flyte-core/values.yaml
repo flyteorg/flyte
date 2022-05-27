@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.1.5 # FLYTEADMIN_TAG
+    tag: v1.1.11 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -58,10 +58,12 @@ flyteadmin:
   serviceAccount:
     # -- Should a service account be created for flyteadmin
     create: true
+    # -- Should a service account always be created for flyteadmin even without an actual flyteadmin deployment running (e.g. for multi-cluster setups)
+    alwaysCreate: false
     # -- Annotations for ServiceAccount attached to Flyteadmin pods
     annotations: {}
-    # -- ImapgePullSecrets to automatically assign to the service account
-    imagePullSecrets: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
     # -- Should a ClusterRole be created for Flyteadmin
     createClusterRole: true
   # -- Annotations for Flyteadmin pods
@@ -89,7 +91,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.1.5 # FLYTESCHEDULER_TAG
+    tag: v1.1.11 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -111,8 +113,8 @@ flytescheduler:
     create: true
     # -- Annotations for ServiceAccount attached to Flytescheduler pods
     annotations: {}
-    # -- ImapgePullSecrets to automatically assign to the service account
-    imagePullSecrets: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
   # -- nodeSelector for Flytescheduler deployment
@@ -163,8 +165,8 @@ datacatalog:
     create: true
     # -- Annotations for ServiceAccount attached to Datacatalog pods
     annotations: {}
-    # -- ImapgePullSecrets to automatically assign to the service account
-    imagePullSecrets: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
   # -- nodeSelector for Datacatalog deployment
@@ -192,7 +194,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.1.1 # FLYTEPROPELLER_TAG
+    tag: v1.1.4 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -214,8 +216,8 @@ flytepropeller:
     create: true
     # -- Annotations for ServiceAccount attached to FlytePropeller pods
     annotations: {}
-    # -- ImapgePullSecrets to automatically assign to the service account
-    imagePullSecrets: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
   # -- nodeSelector for Flytepropeller deployment
@@ -301,8 +303,8 @@ webhook:
     create: true
     # -- Annotations for ServiceAccount attached to the webhook
     annotations: {}
-    # -- ImapgePullSecrets to automatically assign to the service account
-    imagePullSecrets: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
   # -- Service settings for the webhook
   service:
     annotations:
@@ -361,12 +363,23 @@ storage:
   # -- settings for storage type s3
   s3:
     region: us-east-1
+    # -- type of authentication to use for S3 buckets, can either be iam or accesskey
+    authType: iam
+    # -- AWS IAM user access key ID to use for S3 bucket auth, only used if authType is set to accesskey
+    accessKey: ""
+    # -- AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey
+    secretKey: ""
   # -- settings for storage type gcs
   gcs:
   # -- GCP project ID. Required for storage type gcs.
   # projectId:
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
+  # -- toggles multi-container storage config
+  enableMultiContainer: false
+  # -- default limits being applied to storage config
+  limits:
+    maxDownloadMBs: 10
 
 # Database configuration
 db:
