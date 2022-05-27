@@ -37,7 +37,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 
 	literalsInputMap := map[string]*core.Literal{}
 	// Only add kickoff time input arg for cron based schedules
-	if len(s.CronExpression) > 0 {
+	if len(s.CronExpression) > 0 && len(s.KickoffTimeInputArg) > 0 {
 		literalsInputMap[s.KickoffTimeInputArg] = &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{

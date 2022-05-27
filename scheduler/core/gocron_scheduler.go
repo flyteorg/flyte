@@ -271,7 +271,9 @@ func (g *GoCronScheduler) AddFixedIntervalJob(ctx context.Context, job *GoCronJo
 	var jobFunc cron.TimedFuncJob
 	jobFunc = job.Run
 
-	g.cron.ScheduleTimedJob(cron.ConstantDelaySchedule{Delay: d}, jobFunc)
+	entryID := g.cron.ScheduleTimedJob(cron.ConstantDelaySchedule{Delay: d}, jobFunc)
+	// Update the enttry id in the job which is handle to be used for removal
+	job.entryID = entryID
 	logger.Infof(ctx, "successfully added the fixed rate schedule %s to the scheduler for schedule %+v",
 		job.nameOfSchedule, job.schedule)
 
