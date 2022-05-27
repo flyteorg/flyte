@@ -216,29 +216,24 @@ Then run the same Workflow on the Flyte cluster:
 
        * Consistent dependency management is a challenge with python projects, so Flyte uses `docker containers <https://www.docker.com/resources/what-container/>`__ to manage dependencies for your project.
        * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
-       * If you want to use a custom image, use the ``--image`` flag and provide the fully qualified image name of your image:
-
-       .. prompt :: bash $
-
-         pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2 --image <registry/repo:version>
-       
        * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 
-.. dropdown:: :fa:`info-circle` How to use a custom image?
+.. dropdown:: :fa:`info-circle` What does the ``--image`` flag do?
     :title: text-muted
     :animate: fade-in-slide-down
 
-    To use a custom image, push the docker image into the registry;
+    If you want to use a custom image, create a dockerfile, build it and push the docker image to registry:
 
     .. prompt :: bash $
-
+      
+      docker build . --tag <registry/repo:version>
       docker push <registry/repo:version>
 
-    and package the flyte workflow:
+    Once the docker image is pushed to registry, use the ``--image`` flag and provide the fully qualified image name of your image:
 
     .. prompt :: bash $
 
-      pyflyte --pkgs flyte.workflows package --image <registry/repo:version>
+       pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2 --image <registry/repo:version>
 
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^^^^
