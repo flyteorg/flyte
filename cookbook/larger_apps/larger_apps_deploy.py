@@ -124,12 +124,17 @@ track.
 
    flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
 
-Finally, visualize the registered workflow.
+Finally, visualize the registered workflow in a web browser.
 
 .. prompt:: bash $
 
    flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
 
+You can also view the workflow as a ``strict digraph`` on the command line.
+
+.. prompt:: bash $
+
+   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o dot
 
 .. _getting-started-execute:
 
