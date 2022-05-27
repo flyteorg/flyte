@@ -239,8 +239,8 @@ Then run the same Workflow on the Flyte cluster:
 
        * Consistent dependency management is a challenge with python projects, so Flyte uses `docker containers <https://www.docker.com/resources/what-container/>`__ to manage dependencies for your project.
        * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
-       * If you want to use a custom image, use the ``--image`` flag and provide the fully qualified image name of your image.
        * To use a custom image, push the docker image into the registry using ``docker push <registry/repo:version>`` and package it using ``pyflyte --pkgs flyte.workflows package --image <registry/repo:version>``.
+       * If you want to use a custom image, use the ``--image`` flag and provide the fully qualified image name of your image.
        * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 
 Inspect the Results
