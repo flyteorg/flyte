@@ -28,18 +28,22 @@ type gcMetrics struct {
 // GarbageCollector is an active background cleanup service, that deletes all workflows that are completed and older
 // than the configured TTL
 type GarbageCollector struct {
-	wfClient        v1alpha1.FlyteworkflowV1alpha1Interface
-	namespaceClient corev1.NamespaceInterface
-	ttlHours        int
-	interval        time.Duration
-	clk             clock.Clock
-	metrics         *gcMetrics
-	namespace       string
+	wfClient                  v1alpha1.FlyteworkflowV1alpha1Interface
+	namespaceClient           corev1.NamespaceInterface
+	ttlHours                  int
+	interval                  time.Duration
+	clk                       clock.Clock
+	metrics                   *gcMetrics
+	namespace                 string
+	labelSelectorRequirements []v1.LabelSelectorRequirement
 }
 
 // Issues a background deletion command with label selector for all completed workflows outside of the retention period
 func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 	s := CompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours, g.clk.Now())
+	if len(g.labelSelectorRequirements) != 0 {
+		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
+	}
 
 	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
 	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
@@ -74,6 +78,9 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 // Deprecated: Please use deleteWorkflows instead
 func (g *GarbageCollector) deprecatedDeleteWorkflows(ctx context.Context) error {
 	s := DeprecatedCompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours, g.clk.Now())
+	if len(g.labelSelectorRequirements) != 0 {
+		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
+	}
 
 	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
 	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
@@ -168,6 +175,7 @@ func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.Cl
 	} else {
 		logger.Warningf(context.TODO(), "defaulting max ttl for workflows to 23 hours, since configured duration is larger than 23 [%d]", cfg.MaxTTLInHours)
 	}
+	labelSelectorRequirements := getShardedLabelSelectorRequirements(cfg)
 	return &GarbageCollector{
 		wfClient:        wfClient,
 		ttlHours:        ttl,
@@ -178,7 +186,8 @@ func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.Cl
 			gcRoundSuccess: labeled.NewCounter("gc_success", "successful executions of delete request", scope),
 			gcRoundFailure: labeled.NewCounter("gc_failure", "failure to delete workflows", scope),
 		},
-		clk:       clk,
-		namespace: cfg.LimitNamespace,
+		clk:                       clk,
+		namespace:                 cfg.LimitNamespace,
+		labelSelectorRequirements: labelSelectorRequirements,
 	}, nil
 }
