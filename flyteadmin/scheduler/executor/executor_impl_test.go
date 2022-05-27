@@ -28,20 +28,36 @@ func setupExecutor(scope string) Executor {
 func TestExecutor(t *testing.T) {
 	executor := setupExecutor("testExecutor1")
 	active := true
-	schedule := models.SchedulableEntity{
-		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "cron_schedule",
-			Version: "v1",
-		},
-		CronExpression:      "*/1 * * * *",
-		KickoffTimeInputArg: "kickoff_time",
-		Active:              &active,
-	}
 	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
-	err := executor.Execute(context.Background(), time.Now(), schedule)
-	assert.Nil(t, err)
+	t.Run("kickoff_time_arg", func(t *testing.T) {
+		schedule := models.SchedulableEntity{
+			SchedulableEntityKey: models.SchedulableEntityKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "cron_schedule",
+				Version: "v1",
+			},
+			CronExpression:      "*/1 * * * *",
+			KickoffTimeInputArg: "kickoff_time",
+			Active:              &active,
+		}
+		err := executor.Execute(context.Background(), time.Now(), schedule)
+		assert.Nil(t, err)
+	})
+	t.Run("without kickoff_time_arg", func(t *testing.T) {
+		schedule := models.SchedulableEntity{
+			SchedulableEntityKey: models.SchedulableEntityKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "cron_schedule",
+				Version: "v1",
+			},
+			CronExpression: "*/1 * * * *",
+			Active:         &active,
+		}
+		err := executor.Execute(context.Background(), time.Now(), schedule)
+		assert.Nil(t, err)
+	})
 }
 
 func TestExecutorAlreadyExists(t *testing.T) {
