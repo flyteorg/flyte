@@ -1,7 +1,7 @@
 .. _deployment-cluster-config-performance:
 
 ######################################################
-How do I optimize performance of my Flyte Deployment?
+Optimizing Performance
 ######################################################
 
 .. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-cluster-config-monitoring`.

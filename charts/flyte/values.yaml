@@ -16,7 +16,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.1.5 # FLYTEADMIN_TAG
+      tag: v1.1.11 # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
@@ -61,8 +61,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Flyteadmin pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flyteadmin pods
     podAnnotations: {}
     # -- nodeSelector for Flyteadmin deployment
@@ -84,7 +84,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v1.1.5 # FLYTESCHEDULER_TAG
+      tag: v1.1.11 # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -106,8 +106,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Flytescheduler pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flytescheduler pods
     podAnnotations: {}
     # -- nodeSelector for Flytescheduler deployment
@@ -155,8 +155,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to Datacatalog pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Datacatalog pods
     podAnnotations: {}
     # -- nodeSelector for Datacatalog deployment
@@ -178,7 +178,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.1.1 # FLYTEPROPELLER_TAG
+      tag: v1.1.4 # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -201,8 +201,8 @@ flyte:
       create: true
       # -- Annotations for ServiceAccount attached to FlytePropeller pods
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Annotations for Flytepropeller pods
     podAnnotations: {}
     # -- nodeSelector for Flytepropeller deployment
@@ -264,8 +264,8 @@ flyte:
 
       # -- Annotations for ServiceAccount attached to the webhook
       annotations: {}
-      # -- ImapgePullSecrets to automatically assign to the service account
-      imagePullSecrets: {}
+      # -- ImagePullSecrets to automatically assign to the service account
+      imagePullSecrets: []
     # -- Service settings for the webhook
     service:
       annotations:

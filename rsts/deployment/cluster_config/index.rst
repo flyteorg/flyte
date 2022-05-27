@@ -7,10 +7,11 @@ Cluster Config
 
 .. panels::
     :header: text-center
+    :column: col-lg-12 p-2
 
     .. link-button:: deployment-cluster-config-auth-setup
        :type: ref
-       :text: Auth
+       :text: Authenticating in Flyte
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Basic OIDC and Authentication Setup
@@ -19,7 +20,16 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-auth-migration
        :type: ref
-       :text: Auth Migration Guide
+       :text: Migrating Your Authentication Config
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Migration guide to move to Admin's own authorization server.
+
+    ---
+
+    .. link-button:: deployment-cluster-config-auth-appendix
+       :type: ref
+       :text: Understanding Authentication in Detail
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Migration guide to move to Admin's own authorization server.
@@ -28,7 +38,7 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-general
        :type: ref
-       :text: Configuration of Custom K8s Resources, Resource Quotas
+       :text: Configuring Custom K8s Resources
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     How to use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific resource quotas (say, to limit the number of CPUs/GPUs/mem per tenant).
@@ -37,7 +47,7 @@ Cluster Config
 
     .. link-button:: deployment-customizable-resources
        :type: ref
-       :text: New Configurations for Specific Tenants
+       :text: Adding New Customizable Resources
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Creating new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
@@ -109,10 +119,20 @@ Cluster Config
 
     .. link-button:: deployment-cluster-config-performance
        :type: ref
-       :text: Performance
+       :text: Optimizing Performance
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Tweaks to improve performance of the core Flyte engine.
+    Improve the performance of the core Flyte engine.
+
+    ---
+
+    .. link-button:: deployment-cluster-config-eventing
+       :type: ref
+       :text: Platform Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Configure Flyte to to send events to external pub/sub systems.
+
 
 .. toctree::
     :maxdepth: 1
@@ -124,9 +144,9 @@ Cluster Config
     auth_appendix
     general
     customizable_resources
-    datacatalog_config
     flyteadmin_config
     flytepropeller_config
+    datacatalog_config
     scheduler_config
     monitoring
     notifications

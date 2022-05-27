@@ -18,7 +18,7 @@ solution). The following pages will help you effectively deploy and manage an en
 
     .. link-button:: deployment-overview
        :type: ref
-       :text: Overview
+       :text: Deployment Overview
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     A high-level look into the Flyte components that we'll need to move around.
@@ -77,9 +77,17 @@ solution). The following pages will help you effectively deploy and manage an en
     Flyte comes with a lot of things you can configure. These pages will walk you through the various components.
 
     ---
+    .. link-button:: security-overview
+       :type: ref
+       :text: Security Overview
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Understand Flyte's security model.
+
+    ---
     .. link-button:: ideal-flow
        :type: ref
-       :text: How to Streamline Your Flyte Workflows
+       :text: Streamlining Your Flyte Workflows
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     An example use case leveraging DevOps practices to run Flyte pipelines.
@@ -91,11 +99,11 @@ solution). The following pages will help you effectively deploy and manage an en
     :hidden:
 
     overview
+    sandbox
     aws/index
     gcp/index
     multicluster
-    cluster_config/index
-    sandbox
     plugin_setup/index
+    cluster_config/index
     security/security
     ideal_flow

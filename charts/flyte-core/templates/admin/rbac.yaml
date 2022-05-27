@@ -1,4 +1,4 @@
-{{- if .Values.flyteadmin.enabled }}
+{{- if or .Values.flyteadmin.enabled .Values.flyteadmin.serviceAccount.alwaysCreate }}
 ---
 {{- if .Values.flyteadmin.serviceAccount.create }}
 apiVersion: v1

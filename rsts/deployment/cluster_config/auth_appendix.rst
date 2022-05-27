@@ -1,7 +1,7 @@
 .. _deployment-cluster-config-auth-appendix:
 
-Authentication Appendix
-------------------------
+Understanding Authentication in Detail
+---------------------------------------
 
 .. _auth-openid-appendix:
 
