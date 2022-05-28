@@ -1,5 +1,6 @@
 [admin]
 url=<dns_of_cluster>
+insecure_skip_verify=true
 insecure=false
 
 [logger]
