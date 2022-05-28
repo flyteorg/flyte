@@ -111,7 +111,7 @@ jobs:
 #      run: |
 #        echo $OMG_VERSION
 #    - name: Register flytesnacks examples
-#      uses: unionai/flyte-register-action@v0.0.2
+#      uses: unionai-oss/flyte-register-action@v0.0.2
 #      with:
 #        flytesnacks: true
 #        project: flytesnacks
