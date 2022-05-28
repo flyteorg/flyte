@@ -85,40 +85,40 @@ jobs:
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
       flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
     secrets: inherit
-#  mor-flo:
-#    needs:
-#      - create-opta-aws
-#      - calculate-pre-reqs
-#    runs-on: ubuntu-latest
-#    steps:
-#    - name: Checkout repo
-#      uses: actions/checkout@v3
-#    - name: Setup flytectl
-#      uses: unionai-oss/flytectl-setup-action@v0.0.1
-#    - name: update configs
-#      shell: bash
-#      run: |
-#        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config.yaml
-#        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config
-#    - name: see config files
-#      shell: bash
-#      run: |
-#        cat .github/ci_config/config.yaml
-#        cat .github/ci_config/config
-#    - name: check version
-#      env:
-#        OMG_VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#      shell: bash
-#      run: |
-#        echo $OMG_VERSION
-#    - name: Register flytesnacks examples
-#      uses: unionai-oss/flyte-register-action@v0.0.2
-#      with:
-#        flytesnacks: true
-#        project: flytesnacks
-#        version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#        domain: development
-#        config: .github/ci_config/config.yaml
+  mor-flo:
+    needs:
+      - create-opta-aws
+      - calculate-pre-reqs
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Setup flytectl
+      uses: unionai-oss/flytectl-setup-action@v0.0.1
+    - name: update configs
+      shell: bash
+      run: |
+        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config
+    - name: see config files
+      shell: bash
+      run: |
+        cat .github/ci_config/config.yaml
+        cat .github/ci_config/config
+    - name: check version
+      env:
+        OMG_VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+      shell: bash
+      run: |
+        echo $OMG_VERSION
+    - name: Register flytesnacks examples
+      uses: unionai-oss/flyte-register-action@v0.0.2
+      with:
+        flytesnacks: true
+        project: flytesnacks
+        version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+        domain: development
+        config: .github/ci_config/config.yaml
 #    - name: Setup Flytekit
 #      env:
 #        DNS: ${{ needs.create-aws-opta.outputs.dns }}
