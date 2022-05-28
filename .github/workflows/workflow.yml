@@ -98,8 +98,8 @@ jobs:
     - name: update configs
       shell: bash
       run: |
-        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config.yaml
-        sed -i "s/<dns_of_cluster>/${{ needs.create-aws-opta.outputs.dns }}/" .github/ci_config/config
+        sed -i "s/<dns_of_cluster>/${{ needs.create-opta-aws.outputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
+        sed -i "s/<dns_of_cluster>/${{ needs.create-opta-aws.outputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config
     - name: see config files
       shell: bash
       run: |
@@ -118,7 +118,7 @@ jobs:
         project: flytesnacks
         version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
         domain: development
-        config: .github/ci_config/config.yaml
+        config: /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
 #    - name: Setup Flytekit
 #      env:
 #        DNS: ${{ needs.create-aws-opta.outputs.dns }}
