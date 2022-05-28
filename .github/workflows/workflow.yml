@@ -47,7 +47,7 @@ jobs:
       aws-region: ${{ steps.set-env-vars.outputs.aws_region }}
       your-company: ${{ steps.set-env-vars.outputs.your_company }}
       env-name: ${{ steps.set-env-vars.outputs.env_name }}
-      flyte-bucket: ${{ steps.set-env-vars.output.flyte_storage_bucket }}
+      flyte-bucket: ${{ steps.set-env-vars.outputs.flyte_storage_bucket }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO RELEVANT LOCATION ...
     # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
