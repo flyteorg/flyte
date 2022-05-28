@@ -85,7 +85,7 @@ jobs:
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
       flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
     secrets: inherit
-  mor-flo:
+  setup-run-tests:
     needs:
       - create-opta-aws
       - calculate-pre-reqs
@@ -119,30 +119,26 @@ jobs:
         version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
         domain: development
         config: /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
-#    - name: Setup Flytekit
-#      env:
-#        DNS: ${{ needs.create-aws-opta.outputs.dns }}
-#      shell: bash
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install flytekit
-#        pip freeze
-#    # TODO: add a badge for when test is running
-#    - name: Run tests
-#      id: run-tests
-#      env:
-#        VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#        PRIORITIES: P0,P1
-#        # TODO REMOVE BELOW FLYTE_SDK_USE_STRUCTURED_DATASET ONCE ON v1
-#        FLYTE_SDK_USE_STRUCTURED_DATASET: "TRUE"
-#      shell: bash
-#      run: |
-#        run_tests_output=$(./boilerplate/flyte/end2end/end2end.sh .github/ci_config/config )
-#        echo "$run_tests_output"  # for debugging purposes
-#        badges=$(echo "$run_tests_output" | tail -n1)
-#        echo "$badges"  # for debugging purposes
-#        echo ::set-output name=badges::${badges}
-#    # TODO: Add a slack update after tests run
+    - name: Setup Flytekit
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install flytekit
+        pip freeze
+    # TODO: add a badge for when test is running
+    - name: Run tests
+      id: run-tests
+      env:
+        VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+        PRIORITIES: P0,P1
+      shell: bash
+      run: |
+        run_tests_output=$(/home/runner/work/flyte/flyte/./boilerplate/flyte/end2end/end2end.sh /home/runner/work/flyte/flyte/.github/ci_config/config )
+        echo "$run_tests_output"  # for debugging purposes
+        badges=$(echo "$run_tests_output" | tail -n1)
+        echo "$badges"  # for debugging purposes
+        echo ::set-output name=badges::${badges}
+    # TODO: Add a slack update after tests run
 #  destroy-cluster:
 #    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
 #    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main

@@ -1,6 +1,5 @@
 [admin]
-endpoint=dns:///<dns_of_cluster>
-insecureSkipVerify=true
+url=<dns_of_cluster>
 insecure=false
 
 [logger]
