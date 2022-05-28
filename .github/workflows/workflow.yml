@@ -83,6 +83,7 @@ jobs:
       env-name: ${{ needs.set-env-vars.outputs.env-name }}
       mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
     secrets: inherit
 #  mor-flo:
 #    needs:
