@@ -71,12 +71,12 @@ jobs:
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
       flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
     secrets: inherit
-  run-tests:
+  run-flytekit-tests:
     needs:
       - create-opta-aws
       - calculate-pre-reqs
     # TODO: UPDATE TO RELEVANT LOCATION
-    uses: brucearctor/flyte/.github/workflows/run_snack_tests.yml@opta-aws
+    uses: brucearctor/flyte/.github/workflows/run_flytekit_tests.yml@opta-aws
     with:
       dns: ${{ needs.create-opta-aws.outputs.dns }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
@@ -91,4 +91,4 @@ jobs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
-      #- mor-flo
+      - run-flytekit-tests

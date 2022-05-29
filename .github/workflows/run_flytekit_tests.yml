@@ -9,8 +9,8 @@ on:
         required: true
 
 jobs:
-  run-tets:
-    name: run flytesnacks tests
+  run-tests:
+    name: flytekit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
