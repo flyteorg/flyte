@@ -75,7 +75,7 @@ jobs:
       - create-opta-aws
       - calculate-pre-reqs
     # TODO: UPDATE TO RELEVANT LOCATION
-    uses: brucearctor/flyte/.github/workflows/run_snack_tests@opta-aws
+    uses: brucearctor/flyte/.github/workflows/run_snack_tests.yml@opta-aws
     with:
       dns: ${{ needs.create-opta-aws.outputs.dns }}
       components_version: ${{ needs.set-env-vars.outputs.your-company }}
