@@ -26,6 +26,7 @@ permissions:
 
 env:
   ENV_NAME: development
+  # TODO CHANGE COMPANY, ACCOUNT, BUCKET
   YOUR_COMPANY: bamboozoology
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "${{ secrets.AWS_ACCOUNT_ID }}"
@@ -78,10 +79,10 @@ jobs:
     uses: brucearctor/flyte/.github/workflows/run_snack_tests.yml@opta-aws
     with:
       dns: ${{ needs.create-opta-aws.outputs.dns }}
-      components_version: ${{ needs.set-env-vars.outputs.your-company }}
+      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
 #  destroy-cluster:
 #    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
-#    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
+#    # likely: flyteorg/flyte.github/workflows/destroy_cluster.yml@main
 #    uses: brucearctor/flyte/.github/workflows/destroy_cluster.yml@opta-aws
 #    with:
 #      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
