@@ -9,6 +9,7 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+
 jobs:
   destroy-cluster:
     name: Destroy Cluster
