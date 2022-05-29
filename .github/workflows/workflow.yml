@@ -79,7 +79,7 @@ jobs:
     with:
       dns: ${{ needs.create-opta-aws.outputs.dns }}
       components_version: ${{ needs.set-env-vars.outputs.your-company }}
-#    # TODO: Add a slack update after tests run
+      flyte-storage-bucket:
 #  destroy-cluster:
 #    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
 #    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main

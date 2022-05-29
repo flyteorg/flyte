@@ -1,7 +1,7 @@
 on:
   workflow_call:
     inputs:
-      flyte-storage-bucket:
+      dns:
         type: string
         required: true
       components_version:
@@ -60,3 +60,4 @@ jobs:
 #        badges=$(echo "$run_tests_output" | tail -n1)
 #        echo "$badges"  # for debugging purposes
 #        echo ::set-output name=badges::${badges}
+#    # TODO: Add a slack update after tests run
