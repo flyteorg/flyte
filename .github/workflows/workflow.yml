@@ -55,21 +55,6 @@ jobs:
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
-#  do-i-have-vars:
-#    needs:
-#      - set-env-vars
-#      - calculate-pre-reqs
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: set env variables
-#        id: vars
-#        env:
-#          CV: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#          MODE: ${{ needs.calculate-pre-reqs.outputs.mode }}
-#        shell: bash
-#        run: |
-#          echo "CV: $CV"
-#          echo "MODE: $MODE"
   create-opta-aws:
     needs:
       - set-env-vars
@@ -85,60 +70,16 @@ jobs:
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
       flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
     secrets: inherit
-  setup-run-tests:
+  run-tests:
     needs:
       - create-opta-aws
       - calculate-pre-reqs
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-    - name: Setup flytectl
-      uses: unionai-oss/flytectl-setup-action@v0.0.1
-    - name: update configs
-      shell: bash
-      run: |
-        sed -i "s/<dns_of_cluster>/${{ needs.create-opta-aws.outputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
-        sed -i "s/<dns_of_cluster>/${{ needs.create-opta-aws.outputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config
-    - name: see config files
-      shell: bash
-      run: |
-        cat .github/ci_config/config.yaml
-        cat .github/ci_config/config
-    - name: check version
-      env:
-        OMG_VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-      shell: bash
-      run: |
-        echo $OMG_VERSION
-    - name: Register flytesnacks examples
-      uses: unionai-oss/flyte-register-action@v0.0.2
-      with:
-        flytesnacks: true
-        project: flytesnacks
-        version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-        domain: development
-        config: /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
-    - name: Setup Flytekit
-      shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        pip install flytekit
-        pip freeze
-    # TODO: add a badge for when test is running
-    - name: Run tests
-      id: run-tests
-      env:
-        VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-        PRIORITIES: P0,P1
-      shell: bash
-      run: |
-        run_tests_output=$(/home/runner/work/flyte/flyte/./boilerplate/flyte/end2end/end2end.sh /home/runner/work/flyte/flyte/.github/ci_config/config )
-        echo "$run_tests_output"  # for debugging purposes
-        badges=$(echo "$run_tests_output" | tail -n1)
-        echo "$badges"  # for debugging purposes
-        echo ::set-output name=badges::${badges}
-    # TODO: Add a slack update after tests run
+    # TODO: UPDATE TO RELEVANT LOCATION
+    uses: brucearctor/flyte/.github/workflows/run_snack_tests@opta-aws
+    with:
+      dns: ${{ needs.create-opta-aws.outputs.dns }}
+      components_version: ${{ needs.set-env-vars.outputs.your-company }}
+#    # TODO: Add a slack update after tests run
 #  destroy-cluster:
 #    # TODO: UPDATE THIS TO RELEVANT LOCATION ...
 #    # likely: flyteorg/flyte.github/workflows/calculate_pre_reqs.yml@main
