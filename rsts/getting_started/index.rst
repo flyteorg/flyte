@@ -38,7 +38,7 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 Example: Computing Descriptive Statistics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's create a simple Flyte :py:class:`~flytekit.workflow` that involves two steps:
+Let's create a simple Flyte :py:func:`~flytekit.workflow` that involves two steps:
 
 1. Generate a dataset of ``numbers`` drawn from a normal distribution.
 2. Compute the mean and standard deviation of the ``numbers`` data.
@@ -81,7 +81,7 @@ Copy the following code to a file named ``example.py``.
 
     .. note::
 
-       A :py:class:`~flytekit.task` is a pure Python function, while a :py:class:`~flytekit.workflow` is actually a
+       A :py:func:`~flytekit.task` is a pure Python function, while a :py:func:`~flytekit.workflow` is actually a
        `DSL <https://en.wikipedia.org/wiki/Domain-specific_language>`__ that only support a subset of Python's semantics.
        Some key things to learn here are:
 
