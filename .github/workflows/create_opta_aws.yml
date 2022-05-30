@@ -71,7 +71,6 @@ jobs:
         id: output-dns
         shell: bash
         run: |
-          cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
           DNS=$(opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml | jq -r .load_balancer_raw_dns)
           echo $DNS
           echo "::set-output name=dns::${DNS}"
@@ -80,12 +79,6 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v2
         with:
           exec: helm dep update ./charts/flyte-core/
-      - name: tree
-        shell: bash
-        run: |
-          pwd
-          sudo apt-get install tree
-          tree
       - name: set flyte variables
         shell: bash
         run: |
