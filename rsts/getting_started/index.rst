@@ -35,8 +35,8 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
     Visit https://github.com/flyteorg/flyte/issues/2486 for more details.
 
 
-Computing Descriptive Statistics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Example: Computing Descriptive Statistics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Let's create a simple Flyte :py:class:`~flytekit.workflow` that involves two steps:
 
