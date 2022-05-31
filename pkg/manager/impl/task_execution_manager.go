@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
+
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
@@ -48,12 +50,13 @@ type taskExecutionMetrics struct {
 }
 
 type TaskExecutionManager struct {
-	db                 repoInterfaces.Repository
-	config             runtimeInterfaces.Configuration
-	storageClient      *storage.DataStore
-	metrics            taskExecutionMetrics
-	urlData            dataInterfaces.RemoteURLInterface
-	notificationClient notificationInterfaces.Publisher
+	db                   repoInterfaces.Repository
+	config               runtimeInterfaces.Configuration
+	storageClient        *storage.DataStore
+	metrics              taskExecutionMetrics
+	urlData              dataInterfaces.RemoteURLInterface
+	notificationClient   notificationInterfaces.Publisher
+	cloudEventsPublisher cloudeventInterfaces.Publisher
 }
 
 func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
@@ -92,6 +95,7 @@ func (m *TaskExecutionManager) createTaskExecution(
 		logger.Debugf(ctx, "failed to transform task execution %+v into database model: %v", request.Event.TaskId, err)
 		return models.TaskExecution{}, err
 	}
+
 	if err := m.db.TaskExecutionRepo().Create(ctx, *taskExecutionModel); err != nil {
 		logger.Debugf(ctx, "Failed to create task execution with task id [%+v] with err %v",
 			request.Event.TaskId, err)
@@ -204,6 +208,12 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		m.metrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
+
+	go func() {
+		if err := m.cloudEventsPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+		}
+	}()
 
 	m.metrics.TaskExecutionEventsCreated.Inc()
 	logger.Debugf(ctx, "Successfully recorded task execution event [%v]", request.Event)
@@ -331,7 +341,10 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	return response, nil
 }
 
-func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface, publisher notificationInterfaces.Publisher) interfaces.TaskExecutionInterface {
+func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
+	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	publisher notificationInterfaces.Publisher, cloudEventsPublisher cloudeventInterfaces.Publisher) interfaces.TaskExecutionInterface {
+
 	metrics := taskExecutionMetrics{
 		Scope: scope,
 		ActiveTaskExecutions: scope.MustNewGauge("active_executions",
@@ -356,11 +369,12 @@ func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 			"overall count of publish event errors when invoking publish()"),
 	}
 	return &TaskExecutionManager{
-		db:                 db,
-		config:             config,
-		storageClient:      storageClient,
-		metrics:            metrics,
-		urlData:            urlData,
-		notificationClient: publisher,
+		db:                   db,
+		config:               config,
+		storageClient:        storageClient,
+		metrics:              metrics,
+		urlData:              urlData,
+		notificationClient:   publisher,
+		cloudEventsPublisher: cloudEventsPublisher,
 	}
 }

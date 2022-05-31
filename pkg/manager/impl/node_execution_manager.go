@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
+
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
@@ -53,14 +55,15 @@ type nodeExecutionMetrics struct {
 }
 
 type NodeExecutionManager struct {
-	db             repoInterfaces.Repository
-	config         runtimeInterfaces.Configuration
-	storagePrefix  []string
-	storageClient  *storage.DataStore
-	metrics        nodeExecutionMetrics
-	urlData        dataInterfaces.RemoteURLInterface
-	eventPublisher notificationInterfaces.Publisher
-	dbEventWriter  eventWriter.NodeExecutionEventWriter
+	db                  repoInterfaces.Repository
+	config              runtimeInterfaces.Configuration
+	storagePrefix       []string
+	storageClient       *storage.DataStore
+	metrics             nodeExecutionMetrics
+	urlData             dataInterfaces.RemoteURLInterface
+	eventPublisher      notificationInterfaces.Publisher
+	cloudEventPublisher cloudeventInterfaces.Publisher
+	dbEventWriter       eventWriter.NodeExecutionEventWriter
 }
 
 type updateNodeExecutionStatus int
@@ -292,6 +295,12 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 		m.metrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
+
+	go func() {
+		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+		}
+	}()
 
 	return &admin.NodeExecutionEventResponse{}, nil
 }
@@ -546,7 +555,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
 	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
-	eventPublisher notificationInterfaces.Publisher,
+	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
 		Scope: scope,
@@ -570,13 +579,14 @@ func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 			"overall count of publish event errors when invoking publish()"),
 	}
 	return &NodeExecutionManager{
-		db:             db,
-		config:         config,
-		storagePrefix:  storagePrefix,
-		storageClient:  storageClient,
-		metrics:        metrics,
-		urlData:        urlData,
-		eventPublisher: eventPublisher,
-		dbEventWriter:  eventWriter,
+		db:                  db,
+		config:              config,
+		storagePrefix:       storagePrefix,
+		storageClient:       storageClient,
+		metrics:             metrics,
+		urlData:             urlData,
+		eventPublisher:      eventPublisher,
+		dbEventWriter:       eventWriter,
+		cloudEventPublisher: cloudEventPublisher,
 	}
 }

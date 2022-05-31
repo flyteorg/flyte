@@ -2,11 +2,12 @@ package implementations
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/golang/protobuf/jsonpb"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -174,9 +175,9 @@ func TestNewCloudEventsPublisher_EventTypes(t *testing.T) {
 						assert.Equal(t, cloudEvent.Source(), cloudEventSource)
 						assert.Equal(t, cloudEvent.Extensions(), map[string]interface{}{jsonSchemaURLKey: jsonSchemaURL})
 
-						e, err := json.Marshal(event)
+						e, err := (&jsonpb.Marshaler{}).MarshalToString(event)
 						assert.Nil(t, err)
-						assert.Equal(t, cloudEvent.Data(), e)
+						assert.Equal(t, string(cloudEvent.Data()), e)
 						cnt++
 					}
 				}
