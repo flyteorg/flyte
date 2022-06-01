@@ -455,13 +455,9 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    external-dns.alpha.kubernetes.io/hostname: flyte.example.com
     projectcontour.io/upstream-protocol.h2c: grpc
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
 spec:
-  type: LoadBalancer
-  loadBalancerSourceRanges:
-    [0.0.0.0/0]
+  type: ClusterIP
   ports:
     - name: http
       port: 80
@@ -493,11 +489,8 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
-  annotations: 
-    external-dns.alpha.kubernetes.io/hostname: flyte.example.com
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: http
     port: 80
@@ -520,9 +513,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
   - name: grpc-2
     port: 8089
