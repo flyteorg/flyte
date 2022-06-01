@@ -30,7 +30,6 @@ flyteadmin:
       cpu: 50m
       ephemeral-storage: 200Mi
       memory: 200Mi
-
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

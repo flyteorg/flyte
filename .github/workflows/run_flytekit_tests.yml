@@ -17,21 +17,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup flytectl
         uses: unionai-oss/flytectl-setup-action@v0.0.1
-      - name: update configs
+      - name: update dns
         shell: bash
         run: |
           sed -i "s/<dns_of_cluster>/${{ inputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
-          echo ""
-          cat /home/runner/work/flyte/flyte/boilerplate/flyte/end2end/end2end.sh
-          sed -i "s@./boilerplate/flyte/end2end/run-tests.py@/home/runner/work/flyte/flyte/boilerplate/flyte/end2end/run-tests.py@" /home/runner/work/flyte/flyte/boilerplate/flyte/end2end/end2end.sh
-          echo ""
-          cat /home/runner/work/flyte/flyte/boilerplate/flyte/end2end/end2end.sh
-      - name: check version
-        env:
-          OMG_VERSION: ${{ inputs.components_version }}
-        shell: bash
-        run: |
-          echo $OMG_VERSION
       - name: Register flytesnacks examples
         uses: unionai-oss/flyte-register-action@v0.0.2
         with:
