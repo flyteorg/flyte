@@ -12,8 +12,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v1.0.0
-	github.com/flyteorg/flytestdlib v1.0.0
+	github.com/flyteorg/flyteidl v1.1.3-0.20220601015921-c9884d54d34a
+	github.com/flyteorg/flytestdlib v1.0.4-0.20220601010535-57c1386c358f
 	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.2
@@ -30,16 +30,12 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.7.0
-	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
-	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
-	google.golang.org/api v0.40.0
-	google.golang.org/grpc v1.35.0
-	google.golang.org/protobuf v1.25.0
+	github.com/stretchr/testify v1.7.1
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	google.golang.org/api v0.74.0
+	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.28.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
