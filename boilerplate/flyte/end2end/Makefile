@@ -5,8 +5,7 @@
 
 .PHONY: end2end_execute
 end2end_execute:
-	# TODO: These arguments could come from environment variables
-	./boilerplate/flyte/end2end/end2end.sh ./boilerplate/flyte/end2end/functional-test.config --return_non_zero_on_failure
+	./boilerplate/flyte/end2end/end2end.sh ./boilerplate/flyte/end2end/functional-test-config.yaml --return_non_zero_on_failure
 
 .PHONY: k8s_integration_execute
 k8s_integration_execute:

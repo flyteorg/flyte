@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import click
+import datetime
 import json
 import sys
 import time
@@ -10,6 +11,7 @@ from typing import List, Mapping, Tuple, Dict
 from flytekit.remote import FlyteRemote
 from flytekit.models.core.execution import WorkflowExecutionPhase
 from flytekit.configuration import Config, ImageConfig, SerializationSettings
+from flytekit.remote.executions import FlyteWorkflowExecution
 
 
 WAIT_TIME = 10
@@ -52,68 +54,109 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         ("core.type_system.typed_schema.wf", {}),
         ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
+    "integrations-k8s-spark": [
+        ("k8s_spark.pyspark_pi.my_spark", {"triggered_date": datetime.datetime.now()}),
+    ],
+    "integrations-kfpytorch": [
+        ("kfpytorch.pytorch_mnist.pytorch_training_wf", {}),
+    ],
+    "integrations-kftensorflow": [
+        ("kftensorflow.tf_mnist.mnist_tensorflow_workflow", {}),
+    ],
+    "integrations-pod": [
+        ("pod.pod.pod_workflow", {}),
+    ],
+    "integrations-pandera_examples": [
+        ("pandera_examples.basic_schema_example.process_data", {}),
+        # TODO: investigate type mismatch float -> numpy.float64
+        # ("pandera_examples.validating_and_testing_ml_pipelines.pipeline", {"data_random_state": 42, "model_random_state": 99}),
+    ],
+    "integrations-modin_examples": [
+        ("modin_examples.knn_classifier.pipeline", {}),
+    ],
+    "integrations-papermilltasks": [
+        ("papermilltasks.simple.nb_to_python_wf", {"f": 3.1415926535}),
+    ],
+    "integrations-greatexpectations": [
+        ("greatexpectations.task_example.simple_wf", {}),
+        ("greatexpectations.task_example.file_wf", {}),
+        ("greatexpectations.task_example.schema_wf", {}),
+        ("greatexpectations.task_example.runtime_wf", {}),
+    ],
 }
 
 
-def run_launch_plan(remote, version, workflow_name, inputs):
+def execute_workflow(remote, version, workflow_name, inputs):
     print(f"Fetching workflow={workflow_name} and version={version}")
-    lp = remote.fetch_workflow(name=workflow_name, version=version)
-    return remote.execute(lp, inputs=inputs, wait=False)
+    wf = remote.fetch_workflow(name=workflow_name, version=version)
+    return remote.execute(wf, inputs=inputs, wait=False)
 
+def executions_finished(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]) -> bool:
+    for executions in executions_by_wfgroup.values():
+        if not all([execution.is_done for execution in executions]):
+            return False
+    return True
 
-def schedule_workflow_group(
+def sync_executions(remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
+    for executions in executions_by_wfgroup.values():
+        for execution in executions:
+            print(f"About to sync execution_id={execution.id.name}")
+            remote.sync(execution)
+
+def report_executions(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
+    for executions in executions_by_wfgroup.values():
+        for execution in executions:
+            print(execution)
+
+def schedule_workflow_groups(
     tag: str,
-    workflow_group: str,
+    workflow_groups: List[str],
     remote: FlyteRemote,
     terminate_workflow_on_failure: bool,
-) -> bool:
+) -> Dict[str, bool]:
     """
-    Schedule all workflows executions and return True if all executions succeed, otherwise
+    Schedule workflows executions for all workflow gropus and return True if all executions succeed, otherwise
     return False.
     """
-    workflows = FLYTESNACKS_WORKFLOW_GROUPS.get(workflow_group, [])
+    executions_by_wfgroup = {}
+    # Schedule executions for each workflow group,
+    for wf_group in workflow_groups:
+        workflows = FLYTESNACKS_WORKFLOW_GROUPS.get(wf_group, [])
+        executions_by_wfgroup[wf_group] = [
+            execute_workflow(remote, tag, workflow[0], workflow[1]) for workflow in workflows
+        ]
 
-    launch_plans = [
-        run_launch_plan(remote, tag, workflow[0], workflow[1]) for workflow in workflows
-    ]
-
-    # Wait for all launch plans to finish
+    # Wait for all executions to finish
     attempt = 0
     while attempt == 0 or (
-        not all([lp.is_done for lp in launch_plans]) and attempt < MAX_ATTEMPTS
+        not executions_finished(executions_by_wfgroup) and attempt < MAX_ATTEMPTS
     ):
         attempt += 1
         print(
             f"Not all executions finished yet. Sleeping for some time, will check again in {WAIT_TIME}s"
         )
         time.sleep(WAIT_TIME)
-        # Need to sync to refresh status of executions
-        for lp in launch_plans:
-            print(f"About to sync execution_id={lp.id.name}")
-            remote.sync(lp)
+        sync_executions(remote, executions_by_wfgroup)
 
-    # Report result of each launch plan
-    for lp in launch_plans:
-        print(lp)
 
-    # Collect all failing launch plans
-    non_succeeded_lps = [
-        lp
-        for lp in launch_plans
-        if lp.closure.phase != WorkflowExecutionPhase.SUCCEEDED
-    ]
+    report_executions(executions_by_wfgroup)
 
-    if len(non_succeeded_lps) == 0:
-        print("All executions succeeded.")
-        return True
-
-    print("Failed executions:")
-    # Report failing cases
-    for lp in non_succeeded_lps:
-        print(f"    workflow={lp.spec.launch_plan.name}, execution_id={lp.id.name}")
-        if terminate_workflow_on_failure:
-            remote.terminate(lp, "aborting execution scheduled in functional test")
-    return False
+    results = {}
+    for wf_group, executions in executions_by_wfgroup.items():
+        non_succeeded_executions = []
+        for execution in executions:
+            if execution.closure.phase != WorkflowExecutionPhase.SUCCEEDED:
+                non_succeeded_executions.append(execution)
+        # Report failing cases
+        if len(non_succeeded_executions) != 0:
+            print(f"Failed executions for {wf_group}:")
+            for execution in non_succeeded_executions:
+                print(f"    workflow={execution.spec.launch_plan.name}, execution_id={execution.id.name}")
+                if terminate_workflow_on_failure:
+                    remote.terminate(execution, "aborting execution scheduled in functional test")
+        # A workflow group succeeds iff all of its executions succeed
+        results[wf_group] = len(non_succeeded_executions) == 0
+    return results
 
 
 def valid(workflow_group):
@@ -147,6 +190,7 @@ def run(
         group["name"] for group in parsed_manifest if group["priority"] in priorities
     ]
     results = []
+    valid_workgroups = []
     for workflow_group in workflow_groups:
         if not valid(workflow_group):
             results.append(
@@ -157,19 +201,17 @@ def run(
                 }
             )
             continue
+        valid_workgroups.append(workflow_group)
 
-        try:
-            workflows_succeeded = schedule_workflow_group(
-                flytesnacks_release_tag,
-                workflow_group,
-                remote,
-                terminate_workflow_on_failure,
-            )
-        except Exception:
-            print(traceback.format_exc())
-            workflows_succeeded = False
+    results_by_wfgroup = schedule_workflow_groups(
+        flytesnacks_release_tag,
+        valid_workgroups,
+        remote,
+        terminate_workflow_on_failure
+    )
 
-        if workflows_succeeded:
+    for workflow_group, succeeded in results_by_wfgroup.items():
+        if succeeded:
             background_color = "green"
             status = "passing"
         else:
