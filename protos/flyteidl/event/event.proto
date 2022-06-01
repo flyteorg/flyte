@@ -95,6 +95,10 @@ message NodeExecutionEvent {
 
     // Whether this node yielded a dynamic workflow.
     bool is_dynamic = 18;
+
+    // String location uniquely identifying where the deck HTML file is
+    // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+    string deck_uri = 19;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched

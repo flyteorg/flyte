@@ -163,6 +163,10 @@ message NodeExecutionClosure {
         WorkflowNodeMetadata workflow_node_metadata = 8;
         TaskNodeMetadata task_node_metadata = 9;
     }
+
+    // String location uniquely identifying where the deck HTML file is.
+    // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+    string deck_uri = 11;
 }
 
 // Metadata for a WorkflowNode

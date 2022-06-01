@@ -332,6 +332,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fevent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, event_version_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, is_parent_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, is_dynamic_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, deck_uri_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, output_result_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::NodeExecutionEvent, target_metadata_),
   ~0u,  // no _has_bits_
@@ -423,15 +424,15 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fevent_2eproto::o
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::event::WorkflowExecutionEvent)},
   { 13, -1, sizeof(::flyteidl::event::NodeExecutionEvent)},
-  { 38, -1, sizeof(::flyteidl::event::WorkflowNodeMetadata)},
-  { 44, -1, sizeof(::flyteidl::event::TaskNodeMetadata)},
-  { 53, -1, sizeof(::flyteidl::event::DynamicWorkflowNodeMetadata)},
-  { 60, -1, sizeof(::flyteidl::event::ParentTaskExecutionMetadata)},
-  { 66, -1, sizeof(::flyteidl::event::ParentNodeExecutionMetadata)},
-  { 72, -1, sizeof(::flyteidl::event::TaskExecutionEvent)},
-  { 95, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
-  { 106, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
-  { 113, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
+  { 39, -1, sizeof(::flyteidl::event::WorkflowNodeMetadata)},
+  { 45, -1, sizeof(::flyteidl::event::TaskNodeMetadata)},
+  { 54, -1, sizeof(::flyteidl::event::DynamicWorkflowNodeMetadata)},
+  { 61, -1, sizeof(::flyteidl::event::ParentTaskExecutionMetadata)},
+  { 67, -1, sizeof(::flyteidl::event::ParentNodeExecutionMetadata)},
+  { 73, -1, sizeof(::flyteidl::event::TaskExecutionEvent)},
+  { 96, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
+  { 107, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
+  { 114, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -470,7 +471,7 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly"
   "teidl.core.ExecutionErrorH\000\0220\n\013output_da"
   "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n"
-  "\routput_result\"\212\006\n\022NodeExecutionEvent\0222\n"
+  "\routput_result\"\234\006\n\022NodeExecutionEvent\0222\n"
   "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI"
   "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030"
   "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas"
@@ -488,63 +489,63 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "l.event.ParentNodeExecutionMetadata\022\023\n\013r"
   "etry_group\030\013 \001(\t\022\024\n\014spec_node_id\030\014 \001(\t\022\021"
   "\n\tnode_name\030\r \001(\t\022\025\n\revent_version\030\020 \001(\005"
-  "\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dynamic\030\022 \001(\010B"
-  "\017\n\routput_resultB\021\n\017target_metadata\"X\n\024W"
-  "orkflowNodeMetadata\022@\n\014execution_id\030\001 \001("
-  "\0132*.flyteidl.core.WorkflowExecutionIdent"
-  "ifier\"\215\002\n\020TaskNodeMetadata\0227\n\014cache_stat"
-  "us\030\001 \001(\0162!.flyteidl.core.CatalogCacheSta"
-  "tus\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl.core"
-  ".CatalogMetadata\022D\n\022reservation_status\030\003"
-  " \001(\0162(.flyteidl.core.CatalogReservation."
-  "Status\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyte"
-  "idl.event.DynamicWorkflowNodeMetadata\"\207\001"
-  "\n\033DynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001("
-  "\0132\031.flyteidl.core.Identifier\022A\n\021compiled"
-  "_workflow\030\002 \001(\0132&.flyteidl.core.Compiled"
-  "WorkflowClosure\"Q\n\033ParentTaskExecutionMe"
-  "tadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core.TaskE"
-  "xecutionIdentifier\".\n\033ParentNodeExecutio"
-  "nMetadata\022\017\n\007node_id\030\001 \001(\t\"\224\005\n\022TaskExecu"
-  "tionEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl.co"
-  "re.Identifier\022H\n\030parent_node_execution_i"
-  "d\030\002 \001(\0132&.flyteidl.core.NodeExecutionIde"
-  "ntifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030"
-  "\004 \001(\0162\".flyteidl.core.TaskExecution.Phas"
-  "e\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.f"
-  "lyteidl.core.TaskLog\022/\n\013occurred_at\030\007 \001("
-  "\0132\032.google.protobuf.Timestamp\022\021\n\tinput_u"
-  "ri\030\010 \001(\t\022\024\n\noutput_uri\030\t \001(\tH\000\022.\n\005error\030"
-  "\n \001(\0132\035.flyteidl.core.ExecutionErrorH\000\0220"
-  "\n\013output_data\030\021 \001(\0132\031.flyteidl.core.Lite"
-  "ralMapH\000\022,\n\013custom_info\030\013 \001(\0132\027.google.p"
-  "rotobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\016\n"
-  "\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010meta"
-  "data\030\020 \001(\0132%.flyteidl.event.TaskExecutio"
-  "nMetadata\022\025\n\revent_version\030\022 \001(\005B\017\n\routp"
-  "ut_result\"\343\001\n\024ExternalResourceInfo\022\023\n\013ex"
-  "ternal_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretry_"
-  "attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl."
-  "core.TaskExecution.Phase\0227\n\014cache_status"
-  "\030\005 \001(\0162!.flyteidl.core.CatalogCacheStatu"
-  "s\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\""
-  "\?\n\020ResourcePoolInfo\022\030\n\020allocation_token\030"
-  "\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecuti"
-  "onMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022ex"
-  "ternal_resources\030\002 \003(\0132$.flyteidl.event."
-  "ExternalResourceInfo\022<\n\022resource_pool_in"
-  "fo\030\003 \003(\0132 .flyteidl.event.ResourcePoolIn"
-  "fo\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016instanc"
-  "e_class\030\020 \001(\01623.flyteidl.event.TaskExecu"
-  "tionMetadata.InstanceClass\"/\n\rInstanceCl"
-  "ass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5g"
-  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
-  "yteidl/eventb\006proto3"
+  "\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dynamic\030\022 \001(\010\022"
+  "\020\n\010deck_uri\030\023 \001(\tB\017\n\routput_resultB\021\n\017ta"
+  "rget_metadata\"X\n\024WorkflowNodeMetadata\022@\n"
+  "\014execution_id\030\001 \001(\0132*.flyteidl.core.Work"
+  "flowExecutionIdentifier\"\215\002\n\020TaskNodeMeta"
+  "data\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.co"
+  "re.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001"
+  "(\0132\036.flyteidl.core.CatalogMetadata\022D\n\022re"
+  "servation_status\030\003 \001(\0162(.flyteidl.core.C"
+  "atalogReservation.Status\022E\n\020dynamic_work"
+  "flow\030\020 \001(\0132+.flyteidl.event.DynamicWorkf"
+  "lowNodeMetadata\"\207\001\n\033DynamicWorkflowNodeM"
+  "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden"
+  "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt"
+  "eidl.core.CompiledWorkflowClosure\"Q\n\033Par"
+  "entTaskExecutionMetadata\0222\n\002id\030\001 \001(\0132&.f"
+  "lyteidl.core.TaskExecutionIdentifier\".\n\033"
+  "ParentNodeExecutionMetadata\022\017\n\007node_id\030\001"
+  " \001(\t\"\224\005\n\022TaskExecutionEvent\022*\n\007task_id\030\001"
+  " \001(\0132\031.flyteidl.core.Identifier\022H\n\030paren"
+  "t_node_execution_id\030\002 \001(\0132&.flyteidl.cor"
+  "e.NodeExecutionIdentifier\022\025\n\rretry_attem"
+  "pt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core."
+  "TaskExecution.Phase\022\023\n\013producer_id\030\005 \001(\t"
+  "\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\022/"
+  "\n\013occurred_at\030\007 \001(\0132\032.google.protobuf.Ti"
+  "mestamp\022\021\n\tinput_uri\030\010 \001(\t\022\024\n\noutput_uri"
+  "\030\t \001(\tH\000\022.\n\005error\030\n \001(\0132\035.flyteidl.core."
+  "ExecutionErrorH\000\0220\n\013output_data\030\021 \001(\0132\031."
+  "flyteidl.core.LiteralMapH\000\022,\n\013custom_inf"
+  "o\030\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphas"
+  "e_version\030\014 \001(\r\022\016\n\006reason\030\r \001(\t\022\021\n\ttask_"
+  "type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl."
+  "event.TaskExecutionMetadata\022\025\n\revent_ver"
+  "sion\030\022 \001(\005B\017\n\routput_result\"\343\001\n\024External"
+  "ResourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n\005ind"
+  "ex\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase"
+  "\030\004 \001(\0162\".flyteidl.core.TaskExecution.Pha"
+  "se\0227\n\014cache_status\030\005 \001(\0162!.flyteidl.core"
+  ".CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyt"
+  "eidl.core.TaskLog\"\?\n\020ResourcePoolInfo\022\030\n"
+  "\020allocation_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001"
+  "(\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016generate"
+  "d_name\030\001 \001(\t\022@\n\022external_resources\030\002 \003(\013"
+  "2$.flyteidl.event.ExternalResourceInfo\022<"
+  "\n\022resource_pool_info\030\003 \003(\0132 .flyteidl.ev"
+  "ent.ResourcePoolInfo\022\031\n\021plugin_identifie"
+  "r\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.flytei"
+  "dl.event.TaskExecutionMetadata.InstanceC"
+  "lass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rIN"
+  "TERRUPTIBLE\020\001B7Z5github.com/flyteorg/fly"
+  "teidl/gen/pb-go/flyteidl/eventb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto,
-  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3380,
+  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3398,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fevent_2eproto() {
@@ -1519,6 +1520,7 @@ const int NodeExecutionEvent::kNodeNameFieldNumber;
 const int NodeExecutionEvent::kEventVersionFieldNumber;
 const int NodeExecutionEvent::kIsParentFieldNumber;
 const int NodeExecutionEvent::kIsDynamicFieldNumber;
+const int NodeExecutionEvent::kDeckUriFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 NodeExecutionEvent::NodeExecutionEvent()
@@ -1549,6 +1551,10 @@ NodeExecutionEvent::NodeExecutionEvent(const NodeExecutionEvent& from)
   node_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.node_name().size() > 0) {
     node_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.node_name_);
+  }
+  deck_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.deck_uri().size() > 0) {
+    deck_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.deck_uri_);
   }
   if (from.has_id()) {
     id_ = new ::flyteidl::core::NodeExecutionIdentifier(*from.id_);
@@ -1616,6 +1622,7 @@ void NodeExecutionEvent::SharedCtor() {
   retry_group_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   spec_node_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   node_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  deck_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&is_dynamic_) -
       reinterpret_cast<char*>(&id_)) + sizeof(is_dynamic_));
@@ -1634,6 +1641,7 @@ void NodeExecutionEvent::SharedDtor() {
   retry_group_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   spec_node_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   node_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  deck_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete id_;
   if (this != internal_default_instance()) delete occurred_at_;
   if (this != internal_default_instance()) delete parent_task_metadata_;
@@ -1707,6 +1715,7 @@ void NodeExecutionEvent::Clear() {
   retry_group_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   spec_node_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   node_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  deck_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && id_ != nullptr) {
     delete id_;
   }
@@ -1971,6 +1980,22 @@ const char* NodeExecutionEvent::_InternalParse(const char* begin, const char* en
         if (static_cast<::google::protobuf::uint8>(tag) != 144) goto handle_unusual;
         msg->set_is_dynamic(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string deck_uri = 19;
+      case 19: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 154) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.event.NodeExecutionEvent.deck_uri");
+        object = msg->mutable_deck_uri();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       default: {
@@ -2238,6 +2263,21 @@ bool NodeExecutionEvent::MergePartialFromCodedStream(
         break;
       }
 
+      // string deck_uri = 19;
+      case 19: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (154 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_deck_uri()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->deck_uri().data(), static_cast<int>(this->deck_uri().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.event.NodeExecutionEvent.deck_uri"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2392,6 +2432,16 @@ void NodeExecutionEvent::SerializeWithCachedSizes(
   // bool is_dynamic = 18;
   if (this->is_dynamic() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(18, this->is_dynamic(), output);
+  }
+
+  // string deck_uri = 19;
+  if (this->deck_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->deck_uri().data(), static_cast<int>(this->deck_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.event.NodeExecutionEvent.deck_uri");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      19, this->deck_uri(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2550,6 +2600,17 @@ void NodeExecutionEvent::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(18, this->is_dynamic(), target);
   }
 
+  // string deck_uri = 19;
+  if (this->deck_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->deck_uri().data(), static_cast<int>(this->deck_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.event.NodeExecutionEvent.deck_uri");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        19, this->deck_uri(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -2604,6 +2665,13 @@ size_t NodeExecutionEvent::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->node_name());
+  }
+
+  // string deck_uri = 19;
+  if (this->deck_uri().size() > 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->deck_uri());
   }
 
   // .flyteidl.core.NodeExecutionIdentifier id = 1;
@@ -2749,6 +2817,10 @@ void NodeExecutionEvent::MergeFrom(const NodeExecutionEvent& from) {
 
     node_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.node_name_);
   }
+  if (from.deck_uri().size() > 0) {
+
+    deck_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.deck_uri_);
+  }
   if (from.has_id()) {
     mutable_id()->::flyteidl::core::NodeExecutionIdentifier::MergeFrom(from.id());
   }
@@ -2839,6 +2911,8 @@ void NodeExecutionEvent::InternalSwap(NodeExecutionEvent* other) {
   spec_node_id_.Swap(&other->spec_node_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   node_name_.Swap(&other->node_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  deck_uri_.Swap(&other->deck_uri_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(id_, other->id_);
   swap(occurred_at_, other->occurred_at_);

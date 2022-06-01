@@ -21,6 +21,7 @@ namespace service {
 
 static const char* DataProxyService_method_names[] = {
   "/flyteidl.service.DataProxyService/CreateUploadLocation",
+  "/flyteidl.service.DataProxyService/CreateDownloadLocation",
 };
 
 std::unique_ptr< DataProxyService::Stub> DataProxyService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -31,6 +32,7 @@ std::unique_ptr< DataProxyService::Stub> DataProxyService::NewStub(const std::sh
 
 DataProxyService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_CreateUploadLocation_(DataProxyService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateDownloadLocation_(DataProxyService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status DataProxyService::Stub::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::flyteidl::service::CreateUploadLocationResponse* response) {
@@ -61,18 +63,58 @@ void DataProxyService::Stub::experimental_async::CreateUploadLocation(::grpc::Cl
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateUploadLocationResponse>::Create(channel_.get(), cq, rpcmethod_CreateUploadLocation_, context, request, false);
 }
 
+::grpc::Status DataProxyService::Stub::CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::flyteidl::service::CreateDownloadLocationResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_CreateDownloadLocation_, context, request, response);
+}
+
+void DataProxyService::Stub::experimental_async::CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_CreateDownloadLocation_, context, request, response, std::move(f));
+}
+
+void DataProxyService::Stub::experimental_async::CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_CreateDownloadLocation_, context, request, response, std::move(f));
+}
+
+void DataProxyService::Stub::experimental_async::CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_CreateDownloadLocation_, context, request, response, reactor);
+}
+
+void DataProxyService::Stub::experimental_async::CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_CreateDownloadLocation_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>* DataProxyService::Stub::AsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateDownloadLocationResponse>::Create(channel_.get(), cq, rpcmethod_CreateDownloadLocation_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>* DataProxyService::Stub::PrepareAsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateDownloadLocationResponse>::Create(channel_.get(), cq, rpcmethod_CreateDownloadLocation_, context, request, false);
+}
+
 DataProxyService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       DataProxyService_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< DataProxyService::Service, ::flyteidl::service::CreateUploadLocationRequest, ::flyteidl::service::CreateUploadLocationResponse>(
           std::mem_fn(&DataProxyService::Service::CreateUploadLocation), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      DataProxyService_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< DataProxyService::Service, ::flyteidl::service::CreateDownloadLocationRequest, ::flyteidl::service::CreateDownloadLocationResponse>(
+          std::mem_fn(&DataProxyService::Service::CreateDownloadLocation), this)));
 }
 
 DataProxyService::Service::~Service() {
 }
 
 ::grpc::Status DataProxyService::Service::CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status DataProxyService::Service::CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) {
   (void) context;
   (void) request;
   (void) response;

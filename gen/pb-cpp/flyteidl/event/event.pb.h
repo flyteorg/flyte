@@ -517,6 +517,20 @@ class NodeExecutionEvent final :
   ::std::string* release_node_name();
   void set_allocated_node_name(::std::string* node_name);
 
+  // string deck_uri = 19;
+  void clear_deck_uri();
+  static const int kDeckUriFieldNumber = 19;
+  const ::std::string& deck_uri() const;
+  void set_deck_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_deck_uri(::std::string&& value);
+  #endif
+  void set_deck_uri(const char* value);
+  void set_deck_uri(const char* value, size_t size);
+  ::std::string* mutable_deck_uri();
+  ::std::string* release_deck_uri();
+  void set_allocated_deck_uri(::std::string* deck_uri);
+
   // .flyteidl.core.NodeExecutionIdentifier id = 1;
   bool has_id() const;
   void clear_id();
@@ -655,6 +669,7 @@ class NodeExecutionEvent final :
   ::google::protobuf::internal::ArenaStringPtr retry_group_;
   ::google::protobuf::internal::ArenaStringPtr spec_node_id_;
   ::google::protobuf::internal::ArenaStringPtr node_name_;
+  ::google::protobuf::internal::ArenaStringPtr deck_uri_;
   ::flyteidl::core::NodeExecutionIdentifier* id_;
   ::google::protobuf::Timestamp* occurred_at_;
   ::flyteidl::event::ParentTaskExecutionMetadata* parent_task_metadata_;
@@ -3197,6 +3212,59 @@ inline void NodeExecutionEvent::set_is_dynamic(bool value) {
   
   is_dynamic_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.is_dynamic)
+}
+
+// string deck_uri = 19;
+inline void NodeExecutionEvent::clear_deck_uri() {
+  deck_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeExecutionEvent::deck_uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.deck_uri)
+  return deck_uri_.GetNoArena();
+}
+inline void NodeExecutionEvent::set_deck_uri(const ::std::string& value) {
+  
+  deck_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.deck_uri)
+}
+#if LANG_CXX11
+inline void NodeExecutionEvent::set_deck_uri(::std::string&& value) {
+  
+  deck_uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.NodeExecutionEvent.deck_uri)
+}
+#endif
+inline void NodeExecutionEvent::set_deck_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  deck_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.NodeExecutionEvent.deck_uri)
+}
+inline void NodeExecutionEvent::set_deck_uri(const char* value, size_t size) {
+  
+  deck_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.NodeExecutionEvent.deck_uri)
+}
+inline ::std::string* NodeExecutionEvent::mutable_deck_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.deck_uri)
+  return deck_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeExecutionEvent::release_deck_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.deck_uri)
+  
+  return deck_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeExecutionEvent::set_allocated_deck_uri(::std::string* deck_uri) {
+  if (deck_uri != nullptr) {
+    
+  } else {
+    
+  }
+  deck_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), deck_uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.deck_uri)
 }
 
 inline bool NodeExecutionEvent::has_output_result() const {

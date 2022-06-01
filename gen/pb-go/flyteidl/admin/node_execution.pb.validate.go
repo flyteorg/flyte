@@ -614,6 +614,8 @@ func (m *NodeExecutionClosure) Validate() error {
 		}
 	}
 
+	// no validation rules for DeckUri
+
 	switch m.OutputResult.(type) {
 
 	case *NodeExecutionClosure_OutputUri:
