@@ -21,11 +21,11 @@ jobs:
         shell: bash
         run: |
           sed -i "s/<dns_of_cluster>/${{ inputs.dns }}/" /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
-      - name: see config files
-        shell: bash
-        run: |
-          cat .github/ci_config/config.yaml
-          cat .github/ci_config/config
+          echo ""
+          cat /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
+          sed -i "s@./boilerplate/flyte/end2end/run-tests.py@/home/runner/work/flyte/flyte/boilerplate/flyte/end2end/run-tests.py@" /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
+          echo ""
+          cat /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
       - name: check version
         env:
           OMG_VERSION: ${{ inputs.components_version }}
@@ -53,7 +53,7 @@ jobs:
           PRIORITIES: P0,P1
         shell: bash
         run: |
-          run_tests_output=$(/home/runner/work/flyte/flyte/./boilerplate/flyte/end2end/end2end.sh /home/runner/work/flyte/flyte/.github/ci_config/config.yaml )
+          run_tests_output=$(/home/runner/work/flyte/flyte/boilerplate/flyte/end2end/end2end.sh /home/runner/work/flyte/flyte/.github/ci_config/config.yaml )
           echo "$run_tests_output"  # for debugging purposes
           badges=$(echo "$run_tests_output" | tail -n1)
           echo "$badges"  # for debugging purposes

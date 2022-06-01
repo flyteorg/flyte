@@ -1,8 +1,0 @@
-[admin]
-url=<dns_of_cluster>
-insecure_skip_verify=true
-insecure=false
-
-[logger]
-show-source=true
-level=1
