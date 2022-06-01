@@ -4128,6 +4128,10 @@
         },
         "task_node_metadata": {
           "$ref": "#/definitions/flyteidladminTaskNodeMetadata"
+        },
+        "deck_uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the deck HTML file is.\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
         }
       },
       "description": "Container for node execution details and results."
@@ -6661,6 +6665,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Whether this node yielded a dynamic workflow."
+        },
+        "deck_uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the deck HTML file is\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
         }
       }
     },

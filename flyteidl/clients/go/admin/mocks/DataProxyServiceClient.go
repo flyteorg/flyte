@@ -17,6 +17,54 @@ type DataProxyServiceClient struct {
 	mock.Mock
 }
 
+type DataProxyServiceClient_CreateDownloadLocation struct {
+	*mock.Call
+}
+
+func (_m DataProxyServiceClient_CreateDownloadLocation) Return(_a0 *service.CreateDownloadLocationResponse, _a1 error) *DataProxyServiceClient_CreateDownloadLocation {
+	return &DataProxyServiceClient_CreateDownloadLocation{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataProxyServiceClient) OnCreateDownloadLocation(ctx context.Context, in *service.CreateDownloadLocationRequest, opts ...grpc.CallOption) *DataProxyServiceClient_CreateDownloadLocation {
+	c_call := _m.On("CreateDownloadLocation", ctx, in, opts)
+	return &DataProxyServiceClient_CreateDownloadLocation{Call: c_call}
+}
+
+func (_m *DataProxyServiceClient) OnCreateDownloadLocationMatch(matchers ...interface{}) *DataProxyServiceClient_CreateDownloadLocation {
+	c_call := _m.On("CreateDownloadLocation", matchers...)
+	return &DataProxyServiceClient_CreateDownloadLocation{Call: c_call}
+}
+
+// CreateDownloadLocation provides a mock function with given fields: ctx, in, opts
+func (_m *DataProxyServiceClient) CreateDownloadLocation(ctx context.Context, in *service.CreateDownloadLocationRequest, opts ...grpc.CallOption) (*service.CreateDownloadLocationResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *service.CreateDownloadLocationResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateDownloadLocationRequest, ...grpc.CallOption) *service.CreateDownloadLocationResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.CreateDownloadLocationResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.CreateDownloadLocationRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataProxyServiceClient_CreateUploadLocation struct {
 	*mock.Call
 }

@@ -2372,6 +2372,1722 @@ public final class Dataproxy {
 
   }
 
+  public interface CreateDownloadLocationRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.service.CreateDownloadLocationRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string native_url = 1;</code>
+     */
+    java.lang.String getNativeUrl();
+    /**
+     * <pre>
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string native_url = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getNativeUrlBytes();
+
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    boolean hasExpiresIn();
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    com.google.protobuf.Duration getExpiresIn();
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    com.google.protobuf.DurationOrBuilder getExpiresInOrBuilder();
+  }
+  /**
+   * <pre>
+   * CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.service.CreateDownloadLocationRequest}
+   */
+  public  static final class CreateDownloadLocationRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.service.CreateDownloadLocationRequest)
+      CreateDownloadLocationRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CreateDownloadLocationRequest.newBuilder() to construct.
+    private CreateDownloadLocationRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CreateDownloadLocationRequest() {
+      nativeUrl_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CreateDownloadLocationRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              nativeUrl_ = s;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Duration.Builder subBuilder = null;
+              if (expiresIn_ != null) {
+                subBuilder = expiresIn_.toBuilder();
+              }
+              expiresIn_ = input.readMessage(com.google.protobuf.Duration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(expiresIn_);
+                expiresIn_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.service.Dataproxy.CreateDownloadLocationRequest.class, flyteidl.service.Dataproxy.CreateDownloadLocationRequest.Builder.class);
+    }
+
+    public static final int NATIVE_URL_FIELD_NUMBER = 1;
+    private volatile java.lang.Object nativeUrl_;
+    /**
+     * <pre>
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string native_url = 1;</code>
+     */
+    public java.lang.String getNativeUrl() {
+      java.lang.Object ref = nativeUrl_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        nativeUrl_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string native_url = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNativeUrlBytes() {
+      java.lang.Object ref = nativeUrl_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        nativeUrl_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXPIRES_IN_FIELD_NUMBER = 2;
+    private com.google.protobuf.Duration expiresIn_;
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    public boolean hasExpiresIn() {
+      return expiresIn_ != null;
+    }
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    public com.google.protobuf.Duration getExpiresIn() {
+      return expiresIn_ == null ? com.google.protobuf.Duration.getDefaultInstance() : expiresIn_;
+    }
+    /**
+     * <pre>
+     * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+     * exceeds the platform allowed max.
+     * +optional. The default value comes from a global config.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration expires_in = 2;</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getExpiresInOrBuilder() {
+      return getExpiresIn();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getNativeUrlBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, nativeUrl_);
+      }
+      if (expiresIn_ != null) {
+        output.writeMessage(2, getExpiresIn());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getNativeUrlBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, nativeUrl_);
+      }
+      if (expiresIn_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getExpiresIn());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.service.Dataproxy.CreateDownloadLocationRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.service.Dataproxy.CreateDownloadLocationRequest other = (flyteidl.service.Dataproxy.CreateDownloadLocationRequest) obj;
+
+      if (!getNativeUrl()
+          .equals(other.getNativeUrl())) return false;
+      if (hasExpiresIn() != other.hasExpiresIn()) return false;
+      if (hasExpiresIn()) {
+        if (!getExpiresIn()
+            .equals(other.getExpiresIn())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + NATIVE_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getNativeUrl().hashCode();
+      if (hasExpiresIn()) {
+        hash = (37 * hash) + EXPIRES_IN_FIELD_NUMBER;
+        hash = (53 * hash) + getExpiresIn().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.service.Dataproxy.CreateDownloadLocationRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.service.CreateDownloadLocationRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.service.CreateDownloadLocationRequest)
+        flyteidl.service.Dataproxy.CreateDownloadLocationRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.service.Dataproxy.CreateDownloadLocationRequest.class, flyteidl.service.Dataproxy.CreateDownloadLocationRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.service.Dataproxy.CreateDownloadLocationRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        nativeUrl_ = "";
+
+        if (expiresInBuilder_ == null) {
+          expiresIn_ = null;
+        } else {
+          expiresIn_ = null;
+          expiresInBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationRequest getDefaultInstanceForType() {
+        return flyteidl.service.Dataproxy.CreateDownloadLocationRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationRequest build() {
+        flyteidl.service.Dataproxy.CreateDownloadLocationRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationRequest buildPartial() {
+        flyteidl.service.Dataproxy.CreateDownloadLocationRequest result = new flyteidl.service.Dataproxy.CreateDownloadLocationRequest(this);
+        result.nativeUrl_ = nativeUrl_;
+        if (expiresInBuilder_ == null) {
+          result.expiresIn_ = expiresIn_;
+        } else {
+          result.expiresIn_ = expiresInBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.service.Dataproxy.CreateDownloadLocationRequest) {
+          return mergeFrom((flyteidl.service.Dataproxy.CreateDownloadLocationRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.service.Dataproxy.CreateDownloadLocationRequest other) {
+        if (other == flyteidl.service.Dataproxy.CreateDownloadLocationRequest.getDefaultInstance()) return this;
+        if (!other.getNativeUrl().isEmpty()) {
+          nativeUrl_ = other.nativeUrl_;
+          onChanged();
+        }
+        if (other.hasExpiresIn()) {
+          mergeExpiresIn(other.getExpiresIn());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.service.Dataproxy.CreateDownloadLocationRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.service.Dataproxy.CreateDownloadLocationRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object nativeUrl_ = "";
+      /**
+       * <pre>
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string native_url = 1;</code>
+       */
+      public java.lang.String getNativeUrl() {
+        java.lang.Object ref = nativeUrl_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          nativeUrl_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string native_url = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNativeUrlBytes() {
+        java.lang.Object ref = nativeUrl_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          nativeUrl_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string native_url = 1;</code>
+       */
+      public Builder setNativeUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        nativeUrl_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string native_url = 1;</code>
+       */
+      public Builder clearNativeUrl() {
+        
+        nativeUrl_ = getDefaultInstance().getNativeUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string native_url = 1;</code>
+       */
+      public Builder setNativeUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        nativeUrl_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Duration expiresIn_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> expiresInBuilder_;
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public boolean hasExpiresIn() {
+        return expiresInBuilder_ != null || expiresIn_ != null;
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public com.google.protobuf.Duration getExpiresIn() {
+        if (expiresInBuilder_ == null) {
+          return expiresIn_ == null ? com.google.protobuf.Duration.getDefaultInstance() : expiresIn_;
+        } else {
+          return expiresInBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public Builder setExpiresIn(com.google.protobuf.Duration value) {
+        if (expiresInBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          expiresIn_ = value;
+          onChanged();
+        } else {
+          expiresInBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public Builder setExpiresIn(
+          com.google.protobuf.Duration.Builder builderForValue) {
+        if (expiresInBuilder_ == null) {
+          expiresIn_ = builderForValue.build();
+          onChanged();
+        } else {
+          expiresInBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public Builder mergeExpiresIn(com.google.protobuf.Duration value) {
+        if (expiresInBuilder_ == null) {
+          if (expiresIn_ != null) {
+            expiresIn_ =
+              com.google.protobuf.Duration.newBuilder(expiresIn_).mergeFrom(value).buildPartial();
+          } else {
+            expiresIn_ = value;
+          }
+          onChanged();
+        } else {
+          expiresInBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public Builder clearExpiresIn() {
+        if (expiresInBuilder_ == null) {
+          expiresIn_ = null;
+          onChanged();
+        } else {
+          expiresIn_ = null;
+          expiresInBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public com.google.protobuf.Duration.Builder getExpiresInBuilder() {
+        
+        onChanged();
+        return getExpiresInFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      public com.google.protobuf.DurationOrBuilder getExpiresInOrBuilder() {
+        if (expiresInBuilder_ != null) {
+          return expiresInBuilder_.getMessageOrBuilder();
+        } else {
+          return expiresIn_ == null ?
+              com.google.protobuf.Duration.getDefaultInstance() : expiresIn_;
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+       * exceeds the platform allowed max.
+       * +optional. The default value comes from a global config.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration expires_in = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+          getExpiresInFieldBuilder() {
+        if (expiresInBuilder_ == null) {
+          expiresInBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                  getExpiresIn(),
+                  getParentForChildren(),
+                  isClean());
+          expiresIn_ = null;
+        }
+        return expiresInBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.CreateDownloadLocationRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLocationRequest)
+    private static final flyteidl.service.Dataproxy.CreateDownloadLocationRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.CreateDownloadLocationRequest();
+    }
+
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CreateDownloadLocationRequest>
+        PARSER = new com.google.protobuf.AbstractParser<CreateDownloadLocationRequest>() {
+      @java.lang.Override
+      public CreateDownloadLocationRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CreateDownloadLocationRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CreateDownloadLocationRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CreateDownloadLocationRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.service.Dataproxy.CreateDownloadLocationRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface CreateDownloadLocationResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.service.CreateDownloadLocationResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>string signed_url = 1;</code>
+     */
+    java.lang.String getSignedUrl();
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>string signed_url = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSignedUrlBytes();
+
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    boolean hasExpiresAt();
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    com.google.protobuf.Timestamp getExpiresAt();
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
+  }
+  /**
+   * Protobuf type {@code flyteidl.service.CreateDownloadLocationResponse}
+   */
+  public  static final class CreateDownloadLocationResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.service.CreateDownloadLocationResponse)
+      CreateDownloadLocationResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CreateDownloadLocationResponse.newBuilder() to construct.
+    private CreateDownloadLocationResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CreateDownloadLocationResponse() {
+      signedUrl_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CreateDownloadLocationResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              signedUrl_ = s;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (expiresAt_ != null) {
+                subBuilder = expiresAt_.toBuilder();
+              }
+              expiresAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(expiresAt_);
+                expiresAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.service.Dataproxy.CreateDownloadLocationResponse.class, flyteidl.service.Dataproxy.CreateDownloadLocationResponse.Builder.class);
+    }
+
+    public static final int SIGNED_URL_FIELD_NUMBER = 1;
+    private volatile java.lang.Object signedUrl_;
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>string signed_url = 1;</code>
+     */
+    public java.lang.String getSignedUrl() {
+      java.lang.Object ref = signedUrl_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        signedUrl_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>string signed_url = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSignedUrlBytes() {
+      java.lang.Object ref = signedUrl_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        signedUrl_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXPIRES_AT_FIELD_NUMBER = 2;
+    private com.google.protobuf.Timestamp expiresAt_;
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public boolean hasExpiresAt() {
+      return expiresAt_ != null;
+    }
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public com.google.protobuf.Timestamp getExpiresAt() {
+      return expiresAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+    }
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expires.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
+      return getExpiresAt();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getSignedUrlBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, signedUrl_);
+      }
+      if (expiresAt_ != null) {
+        output.writeMessage(2, getExpiresAt());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getSignedUrlBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, signedUrl_);
+      }
+      if (expiresAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getExpiresAt());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.service.Dataproxy.CreateDownloadLocationResponse)) {
+        return super.equals(obj);
+      }
+      flyteidl.service.Dataproxy.CreateDownloadLocationResponse other = (flyteidl.service.Dataproxy.CreateDownloadLocationResponse) obj;
+
+      if (!getSignedUrl()
+          .equals(other.getSignedUrl())) return false;
+      if (hasExpiresAt() != other.hasExpiresAt()) return false;
+      if (hasExpiresAt()) {
+        if (!getExpiresAt()
+            .equals(other.getExpiresAt())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SIGNED_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getSignedUrl().hashCode();
+      if (hasExpiresAt()) {
+        hash = (37 * hash) + EXPIRES_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getExpiresAt().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.service.Dataproxy.CreateDownloadLocationResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.service.CreateDownloadLocationResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.service.CreateDownloadLocationResponse)
+        flyteidl.service.Dataproxy.CreateDownloadLocationResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.service.Dataproxy.CreateDownloadLocationResponse.class, flyteidl.service.Dataproxy.CreateDownloadLocationResponse.Builder.class);
+      }
+
+      // Construct using flyteidl.service.Dataproxy.CreateDownloadLocationResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        signedUrl_ = "";
+
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = null;
+        } else {
+          expiresAt_ = null;
+          expiresAtBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationResponse getDefaultInstanceForType() {
+        return flyteidl.service.Dataproxy.CreateDownloadLocationResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationResponse build() {
+        flyteidl.service.Dataproxy.CreateDownloadLocationResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.CreateDownloadLocationResponse buildPartial() {
+        flyteidl.service.Dataproxy.CreateDownloadLocationResponse result = new flyteidl.service.Dataproxy.CreateDownloadLocationResponse(this);
+        result.signedUrl_ = signedUrl_;
+        if (expiresAtBuilder_ == null) {
+          result.expiresAt_ = expiresAt_;
+        } else {
+          result.expiresAt_ = expiresAtBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.service.Dataproxy.CreateDownloadLocationResponse) {
+          return mergeFrom((flyteidl.service.Dataproxy.CreateDownloadLocationResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.service.Dataproxy.CreateDownloadLocationResponse other) {
+        if (other == flyteidl.service.Dataproxy.CreateDownloadLocationResponse.getDefaultInstance()) return this;
+        if (!other.getSignedUrl().isEmpty()) {
+          signedUrl_ = other.signedUrl_;
+          onChanged();
+        }
+        if (other.hasExpiresAt()) {
+          mergeExpiresAt(other.getExpiresAt());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.service.Dataproxy.CreateDownloadLocationResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.service.Dataproxy.CreateDownloadLocationResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object signedUrl_ = "";
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>string signed_url = 1;</code>
+       */
+      public java.lang.String getSignedUrl() {
+        java.lang.Object ref = signedUrl_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          signedUrl_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>string signed_url = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSignedUrlBytes() {
+        java.lang.Object ref = signedUrl_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          signedUrl_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>string signed_url = 1;</code>
+       */
+      public Builder setSignedUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        signedUrl_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>string signed_url = 1;</code>
+       */
+      public Builder clearSignedUrl() {
+        
+        signedUrl_ = getDefaultInstance().getSignedUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>string signed_url = 1;</code>
+       */
+      public Builder setSignedUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        signedUrl_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp expiresAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> expiresAtBuilder_;
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public boolean hasExpiresAt() {
+        return expiresAtBuilder_ != null || expiresAt_ != null;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp getExpiresAt() {
+        if (expiresAtBuilder_ == null) {
+          return expiresAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+        } else {
+          return expiresAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public Builder setExpiresAt(com.google.protobuf.Timestamp value) {
+        if (expiresAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          expiresAt_ = value;
+          onChanged();
+        } else {
+          expiresAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public Builder setExpiresAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          expiresAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public Builder mergeExpiresAt(com.google.protobuf.Timestamp value) {
+        if (expiresAtBuilder_ == null) {
+          if (expiresAt_ != null) {
+            expiresAt_ =
+              com.google.protobuf.Timestamp.newBuilder(expiresAt_).mergeFrom(value).buildPartial();
+          } else {
+            expiresAt_ = value;
+          }
+          onChanged();
+        } else {
+          expiresAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public Builder clearExpiresAt() {
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = null;
+          onChanged();
+        } else {
+          expiresAt_ = null;
+          expiresAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getExpiresAtBuilder() {
+        
+        onChanged();
+        return getExpiresAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
+        if (expiresAtBuilder_ != null) {
+          return expiresAtBuilder_.getMessageOrBuilder();
+        } else {
+          return expiresAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expires.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getExpiresAtFieldBuilder() {
+        if (expiresAtBuilder_ == null) {
+          expiresAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getExpiresAt(),
+                  getParentForChildren(),
+                  isClean());
+          expiresAt_ = null;
+        }
+        return expiresAtBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.CreateDownloadLocationResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLocationResponse)
+    private static final flyteidl.service.Dataproxy.CreateDownloadLocationResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.CreateDownloadLocationResponse();
+    }
+
+    public static flyteidl.service.Dataproxy.CreateDownloadLocationResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CreateDownloadLocationResponse>
+        PARSER = new com.google.protobuf.AbstractParser<CreateDownloadLocationResponse>() {
+      @java.lang.Override
+      public CreateDownloadLocationResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CreateDownloadLocationResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CreateDownloadLocationResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CreateDownloadLocationResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.service.Dataproxy.CreateDownloadLocationResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_service_CreateUploadLocationResponse_descriptor;
   private static final 
@@ -2382,6 +4098,16 @@ public final class Dataproxy {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_service_CreateUploadLocationRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_service_CreateDownloadLocationResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2402,15 +4128,27 @@ public final class Dataproxy {
       "eateUploadLocationRequest\022\017\n\007project\030\001 \001" +
       "(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010filename\030\003 \001(\t\022-\n\n" +
       "expires_in\030\004 \001(\0132\031.google.protobuf.Durat" +
-      "ion\022\023\n\013content_md5\030\005 \001(\0142\205\002\n\020DataProxySe" +
-      "rvice\022\360\001\n\024CreateUploadLocation\022-.flyteid" +
-      "l.service.CreateUploadLocationRequest\032.." +
-      "flyteidl.service.CreateUploadLocationRes" +
-      "ponse\"y\202\323\344\223\002#\"\036/api/v1/dataproxy/artifac" +
-      "t_urn:\001*\222AM\032KCreates a write-only http l" +
-      "ocation that is accessible for tasks at " +
-      "runtime.B9Z7github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/serviceb\006proto3"
+      "ion\022\023\n\013content_md5\030\005 \001(\014\"b\n\035CreateDownlo" +
+      "adLocationRequest\022\022\n\nnative_url\030\001 \001(\t\022-\n" +
+      "\nexpires_in\030\002 \001(\0132\031.google.protobuf.Dura" +
+      "tion\"d\n\036CreateDownloadLocationResponse\022\022" +
+      "\n\nsigned_url\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(\0132\032" +
+      ".google.protobuf.Timestamp2\372\003\n\020DataProxy" +
+      "Service\022\360\001\n\024CreateUploadLocation\022-.flyte" +
+      "idl.service.CreateUploadLocationRequest\032" +
+      "..flyteidl.service.CreateUploadLocationR" +
+      "esponse\"y\202\323\344\223\002#\"\036/api/v1/dataproxy/artif" +
+      "act_urn:\001*\222AM\032KCreates a write-only http" +
+      " location that is accessible for tasks a" +
+      "t runtime.\022\362\001\n\026CreateDownloadLocation\022/." +
+      "flyteidl.service.CreateDownloadLocationR" +
+      "equest\0320.flyteidl.service.CreateDownload" +
+      "LocationResponse\"u\202\323\344\223\002 \022\036/api/v1/datapr" +
+      "oxy/artifact_urn\222AL\032JCreates a read-only" +
+      " http location that is accessible for ta" +
+      "sks at runtime.B9Z7github.com/flyteorg/f" +
+      "lyteidl/gen/pb-go/flyteidl/serviceb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2440,6 +4178,18 @@ public final class Dataproxy {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor,
         new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", });
+    internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor,
+        new java.lang.String[] { "NativeUrl", "ExpiresIn", });
+    internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_flyteidl_service_CreateDownloadLocationResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_service_CreateDownloadLocationResponse_descriptor,
+        new java.lang.String[] { "SignedUrl", "ExpiresAt", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);

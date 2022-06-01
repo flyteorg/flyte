@@ -46,7 +46,8 @@ class AdminNodeExecutionClosure(object):
         'created_at': 'datetime',
         'updated_at': 'datetime',
         'workflow_node_metadata': 'FlyteidladminWorkflowNodeMetadata',
-        'task_node_metadata': 'FlyteidladminTaskNodeMetadata'
+        'task_node_metadata': 'FlyteidladminTaskNodeMetadata',
+        'deck_uri': 'str'
     }
 
     attribute_map = {
@@ -59,10 +60,11 @@ class AdminNodeExecutionClosure(object):
         'created_at': 'created_at',
         'updated_at': 'updated_at',
         'workflow_node_metadata': 'workflow_node_metadata',
-        'task_node_metadata': 'task_node_metadata'
+        'task_node_metadata': 'task_node_metadata',
+        'deck_uri': 'deck_uri'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None, deck_uri=None):  # noqa: E501
         """AdminNodeExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
@@ -75,6 +77,7 @@ class AdminNodeExecutionClosure(object):
         self._updated_at = None
         self._workflow_node_metadata = None
         self._task_node_metadata = None
+        self._deck_uri = None
         self.discriminator = None
 
         if output_uri is not None:
@@ -97,6 +100,8 @@ class AdminNodeExecutionClosure(object):
             self.workflow_node_metadata = workflow_node_metadata
         if task_node_metadata is not None:
             self.task_node_metadata = task_node_metadata
+        if deck_uri is not None:
+            self.deck_uri = deck_uri
 
     @property
     def output_uri(self):
@@ -321,6 +326,27 @@ class AdminNodeExecutionClosure(object):
         """
 
         self._task_node_metadata = task_node_metadata
+
+    @property
+    def deck_uri(self):
+        """Gets the deck_uri of this AdminNodeExecutionClosure.  # noqa: E501
+
+
+        :return: The deck_uri of this AdminNodeExecutionClosure.  # noqa: E501
+        :rtype: str
+        """
+        return self._deck_uri
+
+    @deck_uri.setter
+    def deck_uri(self, deck_uri):
+        """Sets the deck_uri of this AdminNodeExecutionClosure.
+
+
+        :param deck_uri: The deck_uri of this AdminNodeExecutionClosure.  # noqa: E501
+        :type: str
+        """
+
+        self._deck_uri = deck_uri
 
     def to_dict(self):
         """Returns the model properties as a dict"""

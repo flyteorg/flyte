@@ -227,6 +227,50 @@ flyteidl/service/dataproxy.proto
 
 
 
+.. _ref_flyteidl.service.CreateDownloadLocationRequest:
+
+CreateDownloadLocationRequest
+------------------------------------------------------------------
+
+CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
+
+
+
+.. csv-table:: CreateDownloadLocationRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "native_url", ":ref:`ref_string`", "", "NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+   "expires_in", ":ref:`ref_google.protobuf.Duration`", "", "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this exceeds the platform allowed max. +optional. The default value comes from a global config."
+
+
+
+
+
+
+
+.. _ref_flyteidl.service.CreateDownloadLocationResponse:
+
+CreateDownloadLocationResponse
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: CreateDownloadLocationResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signed_url", ":ref:`ref_string`", "", "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+   "expires_at", ":ref:`ref_google.protobuf.Timestamp`", "", "ExpiresAt defines when will the signed URL expires."
+
+
+
+
+
+
+
 .. _ref_flyteidl.service.CreateUploadLocationRequest:
 
 CreateUploadLocationRequest
@@ -299,6 +343,7 @@ DataProxyService defines an RPC Service that allows access to user-data in a con
    :widths: auto
 
    "CreateUploadLocation", ":ref:`ref_flyteidl.service.CreateUploadLocationRequest`", ":ref:`ref_flyteidl.service.CreateUploadLocationResponse`", "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain."
+   "CreateDownloadLocation", ":ref:`ref_flyteidl.service.CreateDownloadLocationRequest`", ":ref:`ref_flyteidl.service.CreateDownloadLocationResponse`", "CreateDownloadLocation creates a signed url to download artifacts."
 
 ..
    end services

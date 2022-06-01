@@ -2271,6 +2271,7 @@ Container for node execution details and results.
    "updated_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the node execution was last updated."
    "workflow_node_metadata", ":ref:`ref_flyteidl.admin.WorkflowNodeMetadata`", "", ""
    "task_node_metadata", ":ref:`ref_flyteidl.admin.TaskNodeMetadata`", "", ""
+   "deck_uri", ":ref:`ref_string`", "", "String location uniquely identifying where the deck HTML file is. NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
 
 
 

@@ -14893,6 +14893,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number|null} [eventVersion] NodeExecutionEvent eventVersion
              * @property {boolean|null} [isParent] NodeExecutionEvent isParent
              * @property {boolean|null} [isDynamic] NodeExecutionEvent isDynamic
+             * @property {string|null} [deckUri] NodeExecutionEvent deckUri
              */
 
             /**
@@ -15054,6 +15055,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             NodeExecutionEvent.prototype.isDynamic = false;
 
+            /**
+             * NodeExecutionEvent deckUri.
+             * @member {string} deckUri
+             * @memberof flyteidl.event.NodeExecutionEvent
+             * @instance
+             */
+            NodeExecutionEvent.prototype.deckUri = "";
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -15139,6 +15148,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 17, wireType 0 =*/136).bool(message.isParent);
                 if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
                     writer.uint32(/* id 18, wireType 0 =*/144).bool(message.isDynamic);
+                if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                    writer.uint32(/* id 19, wireType 2 =*/154).string(message.deckUri);
                 return writer;
             };
 
@@ -15213,6 +15224,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 18:
                         message.isDynamic = reader.bool();
+                        break;
+                    case 19:
+                        message.deckUri = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -15338,6 +15352,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
                     if (typeof message.isDynamic !== "boolean")
                         return "isDynamic: boolean expected";
+                if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                    if (!$util.isString(message.deckUri))
+                        return "deckUri: string expected";
                 return null;
             };
 
@@ -30373,6 +30390,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {google.protobuf.ITimestamp|null} [updatedAt] NodeExecutionClosure updatedAt
              * @property {flyteidl.admin.IWorkflowNodeMetadata|null} [workflowNodeMetadata] NodeExecutionClosure workflowNodeMetadata
              * @property {flyteidl.admin.ITaskNodeMetadata|null} [taskNodeMetadata] NodeExecutionClosure taskNodeMetadata
+             * @property {string|null} [deckUri] NodeExecutionClosure deckUri
              */
 
             /**
@@ -30470,6 +30488,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             NodeExecutionClosure.prototype.taskNodeMetadata = null;
 
+            /**
+             * NodeExecutionClosure deckUri.
+             * @member {string} deckUri
+             * @memberof flyteidl.admin.NodeExecutionClosure
+             * @instance
+             */
+            NodeExecutionClosure.prototype.deckUri = "";
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -30539,6 +30565,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.TaskNodeMetadata.encode(message.taskNodeMetadata, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 if (message.outputData != null && message.hasOwnProperty("outputData"))
                     $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                    writer.uint32(/* id 11, wireType 2 =*/90).string(message.deckUri);
                 return writer;
             };
 
@@ -30589,6 +30617,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 9:
                         message.taskNodeMetadata = $root.flyteidl.admin.TaskNodeMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 11:
+                        message.deckUri = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -30690,6 +30721,9 @@ export const flyteidl = $root.flyteidl = (() => {
                             return "taskNodeMetadata." + error;
                     }
                 }
+                if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                    if (!$util.isString(message.deckUri))
+                        return "deckUri: string expected";
                 return null;
             };
 
@@ -40084,6 +40118,264 @@ export const flyteidl = $root.flyteidl = (() => {
             return CreateUploadLocationRequest;
         })();
 
+        service.CreateDownloadLocationRequest = (function() {
+
+            /**
+             * Properties of a CreateDownloadLocationRequest.
+             * @memberof flyteidl.service
+             * @interface ICreateDownloadLocationRequest
+             * @property {string|null} [nativeUrl] CreateDownloadLocationRequest nativeUrl
+             * @property {google.protobuf.IDuration|null} [expiresIn] CreateDownloadLocationRequest expiresIn
+             */
+
+            /**
+             * Constructs a new CreateDownloadLocationRequest.
+             * @memberof flyteidl.service
+             * @classdesc Represents a CreateDownloadLocationRequest.
+             * @implements ICreateDownloadLocationRequest
+             * @constructor
+             * @param {flyteidl.service.ICreateDownloadLocationRequest=} [properties] Properties to set
+             */
+            function CreateDownloadLocationRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CreateDownloadLocationRequest nativeUrl.
+             * @member {string} nativeUrl
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @instance
+             */
+            CreateDownloadLocationRequest.prototype.nativeUrl = "";
+
+            /**
+             * CreateDownloadLocationRequest expiresIn.
+             * @member {google.protobuf.IDuration|null|undefined} expiresIn
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @instance
+             */
+            CreateDownloadLocationRequest.prototype.expiresIn = null;
+
+            /**
+             * Creates a new CreateDownloadLocationRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @static
+             * @param {flyteidl.service.ICreateDownloadLocationRequest=} [properties] Properties to set
+             * @returns {flyteidl.service.CreateDownloadLocationRequest} CreateDownloadLocationRequest instance
+             */
+            CreateDownloadLocationRequest.create = function create(properties) {
+                return new CreateDownloadLocationRequest(properties);
+            };
+
+            /**
+             * Encodes the specified CreateDownloadLocationRequest message. Does not implicitly {@link flyteidl.service.CreateDownloadLocationRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @static
+             * @param {flyteidl.service.ICreateDownloadLocationRequest} message CreateDownloadLocationRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CreateDownloadLocationRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.nativeUrl != null && message.hasOwnProperty("nativeUrl"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.nativeUrl);
+                if (message.expiresIn != null && message.hasOwnProperty("expiresIn"))
+                    $root.google.protobuf.Duration.encode(message.expiresIn, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a CreateDownloadLocationRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.service.CreateDownloadLocationRequest} CreateDownloadLocationRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CreateDownloadLocationRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateDownloadLocationRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.nativeUrl = reader.string();
+                        break;
+                    case 2:
+                        message.expiresIn = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CreateDownloadLocationRequest message.
+             * @function verify
+             * @memberof flyteidl.service.CreateDownloadLocationRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CreateDownloadLocationRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.nativeUrl != null && message.hasOwnProperty("nativeUrl"))
+                    if (!$util.isString(message.nativeUrl))
+                        return "nativeUrl: string expected";
+                if (message.expiresIn != null && message.hasOwnProperty("expiresIn")) {
+                    let error = $root.google.protobuf.Duration.verify(message.expiresIn);
+                    if (error)
+                        return "expiresIn." + error;
+                }
+                return null;
+            };
+
+            return CreateDownloadLocationRequest;
+        })();
+
+        service.CreateDownloadLocationResponse = (function() {
+
+            /**
+             * Properties of a CreateDownloadLocationResponse.
+             * @memberof flyteidl.service
+             * @interface ICreateDownloadLocationResponse
+             * @property {string|null} [signedUrl] CreateDownloadLocationResponse signedUrl
+             * @property {google.protobuf.ITimestamp|null} [expiresAt] CreateDownloadLocationResponse expiresAt
+             */
+
+            /**
+             * Constructs a new CreateDownloadLocationResponse.
+             * @memberof flyteidl.service
+             * @classdesc Represents a CreateDownloadLocationResponse.
+             * @implements ICreateDownloadLocationResponse
+             * @constructor
+             * @param {flyteidl.service.ICreateDownloadLocationResponse=} [properties] Properties to set
+             */
+            function CreateDownloadLocationResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CreateDownloadLocationResponse signedUrl.
+             * @member {string} signedUrl
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @instance
+             */
+            CreateDownloadLocationResponse.prototype.signedUrl = "";
+
+            /**
+             * CreateDownloadLocationResponse expiresAt.
+             * @member {google.protobuf.ITimestamp|null|undefined} expiresAt
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @instance
+             */
+            CreateDownloadLocationResponse.prototype.expiresAt = null;
+
+            /**
+             * Creates a new CreateDownloadLocationResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @static
+             * @param {flyteidl.service.ICreateDownloadLocationResponse=} [properties] Properties to set
+             * @returns {flyteidl.service.CreateDownloadLocationResponse} CreateDownloadLocationResponse instance
+             */
+            CreateDownloadLocationResponse.create = function create(properties) {
+                return new CreateDownloadLocationResponse(properties);
+            };
+
+            /**
+             * Encodes the specified CreateDownloadLocationResponse message. Does not implicitly {@link flyteidl.service.CreateDownloadLocationResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @static
+             * @param {flyteidl.service.ICreateDownloadLocationResponse} message CreateDownloadLocationResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CreateDownloadLocationResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signedUrl != null && message.hasOwnProperty("signedUrl"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.signedUrl);
+                if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
+                    $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a CreateDownloadLocationResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.service.CreateDownloadLocationResponse} CreateDownloadLocationResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CreateDownloadLocationResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateDownloadLocationResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.signedUrl = reader.string();
+                        break;
+                    case 2:
+                        message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CreateDownloadLocationResponse message.
+             * @function verify
+             * @memberof flyteidl.service.CreateDownloadLocationResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CreateDownloadLocationResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signedUrl != null && message.hasOwnProperty("signedUrl"))
+                    if (!$util.isString(message.signedUrl))
+                        return "signedUrl: string expected";
+                if (message.expiresAt != null && message.hasOwnProperty("expiresAt")) {
+                    let error = $root.google.protobuf.Timestamp.verify(message.expiresAt);
+                    if (error)
+                        return "expiresAt." + error;
+                }
+                return null;
+            };
+
+            return CreateDownloadLocationResponse;
+        })();
+
         service.DataProxyService = (function() {
 
             /**
@@ -40146,6 +40438,39 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.service.ICreateUploadLocationRequest} request CreateUploadLocationRequest message or plain object
              * @returns {Promise<flyteidl.service.CreateUploadLocationResponse>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.DataProxyService#createDownloadLocation}.
+             * @memberof flyteidl.service.DataProxyService
+             * @typedef CreateDownloadLocationCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.service.CreateDownloadLocationResponse} [response] CreateDownloadLocationResponse
+             */
+
+            /**
+             * Calls CreateDownloadLocation.
+             * @function createDownloadLocation
+             * @memberof flyteidl.service.DataProxyService
+             * @instance
+             * @param {flyteidl.service.ICreateDownloadLocationRequest} request CreateDownloadLocationRequest message or plain object
+             * @param {flyteidl.service.DataProxyService.CreateDownloadLocationCallback} callback Node-style callback called with the error, if any, and CreateDownloadLocationResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(DataProxyService.prototype.createDownloadLocation = function createDownloadLocation(request, callback) {
+                return this.rpcCall(createDownloadLocation, $root.flyteidl.service.CreateDownloadLocationRequest, $root.flyteidl.service.CreateDownloadLocationResponse, request, callback);
+            }, "name", { value: "CreateDownloadLocation" });
+
+            /**
+             * Calls CreateDownloadLocation.
+             * @function createDownloadLocation
+             * @memberof flyteidl.service.DataProxyService
+             * @instance
+             * @param {flyteidl.service.ICreateDownloadLocationRequest} request CreateDownloadLocationRequest message or plain object
+             * @returns {Promise<flyteidl.service.CreateDownloadLocationResponse>} Promise
              * @variation 2
              */
 

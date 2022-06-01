@@ -44,6 +44,25 @@ message CreateUploadLocationRequest {
   bytes content_md5 = 5;
 }
 
+// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
+message CreateDownloadLocationRequest {
+  // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+  string native_url = 1;
+
+  // ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this
+  // exceeds the platform allowed max.
+  // +optional. The default value comes from a global config.
+  google.protobuf.Duration expires_in = 2;
+
+}
+
+message CreateDownloadLocationResponse {
+  // SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+  string signed_url = 1;
+  // ExpiresAt defines when will the signed URL expires.
+  google.protobuf.Timestamp expires_at = 2;
+}
+
 // DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.
 service DataProxyService {
   // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
@@ -54,6 +73,15 @@ service DataProxyService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Creates a write-only http location that is accessible for tasks at runtime."
+    };
+  }
+  // CreateDownloadLocation creates a signed url to download artifacts.
+  rpc CreateDownloadLocation (CreateDownloadLocationRequest) returns (CreateDownloadLocationResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dataproxy/artifact_urn"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Creates a read-only http location that is accessible for tasks at runtime."
     };
   }
 }

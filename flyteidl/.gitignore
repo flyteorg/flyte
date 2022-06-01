@@ -15,3 +15,4 @@ docs/build/
 .vscode/
 tmp/
 .python-version
+__pycache__/

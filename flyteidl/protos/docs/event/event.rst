@@ -93,6 +93,7 @@ NodeExecutionEvent
    "event_version", ":ref:`ref_int32`", "", ""
    "is_parent", ":ref:`ref_bool`", "", "Whether this node launched a subworkflow."
    "is_dynamic", ":ref:`ref_bool`", "", "Whether this node yielded a dynamic workflow."
+   "deck_uri", ":ref:`ref_string`", "", "String location uniquely identifying where the deck HTML file is NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
 
 
 

@@ -14,6 +14,47 @@ type DataProxyServiceServer struct {
 	mock.Mock
 }
 
+type DataProxyServiceServer_CreateDownloadLocation struct {
+	*mock.Call
+}
+
+func (_m DataProxyServiceServer_CreateDownloadLocation) Return(_a0 *service.CreateDownloadLocationResponse, _a1 error) *DataProxyServiceServer_CreateDownloadLocation {
+	return &DataProxyServiceServer_CreateDownloadLocation{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataProxyServiceServer) OnCreateDownloadLocation(_a0 context.Context, _a1 *service.CreateDownloadLocationRequest) *DataProxyServiceServer_CreateDownloadLocation {
+	c_call := _m.On("CreateDownloadLocation", _a0, _a1)
+	return &DataProxyServiceServer_CreateDownloadLocation{Call: c_call}
+}
+
+func (_m *DataProxyServiceServer) OnCreateDownloadLocationMatch(matchers ...interface{}) *DataProxyServiceServer_CreateDownloadLocation {
+	c_call := _m.On("CreateDownloadLocation", matchers...)
+	return &DataProxyServiceServer_CreateDownloadLocation{Call: c_call}
+}
+
+// CreateDownloadLocation provides a mock function with given fields: _a0, _a1
+func (_m *DataProxyServiceServer) CreateDownloadLocation(_a0 context.Context, _a1 *service.CreateDownloadLocationRequest) (*service.CreateDownloadLocationResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *service.CreateDownloadLocationResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateDownloadLocationRequest) *service.CreateDownloadLocationResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.CreateDownloadLocationResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.CreateDownloadLocationRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataProxyServiceServer_CreateUploadLocation struct {
 	*mock.Call
 }
