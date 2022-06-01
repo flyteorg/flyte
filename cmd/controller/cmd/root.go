@@ -7,27 +7,28 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-
-	"github.com/flyteorg/flytestdlib/profutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"golang.org/x/sync/errgroup"
-	"k8s.io/klog"
-
+	"github.com/flyteorg/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flytestdlib/config/viper"
-	"github.com/flyteorg/flytestdlib/version"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/signals"
 
 	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/spf13/pflag"
+	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/version"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller"
-	"github.com/flyteorg/flytepropeller/pkg/signals"
+	"golang.org/x/sync/errgroup"
+
+	"k8s.io/klog"
+
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 const (
@@ -107,6 +108,13 @@ func logAndExit(err error) {
 func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
+
+	// set metric keys
+	keys := contextutils.MetricKeysFromStrings(cfg.MetricKeys)
+	logger.Infof(context.TODO(), "setting metrics keys to %+v", keys)
+	if len(keys) > 0 {
+		labeled.SetMetricKeys(keys...)
+	}
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
