@@ -31,6 +31,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type metadata struct {
+	exists bool
+	size   int64
+}
+
+func (m metadata) Exists() bool {
+	return m.exists
+}
+
+func (m metadata) Size() int64 {
+	return m.size
+}
+
 func createSampleContainerTask() *core2.Container {
 	return &core2.Container{
 		Command: []string{"cmd"},
@@ -106,8 +119,13 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	ir.OnGetInputPath().Return("/prefix/inputs.pb")
 	ir.OnGetMatch(mock.Anything).Return(&core2.LiteralMap{}, nil)
 
+	composedProtobufStore := &stdmocks.ComposedProtobufStore{}
+	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {
+		return true
+	})
+	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0}, nil)
 	dataStore := &storage.DataStore{
-		ComposedProtobufStore: &stdmocks.ComposedProtobufStore{},
+		ComposedProtobufStore: composedProtobufStore,
 		ReferenceConstructor:  &storage.URLPathConstructor{},
 	}
 
@@ -446,7 +464,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, tCtx.DataStore(), "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
@@ -495,7 +513,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		// execute
-		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", currentState)
+		newState, _, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, tCtx.DataStore(), "/prefix/", "/prefix-sand/", currentState)
 
 		// validate results
 		assert.Nil(t, err)
