@@ -57,7 +57,8 @@ class EventNodeExecutionEvent(object):
         'node_name': 'str',
         'event_version': 'int',
         'is_parent': 'bool',
-        'is_dynamic': 'bool'
+        'is_dynamic': 'bool',
+        'deck_uri': 'str'
     }
 
     attribute_map = {
@@ -78,10 +79,11 @@ class EventNodeExecutionEvent(object):
         'node_name': 'node_name',
         'event_version': 'event_version',
         'is_parent': 'is_parent',
-        'is_dynamic': 'is_dynamic'
+        'is_dynamic': 'is_dynamic',
+        'deck_uri': 'deck_uri'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -102,6 +104,7 @@ class EventNodeExecutionEvent(object):
         self._event_version = None
         self._is_parent = None
         self._is_dynamic = None
+        self._deck_uri = None
         self.discriminator = None
 
         if id is not None:
@@ -140,6 +143,8 @@ class EventNodeExecutionEvent(object):
             self.is_parent = is_parent
         if is_dynamic is not None:
             self.is_dynamic = is_dynamic
+        if deck_uri is not None:
+            self.deck_uri = deck_uri
 
     @property
     def id(self):
@@ -532,6 +537,27 @@ class EventNodeExecutionEvent(object):
         """
 
         self._is_dynamic = is_dynamic
+
+    @property
+    def deck_uri(self):
+        """Gets the deck_uri of this EventNodeExecutionEvent.  # noqa: E501
+
+
+        :return: The deck_uri of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: str
+        """
+        return self._deck_uri
+
+    @deck_uri.setter
+    def deck_uri(self, deck_uri):
+        """Sets the deck_uri of this EventNodeExecutionEvent.
+
+
+        :param deck_uri: The deck_uri of this EventNodeExecutionEvent.  # noqa: E501
+        :type: str
+        """
+
+        self._deck_uri = deck_uri
 
     def to_dict(self):
         """Returns the model properties as a dict"""

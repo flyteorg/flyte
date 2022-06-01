@@ -45,7 +45,7 @@ struct TableStruct_flyteidl_2fservice_2fdataproxy_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -54,6 +54,12 @@ struct TableStruct_flyteidl_2fservice_2fdataproxy_2eproto {
 void AddDescriptors_flyteidl_2fservice_2fdataproxy_2eproto();
 namespace flyteidl {
 namespace service {
+class CreateDownloadLocationRequest;
+class CreateDownloadLocationRequestDefaultTypeInternal;
+extern CreateDownloadLocationRequestDefaultTypeInternal _CreateDownloadLocationRequest_default_instance_;
+class CreateDownloadLocationResponse;
+class CreateDownloadLocationResponseDefaultTypeInternal;
+extern CreateDownloadLocationResponseDefaultTypeInternal _CreateDownloadLocationResponse_default_instance_;
 class CreateUploadLocationRequest;
 class CreateUploadLocationRequestDefaultTypeInternal;
 extern CreateUploadLocationRequestDefaultTypeInternal _CreateUploadLocationRequest_default_instance_;
@@ -64,6 +70,8 @@ extern CreateUploadLocationResponseDefaultTypeInternal _CreateUploadLocationResp
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::service::CreateDownloadLocationRequest* Arena::CreateMaybeMessage<::flyteidl::service::CreateDownloadLocationRequest>(Arena*);
+template<> ::flyteidl::service::CreateDownloadLocationResponse* Arena::CreateMaybeMessage<::flyteidl::service::CreateDownloadLocationResponse>(Arena*);
 template<> ::flyteidl::service::CreateUploadLocationRequest* Arena::CreateMaybeMessage<::flyteidl::service::CreateUploadLocationRequest>(Arena*);
 template<> ::flyteidl::service::CreateUploadLocationResponse* Arena::CreateMaybeMessage<::flyteidl::service::CreateUploadLocationResponse>(Arena*);
 }  // namespace protobuf
@@ -388,6 +396,266 @@ class CreateUploadLocationRequest final :
   ::google::protobuf::internal::ArenaStringPtr filename_;
   ::google::protobuf::internal::ArenaStringPtr content_md5_;
   ::google::protobuf::Duration* expires_in_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fservice_2fdataproxy_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CreateDownloadLocationRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.service.CreateDownloadLocationRequest) */ {
+ public:
+  CreateDownloadLocationRequest();
+  virtual ~CreateDownloadLocationRequest();
+
+  CreateDownloadLocationRequest(const CreateDownloadLocationRequest& from);
+
+  inline CreateDownloadLocationRequest& operator=(const CreateDownloadLocationRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CreateDownloadLocationRequest(CreateDownloadLocationRequest&& from) noexcept
+    : CreateDownloadLocationRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline CreateDownloadLocationRequest& operator=(CreateDownloadLocationRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CreateDownloadLocationRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CreateDownloadLocationRequest* internal_default_instance() {
+    return reinterpret_cast<const CreateDownloadLocationRequest*>(
+               &_CreateDownloadLocationRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(CreateDownloadLocationRequest* other);
+  friend void swap(CreateDownloadLocationRequest& a, CreateDownloadLocationRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CreateDownloadLocationRequest* New() const final {
+    return CreateMaybeMessage<CreateDownloadLocationRequest>(nullptr);
+  }
+
+  CreateDownloadLocationRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CreateDownloadLocationRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CreateDownloadLocationRequest& from);
+  void MergeFrom(const CreateDownloadLocationRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CreateDownloadLocationRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string native_url = 1;
+  void clear_native_url();
+  static const int kNativeUrlFieldNumber = 1;
+  const ::std::string& native_url() const;
+  void set_native_url(const ::std::string& value);
+  #if LANG_CXX11
+  void set_native_url(::std::string&& value);
+  #endif
+  void set_native_url(const char* value);
+  void set_native_url(const char* value, size_t size);
+  ::std::string* mutable_native_url();
+  ::std::string* release_native_url();
+  void set_allocated_native_url(::std::string* native_url);
+
+  // .google.protobuf.Duration expires_in = 2;
+  bool has_expires_in() const;
+  void clear_expires_in();
+  static const int kExpiresInFieldNumber = 2;
+  const ::google::protobuf::Duration& expires_in() const;
+  ::google::protobuf::Duration* release_expires_in();
+  ::google::protobuf::Duration* mutable_expires_in();
+  void set_allocated_expires_in(::google::protobuf::Duration* expires_in);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLocationRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr native_url_;
+  ::google::protobuf::Duration* expires_in_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fservice_2fdataproxy_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CreateDownloadLocationResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.service.CreateDownloadLocationResponse) */ {
+ public:
+  CreateDownloadLocationResponse();
+  virtual ~CreateDownloadLocationResponse();
+
+  CreateDownloadLocationResponse(const CreateDownloadLocationResponse& from);
+
+  inline CreateDownloadLocationResponse& operator=(const CreateDownloadLocationResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CreateDownloadLocationResponse(CreateDownloadLocationResponse&& from) noexcept
+    : CreateDownloadLocationResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline CreateDownloadLocationResponse& operator=(CreateDownloadLocationResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CreateDownloadLocationResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CreateDownloadLocationResponse* internal_default_instance() {
+    return reinterpret_cast<const CreateDownloadLocationResponse*>(
+               &_CreateDownloadLocationResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(CreateDownloadLocationResponse* other);
+  friend void swap(CreateDownloadLocationResponse& a, CreateDownloadLocationResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CreateDownloadLocationResponse* New() const final {
+    return CreateMaybeMessage<CreateDownloadLocationResponse>(nullptr);
+  }
+
+  CreateDownloadLocationResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CreateDownloadLocationResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CreateDownloadLocationResponse& from);
+  void MergeFrom(const CreateDownloadLocationResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CreateDownloadLocationResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string signed_url = 1;
+  void clear_signed_url();
+  static const int kSignedUrlFieldNumber = 1;
+  const ::std::string& signed_url() const;
+  void set_signed_url(const ::std::string& value);
+  #if LANG_CXX11
+  void set_signed_url(::std::string&& value);
+  #endif
+  void set_signed_url(const char* value);
+  void set_signed_url(const char* value, size_t size);
+  ::std::string* mutable_signed_url();
+  ::std::string* release_signed_url();
+  void set_allocated_signed_url(::std::string* signed_url);
+
+  // .google.protobuf.Timestamp expires_at = 2;
+  bool has_expires_at() const;
+  void clear_expires_at();
+  static const int kExpiresAtFieldNumber = 2;
+  const ::google::protobuf::Timestamp& expires_at() const;
+  ::google::protobuf::Timestamp* release_expires_at();
+  ::google::protobuf::Timestamp* mutable_expires_at();
+  void set_allocated_expires_at(::google::protobuf::Timestamp* expires_at);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLocationResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr signed_url_;
+  ::google::protobuf::Timestamp* expires_at_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fdataproxy_2eproto;
 };
@@ -816,9 +1084,219 @@ inline void CreateUploadLocationRequest::set_allocated_content_md5(::std::string
   // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateUploadLocationRequest.content_md5)
 }
 
+// -------------------------------------------------------------------
+
+// CreateDownloadLocationRequest
+
+// string native_url = 1;
+inline void CreateDownloadLocationRequest::clear_native_url() {
+  native_url_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CreateDownloadLocationRequest::native_url() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.CreateDownloadLocationRequest.native_url)
+  return native_url_.GetNoArena();
+}
+inline void CreateDownloadLocationRequest::set_native_url(const ::std::string& value) {
+  
+  native_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.service.CreateDownloadLocationRequest.native_url)
+}
+#if LANG_CXX11
+inline void CreateDownloadLocationRequest::set_native_url(::std::string&& value) {
+  
+  native_url_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.service.CreateDownloadLocationRequest.native_url)
+}
+#endif
+inline void CreateDownloadLocationRequest::set_native_url(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  native_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.service.CreateDownloadLocationRequest.native_url)
+}
+inline void CreateDownloadLocationRequest::set_native_url(const char* value, size_t size) {
+  
+  native_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.service.CreateDownloadLocationRequest.native_url)
+}
+inline ::std::string* CreateDownloadLocationRequest::mutable_native_url() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.CreateDownloadLocationRequest.native_url)
+  return native_url_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CreateDownloadLocationRequest::release_native_url() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.CreateDownloadLocationRequest.native_url)
+  
+  return native_url_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CreateDownloadLocationRequest::set_allocated_native_url(::std::string* native_url) {
+  if (native_url != nullptr) {
+    
+  } else {
+    
+  }
+  native_url_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), native_url);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateDownloadLocationRequest.native_url)
+}
+
+// .google.protobuf.Duration expires_in = 2;
+inline bool CreateDownloadLocationRequest::has_expires_in() const {
+  return this != internal_default_instance() && expires_in_ != nullptr;
+}
+inline const ::google::protobuf::Duration& CreateDownloadLocationRequest::expires_in() const {
+  const ::google::protobuf::Duration* p = expires_in_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.CreateDownloadLocationRequest.expires_in)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Duration*>(
+      &::google::protobuf::_Duration_default_instance_);
+}
+inline ::google::protobuf::Duration* CreateDownloadLocationRequest::release_expires_in() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.CreateDownloadLocationRequest.expires_in)
+  
+  ::google::protobuf::Duration* temp = expires_in_;
+  expires_in_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Duration* CreateDownloadLocationRequest::mutable_expires_in() {
+  
+  if (expires_in_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Duration>(GetArenaNoVirtual());
+    expires_in_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.CreateDownloadLocationRequest.expires_in)
+  return expires_in_;
+}
+inline void CreateDownloadLocationRequest::set_allocated_expires_in(::google::protobuf::Duration* expires_in) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(expires_in_);
+  }
+  if (expires_in) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(expires_in)->GetArena();
+    if (message_arena != submessage_arena) {
+      expires_in = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, expires_in, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  expires_in_ = expires_in;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateDownloadLocationRequest.expires_in)
+}
+
+// -------------------------------------------------------------------
+
+// CreateDownloadLocationResponse
+
+// string signed_url = 1;
+inline void CreateDownloadLocationResponse::clear_signed_url() {
+  signed_url_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CreateDownloadLocationResponse::signed_url() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+  return signed_url_.GetNoArena();
+}
+inline void CreateDownloadLocationResponse::set_signed_url(const ::std::string& value) {
+  
+  signed_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+}
+#if LANG_CXX11
+inline void CreateDownloadLocationResponse::set_signed_url(::std::string&& value) {
+  
+  signed_url_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+}
+#endif
+inline void CreateDownloadLocationResponse::set_signed_url(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  signed_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+}
+inline void CreateDownloadLocationResponse::set_signed_url(const char* value, size_t size) {
+  
+  signed_url_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+}
+inline ::std::string* CreateDownloadLocationResponse::mutable_signed_url() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+  return signed_url_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CreateDownloadLocationResponse::release_signed_url() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+  
+  return signed_url_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CreateDownloadLocationResponse::set_allocated_signed_url(::std::string* signed_url) {
+  if (signed_url != nullptr) {
+    
+  } else {
+    
+  }
+  signed_url_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), signed_url);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateDownloadLocationResponse.signed_url)
+}
+
+// .google.protobuf.Timestamp expires_at = 2;
+inline bool CreateDownloadLocationResponse::has_expires_at() const {
+  return this != internal_default_instance() && expires_at_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& CreateDownloadLocationResponse::expires_at() const {
+  const ::google::protobuf::Timestamp* p = expires_at_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.CreateDownloadLocationResponse.expires_at)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* CreateDownloadLocationResponse::release_expires_at() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.CreateDownloadLocationResponse.expires_at)
+  
+  ::google::protobuf::Timestamp* temp = expires_at_;
+  expires_at_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* CreateDownloadLocationResponse::mutable_expires_at() {
+  
+  if (expires_at_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    expires_at_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.CreateDownloadLocationResponse.expires_at)
+  return expires_at_;
+}
+inline void CreateDownloadLocationResponse::set_allocated_expires_at(::google::protobuf::Timestamp* expires_at) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(expires_at_);
+  }
+  if (expires_at) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(expires_at)->GetArena();
+    if (message_arena != submessage_arena) {
+      expires_at = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, expires_at, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  expires_at_ = expires_at;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateDownloadLocationResponse.expires_at)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

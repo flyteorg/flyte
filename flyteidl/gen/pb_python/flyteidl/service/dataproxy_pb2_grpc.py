@@ -19,6 +19,11 @@ class DataProxyServiceStub(object):
         request_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateUploadLocationRequest.SerializeToString,
         response_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateUploadLocationResponse.FromString,
         )
+    self.CreateDownloadLocation = channel.unary_unary(
+        '/flyteidl.service.DataProxyService/CreateDownloadLocation',
+        request_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationResponse.FromString,
+        )
 
 
 class DataProxyServiceServicer(object):
@@ -32,6 +37,13 @@ class DataProxyServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def CreateDownloadLocation(self, request, context):
+    """CreateDownloadLocation creates a signed url to download artifacts.
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -39,6 +51,11 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
           servicer.CreateUploadLocation,
           request_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateUploadLocationRequest.FromString,
           response_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateUploadLocationResponse.SerializeToString,
+      ),
+      'CreateDownloadLocation': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateDownloadLocation,
+          request_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationRequest.FromString,
+          response_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

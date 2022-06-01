@@ -240,6 +240,8 @@ func (m *NodeExecutionEvent) Validate() error {
 
 	// no validation rules for IsDynamic
 
+	// no validation rules for DeckUri
+
 	switch m.OutputResult.(type) {
 
 	case *NodeExecutionEvent_OutputUri:

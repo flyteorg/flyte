@@ -39,4 +39,5 @@ type EventNodeExecutionEvent struct {
 	IsParent bool `json:"is_parent,omitempty"`
 	// Whether this node yielded a dynamic workflow.
 	IsDynamic bool `json:"is_dynamic,omitempty"`
+	DeckUri string `json:"deck_uri,omitempty"`
 }

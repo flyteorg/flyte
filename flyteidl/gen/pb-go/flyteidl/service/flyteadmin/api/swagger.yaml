@@ -7304,6 +7304,11 @@ definitions:
         $ref: "#/definitions/flyteidladminWorkflowNodeMetadata"
       task_node_metadata:
         $ref: "#/definitions/flyteidladminTaskNodeMetadata"
+      deck_uri:
+        type: "string"
+        title: "String location uniquely identifying where the deck HTML file is.\n\
+          NativeUrl specifies the url in the format of the configured storage provider\
+          \ (e.g. s3://my-bucket/randomstring/suffix.tar)"
     description: "Container for node execution details and results."
     example:
       phase: {}
@@ -7350,6 +7355,7 @@ definitions:
         error_uri: "error_uri"
       output_data:
         literals: {}
+      deck_uri: "deck_uri"
   adminNodeExecutionEventRequest:
     type: "object"
     properties:
@@ -13479,6 +13485,7 @@ definitions:
             error_uri: "error_uri"
           output_data:
             literals: {}
+          deck_uri: "deck_uri"
       - metadata:
           retry_group: "retry_group"
           is_parent_node: true
@@ -13536,6 +13543,7 @@ definitions:
             error_uri: "error_uri"
           output_data:
             literals: {}
+          deck_uri: "deck_uri"
       token: "token"
   adminNodeExecutionMetaData:
     type: "object"
@@ -54272,6 +54280,11 @@ definitions:
         type: "boolean"
         format: "boolean"
         description: "Whether this node yielded a dynamic workflow."
+      deck_uri:
+        type: "string"
+        title: "String location uniquely identifying where the deck HTML file is\n\
+          NativeUrl specifies the url in the format of the configured storage provider\
+          \ (e.g. s3://my-bucket/randomstring/suffix.tar)"
   eventParentNodeExecutionMetadata:
     type: "object"
     properties:
@@ -60568,6 +60581,7 @@ definitions:
           error_uri: "error_uri"
         output_data:
           literals: {}
+        deck_uri: "deck_uri"
   flyteidladminTaskExecution:
     type: "object"
     properties:

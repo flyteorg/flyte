@@ -57,6 +57,14 @@ class DataProxyService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>> PrepareAsyncCreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>>(PrepareAsyncCreateUploadLocationRaw(context, request, cq));
     }
+    // CreateDownloadLocation creates a signed url to download artifacts.
+    virtual ::grpc::Status CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::flyteidl::service::CreateDownloadLocationResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>> AsyncCreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>>(AsyncCreateDownloadLocationRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>> PrepareAsyncCreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>>(PrepareAsyncCreateDownloadLocationRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -65,11 +73,18 @@ class DataProxyService final {
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // CreateDownloadLocation creates a signed url to download artifacts.
+      virtual void CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>* AsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateUploadLocationResponse>* PrepareAsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>* AsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::CreateDownloadLocationResponse>* PrepareAsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -81,6 +96,13 @@ class DataProxyService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>> PrepareAsyncCreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>>(PrepareAsyncCreateUploadLocationRaw(context, request, cq));
     }
+    ::grpc::Status CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::flyteidl::service::CreateDownloadLocationResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>> AsyncCreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>>(AsyncCreateDownloadLocationRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>> PrepareAsyncCreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>>(PrepareAsyncCreateDownloadLocationRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -88,6 +110,10 @@ class DataProxyService final {
       void CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, std::function<void(::grpc::Status)>) override;
       void CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void CreateUploadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateDownloadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateDownloadLocation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -101,7 +127,10 @@ class DataProxyService final {
     class experimental_async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* AsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateUploadLocationResponse>* PrepareAsyncCreateUploadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>* AsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::CreateDownloadLocationResponse>* PrepareAsyncCreateDownloadLocationRaw(::grpc::ClientContext* context, const ::flyteidl::service::CreateDownloadLocationRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateUploadLocation_;
+    const ::grpc::internal::RpcMethod rpcmethod_CreateDownloadLocation_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -111,6 +140,8 @@ class DataProxyService final {
     virtual ~Service();
     // CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.
     virtual ::grpc::Status CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response);
+    // CreateDownloadLocation creates a signed url to download artifacts.
+    virtual ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateUploadLocation : public BaseClass {
@@ -132,7 +163,27 @@ class DataProxyService final {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateUploadLocation<Service > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_CreateDownloadLocation() {
+      ::grpc::Service::MarkMethodAsync(1);
+    }
+    ~WithAsyncMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestCreateDownloadLocation(::grpc::ServerContext* context, ::flyteidl::service::CreateDownloadLocationRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::service::CreateDownloadLocationResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_CreateUploadLocation<WithAsyncMethod_CreateDownloadLocation<Service > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateUploadLocation : public BaseClass {
    private:
@@ -164,7 +215,38 @@ class DataProxyService final {
     }
     virtual void CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateUploadLocation<Service > ExperimentalCallbackService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateDownloadLocation() {
+      ::grpc::Service::experimental().MarkMethodCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::CreateDownloadLocationRequest, ::flyteidl::service::CreateDownloadLocationResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::service::CreateDownloadLocationRequest* request,
+                 ::flyteidl::service::CreateDownloadLocationResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateDownloadLocation(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateDownloadLocation(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::service::CreateDownloadLocationRequest, ::flyteidl::service::CreateDownloadLocationResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::CreateDownloadLocationRequest, ::flyteidl::service::CreateDownloadLocationResponse>*>(
+          ::grpc::Service::experimental().GetHandler(1))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_CreateUploadLocation<ExperimentalWithCallbackMethod_CreateDownloadLocation<Service > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateUploadLocation : public BaseClass {
    private:
@@ -178,6 +260,23 @@ class DataProxyService final {
     }
     // disable synchronous version of this method
     ::grpc::Status CreateUploadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateUploadLocationRequest* request, ::flyteidl::service::CreateUploadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_CreateDownloadLocation() {
+      ::grpc::Service::MarkMethodGeneric(1);
+    }
+    ~WithGenericMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -200,6 +299,26 @@ class DataProxyService final {
     }
     void RequestCreateUploadLocation(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_CreateDownloadLocation() {
+      ::grpc::Service::MarkMethodRaw(1);
+    }
+    ~WithRawMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestCreateDownloadLocation(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -228,6 +347,31 @@ class DataProxyService final {
     virtual void CreateUploadLocation(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateDownloadLocation() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateDownloadLocation(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateDownloadLocation(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_CreateUploadLocation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
@@ -247,9 +391,29 @@ class DataProxyService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedCreateUploadLocation(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::service::CreateUploadLocationRequest,::flyteidl::service::CreateUploadLocationResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateUploadLocation<Service > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_CreateDownloadLocation : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_CreateDownloadLocation() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::service::CreateDownloadLocationRequest, ::flyteidl::service::CreateDownloadLocationResponse>(std::bind(&WithStreamedUnaryMethod_CreateDownloadLocation<BaseClass>::StreamedCreateDownloadLocation, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_CreateDownloadLocation() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status CreateDownloadLocation(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLocationRequest* request, ::flyteidl::service::CreateDownloadLocationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedCreateDownloadLocation(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::service::CreateDownloadLocationRequest,::flyteidl::service::CreateDownloadLocationResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_CreateUploadLocation<WithStreamedUnaryMethod_CreateDownloadLocation<Service > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateUploadLocation<Service > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateUploadLocation<WithStreamedUnaryMethod_CreateDownloadLocation<Service > > StreamedService;
 };
 
 }  // namespace service

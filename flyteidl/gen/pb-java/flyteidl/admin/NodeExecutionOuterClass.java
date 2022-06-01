@@ -7213,6 +7213,26 @@ public final class NodeExecutionOuterClass {
      */
     flyteidl.admin.NodeExecutionOuterClass.TaskNodeMetadataOrBuilder getTaskNodeMetadataOrBuilder();
 
+    /**
+     * <pre>
+     * String location uniquely identifying where the deck HTML file is.
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string deck_uri = 11;</code>
+     */
+    java.lang.String getDeckUri();
+    /**
+     * <pre>
+     * String location uniquely identifying where the deck HTML file is.
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string deck_uri = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeckUriBytes();
+
     public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionClosure.OutputResultCase getOutputResultCase();
 
     public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionClosure.TargetMetadataCase getTargetMetadataCase();
@@ -7235,6 +7255,7 @@ public final class NodeExecutionOuterClass {
     }
     private NodeExecutionClosure() {
       phase_ = 0;
+      deckUri_ = "";
     }
 
     @java.lang.Override
@@ -7379,6 +7400,12 @@ public final class NodeExecutionOuterClass {
                 outputResult_ = subBuilder.buildPartial();
               }
               outputResultCase_ = 10;
+              break;
+            }
+            case 90: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deckUri_ = s;
               break;
             }
             default: {
@@ -7832,6 +7859,50 @@ public final class NodeExecutionOuterClass {
       return flyteidl.admin.NodeExecutionOuterClass.TaskNodeMetadata.getDefaultInstance();
     }
 
+    public static final int DECK_URI_FIELD_NUMBER = 11;
+    private volatile java.lang.Object deckUri_;
+    /**
+     * <pre>
+     * String location uniquely identifying where the deck HTML file is.
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string deck_uri = 11;</code>
+     */
+    public java.lang.String getDeckUri() {
+      java.lang.Object ref = deckUri_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deckUri_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * String location uniquely identifying where the deck HTML file is.
+     * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+     * </pre>
+     *
+     * <code>string deck_uri = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeckUriBytes() {
+      java.lang.Object ref = deckUri_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deckUri_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -7875,6 +7946,9 @@ public final class NodeExecutionOuterClass {
       }
       if (outputResultCase_ == 10) {
         output.writeMessage(10, (flyteidl.core.Literals.LiteralMap) outputResult_);
+      }
+      if (!getDeckUriBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, deckUri_);
       }
       unknownFields.writeTo(output);
     }
@@ -7924,6 +7998,9 @@ public final class NodeExecutionOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, (flyteidl.core.Literals.LiteralMap) outputResult_);
       }
+      if (!getDeckUriBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, deckUri_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -7960,6 +8037,8 @@ public final class NodeExecutionOuterClass {
         if (!getUpdatedAt()
             .equals(other.getUpdatedAt())) return false;
       }
+      if (!getDeckUri()
+          .equals(other.getDeckUri())) return false;
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 1:
@@ -8019,6 +8098,8 @@ public final class NodeExecutionOuterClass {
         hash = (37 * hash) + UPDATED_AT_FIELD_NUMBER;
         hash = (53 * hash) + getUpdatedAt().hashCode();
       }
+      hash = (37 * hash) + DECK_URI_FIELD_NUMBER;
+      hash = (53 * hash) + getDeckUri().hashCode();
       switch (outputResultCase_) {
         case 1:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -8210,6 +8291,8 @@ public final class NodeExecutionOuterClass {
           updatedAt_ = null;
           updatedAtBuilder_ = null;
         }
+        deckUri_ = "";
+
         outputResultCase_ = 0;
         outputResult_ = null;
         targetMetadataCase_ = 0;
@@ -8292,6 +8375,7 @@ public final class NodeExecutionOuterClass {
             result.targetMetadata_ = taskNodeMetadataBuilder_.build();
           }
         }
+        result.deckUri_ = deckUri_;
         result.outputResultCase_ = outputResultCase_;
         result.targetMetadataCase_ = targetMetadataCase_;
         onBuilt();
@@ -8356,6 +8440,10 @@ public final class NodeExecutionOuterClass {
         }
         if (other.hasUpdatedAt()) {
           mergeUpdatedAt(other.getUpdatedAt());
+        }
+        if (!other.getDeckUri().isEmpty()) {
+          deckUri_ = other.deckUri_;
+          onChanged();
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -9853,6 +9941,100 @@ public final class NodeExecutionOuterClass {
         targetMetadataCase_ = 9;
         onChanged();;
         return taskNodeMetadataBuilder_;
+      }
+
+      private java.lang.Object deckUri_ = "";
+      /**
+       * <pre>
+       * String location uniquely identifying where the deck HTML file is.
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string deck_uri = 11;</code>
+       */
+      public java.lang.String getDeckUri() {
+        java.lang.Object ref = deckUri_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deckUri_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * String location uniquely identifying where the deck HTML file is.
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string deck_uri = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeckUriBytes() {
+        java.lang.Object ref = deckUri_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deckUri_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * String location uniquely identifying where the deck HTML file is.
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string deck_uri = 11;</code>
+       */
+      public Builder setDeckUri(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deckUri_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * String location uniquely identifying where the deck HTML file is.
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string deck_uri = 11;</code>
+       */
+      public Builder clearDeckUri() {
+        
+        deckUri_ = getDefaultInstance().getDeckUri();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * String location uniquely identifying where the deck HTML file is.
+       * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+       * </pre>
+       *
+       * <code>string deck_uri = 11;</code>
+       */
+      public Builder setDeckUriBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deckUri_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14807,7 +14989,7 @@ public final class NodeExecutionOuterClass {
       "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n\n" +
       "is_dynamic\030\004 \001(\010\"Z\n\021NodeExecutionList\0226\n" +
       "\017node_executions\030\001 \003(\0132\035.flyteidl.admin." +
-      "NodeExecution\022\r\n\005token\030\002 \001(\t\"\262\004\n\024NodeExe" +
+      "NodeExecution\022\r\n\005token\030\002 \001(\t\"\304\004\n\024NodeExe" +
       "cutionClosure\022\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022" +
       ".\n\005error\030\002 \001(\0132\035.flyteidl.core.Execution" +
       "ErrorH\000\0224\n\013output_data\030\n \001(\0132\031.flyteidl." +
@@ -14820,28 +15002,29 @@ public final class NodeExecutionOuterClass {
       "le.protobuf.Timestamp\022F\n\026workflow_node_m" +
       "etadata\030\010 \001(\0132$.flyteidl.admin.WorkflowN" +
       "odeMetadataH\001\022>\n\022task_node_metadata\030\t \001(" +
-      "\0132 .flyteidl.admin.TaskNodeMetadataH\001B\017\n" +
-      "\routput_resultB\021\n\017target_metadata\"W\n\024Wor" +
-      "kflowNodeMetadata\022?\n\013executionId\030\001 \001(\0132*" +
-      ".flyteidl.core.WorkflowExecutionIdentifi" +
-      "er\"\200\001\n\020TaskNodeMetadata\0227\n\014cache_status\030" +
-      "\001 \001(\0162!.flyteidl.core.CatalogCacheStatus" +
-      "\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl.core.Ca" +
-      "talogMetadata\"\207\001\n\033DynamicWorkflowNodeMet" +
-      "adata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identi" +
-      "fier\022A\n\021compiled_workflow\030\002 \001(\0132&.flytei" +
-      "dl.core.CompiledWorkflowClosure\"Q\n\033NodeE" +
-      "xecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fly" +
-      "teidl.core.NodeExecutionIdentifier\"\241\002\n\034N" +
-      "odeExecutionGetDataResponse\022+\n\006inputs\030\001 " +
-      "\001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007outp" +
-      "uts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022." +
-      "\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lite" +
-      "ralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl." +
-      "core.LiteralMap\022E\n\020dynamic_workflow\030\020 \001(" +
-      "\0132+.flyteidl.admin.DynamicWorkflowNodeMe" +
-      "tadataB7Z5github.com/flyteorg/flyteidl/g" +
-      "en/pb-go/flyteidl/adminb\006proto3"
+      "\0132 .flyteidl.admin.TaskNodeMetadataH\001\022\020\n" +
+      "\010deck_uri\030\013 \001(\tB\017\n\routput_resultB\021\n\017targ" +
+      "et_metadata\"W\n\024WorkflowNodeMetadata\022?\n\013e" +
+      "xecutionId\030\001 \001(\0132*.flyteidl.core.Workflo" +
+      "wExecutionIdentifier\"\200\001\n\020TaskNodeMetadat" +
+      "a\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.core." +
+      "CatalogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132" +
+      "\036.flyteidl.core.CatalogMetadata\"\207\001\n\033Dyna" +
+      "micWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.fl" +
+      "yteidl.core.Identifier\022A\n\021compiled_workf" +
+      "low\030\002 \001(\0132&.flyteidl.core.CompiledWorkfl" +
+      "owClosure\"Q\n\033NodeExecutionGetDataRequest" +
+      "\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExecuti" +
+      "onIdentifier\"\241\002\n\034NodeExecutionGetDataRes" +
+      "ponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.U" +
+      "rlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.a" +
+      "dmin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031." +
+      "flyteidl.core.LiteralMap\022/\n\014full_outputs" +
+      "\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n\020dyn" +
+      "amic_workflow\030\020 \001(\0132+.flyteidl.admin.Dyn" +
+      "amicWorkflowNodeMetadataB7Z5github.com/f" +
+      "lyteorg/flyteidl/gen/pb-go/flyteidl/admi" +
+      "nb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14904,7 +15087,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "DeckUri", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_admin_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_WorkflowNodeMetadata_fieldAccessorTable = new
