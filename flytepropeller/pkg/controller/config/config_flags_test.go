@@ -421,6 +421,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_metrics-keys", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.MetricKeys, ",")
+
+			cmdFlags.Set("metrics-keys", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("metrics-keys"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.MetricKeys)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_enable-admin-launcher", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

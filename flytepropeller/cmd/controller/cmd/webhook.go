@@ -3,21 +3,24 @@ package cmd
 import (
 	"context"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-
 	"github.com/flyteorg/flytepropeller/pkg/controller"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"golang.org/x/sync/errgroup"
-
-	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flytestdlib/profutils"
-
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flytepropeller/pkg/webhook"
+	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
+
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
 	"github.com/spf13/cobra"
+
+	"golang.org/x/sync/errgroup"
+
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 var webhookCmd = &cobra.Command{
@@ -84,6 +87,13 @@ func init() {
 func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *webhookConfig.Config) error {
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(origContext)
+
+	// set metric keys
+	keys := contextutils.MetricKeysFromStrings(propellerCfg.MetricKeys)
+	logger.Infof(context.TODO(), "setting metrics keys to %+v", keys)
+	if len(keys) > 0 {
+		labeled.SetMetricKeys(keys...)
+	}
 
 	webhookScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("webhook")
 	limitNamespace := ""

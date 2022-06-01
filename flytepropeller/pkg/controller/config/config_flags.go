@@ -73,6 +73,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "queue.batching-interval"), defaultConfig.Queue.BatchingInterval.String(), "Duration for which downstream updates are buffered")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "queue.batch-size"), defaultConfig.Queue.BatchSize, "Number of downstream triggered top-level objects to re-enqueue every duration. -1 indicates all available.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metrics-prefix"), defaultConfig.MetricsPrefix, "An optional prefix for all published metrics.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "metrics-keys"), defaultConfig.MetricKeys, "Metrics labels applied to prometheus metrics emitted by the service.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-admin-launcher"), defaultConfig.EnableAdminLauncher, "")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-workflow-retries"), defaultConfig.MaxWorkflowRetries, "")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-ttl-hours"), defaultConfig.MaxTTLInHours, "")
