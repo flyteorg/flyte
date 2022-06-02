@@ -9,7 +9,7 @@ dependencies:
     version: v0.1.10 # VERSION
     repository: file://../flyte-core # REPOSITORY
   - name: contour
-    version: 5.0.0
+    version: 7.10.1
     repository: https://charts.bitnami.com/bitnami
     condition: contour.enabled
   - name: spark-operator

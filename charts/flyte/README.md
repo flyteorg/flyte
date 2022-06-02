@@ -9,7 +9,7 @@ A Helm chart for Flyte Sandbox
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../flyte-core | flyte(flyte-core) | v0.1.10 |
-| https://charts.bitnami.com/bitnami | contour | 5.0.0 |
+| https://charts.bitnami.com/bitnami | contour | 7.10.1 |
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.1.15 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
