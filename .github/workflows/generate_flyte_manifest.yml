@@ -1,6 +1,6 @@
 name: Generate Flyte manifest
 
-on: 
+on:
   workflow_dispatch:
 
 jobs:
