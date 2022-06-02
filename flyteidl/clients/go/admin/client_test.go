@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
+	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {
@@ -259,6 +260,42 @@ func Test_getPkceAuthTokenSource(t *testing.T) {
 		dialOption, err := GetPKCEAuthTokenSource(ctx, orchestrator)
 		assert.Nil(t, dialOption)
 		assert.Error(t, err)
+	})
+}
+
+func TestGetDefaultServiceConfig(t *testing.T) {
+	u, _ := url.Parse("localhost:8089")
+	adminServiceConfig := &Config{
+		Endpoint:             config.URL{URL: *u},
+		DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
+	}
+
+	assert.NoError(t, SetConfig(adminServiceConfig))
+
+	ctx := context.Background()
+	t.Run("legal", func(t *testing.T) {
+		u, err := url.Parse("http://localhost:8089")
+		assert.NoError(t, err)
+		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`}).Build(ctx)
+		assert.NoError(t, err)
+		assert.NotNil(t, clientSet)
+		assert.NotNil(t, clientSet.AdminClient())
+		assert.NotNil(t, clientSet.AuthMetadataClient())
+		assert.NotNil(t, clientSet.IdentityClient())
+		assert.NotNil(t, clientSet.HealthServiceClient())
+	})
+	t.Run("illegal default service config", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("The code did not panic")
+			}
+		}()
+
+		u, err := url.Parse("http://localhost:8089")
+		assert.NoError(t, err)
+		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"foo":{}}]}`}).Build(ctx)
+		assert.Error(t, err)
+		assert.Nil(t, clientSet)
 	})
 }
 

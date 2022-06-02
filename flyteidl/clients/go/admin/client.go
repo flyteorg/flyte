@@ -192,6 +192,10 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 		opts = append(opts, authOpt)
 	}
 
+	if cfg.DefaultServiceConfig != "" {
+		opts = append(opts, grpc.WithDefaultServiceConfig(cfg.DefaultServiceConfig))
+	}
+
 	adminConnection, err := NewAdminConnection(ctx, cfg, opts...)
 	if err != nil {
 		logger.Panicf(ctx, "failed to initialize Admin connection. Err: %s", err.Error())
