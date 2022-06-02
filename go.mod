@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/flyteorg/datacatalog v1.0.1
-	github.com/flyteorg/flyteadmin v1.1.10
-	github.com/flyteorg/flytepropeller v1.1.3
-	github.com/flyteorg/flytestdlib v1.0.2
+	github.com/flyteorg/flyteadmin v1.1.16
+	github.com/flyteorg/flytepropeller v1.1.7
+	github.com/flyteorg/flytestdlib v1.0.3
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5

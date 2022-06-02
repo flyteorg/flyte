@@ -3028,6 +3028,21 @@ An optional prefix for all published metrics.
   flyte
   
 
+metrics-keys ([]string)
+--------------------------------------------------------------------------------
+
+Metrics labels applied to prometheus metrics emitted by the service.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - project
+  - domain
+  - wf
+  - task
+  
+
 enable-admin-launcher (bool)
 --------------------------------------------------------------------------------
 
