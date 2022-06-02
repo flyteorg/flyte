@@ -1,7 +1,6 @@
 // Initializes an Admin Client that exposes all implemented services by FlyteAdmin server. The library supports different
-// authentication flows (see AuthType). It initializes the grpc connection once and reuses it. The gRPC connection is
-// sticky (it hogs one server and keeps the connection alive). For better load balancing against the server, place a
-// proxy service in between instead.
+// authentication flows (see AuthType). It initializes the grpc connection once and reuses it. A grpc load balancing policy
+// can be configured as well.
 package admin
 
 import (
@@ -68,6 +67,12 @@ type Config struct {
 	PkceConfig pkce.Config `json:"pkceConfig" pflag:",Config for Pkce authentication flow."`
 
 	Command []string `json:"command" pflag:",Command for external authentication token generation"`
+
+	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
+	// eg. {"loadBalancingConfig": [{"round_robin":{}}], "methodConfig": [{"name":[{"service": "foo", "method": "bar"}, {"service": "baz"}], "timeout": "1.000000001s"}]}
+	// find the full schema here https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto#L625
+	// Note that required packages may need to be preloaded to support certain service config. For example "google.golang.org/grpc/balancer/roundrobin" should be preloaded to have round-robin policy supported.
+	DefaultServiceConfig string `json:"defaultServiceConfig" pdflag:",Set the default service config for the admin gRPC client"`
 }
 
 var (
