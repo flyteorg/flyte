@@ -87,6 +87,8 @@ flyteadmin:
 #
 
 flytescheduler:
+  # -- Whether to inject an init container which waits on flyteadmin
+  runPrecheck: true
   image:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
