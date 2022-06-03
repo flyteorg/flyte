@@ -2,7 +2,6 @@ package flytek8s
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -250,7 +249,7 @@ func TestDecorateEnvVars(t *testing.T) {
 	originalEnvVal := os.Getenv("value")
 	err := os.Setenv("value", "v")
 	if err != nil {
-		t.Fatal(fmt.Sprintf("failed to set env var 'value'; %v", err))
+		t.Fatalf("failed to set env var 'value'; %v", err)
 	}
 	defer os.Setenv("value", originalEnvVal)
 
