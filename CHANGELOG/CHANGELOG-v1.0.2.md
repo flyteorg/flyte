@@ -17,6 +17,22 @@
 1. [Feature](https://github.com/flyteorg/flyte/pull/2439) Use the same pod annotation formatting in syncresources cronjob
 
 
+## Flyteconsole
+1. [Refactor](https://github.com/flyteorg/flyteconsole/issues/431) Move to monorepo structure to allow separate FlyteConsole into plugins system
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/414) Add support for StructuredDataSet Input/Output type
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/448) Updated Task details page to be able to browse different task versions
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/445) Updated Input/Output and TaskDetails representation - now you can collapse parts of it.
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/311) Show new map tasks in the GraphView with information of which subtasks are in which phase(running, erroring, succeeded)
+1. [Feature](https://github.com/flyteorg/flyte/issues/2284) Add interruptible override to launch forms
+1. [Bugfix](https://github.com/flyteorg/flyteconsole/issues/463) ensure that setups with different domains for console and admin API properly works
+1. [Bugfix](https://github.com/flyteorg/flyteconsole/issues/416) Fixes one of the crashes in Graph component for Viel All Workflow section
+1. [Bugfix](https://github.com/flyteorg/flyteconsole/issues/465) ensure that admin version is fully shown FC#465
+1. [Bugfix] Small cosmetic updates: https://github.com/flyteorg/flyteconsole/issues/451, https://github.com/flyteorg/flyteconsole/issues/386, and https://github.com/flyteorg/flyteconsole/issues/398
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/312) Map Tasks - allow to check statuses of all retries per child task
+1. [Feature](https://github.com/flyteorg/flyteconsole/issues/461) Allow to rerun single task in execution page
+1. [Plugins]: Adds flyte-api plugin package. You can check basic how to info and consume package from https://www.npmjs.com/package/@flyteconsole/flyte-api . It will allow you to authorize you flytectl queries and perform api requests from your app. At this point only request without included data in body is allowed. More work is planned in future updates.
+
+
 ## Flytekit
 1. [Feature](https://github.com/flyteorg/flyte/issues/2471) pyflyte run should support executing tasks
 1. [Bugfix](https://github.com/flyteorg/flyte/issues/2476) Dot separated python packages does not work for pyflyte
