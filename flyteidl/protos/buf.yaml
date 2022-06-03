@@ -1,0 +1,11 @@
+version: v1
+name: buf.build/flyteorg/flyteidl
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/unionai/protoc-gen-swagger
