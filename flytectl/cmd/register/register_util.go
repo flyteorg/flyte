@@ -402,8 +402,14 @@ func hydrateLaunchPlanSpec(configAssumableIamRole string, configK8sServiceAccoun
 	outputLocationPrefix := len(configOutputLocationPrefix) > 0
 	if assumableIamRole || k8sServiceAcct {
 		lpSpec.AuthRole = &admin.AuthRole{
-			AssumableIamRole:         configAssumableIamRole,
 			KubernetesServiceAccount: configK8sServiceAccount,
+			AssumableIamRole:         configAssumableIamRole,
+		}
+		lpSpec.SecurityContext = &core.SecurityContext{
+			RunAs: &core.Identity{
+				IamRole:           configAssumableIamRole,
+				K8SServiceAccount: configK8sServiceAccount,
+			},
 		}
 	}
 	if outputLocationPrefix {

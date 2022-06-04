@@ -347,6 +347,7 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.AuthRole)
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole"}}, lpSpec.SecurityContext)
 	})
 	t.Run("k8sService account override", func(t *testing.T) {
 		registerFilesSetup()
@@ -355,6 +356,7 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "k8Account"}}, lpSpec.SecurityContext)
 	})
 	t.Run("Both k8sService and IamRole", func(t *testing.T) {
 		registerFilesSetup()
@@ -365,6 +367,7 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole",
 			KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole", K8SServiceAccount: "k8Account"}}, lpSpec.SecurityContext)
 	})
 	t.Run("Output prefix", func(t *testing.T) {
 		registerFilesSetup()
