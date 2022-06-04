@@ -199,6 +199,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.priorityClassName | string | `""` | Sets priorityClassName for flyte scheduler pod(s). |
 | flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
+| flytescheduler.runPrecheck | bool | `true` | Whether to inject an init container which waits on flyteadmin |
 | flytescheduler.secrets | object | `{}` |  |
 | flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Flytescheduler |
 | flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
