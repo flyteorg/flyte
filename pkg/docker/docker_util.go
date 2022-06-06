@@ -12,8 +12,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/enescakir/emoji"
 
-	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-
 	"github.com/flyteorg/flytectl/clierrors"
 
 	"github.com/docker/docker/api/types"
@@ -128,11 +126,11 @@ func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, erro
 }
 
 // PullDockerImage will Pull docker image
-func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy sandboxConfig.ImagePullPolicy,
-	imagePullOptions sandboxConfig.ImagePullOptions) error {
+func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy ImagePullPolicy,
+	imagePullOptions ImagePullOptions) error {
 
-	if pullPolicy == sandboxConfig.ImagePullPolicyAlways || pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
-		if pullPolicy == sandboxConfig.ImagePullPolicyIfNotPresent {
+	if pullPolicy == ImagePullPolicyAlways || pullPolicy == ImagePullPolicyIfNotPresent {
+		if pullPolicy == ImagePullPolicyIfNotPresent {
 			imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
 			if err != nil {
 				return err

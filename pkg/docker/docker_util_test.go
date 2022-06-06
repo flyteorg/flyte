@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/docker/docker/api/types/container"
@@ -106,7 +104,7 @@ func TestPullDockerImage(t *testing.T) {
 		ctx := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
-		err := PullDockerImage(ctx, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways, sandboxConfig.ImagePullOptions{})
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 
@@ -116,7 +114,7 @@ func TestPullDockerImage(t *testing.T) {
 		ctx := context.Background()
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("error"))
-		err := PullDockerImage(ctx, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyAlways, sandboxConfig.ImagePullOptions{})
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{})
 		assert.NotNil(t, err)
 	})
 
@@ -127,7 +125,7 @@ func TestPullDockerImage(t *testing.T) {
 		// Verify the attributes
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
 		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
-		err := PullDockerImage(ctx, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyIfNotPresent, sandboxConfig.ImagePullOptions{})
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 
@@ -135,7 +133,7 @@ func TestPullDockerImage(t *testing.T) {
 		setupSandbox()
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		err := PullDockerImage(ctx, mockDocker, "nginx:latest", sandboxConfig.ImagePullPolicyNever, sandboxConfig.ImagePullOptions{})
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{})
 		assert.Nil(t, err)
 	})
 }
