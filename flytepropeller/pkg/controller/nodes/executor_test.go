@@ -790,6 +790,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				} else {
 					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
 				}
+				h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
