@@ -462,7 +462,6 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, 0, len(r.Finalizers))
 		assert.True(t, HasCompletedLabel(r))
 	})
-
 	t.Run("failOnExecutionNotFoundError", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
