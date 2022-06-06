@@ -15,6 +15,8 @@
 1. [Housekeeping](https://github.com/flyteorg/flyte/issues/2504) Checksum grpc_health_probe
 1. [Feature](https://github.com/flyteorg/flyte/issues/2284) Allow to choose Spot Instances at workflow start time
 1. [Feature](https://github.com/flyteorg/flyte/pull/2439) Use the same pod annotation formatting in syncresources cronjob
+1. [Housekeeping](https://github.com/flyteorg/flyte/pull/2446) Migrate flyte sandbox docker image to use flyte-dep & flyte-core
+1. [Feature](https://github.com/flyteorg/flyteidl/pull/300) Buf integration for proto release
 
 
 ## Flyteconsole
