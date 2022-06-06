@@ -1057,7 +1057,7 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.E
 			},
 			ProducerId: c.clusterID,
 		})
-		if err != nil && !eventsErr.IsEventIncompatibleClusterError(err) {
+		if err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
 			if errors2.IsCausedBy(err, errors.IllegalStateError) {
 				logger.Debugf(ctx, "Failed to record abort event due to illegal state transition. Ignoring the error. Error: %v", err)
 			} else {
