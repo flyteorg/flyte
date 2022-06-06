@@ -153,10 +153,10 @@ func (a *adminLaunchPlanExecutor) GetLaunchPlan(ctx context.Context, launchPlanR
 
 	lp, err := a.adminClient.GetLaunchPlan(ctx, &getObjectRequest)
 	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			return nil, errors.Wrapf(RemoteErrorNotFound, err, "No launch plan retrieved from Admin")
+		}
 		return nil, errors.Wrapf(RemoteErrorSystem, err, "Could not fetch launch plan definition from Admin")
-	}
-	if lp == nil {
-		return nil, errors.Wrapf(RemoteErrorNotFound, err, "No launch plan retrieved from Admin")
 	}
 
 	return lp, nil
