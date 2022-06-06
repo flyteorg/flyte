@@ -30,3 +30,33 @@ type Docker interface {
 type FlyteDocker struct {
 	*client.Client
 }
+
+//go:generate enumer -type=ImagePullPolicy -trimprefix=ImagePullPolicy --json
+type ImagePullPolicy int
+
+const (
+	ImagePullPolicyAlways ImagePullPolicy = iota
+	ImagePullPolicyIfNotPresent
+	ImagePullPolicyNever
+)
+
+// Set implements PFlag's Value interface to attempt to set the value of the flag from string.
+func (i *ImagePullPolicy) Set(val string) error {
+	policy, err := ImagePullPolicyString(val)
+	if err != nil {
+		return err
+	}
+
+	*i = policy
+	return nil
+}
+
+// Type implements PFlag's Value interface to return type name.
+func (i ImagePullPolicy) Type() string {
+	return "ImagePullPolicy"
+}
+
+type ImagePullOptions struct {
+	RegistryAuth string `json:"registryAuth" pflag:",The base64 encoded credentials for the registry."`
+	Platform     string `json:"platform" pflag:",Forces a specific platform's image to be pulled.'"`
+}

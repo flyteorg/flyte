@@ -1,34 +1,6 @@
 package sandbox
 
-//go:generate enumer -type=ImagePullPolicy -trimprefix=ImagePullPolicy --json
-type ImagePullPolicy int
-
-const (
-	ImagePullPolicyAlways ImagePullPolicy = iota
-	ImagePullPolicyIfNotPresent
-	ImagePullPolicyNever
-)
-
-// Set implements PFlag's Value interface to attempt to set the value of the flag from string.
-func (i *ImagePullPolicy) Set(val string) error {
-	policy, err := ImagePullPolicyString(val)
-	if err != nil {
-		return err
-	}
-
-	*i = policy
-	return nil
-}
-
-// Type implements PFlag's Value interface to return type name.
-func (i ImagePullPolicy) Type() string {
-	return "ImagePullPolicy"
-}
-
-//go:generate pflags Config --default-var DefaultConfig --bind-default-var
-var (
-	DefaultConfig = &Config{}
-)
+import "github.com/flyteorg/flytectl/pkg/docker"
 
 //Config holds configuration flags for sandbox command.
 type Config struct {
@@ -52,12 +24,12 @@ type Config struct {
 
 	// Optionally it is possible to use local sandbox image
 	// Flytectl will not pull the image from the registry if the local flag passes. It is usually useful while testing your local images without pushing them to a registry.
-	ImagePullPolicy ImagePullPolicy `json:"imagePullPolicy" pflag:",Optional. Defines the image pull behavior [Always/IfNotPresent/Never]"`
+	ImagePullPolicy docker.ImagePullPolicy `json:"imagePullPolicy" pflag:",Optional. Defines the image pull behavior [Always/IfNotPresent/Never]"`
 
-	ImagePullOptions ImagePullOptions `json:"imagePullOptions" pflag:",Optional. Defines image pull options (e.g. auth)"`
+	ImagePullOptions docker.ImagePullOptions `json:"imagePullOptions" pflag:",Optional. Defines image pull options (e.g. auth)"`
 }
 
-type ImagePullOptions struct {
-	RegistryAuth string `json:"registryAuth" pflag:",The base64 encoded credentials for the registry."`
-	Platform     string `json:"platform" pflag:",Forces a specific platform's image to be pulled.'"`
-}
+//go:generate pflags Config --default-var DefaultConfig --bind-default-var
+var (
+	DefaultConfig = &Config{}
+)
