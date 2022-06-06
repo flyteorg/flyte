@@ -12,7 +12,8 @@
         "packages/basics/**",
         "packages/composites/**",
         "packages/plugins/**",
-        "packages/zapp/**"
+        "packages/zapp/**",
+        "script/generator/**"
     ],
     "scripts": {
         "clean": "yarn workspace @flyteconsole/client-app clean",
@@ -20,6 +21,7 @@
         "start:prod": "yarn workspace @flyteconsole/client-app start:prod",
         "build:prod": "yarn workspace @flyteconsole/client-app build:prod",
         "build:storybook": "build-storybook",
+        "generate:package": "yarn workspace @flyteconsole/generator start",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "storybook": "start-storybook -p 6006",
         "test": "NODE_ENV=test jest",

@@ -1,0 +1,20 @@
+{
+    "name": "@flyteconsole/generator",
+    "version": "1.0.0",
+    "exports": "./src/index.js",
+    "license": "MIT",
+    "private": true,
+    "type": "module",
+    "node": ">=17.6.0",
+    "scripts": {
+        "start": "yarn install && ./src/index.js"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "eslint": "^8.15.0",
+        "chalk": "^5.0.1",
+        "inquirer": "^8.2.4",
+        "listr": "^0.14.3",
+        "ncp": "^2.0.0"
+    }
+}
