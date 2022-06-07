@@ -244,6 +244,16 @@ Command for external authentication token generation
   []
   
 
+defaultServiceConfig (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.Duration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -466,6 +476,18 @@ Use the same gRPC credentials option as the flyteadmin client
 .. code-block:: yaml
 
   "false"
+  
+
+default-service-config (string)
+--------------------------------------------------------------------------------
+
+Set the default service config for the catalog gRPC client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: event
@@ -3026,6 +3048,21 @@ An optional prefix for all published metrics.
 .. code-block:: yaml
 
   flyte
+  
+
+metrics-keys ([]string)
+--------------------------------------------------------------------------------
+
+Metrics labels applied to prometheus metrics emitted by the service.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - project
+  - domain
+  - wf
+  - task
   
 
 enable-admin-launcher (bool)
