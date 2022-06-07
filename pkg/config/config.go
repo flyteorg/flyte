@@ -29,7 +29,12 @@ type ServerConfig struct {
 }
 
 type DataProxyConfig struct {
-	Upload DataProxyUploadConfig `json:"upload" pflag:",Defines data proxy upload configuration."`
+	Upload   DataProxyUploadConfig   `json:"upload" pflag:",Defines data proxy upload configuration."`
+	Download DataProxyDownloadConfig `json:"download" pflag:",Defines data proxy download configuration."`
+}
+
+type DataProxyDownloadConfig struct {
+	MaxExpiresIn config.Duration `json:"maxExpiresIn" pflag:",Maximum allowed expiration duration."`
 }
 
 type DataProxyUploadConfig struct {
@@ -85,6 +90,9 @@ var defaultServerConfig = &ServerConfig{
 			MaxSize:               resource.MustParse("6Mi"),
 			MaxExpiresIn:          config.Duration{Duration: time.Hour},
 			DefaultFileNameLength: 20,
+		},
+		Download: DataProxyDownloadConfig{
+			MaxExpiresIn: config.Duration{Duration: time.Hour},
 		},
 	},
 }

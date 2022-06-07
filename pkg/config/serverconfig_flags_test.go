@@ -421,4 +421,18 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_dataProxy.download.maxExpiresIn", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultServerConfig.DataProxy.Download.MaxExpiresIn.String()
+
+			cmdFlags.Set("dataProxy.download.maxExpiresIn", testValue)
+			if vString, err := cmdFlags.GetString("dataProxy.download.maxExpiresIn"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.DataProxy.Download.MaxExpiresIn)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

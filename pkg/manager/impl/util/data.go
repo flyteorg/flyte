@@ -13,6 +13,11 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+const (
+	OutputsFile = "outputs.pb"
+	DeckFile    = "deck.html"
+)
+
 func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
 		urlBlob.Bytes < config.MaxSizeInBytes

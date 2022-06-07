@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
+
 	genModel "github.com/flyteorg/flyteadmin/pkg/repositories/gen/models"
 
 	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
@@ -1192,8 +1194,9 @@ func TestGetNodeExecutionData(t *testing.T) {
 	expectedClosure := admin.NodeExecutionClosure{
 		Phase: core.NodeExecution_SUCCEEDED,
 		OutputResult: &admin.NodeExecutionClosure_OutputUri{
-			OutputUri: "output uri",
+			OutputUri: util.OutputsFile,
 		},
+		DeckUri: util.DeckFile,
 	}
 	dynamicWorkflowClosureRef := "s3://my-s3-bucket/foo/bar/dynamic.pb"
 
@@ -1233,7 +1236,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 				Url:   "inputs",
 				Bytes: 100,
 			}, nil
-		} else if uri == "output uri" {
+		} else if uri == util.OutputsFile {
 			return admin.UrlBlob{
 				Url:   "outputs",
 				Bytes: 200,
@@ -1260,7 +1263,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 			marshalled, _ := proto.Marshal(fullInputs)
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
-		} else if reference.String() == "output uri" {
+		} else if reference.String() == util.OutputsFile {
 			marshalled, _ := proto.Marshal(fullOutputs)
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil

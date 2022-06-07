@@ -95,6 +95,8 @@ func addTerminalState(
 		nodeExecutionModel.ErrorKind = &k
 		nodeExecutionModel.ErrorCode = &request.Event.GetError().Code
 	}
+	closure.DeckUri = request.Event.DeckUri
+
 	return nil
 }
 

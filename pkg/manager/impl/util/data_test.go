@@ -154,7 +154,6 @@ func TestGetInputs(t *testing.T) {
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
 		assert.Empty(t, inputURLBlob)
 	})
-
 }
 
 func TestGetOutputs(t *testing.T) {
