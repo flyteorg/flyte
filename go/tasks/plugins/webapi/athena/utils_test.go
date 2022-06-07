@@ -111,7 +111,7 @@ func Test_writeOutput(t *testing.T) {
 						},
 					},
 				},
-			}, nil)).Return(nil)
+			}, nil, nil)).Return(nil)
 		statusContext.OnOutputWriter().Return(ow)
 
 		err = writeOutput(context.Background(), statusContext, externalLocation)

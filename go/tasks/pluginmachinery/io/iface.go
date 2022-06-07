@@ -41,6 +41,8 @@ type OutputReader interface {
 	Exists(ctx context.Context) (bool, error)
 	// Read returns the output -> *core.LiteralMap (nil if void), *ExecutionError if user error when reading the output and error to indicate system problems
 	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
+	// GetDeckPath returns a fully qualified path (URN) of deck file.
+	GetDeckPath() *storage.DataReference
 }
 
 // CheckpointPaths provides the paths / keys to input Checkpoints directory and an output checkpoints directory.
@@ -77,6 +79,8 @@ type OutputFilePaths interface {
 	GetOutputPrefixPath() storage.DataReference
 	// GetOutputPath returns a fully qualified path (URN) to where the framework expects the output to exist in the configured storage backend
 	GetOutputPath() storage.DataReference
+	// GetDeckPath returns a fully qualified path (URN) to where the framework expects the deck.html to exist in the configured storage backend
+	GetDeckPath() storage.DataReference
 	// GetErrorPath returns a fully qualified path (URN) where the error information should be placed as a protobuf core.ErrorDocument. It is not directly
 	// used by the framework, but could be used in the future
 	GetErrorPath() storage.DataReference
