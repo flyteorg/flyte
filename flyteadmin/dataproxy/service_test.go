@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	stdlibConfig "github.com/flyteorg/flytestdlib/config"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -70,5 +73,41 @@ func TestCreateUploadLocation(t *testing.T) {
 			ExpiresIn: durationpb.New(-time.Hour),
 		})
 		assert.Error(t, err)
+	})
+}
+
+func TestCreateDownloadLocation(t *testing.T) {
+	dataStore := commonMocks.GetMockStorageClient()
+	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, dataStore)
+	assert.NoError(t, err)
+
+	t.Run("Invalid expiry", func(t *testing.T) {
+		_, err = s.CreateDownloadLocation(context.Background(), &service.CreateDownloadLocationRequest{
+			NativeUrl: "s3://bucket/key",
+			ExpiresIn: durationpb.New(-time.Hour),
+		})
+		assert.Error(t, err)
+	})
+
+	t.Run("valid config", func(t *testing.T) {
+		_, err = s.CreateDownloadLocation(context.Background(), &service.CreateDownloadLocationRequest{
+			NativeUrl: "s3://bucket/key",
+			ExpiresIn: durationpb.New(time.Hour),
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("use default ExpiresIn", func(t *testing.T) {
+		_, err = s.CreateDownloadLocation(context.Background(), &service.CreateDownloadLocationRequest{
+			NativeUrl: "s3://bucket/key",
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("invalid URL", func(t *testing.T) {
+		_, err = s.CreateDownloadLocation(context.Background(), &service.CreateDownloadLocationRequest{
+			NativeUrl: "bucket/key",
+		})
+		assert.NoError(t, err)
 	})
 }

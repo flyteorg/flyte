@@ -210,6 +210,11 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, _ *authConfig.
 		return nil, errors.Wrap(err, "error registering identity service")
 	}
 
+	err = service.RegisterDataProxyServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
+	if err != nil {
+		return nil, errors.Wrap(err, "error registering data proxy service")
+	}
+
 	mux.Handle("/", gwmux)
 
 	return mux, nil

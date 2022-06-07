@@ -13,7 +13,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/evanphx/json-patch v4.9.0+incompatible
-	github.com/flyteorg/flyteidl v1.1.0
+	github.com/flyteorg/flyteidl v1.1.4
 	github.com/flyteorg/flyteplugins v1.0.0
 	github.com/flyteorg/flytepropeller v1.1.3
 	github.com/flyteorg/flytestdlib v1.0.2
