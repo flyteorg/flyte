@@ -35,7 +35,7 @@ func TestSecureCookieLifecycle(t *testing.T) {
 	fmt.Printf("Hash key: |%s| Block key: |%s|\n",
 		base64.RawStdEncoding.EncodeToString(hashKey), base64.RawStdEncoding.EncodeToString(blockKey))
 
-	cookie, err := NewSecureCookie("choc", "chip", hashKey, blockKey)
+	cookie, err := NewSecureCookie("choc", "chip", hashKey, blockKey, "localhost", http.SameSiteLaxMode)
 	assert.NoError(t, err)
 
 	value, err := ReadSecureCookie(context.Background(), cookie, hashKey, blockKey)

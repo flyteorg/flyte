@@ -122,7 +122,7 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 		return Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
 	}
 
-	cookieManager, err := NewCookieManager(ctx, hashKeyBase64, blockKeyBase64)
+	cookieManager, err := NewCookieManager(ctx, hashKeyBase64, blockKeyBase64, options.UserAuth.CookieSetting)
 	if err != nil {
 		logger.Errorf(ctx, "Error creating cookie manager %s", err)
 		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating cookie manager")

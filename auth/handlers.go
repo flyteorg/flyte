@@ -79,7 +79,7 @@ func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.Authenticatio
 			}
 
 			logger.Debugf(ctx, "Tokens are refreshed. Saving new tokens into cookies.")
-			err = authCtx.CookieManager().SetTokenCookies(ctx, writer, newToken)
+			err = authCtx.CookieManager().SetTokenCookies(ctx, request, writer, newToken)
 			if err != nil {
 				logger.Infof(ctx, "Failed to set token cookies. Restarting login flow. Error: %s", err)
 				authHandler(writer, request)
@@ -93,7 +93,7 @@ func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.Authenticatio
 				return
 			}
 
-			err = authCtx.CookieManager().SetUserInfoCookie(ctx, writer, userInfo)
+			err = authCtx.CookieManager().SetUserInfoCookie(ctx, request, writer, userInfo)
 			if err != nil {
 				logger.Infof(ctx, "Failed to set user info cookie. Restarting login flow. Error: %s", err)
 				authHandler(writer, request)
@@ -156,7 +156,7 @@ func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationCo
 			return
 		}
 
-		err = authCtx.CookieManager().SetTokenCookies(ctx, writer, token)
+		err = authCtx.CookieManager().SetTokenCookies(ctx, request, writer, token)
 		if err != nil {
 			logger.Errorf(ctx, "Error setting encrypted JWT cookie %s", err)
 			writer.WriteHeader(http.StatusForbidden)
@@ -170,7 +170,7 @@ func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationCo
 			return
 		}
 
-		err = authCtx.CookieManager().SetUserInfoCookie(ctx, writer, userInfo)
+		err = authCtx.CookieManager().SetUserInfoCookie(ctx, request, writer, userInfo)
 		if err != nil {
 			logger.Errorf(ctx, "Error setting encrypted user info cookie. Error: %v", err)
 			writer.WriteHeader(http.StatusForbidden)

@@ -51,14 +51,15 @@ func HashCsrfState(csrf string) string {
 	return hash
 }
 
-func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte) (http.Cookie, error) {
+func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte, domain string, sameSiteMode http.SameSite) (http.Cookie, error) {
 	var s = securecookie.New(hashKey, blockKey)
 	encoded, err := s.Encode(cookieName, value)
-
 	if err == nil {
 		return http.Cookie{
-			Name:  cookieName,
-			Value: encoded,
+			Name:     cookieName,
+			Value:    encoded,
+			Domain:   domain,
+			SameSite: sameSiteMode,
 		}, nil
 	}
 
