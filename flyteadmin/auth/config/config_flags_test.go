@@ -267,6 +267,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_userAuth.cookieSetting.sameSitePolicy", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("userAuth.cookieSetting.sameSitePolicy", testValue)
+			if vString, err := cmdFlags.GetString("userAuth.cookieSetting.sameSitePolicy"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.UserAuth.CookieSetting.SameSitePolicy)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_userAuth.cookieSetting.domainMatchPolicy", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("userAuth.cookieSetting.domainMatchPolicy", testValue)
+			if vString, err := cmdFlags.GetString("userAuth.cookieSetting.domainMatchPolicy"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.UserAuth.CookieSetting.DomainMatchPolicy)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_appAuth.selfAuthServer.issuer", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -43,8 +43,8 @@ func setupMockedAuthContextAtEndpoint(endpoint string) *mocks.AuthenticationCont
 		Scopes: []string{"openid", "other"},
 	}
 	mockAuthCtx.OnCookieManagerMatch().Return(mockCookieHandler)
-	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
 	return mockAuthCtx
 }
@@ -212,7 +212,11 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	// These were generated for unit testing only.
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-	cookieManager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded)
+	cookieSetting := config.CookieSettings{
+		SameSitePolicy:    config.SameSiteDefaultMode,
+		DomainMatchPolicy: config.DomainMatchSubdomains,
+	}
+	cookieManager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
 	assert.NoError(t, err)
 	mockAuthCtx := mocks.AuthenticationContext{}
 	mockAuthCtx.OnCookieManager().Return(&cookieManager)
@@ -221,11 +225,11 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
 
-	accessTokenCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey)
+	accessTokenCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&accessTokenCookie)
 
-	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey)
+	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&idCookie)
 
@@ -247,7 +251,11 @@ func TestGetHTTPRequestCookieToMetadataHandler_CustomHeader(t *testing.T) {
 	// These were generated for unit testing only.
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-	cookieManager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded)
+	cookieSetting := config.CookieSettings{
+		SameSitePolicy:    config.SameSiteDefaultMode,
+		DomainMatchPolicy: config.DomainMatchSubdomains,
+	}
+	cookieManager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
 	assert.NoError(t, err)
 	mockAuthCtx := mocks.AuthenticationContext{}
 	mockAuthCtx.On("CookieManager").Return(&cookieManager)

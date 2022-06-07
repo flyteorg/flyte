@@ -121,7 +121,7 @@ func authEndpoint(authCtx interfaces.AuthenticationContext, rw http.ResponseWrit
 		return
 	}
 
-	err = authCtx.CookieManager().SetAuthCodeCookie(ctx, rw, req.URL.String())
+	err = authCtx.CookieManager().SetAuthCodeCookie(ctx, req, rw, req.URL.String())
 	if err != nil {
 		logger.Infof(ctx, "Error occurred in NewAuthorizeRequest: %+v", err)
 		oauth2Provider.WriteAuthorizeError(rw, ar, err)
