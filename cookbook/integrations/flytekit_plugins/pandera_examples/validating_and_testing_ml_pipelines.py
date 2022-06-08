@@ -99,7 +99,7 @@ from sklearn.metrics import accuracy_score
 #      - the predicted attribute
 #
 # In practice, we'd want to do a little data exploration to first to get a sense of the distribution of variables.
-# A useful resource for this is the `Kaggle <https://www.kaggle.com/datasets/cherngs/heart-disease-cleveland-uci>`__ version of this dataset,
+# A useful resource for this is the `Kaggle <https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset>`__ version of this dataset,
 # which has been slightly preprocessed to be model-ready.
 #
 # .. Note::
