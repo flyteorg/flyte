@@ -48,6 +48,38 @@ func (_m *OutputWriter) GetCheckpointPrefix() storage.DataReference {
 	return r0
 }
 
+type OutputWriter_GetDeckPath struct {
+	*mock.Call
+}
+
+func (_m OutputWriter_GetDeckPath) Return(_a0 storage.DataReference) *OutputWriter_GetDeckPath {
+	return &OutputWriter_GetDeckPath{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputWriter) OnGetDeckPath() *OutputWriter_GetDeckPath {
+	c := _m.On("GetDeckPath")
+	return &OutputWriter_GetDeckPath{Call: c}
+}
+
+func (_m *OutputWriter) OnGetDeckPathMatch(matchers ...interface{}) *OutputWriter_GetDeckPath {
+	c := _m.On("GetDeckPath", matchers...)
+	return &OutputWriter_GetDeckPath{Call: c}
+}
+
+// GetDeckPath provides a mock function with given fields:
+func (_m *OutputWriter) GetDeckPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type OutputWriter_GetErrorPath struct {
 	*mock.Call
 }

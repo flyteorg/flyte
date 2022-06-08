@@ -94,7 +94,7 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 						return nil, err
 					}
 
-					if err = ow.Put(ctx, ioutils.NewInMemoryOutputReader(nil, &io.ExecutionError{
+					if err = ow.Put(ctx, ioutils.NewInMemoryOutputReader(nil, nil, &io.ExecutionError{
 						ExecutionError: &core2.ExecutionError{
 							Code:     "",
 							Message:  subJob.Status.Message,

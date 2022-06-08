@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	storageMocks "github.com/flyteorg/flytestdlib/storage/mocks"
@@ -16,6 +18,8 @@ func TestReadOrigin(t *testing.T) {
 
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.OnGetErrorPath().Return("")
+	deckPath := "deck.html"
+	opath.OnGetDeckPath().Return(storage.DataReference(deckPath))
 
 	t.Run("user", func(t *testing.T) {
 		errorDoc := &core.ErrorDocument{
@@ -44,6 +48,7 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_USER, ee.Kind)
 		assert.False(t, ee.IsRecoverable)
+		assert.Equal(t, deckPath, r.GetDeckPath().String())
 	})
 
 	t.Run("system", func(t *testing.T) {

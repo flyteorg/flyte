@@ -34,7 +34,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14
+          go-version: '1.18'
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -50,11 +50,7 @@ jobs:
         with:
           fetch-depth: "0"
       - name: Unit Tests
-        uses: cedrickring/golang-action@1.7.0
-        env:
-          GO111MODULE: "on"
-        with:
-          args: make install && make test_unit_codecov
+        run: make install && make test_unit_codecov
       - name: Push CodeCov
         uses: codecov/codecov-action@v1
         with:
@@ -62,8 +58,4 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
       - name: Lint
-        uses: cedrickring/golang-action@1.7.0
-        env:
-          GO111MODULE: "on"
-        with:
-          args: make install && make lint
+        run: make install && make lint
