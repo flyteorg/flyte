@@ -93,8 +93,8 @@ the control-plane from the user-plane. Thus, every organization can offer Flyte 
 - Resource-aware and deployments at scale
 
 | ![Flyte UI](https://raw.githubusercontent.com/flyteorg/static-resources/main/common/first_run_console.gif) |
-|:--:|
-| *✨ Flyte UI ✨* |
+| :--------------------------------------------------------------------------------------------------------: |
+|                                               *✨ Flyte UI ✨*                                               |
 
 ## ⭐️ Current Deployments & Contributors
 
@@ -232,7 +232,7 @@ The table below has different release versions as the columns and the result of 
 <center>
 
 | workflow group                  | nightly                                                                                                            | v1.0.1                                                                                                            | v1.0.0                                                                                                            | v0.19.4                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | core                            | ![core](https://byob.yarr.is/unionai/gh-badges/nightly/core)                                                       | ![core](https://byob.yarr.is/unionai/gh-badges/v1.0.1/core)                                                       | ![core](https://byob.yarr.is/unionai/gh-badges/v1.0.0/core)                                                       | ![core](https://byob.yarr.is/unionai/gh-badges/v0.19.4/core)                                                       |
 | integrations-hive               | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-hive)                              | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/v1.0.1/integrations-hive)                              | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/v1.0.0/integrations-hive)                              | ![integration-hive](https://byob.yarr.is/unionai/gh-badges/v0.19.4/integrations-hive)                              |
 | integrations-k8s-spark          | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/nightly/integrations-k8s-spark)                   | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/v1.0.1/integrations-k8s-spark)                   | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/v1.0.0/integrations-k8s-spark)                   | ![integrations-k8s-spark](https://byob.yarr.is/unionai/gh-badges/v0.19.4/integrations-k8s-spark)                   |
@@ -306,7 +306,7 @@ Ask us anything Flyte, Weekly on Wednesdays:
 
 ### Knowledge Base
 
-Find answers to the FAQs at [Knowledge Base](https://discuss.flyte.io): our minified StackOverflow and magnified Slack.
+Find answers to the FAQs at [Knowledge Base](https://discuss.flyte.org): our minified StackOverflow and magnified Slack.
 
 ### Conference Talks & Podcasts
 
