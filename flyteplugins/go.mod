@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v1.1.3-0.20220601015921-c9884d54d34a
+	github.com/flyteorg/flyteidl v1.1.7-0.20220608052921-d6e455ce8da6
 	github.com/flyteorg/flytestdlib v1.0.4-0.20220601010535-57c1386c358f
 	github.com/go-logr/zapr v0.4.0 // indirect
 	github.com/go-test/deep v1.0.7
