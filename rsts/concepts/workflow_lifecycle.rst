@@ -4,29 +4,21 @@
 Understand the Lifecycle of a Flyte Workflow
 #################################################################
 
-After reading this entry you should be able to understand how Flyte's Plugin machinery
-work under the hood and how information flows from the different
-components in Flyte.
+Let's understand how Flyte's plugin machinery works and how information flows from one component to another in Flyte.
 
-Under the hood Flyte relies on a primitive called “Plugins”. Every task
-that you run on Flyte is somehow powered by a plugin. Some of those plugins are native and guaranteed by Flyte system. These native plugins are for example powering your python functions (i.e: Tasks) by running them inside a k8s pod. There are Three native plugins : ``Container``, ``K8sPod`` and ``Sql``.
+Under the hood, Flyte relies on a primitive called “Plugins”. Every task that you run on Flyte is powered by a plugin. Some of these plugins are native and guaranteed by Flyte system. These native plugins, for example, run your Flyte tasks inside a k8s pod. There are three native plugins, namely, ``Container``, ``K8sPod``, and ``Sql``.
 
-Addionally there are also plugins which are actual extensions, they create additional infrastructure, talk to other SaaS on your behalf. Examples of those are the Spark or AWS Athena plugins.
+Moreover, there are plugins that are actual extensions; they create additional infrastructure and communicate with SaaS on your behalf. Examples include :ref:`Spark <intermediate_using_spark_tasks>`, :ref:`AWS Athena <AWS Athena>`, etc.
 
-A plugin requires code to live in multiple locations
+A plugin requires code to live in multiple locations.
 
-1. Some plugin logic has to live in SDK so that users can create tasks
-   that make use of a plugin. This logic usually goes into a specific
-   SDK i.e: flytekit’s python: https://github.com/flyteorg/flyteplugins
+1. Some parts of plugin logic reside in the SDK for users to create tasks that use the plugin. This logic is present in a specific SDK, like Flytekit’s Python: https://github.com/flyteorg/flytekit/tree/master/plugins.
 
 2. Another big chunk of plugins logic lives in
-   `Flyteplugins <https://github.com/flyteorg/flyteplugins>`__. This
-   repository is a library that gets loaded into
-   `FlytePropeller <https://github.com/flyteorg/flytepropeller>`__.
-   Flytepropeller is a Kubernetes operator, when Flytepropeller starts
-   it loads Flyteplugins. Flytepropeller knows that plugins exists and that
-   executing tasks depends on them. However Flytepropeller knows nothing
-   about “how to execute plugins”.
+   `Flyteplugins <https://github.com/flyteorg/flyteplugins>`__. This is a library that gets loaded into `FlytePropeller <https://github.com/flyteorg/flytepropeller>`__.
+   FlytePropeller (a Kubernetes operator) loads Flyteplugins upon starting. 
+   FlytePropeller is aware of the plugins and their dependency on task execution.
+   However, FlytePropeller is unaware of how these plugins are executed.
 
 ------------
 
