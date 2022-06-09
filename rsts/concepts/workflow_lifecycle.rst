@@ -1,4 +1,4 @@
-.. _lifecycle-workflow:
+.. _workflow-lifecycle:
 
 #################################################################
 Understand the Lifecycle of a Flyte Workflow

@@ -139,7 +139,7 @@ Output:
 🧱 Component Reference
 ======================
 
-A good way to understand how components below interact with each other would be to take a look at :ref:`Understand the lifecycle of a workflow <lifecycle-workflow>`, which explains how these components interact with each other.
+A good way to understand how components below interact with each other would be to take a look at :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`, which explains how these components interact with each other.
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
