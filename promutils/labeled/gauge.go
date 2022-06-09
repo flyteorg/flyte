@@ -3,6 +3,8 @@ package labeled
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
@@ -13,13 +15,13 @@ type Gauge struct {
 	*prometheus.GaugeVec
 
 	prometheus.Gauge
-	additionalLabels []contextutils.Key
+	labels []contextutils.Key
 }
 
 // Inc increments the gauge by 1. Use Add to increment by arbitrary values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Inc(ctx context.Context) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
+	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -33,7 +35,7 @@ func (g Gauge) Inc(ctx context.Context) {
 // Add adds the given value to the Gauge. (The value can be negative, resulting in a decrease of the Gauge.)
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Add(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
+	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -47,7 +49,7 @@ func (g Gauge) Add(ctx context.Context, v float64) {
 // Set sets the Gauge to an arbitrary value.
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Set(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
+	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -61,7 +63,7 @@ func (g Gauge) Set(ctx context.Context, v float64) {
 // Dec decrements the level by 1. Use Sub to decrement by arbitrary values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Dec(ctx context.Context) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
+	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -75,7 +77,7 @@ func (g Gauge) Dec(ctx context.Context) {
 // Sub adds the given value to the Gauge. The value can be negative, resulting in an increase of the Gauge.
 // The data point will be labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (g Gauge) Sub(ctx context.Context, v float64) {
-	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, g.additionalLabels...)...))
+	gauge, err := g.GaugeVec.GetMetricWith(contextutils.Values(ctx, g.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -113,14 +115,19 @@ func NewGauge(name, description string, scope promutils.Scope, opts ...MetricOpt
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			g.Gauge = scope.MustNewGauge(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
-			g.GaugeVec = scope.MustNewGaugeVec(name, description, append(metricStringKeys, labels...)...)
-			g.additionalLabels = contextutils.MetricKeysFromStrings(labels)
+			// compute unique labels
+			labelSet := sets.NewString(metricStringKeys...)
+			labelSet.Insert(additionalLabels.Labels...)
+			labels := labelSet.List()
+
+			g.GaugeVec = scope.MustNewGaugeVec(name, description, labels...)
+			g.labels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 
 	if g.GaugeVec == nil {
 		g.GaugeVec = scope.MustNewGaugeVec(name, description, metricStringKeys...)
+		g.labels = metricKeys
 	}
 
 	return g

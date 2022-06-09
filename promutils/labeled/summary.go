@@ -3,6 +3,8 @@ package labeled
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,12 +16,12 @@ type Summary struct {
 	*prometheus.SummaryVec
 
 	prometheus.Summary
-	additionalLabels []contextutils.Key
+	labels []contextutils.Key
 }
 
 // Observe adds a single observation to the summary.
 func (s Summary) Observe(ctx context.Context, v float64) {
-	summary, err := s.SummaryVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, s.additionalLabels...)...))
+	summary, err := s.SummaryVec.GetMetricWith(contextutils.Values(ctx, s.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -43,14 +45,19 @@ func NewSummary(name, description string, scope promutils.Scope, opts ...MetricO
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			s.Summary = scope.MustNewSummary(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
-			s.SummaryVec = scope.MustNewSummaryVec(name, description, append(metricStringKeys, labels...)...)
-			s.additionalLabels = contextutils.MetricKeysFromStrings(labels)
+			// compute unique labels
+			labelSet := sets.NewString(metricStringKeys...)
+			labelSet.Insert(additionalLabels.Labels...)
+			labels := labelSet.List()
+
+			s.SummaryVec = scope.MustNewSummaryVec(name, description, labels...)
+			s.labels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 
 	if s.SummaryVec == nil {
 		s.SummaryVec = scope.MustNewSummaryVec(name, description, metricStringKeys...)
+		s.labels = metricKeys
 	}
 
 	return s
