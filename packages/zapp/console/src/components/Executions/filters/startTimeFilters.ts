@@ -1,5 +1,5 @@
+import * as moment from 'moment';
 import { FilterOperationName } from 'models/AdminEntity/types';
-import moment from 'moment';
 import { FilterMap } from './types';
 
 const workflowExecutionStartTimeKey = 'execution_created_at';
