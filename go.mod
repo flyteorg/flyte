@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.10.0
 	github.com/flyteorg/flyteidl v1.1.5
 	github.com/flyteorg/flyteplugins v1.0.0
-	github.com/flyteorg/flytestdlib v1.0.0
+	github.com/flyteorg/flytestdlib v1.0.4
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-test/deep v1.0.7
