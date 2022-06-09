@@ -50,6 +50,7 @@ Prerequisites
 =============
 
 The following is required for non-sandbox deployments:
+
 * A public domain name (e.g. example.foobar.com)
 * Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
 
@@ -93,9 +94,13 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
     It offers more detailed control on access policies, user consent, and app management.
 
     1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
-    2. Create an app (choose Web for the platform) and OpenID Connect for the sign-on method.
-    3. Add Login redirect URIs (e.g. http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``)
-    4. *Optional*: Add logout redirect URIs (e.g. http://localhost:30081/logout for sandbox)
+    2. Create an app integration:
+
+      a) Choose OIDC - OpenID Connect as the sign-on method.
+      b) Choose Web Application as the type.
+
+    3. Add sign-in redirect URIs (e.g. http://localhost:30081/callback for sandbox or ``https://<your deployment url>/callback``)
+    4. *Optional*: Add logout redirect URIs (e.g. http://localhost:30081/logout for sandbox, ``https://<your deployment url>/callback`` for non-sandboxed)
     5. Write down the Client ID and Client Secret
 
 .. tabbed:: Keycloak
@@ -171,7 +176,7 @@ Apply Configuration
             clientId: 0oakkheteNjCMERst5d6
         authorizedUris:
           # 4. Update with a public domain name (for non-sandbox deployments).
-          # - https://example.foobar.com:443
+          # - https://example.foobar.com
           # Or uncomment this line for sandbox deployment
           # - http://localhost:30081
           - http://flyteadmin:80
@@ -228,12 +233,30 @@ To set up an external OAuth2 Authorization Server, follow the instructions below
 
 .. tabbed:: Okta
 
-   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of FlyteAdmin (e.g. https://flyte.mycompany.io/).
-   2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
-   3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
-   4. Create 2 apps (for Flytectl and Flytepropeller) to enable these clients to communicate with the service.
-      Flytectl should be created as a `native client`.
-      Flytepropeller should be created as an `OAuth Service` and note the client ID and client Secrets provided.
+   Okta's custom authorization servers are available through an add-on license. The free developer accounts do include access, which you can use to test before rolling out the configuration more broadly.
+
+   1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of FlyteAdmin (e.g. https://example.foobar.com).
+
+      .. note::
+
+      The audience must exactly match one of the URIs in the `authorizedUris` section above
+
+   2. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.
+   3. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server. Then, add a rule to the policy with the default settings (you can fine-tune these later).
+   4. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
+   5. Add another scope, named `offline`. Check the consent option, and `Include in public metadata`.
+   6. Create an app for Flytectl:
+      a) In the `Applications` section, `Create App Integration`.
+      b) Choose `OIDC - OpenID Connect`, and then `Native Application`.
+      c) Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
+      d) Assign this integration to any Okta users or groups who should be able to use the Flytectl tool.
+      e) Note down the client ID; there will not be a secret.
+   7. Create an app for Flytepropeller:
+      a) In the `Applications` section, `Create App Integration`.
+      b) Choose `OIDC - OpenID Connect`, and then `Web Application`.
+      c) Check the `Client acting on behalf of itself - Client Credentials` option.
+      d) This app does not need a specific redirect URI; nor does it need to be assigned to any users.
+      e) Note down the client ID and secret; you will need these later.
 
 .. tabbed:: Keycloak
 
@@ -267,18 +290,18 @@ Apply Configuration
                     #baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for keycloak
                     #metadataUrl: .well-known/openid-configuration #Uncomment for keycloak
 
-            thirdPartyConfig:
-                flyteClient:
-                    # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                    clientId: flytectl
+                thirdPartyConfig:
+                    flyteClient:
+                        # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                        clientId: flytectl
 
-                    # This should not change
-                    redirectUri: http://localhost:53593/callback
+                        # This should not change
+                        redirectUri: http://localhost:53593/callback
 
-                    # 4. "all" is a required scope and must be configured in the custom authorization server.
-                    scopes:
-                    - offline
-                    - all
+                        # 4. "all" is a required scope and must be configured in the custom authorization server.
+                        scopes:
+                        - offline
+                        - all
             userAuth:
                 openId:
                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
