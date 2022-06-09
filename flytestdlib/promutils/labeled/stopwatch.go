@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 )
@@ -17,7 +19,7 @@ type StopWatch struct {
 	// across tags.
 	promutils.StopWatch
 
-	additionalLabels []contextutils.Key
+	labels []contextutils.Key
 }
 
 // Start creates a new Instance of the StopWatch called a Timer that is closeable/stoppable.
@@ -28,7 +30,7 @@ type StopWatch struct {
 //   ....
 // }
 func (c StopWatch) Start(ctx context.Context) Timer {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
+	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -48,7 +50,7 @@ func (c StopWatch) Start(ctx context.Context) Timer {
 // Observe observes specified duration between the start and end time. The data point will be labeled with values from context.
 // See labeled.SetMetricsKeys for information about how to configure that.
 func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
+	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -82,15 +84,19 @@ func NewStopWatch(name, description string, scale time.Duration, scope promutils
 		if _, emitUnableMetric := opt.(EmitUnlabeledMetricOption); emitUnableMetric {
 			sw.StopWatch = scope.MustNewStopWatch(GetUnlabeledMetricName(name), description, scale)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
-			sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale,
-				append(metricStringKeys, labels...)...)
-			sw.additionalLabels = contextutils.MetricKeysFromStrings(labels)
+			// compute unique labels
+			labelSet := sets.NewString(metricStringKeys...)
+			labelSet.Insert(additionalLabels.Labels...)
+			labels := labelSet.List()
+
+			sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale, labels...)
+			sw.labels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 
 	if sw.StopWatchVec == nil {
 		sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale, metricStringKeys...)
+		sw.labels = metricKeys
 	}
 
 	return sw

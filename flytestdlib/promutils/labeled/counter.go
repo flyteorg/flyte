@@ -16,13 +16,13 @@ type Counter struct {
 	*prometheus.CounterVec
 
 	prometheus.Counter
-	additionalLabels []contextutils.Key
+	labels []contextutils.Key
 }
 
 // Inc increments the counter by 1. Use Add to increment it by arbitrary non-negative values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Inc(ctx context.Context) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
+	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -36,7 +36,7 @@ func (c Counter) Inc(ctx context.Context) {
 // Add adds the given value to the counter. It panics if the value is < 0.. The data point will be labeled with values
 // from context. See labeled.SetMetricsKeys for information about how to configure that.
 func (c Counter) Add(ctx context.Context, v float64) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
+	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -45,18 +45,6 @@ func (c Counter) Add(ctx context.Context, v float64) {
 	if c.Counter != nil {
 		c.Counter.Add(v)
 	}
-}
-
-// GetUniqueLabels Remove labels from additionalLabels that already exist in metricStringKeys
-func GetUniqueLabels(metricStringKeys []string, additionalLabels []string) []string {
-	labels := make([]string, 0, len(additionalLabels))
-	metricKeysSet := sets.NewString(metricStringKeys...)
-	for _, label := range additionalLabels {
-		if !metricKeysSet.Has(label) {
-			labels = append(labels, label)
-		}
-	}
-	return labels
 }
 
 // NewCounter  creates a new labeled counter. Label keys must be set before instantiating a counter. See labeled.SetMetricsKeys for
@@ -73,15 +61,19 @@ func NewCounter(name, description string, scope promutils.Scope, opts ...MetricO
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			c.Counter = scope.MustNewCounter(GetUnlabeledMetricName(name), description)
 		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
-			labels := GetUniqueLabels(metricStringKeys, additionalLabels.Labels)
-			// Here we only append the labels that don't exist in metricStringKeys
-			c.CounterVec = scope.MustNewCounterVec(name, description, append(metricStringKeys, labels...)...)
-			c.additionalLabels = contextutils.MetricKeysFromStrings(labels)
+			// compute unique labels
+			labelSet := sets.NewString(metricStringKeys...)
+			labelSet.Insert(additionalLabels.Labels...)
+			labels := labelSet.List()
+
+			c.CounterVec = scope.MustNewCounterVec(name, description, labels...)
+			c.labels = contextutils.MetricKeysFromStrings(labels)
 		}
 	}
 
 	if c.CounterVec == nil {
 		c.CounterVec = scope.MustNewCounterVec(name, description, metricStringKeys...)
+		c.labels = metricKeys
 	}
 
 	return c
