@@ -11,7 +11,7 @@ Many platform specifications such as task resource defaults, project namespace K
 assigned using default values or custom overrides. Defaults are specified in the FlyteAdmin config and
 overrides for specific projects are registered with the FlyteAdmin service.
 
-Specifically, Flyte allows these custom settings along increasing levels of specificity:
+You can customize these settings along increasing levels of specificity with Flyte:
 
 - domain
 - project and domain
@@ -36,7 +36,7 @@ In the absence of an override, the global
 `default values <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L35,L43>`__
 in the FlyteAdmin config are used.
 
-The override values from the database are assigned at execution, rather than registration time.
+You can override values from the database, that are assigned at execution, rather than registration time.
 
 To customize resources for project-domain attributes, define a ``tra.yaml`` file with the values you need:
 
@@ -71,16 +71,15 @@ You can view all custom task-resource-attributes by visiting ``protocol://<host/
 
 Cluster Resources
 =================
-These are free-form key-value pairs used when filling the templates that the admin feeds into the cluster manager, the process that syncs kubernetes resources.
+These are free-form key-value pairs used when filling the templates that the admin feeds into the cluster manager; the process that syncs Kubernetes resources.
 
 The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__ and the values are what you want to see filled in.
 
-In the absence of custom override values, ``templateData`` from the `FlyteAdmin config <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__
-is used as a default. These defaults are specified by domain but will be applied to every project-domain namespace combination.
+In the absence of custom override values, you can use ``templateData`` from the `FlyteAdmin config <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__ as a default. Flyte specifies these defaults by domain and applies them to every project-domain namespace combination.
 
 .. note::
-    The above-referenced settings can only take on domain, project, and domain specificity.
-    Since Flyte is not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make sense.
+    The settings above can be specified on domain, and project-and-domain.
+    Since Flyte hasn't tied the notion of a workflow or a launch plan to any Kubernetes construct, specifying a workflow or launch plan name doesn't make sense.
     This is a departure from the usual hierarchy for customizable resources.
 
 Define an attributes file, ``cra.yaml``:
@@ -110,7 +109,7 @@ To fetch and verify the individual project-domain attributes:
 
 Refer to the :ref:`docs <flytectl:flytectl_get_task-resource-attribute>` to learn more about the command and its supported flag(s).
 
-The above-updated values will be used to fill in the template fields for the flyteexamples-development namespace.
+You can use these updated values to fill the template fields for the flyteexamples-development namespace.
 
 For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__ apply.
 
@@ -153,7 +152,7 @@ You can view all custom execution cluster attributes by visiting ``protocol://<h
 
 Execution Queues
 ================
-Execution queues are currently defined in
+Execution queues are defined in
 `flyteadmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
 These are used for execution placement for constructs like AWS Batch.
 
