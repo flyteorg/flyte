@@ -145,7 +145,7 @@
         "react-router-dom": "^5.0.1",
         "react-virtualized": "^9.21.1",
         "resolve-url-loader": "^5.0.0",
-        "semantic-release": "^17.2.3",
+        "semantic-release": "^19.0.3",
         "shallowequal": "^1.1.0",
         "snakecase-keys": "^5.4.2",
         "source-map-loader": "^3.0.1",
