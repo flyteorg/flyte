@@ -3987,6 +3987,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	defaultK8sServiceAccount := applicationConfig.ApplicationConfiguration().GetTopLevelConfig().K8SServiceAccount
 	defaultMaxParallelism := applicationConfig.ApplicationConfiguration().GetTopLevelConfig().MaxParallelism
 
+	deprecatedLaunchPlanK8sServiceAccount := "deprecatedLaunchPlanK8sServiceAccount"
 	rmLabels := map[string]string{"rmLabelKey": "rmLabelValue"}
 	rmAnnotations := map[string]string{"rmAnnotationKey": "rmAnnotationValue"}
 	rmOutputLocationPrefix := "rmOutputLocationPrefix"
@@ -4266,6 +4267,42 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
 	})
+	t.Run("fetch security context from deprecated config", func(t *testing.T) {
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			})
+			return &managerInterfaces.ResourceResponse{
+				Attributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+						WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{},
+					},
+				},
+			}, nil
+		}
+		request := &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		}
+		launchPlan := &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				AuthRole: &admin.AuthRole{
+					KubernetesServiceAccount: deprecatedLaunchPlanK8sServiceAccount,
+				},
+			},
+		}
+		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
+		assert.NoError(t, err)
+		assert.Equal(t, defaultMaxParallelism, execConfig.MaxParallelism)
+		assert.Equal(t, deprecatedLaunchPlanK8sServiceAccount, execConfig.SecurityContext.RunAs.K8SServiceAccount)
+		assert.Nil(t, execConfig.GetRawOutputDataConfig())
+		assert.Nil(t, execConfig.GetLabels())
+		assert.Nil(t, execConfig.GetAnnotations())
+	})
 	t.Run("matchable resource workflow resource", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
@@ -4504,7 +4541,7 @@ func TestResolvePermissions(t *testing.T) {
 	k8sServiceAccountSc := "saSc"
 
 	t.Run("backward compat use request values from auth", func(t *testing.T) {
-		execRequest := admin.ExecutionCreateRequest{
+		execRequest := &admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{
 				AuthRole: &admin.AuthRole{
 					AssumableIamRole:         assumableIamRole,
@@ -4537,7 +4574,7 @@ func TestResolvePermissions(t *testing.T) {
 			}}, sc)
 	})
 	t.Run("use request values security context", func(t *testing.T) {
-		execRequest := admin.ExecutionCreateRequest{
+		execRequest := &admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{
 				SecurityContext: &core.SecurityContext{
 					RunAs: &core.Identity{
@@ -4571,7 +4608,7 @@ func TestResolvePermissions(t *testing.T) {
 		assert.Equal(t, k8sServiceAccountSc, sc.RunAs.K8SServiceAccount)
 	})
 	t.Run("prefer lp auth role over auth", func(t *testing.T) {
-		execRequest := admin.ExecutionCreateRequest{
+		execRequest := &admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{},
 		}
 		lp := &admin.LaunchPlan{
@@ -4601,7 +4638,7 @@ func TestResolvePermissions(t *testing.T) {
 		}, sc)
 	})
 	t.Run("prefer security context over auth context", func(t *testing.T) {
-		execRequest := admin.ExecutionCreateRequest{
+		execRequest := &admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{
 				AuthRole: &admin.AuthRole{
 					AssumableIamRole:         assumableIamRole,
@@ -4643,7 +4680,7 @@ func TestResolvePermissions(t *testing.T) {
 		assert.Equal(t, k8sServiceAccountSc, sc.RunAs.K8SServiceAccount)
 	})
 	t.Run("prefer lp auth over role", func(t *testing.T) {
-		execRequest := admin.ExecutionCreateRequest{
+		execRequest := &admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{},
 		}
 		lp := &admin.LaunchPlan{
@@ -4673,7 +4710,7 @@ func TestResolvePermissions(t *testing.T) {
 		}, sc)
 	})
 	t.Run("prefer lp auth over role", func(t *testing.T) {
-		authRole := resolveAuthRole(admin.ExecutionCreateRequest{
+		authRole := resolveAuthRole(&admin.ExecutionCreateRequest{
 			Spec: &admin.ExecutionSpec{},
 		}, &admin.LaunchPlan{
 			Spec: &admin.LaunchPlanSpec{

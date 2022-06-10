@@ -191,15 +191,15 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 					MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
 				},
 			},
-			SecurityContext: &core.SecurityContext{
-				RunAs: &core.Identity{
-					IamRole:           testRoleSc,
-					K8SServiceAccount: testK8sServiceAccountSc,
-				},
-			},
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				MaxParallelism: 50,
 				Interruptible:  &wrappers.BoolValue{Value: true},
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           testRoleSc,
+						K8SServiceAccount: testK8sServiceAccountSc,
+					},
+				},
 			},
 			RecoveryExecution: recoveryNodeExecutionID,
 			EventVersion:      1,
