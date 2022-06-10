@@ -26,6 +26,7 @@ spec:
       {{- if .Values.flytescheduler.priorityClassName }}
       priorityClassName: {{ .Values.flytescheduler.priorityClassName }}
       {{- end }}
+      {{- if .Values.flytescheduler.runPrecheck }}
       initContainers:
       - command:
         - flytescheduler
@@ -40,6 +41,7 @@ spec:
             name: config-volume
           - name: auth
             mountPath: /etc/secrets/
+      {{- end }}
       containers:
       - command:
         - flytescheduler

@@ -90,3 +90,7 @@ flyte:
   admin:
     disableClusterResourceManager: true
     disableScheduler: true
+catalog-cache:
+  endpoint: localhost:8081
+  insecure: true
+  type: datacatalog

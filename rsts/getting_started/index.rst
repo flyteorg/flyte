@@ -1,17 +1,21 @@
 .. _getting-started:
 
-################
+###############
 Getting Started
-################
+###############
+
+This quick start gives an overview of how to get Flyte up and running on your local machine.
 
 Requirements
-^^^^^^^^^^^^^
-Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ and the Docker Daemon is running.
+^^^^^^^^^^^^
+
+- Install `Docker <https://docs.docker.com/get-docker/>`__
+- Ensure Docker Daemon is running
 
 Installation
 ^^^^^^^^^^^^
 
-Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's python SDK.
+Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 
 .. prompt:: bash
 
@@ -32,9 +36,9 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's python SDK.
 
 
 Example: Computing Descriptive Statistics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let's create a simple Flyte Workflow that involves two steps:
+Let's create a simple Flyte :py:func:`~flytekit.workflow` that involves two steps:
 
 1. Generate a dataset of ``numbers`` drawn from a normal distribution.
 2. Compute the mean and standard deviation of the ``numbers`` data.
@@ -42,7 +46,7 @@ Let's create a simple Flyte Workflow that involves two steps:
 Create a Workflow
 """"""""""""""""""
 
-Copy the following code to a file named ``example.py``
+Copy the following code to a file named ``example.py``.
 
 .. code-block:: python
 
@@ -65,34 +69,35 @@ Copy the following code to a file named ``example.py``
         return compute_stats(df=generate_normal_df(n=n, mean=mean, sigma=sigma))
 
 
-.. dropdown:: :fa:`info-circle` This looks like Python, but what does ``@task`` and ``@workflow`` do?
+.. dropdown:: :fa:`info-circle` This looks like Python, but what do ``@task`` and ``@workflow`` do?
     :title: text-muted
     :animate: fade-in-slide-down
 
     Flyte ``@task`` and ``@workflow`` decorators are designed to work seamlessly with your code-base, provided
     that the *decorated function is at the top-level scope of the module*.
-    
-    This means that you can invoke your Tasks and Workflows as regular python methods and even import and use them in
+
+    This means that you can invoke tasks and workflows as regular Python methods and even import and use them in
     other Python modules or scripts.
 
     .. note::
 
-       A Task is a pure Python function, while a Workflow is actually a `DSL <https://en.wikipedia.org/wiki/Domain-specific_language>`__
-       that only support a subset of Python's semantics. Some key things to learn here are:
+       A :py:func:`~flytekit.task` is a pure Python function, while a :py:func:`~flytekit.workflow` is actually a
+       `DSL <https://en.wikipedia.org/wiki/Domain-specific_language>`__ that only support a subset of Python's semantics.
+       Some key things to learn here are:
 
-       - In Workflows, you can't use non-deterministic operations like ``rand.random`` or ``time.now()`` etc.
-       - Within Workflows, the outputs of tasks are promises under the hood, so you can't access and operate on them
-         like typical Python function outputs. *You can only pass them into other Tasks/Workflows.*
+       - In workflows, you can't use non-deterministic operations like ``rand.random``, ``time.now()``, etc.
+       - Within workflows, the outputs of tasks are promises under the hood, so you can't access and operate on them
+         like typical Python function outputs. *You can only pass them into other tasks/workflows.*
        - Tasks can only be invoked with keyword arguments, not positional arguments.
 
-       You can read more about Tasks :doc:`here <cookbook:auto/core/flyte_basics/task>` and Workflows
-       :doc:`here <cookbook:auto/core/flyte_basics/basic_workflow>`
+       You can read more about tasks :doc:`here <cookbook:auto/core/flyte_basics/task>` and workflows
+       :doc:`here <cookbook:auto/core/flyte_basics/basic_workflow>`.
 
 
 Running Flyte Workflows
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can run the workflow in ``example.py`` on a local python environment or a Flyte cluster.
+You can run the workflow in ``example.py`` on a local Python environment or a Flyte cluster.
 
 Executing Workflows Locally
 """"""""""""""""""""""""""""
@@ -107,14 +112,14 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
     :title: text-muted
     :animate: fade-in-slide-down
 
-    ``pyflyte run`` enables you to execute a specific workflow in your python script using the syntax
+    ``pyflyte run`` enables you to execute a specific workflow in your Python script using the syntax
     ``pyflyte run <path/to/script.py> <workflow_function_name>``.
 
-    Key-word arguments can be supplied to ``pyflyte run`` by passing in options in the format ``--kwarg value``, and in
+    Keyword arguments can be supplied to ``pyflyte run`` by passing in options in the format ``--kwarg value``, and in
     the case of ``snake_case_arg`` argument names, you can pass in options in the form of ``--snake-case-arg value``.
 
     .. note::
-       If you wanted to run a workflow with ``python example.py``, you would have to write a ``main`` module
+       If you want to run a workflow with ``python example.py``, you would have to write a ``main`` module
        conditional at the end of the script to actually run the workflow:
 
        .. code-block:: python
@@ -139,7 +144,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
 Creating a Demo Flyte Cluster
 """""""""""""""""""""""""""""""
 
-To start a local demo cluster, first install :std:ref:`flytectl`, which is the command-line interface for Flyte.
+To start a local demo cluster, install :std:ref:`flytectl`, which is the command-line interface for Flyte.
 
 .. tabbed:: OSX
 
@@ -155,7 +160,7 @@ To start a local demo cluster, first install :std:ref:`flytectl`, which is the c
     export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
 
 
-Start a Flyte demonstration environment on your local machine:
+Start a Flyte demonstration environment on your local machine via:
 
 .. prompt:: bash $
 
@@ -166,14 +171,13 @@ Start a Flyte demonstration environment on your local machine:
    **Expected Output:**
 
    .. code-block::
-   
+
       👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
 
 .. note::
 
    Make sure to export the ``KUBECONFIG`` and ``FLYTECTL_CONFIG`` environment variables in your shell, replacing
    ``<username>`` with your actual username.
-
 
 .. dropdown:: :fa:`info-circle` What is a flyte demo environment?
     :title: text-muted
@@ -182,13 +186,13 @@ Start a Flyte demonstration environment on your local machine:
     ``flytectl`` ships with a limited testing environment that can run on your local machine. It's not a substitute for the production environment,
     but it's great for trying out the platform and checking out some of its capabilities.
 
-    Most :doc:`integrations <cookbook:integrations>` are not directly installed in this environment, and it's not a great
+    However, most :doc:`integrations <cookbook:integrations>` are not directly installed in this environment, and it's not a great
     way to test the platform's performance.
 
 Executing Workflows on a Flyte Cluster
 """""""""""""""""""""""""""""""""""""""
 
-Then run the same Workflow on the Flyte cluster:
+Run the workflow on Flyte cluster via:
 
 .. prompt:: bash $
 
@@ -196,77 +200,68 @@ Then run the same Workflow on the Flyte cluster:
 
 .. div:: shadow p-3 mb-8 rounded
 
-   **Expected Output:** A URL to the Workflow Execution on your demo Flyte cluster:
+   **Expected Output:** A URL to the workflow execution on your demo Flyte cluster:
 
    .. code-block::
 
       Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution_name> to see execution in the console.
 
-   Where ``<execution_name>`` is a unique identifier for your Workflow Execution.
+   where ``<execution_name>`` is a unique identifier for the workflow execution.
 
-|
+Unlike the previous ``pyflyte run`` invocation, passing the ``--remote`` flag will trigger the execution on the configured backend.
 
-.. dropdown:: :fa:`info-circle` What does the ``--remote`` flag do?
+.. dropdown:: :fa:`info-circle` How to handle custom dependencies? Meet the ``--image`` flag!
     :title: text-muted
     :animate: fade-in-slide-down
 
-    Unlike the previous ``pyflyte run`` invocation, passing the ``--remote`` flag will trigger the execution on the configured backend.
+    * Consistent dependency management is a challenge with python projects, so Flyte uses `Docker containers <https://www.docker.com/resources/what-container/>`__ to manage dependencies for your project.
+    * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
+    * If you want to use a custom image, create a Dockerfile, build the Docker image, and push it to a registry that is accessible to your cluster.
 
-    .. note::
+      .. prompt :: bash $
 
-       * Consistent dependency management is a challenge with python projects, so Flyte uses `docker containers <https://www.docker.com/resources/what-container/>`__ to manage dependencies for your project.
-       * ``pyflyte run --remote`` uses a default image bundled with flytekit, which contains numpy, pandas, and flytekit and matches your current python (major, minor) version.
-       * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
+        docker build . --tag <registry/repo:version>
+        docker push <registry/repo:version>
 
-.. dropdown:: :fa:`info-circle` What does the ``--image`` flag do?
-    :title: text-muted
-    :animate: fade-in-slide-down
+    * And, use the ``--image`` flag and provide the fully qualified image name of your image to the ``pyflyte run`` command.
 
-    If you want to use a custom image, create a dockerfile, build it and push the docker image to registry:
+      .. prompt :: bash $
 
-    .. prompt :: bash $
-      
-      docker build . --tag <registry/repo:version>
-      docker push <registry/repo:version>
+        pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2 --image <registry/repo:version>
 
-    Once the docker image is pushed to registry, use the ``--image`` flag and provide the fully qualified image name of your image:
+    * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 
-    .. prompt :: bash $
-
-       pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2 --image <registry/repo:version>
 
 Inspect the Results
-^^^^^^^^^^^^^^^^^^^^^^
-Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to Flyte Console, the web UI
+^^^^^^^^^^^^^^^^^^^
+Navigate to the URL produced as the result of running ``pyflyte run``. This will take you to FlyteConsole, the web UI
 used to manage Flyte entities such as tasks, workflows, and executions.
 
 .. image:: https://github.com/flyteorg/static-resources/raw/main/flyte/getting_started/getting_started_console.gif
 
 .. note::
 
-   There are a few features about the Flyte console worth noting in this video:
+   There are a few features about FlyteConsole worth noting in this video:
 
-   - The default execution view shows the list of Tasks executing in sequential order
-   - The right-hand panel shows metadata about the Task Execution, including logs, inputs, outputs, and Task Metadata.
-   - The *Graph* view shows the execution graph of the Workflow, providing visual information about the topology
-     of the graph and the state of each node as the Workflow progresses.
-   - On completion, you can inspect the outputs of each Task, and ultimately, the overarching Workflow.
+   - The default execution view shows the list of tasks executing in sequential order.
+   - The right-hand panel shows metadata about the task execution, including logs, inputs, outputs, and task metadata.
+   - The *Graph* view shows the execution graph of the workflow, providing visual information about the topology
+     of the graph and the state of each node as the workflow progresses.
+   - On completion, you can inspect the outputs of each task, and ultimately, the overarching workflow.
 
 Recap
-^^^^^^^^
-
+^^^^^
 🎉  **Congratulations!  In this getting started guide, you:**
 
 1. 📜 Created a Flyte script, which computes descriptive statistics over some generated data.
-2. 🛥 Created a demo Flyte cluster on your local system
+2. 🛥 Created a demo Flyte cluster on your local system.
 3. 👟 Ran a workflow locally and on a demo Flyte cluster.
 
 What's Next?
-^^^^^^^^^^^^^^^^
-
+^^^^^^^^^^^^
 This guide demonstrated how you can quickly iterate on self-contained scripts using ``pyflyte run``.
 
-- To learn more about Flyte's features such as caching, conditionals, specifying resource requirements, and scheduling
+- To learn about Flyte's features such as caching, conditionals, specifying resource requirements, and scheduling
   workflows, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
-- To learn more about how to organize, package, and register workflows for larger projects, see the guide for
+- To learn about how to organize, package, and register workflows for larger projects, see the guide for
   :ref:`Building Large Apps <cookbook:larger_apps>`.

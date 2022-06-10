@@ -97,3 +97,7 @@ task_resources:
     cpu: 500m
     memory: 500Mi
     storage: 500Mi
+catalog-cache:
+  endpoint: localhost:8081
+  insecure: true
+  type: datacatalog
