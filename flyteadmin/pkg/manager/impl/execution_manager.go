@@ -524,7 +524,19 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 		workflowExecConfig = mergeIntoExecConfig(workflowExecConfig,
 			matchableResource.Attributes.GetWorkflowExecutionConfig())
 	}
-	//  merge the application config into workflowExecConfig
+
+	// Backward compatibility changes to get security context from auth role.
+	// Older authRole or auth fields in the launchplan spec or execution request need to be used over application defaults.
+	// This portion of the code makes sure if newer way of setting security context is empty i.e
+	// K8sServiceAccount and  IamRole is empty then get the values from the deprecated fields.
+	resolvedAuthRole := resolveAuthRole(request, launchPlan)
+	resolvedSecurityCtx := resolveSecurityCtx(ctx, workflowExecConfig.GetSecurityContext(), resolvedAuthRole)
+	if workflowExecConfig.GetSecurityContext() == nil &&
+		(len(resolvedSecurityCtx.GetRunAs().GetK8SServiceAccount()) > 0 ||
+			len(resolvedSecurityCtx.GetRunAs().GetIamRole()) > 0) {
+		workflowExecConfig.SecurityContext = resolvedSecurityCtx
+	}
+	//  merge the application config into workflowExecConfig. If even the deprecated fields are not set
 	workflowExecConfig = mergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
 	logger.Infof(ctx, "getting the workflow execution config from application configuration")
 	// Defaults to one from the application config
@@ -669,16 +681,12 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
-	resolvedAuthRole := resolveAuthRole(request, launchPlan)
-	resolvedSecurityCtx := resolveSecurityCtx(ctx, executionConfig.GetSecurityContext(), resolvedAuthRole)
-
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
 		Inputs:              request.Inputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,
 		ExecutionConfig:     executionConfig,
-		SecurityContext:     resolvedSecurityCtx,
 		TaskResources:       &platformTaskResources,
 		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
@@ -746,7 +754,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       resolvedSecurityCtx,
+		SecurityContext:       executionConfig.SecurityContext,
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
@@ -757,9 +765,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	return ctx, executionModel, nil
 }
 
-func resolveAuthRole(request admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
+func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
 	if request.Spec.AuthRole != nil {
 		return request.Spec.AuthRole
+	}
+
+	if launchPlan == nil || launchPlan.Spec == nil {
+		return &admin.AuthRole{}
 	}
 
 	// Set role permissions based on launch plan Auth values.
@@ -776,6 +788,7 @@ func resolveAuthRole(request admin.ExecutionCreateRequest, launchPlan *admin.Lau
 			AssumableIamRole: launchPlan.GetSpec().GetRole(),
 		}
 	}
+
 	return &admin.AuthRole{}
 }
 
@@ -907,15 +920,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
-	resolvedAuthRole := resolveAuthRole(request, launchPlan)
-	resolvedSecurityCtx := resolveSecurityCtx(ctx, executionConfig.GetSecurityContext(), resolvedAuthRole)
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
 		Inputs:              executionInputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,
 		ExecutionConfig:     executionConfig,
-		SecurityContext:     resolvedSecurityCtx,
 		TaskResources:       &platformTaskResources,
 		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
@@ -984,7 +994,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       resolvedSecurityCtx,
+		SecurityContext:       executionConfig.SecurityContext,
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
