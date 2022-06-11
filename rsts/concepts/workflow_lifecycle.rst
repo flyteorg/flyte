@@ -12,7 +12,7 @@ Moreover, there are plugins that are actual extensions; they create additional i
 
 A plugin requires code to live in multiple locations.
 
-1. Some parts of plugin logic reside in the SDK for users to create tasks that use the plugin. This logic is present in a specific SDK, like Flytekit’s Python: https://github.com/flyteorg/flytekit/tree/master/plugins.
+1. Some parts of plugins logic resides in Flytekit's SDK. This let users define tasks. You can find this logic in Flytekit’s Python (https://github.com/flyteorg/flytekit/tree/master/plugins). Think of this as a client for an RPC service or a web service
 
 2. Another big chunk of plugins logic lives in
    `Flyteplugins <https://github.com/flyteorg/flyteplugins>`__. This is a library that gets loaded into `FlytePropeller <https://github.com/flyteorg/flytepropeller>`__.
