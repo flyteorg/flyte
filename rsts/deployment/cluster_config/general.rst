@@ -36,9 +36,9 @@ In the absence of an override, the global
 `default values <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L35,L43>`__
 in the FlyteAdmin config are used.
 
-You can override values from the database, that are assigned at execution, rather than registration time.
+The override values from the database are assigned at execution, rather than registration time.
 
-To customize resources for project-domain attributes, define a ``tra.yaml`` file with the values you need:
+To customize resources for project-domain attributes, define a ``tra.yaml`` file with your overrides:
 
 .. code-block:: yaml
 
@@ -51,7 +51,7 @@ To customize resources for project-domain attributes, define a ``tra.yaml`` file
     project: flyteexamples
     domain: development
 
-Update the task resource attributes for a project-domain-workflow combination:
+Update the task resource attributes for a project-domain combination:
 
 .. prompt:: bash
 
@@ -109,12 +109,12 @@ To fetch and verify the individual project-domain attributes:
 
 Refer to the :ref:`docs <flytectl:flytectl_get_task-resource-attribute>` to learn more about the command and its supported flag(s).
 
-You can use these updated values to fill the template fields for the flyteexamples-development namespace.
+Flyte uses these updated values to fill the template fields for the flyteexamples-development namespace.
 
 For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__ apply.
 
 .. note::
-    The template values, for example: ``projectQuotaCpu`` or ``projectQuotaMemory`` are free-form strings.
+    The template values, for example, ``projectQuotaCpu`` or ``projectQuotaMemory`` are free-form strings.
     Ensure that they match the template placeholders in your `template file <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml>`__
     for your changes to take effect and custom values to be substituted.
 
