@@ -1,4 +1,4 @@
-import { Admin, Core, Event, Protobuf } from 'flyteidl';
+import { Admin, Core, Event, Protobuf, Service } from 'flyteidl';
 import { Identifier, LiteralMap, LiteralMapBlob, TaskLog, UrlBlob } from 'models/Common/types';
 import { CompiledWorkflow } from 'models/Workflow/types';
 import {
@@ -55,6 +55,11 @@ export interface Execution extends Admin.IExecution {
   spec: ExecutionSpec;
 }
 
+export interface DownloadLocation extends Service.CreateDownloadLocationResponse {
+  signedUrl: string;
+  expiresAt: Protobuf.ITimestamp;
+}
+
 /** Node executions */
 export interface WorkflowNodeMetadata {
   executionId: WorkflowExecutionIdentifier;
@@ -102,6 +107,7 @@ export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
   startedAt?: Protobuf.ITimestamp;
   taskNodeMetadata?: TaskNodeMetadata;
   workflowNodeMetadata?: WorkflowNodeMetadata;
+  deckUri?: string;
 }
 
 /** Task executions */
@@ -138,5 +144,6 @@ export interface ExecutionData {
   outputs?: UrlBlob; // TODO FC#393: this field  was deprecated use fullOutputs instead - check for usage and remove
   fullInputs: LiteralMap | null;
   fullOutputs: LiteralMap | null;
+  deckUri?: string;
   dynamicWorkflow?: CompiledWorkflow;
 }

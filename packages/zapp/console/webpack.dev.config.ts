@@ -2,7 +2,7 @@ import * as webpack from 'webpack';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
 import chalk from 'chalk';
-import { LOCAL_DEV_HOST, CERTIFICATE_PATH } from './env';
+import { LOCAL_DEV_HOST, CERTIFICATE_PATH, ADMIN_API_USE_SSL } from './env';
 
 const { merge } = require('webpack-merge');
 const fs = require('fs');
@@ -42,7 +42,7 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
     host: LOCAL_DEV_HOST,
     historyApiFallback: true,
     server: {
-      type: 'https',
+      type: ADMIN_API_USE_SSL,
       options: {
         key: fs.readFileSync(`${CERTIFICATE_PATH}/server.key`),
         cert: fs.readFileSync(`${CERTIFICATE_PATH}/server.crt`),

@@ -1,4 +1,4 @@
-import { Admin, Core, Protobuf } from 'flyteidl';
+import { Admin, Core, Protobuf, Service } from 'flyteidl';
 import { getAdminEntity, postAdminEntity } from 'models/AdminEntity/AdminEntity';
 import {
   defaultListExecutionChildrenConfig,
@@ -11,6 +11,7 @@ import { makeIdentifierPath } from 'models/Common/utils';
 import { defaultExecutionPrincipal } from './constants';
 import { ExecutionState } from './enums';
 import {
+  DownloadLocation,
   Execution,
   ExecutionData,
   ExecutionMetadata,
@@ -22,6 +23,7 @@ import {
 } from './types';
 import {
   executionListTransformer,
+  makeCreateDownloadLocationPath,
   makeExecutionPath,
   makeNodeExecutionListPath,
   makeNodeExecutionPath,
@@ -52,6 +54,16 @@ export const getExecution = (id: WorkflowExecutionIdentifier, config?: RequestCo
     {
       path: makeExecutionPath(id),
       messageType: Admin.Execution,
+    },
+    config,
+  );
+
+/** Fetches a signed url of the native url */
+export const getDownloadLocation = (nativeUrl: string, config?: RequestConfig) =>
+  getAdminEntity<Service.CreateDownloadLocationResponse, DownloadLocation>(
+    {
+      path: makeCreateDownloadLocationPath(nativeUrl),
+      messageType: Service.CreateDownloadLocationResponse,
     },
     config,
   );

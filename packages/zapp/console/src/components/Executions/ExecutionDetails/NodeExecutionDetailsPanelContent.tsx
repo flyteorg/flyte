@@ -94,11 +94,6 @@ const useStyles = makeStyles((theme: Theme) => {
       marginTop: theme.spacing(2),
       paddingTop: theme.spacing(2),
     },
-    actionsContainer: {
-      borderTop: `1px solid ${theme.palette.divider}`,
-      marginTop: theme.spacing(2),
-      paddingTop: theme.spacing(2),
-    },
     nodeTypeContent: {
       minWidth: theme.spacing(9),
     },
@@ -403,9 +398,9 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
           {!dag && detailsContent}
           {details && (
             <ExecutionDetailsActions
-              className={styles.actionsContainer}
               details={details}
               nodeExecutionId={nodeExecutionId}
+              phase={nodeExecution?.closure.phase}
             />
           )}
         </div>
