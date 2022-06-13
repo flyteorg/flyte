@@ -92,7 +92,7 @@ Define an attributes file, ``cra.yaml``:
     domain: development
     project: flyteexamples
 
-To ensure that when the admin fills in cluster resource templates, the Kubernetes namespace ``flyteexamples-development`` will have a resource quota of 1000 CPU cores and 5TB of memory:
+To ensure that the overrides reflect in the Kubernetes namespace ``flyteexamples-development`` (that is, the namespace has a resource quota of 1000 CPU cores and 5TB of memory) when the admin fills in cluster resource templates:
 
 .. prompt:: bash
 
