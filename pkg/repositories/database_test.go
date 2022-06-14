@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
+	"net"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,6 +12,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flytestdlib/database"
+	"github.com/jackc/pgconn"
 
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -71,6 +74,57 @@ func TestGetPostgresDsn(t *testing.T) {
 		dsn := getPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=123abc ", dsn)
 	})
+}
+
+type wrappedError struct {
+	err error
+}
+
+func (e *wrappedError) Error() string {
+	return e.err.Error()
+}
+
+func (e *wrappedError) Unwrap() error {
+	return e.err
+}
+
+func TestIsInvalidDBPgError(t *testing.T) {
+	// wrap error with wrappedError when testing to ensure the function checks the whole error chain
+
+	testCases := []struct {
+		Name           string
+		Err            error
+		ExpectedResult bool
+	}{
+		{
+			Name:           "nil error",
+			Err:            nil,
+			ExpectedResult: false,
+		},
+		{
+			Name:           "not a PgError",
+			Err:            &wrappedError{err: &net.OpError{Op: "connect", Err: errors.New("connection refused")}},
+			ExpectedResult: false,
+		},
+		{
+			Name:           "PgError but not invalid DB",
+			Err:            &wrappedError{&pgconn.PgError{Severity: "FATAL", Message: "out of memory", Code: "53200"}},
+			ExpectedResult: false,
+		},
+		{
+			Name:           "PgError and is invalid DB",
+			Err:            &wrappedError{&pgconn.PgError{Severity: "FATAL", Message: "database \"flyte\" does not exist", Code: "3D000"}},
+			ExpectedResult: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		t.Run(tc.Name, func(t *testing.T) {
+			assert.Equal(t, tc.ExpectedResult, isInvalidDBPgError(tc.Err))
+		})
+	}
 }
 
 func TestSetupDbConnectionPool(t *testing.T) {

@@ -2,15 +2,14 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"strings"
 
 	"github.com/flyteorg/flytestdlib/database"
 
-	repoErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"gorm.io/driver/sqlite"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -116,15 +115,7 @@ func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 		return gormDb, nil
 	}
 
-	// Check if its invalid db code error
-	cErr, ok := err.(repoErrors.ConnectError)
-	if !ok {
-		logger.Errorf(ctx, "Failed to cast error of type: %v, err: %v", reflect.TypeOf(err),
-			err)
-		return nil, err
-	}
-	pqError := cErr.Unwrap().(*pgconn.PgError)
-	if pqError.Code != pqInvalidDBCode {
+	if !isInvalidDBPgError(err) {
 		return nil, err
 	}
 
@@ -152,6 +143,17 @@ func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	}
 	// Now try connecting to the db again
 	return gorm.Open(dialector, gormConfig)
+}
+
+func isInvalidDBPgError(err error) bool {
+	pgErr := &pgconn.PgError{}
+	if !errors.As(err, &pgErr) {
+		// err chain does not contain a pgconn.PgError
+		return false
+	}
+
+	// pgconn.PgError found in chain and set to pgErr
+	return pgErr.Code == pqInvalidDBCode
 }
 
 func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *database.DbConfig) error {
