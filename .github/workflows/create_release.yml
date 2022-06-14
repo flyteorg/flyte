@@ -145,4 +145,4 @@ jobs:
           token: ${{ secrets.FLYTE_BOT_PAT }}
           repository: flyteorg/flyteorg.github.io
           event-type: release
-          client-payload: '{"tag": "${{ needs.bump-version.outputs.version }}"}'
+          client-payload: '{"tag": "v1.0.2"}'
