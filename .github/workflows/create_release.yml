@@ -1,13 +1,10 @@
 name: Create a flyte release
 on:
-  # workflow_dispatch:
-  #   inputs:
-  #     version:
-  #       description: "version name. example v0.1.1"
-  #       required: true
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version name. example v0.1.1"
+        required: true
 
 jobs:
   bump-version:
@@ -132,17 +129,3 @@ jobs:
           args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-
-  repository-dispatch:
-    name: Repository Dispatch
-    runs-on: ubuntu-latest
-    needs: [bump-version]
-    if: ${{ !contains(${{ github.event.inputs.version }}, 'b') }}
-    steps:
-      - name: Create an event for the release
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.FLYTE_BOT_PAT }}
-          repository: flyteorg/flyteorg.github.io
-          event-type: release
-          client-payload: '{"tag": ${{ github.event.inputs.version }}}'
