@@ -65,12 +65,6 @@ func PrintSandboxMessage(flyteConsolePort int) {
 	fmt.Printf("export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
 }
 
-// PrintDemoMessage will print demo success message
-func PrintDemoMessage(flyteConsolePort int) {
-	successMsg := fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessage, flyteConsolePort)
-	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, successMsg, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
-}
-
 // SendRequest will create request and return the response
 func SendRequest(method, url string, option io.Reader) (*http.Response, error) {
 	client := &http.Client{}
