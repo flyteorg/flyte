@@ -288,7 +288,7 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 	if err != nil {
 		return err
 	}
-	util.PrintDemoMessage(util.DemoConsolePort)
+	util.PrintSandboxMessage(util.DemoConsolePort)
 	return nil
 }
 
