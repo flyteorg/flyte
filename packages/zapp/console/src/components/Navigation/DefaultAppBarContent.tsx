@@ -9,8 +9,10 @@ import { Routes } from 'routes/routes';
 import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
 import { useAdminVersion } from 'components/hooks/useVersion';
 import { env } from 'common/env';
+import { NavigationDropdown } from './NavigationDropdown';
 import { UserInformation } from './UserInformation';
 import { OnlyMine } from './OnlyMine';
+import { FlyteNavItem } from './utils';
 import t, { patternKey } from './strings';
 
 const { version: platformVersion } = require('../../../package.json');
@@ -24,8 +26,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+interface DefaultAppBarProps {
+  items: FlyteNavItem[];
+}
+
 /** Renders the default content for the app bar, which is the logo and help links */
-export const DefaultAppBarContent: React.FC = () => {
+export const DefaultAppBarContent = (props: DefaultAppBarProps) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
 
@@ -55,6 +61,7 @@ export const DefaultAppBarContent: React.FC = () => {
       <Link className={classnames(commonStyles.linkUnstyled)} to={Routes.SelectProject.path}>
         <FlyteLogo size={32} />
       </Link>
+      {props.items?.length > 0 ? <NavigationDropdown items={props.items} /> : false}
       <div className={styles.spacer} />
       {isFlagEnabled && <OnlyMine />}
       <UserInformation />

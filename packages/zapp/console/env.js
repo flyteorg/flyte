@@ -39,6 +39,8 @@ const STATUS_URL = process.env.STATUS_URL;
 const ENABLE_GA = process.env.ENABLE_GA || false;
 const GA_TRACKING_ID = process.env.GA_TRACKING_ID || 'G-0QW4DJWJ20';
 
+const FLYTE_NAVIGATION = process.env.FLYTE_NAVIGATION || '';
+
 module.exports = {
   ADMIN_API_URL,
   ADMIN_API_USE_SSL,
@@ -58,5 +60,6 @@ module.exports = {
     GA_TRACKING_ID,
     NODE_ENV,
     STATUS_URL,
+    FLYTE_NAVIGATION,
   },
 };
