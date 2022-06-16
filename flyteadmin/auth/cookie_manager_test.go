@@ -20,8 +20,8 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
 	cookieSetting := config.CookieSettings{
-		SameSitePolicy:    config.SameSiteDefaultMode,
-		DomainMatchPolicy: config.DomainMatchSubdomains,
+		SameSitePolicy: config.SameSiteDefaultMode,
+		Domain:         "default",
 	}
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
 	assert.NoError(t, err)
@@ -36,9 +36,9 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+	_, err = http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
-	err = manager.SetTokenCookies(ctx, req, w, token)
+	err = manager.SetTokenCookies(ctx, w, token)
 	assert.NoError(t, err)
 	fmt.Println(w.Header().Get("Set-Cookie"))
 	c := w.Result().Cookies()
@@ -54,8 +54,8 @@ func TestCookieManager_RetrieveTokenValues(t *testing.T) {
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
 
 	cookieSetting := config.CookieSettings{
-		SameSitePolicy:    config.SameSiteDefaultMode,
-		DomainMatchPolicy: config.DomainMatchSubdomains,
+		SameSitePolicy: config.SameSiteDefaultMode,
+		Domain:         "default",
 	}
 
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
@@ -71,13 +71,13 @@ func TestCookieManager_RetrieveTokenValues(t *testing.T) {
 	})
 
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+	_, err = http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
-	err = manager.SetTokenCookies(ctx, req, w, token)
+	err = manager.SetTokenCookies(ctx, w, token)
 	assert.NoError(t, err)
 
 	cookies := w.Result().Cookies()
-	req, err = http.NewRequest("GET", "/api/v1/projects", nil)
+	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
 	for _, c := range cookies {
 		req.AddCookie(c)
@@ -107,8 +107,8 @@ func TestCookieManager_DeleteCookies(t *testing.T) {
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
 	cookieSetting := config.CookieSettings{
-		SameSitePolicy:    config.SameSiteDefaultMode,
-		DomainMatchPolicy: config.DomainMatchSubdomains,
+		SameSitePolicy: config.SameSiteDefaultMode,
+		Domain:         "default",
 	}
 
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
@@ -129,8 +129,8 @@ func TestGetHTTPSameSitePolicy(t *testing.T) {
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
 	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
 	cookieSetting := config.CookieSettings{
-		SameSitePolicy:    config.SameSiteDefaultMode,
-		DomainMatchPolicy: config.DomainMatchSubdomains,
+		SameSitePolicy: config.SameSiteDefaultMode,
+		Domain:         "default",
 	}
 
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
@@ -145,26 +145,4 @@ func TestGetHTTPSameSitePolicy(t *testing.T) {
 
 	manager.sameSitePolicy = config.SameSiteNoneMode
 	assert.Equal(t, http.SameSiteNoneMode, manager.getHTTPSameSitePolicy())
-}
-
-func TestGetCookieDomain(t *testing.T) {
-	ctx := context.Background()
-
-	// These were generated for unit testing only.
-	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
-	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-	cookieSetting := config.CookieSettings{
-		SameSitePolicy:    config.SameSiteDefaultMode,
-		DomainMatchPolicy: config.DomainMatchSubdomains,
-	}
-
-	req, err := http.NewRequest("GET", "http://localhost/api/v1/projects", nil)
-	assert.NoError(t, err)
-
-	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
-	assert.NoError(t, err)
-	assert.Equal(t, ".localhost", manager.getCookieDomain(req))
-
-	manager.domainMatchPolicy = config.DomainMatchExact
-	assert.Equal(t, "", manager.getCookieDomain(req))
 }

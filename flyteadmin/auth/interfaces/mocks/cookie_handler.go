@@ -164,8 +164,8 @@ func (_m CookieHandler_SetAuthCodeCookie) Return(_a0 error) *CookieHandler_SetAu
 	return &CookieHandler_SetAuthCodeCookie{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *CookieHandler) OnSetAuthCodeCookie(ctx context.Context, request *http.Request, writer http.ResponseWriter, authRequestURL string) *CookieHandler_SetAuthCodeCookie {
-	c_call := _m.On("SetAuthCodeCookie", ctx, request, writer, authRequestURL)
+func (_m *CookieHandler) OnSetAuthCodeCookie(ctx context.Context, writer http.ResponseWriter, authRequestURL string) *CookieHandler_SetAuthCodeCookie {
+	c_call := _m.On("SetAuthCodeCookie", ctx, writer, authRequestURL)
 	return &CookieHandler_SetAuthCodeCookie{Call: c_call}
 }
 
@@ -174,13 +174,13 @@ func (_m *CookieHandler) OnSetAuthCodeCookieMatch(matchers ...interface{}) *Cook
 	return &CookieHandler_SetAuthCodeCookie{Call: c_call}
 }
 
-// SetAuthCodeCookie provides a mock function with given fields: ctx, request, writer, authRequestURL
-func (_m *CookieHandler) SetAuthCodeCookie(ctx context.Context, request *http.Request, writer http.ResponseWriter, authRequestURL string) error {
-	ret := _m.Called(ctx, request, writer, authRequestURL)
+// SetAuthCodeCookie provides a mock function with given fields: ctx, writer, authRequestURL
+func (_m *CookieHandler) SetAuthCodeCookie(ctx context.Context, writer http.ResponseWriter, authRequestURL string) error {
+	ret := _m.Called(ctx, writer, authRequestURL)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *http.Request, http.ResponseWriter, string) error); ok {
-		r0 = rf(ctx, request, writer, authRequestURL)
+	if rf, ok := ret.Get(0).(func(context.Context, http.ResponseWriter, string) error); ok {
+		r0 = rf(ctx, writer, authRequestURL)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -196,8 +196,8 @@ func (_m CookieHandler_SetTokenCookies) Return(_a0 error) *CookieHandler_SetToke
 	return &CookieHandler_SetTokenCookies{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *CookieHandler) OnSetTokenCookies(ctx context.Context, request *http.Request, writer http.ResponseWriter, token *oauth2.Token) *CookieHandler_SetTokenCookies {
-	c_call := _m.On("SetTokenCookies", ctx, request, writer, token)
+func (_m *CookieHandler) OnSetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) *CookieHandler_SetTokenCookies {
+	c_call := _m.On("SetTokenCookies", ctx, writer, token)
 	return &CookieHandler_SetTokenCookies{Call: c_call}
 }
 
@@ -206,13 +206,13 @@ func (_m *CookieHandler) OnSetTokenCookiesMatch(matchers ...interface{}) *Cookie
 	return &CookieHandler_SetTokenCookies{Call: c_call}
 }
 
-// SetTokenCookies provides a mock function with given fields: ctx, request, writer, token
-func (_m *CookieHandler) SetTokenCookies(ctx context.Context, request *http.Request, writer http.ResponseWriter, token *oauth2.Token) error {
-	ret := _m.Called(ctx, request, writer, token)
+// SetTokenCookies provides a mock function with given fields: ctx, writer, token
+func (_m *CookieHandler) SetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) error {
+	ret := _m.Called(ctx, writer, token)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *http.Request, http.ResponseWriter, *oauth2.Token) error); ok {
-		r0 = rf(ctx, request, writer, token)
+	if rf, ok := ret.Get(0).(func(context.Context, http.ResponseWriter, *oauth2.Token) error); ok {
+		r0 = rf(ctx, writer, token)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -228,8 +228,8 @@ func (_m CookieHandler_SetUserInfoCookie) Return(_a0 error) *CookieHandler_SetUs
 	return &CookieHandler_SetUserInfoCookie{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *CookieHandler) OnSetUserInfoCookie(ctx context.Context, request *http.Request, writer http.ResponseWriter, userInfo *service.UserInfoResponse) *CookieHandler_SetUserInfoCookie {
-	c_call := _m.On("SetUserInfoCookie", ctx, request, writer, userInfo)
+func (_m *CookieHandler) OnSetUserInfoCookie(ctx context.Context, writer http.ResponseWriter, userInfo *service.UserInfoResponse) *CookieHandler_SetUserInfoCookie {
+	c_call := _m.On("SetUserInfoCookie", ctx, writer, userInfo)
 	return &CookieHandler_SetUserInfoCookie{Call: c_call}
 }
 
@@ -238,13 +238,13 @@ func (_m *CookieHandler) OnSetUserInfoCookieMatch(matchers ...interface{}) *Cook
 	return &CookieHandler_SetUserInfoCookie{Call: c_call}
 }
 
-// SetUserInfoCookie provides a mock function with given fields: ctx, request, writer, userInfo
-func (_m *CookieHandler) SetUserInfoCookie(ctx context.Context, request *http.Request, writer http.ResponseWriter, userInfo *service.UserInfoResponse) error {
-	ret := _m.Called(ctx, request, writer, userInfo)
+// SetUserInfoCookie provides a mock function with given fields: ctx, writer, userInfo
+func (_m *CookieHandler) SetUserInfoCookie(ctx context.Context, writer http.ResponseWriter, userInfo *service.UserInfoResponse) error {
+	ret := _m.Called(ctx, writer, userInfo)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *http.Request, http.ResponseWriter, *service.UserInfoResponse) error); ok {
-		r0 = rf(ctx, request, writer, userInfo)
+	if rf, ok := ret.Get(0).(func(context.Context, http.ResponseWriter, *service.UserInfoResponse) error); ok {
+		r0 = rf(ctx, writer, userInfo)
 	} else {
 		r0 = ret.Error(0)
 	}
