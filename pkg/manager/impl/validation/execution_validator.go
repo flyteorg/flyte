@@ -62,6 +62,11 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 	if err := validateLiteralMap(request.Inputs, shared.Inputs); err != nil {
 		return err
 	}
+	if request.Spec.GetNotifications() != nil {
+		if err := validateNotifications(request.Spec.GetNotifications().Notifications); err != nil {
+			return err
+		}
+	}
 	// TODO: Remove redundant validation with the rest of the method.
 	// This final call to validating the request ensures the notification types are expected.
 	if err := request.Validate(); err != nil {
