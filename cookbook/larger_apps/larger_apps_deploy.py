@@ -46,10 +46,9 @@ pre-provisioned remote Flyte cluster.
 
       .. prompt:: bash $
 
-         flytectl config init --host={FLYTEADMIN_URL} --storage
+         flytectl config init --host={FLYTEADMIN_URL}
 
-      Where ``{FLYTEADMIN_URL}`` is your custom url.
-
+      where ``FLYTEADMIN_URL`` is your custom url.
 
 Build & Deploy Your Application to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
