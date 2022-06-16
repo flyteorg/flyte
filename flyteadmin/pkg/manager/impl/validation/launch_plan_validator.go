@@ -50,6 +50,11 @@ func ValidateLaunchPlan(ctx context.Context,
 	}
 	// Augment default inputs with the unbound workflow inputs.
 	request.Spec.DefaultInputs = expectedInputs
+	if request.Spec.EntityMetadata != nil {
+		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
+			return err
+		}
+	}
 	// TODO: Remove redundant validation that occurs with launch plan and the validate method for the message.
 	// Ensure the notification types are validated.
 	if err := request.Validate(); err != nil {
