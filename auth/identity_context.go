@@ -13,6 +13,8 @@ var (
 	emptyIdentityContext = IdentityContext{}
 )
 
+type claimsType = map[string]interface{}
+
 // IdentityContext is an abstract entity to enclose the authenticated identity of the user/app. Both gRPC and HTTP
 // servers have interceptors to set the IdentityContext on the context.Context.
 // To retrieve the current IdentityContext call auth.IdentityContextFromContext(ctx).
@@ -25,6 +27,8 @@ type IdentityContext struct {
 	userInfo        *service.UserInfoResponse
 	// Set to pointer just to keep this struct go-simple to support equal operator
 	scopes *sets.String
+	// Raw JWT token from the IDP. Set to a pointer to support the equal operator for this struct.
+	claims *claimsType
 }
 
 func (c IdentityContext) Audience() string {
@@ -59,6 +63,13 @@ func (c IdentityContext) Scopes() sets.String {
 	return sets.NewString()
 }
 
+func (c IdentityContext) Claims() map[string]interface{} {
+	if c.claims != nil {
+		return *c.claims
+	}
+	return make(map[string]interface{})
+}
+
 func (c IdentityContext) WithContext(ctx context.Context) context.Context {
 	return context.WithValue(ctx, ContextKeyIdentityContext, c)
 }
@@ -68,7 +79,7 @@ func (c IdentityContext) AuthenticatedAt() time.Time {
 }
 
 // NewIdentityContext creates a new IdentityContext.
-func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Time, scopes sets.String, userInfo *service.UserInfoResponse) IdentityContext {
+func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Time, scopes sets.String, userInfo *service.UserInfoResponse, claims map[string]interface{}) IdentityContext {
 	// For some reason, google IdP returns a subject in the ID Token but an empty subject in the /user_info endpoint
 	if userInfo == nil {
 		userInfo = &service.UserInfoResponse{}
@@ -85,6 +96,7 @@ func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Tim
 		userInfo:        userInfo,
 		authenticatedAt: authenticatedAt,
 		scopes:          &scopes,
+		claims:          &claims,
 	}
 }
 

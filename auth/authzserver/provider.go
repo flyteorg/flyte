@@ -175,7 +175,7 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		scopes.Insert(auth.ScopeAll)
 	}
 
-	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo), nil
+	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw), nil
 }
 
 // NewProvider creates a new OAuth2 Provider that is able to do OAuth 2-legged and 3-legged flows. It'll lookup
