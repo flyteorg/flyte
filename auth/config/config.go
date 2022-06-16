@@ -74,8 +74,8 @@ var (
 				},
 			},
 			CookieSetting: CookieSettings{
-				DomainMatchPolicy: DomainMatchExact,
-				SameSitePolicy:    SameSiteDefaultMode,
+				Domain:         "",
+				SameSitePolicy: SameSiteDefaultMode,
 			},
 		},
 		AppAuth: OAuth2Options{
@@ -221,14 +221,6 @@ type UserAuthConfig struct {
 	CookieSetting            CookieSettings `json:"cookieSetting" pflag:", settings used by cookies created for user auth"`
 }
 
-//go:generate enumer --type=DomainMatch --trimprefix=DomainMatch -json
-type DomainMatch int
-
-const (
-	DomainMatchExact DomainMatch = iota
-	DomainMatchSubdomains
-)
-
 //go:generate enumer --type=SameSite --trimprefix=SameSite -json
 type SameSite int
 
@@ -240,8 +232,8 @@ const (
 )
 
 type CookieSettings struct {
-	SameSitePolicy    SameSite    `json:"sameSitePolicy" pflag:",OPTIONAL: Allows you to declare if your cookie should be restricted to a first-party or same-site context.Wrapper around http.SameSite."`
-	DomainMatchPolicy DomainMatch `json:"domainMatchPolicy" pflag:",OPTIONAL: Allow subdomain access to the created cookies by setting the domain attribute or do an exact match on domain."`
+	SameSitePolicy SameSite `json:"sameSitePolicy" pflag:",OPTIONAL: Allows you to declare if your cookie should be restricted to a first-party or same-site context.Wrapper around http.SameSite."`
+	Domain         string   `json:"domain" pflag:",OPTIONAL: Allows you to set the domain attribute on the auth cookies."`
 }
 
 type OpenIDOptions struct {

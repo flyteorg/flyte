@@ -34,7 +34,7 @@ func TestAuthEndpoint(t *testing.T) {
 		authCtx.OnOAuth2Provider().Return(oauth2Provider)
 
 		cookieManager := &mocks.CookieHandler{}
-		cookieManager.OnSetAuthCodeCookie(req.Context(), req, w, originalURL).Return(nil)
+		cookieManager.OnSetAuthCodeCookie(req.Context(), w, originalURL).Return(nil)
 		authCtx.OnCookieManager().Return(cookieManager)
 
 		authEndpoint(authCtx, w, req)
@@ -57,7 +57,7 @@ func TestAuthEndpoint(t *testing.T) {
 		authCtx.OnOAuth2Provider().Return(oauth2Provider)
 
 		cookieManager := &mocks.CookieHandler{}
-		cookieManager.OnSetAuthCodeCookie(req.Context(), req, w, originalURL).Return(fmt.Errorf("failure injection"))
+		cookieManager.OnSetAuthCodeCookie(req.Context(), w, originalURL).Return(fmt.Errorf("failure injection"))
 		authCtx.OnCookieManager().Return(cookieManager)
 
 		authEndpoint(authCtx, w, req)
