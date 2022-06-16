@@ -1144,6 +1144,28 @@ func TestValidateBindings(t *testing.T) {
 						},
 					},
 				},
+				"y": {
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_UnionType{
+							UnionType: &core.UnionType{
+								Variants: []*core.LiteralType{
+									{
+										Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+										Structure: &core.TypeStructure{
+											Tag: "str",
+										},
+									},
+									{
+										Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
+										Structure: &core.TypeStructure{
+											Tag: "none",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		}
 

@@ -224,12 +224,25 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 
 	// If we missed binding some params, add errors
 	if params != nil {
-		for paramName := range params.Variables {
-			if !providedBindings.Has(paramName) {
+		for paramName, Variable := range params.Variables {
+			if !providedBindings.Has(paramName) && !IsOptionalType(*Variable) {
 				errs.Collect(errors.NewParameterNotBoundErr(node.GetId(), paramName))
 			}
 		}
 	}
 
 	return resolved, !errs.HasErrors()
+}
+
+// IsOptionalType Return true if there is a None type in Union Type
+func IsOptionalType(variable flyte.Variable) bool {
+	if variable.Type.GetUnionType() == nil {
+		return false
+	}
+	for _, variant := range variable.Type.GetUnionType().Variants {
+		if flyte.SimpleType_NONE == variant.GetSimple() {
+			return true
+		}
+	}
+	return false
 }
