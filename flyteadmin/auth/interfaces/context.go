@@ -64,6 +64,8 @@ type IdentityContext interface {
 	UserInfo() *service.UserInfoResponse
 	AuthenticatedAt() time.Time
 	Scopes() sets.String
+	// Returns the full set of claims in the JWT token provided by the IDP.
+	Claims() map[string]interface{}
 
 	IsEmpty() bool
 	WithContext(ctx context.Context) context.Context

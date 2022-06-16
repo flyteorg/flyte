@@ -115,6 +115,40 @@ func (_m *IdentityContext) AuthenticatedAt() time.Time {
 	return r0
 }
 
+type IdentityContext_Claims struct {
+	*mock.Call
+}
+
+func (_m IdentityContext_Claims) Return(_a0 map[string]interface{}) *IdentityContext_Claims {
+	return &IdentityContext_Claims{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *IdentityContext) OnClaims() *IdentityContext_Claims {
+	c_call := _m.On("Claims")
+	return &IdentityContext_Claims{Call: c_call}
+}
+
+func (_m *IdentityContext) OnClaimsMatch(matchers ...interface{}) *IdentityContext_Claims {
+	c_call := _m.On("Claims", matchers...)
+	return &IdentityContext_Claims{Call: c_call}
+}
+
+// Claims provides a mock function with given fields:
+func (_m *IdentityContext) Claims() map[string]interface{} {
+	ret := _m.Called()
+
+	var r0 map[string]interface{}
+	if rf, ok := ret.Get(0).(func() map[string]interface{}); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]interface{})
+		}
+	}
+
+	return r0
+}
+
 type IdentityContext_IsEmpty struct {
 	*mock.Call
 }
