@@ -25,8 +25,8 @@ Essentially FLYTE_NAVIGATION is a JSON object
     background:"black",  // default NavBar background color
     items:[
         {title:"Remote", url:"https://remote.site/"},
-        {title:"Dashboard", url:"/projects/flytesnacks/executions?domain=development&duration=all"},
-        {title:"Execution", url:"/projects/flytesnacks/domains/development/executions/awf2lx4g58htr8svwb7x?duration=all"}
+        {title:"Dashboard", url:"+/projects/flytesnacks/executions?domain=development&duration=all"},
+        {title:"Information", url:"/information"}
     ]
 }
 ```
@@ -35,12 +35,12 @@ If at least one item in `items` array is present the dropdown will appear in Nav
 It will contain at least two items:
 
 -   default "Console" item which navigates to ${BASE_URL}
--   all items you have provided
+-   all items you have provided:
+    -   If item's url starts with `+` sign, the navigstion would be treated as an internal one. + sign would be stripped and BASE_URL would be added to navigaiton
 
 Feel free to play around with the views in Storybook:
 
 <img width="874" alt="Screen Shot 2022-06-15 at 2 01 29 PM" src="https://user-images.githubusercontent.com/55718143/173962811-a3603d6c-3fe4-4cab-b57a-4d4806c88cfc.png">
-
 
 #### Note
 

@@ -47,11 +47,11 @@ export const NavigationDropdown = (props: NavigationDropdownProps) => {
   const handleItemSelection = (item: FlyteNavItem) => {
     setSelectedPage(item.title);
 
-    if (item.url.startsWith('/')) {
-      // local navigation without BASE_URL addition
-      history.push(item.url);
+    if (item.url.startsWith('+')) {
+      // local navigation with BASE_URL addition
+      history.push(makeRoute(item.url.slice(1)));
     } else {
-      // external navigation
+      // treated as external navigation
       window.location.assign(item.url);
     }
   };
