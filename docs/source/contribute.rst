@@ -67,6 +67,7 @@ To update the documentation, follow these steps:
         * - ``version``
           - ``flytectl version ...``
           - Fetches Flytectl version
+
      Find all the Flytectl commands :ref:`here <nouns>`.
    * Run appropriate tests to view the changes by running ``go test ./... -race -coverprofile=coverage.txt -covermode=atomic  -v`` in the root directory.
 
