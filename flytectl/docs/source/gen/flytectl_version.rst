@@ -66,7 +66,7 @@ Options inherited from parent commands
       --files.sourceUploadPath string              Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                       Version of the entity to be registered with flyte which are un-versioned after serialization.
       --logger.formatter.type string               Sets logging format type. (default "json")
-      --logger.level int                           Sets the minimum logging level. (default 4)
+      --logger.level int                           Sets the minimum logging level. (default 3)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                         Includes source code location in logs.
   -o, --output string                              Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
@@ -83,8 +83,8 @@ Options inherited from parent commands
       --storage.defaultHttpClient.timeout string   Sets time out on the http client. (default "0s")
       --storage.enable-multicontainer              If this is true,  then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered
       --storage.limits.maxDownloadMBs int          Maximum allowed download size (in MBs) per call. (default 2)
-      --storage.stow.config stringToString         Configuration for stow backend. Refer to github/graymeta/stow (default [])
-      --storage.stow.kind string                   Kind of Stow backend to use. Refer to github/graymeta/stow
+      --storage.stow.config stringToString         Configuration for stow backend. Refer to github/flyteorg/stow (default [])
+      --storage.stow.kind string                   Kind of Stow backend to use. Refer to github/flyteorg/stow
       --storage.type string                        Sets the type of storage to configure [s3/minio/local/mem/stow]. (default "s3")
 
 SEE ALSO

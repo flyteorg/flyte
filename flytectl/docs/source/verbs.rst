@@ -14,6 +14,7 @@ Flytectl verbs specify the actions to be performed on the resources. Example: cr
     gen/flytectl_delete
     gen/flytectl_register
     gen/flytectl_config
+    gen/flytectl_compile
     gen/flytectl_sandbox
     gen/flytectl_demo
     gen/flytectl_version
