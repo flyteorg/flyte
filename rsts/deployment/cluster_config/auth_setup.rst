@@ -95,7 +95,6 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
 
     1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
     2. Create an app integration:
-
       a) Choose OIDC - OpenID Connect as the sign-on method.
       b) Choose Web Application as the type.
 
