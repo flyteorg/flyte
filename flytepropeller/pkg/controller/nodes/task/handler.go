@@ -82,10 +82,10 @@ func getPluginMetricKey(pluginID, taskType string) string {
 	return taskType + "_" + pluginID
 }
 
-func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, entry catalog.Entry) {
+func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, deckPath *storage.DataReference, entry catalog.Entry) {
 	p.ttype = handler.TransitionTypeEphemeral
 	p.pInfo = pluginCore.PhaseInfoSuccess(nil)
-	p.ObserveSuccess(outputPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
+	p.ObserveSuccess(outputPath, deckPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
 }
 
 func (p *pluginRequestedTransition) PopulateCacheInfo(entry catalog.Entry) {
@@ -141,8 +141,12 @@ func (p *pluginRequestedTransition) FinalTaskEvent(input ToTaskExecutionEventInp
 	return ToTaskExecutionEvent(input)
 }
 
-func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
-	p.execInfo.OutputInfo = &handler.OutputInfo{OutputURI: outputPath}
+func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, deckPath *storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
+	p.execInfo.OutputInfo = &handler.OutputInfo{
+		OutputURI: outputPath,
+		DeckURI:   deckPath,
+	}
+
 	p.execInfo.TaskNodeInfo = &handler.TaskNodeInfo{
 		TaskNodeMetadata: taskMetadata,
 	}
@@ -479,7 +483,21 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		if ee != nil {
 			pluginTrns.ObservedExecutionError(ee)
 		} else {
-			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), &event.TaskNodeMetadata{CacheStatus: cacheStatus.GetCacheStatus(), CatalogKey: cacheStatus.GetMetadata()})
+			var deckURI *storage.DataReference
+			exists, err := tCtx.ow.GetReader().DeckExists(ctx)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+				return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
+			} else if exists {
+				deckURIValue := tCtx.ow.GetDeckPath()
+				deckURI = &deckURIValue
+			}
+
+			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
+				&event.TaskNodeMetadata{
+					CacheStatus: cacheStatus.GetCacheStatus(),
+					CatalogKey:  cacheStatus.GetMetadata(),
+				})
 		}
 	}
 
@@ -522,26 +540,31 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 			logger.Errorf(ctx, "failed to check catalog cache with error")
 			return handler.UnknownTransition, err
 		}
+
 		if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
 			r := tCtx.ow.GetReader()
 			if r == nil {
 				return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "failed to reader outputs from a CacheHIT. Unexpected!")
 			}
+
 			// TODO @kumare this can be optimized, if we have paths then the reader could be pipelined to a sink
 			o, ee, err := r.Read(ctx)
 			if err != nil {
 				logger.Errorf(ctx, "failed to read from catalog, err: %s", err.Error())
 				return handler.UnknownTransition, err
 			}
+
 			if ee != nil {
 				logger.Errorf(ctx, "got execution error from catalog output reader? This should not happen, err: %s", ee.String())
 				return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "execution error from a cache output, bad state: %s", ee.String())
 			}
+
 			if err := nCtx.DataStore().WriteProtobuf(ctx, tCtx.ow.GetOutputPath(), storage.Options{}, o); err != nil {
 				logger.Errorf(ctx, "failed to write cached value to datastore, err: %s", err.Error())
 				return handler.UnknownTransition, err
 			}
-			pluginTrns.CacheHit(tCtx.ow.GetOutputPath(), entry)
+
+			pluginTrns.CacheHit(tCtx.ow.GetOutputPath(), nil, entry)
 		} else {
 			logger.Infof(ctx, "No CacheHIT. Status [%s]", entry.GetStatus().GetCacheStatus().String())
 			pluginTrns.PopulateCacheInfo(entry)

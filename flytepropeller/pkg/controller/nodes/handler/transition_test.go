@@ -7,6 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func AsPointer[T any](val T) *T {
+	return &val
+}
+
 func TestDoTransition(t *testing.T) {
 	t.Run("ephemeral", func(t *testing.T) {
 		tr := DoTransition(TransitionTypeEphemeral, PhaseInfoQueued("queued"))
@@ -16,11 +20,12 @@ func TestDoTransition(t *testing.T) {
 
 	t.Run("barrier", func(t *testing.T) {
 		tr := DoTransition(TransitionTypeBarrier, PhaseInfoSuccess(&ExecutionInfo{
-			OutputInfo: &OutputInfo{OutputURI: "uri"},
+			OutputInfo: &OutputInfo{OutputURI: "uri", DeckURI: AsPointer(storage.DataReference("deck"))},
 		}))
 		assert.Equal(t, TransitionTypeBarrier, tr.Type())
 		assert.Equal(t, EPhaseSuccess, tr.Info().p)
 		assert.Equal(t, storage.DataReference("uri"), tr.Info().GetInfo().OutputInfo.OutputURI)
+		assert.Equal(t, AsPointer(storage.DataReference("deck")), tr.Info().GetInfo().OutputInfo.DeckURI)
 	})
 }
 

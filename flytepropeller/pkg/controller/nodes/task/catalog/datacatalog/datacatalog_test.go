@@ -432,7 +432,7 @@ func TestCatalog_Put(t *testing.T) {
 		).Return(&datacatalog.AddTagResponse{}, nil)
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
 		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
@@ -523,7 +523,7 @@ func TestCatalog_Put(t *testing.T) {
 		).Return(&datacatalog.AddTagResponse{}, nil)
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
 		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",

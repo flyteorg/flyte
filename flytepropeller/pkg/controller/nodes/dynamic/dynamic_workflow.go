@@ -320,6 +320,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 					), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "Failed to copy subworkflow outputs"},
 					nil
 			}
+
 			o = &handler.OutputInfo{OutputURI: destinationPath}
 		}
 

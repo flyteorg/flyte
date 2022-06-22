@@ -160,6 +160,10 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		}
 	}
 	if eInfo != nil && eInfo.OutputInfo != nil {
+		if eInfo.OutputInfo.DeckURI != nil {
+			nev.DeckUri = eInfo.OutputInfo.DeckURI.String()
+		}
+
 		nev.OutputResult = ToNodeExecOutput(eInfo.OutputInfo)
 	} else if info.GetErr() != nil {
 		nev.OutputResult = &event.NodeExecutionEvent_Error{

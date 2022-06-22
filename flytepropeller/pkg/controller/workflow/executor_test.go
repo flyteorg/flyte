@@ -466,24 +466,15 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 			assert.True(t, ok)
 			switch e.Phase {
 			case core.WorkflowExecution_RUNNING:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
-				assert.NoError(t, err)
-
-				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
+				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
 				assert.Equal(t, testClusterID, e.ProducerId)
 				recordedRunning = true
 			case core.WorkflowExecution_FAILING:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
-				assert.NoError(t, err)
-
-				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
+				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
 				assert.Equal(t, testClusterID, e.ProducerId)
 				recordedFailing = true
 			case core.WorkflowExecution_FAILED:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
-				assert.NoError(t, err)
-
-				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
+				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
 				assert.Equal(t, testClusterID, e.ProducerId)
 				recordedFailed = true
 			default:
