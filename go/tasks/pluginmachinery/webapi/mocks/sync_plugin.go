@@ -25,13 +25,13 @@ func (_m SyncPlugin_Do) Return(phase core.PhaseInfo, err error) *SyncPlugin_Do {
 }
 
 func (_m *SyncPlugin) OnDo(ctx context.Context, tCtx webapi.TaskExecutionContext) *SyncPlugin_Do {
-	c := _m.On("Do", ctx, tCtx)
-	return &SyncPlugin_Do{Call: c}
+	c_call := _m.On("Do", ctx, tCtx)
+	return &SyncPlugin_Do{Call: c_call}
 }
 
 func (_m *SyncPlugin) OnDoMatch(matchers ...interface{}) *SyncPlugin_Do {
-	c := _m.On("Do", matchers...)
-	return &SyncPlugin_Do{Call: c}
+	c_call := _m.On("Do", matchers...)
+	return &SyncPlugin_Do{Call: c_call}
 }
 
 // Do provides a mock function with given fields: ctx, tCtx
@@ -64,13 +64,13 @@ func (_m SyncPlugin_GetConfig) Return(_a0 webapi.PluginConfig) *SyncPlugin_GetCo
 }
 
 func (_m *SyncPlugin) OnGetConfig() *SyncPlugin_GetConfig {
-	c := _m.On("GetConfig")
-	return &SyncPlugin_GetConfig{Call: c}
+	c_call := _m.On("GetConfig")
+	return &SyncPlugin_GetConfig{Call: c_call}
 }
 
 func (_m *SyncPlugin) OnGetConfigMatch(matchers ...interface{}) *SyncPlugin_GetConfig {
-	c := _m.On("GetConfig", matchers...)
-	return &SyncPlugin_GetConfig{Call: c}
+	c_call := _m.On("GetConfig", matchers...)
+	return &SyncPlugin_GetConfig{Call: c_call}
 }
 
 // GetConfig provides a mock function with given fields:

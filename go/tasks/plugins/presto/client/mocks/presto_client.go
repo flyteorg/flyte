@@ -24,13 +24,13 @@ func (_m PrestoClient_ExecuteCommand) Return(_a0 client.PrestoExecuteResponse, _
 }
 
 func (_m *PrestoClient) OnExecuteCommand(ctx context.Context, commandStr string, executeArgs client.PrestoExecuteArgs) *PrestoClient_ExecuteCommand {
-	c := _m.On("ExecuteCommand", ctx, commandStr, executeArgs)
-	return &PrestoClient_ExecuteCommand{Call: c}
+	c_call := _m.On("ExecuteCommand", ctx, commandStr, executeArgs)
+	return &PrestoClient_ExecuteCommand{Call: c_call}
 }
 
 func (_m *PrestoClient) OnExecuteCommandMatch(matchers ...interface{}) *PrestoClient_ExecuteCommand {
-	c := _m.On("ExecuteCommand", matchers...)
-	return &PrestoClient_ExecuteCommand{Call: c}
+	c_call := _m.On("ExecuteCommand", matchers...)
+	return &PrestoClient_ExecuteCommand{Call: c_call}
 }
 
 // ExecuteCommand provides a mock function with given fields: ctx, commandStr, executeArgs
@@ -63,13 +63,13 @@ func (_m PrestoClient_GetCommandStatus) Return(_a0 client.PrestoStatus, _a1 erro
 }
 
 func (_m *PrestoClient) OnGetCommandStatus(ctx context.Context, commandID string) *PrestoClient_GetCommandStatus {
-	c := _m.On("GetCommandStatus", ctx, commandID)
-	return &PrestoClient_GetCommandStatus{Call: c}
+	c_call := _m.On("GetCommandStatus", ctx, commandID)
+	return &PrestoClient_GetCommandStatus{Call: c_call}
 }
 
 func (_m *PrestoClient) OnGetCommandStatusMatch(matchers ...interface{}) *PrestoClient_GetCommandStatus {
-	c := _m.On("GetCommandStatus", matchers...)
-	return &PrestoClient_GetCommandStatus{Call: c}
+	c_call := _m.On("GetCommandStatus", matchers...)
+	return &PrestoClient_GetCommandStatus{Call: c_call}
 }
 
 // GetCommandStatus provides a mock function with given fields: ctx, commandID
@@ -102,13 +102,13 @@ func (_m PrestoClient_KillCommand) Return(_a0 error) *PrestoClient_KillCommand {
 }
 
 func (_m *PrestoClient) OnKillCommand(ctx context.Context, commandID string) *PrestoClient_KillCommand {
-	c := _m.On("KillCommand", ctx, commandID)
-	return &PrestoClient_KillCommand{Call: c}
+	c_call := _m.On("KillCommand", ctx, commandID)
+	return &PrestoClient_KillCommand{Call: c_call}
 }
 
 func (_m *PrestoClient) OnKillCommandMatch(matchers ...interface{}) *PrestoClient_KillCommand {
-	c := _m.On("KillCommand", matchers...)
-	return &PrestoClient_KillCommand{Call: c}
+	c_call := _m.On("KillCommand", matchers...)
+	return &PrestoClient_KillCommand{Call: c_call}
 }
 
 // KillCommand provides a mock function with given fields: ctx, commandID

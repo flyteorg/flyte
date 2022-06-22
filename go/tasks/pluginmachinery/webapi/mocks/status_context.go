@@ -25,13 +25,13 @@ func (_m StatusContext_DataStore) Return(_a0 *storage.DataStore) *StatusContext_
 }
 
 func (_m *StatusContext) OnDataStore() *StatusContext_DataStore {
-	c := _m.On("DataStore")
-	return &StatusContext_DataStore{Call: c}
+	c_call := _m.On("DataStore")
+	return &StatusContext_DataStore{Call: c_call}
 }
 
 func (_m *StatusContext) OnDataStoreMatch(matchers ...interface{}) *StatusContext_DataStore {
-	c := _m.On("DataStore", matchers...)
-	return &StatusContext_DataStore{Call: c}
+	c_call := _m.On("DataStore", matchers...)
+	return &StatusContext_DataStore{Call: c_call}
 }
 
 // DataStore provides a mock function with given fields:
@@ -59,13 +59,13 @@ func (_m StatusContext_InputReader) Return(_a0 io.InputReader) *StatusContext_In
 }
 
 func (_m *StatusContext) OnInputReader() *StatusContext_InputReader {
-	c := _m.On("InputReader")
-	return &StatusContext_InputReader{Call: c}
+	c_call := _m.On("InputReader")
+	return &StatusContext_InputReader{Call: c_call}
 }
 
 func (_m *StatusContext) OnInputReaderMatch(matchers ...interface{}) *StatusContext_InputReader {
-	c := _m.On("InputReader", matchers...)
-	return &StatusContext_InputReader{Call: c}
+	c_call := _m.On("InputReader", matchers...)
+	return &StatusContext_InputReader{Call: c_call}
 }
 
 // InputReader provides a mock function with given fields:
@@ -93,13 +93,13 @@ func (_m StatusContext_MaxDatasetSizeBytes) Return(_a0 int64) *StatusContext_Max
 }
 
 func (_m *StatusContext) OnMaxDatasetSizeBytes() *StatusContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes")
-	return &StatusContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes")
+	return &StatusContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 func (_m *StatusContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *StatusContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &StatusContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
+	return &StatusContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 // MaxDatasetSizeBytes provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m StatusContext_OutputWriter) Return(_a0 io.OutputWriter) *StatusContext_
 }
 
 func (_m *StatusContext) OnOutputWriter() *StatusContext_OutputWriter {
-	c := _m.On("OutputWriter")
-	return &StatusContext_OutputWriter{Call: c}
+	c_call := _m.On("OutputWriter")
+	return &StatusContext_OutputWriter{Call: c_call}
 }
 
 func (_m *StatusContext) OnOutputWriterMatch(matchers ...interface{}) *StatusContext_OutputWriter {
-	c := _m.On("OutputWriter", matchers...)
-	return &StatusContext_OutputWriter{Call: c}
+	c_call := _m.On("OutputWriter", matchers...)
+	return &StatusContext_OutputWriter{Call: c_call}
 }
 
 // OutputWriter provides a mock function with given fields:
@@ -159,13 +159,13 @@ func (_m StatusContext_Resource) Return(_a0 interface{}) *StatusContext_Resource
 }
 
 func (_m *StatusContext) OnResource() *StatusContext_Resource {
-	c := _m.On("Resource")
-	return &StatusContext_Resource{Call: c}
+	c_call := _m.On("Resource")
+	return &StatusContext_Resource{Call: c_call}
 }
 
 func (_m *StatusContext) OnResourceMatch(matchers ...interface{}) *StatusContext_Resource {
-	c := _m.On("Resource", matchers...)
-	return &StatusContext_Resource{Call: c}
+	c_call := _m.On("Resource", matchers...)
+	return &StatusContext_Resource{Call: c_call}
 }
 
 // Resource provides a mock function with given fields:
@@ -193,13 +193,13 @@ func (_m StatusContext_ResourceMeta) Return(_a0 interface{}) *StatusContext_Reso
 }
 
 func (_m *StatusContext) OnResourceMeta() *StatusContext_ResourceMeta {
-	c := _m.On("ResourceMeta")
-	return &StatusContext_ResourceMeta{Call: c}
+	c_call := _m.On("ResourceMeta")
+	return &StatusContext_ResourceMeta{Call: c_call}
 }
 
 func (_m *StatusContext) OnResourceMetaMatch(matchers ...interface{}) *StatusContext_ResourceMeta {
-	c := _m.On("ResourceMeta", matchers...)
-	return &StatusContext_ResourceMeta{Call: c}
+	c_call := _m.On("ResourceMeta", matchers...)
+	return &StatusContext_ResourceMeta{Call: c_call}
 }
 
 // ResourceMeta provides a mock function with given fields:
@@ -227,13 +227,13 @@ func (_m StatusContext_SecretManager) Return(_a0 core.SecretManager) *StatusCont
 }
 
 func (_m *StatusContext) OnSecretManager() *StatusContext_SecretManager {
-	c := _m.On("SecretManager")
-	return &StatusContext_SecretManager{Call: c}
+	c_call := _m.On("SecretManager")
+	return &StatusContext_SecretManager{Call: c_call}
 }
 
 func (_m *StatusContext) OnSecretManagerMatch(matchers ...interface{}) *StatusContext_SecretManager {
-	c := _m.On("SecretManager", matchers...)
-	return &StatusContext_SecretManager{Call: c}
+	c_call := _m.On("SecretManager", matchers...)
+	return &StatusContext_SecretManager{Call: c_call}
 }
 
 // SecretManager provides a mock function with given fields:
@@ -261,13 +261,13 @@ func (_m StatusContext_TaskExecutionMetadata) Return(_a0 core.TaskExecutionMetad
 }
 
 func (_m *StatusContext) OnTaskExecutionMetadata() *StatusContext_TaskExecutionMetadata {
-	c := _m.On("TaskExecutionMetadata")
-	return &StatusContext_TaskExecutionMetadata{Call: c}
+	c_call := _m.On("TaskExecutionMetadata")
+	return &StatusContext_TaskExecutionMetadata{Call: c_call}
 }
 
 func (_m *StatusContext) OnTaskExecutionMetadataMatch(matchers ...interface{}) *StatusContext_TaskExecutionMetadata {
-	c := _m.On("TaskExecutionMetadata", matchers...)
-	return &StatusContext_TaskExecutionMetadata{Call: c}
+	c_call := _m.On("TaskExecutionMetadata", matchers...)
+	return &StatusContext_TaskExecutionMetadata{Call: c_call}
 }
 
 // TaskExecutionMetadata provides a mock function with given fields:
@@ -295,13 +295,13 @@ func (_m StatusContext_TaskReader) Return(_a0 core.TaskReader) *StatusContext_Ta
 }
 
 func (_m *StatusContext) OnTaskReader() *StatusContext_TaskReader {
-	c := _m.On("TaskReader")
-	return &StatusContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader")
+	return &StatusContext_TaskReader{Call: c_call}
 }
 
 func (_m *StatusContext) OnTaskReaderMatch(matchers ...interface{}) *StatusContext_TaskReader {
-	c := _m.On("TaskReader", matchers...)
-	return &StatusContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader", matchers...)
+	return &StatusContext_TaskReader{Call: c_call}
 }
 
 // TaskReader provides a mock function with given fields:

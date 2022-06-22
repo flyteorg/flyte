@@ -21,13 +21,13 @@ func (_m CheckpointPaths_GetCheckpointPrefix) Return(_a0 storage.DataReference) 
 }
 
 func (_m *CheckpointPaths) OnGetCheckpointPrefix() *CheckpointPaths_GetCheckpointPrefix {
-	c := _m.On("GetCheckpointPrefix")
-	return &CheckpointPaths_GetCheckpointPrefix{Call: c}
+	c_call := _m.On("GetCheckpointPrefix")
+	return &CheckpointPaths_GetCheckpointPrefix{Call: c_call}
 }
 
 func (_m *CheckpointPaths) OnGetCheckpointPrefixMatch(matchers ...interface{}) *CheckpointPaths_GetCheckpointPrefix {
-	c := _m.On("GetCheckpointPrefix", matchers...)
-	return &CheckpointPaths_GetCheckpointPrefix{Call: c}
+	c_call := _m.On("GetCheckpointPrefix", matchers...)
+	return &CheckpointPaths_GetCheckpointPrefix{Call: c_call}
 }
 
 // GetCheckpointPrefix provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m CheckpointPaths_GetPreviousCheckpointsPrefix) Return(_a0 storage.DataRe
 }
 
 func (_m *CheckpointPaths) OnGetPreviousCheckpointsPrefix() *CheckpointPaths_GetPreviousCheckpointsPrefix {
-	c := _m.On("GetPreviousCheckpointsPrefix")
-	return &CheckpointPaths_GetPreviousCheckpointsPrefix{Call: c}
+	c_call := _m.On("GetPreviousCheckpointsPrefix")
+	return &CheckpointPaths_GetPreviousCheckpointsPrefix{Call: c_call}
 }
 
 func (_m *CheckpointPaths) OnGetPreviousCheckpointsPrefixMatch(matchers ...interface{}) *CheckpointPaths_GetPreviousCheckpointsPrefix {
-	c := _m.On("GetPreviousCheckpointsPrefix", matchers...)
-	return &CheckpointPaths_GetPreviousCheckpointsPrefix{Call: c}
+	c_call := _m.On("GetPreviousCheckpointsPrefix", matchers...)
+	return &CheckpointPaths_GetPreviousCheckpointsPrefix{Call: c_call}
 }
 
 // GetPreviousCheckpointsPrefix provides a mock function with given fields:

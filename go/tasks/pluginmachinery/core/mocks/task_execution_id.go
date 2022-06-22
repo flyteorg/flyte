@@ -21,13 +21,13 @@ func (_m TaskExecutionID_GetGeneratedName) Return(_a0 string) *TaskExecutionID_G
 }
 
 func (_m *TaskExecutionID) OnGetGeneratedName() *TaskExecutionID_GetGeneratedName {
-	c := _m.On("GetGeneratedName")
-	return &TaskExecutionID_GetGeneratedName{Call: c}
+	c_call := _m.On("GetGeneratedName")
+	return &TaskExecutionID_GetGeneratedName{Call: c_call}
 }
 
 func (_m *TaskExecutionID) OnGetGeneratedNameMatch(matchers ...interface{}) *TaskExecutionID_GetGeneratedName {
-	c := _m.On("GetGeneratedName", matchers...)
-	return &TaskExecutionID_GetGeneratedName{Call: c}
+	c_call := _m.On("GetGeneratedName", matchers...)
+	return &TaskExecutionID_GetGeneratedName{Call: c_call}
 }
 
 // GetGeneratedName provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m TaskExecutionID_GetGeneratedNameWith) Return(_a0 string, _a1 error) *Ta
 }
 
 func (_m *TaskExecutionID) OnGetGeneratedNameWith(minLength int, maxLength int) *TaskExecutionID_GetGeneratedNameWith {
-	c := _m.On("GetGeneratedNameWith", minLength, maxLength)
-	return &TaskExecutionID_GetGeneratedNameWith{Call: c}
+	c_call := _m.On("GetGeneratedNameWith", minLength, maxLength)
+	return &TaskExecutionID_GetGeneratedNameWith{Call: c_call}
 }
 
 func (_m *TaskExecutionID) OnGetGeneratedNameWithMatch(matchers ...interface{}) *TaskExecutionID_GetGeneratedNameWith {
-	c := _m.On("GetGeneratedNameWith", matchers...)
-	return &TaskExecutionID_GetGeneratedNameWith{Call: c}
+	c_call := _m.On("GetGeneratedNameWith", matchers...)
+	return &TaskExecutionID_GetGeneratedNameWith{Call: c_call}
 }
 
 // GetGeneratedNameWith provides a mock function with given fields: minLength, maxLength
@@ -92,13 +92,13 @@ func (_m TaskExecutionID_GetID) Return(_a0 flyteidlcore.TaskExecutionIdentifier)
 }
 
 func (_m *TaskExecutionID) OnGetID() *TaskExecutionID_GetID {
-	c := _m.On("GetID")
-	return &TaskExecutionID_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &TaskExecutionID_GetID{Call: c_call}
 }
 
 func (_m *TaskExecutionID) OnGetIDMatch(matchers ...interface{}) *TaskExecutionID_GetID {
-	c := _m.On("GetID", matchers...)
-	return &TaskExecutionID_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &TaskExecutionID_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:

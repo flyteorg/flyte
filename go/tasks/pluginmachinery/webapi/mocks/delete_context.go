@@ -18,13 +18,13 @@ func (_m DeleteContext_Reason) Return(_a0 string) *DeleteContext_Reason {
 }
 
 func (_m *DeleteContext) OnReason() *DeleteContext_Reason {
-	c := _m.On("Reason")
-	return &DeleteContext_Reason{Call: c}
+	c_call := _m.On("Reason")
+	return &DeleteContext_Reason{Call: c_call}
 }
 
 func (_m *DeleteContext) OnReasonMatch(matchers ...interface{}) *DeleteContext_Reason {
-	c := _m.On("Reason", matchers...)
-	return &DeleteContext_Reason{Call: c}
+	c_call := _m.On("Reason", matchers...)
+	return &DeleteContext_Reason{Call: c_call}
 }
 
 // Reason provides a mock function with given fields:
@@ -50,13 +50,13 @@ func (_m DeleteContext_ResourceMeta) Return(_a0 interface{}) *DeleteContext_Reso
 }
 
 func (_m *DeleteContext) OnResourceMeta() *DeleteContext_ResourceMeta {
-	c := _m.On("ResourceMeta")
-	return &DeleteContext_ResourceMeta{Call: c}
+	c_call := _m.On("ResourceMeta")
+	return &DeleteContext_ResourceMeta{Call: c_call}
 }
 
 func (_m *DeleteContext) OnResourceMetaMatch(matchers ...interface{}) *DeleteContext_ResourceMeta {
-	c := _m.On("ResourceMeta", matchers...)
-	return &DeleteContext_ResourceMeta{Call: c}
+	c_call := _m.On("ResourceMeta", matchers...)
+	return &DeleteContext_ResourceMeta{Call: c_call}
 }
 
 // ResourceMeta provides a mock function with given fields:

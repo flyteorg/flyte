@@ -23,13 +23,13 @@ func (_m EventsRecorder_RecordRaw) Return(_a0 error) *EventsRecorder_RecordRaw {
 }
 
 func (_m *EventsRecorder) OnRecordRaw(ctx context.Context, ev core.PhaseInfo) *EventsRecorder_RecordRaw {
-	c := _m.On("RecordRaw", ctx, ev)
-	return &EventsRecorder_RecordRaw{Call: c}
+	c_call := _m.On("RecordRaw", ctx, ev)
+	return &EventsRecorder_RecordRaw{Call: c_call}
 }
 
 func (_m *EventsRecorder) OnRecordRawMatch(matchers ...interface{}) *EventsRecorder_RecordRaw {
-	c := _m.On("RecordRaw", matchers...)
-	return &EventsRecorder_RecordRaw{Call: c}
+	c_call := _m.On("RecordRaw", matchers...)
+	return &EventsRecorder_RecordRaw{Call: c_call}
 }
 
 // RecordRaw provides a mock function with given fields: ctx, ev

@@ -23,13 +23,13 @@ func (_m ResourceRegistrar_RegisterResourceQuota) Return(_a0 error) *ResourceReg
 }
 
 func (_m *ResourceRegistrar) OnRegisterResourceQuota(ctx context.Context, namespace core.ResourceNamespace, quota int) *ResourceRegistrar_RegisterResourceQuota {
-	c := _m.On("RegisterResourceQuota", ctx, namespace, quota)
-	return &ResourceRegistrar_RegisterResourceQuota{Call: c}
+	c_call := _m.On("RegisterResourceQuota", ctx, namespace, quota)
+	return &ResourceRegistrar_RegisterResourceQuota{Call: c_call}
 }
 
 func (_m *ResourceRegistrar) OnRegisterResourceQuotaMatch(matchers ...interface{}) *ResourceRegistrar_RegisterResourceQuota {
-	c := _m.On("RegisterResourceQuota", matchers...)
-	return &ResourceRegistrar_RegisterResourceQuota{Call: c}
+	c_call := _m.On("RegisterResourceQuota", matchers...)
+	return &ResourceRegistrar_RegisterResourceQuota{Call: c_call}
 }
 
 // RegisterResourceQuota provides a mock function with given fields: ctx, namespace, quota

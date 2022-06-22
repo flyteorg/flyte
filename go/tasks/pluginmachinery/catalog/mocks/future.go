@@ -21,13 +21,13 @@ func (_m Future_GetResponseError) Return(_a0 error) *Future_GetResponseError {
 }
 
 func (_m *Future) OnGetResponseError() *Future_GetResponseError {
-	c := _m.On("GetResponseError")
-	return &Future_GetResponseError{Call: c}
+	c_call := _m.On("GetResponseError")
+	return &Future_GetResponseError{Call: c_call}
 }
 
 func (_m *Future) OnGetResponseErrorMatch(matchers ...interface{}) *Future_GetResponseError {
-	c := _m.On("GetResponseError", matchers...)
-	return &Future_GetResponseError{Call: c}
+	c_call := _m.On("GetResponseError", matchers...)
+	return &Future_GetResponseError{Call: c_call}
 }
 
 // GetResponseError provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m Future_GetResponseStatus) Return(_a0 catalog.ResponseStatus) *Future_Ge
 }
 
 func (_m *Future) OnGetResponseStatus() *Future_GetResponseStatus {
-	c := _m.On("GetResponseStatus")
-	return &Future_GetResponseStatus{Call: c}
+	c_call := _m.On("GetResponseStatus")
+	return &Future_GetResponseStatus{Call: c_call}
 }
 
 func (_m *Future) OnGetResponseStatusMatch(matchers ...interface{}) *Future_GetResponseStatus {
-	c := _m.On("GetResponseStatus", matchers...)
-	return &Future_GetResponseStatus{Call: c}
+	c_call := _m.On("GetResponseStatus", matchers...)
+	return &Future_GetResponseStatus{Call: c_call}
 }
 
 // GetResponseStatus provides a mock function with given fields:

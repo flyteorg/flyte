@@ -24,13 +24,13 @@ func (_m QuboleClient_ExecuteHiveCommand) Return(_a0 *client.QuboleCommandDetail
 }
 
 func (_m *QuboleClient) OnExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string, commandMetadata client.CommandMetadata) *QuboleClient_ExecuteHiveCommand {
-	c := _m.On("ExecuteHiveCommand", ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
-	return &QuboleClient_ExecuteHiveCommand{Call: c}
+	c_call := _m.On("ExecuteHiveCommand", ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
+	return &QuboleClient_ExecuteHiveCommand{Call: c_call}
 }
 
 func (_m *QuboleClient) OnExecuteHiveCommandMatch(matchers ...interface{}) *QuboleClient_ExecuteHiveCommand {
-	c := _m.On("ExecuteHiveCommand", matchers...)
-	return &QuboleClient_ExecuteHiveCommand{Call: c}
+	c_call := _m.On("ExecuteHiveCommand", matchers...)
+	return &QuboleClient_ExecuteHiveCommand{Call: c_call}
 }
 
 // ExecuteHiveCommand provides a mock function with given fields: ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata
@@ -65,13 +65,13 @@ func (_m QuboleClient_GetCommandStatus) Return(_a0 client.QuboleStatus, _a1 erro
 }
 
 func (_m *QuboleClient) OnGetCommandStatus(ctx context.Context, commandID string, accountKey string) *QuboleClient_GetCommandStatus {
-	c := _m.On("GetCommandStatus", ctx, commandID, accountKey)
-	return &QuboleClient_GetCommandStatus{Call: c}
+	c_call := _m.On("GetCommandStatus", ctx, commandID, accountKey)
+	return &QuboleClient_GetCommandStatus{Call: c_call}
 }
 
 func (_m *QuboleClient) OnGetCommandStatusMatch(matchers ...interface{}) *QuboleClient_GetCommandStatus {
-	c := _m.On("GetCommandStatus", matchers...)
-	return &QuboleClient_GetCommandStatus{Call: c}
+	c_call := _m.On("GetCommandStatus", matchers...)
+	return &QuboleClient_GetCommandStatus{Call: c_call}
 }
 
 // GetCommandStatus provides a mock function with given fields: ctx, commandID, accountKey
@@ -104,13 +104,13 @@ func (_m QuboleClient_KillCommand) Return(_a0 error) *QuboleClient_KillCommand {
 }
 
 func (_m *QuboleClient) OnKillCommand(ctx context.Context, commandID string, accountKey string) *QuboleClient_KillCommand {
-	c := _m.On("KillCommand", ctx, commandID, accountKey)
-	return &QuboleClient_KillCommand{Call: c}
+	c_call := _m.On("KillCommand", ctx, commandID, accountKey)
+	return &QuboleClient_KillCommand{Call: c_call}
 }
 
 func (_m *QuboleClient) OnKillCommandMatch(matchers ...interface{}) *QuboleClient_KillCommand {
-	c := _m.On("KillCommand", matchers...)
-	return &QuboleClient_KillCommand{Call: c}
+	c_call := _m.On("KillCommand", matchers...)
+	return &QuboleClient_KillCommand{Call: c_call}
 }
 
 // KillCommand provides a mock function with given fields: ctx, commandID, accountKey
