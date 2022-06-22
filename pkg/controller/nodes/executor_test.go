@@ -53,6 +53,7 @@ var recoveryClient = &recoveryMocks.RecoveryClient{}
 
 const taskID = "tID"
 const inputsPath = "inputs.pb"
+const deckPath = "out/deck.html"
 const outputsPath = "out/outputs.pb"
 const testClusterID = "C1"
 
@@ -2111,14 +2112,19 @@ func TestRecover(t *testing.T) {
 			}, nil)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		metadata := existsMetadata{}
+		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
 			mock.Anything).Return(nil)
+
 		storageClient := &storage.DataStore{
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
+		nCtx.OnDataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2180,6 +2186,9 @@ func TestRecover(t *testing.T) {
 			}, nil)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		metadata := existsMetadata{}
+		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
@@ -2188,6 +2197,8 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
+
+		nCtx.OnDataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2239,6 +2250,9 @@ func TestRecover(t *testing.T) {
 			}, nil)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		metadata := existsMetadata{}
+		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
@@ -2247,6 +2261,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
+		nCtx.OnDataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2301,6 +2316,10 @@ func TestRecover(t *testing.T) {
 			}, nil)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		metadata := existsMetadata{}
+		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+			Return(&metadata, nil)
+
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
@@ -2312,6 +2331,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
 
+		nCtx.OnDataStore().Return(storageClient)
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
 			store:          storageClient,
@@ -2341,6 +2361,9 @@ func TestRecover(t *testing.T) {
 			}, nil)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		metadata := existsMetadata{}
+		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
@@ -2351,6 +2374,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
+		nCtx.OnDataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2428,4 +2452,14 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
+}
+
+type existsMetadata struct{}
+
+func (e existsMetadata) Exists() bool {
+	return false
+}
+
+func (e existsMetadata) Size() int64 {
+	return int64(1)
 }

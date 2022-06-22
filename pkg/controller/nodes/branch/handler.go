@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	stdErrors "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -152,6 +151,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
 			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetOutputDir())},
 		})
+
 		return handler.DoTransition(handler.TransitionTypeEphemeral, phase), nil
 	}
 

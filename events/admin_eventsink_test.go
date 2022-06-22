@@ -45,6 +45,7 @@ var (
 		OccurredAt:   ptypes.TimestampNow(),
 		ProducerId:   "",
 		InputUri:     "input-uri",
+		DeckUri:      deckURI,
 		OutputResult: &event.NodeExecutionEvent_OutputUri{OutputUri: ""},
 	}
 

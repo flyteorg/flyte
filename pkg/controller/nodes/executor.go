@@ -235,17 +235,32 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 	} else {
 		logger.Debugf(ctx, "No outputs found for recovered node [%+v]", nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 	}
+
 	outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
+	oi := &handler.OutputInfo{
+		OutputURI: outputFile,
+	}
+
+	deckFile := v1alpha1.GetDeckFile(nCtx.NodeStatus().GetOutputDir())
+	metadata, err := nCtx.DataStore().Head(ctx, deckFile)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to check the existence of deck file. Error: %v", err)
+		return handler.PhaseInfoUndefined, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to check the existence of deck file.")
+	}
+
+	if metadata.Exists() {
+		oi.DeckURI = &deckFile
+	}
+
 	if err := c.store.WriteProtobuf(ctx, outputFile, so, outputs); err != nil {
 		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)
 		return handler.PhaseInfoUndefined, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to store recovered node execution outputs")
 	}
 
 	info := &handler.ExecutionInfo{
-		OutputInfo: &handler.OutputInfo{
-			OutputURI: outputFile,
-		},
+		OutputInfo: oi,
 	}
+
 	if recovered.Closure.GetTaskNodeMetadata() != nil {
 		taskNodeInfo := &handler.TaskNodeInfo{
 			TaskNodeMetadata: &event.TaskNodeMetadata{

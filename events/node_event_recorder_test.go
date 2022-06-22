@@ -23,6 +23,7 @@ func getReferenceNodeEv() *event.NodeExecutionEvent {
 		OutputResult: &event.NodeExecutionEvent_OutputUri{
 			OutputUri: referenceURI,
 		},
+		DeckUri: deckURI,
 	}
 }
 
@@ -32,6 +33,7 @@ func getRawOutputNodeEv() *event.NodeExecutionEvent {
 		OutputResult: &event.NodeExecutionEvent_OutputData{
 			OutputData: outputData,
 		},
+		DeckUri: deckURI,
 	}
 }
 
@@ -79,6 +81,7 @@ func TestRecordNodeEvent_Success_InlineOutputs(t *testing.T) {
 		store:         mockStore,
 	}
 	err := recorder.RecordNodeEvent(ctx, getReferenceNodeEv(), inlineEventConfig)
+	assert.Equal(t, deckURI, nodeEvent.DeckUri)
 	assert.NoError(t, err)
 }
 

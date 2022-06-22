@@ -788,7 +788,6 @@ func Test_task_Handle_Catalog(t *testing.T) {
 		nCtx.OnNodeExecutionMetadata().Return(nm)
 		nCtx.OnNode().Return(n)
 		nCtx.OnInputReader().Return(ir)
-		nCtx.OnInputReader().Return(ir)
 		ds, err := storage.NewDataStore(
 			&storage.Config{
 				Type: storage.TypeMemory,
@@ -895,6 +894,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 			c := &pluginCatalogMocks.Client{}
 			if tt.args.catalogFetch {
 				or := &ioMocks.OutputReader{}
+				or.OnDeckExistsMatch(mock.Anything).Return(true, nil)
 				or.OnReadMatch(mock.Anything).Return(&core.LiteralMap{}, nil, nil)
 				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewCatalogEntry(or, catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, nil)), nil)
 			} else {
@@ -1122,6 +1122,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 			nCtx.OnNodeStateReader().Return(nr)
 			if tt.args.catalogFetch {
 				or := &ioMocks.OutputReader{}
+				or.OnDeckExistsMatch(mock.Anything).Return(true, nil)
 				or.OnReadMatch(mock.Anything).Return(&core.LiteralMap{}, nil, nil)
 				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewCatalogEntry(or, catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, nil)), nil)
 			} else {

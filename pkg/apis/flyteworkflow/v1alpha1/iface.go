@@ -296,7 +296,7 @@ type ExecutionTimeInfo interface {
 	GetLastUpdatedAt() *metav1.Time
 }
 
-// Interface for a Node p. This provides a mutable API.
+// ExecutableNodeStatus interface for a Node p. This provides a mutable API.
 type ExecutableNodeStatus interface {
 	NodeStatusGetter
 	MutableNodeStatus
@@ -349,7 +349,7 @@ type MutableTaskNodeStatus interface {
 	SetBarrierClockTick(tick uint32)
 }
 
-// Interface for a Child Workflow Node
+// ExecutableWorkflowNode is an interface for a Child Workflow Node
 type ExecutableWorkflowNode interface {
 	GetLaunchPlanRefID() *LaunchPlanRefID
 	GetSubWorkflowRef() *WorkflowID
@@ -360,7 +360,7 @@ type BaseNode interface {
 	GetKind() NodeKind
 }
 
-// Interface for the Executable Node
+// ExecutableNode is an interface for the Executable Node
 type ExecutableNode interface {
 	BaseNode
 	IsStartNode() bool
@@ -379,7 +379,7 @@ type ExecutableNode interface {
 	GetName() string
 }
 
-// Interface for the Workflow p. This is the mutable portion for a Workflow
+// ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow
 type ExecutableWorkflowStatus interface {
 	NodeStatusGetter
 	ExecutionTimeInfo
@@ -405,7 +405,7 @@ type BaseWorkflow interface {
 	NodeGetter
 	StartNode() ExecutableNode
 	GetID() WorkflowID
-	// From returns all nodes that can be reached directly
+	// FromNode returns all nodes that can be reached directly
 	// from the node with the given unique name.
 	FromNode(name NodeID) ([]NodeID, error)
 	ToNode(name NodeID) ([]NodeID, error)
@@ -416,7 +416,7 @@ type BaseWorkflowWithStatus interface {
 	NodeStatusGetter
 }
 
-// This interface captures the methods available on any workflow (top level or child). The Meta section is available
+// ExecutableSubWorkflow interface captures the methods available on any workflow (top level or child). The Meta section is available
 // only for the top level workflow
 type ExecutableSubWorkflow interface {
 	BaseWorkflow
@@ -490,4 +490,8 @@ func GetOutputsFile(outputDir DataReference) DataReference {
 
 func GetInputsFile(inputDir DataReference) DataReference {
 	return inputDir + "/inputs.pb"
+}
+
+func GetDeckFile(inputDir DataReference) DataReference {
+	return inputDir + "/deck.html"
 }

@@ -19,6 +19,7 @@ var referenceEventConfig = &config.EventConfig{
 }
 
 var referenceURI = "s3://foo/bar/outputs.pb"
+var deckURI = "s3://foo/bar/deck.html"
 
 var outputData = &core.LiteralMap{
 	Literals: map[string]*core.Literal{

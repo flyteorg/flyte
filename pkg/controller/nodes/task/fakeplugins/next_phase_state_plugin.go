@@ -16,6 +16,7 @@ type NextPhaseState struct {
 	PhaseVersion uint32
 	TaskInfo     *pluginCore.TaskInfo
 	TaskErr      *io.ExecutionError
+	DeckExists   bool
 	OutputExists bool
 	OrError      bool
 }
@@ -49,6 +50,8 @@ func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskEx
 			isErr = true
 			r.On("ReadError", mock.Anything).Return(*s.TaskErr, nil)
 		}
+
+		r.OnDeckExistsMatch(mock.Anything).Return(s.DeckExists, nil)
 		r.On("IsError", mock.Anything).Return(isErr, nil)
 		r.On("IsFile", mock.Anything).Return(true)
 		r.On("Exists", mock.Anything).Return(s.OutputExists, nil)
