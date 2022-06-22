@@ -235,7 +235,7 @@ To set up an external OAuth2 Authorization Server, follow the instructions below
 
       .. note::
 
-         The audience must exactly match one of the URIs in the `authorizedUris` section above
+        The audience must exactly match one of the URIs in the `authorizedUris` section above
 
    2. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.
    3. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server. Then, add a rule to the policy with the default settings (you can fine-tune these later).
