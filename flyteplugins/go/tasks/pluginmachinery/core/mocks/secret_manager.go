@@ -22,13 +22,13 @@ func (_m SecretManager_Get) Return(_a0 string, _a1 error) *SecretManager_Get {
 }
 
 func (_m *SecretManager) OnGet(ctx context.Context, key string) *SecretManager_Get {
-	c := _m.On("Get", ctx, key)
-	return &SecretManager_Get{Call: c}
+	c_call := _m.On("Get", ctx, key)
+	return &SecretManager_Get{Call: c_call}
 }
 
 func (_m *SecretManager) OnGetMatch(matchers ...interface{}) *SecretManager_Get {
-	c := _m.On("Get", matchers...)
-	return &SecretManager_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &SecretManager_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, key

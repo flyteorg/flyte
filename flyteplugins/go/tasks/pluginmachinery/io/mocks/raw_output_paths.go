@@ -21,13 +21,13 @@ func (_m RawOutputPaths_GetRawOutputPrefix) Return(_a0 storage.DataReference) *R
 }
 
 func (_m *RawOutputPaths) OnGetRawOutputPrefix() *RawOutputPaths_GetRawOutputPrefix {
-	c := _m.On("GetRawOutputPrefix")
-	return &RawOutputPaths_GetRawOutputPrefix{Call: c}
+	c_call := _m.On("GetRawOutputPrefix")
+	return &RawOutputPaths_GetRawOutputPrefix{Call: c_call}
 }
 
 func (_m *RawOutputPaths) OnGetRawOutputPrefixMatch(matchers ...interface{}) *RawOutputPaths_GetRawOutputPrefix {
-	c := _m.On("GetRawOutputPrefix", matchers...)
-	return &RawOutputPaths_GetRawOutputPrefix{Call: c}
+	c_call := _m.On("GetRawOutputPrefix", matchers...)
+	return &RawOutputPaths_GetRawOutputPrefix{Call: c_call}
 }
 
 // GetRawOutputPrefix provides a mock function with given fields:

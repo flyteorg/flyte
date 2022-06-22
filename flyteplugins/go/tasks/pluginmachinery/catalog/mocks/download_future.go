@@ -21,13 +21,13 @@ func (_m DownloadFuture_GetResponse) Return(_a0 catalog.DownloadResponse, _a1 er
 }
 
 func (_m *DownloadFuture) OnGetResponse() *DownloadFuture_GetResponse {
-	c := _m.On("GetResponse")
-	return &DownloadFuture_GetResponse{Call: c}
+	c_call := _m.On("GetResponse")
+	return &DownloadFuture_GetResponse{Call: c_call}
 }
 
 func (_m *DownloadFuture) OnGetResponseMatch(matchers ...interface{}) *DownloadFuture_GetResponse {
-	c := _m.On("GetResponse", matchers...)
-	return &DownloadFuture_GetResponse{Call: c}
+	c_call := _m.On("GetResponse", matchers...)
+	return &DownloadFuture_GetResponse{Call: c_call}
 }
 
 // GetResponse provides a mock function with given fields:
@@ -62,13 +62,13 @@ func (_m DownloadFuture_GetResponseError) Return(_a0 error) *DownloadFuture_GetR
 }
 
 func (_m *DownloadFuture) OnGetResponseError() *DownloadFuture_GetResponseError {
-	c := _m.On("GetResponseError")
-	return &DownloadFuture_GetResponseError{Call: c}
+	c_call := _m.On("GetResponseError")
+	return &DownloadFuture_GetResponseError{Call: c_call}
 }
 
 func (_m *DownloadFuture) OnGetResponseErrorMatch(matchers ...interface{}) *DownloadFuture_GetResponseError {
-	c := _m.On("GetResponseError", matchers...)
-	return &DownloadFuture_GetResponseError{Call: c}
+	c_call := _m.On("GetResponseError", matchers...)
+	return &DownloadFuture_GetResponseError{Call: c_call}
 }
 
 // GetResponseError provides a mock function with given fields:
@@ -94,13 +94,13 @@ func (_m DownloadFuture_GetResponseStatus) Return(_a0 catalog.ResponseStatus) *D
 }
 
 func (_m *DownloadFuture) OnGetResponseStatus() *DownloadFuture_GetResponseStatus {
-	c := _m.On("GetResponseStatus")
-	return &DownloadFuture_GetResponseStatus{Call: c}
+	c_call := _m.On("GetResponseStatus")
+	return &DownloadFuture_GetResponseStatus{Call: c_call}
 }
 
 func (_m *DownloadFuture) OnGetResponseStatusMatch(matchers ...interface{}) *DownloadFuture_GetResponseStatus {
-	c := _m.On("GetResponseStatus", matchers...)
-	return &DownloadFuture_GetResponseStatus{Call: c}
+	c_call := _m.On("GetResponseStatus", matchers...)
+	return &DownloadFuture_GetResponseStatus{Call: c_call}
 }
 
 // GetResponseStatus provides a mock function with given fields:

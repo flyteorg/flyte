@@ -114,9 +114,13 @@ func (r RemoteFileOutputReader) IsFile(ctx context.Context) bool {
 	return true
 }
 
-func (r RemoteFileOutputReader) GetDeckPath() *storage.DataReference {
-	path := r.outPath.GetDeckPath()
-	return &path
+func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
+	md, err := r.store.Head(ctx, r.outPath.GetDeckPath())
+	if err != nil {
+		return false, err
+	}
+
+	return md.Exists(), nil
 }
 
 func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {

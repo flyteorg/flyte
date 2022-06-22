@@ -23,13 +23,13 @@ func (_m IndexedWorkQueue_Get) Return(info workqueue.WorkItemInfo, found bool, e
 }
 
 func (_m *IndexedWorkQueue) OnGet(id string) *IndexedWorkQueue_Get {
-	c := _m.On("Get", id)
-	return &IndexedWorkQueue_Get{Call: c}
+	c_call := _m.On("Get", id)
+	return &IndexedWorkQueue_Get{Call: c_call}
 }
 
 func (_m *IndexedWorkQueue) OnGetMatch(matchers ...interface{}) *IndexedWorkQueue_Get {
-	c := _m.On("Get", matchers...)
-	return &IndexedWorkQueue_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &IndexedWorkQueue_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: id
@@ -71,13 +71,13 @@ func (_m IndexedWorkQueue_Queue) Return(_a0 error) *IndexedWorkQueue_Queue {
 }
 
 func (_m *IndexedWorkQueue) OnQueue(ctx context.Context, id string, once workqueue.WorkItem) *IndexedWorkQueue_Queue {
-	c := _m.On("Queue", ctx, id, once)
-	return &IndexedWorkQueue_Queue{Call: c}
+	c_call := _m.On("Queue", ctx, id, once)
+	return &IndexedWorkQueue_Queue{Call: c_call}
 }
 
 func (_m *IndexedWorkQueue) OnQueueMatch(matchers ...interface{}) *IndexedWorkQueue_Queue {
-	c := _m.On("Queue", matchers...)
-	return &IndexedWorkQueue_Queue{Call: c}
+	c_call := _m.On("Queue", matchers...)
+	return &IndexedWorkQueue_Queue{Call: c_call}
 }
 
 // Queue provides a mock function with given fields: ctx, id, once
@@ -103,13 +103,13 @@ func (_m IndexedWorkQueue_Start) Return(_a0 error) *IndexedWorkQueue_Start {
 }
 
 func (_m *IndexedWorkQueue) OnStart(ctx context.Context) *IndexedWorkQueue_Start {
-	c := _m.On("Start", ctx)
-	return &IndexedWorkQueue_Start{Call: c}
+	c_call := _m.On("Start", ctx)
+	return &IndexedWorkQueue_Start{Call: c_call}
 }
 
 func (_m *IndexedWorkQueue) OnStartMatch(matchers ...interface{}) *IndexedWorkQueue_Start {
-	c := _m.On("Start", matchers...)
-	return &IndexedWorkQueue_Start{Call: c}
+	c_call := _m.On("Start", matchers...)
+	return &IndexedWorkQueue_Start{Call: c_call}
 }
 
 // Start provides a mock function with given fields: ctx

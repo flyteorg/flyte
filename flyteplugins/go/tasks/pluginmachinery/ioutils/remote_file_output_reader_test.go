@@ -13,6 +13,19 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+type MemoryMetadata struct {
+	exists bool
+	size   int64
+}
+
+func (m MemoryMetadata) Size() int64 {
+	return m.size
+}
+
+func (m MemoryMetadata) Exists() bool {
+	return m.exists
+}
+
 func TestReadOrigin(t *testing.T) {
 	ctx := context.TODO()
 
@@ -38,6 +51,10 @@ func TestReadOrigin(t *testing.T) {
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
+		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+
 		r := RemoteFileOutputReader{
 			outPath:        opath,
 			store:          store,
@@ -48,7 +65,9 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_USER, ee.Kind)
 		assert.False(t, ee.IsRecoverable)
-		assert.Equal(t, deckPath, r.GetDeckPath().String())
+		exists, err := r.DeckExists(ctx)
+		assert.NoError(t, err)
+		assert.True(t, exists)
 	})
 
 	t.Run("system", func(t *testing.T) {

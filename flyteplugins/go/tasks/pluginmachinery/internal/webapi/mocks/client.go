@@ -26,13 +26,13 @@ func (_m Client_Get) Return(latest interface{}, err error) *Client_Get {
 }
 
 func (_m *Client) OnGet(ctx context.Context, tCtx webapi.GetContext) *Client_Get {
-	c := _m.On("Get", ctx, tCtx)
-	return &Client_Get{Call: c}
+	c_call := _m.On("Get", ctx, tCtx)
+	return &Client_Get{Call: c_call}
 }
 
 func (_m *Client) OnGetMatch(matchers ...interface{}) *Client_Get {
-	c := _m.On("Get", matchers...)
-	return &Client_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &Client_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, tCtx
@@ -67,13 +67,13 @@ func (_m Client_Status) Return(phase core.PhaseInfo, err error) *Client_Status {
 }
 
 func (_m *Client) OnStatus(ctx context.Context, tCtx webapi.StatusContext) *Client_Status {
-	c := _m.On("Status", ctx, tCtx)
-	return &Client_Status{Call: c}
+	c_call := _m.On("Status", ctx, tCtx)
+	return &Client_Status{Call: c_call}
 }
 
 func (_m *Client) OnStatusMatch(matchers ...interface{}) *Client_Status {
-	c := _m.On("Status", matchers...)
-	return &Client_Status{Call: c}
+	c_call := _m.On("Status", matchers...)
+	return &Client_Status{Call: c_call}
 }
 
 // Status provides a mock function with given fields: ctx, tCtx

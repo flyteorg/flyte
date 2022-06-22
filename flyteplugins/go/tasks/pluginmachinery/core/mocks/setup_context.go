@@ -23,13 +23,13 @@ func (_m SetupContext_EnqueueOwner) Return(_a0 core.EnqueueOwner) *SetupContext_
 }
 
 func (_m *SetupContext) OnEnqueueOwner() *SetupContext_EnqueueOwner {
-	c := _m.On("EnqueueOwner")
-	return &SetupContext_EnqueueOwner{Call: c}
+	c_call := _m.On("EnqueueOwner")
+	return &SetupContext_EnqueueOwner{Call: c_call}
 }
 
 func (_m *SetupContext) OnEnqueueOwnerMatch(matchers ...interface{}) *SetupContext_EnqueueOwner {
-	c := _m.On("EnqueueOwner", matchers...)
-	return &SetupContext_EnqueueOwner{Call: c}
+	c_call := _m.On("EnqueueOwner", matchers...)
+	return &SetupContext_EnqueueOwner{Call: c_call}
 }
 
 // EnqueueOwner provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m SetupContext_KubeClient) Return(_a0 core.KubeClient) *SetupContext_Kube
 }
 
 func (_m *SetupContext) OnKubeClient() *SetupContext_KubeClient {
-	c := _m.On("KubeClient")
-	return &SetupContext_KubeClient{Call: c}
+	c_call := _m.On("KubeClient")
+	return &SetupContext_KubeClient{Call: c_call}
 }
 
 func (_m *SetupContext) OnKubeClientMatch(matchers ...interface{}) *SetupContext_KubeClient {
-	c := _m.On("KubeClient", matchers...)
-	return &SetupContext_KubeClient{Call: c}
+	c_call := _m.On("KubeClient", matchers...)
+	return &SetupContext_KubeClient{Call: c_call}
 }
 
 // KubeClient provides a mock function with given fields:
@@ -91,13 +91,13 @@ func (_m SetupContext_MetricsScope) Return(_a0 promutils.Scope) *SetupContext_Me
 }
 
 func (_m *SetupContext) OnMetricsScope() *SetupContext_MetricsScope {
-	c := _m.On("MetricsScope")
-	return &SetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope")
+	return &SetupContext_MetricsScope{Call: c_call}
 }
 
 func (_m *SetupContext) OnMetricsScopeMatch(matchers ...interface{}) *SetupContext_MetricsScope {
-	c := _m.On("MetricsScope", matchers...)
-	return &SetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope", matchers...)
+	return &SetupContext_MetricsScope{Call: c_call}
 }
 
 // MetricsScope provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m SetupContext_OwnerKind) Return(_a0 string) *SetupContext_OwnerKind {
 }
 
 func (_m *SetupContext) OnOwnerKind() *SetupContext_OwnerKind {
-	c := _m.On("OwnerKind")
-	return &SetupContext_OwnerKind{Call: c}
+	c_call := _m.On("OwnerKind")
+	return &SetupContext_OwnerKind{Call: c_call}
 }
 
 func (_m *SetupContext) OnOwnerKindMatch(matchers ...interface{}) *SetupContext_OwnerKind {
-	c := _m.On("OwnerKind", matchers...)
-	return &SetupContext_OwnerKind{Call: c}
+	c_call := _m.On("OwnerKind", matchers...)
+	return &SetupContext_OwnerKind{Call: c_call}
 }
 
 // OwnerKind provides a mock function with given fields:
@@ -157,13 +157,13 @@ func (_m SetupContext_ResourceRegistrar) Return(_a0 core.ResourceRegistrar) *Set
 }
 
 func (_m *SetupContext) OnResourceRegistrar() *SetupContext_ResourceRegistrar {
-	c := _m.On("ResourceRegistrar")
-	return &SetupContext_ResourceRegistrar{Call: c}
+	c_call := _m.On("ResourceRegistrar")
+	return &SetupContext_ResourceRegistrar{Call: c_call}
 }
 
 func (_m *SetupContext) OnResourceRegistrarMatch(matchers ...interface{}) *SetupContext_ResourceRegistrar {
-	c := _m.On("ResourceRegistrar", matchers...)
-	return &SetupContext_ResourceRegistrar{Call: c}
+	c_call := _m.On("ResourceRegistrar", matchers...)
+	return &SetupContext_ResourceRegistrar{Call: c_call}
 }
 
 // ResourceRegistrar provides a mock function with given fields:
@@ -191,13 +191,13 @@ func (_m SetupContext_SecretManager) Return(_a0 core.SecretManager) *SetupContex
 }
 
 func (_m *SetupContext) OnSecretManager() *SetupContext_SecretManager {
-	c := _m.On("SecretManager")
-	return &SetupContext_SecretManager{Call: c}
+	c_call := _m.On("SecretManager")
+	return &SetupContext_SecretManager{Call: c_call}
 }
 
 func (_m *SetupContext) OnSecretManagerMatch(matchers ...interface{}) *SetupContext_SecretManager {
-	c := _m.On("SecretManager", matchers...)
-	return &SetupContext_SecretManager{Call: c}
+	c_call := _m.On("SecretManager", matchers...)
+	return &SetupContext_SecretManager{Call: c_call}
 }
 
 // SecretManager provides a mock function with given fields:

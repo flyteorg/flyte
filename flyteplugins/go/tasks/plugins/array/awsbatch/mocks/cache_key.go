@@ -18,13 +18,13 @@ func (_m CacheKey_String) Return(_a0 string) *CacheKey_String {
 }
 
 func (_m *CacheKey) OnString() *CacheKey_String {
-	c := _m.On("String")
-	return &CacheKey_String{Call: c}
+	c_call := _m.On("String")
+	return &CacheKey_String{Call: c_call}
 }
 
 func (_m *CacheKey) OnStringMatch(matchers ...interface{}) *CacheKey_String {
-	c := _m.On("String", matchers...)
-	return &CacheKey_String{Call: c}
+	c_call := _m.On("String", matchers...)
+	return &CacheKey_String{Call: c_call}
 }
 
 // String provides a mock function with given fields:

@@ -29,13 +29,13 @@ func (_m TaskExecutionMetadata_GetAnnotations) Return(_a0 map[string]string) *Ta
 }
 
 func (_m *TaskExecutionMetadata) OnGetAnnotations() *TaskExecutionMetadata_GetAnnotations {
-	c := _m.On("GetAnnotations")
-	return &TaskExecutionMetadata_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations")
+	return &TaskExecutionMetadata_GetAnnotations{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetAnnotationsMatch(matchers ...interface{}) *TaskExecutionMetadata_GetAnnotations {
-	c := _m.On("GetAnnotations", matchers...)
-	return &TaskExecutionMetadata_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &TaskExecutionMetadata_GetAnnotations{Call: c_call}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -63,13 +63,13 @@ func (_m TaskExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint
 }
 
 func (_m *TaskExecutionMetadata) OnGetInterruptibleFailureThreshold() *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
-	c := _m.On("GetInterruptibleFailureThreshold")
-	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+	c_call := _m.On("GetInterruptibleFailureThreshold")
+	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matchers ...interface{}) *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
-	c := _m.On("GetInterruptibleFailureThreshold", matchers...)
-	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+	c_call := _m.On("GetInterruptibleFailureThreshold", matchers...)
+	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: c_call}
 }
 
 // GetInterruptibleFailureThreshold provides a mock function with given fields:
@@ -95,13 +95,13 @@ func (_m TaskExecutionMetadata_GetK8sServiceAccount) Return(_a0 string) *TaskExe
 }
 
 func (_m *TaskExecutionMetadata) OnGetK8sServiceAccount() *TaskExecutionMetadata_GetK8sServiceAccount {
-	c := _m.On("GetK8sServiceAccount")
-	return &TaskExecutionMetadata_GetK8sServiceAccount{Call: c}
+	c_call := _m.On("GetK8sServiceAccount")
+	return &TaskExecutionMetadata_GetK8sServiceAccount{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetK8sServiceAccountMatch(matchers ...interface{}) *TaskExecutionMetadata_GetK8sServiceAccount {
-	c := _m.On("GetK8sServiceAccount", matchers...)
-	return &TaskExecutionMetadata_GetK8sServiceAccount{Call: c}
+	c_call := _m.On("GetK8sServiceAccount", matchers...)
+	return &TaskExecutionMetadata_GetK8sServiceAccount{Call: c_call}
 }
 
 // GetK8sServiceAccount provides a mock function with given fields:
@@ -127,13 +127,13 @@ func (_m TaskExecutionMetadata_GetLabels) Return(_a0 map[string]string) *TaskExe
 }
 
 func (_m *TaskExecutionMetadata) OnGetLabels() *TaskExecutionMetadata_GetLabels {
-	c := _m.On("GetLabels")
-	return &TaskExecutionMetadata_GetLabels{Call: c}
+	c_call := _m.On("GetLabels")
+	return &TaskExecutionMetadata_GetLabels{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetLabelsMatch(matchers ...interface{}) *TaskExecutionMetadata_GetLabels {
-	c := _m.On("GetLabels", matchers...)
-	return &TaskExecutionMetadata_GetLabels{Call: c}
+	c_call := _m.On("GetLabels", matchers...)
+	return &TaskExecutionMetadata_GetLabels{Call: c_call}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -161,13 +161,13 @@ func (_m TaskExecutionMetadata_GetMaxAttempts) Return(_a0 uint32) *TaskExecution
 }
 
 func (_m *TaskExecutionMetadata) OnGetMaxAttempts() *TaskExecutionMetadata_GetMaxAttempts {
-	c := _m.On("GetMaxAttempts")
-	return &TaskExecutionMetadata_GetMaxAttempts{Call: c}
+	c_call := _m.On("GetMaxAttempts")
+	return &TaskExecutionMetadata_GetMaxAttempts{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetMaxAttemptsMatch(matchers ...interface{}) *TaskExecutionMetadata_GetMaxAttempts {
-	c := _m.On("GetMaxAttempts", matchers...)
-	return &TaskExecutionMetadata_GetMaxAttempts{Call: c}
+	c_call := _m.On("GetMaxAttempts", matchers...)
+	return &TaskExecutionMetadata_GetMaxAttempts{Call: c_call}
 }
 
 // GetMaxAttempts provides a mock function with given fields:
@@ -193,13 +193,13 @@ func (_m TaskExecutionMetadata_GetNamespace) Return(_a0 string) *TaskExecutionMe
 }
 
 func (_m *TaskExecutionMetadata) OnGetNamespace() *TaskExecutionMetadata_GetNamespace {
-	c := _m.On("GetNamespace")
-	return &TaskExecutionMetadata_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace")
+	return &TaskExecutionMetadata_GetNamespace{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetNamespaceMatch(matchers ...interface{}) *TaskExecutionMetadata_GetNamespace {
-	c := _m.On("GetNamespace", matchers...)
-	return &TaskExecutionMetadata_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace", matchers...)
+	return &TaskExecutionMetadata_GetNamespace{Call: c_call}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -225,13 +225,13 @@ func (_m TaskExecutionMetadata_GetOverrides) Return(_a0 core.TaskOverrides) *Tas
 }
 
 func (_m *TaskExecutionMetadata) OnGetOverrides() *TaskExecutionMetadata_GetOverrides {
-	c := _m.On("GetOverrides")
-	return &TaskExecutionMetadata_GetOverrides{Call: c}
+	c_call := _m.On("GetOverrides")
+	return &TaskExecutionMetadata_GetOverrides{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetOverridesMatch(matchers ...interface{}) *TaskExecutionMetadata_GetOverrides {
-	c := _m.On("GetOverrides", matchers...)
-	return &TaskExecutionMetadata_GetOverrides{Call: c}
+	c_call := _m.On("GetOverrides", matchers...)
+	return &TaskExecutionMetadata_GetOverrides{Call: c_call}
 }
 
 // GetOverrides provides a mock function with given fields:
@@ -259,13 +259,13 @@ func (_m TaskExecutionMetadata_GetOwnerID) Return(_a0 types.NamespacedName) *Tas
 }
 
 func (_m *TaskExecutionMetadata) OnGetOwnerID() *TaskExecutionMetadata_GetOwnerID {
-	c := _m.On("GetOwnerID")
-	return &TaskExecutionMetadata_GetOwnerID{Call: c}
+	c_call := _m.On("GetOwnerID")
+	return &TaskExecutionMetadata_GetOwnerID{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetOwnerIDMatch(matchers ...interface{}) *TaskExecutionMetadata_GetOwnerID {
-	c := _m.On("GetOwnerID", matchers...)
-	return &TaskExecutionMetadata_GetOwnerID{Call: c}
+	c_call := _m.On("GetOwnerID", matchers...)
+	return &TaskExecutionMetadata_GetOwnerID{Call: c_call}
 }
 
 // GetOwnerID provides a mock function with given fields:
@@ -291,13 +291,13 @@ func (_m TaskExecutionMetadata_GetOwnerReference) Return(_a0 v1.OwnerReference) 
 }
 
 func (_m *TaskExecutionMetadata) OnGetOwnerReference() *TaskExecutionMetadata_GetOwnerReference {
-	c := _m.On("GetOwnerReference")
-	return &TaskExecutionMetadata_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference")
+	return &TaskExecutionMetadata_GetOwnerReference{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetOwnerReferenceMatch(matchers ...interface{}) *TaskExecutionMetadata_GetOwnerReference {
-	c := _m.On("GetOwnerReference", matchers...)
-	return &TaskExecutionMetadata_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference", matchers...)
+	return &TaskExecutionMetadata_GetOwnerReference{Call: c_call}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -323,13 +323,13 @@ func (_m TaskExecutionMetadata_GetPlatformResources) Return(_a0 *corev1.Resource
 }
 
 func (_m *TaskExecutionMetadata) OnGetPlatformResources() *TaskExecutionMetadata_GetPlatformResources {
-	c := _m.On("GetPlatformResources")
-	return &TaskExecutionMetadata_GetPlatformResources{Call: c}
+	c_call := _m.On("GetPlatformResources")
+	return &TaskExecutionMetadata_GetPlatformResources{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetPlatformResourcesMatch(matchers ...interface{}) *TaskExecutionMetadata_GetPlatformResources {
-	c := _m.On("GetPlatformResources", matchers...)
-	return &TaskExecutionMetadata_GetPlatformResources{Call: c}
+	c_call := _m.On("GetPlatformResources", matchers...)
+	return &TaskExecutionMetadata_GetPlatformResources{Call: c_call}
 }
 
 // GetPlatformResources provides a mock function with given fields:
@@ -357,13 +357,13 @@ func (_m TaskExecutionMetadata_GetSecurityContext) Return(_a0 flyteidlcore.Secur
 }
 
 func (_m *TaskExecutionMetadata) OnGetSecurityContext() *TaskExecutionMetadata_GetSecurityContext {
-	c := _m.On("GetSecurityContext")
-	return &TaskExecutionMetadata_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext")
+	return &TaskExecutionMetadata_GetSecurityContext{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetSecurityContextMatch(matchers ...interface{}) *TaskExecutionMetadata_GetSecurityContext {
-	c := _m.On("GetSecurityContext", matchers...)
-	return &TaskExecutionMetadata_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext", matchers...)
+	return &TaskExecutionMetadata_GetSecurityContext{Call: c_call}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -389,13 +389,13 @@ func (_m TaskExecutionMetadata_GetTaskExecutionID) Return(_a0 core.TaskExecution
 }
 
 func (_m *TaskExecutionMetadata) OnGetTaskExecutionID() *TaskExecutionMetadata_GetTaskExecutionID {
-	c := _m.On("GetTaskExecutionID")
-	return &TaskExecutionMetadata_GetTaskExecutionID{Call: c}
+	c_call := _m.On("GetTaskExecutionID")
+	return &TaskExecutionMetadata_GetTaskExecutionID{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnGetTaskExecutionIDMatch(matchers ...interface{}) *TaskExecutionMetadata_GetTaskExecutionID {
-	c := _m.On("GetTaskExecutionID", matchers...)
-	return &TaskExecutionMetadata_GetTaskExecutionID{Call: c}
+	c_call := _m.On("GetTaskExecutionID", matchers...)
+	return &TaskExecutionMetadata_GetTaskExecutionID{Call: c_call}
 }
 
 // GetTaskExecutionID provides a mock function with given fields:
@@ -423,13 +423,13 @@ func (_m TaskExecutionMetadata_IsInterruptible) Return(_a0 bool) *TaskExecutionM
 }
 
 func (_m *TaskExecutionMetadata) OnIsInterruptible() *TaskExecutionMetadata_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &TaskExecutionMetadata_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &TaskExecutionMetadata_IsInterruptible{Call: c_call}
 }
 
 func (_m *TaskExecutionMetadata) OnIsInterruptibleMatch(matchers ...interface{}) *TaskExecutionMetadata_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &TaskExecutionMetadata_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &TaskExecutionMetadata_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:
