@@ -22,9 +22,7 @@ on:
     secrets:
       AWS_ACCOUNT_ID:
         required: true
-      AWS_ACCESS_KEY:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
+      AWS_IAM_ROLE_ARN_FOR_GITHUB:
         required: true
     outputs:
       dns:
@@ -54,10 +52,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          #role-to-assume: "arn:aws:iam::896381257720:role/GitHubAdmin"
-          #role-session-name: ApplySession
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN_FOR_GITHUB }}
+          role-session-name: ApplySession
           aws-region: ${{ inputs.aws-region }}
       - name: SETUP AND APPLY OPTA
         shell: bash
