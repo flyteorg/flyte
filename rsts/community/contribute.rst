@@ -139,6 +139,8 @@ Output:
 🧱 Component Reference
 ======================
 
+To understand how the below components interact with each other, refer to :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`
+
 .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
     :align: center
