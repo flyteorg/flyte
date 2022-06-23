@@ -139,9 +139,10 @@ brew install asdf
 brew install vips
 ```
 
--   Add Yarn plugin to asdf, to manage yarn versions
+-   Add Yarn and NodeJs plugins to asdf, to manage versions
 
 ```bash
+asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 asdf plugin-add yarn https://github.com/twuni/asdf-yarn.git
 brew install gpg
 ```
