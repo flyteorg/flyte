@@ -8,6 +8,7 @@ export interface FlyteNavItem {
 export interface FlyteNavigation {
   color?: string;
   background?: string;
+  console?: string;
   items: FlyteNavItem[];
 }
 

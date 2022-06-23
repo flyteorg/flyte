@@ -21,9 +21,10 @@ Essentially FLYTE_NAVIGATION is a JSON object
 
 ```
 {
-    color:"white",       // default NavBar text color
-    background:"black",  // default NavBar background color
-    items:[
+    color:"white",          // optional - default NavBar text color, if not provided uses Flyte colors
+    background:"black",     // optional - default NavBar background color, if not provided uses Flyte colors
+    console:"FlyteConsole"  // optional - name of the default navigation, if not provided uses "Console"
+    items:[                 // required - if no dropdown needed provide an empty array
         {title:"Remote", url:"https://remote.site/"},
         {title:"Dashboard", url:"+/projects/flytesnacks/executions?domain=development&duration=all"},
         {title:"Information", url:"/information"}

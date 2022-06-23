@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface DefaultAppBarProps {
   items: FlyteNavItem[];
+  console?: string;
 }
 
 /** Renders the default content for the app bar, which is the logo and help links */
@@ -61,7 +62,11 @@ export const DefaultAppBarContent = (props: DefaultAppBarProps) => {
       <Link className={classnames(commonStyles.linkUnstyled)} to={Routes.SelectProject.path}>
         <FlyteLogo size={32} />
       </Link>
-      {props.items?.length > 0 ? <NavigationDropdown items={props.items} /> : false}
+      {props.items?.length > 0 ? (
+        <NavigationDropdown items={props.items} console={props.console} />
+      ) : (
+        false
+      )}
       <div className={styles.spacer} />
       {isFlagEnabled && <OnlyMine />}
       <UserInformation />

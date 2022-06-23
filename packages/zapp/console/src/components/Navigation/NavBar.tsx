@@ -16,7 +16,7 @@ export const NavBar = (props: NavBarProps) => {
   const content = props.useCustomContent ? (
     <div id={navBarContentId} />
   ) : (
-    <DefaultAppBarContent items={navData?.items ?? []} />
+    <DefaultAppBarContent items={navData?.items ?? []} console={navData?.console} />
   );
 
   return (
