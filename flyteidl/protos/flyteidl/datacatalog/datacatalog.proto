@@ -6,6 +6,8 @@ import "flyteidl/core/literals.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog";
+
 /*
  * Data Catalog service definition
  * Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
@@ -37,7 +39,7 @@ service DataCatalog {
 
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
-    // Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    // Once you acquire a reservation, you need to  periodically extend the reservation with an
     // identical call. If the reservation is not extended before the defined expiration, it may be
     // acquired by another task.
     // Note: We may have multiple concurrent tasks with the same signature and the same input that
