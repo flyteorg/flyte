@@ -111,7 +111,7 @@ class DataCatalog final {
     }
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
-    // Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    // Once you acquire a reservation, you need to  periodically extend the reservation with an
     // identical call. If the reservation is not extended before the defined expiration, it may be
     // acquired by another task.
     // Note: We may have multiple concurrent tasks with the same signature and the same input that
@@ -178,7 +178,7 @@ class DataCatalog final {
       virtual void ListDatasets(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ListDatasetsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
       // (ie. another entity owns the reservation) then that reservation is retrieved.
-      // Once you acquire a reservation, you need to  periodically extend the reservation with an 
+      // Once you acquire a reservation, you need to  periodically extend the reservation with an
       // identical call. If the reservation is not extended before the defined expiration, it may be
       // acquired by another task.
       // Note: We may have multiple concurrent tasks with the same signature and the same input that
@@ -387,7 +387,7 @@ class DataCatalog final {
     virtual ::grpc::Status ListDatasets(::grpc::ServerContext* context, const ::datacatalog::ListDatasetsRequest* request, ::datacatalog::ListDatasetsResponse* response);
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
-    // Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    // Once you acquire a reservation, you need to  periodically extend the reservation with an
     // identical call. If the reservation is not extended before the defined expiration, it may be
     // acquired by another task.
     // Note: We may have multiple concurrent tasks with the same signature and the same input that

@@ -125,7 +125,7 @@ class DataCatalogServicer(object):
   def GetOrExtendReservation(self, request, context):
     """Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     (ie. another entity owns the reservation) then that reservation is retrieved.
-    Once you acquire a reservation, you need to  periodically extend the reservation with an 
+    Once you acquire a reservation, you need to  periodically extend the reservation with an
     identical call. If the reservation is not extended before the defined expiration, it may be
     acquired by another task.
     Note: We may have multiple concurrent tasks with the same signature and the same input that

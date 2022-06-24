@@ -30982,7 +30982,9 @@ public final class Datacatalog {
       "g.GetOrExtendReservationResponse\022e\n\022Rele" +
       "aseReservation\022&.datacatalog.ReleaseRese" +
       "rvationRequest\032\'.datacatalog.ReleaseRese" +
-      "rvationResponseb\006proto3"
+      "rvationResponseB=Z;github.com/flyteorg/f" +
+      "lyteidl/gen/pb-go/flyteidl/datacatalogb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

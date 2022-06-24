@@ -1244,12 +1244,14 @@ const char descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eprot
   "g.GetOrExtendReservationResponse\022e\n\022Rele"
   "aseReservation\022&.datacatalog.ReleaseRese"
   "rvationRequest\032\'.datacatalog.ReleaseRese"
-  "rvationResponseb\006proto3"
+  "rvationResponseB=Z;github.com/flyteorg/f"
+  "lyteidl/gen/pb-go/flyteidl/datacatalogb\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto = {
   false, InitDefaults_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eproto,
-  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4503,
+  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4566,
 };
 
 void AddDescriptors_flyteidl_2fdatacatalog_2fdatacatalog_2eproto() {
