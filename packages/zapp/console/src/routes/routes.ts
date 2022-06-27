@@ -34,6 +34,11 @@ export class Routes {
           makeProjectBoundPath(project, `/workflows${domain ? `?domain=${domain}` : ''}`),
         path: `${projectBasePath}/workflows`,
       },
+      launchPlans: {
+        makeUrl: (project: string, domain?: string) =>
+          makeProjectBoundPath(project, `/launchPlans${domain ? `?domain=${domain}` : ''}`),
+        path: `${projectBasePath}/launchPlans`,
+      },
     },
   };
 
@@ -60,6 +65,13 @@ export class Routes {
     makeUrl: (project: string, domain: string, workflowName: string) =>
       makeProjectDomainBoundPath(project, domain, `/workflows/${workflowName}`),
     path: `${projectDomainBasePath}/workflows/:workflowName`,
+  };
+
+  // LaunchPlans
+  static LaunchPlanDetails = {
+    makeUrl: (project: string, domain: string, launchPlanName: string) =>
+      makeProjectDomainBoundPath(project, domain, `/launchPlans/${launchPlanName}`),
+    path: `${projectDomainBasePath}/launchPlans/:launchPlanName`,
   };
 
   // Entity Version Details

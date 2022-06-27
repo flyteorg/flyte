@@ -4,6 +4,7 @@ import { ProjectDetails } from 'components/Project/ProjectDetails';
 import { SelectProject } from 'components/SelectProject/SelectProject';
 import { TaskDetails } from 'components/Task/TaskDetails';
 import { WorkflowDetails } from 'components/Workflow/WorkflowDetails';
+import { LaunchPlanDetails } from 'components/LaunchPlan/LaunchPlanDetails';
 import { EntityVersionsDetailsContainer } from 'components/Entities/VersionDetails/EntityVersionDetailsContainer';
 
 /** Indexes the components for each defined route. These are done separately to avoid circular references
@@ -17,4 +18,5 @@ export const components = {
   taskDetails: TaskDetails,
   workflowDetails: WorkflowDetails,
   entityVersionDetails: EntityVersionsDetailsContainer,
+  launchPlanDetails: LaunchPlanDetails,
 };

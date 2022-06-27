@@ -29,4 +29,5 @@ export const workflowVersionsTableColumnWidths = {
   release: 150,
   lastRun: 175,
   createdAt: 260,
+  recentRun: 160,
 };

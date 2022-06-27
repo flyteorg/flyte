@@ -1,6 +1,9 @@
 import { Typography } from '@material-ui/core';
 import { formatDateUTC } from 'common/formatters';
-import { timestampToDate } from 'common/utils';
+import { padExecutionPaths, padExecutions, timestampToDate } from 'common/utils';
+import { WaitForData } from 'components/common/WaitForData';
+import ProjectStatusBar from 'components/Project/ProjectStatusBar';
+import * as moment from 'moment';
 import * as React from 'react';
 import { useWorkflowVersionsColumnStyles } from './styles';
 import { WorkflowVersionColumnDefinition } from './types';
@@ -35,6 +38,39 @@ export function useWorkflowVersionsTableColumns(): WorkflowVersionColumnDefiniti
         className: styles.columnCreatedAt,
         key: 'createdAt',
         label: 'time created',
+      },
+      {
+        cellRenderer: ({ executions }) => {
+          return (
+            <WaitForData {...executions}>
+              <Typography variant="body1">
+                {executions.value.length
+                  ? moment(timestampToDate(executions.value[0].closure.createdAt)).fromNow()
+                  : ''}
+              </Typography>
+            </WaitForData>
+          );
+        },
+        className: styles.columnLastRun,
+        key: 'lastExecution',
+        label: 'last execution',
+      },
+      {
+        cellRenderer: ({ executions }) => {
+          return (
+            <WaitForData {...executions}>
+              <ProjectStatusBar
+                items={padExecutions(
+                  executions.value.map((execution) => execution.closure.phase) || [],
+                )}
+                paths={padExecutionPaths(executions.value.map((execution) => execution.id) || [])}
+              />
+            </WaitForData>
+          );
+        },
+        className: styles.columnRecentRun,
+        key: 'recentRun',
+        label: 'recent run',
       },
     ],
     [styles],

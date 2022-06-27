@@ -11,7 +11,7 @@ import { isLoadingState } from 'components/hooks/fetchMachine';
 import { useEntityVersions } from 'components/hooks/Entity/useEntityVersions';
 import { interactiveTextColor } from 'components/Theme/constants';
 import { SortDirection } from 'models/AdminEntity/types';
-import { Identifier, ResourceIdentifier } from 'models/Common/types';
+import { Identifier, ResourceIdentifier, ResourceType } from 'models/Common/types';
 import { executionSortFields } from 'models/Execution/constants';
 import { executionFilterGenerator, versionDetailsUrlGenerator } from './generators';
 import { WorkflowVersionsTablePageSize, entityStrings } from './constants';
@@ -20,6 +20,7 @@ import t, { patternKey } from './strings';
 const useStyles = makeStyles((theme: Theme) => ({
   headerContainer: {
     display: 'flex',
+    marginTop: theme.spacing(3),
   },
   collapseButton: {
     marginTop: theme.spacing(-0.5),
@@ -114,7 +115,7 @@ export const EntityVersions: React.FC<EntityVersionsProps> = ({ id, showAll = fa
           <EntityVersionsTable
             {...versions}
             isFetching={isLoadingState(versions.state)}
-            versionView={showAll}
+            versionView={showAll && resourceType !== ResourceType.LAUNCH_PLAN}
             resourceType={resourceType}
           />
         ) : (

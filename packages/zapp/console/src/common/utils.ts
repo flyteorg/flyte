@@ -1,5 +1,8 @@
 import { Protobuf } from 'flyteidl';
 import * as Long from 'long';
+import { WorkflowExecutionPhase } from 'models/Execution/enums';
+import { WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { Routes } from 'routes/routes';
 
 /** Determines if a given date string or object is a valid, usable date. This will detect
  * JS Date objects which have been initialized with invalid values as well as strings which
@@ -101,3 +104,22 @@ export function toBoolean(value?: string): boolean {
 export function stringifyValue(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
+
+export const padExecutions = (items: WorkflowExecutionPhase[]) => {
+  if (items.length >= 10) {
+    return items.slice(0, 10).reverse();
+  }
+  const emptyExecutions = new Array(10 - items.length).fill(WorkflowExecutionPhase.QUEUED);
+  return [...items, ...emptyExecutions].reverse();
+};
+
+export const padExecutionPaths = (items: WorkflowExecutionIdentifier[]) => {
+  if (items.length >= 10) {
+    return items
+      .slice(0, 10)
+      .map((id) => Routes.ExecutionDetails.makeUrl(id))
+      .reverse();
+  }
+  const emptyExecutions = new Array(10 - items.length).fill(null);
+  return [...items.map((id) => Routes.ExecutionDetails.makeUrl(id)), ...emptyExecutions].reverse();
+};

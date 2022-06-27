@@ -8,6 +8,7 @@ import { ResourceIdentifier } from 'models/Common/types';
 import * as React from 'react';
 import { entitySections } from './constants';
 import { EntityDetailsHeader } from './EntityDetailsHeader';
+import { EntityInputs } from './EntityInputs';
 import { EntityExecutions } from './EntityExecutions';
 import { EntitySchedules } from './EntitySchedules';
 import { EntityVersions } from './EntityVersions';
@@ -16,7 +17,7 @@ import { EntityExecutionsBarChart } from './EntityExecutionsBarChart';
 const useStyles = makeStyles((theme: Theme) => ({
   metadataContainer: {
     display: 'flex',
-    marginBottom: theme.spacing(5),
+    marginBottom: theme.spacing(2),
     marginTop: theme.spacing(2),
     width: '100%',
   },
@@ -38,6 +39,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   schedulesContainer: {
     flex: '1 2 auto',
     marginRight: theme.spacing(30),
+  },
+  inputsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
   },
 }));
 
@@ -67,12 +72,18 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({ id }) => {
             <EntityDescription id={id} />
           </div>
         ) : null}
-        {sections.schedules ? (
+        {!sections.inputs && sections.schedules ? (
           <div className={styles.schedulesContainer}>
             <EntitySchedules id={id} />
           </div>
         ) : null}
       </div>
+
+      {sections.inputs ? (
+        <div className={styles.inputsContainer}>
+          <EntityInputs id={id} />
+        </div>
+      ) : null}
 
       {sections.versions ? (
         <div className={styles.versionsContainer}>

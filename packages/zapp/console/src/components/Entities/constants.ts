@@ -4,7 +4,7 @@ type EntityStringMap = { [k in ResourceType]: string };
 
 export const entityStrings: EntityStringMap = {
   [ResourceType.DATASET]: 'dataset',
-  [ResourceType.LAUNCH_PLAN]: 'launch plan',
+  [ResourceType.LAUNCH_PLAN]: 'launch_plan',
   [ResourceType.TASK]: 'task',
   [ResourceType.UNSPECIFIED]: 'item',
   [ResourceType.WORKFLOW]: 'workflow',
@@ -14,7 +14,7 @@ type TypeNameToEntityResourceType = { [key: string]: ResourceType };
 
 export const typeNameToEntityResource: TypeNameToEntityResourceType = {
   ['dataset']: ResourceType.DATASET,
-  ['launch plan']: ResourceType.LAUNCH_PLAN,
+  ['launch_plan']: ResourceType.LAUNCH_PLAN,
   ['task']: ResourceType.TASK,
   ['item']: ResourceType.UNSPECIFIED,
   ['workflow']: ResourceType.WORKFLOW,
@@ -27,15 +27,17 @@ interface EntitySectionsFlags {
   schedules?: boolean;
   versions?: boolean;
   descriptionInputsAndOutputs?: boolean;
+  inputs?: boolean;
 }
 
 export const entitySections: { [k in ResourceType]: EntitySectionsFlags } = {
   [ResourceType.DATASET]: { description: true },
   [ResourceType.LAUNCH_PLAN]: {
-    description: true,
     executions: true,
-    launch: true,
+    launch: false,
+    inputs: true,
     schedules: true,
+    versions: true,
   },
   [ResourceType.TASK]: {
     description: true,

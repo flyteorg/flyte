@@ -13,6 +13,7 @@ import * as React from 'react';
 import { matchPath, NavLink, NavLinkProps } from 'react-router-dom';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
+import { MuiLaunchPlanIcon } from '@flyteconsole/ui-atoms';
 import { ProjectSelector } from './ProjectSelector';
 
 interface ProjectNavigationRouteParams {
@@ -112,6 +113,20 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
       },
       path: Routes.ProjectDetails.sections.tasks.makeUrl(project.value.id, domainId),
       text: 'Tasks',
+    },
+    {
+      icon: MuiLaunchPlanIcon,
+      isActive: (match, location) => {
+        const finalMatch = match
+          ? match
+          : matchPath(location.pathname, {
+              path: Routes.LaunchPlanDetails.path,
+              exact: false,
+            });
+        return !!finalMatch;
+      },
+      path: Routes.ProjectDetails.sections.launchPlans.makeUrl(project.value.id, domainId),
+      text: 'Launch Plans',
     },
   ];
 

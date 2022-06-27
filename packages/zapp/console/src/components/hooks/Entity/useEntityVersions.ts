@@ -1,6 +1,5 @@
-import { IdentifierScope, Identifier, ResourceIdentifier } from 'models/Common/types';
+import { IdentifierScope, ResourceIdentifier } from 'models/Common/types';
 import { RequestConfig } from 'models/AdminEntity/types';
-import { entityStrings } from 'components/Entities/constants';
 import { usePagination } from '../usePagination';
 import { EntityType, entityFunctions } from './constants';
 

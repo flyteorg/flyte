@@ -5,6 +5,11 @@ import * as React from 'react';
 import { ListRowProps } from 'react-virtualized';
 import { Workflow } from 'models/Workflow/types';
 import TableRow from '@material-ui/core/TableRow';
+import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
+import { executionSortFields } from 'models/Execution/constants';
+import { SortDirection } from 'models/AdminEntity/types';
+import { executionFilterGenerator } from 'components/Entities/generators';
+import { ResourceIdentifier } from 'models/Common/types';
 import { useWorkflowVersionsColumnStyles } from './styles';
 import { WorkflowExecutionsTableState, WorkflowVersionColumnDefinition } from './types';
 
@@ -51,6 +56,31 @@ export const WorkflowVersionRow: React.FC<WorkflowVersionRowProps> = ({
   const versionTableStyles = useWorkflowVersionsColumnStyles();
   const styles = useStyles();
 
+  const sort = {
+    key: executionSortFields.createdAt,
+    direction: SortDirection.DESCENDING,
+  };
+
+  const baseFilters = React.useMemo(
+    () =>
+      workflow.id.resourceType
+        ? executionFilterGenerator[workflow.id.resourceType](
+            workflow.id as ResourceIdentifier,
+            workflow.id.version,
+          )
+        : [],
+    [workflow.id],
+  );
+
+  const executions = useWorkflowExecutions(
+    { domain: workflow.id.domain, project: workflow.id.project, version: workflow.id.version },
+    {
+      sort,
+      filter: baseFilters,
+      limit: 10,
+    },
+  );
+
   return (
     <TableRow className={classnames(styles.row)} style={style} onClick={onClick}>
       {versionView && (
@@ -74,6 +104,7 @@ export const WorkflowVersionRow: React.FC<WorkflowVersionRowProps> = ({
           {cellRenderer({
             workflow,
             state,
+            executions,
           })}
         </TableCell>
       ))}

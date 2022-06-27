@@ -68,6 +68,7 @@ export const EntityDetailsHeader: React.FC<EntityDetailsHeaderProps> = ({
 
   const domain = getProjectDomain(project, id.domain);
   const headerText = `${domain.name} / ${id.name}`;
+
   return (
     <>
       <div className={styles.headerContainer}>

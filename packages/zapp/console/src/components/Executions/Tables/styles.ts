@@ -178,4 +178,10 @@ export const useWorkflowVersionsColumnStyles = makeStyles(() => ({
   columnCreatedAt: {
     flexBasis: workflowVersionsTableColumnWidths.createdAt,
   },
+  columnLastRun: {
+    flexBasis: workflowVersionsTableColumnWidths.lastRun,
+  },
+  columnRecentRun: {
+    flexBasis: workflowVersionsTableColumnWidths.recentRun,
+  },
 }));

@@ -1,3 +1,4 @@
+import { PaginatedFetchableData } from 'components/hooks/types';
 import { Execution, NodeExecution, NodeExecutionIdentifier } from 'models/Execution/types';
 import { Workflow } from 'models/Workflow/types';
 
@@ -32,6 +33,7 @@ export type WorkflowExecutionColumnDefinition = ColumnDefinition<WorkflowExecuti
 export interface WorkflowVersionCellRendererData {
   workflow: Workflow;
   state: WorkflowExecutionsTableState;
+  executions: PaginatedFetchableData<Execution>;
 }
 
 export type WorkflowVersionColumnDefinition = ColumnDefinition<WorkflowVersionCellRendererData>;

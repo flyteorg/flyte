@@ -32,6 +32,11 @@ export const ApplicationRouter: React.FC = () => (
       />
       <Route
         exact
+        path={Routes.LaunchPlanDetails.path}
+        component={withSideNavigation(components.launchPlanDetails)}
+      />
+      <Route
+        exact
         path={Routes.WorkflowDetails.path}
         component={withSideNavigation(components.workflowDetails)}
       />

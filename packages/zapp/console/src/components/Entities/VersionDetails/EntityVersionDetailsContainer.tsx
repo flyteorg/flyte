@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { withRouteParams } from 'components/common/withRouteParams';
-import { ResourceIdentifier } from 'models/Common/types';
+import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common/WaitForData';
 import { useProject } from 'components/hooks/useProjects';
@@ -13,7 +13,11 @@ import { typeNameToEntityResource } from '../constants';
 import { versionsDetailsSections } from './constants';
 import { EntityVersionDetails } from './EntityVersionDetails';
 
-const useStyles = makeStyles((theme: Theme) => ({
+interface StyleProps {
+  resourceType: ResourceType;
+}
+
+const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   verionDetailsContainer: {
     marginTop: theme.spacing(2),
     display: 'flex',
@@ -39,9 +43,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   versionsContainer: {
     display: 'flex',
     flex: '0 1 auto',
-    height: '40%',
+    height: ({ resourceType }) => (resourceType === ResourceType.LAUNCH_PLAN ? '100%' : '40%'),
     flexDirection: 'column',
-    overflowY: 'scroll',
+    overflowY: 'auto',
   },
 }));
 
@@ -81,7 +85,7 @@ const EntityVersionsDetailsContainerImpl: React.FC<WorkflowVersionDetailsRoutePa
   const sections = entitySections[id.resourceType];
   const versionsSections = versionsDetailsSections[id.resourceType];
   const project = useProject(workflowId.project);
-  const styles = useStyles();
+  const styles = useStyles({ resourceType: id.resourceType });
 
   return (
     <WaitForData {...project}>

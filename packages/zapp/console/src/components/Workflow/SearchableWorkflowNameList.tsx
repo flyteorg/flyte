@@ -7,9 +7,7 @@ import { separatorColor, primaryTextColor, workflowLabelColor } from 'components
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes/routes';
-import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import { Shimmer } from 'components/common/Shimmer';
-import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { debounce } from 'lodash';
 import {
   IconButton,
@@ -27,6 +25,7 @@ import { NamedEntityState } from 'models/enums';
 import { updateWorkflowState } from 'models/Workflow/api';
 import { useState } from 'react';
 import { useSnackbar } from 'notistack';
+import { padExecutionPaths, padExecutions } from 'common/utils';
 import { WorkflowListStructureItem } from './types';
 import ProjectStatusBar from '../Project/ProjectStatusBar';
 import { workflowNoInputsString } from '../Launch/LaunchForm/constants';
@@ -141,25 +140,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     flex: 1,
   },
 }));
-
-const padExecutions = (items: WorkflowExecutionPhase[]) => {
-  if (items.length >= 10) {
-    return items.slice(0, 10).reverse();
-  }
-  const emptyExecutions = new Array(10 - items.length).fill(WorkflowExecutionPhase.QUEUED);
-  return [...items, ...emptyExecutions].reverse();
-};
-
-const padExecutionPaths = (items: WorkflowExecutionIdentifier[]) => {
-  if (items.length >= 10) {
-    return items
-      .slice(0, 10)
-      .map((id) => Routes.ExecutionDetails.makeUrl(id))
-      .reverse();
-  }
-  const emptyExecutions = new Array(10 - items.length).fill(null);
-  return [...items.map((id) => Routes.ExecutionDetails.makeUrl(id)), ...emptyExecutions].reverse();
-};
 
 const getArchiveIcon = (isArchived: boolean) =>
   isArchived ? <UnarchiveOutline /> : <ArchiveOutlined />;
