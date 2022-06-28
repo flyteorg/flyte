@@ -23,13 +23,13 @@ func (_m Plugin_Abort) Return(_a0 error) *Plugin_Abort {
 }
 
 func (_m *Plugin) OnAbort(ctx context.Context, tCtx core.TaskExecutionContext) *Plugin_Abort {
-	c := _m.On("Abort", ctx, tCtx)
-	return &Plugin_Abort{Call: c}
+	c_call := _m.On("Abort", ctx, tCtx)
+	return &Plugin_Abort{Call: c_call}
 }
 
 func (_m *Plugin) OnAbortMatch(matchers ...interface{}) *Plugin_Abort {
-	c := _m.On("Abort", matchers...)
-	return &Plugin_Abort{Call: c}
+	c_call := _m.On("Abort", matchers...)
+	return &Plugin_Abort{Call: c_call}
 }
 
 // Abort provides a mock function with given fields: ctx, tCtx
@@ -55,13 +55,13 @@ func (_m Plugin_Finalize) Return(_a0 error) *Plugin_Finalize {
 }
 
 func (_m *Plugin) OnFinalize(ctx context.Context, tCtx core.TaskExecutionContext) *Plugin_Finalize {
-	c := _m.On("Finalize", ctx, tCtx)
-	return &Plugin_Finalize{Call: c}
+	c_call := _m.On("Finalize", ctx, tCtx)
+	return &Plugin_Finalize{Call: c_call}
 }
 
 func (_m *Plugin) OnFinalizeMatch(matchers ...interface{}) *Plugin_Finalize {
-	c := _m.On("Finalize", matchers...)
-	return &Plugin_Finalize{Call: c}
+	c_call := _m.On("Finalize", matchers...)
+	return &Plugin_Finalize{Call: c_call}
 }
 
 // Finalize provides a mock function with given fields: ctx, tCtx
@@ -87,13 +87,13 @@ func (_m Plugin_GetID) Return(_a0 string) *Plugin_GetID {
 }
 
 func (_m *Plugin) OnGetID() *Plugin_GetID {
-	c := _m.On("GetID")
-	return &Plugin_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &Plugin_GetID{Call: c_call}
 }
 
 func (_m *Plugin) OnGetIDMatch(matchers ...interface{}) *Plugin_GetID {
-	c := _m.On("GetID", matchers...)
-	return &Plugin_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &Plugin_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -119,13 +119,13 @@ func (_m Plugin_GetProperties) Return(_a0 core.PluginProperties) *Plugin_GetProp
 }
 
 func (_m *Plugin) OnGetProperties() *Plugin_GetProperties {
-	c := _m.On("GetProperties")
-	return &Plugin_GetProperties{Call: c}
+	c_call := _m.On("GetProperties")
+	return &Plugin_GetProperties{Call: c_call}
 }
 
 func (_m *Plugin) OnGetPropertiesMatch(matchers ...interface{}) *Plugin_GetProperties {
-	c := _m.On("GetProperties", matchers...)
-	return &Plugin_GetProperties{Call: c}
+	c_call := _m.On("GetProperties", matchers...)
+	return &Plugin_GetProperties{Call: c_call}
 }
 
 // GetProperties provides a mock function with given fields:
@@ -151,13 +151,13 @@ func (_m Plugin_Handle) Return(_a0 core.Transition, _a1 error) *Plugin_Handle {
 }
 
 func (_m *Plugin) OnHandle(ctx context.Context, tCtx core.TaskExecutionContext) *Plugin_Handle {
-	c := _m.On("Handle", ctx, tCtx)
-	return &Plugin_Handle{Call: c}
+	c_call := _m.On("Handle", ctx, tCtx)
+	return &Plugin_Handle{Call: c_call}
 }
 
 func (_m *Plugin) OnHandleMatch(matchers ...interface{}) *Plugin_Handle {
-	c := _m.On("Handle", matchers...)
-	return &Plugin_Handle{Call: c}
+	c_call := _m.On("Handle", matchers...)
+	return &Plugin_Handle{Call: c_call}
 }
 
 // Handle provides a mock function with given fields: ctx, tCtx

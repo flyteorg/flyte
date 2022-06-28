@@ -30,13 +30,13 @@ func (_m Client_Get) Return(_a0 catalog.Entry, _a1 error) *Client_Get {
 }
 
 func (_m *Client) OnGet(ctx context.Context, key catalog.Key) *Client_Get {
-	c := _m.On("Get", ctx, key)
-	return &Client_Get{Call: c}
+	c_call := _m.On("Get", ctx, key)
+	return &Client_Get{Call: c_call}
 }
 
 func (_m *Client) OnGetMatch(matchers ...interface{}) *Client_Get {
-	c := _m.On("Get", matchers...)
-	return &Client_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &Client_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, key
@@ -69,13 +69,13 @@ func (_m Client_GetOrExtendReservation) Return(_a0 *datacatalog.Reservation, _a1
 }
 
 func (_m *Client) OnGetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) *Client_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", ctx, key, ownerID, heartbeatInterval)
-	return &Client_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", ctx, key, ownerID, heartbeatInterval)
+	return &Client_GetOrExtendReservation{Call: c_call}
 }
 
 func (_m *Client) OnGetOrExtendReservationMatch(matchers ...interface{}) *Client_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", matchers...)
-	return &Client_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", matchers...)
+	return &Client_GetOrExtendReservation{Call: c_call}
 }
 
 // GetOrExtendReservation provides a mock function with given fields: ctx, key, ownerID, heartbeatInterval
@@ -110,13 +110,13 @@ func (_m Client_Put) Return(_a0 catalog.Status, _a1 error) *Client_Put {
 }
 
 func (_m *Client) OnPut(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) *Client_Put {
-	c := _m.On("Put", ctx, key, reader, metadata)
-	return &Client_Put{Call: c}
+	c_call := _m.On("Put", ctx, key, reader, metadata)
+	return &Client_Put{Call: c_call}
 }
 
 func (_m *Client) OnPutMatch(matchers ...interface{}) *Client_Put {
-	c := _m.On("Put", matchers...)
-	return &Client_Put{Call: c}
+	c_call := _m.On("Put", matchers...)
+	return &Client_Put{Call: c_call}
 }
 
 // Put provides a mock function with given fields: ctx, key, reader, metadata
@@ -149,13 +149,13 @@ func (_m Client_ReleaseReservation) Return(_a0 error) *Client_ReleaseReservation
 }
 
 func (_m *Client) OnReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) *Client_ReleaseReservation {
-	c := _m.On("ReleaseReservation", ctx, key, ownerID)
-	return &Client_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", ctx, key, ownerID)
+	return &Client_ReleaseReservation{Call: c_call}
 }
 
 func (_m *Client) OnReleaseReservationMatch(matchers ...interface{}) *Client_ReleaseReservation {
-	c := _m.On("ReleaseReservation", matchers...)
-	return &Client_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", matchers...)
+	return &Client_ReleaseReservation{Call: c_call}
 }
 
 // ReleaseReservation provides a mock function with given fields: ctx, key, ownerID

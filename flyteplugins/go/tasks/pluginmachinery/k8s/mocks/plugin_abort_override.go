@@ -28,13 +28,13 @@ func (_m PluginAbortOverride_OnAbort) Return(behavior k8s.AbortBehavior, err err
 }
 
 func (_m *PluginAbortOverride) OnOnAbort(ctx context.Context, tCtx core.TaskExecutionContext, resource client.Object) *PluginAbortOverride_OnAbort {
-	c := _m.On("OnAbort", ctx, tCtx, resource)
-	return &PluginAbortOverride_OnAbort{Call: c}
+	c_call := _m.On("OnAbort", ctx, tCtx, resource)
+	return &PluginAbortOverride_OnAbort{Call: c_call}
 }
 
 func (_m *PluginAbortOverride) OnOnAbortMatch(matchers ...interface{}) *PluginAbortOverride_OnAbort {
-	c := _m.On("OnAbort", matchers...)
-	return &PluginAbortOverride_OnAbort{Call: c}
+	c_call := _m.On("OnAbort", matchers...)
+	return &PluginAbortOverride_OnAbort{Call: c_call}
 }
 
 // OnAbort provides a mock function with given fields: ctx, tCtx, resource

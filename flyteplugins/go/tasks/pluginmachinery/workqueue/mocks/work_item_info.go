@@ -21,13 +21,13 @@ func (_m WorkItemInfo_Error) Return(_a0 error) *WorkItemInfo_Error {
 }
 
 func (_m *WorkItemInfo) OnError() *WorkItemInfo_Error {
-	c := _m.On("Error")
-	return &WorkItemInfo_Error{Call: c}
+	c_call := _m.On("Error")
+	return &WorkItemInfo_Error{Call: c_call}
 }
 
 func (_m *WorkItemInfo) OnErrorMatch(matchers ...interface{}) *WorkItemInfo_Error {
-	c := _m.On("Error", matchers...)
-	return &WorkItemInfo_Error{Call: c}
+	c_call := _m.On("Error", matchers...)
+	return &WorkItemInfo_Error{Call: c_call}
 }
 
 // Error provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m WorkItemInfo_ID) Return(_a0 string) *WorkItemInfo_ID {
 }
 
 func (_m *WorkItemInfo) OnID() *WorkItemInfo_ID {
-	c := _m.On("ID")
-	return &WorkItemInfo_ID{Call: c}
+	c_call := _m.On("ID")
+	return &WorkItemInfo_ID{Call: c_call}
 }
 
 func (_m *WorkItemInfo) OnIDMatch(matchers ...interface{}) *WorkItemInfo_ID {
-	c := _m.On("ID", matchers...)
-	return &WorkItemInfo_ID{Call: c}
+	c_call := _m.On("ID", matchers...)
+	return &WorkItemInfo_ID{Call: c_call}
 }
 
 // ID provides a mock function with given fields:
@@ -85,13 +85,13 @@ func (_m WorkItemInfo_Item) Return(_a0 workqueue.WorkItem) *WorkItemInfo_Item {
 }
 
 func (_m *WorkItemInfo) OnItem() *WorkItemInfo_Item {
-	c := _m.On("Item")
-	return &WorkItemInfo_Item{Call: c}
+	c_call := _m.On("Item")
+	return &WorkItemInfo_Item{Call: c_call}
 }
 
 func (_m *WorkItemInfo) OnItemMatch(matchers ...interface{}) *WorkItemInfo_Item {
-	c := _m.On("Item", matchers...)
-	return &WorkItemInfo_Item{Call: c}
+	c_call := _m.On("Item", matchers...)
+	return &WorkItemInfo_Item{Call: c_call}
 }
 
 // Item provides a mock function with given fields:
@@ -119,13 +119,13 @@ func (_m WorkItemInfo_Status) Return(_a0 workqueue.WorkStatus) *WorkItemInfo_Sta
 }
 
 func (_m *WorkItemInfo) OnStatus() *WorkItemInfo_Status {
-	c := _m.On("Status")
-	return &WorkItemInfo_Status{Call: c}
+	c_call := _m.On("Status")
+	return &WorkItemInfo_Status{Call: c_call}
 }
 
 func (_m *WorkItemInfo) OnStatusMatch(matchers ...interface{}) *WorkItemInfo_Status {
-	c := _m.On("Status", matchers...)
-	return &WorkItemInfo_Status{Call: c}
+	c_call := _m.On("Status", matchers...)
+	return &WorkItemInfo_Status{Call: c_call}
 }
 
 // Status provides a mock function with given fields:

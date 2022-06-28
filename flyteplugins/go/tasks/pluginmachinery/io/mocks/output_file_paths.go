@@ -21,13 +21,13 @@ func (_m OutputFilePaths_GetCheckpointPrefix) Return(_a0 storage.DataReference) 
 }
 
 func (_m *OutputFilePaths) OnGetCheckpointPrefix() *OutputFilePaths_GetCheckpointPrefix {
-	c := _m.On("GetCheckpointPrefix")
-	return &OutputFilePaths_GetCheckpointPrefix{Call: c}
+	c_call := _m.On("GetCheckpointPrefix")
+	return &OutputFilePaths_GetCheckpointPrefix{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetCheckpointPrefixMatch(matchers ...interface{}) *OutputFilePaths_GetCheckpointPrefix {
-	c := _m.On("GetCheckpointPrefix", matchers...)
-	return &OutputFilePaths_GetCheckpointPrefix{Call: c}
+	c_call := _m.On("GetCheckpointPrefix", matchers...)
+	return &OutputFilePaths_GetCheckpointPrefix{Call: c_call}
 }
 
 // GetCheckpointPrefix provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m OutputFilePaths_GetDeckPath) Return(_a0 storage.DataReference) *OutputF
 }
 
 func (_m *OutputFilePaths) OnGetDeckPath() *OutputFilePaths_GetDeckPath {
-	c := _m.On("GetDeckPath")
-	return &OutputFilePaths_GetDeckPath{Call: c}
+	c_call := _m.On("GetDeckPath")
+	return &OutputFilePaths_GetDeckPath{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetDeckPathMatch(matchers ...interface{}) *OutputFilePaths_GetDeckPath {
-	c := _m.On("GetDeckPath", matchers...)
-	return &OutputFilePaths_GetDeckPath{Call: c}
+	c_call := _m.On("GetDeckPath", matchers...)
+	return &OutputFilePaths_GetDeckPath{Call: c_call}
 }
 
 // GetDeckPath provides a mock function with given fields:
@@ -85,13 +85,13 @@ func (_m OutputFilePaths_GetErrorPath) Return(_a0 storage.DataReference) *Output
 }
 
 func (_m *OutputFilePaths) OnGetErrorPath() *OutputFilePaths_GetErrorPath {
-	c := _m.On("GetErrorPath")
-	return &OutputFilePaths_GetErrorPath{Call: c}
+	c_call := _m.On("GetErrorPath")
+	return &OutputFilePaths_GetErrorPath{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetErrorPathMatch(matchers ...interface{}) *OutputFilePaths_GetErrorPath {
-	c := _m.On("GetErrorPath", matchers...)
-	return &OutputFilePaths_GetErrorPath{Call: c}
+	c_call := _m.On("GetErrorPath", matchers...)
+	return &OutputFilePaths_GetErrorPath{Call: c_call}
 }
 
 // GetErrorPath provides a mock function with given fields:
@@ -117,13 +117,13 @@ func (_m OutputFilePaths_GetOutputPath) Return(_a0 storage.DataReference) *Outpu
 }
 
 func (_m *OutputFilePaths) OnGetOutputPath() *OutputFilePaths_GetOutputPath {
-	c := _m.On("GetOutputPath")
-	return &OutputFilePaths_GetOutputPath{Call: c}
+	c_call := _m.On("GetOutputPath")
+	return &OutputFilePaths_GetOutputPath{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetOutputPathMatch(matchers ...interface{}) *OutputFilePaths_GetOutputPath {
-	c := _m.On("GetOutputPath", matchers...)
-	return &OutputFilePaths_GetOutputPath{Call: c}
+	c_call := _m.On("GetOutputPath", matchers...)
+	return &OutputFilePaths_GetOutputPath{Call: c_call}
 }
 
 // GetOutputPath provides a mock function with given fields:
@@ -149,13 +149,13 @@ func (_m OutputFilePaths_GetOutputPrefixPath) Return(_a0 storage.DataReference) 
 }
 
 func (_m *OutputFilePaths) OnGetOutputPrefixPath() *OutputFilePaths_GetOutputPrefixPath {
-	c := _m.On("GetOutputPrefixPath")
-	return &OutputFilePaths_GetOutputPrefixPath{Call: c}
+	c_call := _m.On("GetOutputPrefixPath")
+	return &OutputFilePaths_GetOutputPrefixPath{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetOutputPrefixPathMatch(matchers ...interface{}) *OutputFilePaths_GetOutputPrefixPath {
-	c := _m.On("GetOutputPrefixPath", matchers...)
-	return &OutputFilePaths_GetOutputPrefixPath{Call: c}
+	c_call := _m.On("GetOutputPrefixPath", matchers...)
+	return &OutputFilePaths_GetOutputPrefixPath{Call: c_call}
 }
 
 // GetOutputPrefixPath provides a mock function with given fields:
@@ -181,13 +181,13 @@ func (_m OutputFilePaths_GetPreviousCheckpointsPrefix) Return(_a0 storage.DataRe
 }
 
 func (_m *OutputFilePaths) OnGetPreviousCheckpointsPrefix() *OutputFilePaths_GetPreviousCheckpointsPrefix {
-	c := _m.On("GetPreviousCheckpointsPrefix")
-	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c}
+	c_call := _m.On("GetPreviousCheckpointsPrefix")
+	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetPreviousCheckpointsPrefixMatch(matchers ...interface{}) *OutputFilePaths_GetPreviousCheckpointsPrefix {
-	c := _m.On("GetPreviousCheckpointsPrefix", matchers...)
-	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c}
+	c_call := _m.On("GetPreviousCheckpointsPrefix", matchers...)
+	return &OutputFilePaths_GetPreviousCheckpointsPrefix{Call: c_call}
 }
 
 // GetPreviousCheckpointsPrefix provides a mock function with given fields:
@@ -213,13 +213,13 @@ func (_m OutputFilePaths_GetRawOutputPrefix) Return(_a0 storage.DataReference) *
 }
 
 func (_m *OutputFilePaths) OnGetRawOutputPrefix() *OutputFilePaths_GetRawOutputPrefix {
-	c := _m.On("GetRawOutputPrefix")
-	return &OutputFilePaths_GetRawOutputPrefix{Call: c}
+	c_call := _m.On("GetRawOutputPrefix")
+	return &OutputFilePaths_GetRawOutputPrefix{Call: c_call}
 }
 
 func (_m *OutputFilePaths) OnGetRawOutputPrefixMatch(matchers ...interface{}) *OutputFilePaths_GetRawOutputPrefix {
-	c := _m.On("GetRawOutputPrefix", matchers...)
-	return &OutputFilePaths_GetRawOutputPrefix{Call: c}
+	c_call := _m.On("GetRawOutputPrefix", matchers...)
+	return &OutputFilePaths_GetRawOutputPrefix{Call: c_call}
 }
 
 // GetRawOutputPrefix provides a mock function with given fields:

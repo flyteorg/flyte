@@ -25,13 +25,13 @@ func (_m PluginContext_DataStore) Return(_a0 *storage.DataStore) *PluginContext_
 }
 
 func (_m *PluginContext) OnDataStore() *PluginContext_DataStore {
-	c := _m.On("DataStore")
-	return &PluginContext_DataStore{Call: c}
+	c_call := _m.On("DataStore")
+	return &PluginContext_DataStore{Call: c_call}
 }
 
 func (_m *PluginContext) OnDataStoreMatch(matchers ...interface{}) *PluginContext_DataStore {
-	c := _m.On("DataStore", matchers...)
-	return &PluginContext_DataStore{Call: c}
+	c_call := _m.On("DataStore", matchers...)
+	return &PluginContext_DataStore{Call: c_call}
 }
 
 // DataStore provides a mock function with given fields:
@@ -59,13 +59,13 @@ func (_m PluginContext_InputReader) Return(_a0 io.InputReader) *PluginContext_In
 }
 
 func (_m *PluginContext) OnInputReader() *PluginContext_InputReader {
-	c := _m.On("InputReader")
-	return &PluginContext_InputReader{Call: c}
+	c_call := _m.On("InputReader")
+	return &PluginContext_InputReader{Call: c_call}
 }
 
 func (_m *PluginContext) OnInputReaderMatch(matchers ...interface{}) *PluginContext_InputReader {
-	c := _m.On("InputReader", matchers...)
-	return &PluginContext_InputReader{Call: c}
+	c_call := _m.On("InputReader", matchers...)
+	return &PluginContext_InputReader{Call: c_call}
 }
 
 // InputReader provides a mock function with given fields:
@@ -93,13 +93,13 @@ func (_m PluginContext_MaxDatasetSizeBytes) Return(_a0 int64) *PluginContext_Max
 }
 
 func (_m *PluginContext) OnMaxDatasetSizeBytes() *PluginContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes")
-	return &PluginContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes")
+	return &PluginContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 func (_m *PluginContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *PluginContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &PluginContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
+	return &PluginContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 // MaxDatasetSizeBytes provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m PluginContext_OutputWriter) Return(_a0 io.OutputWriter) *PluginContext_
 }
 
 func (_m *PluginContext) OnOutputWriter() *PluginContext_OutputWriter {
-	c := _m.On("OutputWriter")
-	return &PluginContext_OutputWriter{Call: c}
+	c_call := _m.On("OutputWriter")
+	return &PluginContext_OutputWriter{Call: c_call}
 }
 
 func (_m *PluginContext) OnOutputWriterMatch(matchers ...interface{}) *PluginContext_OutputWriter {
-	c := _m.On("OutputWriter", matchers...)
-	return &PluginContext_OutputWriter{Call: c}
+	c_call := _m.On("OutputWriter", matchers...)
+	return &PluginContext_OutputWriter{Call: c_call}
 }
 
 // OutputWriter provides a mock function with given fields:
@@ -159,13 +159,13 @@ func (_m PluginContext_TaskExecutionMetadata) Return(_a0 core.TaskExecutionMetad
 }
 
 func (_m *PluginContext) OnTaskExecutionMetadata() *PluginContext_TaskExecutionMetadata {
-	c := _m.On("TaskExecutionMetadata")
-	return &PluginContext_TaskExecutionMetadata{Call: c}
+	c_call := _m.On("TaskExecutionMetadata")
+	return &PluginContext_TaskExecutionMetadata{Call: c_call}
 }
 
 func (_m *PluginContext) OnTaskExecutionMetadataMatch(matchers ...interface{}) *PluginContext_TaskExecutionMetadata {
-	c := _m.On("TaskExecutionMetadata", matchers...)
-	return &PluginContext_TaskExecutionMetadata{Call: c}
+	c_call := _m.On("TaskExecutionMetadata", matchers...)
+	return &PluginContext_TaskExecutionMetadata{Call: c_call}
 }
 
 // TaskExecutionMetadata provides a mock function with given fields:
@@ -193,13 +193,13 @@ func (_m PluginContext_TaskReader) Return(_a0 core.TaskReader) *PluginContext_Ta
 }
 
 func (_m *PluginContext) OnTaskReader() *PluginContext_TaskReader {
-	c := _m.On("TaskReader")
-	return &PluginContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader")
+	return &PluginContext_TaskReader{Call: c_call}
 }
 
 func (_m *PluginContext) OnTaskReaderMatch(matchers ...interface{}) *PluginContext_TaskReader {
-	c := _m.On("TaskReader", matchers...)
-	return &PluginContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader", matchers...)
+	return &PluginContext_TaskReader{Call: c_call}
 }
 
 // TaskReader provides a mock function with given fields:

@@ -23,13 +23,13 @@ func (_m ResourceManager_AllocateResource) Return(_a0 core.AllocationStatus, _a1
 }
 
 func (_m *ResourceManager) OnAllocateResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string, constraintsSpec core.ResourceConstraintsSpec) *ResourceManager_AllocateResource {
-	c := _m.On("AllocateResource", ctx, namespace, allocationToken, constraintsSpec)
-	return &ResourceManager_AllocateResource{Call: c}
+	c_call := _m.On("AllocateResource", ctx, namespace, allocationToken, constraintsSpec)
+	return &ResourceManager_AllocateResource{Call: c_call}
 }
 
 func (_m *ResourceManager) OnAllocateResourceMatch(matchers ...interface{}) *ResourceManager_AllocateResource {
-	c := _m.On("AllocateResource", matchers...)
-	return &ResourceManager_AllocateResource{Call: c}
+	c_call := _m.On("AllocateResource", matchers...)
+	return &ResourceManager_AllocateResource{Call: c_call}
 }
 
 // AllocateResource provides a mock function with given fields: ctx, namespace, allocationToken, constraintsSpec
@@ -62,13 +62,13 @@ func (_m ResourceManager_GetID) Return(_a0 string) *ResourceManager_GetID {
 }
 
 func (_m *ResourceManager) OnGetID() *ResourceManager_GetID {
-	c := _m.On("GetID")
-	return &ResourceManager_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ResourceManager_GetID{Call: c_call}
 }
 
 func (_m *ResourceManager) OnGetIDMatch(matchers ...interface{}) *ResourceManager_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ResourceManager_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ResourceManager_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -94,13 +94,13 @@ func (_m ResourceManager_ReleaseResource) Return(_a0 error) *ResourceManager_Rel
 }
 
 func (_m *ResourceManager) OnReleaseResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string) *ResourceManager_ReleaseResource {
-	c := _m.On("ReleaseResource", ctx, namespace, allocationToken)
-	return &ResourceManager_ReleaseResource{Call: c}
+	c_call := _m.On("ReleaseResource", ctx, namespace, allocationToken)
+	return &ResourceManager_ReleaseResource{Call: c_call}
 }
 
 func (_m *ResourceManager) OnReleaseResourceMatch(matchers ...interface{}) *ResourceManager_ReleaseResource {
-	c := _m.On("ReleaseResource", matchers...)
-	return &ResourceManager_ReleaseResource{Call: c}
+	c_call := _m.On("ReleaseResource", matchers...)
+	return &ResourceManager_ReleaseResource{Call: c_call}
 }
 
 // ReleaseResource provides a mock function with given fields: ctx, namespace, allocationToken

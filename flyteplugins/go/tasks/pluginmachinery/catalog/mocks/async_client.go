@@ -24,13 +24,13 @@ func (_m AsyncClient_Download) Return(outputFuture catalog.DownloadFuture, err e
 }
 
 func (_m *AsyncClient) OnDownload(ctx context.Context, requests ...catalog.DownloadRequest) *AsyncClient_Download {
-	c := _m.On("Download", ctx, requests)
-	return &AsyncClient_Download{Call: c}
+	c_call := _m.On("Download", ctx, requests)
+	return &AsyncClient_Download{Call: c_call}
 }
 
 func (_m *AsyncClient) OnDownloadMatch(matchers ...interface{}) *AsyncClient_Download {
-	c := _m.On("Download", matchers...)
-	return &AsyncClient_Download{Call: c}
+	c_call := _m.On("Download", matchers...)
+	return &AsyncClient_Download{Call: c_call}
 }
 
 // Download provides a mock function with given fields: ctx, requests
@@ -72,13 +72,13 @@ func (_m AsyncClient_Upload) Return(putFuture catalog.UploadFuture, err error) *
 }
 
 func (_m *AsyncClient) OnUpload(ctx context.Context, requests ...catalog.UploadRequest) *AsyncClient_Upload {
-	c := _m.On("Upload", ctx, requests)
-	return &AsyncClient_Upload{Call: c}
+	c_call := _m.On("Upload", ctx, requests)
+	return &AsyncClient_Upload{Call: c_call}
 }
 
 func (_m *AsyncClient) OnUploadMatch(matchers ...interface{}) *AsyncClient_Upload {
-	c := _m.On("Upload", matchers...)
-	return &AsyncClient_Upload{Call: c}
+	c_call := _m.On("Upload", matchers...)
+	return &AsyncClient_Upload{Call: c_call}
 }
 
 // Upload provides a mock function with given fields: ctx, requests

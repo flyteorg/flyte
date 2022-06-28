@@ -41,8 +41,8 @@ type OutputReader interface {
 	Exists(ctx context.Context) (bool, error)
 	// Read returns the output -> *core.LiteralMap (nil if void), *ExecutionError if user error when reading the output and error to indicate system problems
 	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
-	// GetDeckPath returns a fully qualified path (URN) of deck file.
-	GetDeckPath() *storage.DataReference
+	// DeckExists checks if the deck file has been generated.
+	DeckExists(ctx context.Context) (bool, error)
 }
 
 // CheckpointPaths provides the paths / keys to input Checkpoints directory and an output checkpoints directory.

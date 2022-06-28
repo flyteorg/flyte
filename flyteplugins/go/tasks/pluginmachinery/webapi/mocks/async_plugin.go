@@ -25,13 +25,13 @@ func (_m AsyncPlugin_Create) Return(resourceMeta interface{}, optionalResource i
 }
 
 func (_m *AsyncPlugin) OnCreate(ctx context.Context, tCtx webapi.TaskExecutionContextReader) *AsyncPlugin_Create {
-	c := _m.On("Create", ctx, tCtx)
-	return &AsyncPlugin_Create{Call: c}
+	c_call := _m.On("Create", ctx, tCtx)
+	return &AsyncPlugin_Create{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnCreateMatch(matchers ...interface{}) *AsyncPlugin_Create {
-	c := _m.On("Create", matchers...)
-	return &AsyncPlugin_Create{Call: c}
+	c_call := _m.On("Create", matchers...)
+	return &AsyncPlugin_Create{Call: c_call}
 }
 
 // Create provides a mock function with given fields: ctx, tCtx
@@ -75,13 +75,13 @@ func (_m AsyncPlugin_Delete) Return(_a0 error) *AsyncPlugin_Delete {
 }
 
 func (_m *AsyncPlugin) OnDelete(ctx context.Context, tCtx webapi.DeleteContext) *AsyncPlugin_Delete {
-	c := _m.On("Delete", ctx, tCtx)
-	return &AsyncPlugin_Delete{Call: c}
+	c_call := _m.On("Delete", ctx, tCtx)
+	return &AsyncPlugin_Delete{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnDeleteMatch(matchers ...interface{}) *AsyncPlugin_Delete {
-	c := _m.On("Delete", matchers...)
-	return &AsyncPlugin_Delete{Call: c}
+	c_call := _m.On("Delete", matchers...)
+	return &AsyncPlugin_Delete{Call: c_call}
 }
 
 // Delete provides a mock function with given fields: ctx, tCtx
@@ -107,13 +107,13 @@ func (_m AsyncPlugin_Get) Return(latest interface{}, err error) *AsyncPlugin_Get
 }
 
 func (_m *AsyncPlugin) OnGet(ctx context.Context, tCtx webapi.GetContext) *AsyncPlugin_Get {
-	c := _m.On("Get", ctx, tCtx)
-	return &AsyncPlugin_Get{Call: c}
+	c_call := _m.On("Get", ctx, tCtx)
+	return &AsyncPlugin_Get{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnGetMatch(matchers ...interface{}) *AsyncPlugin_Get {
-	c := _m.On("Get", matchers...)
-	return &AsyncPlugin_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &AsyncPlugin_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, tCtx
@@ -148,13 +148,13 @@ func (_m AsyncPlugin_GetConfig) Return(_a0 webapi.PluginConfig) *AsyncPlugin_Get
 }
 
 func (_m *AsyncPlugin) OnGetConfig() *AsyncPlugin_GetConfig {
-	c := _m.On("GetConfig")
-	return &AsyncPlugin_GetConfig{Call: c}
+	c_call := _m.On("GetConfig")
+	return &AsyncPlugin_GetConfig{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnGetConfigMatch(matchers ...interface{}) *AsyncPlugin_GetConfig {
-	c := _m.On("GetConfig", matchers...)
-	return &AsyncPlugin_GetConfig{Call: c}
+	c_call := _m.On("GetConfig", matchers...)
+	return &AsyncPlugin_GetConfig{Call: c_call}
 }
 
 // GetConfig provides a mock function with given fields:
@@ -180,13 +180,13 @@ func (_m AsyncPlugin_ResourceRequirements) Return(namespace core.ResourceNamespa
 }
 
 func (_m *AsyncPlugin) OnResourceRequirements(ctx context.Context, tCtx webapi.TaskExecutionContextReader) *AsyncPlugin_ResourceRequirements {
-	c := _m.On("ResourceRequirements", ctx, tCtx)
-	return &AsyncPlugin_ResourceRequirements{Call: c}
+	c_call := _m.On("ResourceRequirements", ctx, tCtx)
+	return &AsyncPlugin_ResourceRequirements{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnResourceRequirementsMatch(matchers ...interface{}) *AsyncPlugin_ResourceRequirements {
-	c := _m.On("ResourceRequirements", matchers...)
-	return &AsyncPlugin_ResourceRequirements{Call: c}
+	c_call := _m.On("ResourceRequirements", matchers...)
+	return &AsyncPlugin_ResourceRequirements{Call: c_call}
 }
 
 // ResourceRequirements provides a mock function with given fields: ctx, tCtx
@@ -226,13 +226,13 @@ func (_m AsyncPlugin_Status) Return(phase core.PhaseInfo, err error) *AsyncPlugi
 }
 
 func (_m *AsyncPlugin) OnStatus(ctx context.Context, tCtx webapi.StatusContext) *AsyncPlugin_Status {
-	c := _m.On("Status", ctx, tCtx)
-	return &AsyncPlugin_Status{Call: c}
+	c_call := _m.On("Status", ctx, tCtx)
+	return &AsyncPlugin_Status{Call: c_call}
 }
 
 func (_m *AsyncPlugin) OnStatusMatch(matchers ...interface{}) *AsyncPlugin_Status {
-	c := _m.On("Status", matchers...)
-	return &AsyncPlugin_Status{Call: c}
+	c_call := _m.On("Status", matchers...)
+	return &AsyncPlugin_Status{Call: c_call}
 }
 
 // Status provides a mock function with given fields: ctx, tCtx

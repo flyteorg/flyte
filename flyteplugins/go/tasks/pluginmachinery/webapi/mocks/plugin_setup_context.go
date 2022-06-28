@@ -21,13 +21,13 @@ func (_m PluginSetupContext_MetricsScope) Return(_a0 promutils.Scope) *PluginSet
 }
 
 func (_m *PluginSetupContext) OnMetricsScope() *PluginSetupContext_MetricsScope {
-	c := _m.On("MetricsScope")
-	return &PluginSetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope")
+	return &PluginSetupContext_MetricsScope{Call: c_call}
 }
 
 func (_m *PluginSetupContext) OnMetricsScopeMatch(matchers ...interface{}) *PluginSetupContext_MetricsScope {
-	c := _m.On("MetricsScope", matchers...)
-	return &PluginSetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope", matchers...)
+	return &PluginSetupContext_MetricsScope{Call: c_call}
 }
 
 // MetricsScope provides a mock function with given fields:
