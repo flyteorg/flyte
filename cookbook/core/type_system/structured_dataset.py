@@ -87,7 +87,7 @@ def get_subset_df(
 ) -> Annotated[StructuredDataset, subset_cols]:
     df = df.open(pd.DataFrame).all()
     df = pd.concat([df, pd.DataFrame([[30]], columns=["Age"])])
-    # On specifying BigQuery uri for StructuredDataset, flytekit writes pd.dataframe to a BigQuery table
+    # On specifying BigQuery uri for StructuredDataset, flytekit writes a pandas dataframe to a BigQuery table
     return StructuredDataset(dataframe=df)
 
 
@@ -97,12 +97,13 @@ def get_subset_df(
 #
 # BigQuery ``uri`` allows you to load and retrieve data from cloud using the ``uri``. The ``uri`` comprises of the bucket name and the filename prefixed with ``gs://``.
 # If you specify BigQuery ``uri`` for StructuredDataset, BigQuery creates a table in the location specified by the ``uri``.
+# The ``uri`` in StructuredDataset reads from or writes to S3, GCP, BigQuery, or any storage.
 # Let's understand how to convert a pandas DataFrame to a BigQuery table and vice-versa through an example.
 #
 # Before writing DataFrame to a BigQuery table,
 #
 # #. Create a `GCP account <https://cloud.google.com/docs/authentication/getting-started>`__ and create a service account.
-# #. Create a project and add the ``GOOGLE_APPLICATION_CREDENTIALS`` environment variable to your bashrc file.
+# #. Create a project and add the ``GOOGLE_APPLICATION_CREDENTIALS`` environment variable to your .bashrc file.
 # #. Create a dataset in your project.
 
 
@@ -151,19 +152,19 @@ if __name__ == "__main__":
 
 
 # %%
-# Numpy Encoder and Decoder
+# NumPy Encoder and Decoder
 # ==========================
 #
-# ``StructuredDataset`` ships with an encoder and a decoder that handles conversion of a Python value to Flyte literal and vice-versa, respectively.
-# Let's understand how they need to be written by defining a Numpy encoder and decoder, which in turn helps use Numpy array as a valid type within structured datasets.
+# ``StructuredDataset`` ships with an encoder and a decoder that handles the conversion of a Python value to a Flyte literal and vice-versa, respectively.
+# Let's understand how to write them by defining a NumPy encoder and decoder, which helps use NumPy array as a valid type within structured datasets.
 
 
 # %%
-# Numpy Encoder
+# NumPy Encoder
 # ^^^^^^^^^^^^^
 #
 # We extend ``StructuredDatasetEncoder`` and implement the ``encode`` function.
-# The ``encode`` function converts Numpy array to an intermediate format like parquet.
+# The ``encode`` function converts NumPy array to an intermediate format (parquet file format in this case).
 class NumpyEncodingHandlers(StructuredDatasetEncoder):
     def encode(
         self,
@@ -188,7 +189,7 @@ class NumpyEncodingHandlers(StructuredDatasetEncoder):
 
 
 # %%
-# Numpy Decoder
+# NumPy Decoder
 # ^^^^^^^^^^^^^
 #
 # Next we extend ``StructuredDatasetDecoder`` and implement the ``decode`` function.
@@ -217,7 +218,7 @@ for protocol in [LOCAL, S3]:
     )
 
 # %%
-# You can now use ``numpy.ndarray`` to deserialize the parquet file to Numpy and serialize a task's output (Numpy array) to a parquet file.
+# You can now use ``numpy.ndarray`` to deserialize the parquet file to NumPy and serialize a task's output (NumPy array) to a parquet file.
 
 # %%
 # Let's define a task to test the above functionality.
