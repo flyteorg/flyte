@@ -139,16 +139,13 @@ export function generateColumns(
       label: 'type',
     },
     {
-      cellRenderer: ({
-        execution: {
-          closure: { phase = NodeExecutionPhase.UNDEFINED, taskNodeMetadata },
-        },
-      }) => (
+      cellRenderer: ({ execution }) => (
         <>
-          <ExecutionStatusBadge phase={phase} type="node" />
-          {hasCacheStatus(taskNodeMetadata) ? (
-            <NodeExecutionCacheStatus taskNodeMetadata={taskNodeMetadata} variant="iconOnly" />
-          ) : null}
+          <ExecutionStatusBadge
+            phase={execution.closure?.phase ?? NodeExecutionPhase.UNDEFINED}
+            type="node"
+          />
+          <NodeExecutionCacheStatus execution={execution} variant="iconOnly" />
         </>
       ),
       className: styles.columnStatus,

@@ -1,6 +1,7 @@
 import { timestampToDate } from 'common/utils';
 import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
 import { dNode } from 'models/Graph/types';
+import { isMapTaskType } from 'models/Task/utils';
 import { BarItemData } from './utils';
 
 const WEEK_DURATION_SEC = 7 * 24 * 3600;
@@ -10,6 +11,7 @@ const EMPTY_BAR_ITEM: BarItemData = {
   startOffsetSec: 0,
   durationSec: 0,
   isFromCache: false,
+  isMapTaskCache: false,
 };
 
 export const getChartDurationData = (
@@ -20,7 +22,8 @@ export const getChartDurationData = (
 
   let totalDurationSec = 0;
   const initialStartTime = startedAt.getTime();
-  const result: BarItemData[] = nodes.map(({ execution }) => {
+
+  const result: BarItemData[] = nodes.map(({ execution, value }) => {
     if (!execution) {
       return EMPTY_BAR_ITEM;
     }
@@ -28,6 +31,9 @@ export const getChartDurationData = (
     let phase = execution.closure.phase;
     const isFromCache =
       execution.closure.taskNodeMetadata?.cacheStatus === CatalogCacheStatus.CACHE_HIT;
+
+    const isMapTaskCache =
+      isMapTaskType(value?.template?.type) && value?.template?.metadata?.cacheSerializable;
 
     // Offset values
     let startOffset = 0;
@@ -67,7 +73,7 @@ export const getChartDurationData = (
 
     const startOffsetSec = Math.trunc(startOffset / 1000);
     totalDurationSec = Math.max(totalDurationSec, startOffsetSec + durationSec);
-    return { phase, startOffsetSec, durationSec, isFromCache };
+    return { phase, startOffsetSec, durationSec, isFromCache, isMapTaskCache };
   });
 
   // Do we want to get initialStartTime from different place, to avoid recalculating it.

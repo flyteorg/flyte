@@ -1,6 +1,7 @@
 import { getNodeExecutionPhaseConstants } from 'components/Executions/utils';
 import { primaryTextColor } from 'components/Theme/constants';
 import { NodeExecutionPhase } from 'models/Execution/enums';
+import t from 'components/Executions/strings';
 
 export const CASHED_GREEN = 'rgba(74,227,174,0.25)'; // statusColors.SUCCESS (Mint20) with 25% opacity
 export const TRANSPARENT = 'rgba(0, 0, 0, 0)';
@@ -10,6 +11,7 @@ export interface BarItemData {
   startOffsetSec: number;
   durationSec: number;
   isFromCache: boolean;
+  isMapTaskCache: boolean;
 }
 
 interface ChartDataInput {
@@ -60,11 +62,24 @@ export const generateChartData = (data: BarItemData[]): ChartDataInput => {
     // don't show Label if there is now duration yet.
     const labelString = element.durationSec > 0 ? durationString : '';
 
+    const generateTooltipLabelText = (element: BarItemData): string[] => {
+      if (element.isMapTaskCache) return [tooltipString, t('mapCacheMessage')];
+      if (element.isFromCache) return [tooltipString, t('readFromCache')];
+
+      return [tooltipString];
+    };
+
+    const generateBarLabelText = (element: BarItemData): string => {
+      if (element.isMapTaskCache) return '\u229A ' + t('mapCacheMessage');
+      if (element.isFromCache) return '\u229A ' + t('fromCache');
+      return labelString;
+    };
+
     durations.push(element.durationSec);
     startOffset.push(element.startOffsetSec);
     offsetColor.push(element.isFromCache ? CASHED_GREEN : TRANSPARENT);
-    tooltipLabel.push(element.isFromCache ? [tooltipString, 'Read from cache'] : [tooltipString]);
-    barLabel.push(element.isFromCache ? '\u229A From cache' : labelString);
+    tooltipLabel.push(generateTooltipLabelText(element));
+    barLabel.push(generateBarLabelText(element));
     barColor.push(phaseConstant.badgeColor);
   });
 

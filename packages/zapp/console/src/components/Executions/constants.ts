@@ -11,10 +11,11 @@ import {
   WorkflowExecutionPhase,
 } from 'models/Execution/enums';
 import { TaskType } from 'models/Task/constants';
+import t from './strings';
 import { ExecutionPhaseConstants, NodeExecutionDisplayType } from './types';
 
 export const executionRefreshIntervalMs = 10000;
-export const noLogsFoundString = 'No logs found';
+export const noLogsFoundString = t('noLogsFoundString');
 
 /** Shared values for color/text/etc for each execution phase */
 export const workflowExecutionPhaseConstants: {
@@ -22,52 +23,52 @@ export const workflowExecutionPhaseConstants: {
 } = {
   [WorkflowExecutionPhase.ABORTED]: {
     badgeColor: statusColors.SKIPPED,
-    text: 'Aborted',
+    text: t('aborted'),
     textColor: negativeTextColor,
   },
   [WorkflowExecutionPhase.ABORTING]: {
     badgeColor: statusColors.SKIPPED,
-    text: 'Aborting',
+    text: t('aborting'),
     textColor: negativeTextColor,
   },
   [WorkflowExecutionPhase.FAILING]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Failing',
+    text: t('failing'),
     textColor: negativeTextColor,
   },
   [WorkflowExecutionPhase.FAILED]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Failed',
+    text: t('failed'),
     textColor: negativeTextColor,
   },
   [WorkflowExecutionPhase.QUEUED]: {
     badgeColor: statusColors.QUEUED,
-    text: 'Queued',
+    text: t('queued'),
     textColor: secondaryTextColor,
   },
   [WorkflowExecutionPhase.RUNNING]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Running',
+    text: t('running'),
     textColor: secondaryTextColor,
   },
   [WorkflowExecutionPhase.SUCCEEDED]: {
     badgeColor: statusColors.SUCCESS,
-    text: 'Succeeded',
+    text: t('succeeded'),
     textColor: positiveTextColor,
   },
   [WorkflowExecutionPhase.SUCCEEDING]: {
     badgeColor: statusColors.SUCCESS,
-    text: 'Succeeding',
+    text: t('succeeding'),
     textColor: positiveTextColor,
   },
   [WorkflowExecutionPhase.TIMED_OUT]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Timed Out',
+    text: t('timedOut'),
     textColor: negativeTextColor,
   },
   [WorkflowExecutionPhase.UNDEFINED]: {
     badgeColor: statusColors.UNKNOWN,
-    text: 'Unknown',
+    text: t('unknown'),
     textColor: secondaryTextColor,
   },
 };
@@ -78,57 +79,57 @@ export const nodeExecutionPhaseConstants: {
 } = {
   [NodeExecutionPhase.ABORTED]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Aborted',
+    text: t('aborted'),
     textColor: negativeTextColor,
   },
   [NodeExecutionPhase.FAILING]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Failing',
+    text: t('failing'),
     textColor: negativeTextColor,
   },
   [NodeExecutionPhase.FAILED]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Failed',
+    text: t('failed'),
     textColor: negativeTextColor,
   },
   [NodeExecutionPhase.QUEUED]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Queued',
+    text: t('queued'),
     textColor: secondaryTextColor,
   },
   [NodeExecutionPhase.RUNNING]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Running',
+    text: t('running'),
     textColor: secondaryTextColor,
   },
   [NodeExecutionPhase.DYNAMIC_RUNNING]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Running',
+    text: t('running'),
     textColor: secondaryTextColor,
   },
   [NodeExecutionPhase.SUCCEEDED]: {
     badgeColor: statusColors.SUCCESS,
-    text: 'Succeeded',
+    text: t('succeeded'),
     textColor: positiveTextColor,
   },
   [NodeExecutionPhase.TIMED_OUT]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Timed Out',
+    text: t('timedOut'),
     textColor: negativeTextColor,
   },
   [NodeExecutionPhase.SKIPPED]: {
     badgeColor: statusColors.UNKNOWN,
-    text: 'Skipped',
+    text: t('skipped'),
     textColor: secondaryTextColor,
   },
   [NodeExecutionPhase.RECOVERED]: {
     badgeColor: statusColors.SUCCESS,
-    text: 'Recovered',
+    text: t('recovered'),
     textColor: positiveTextColor,
   },
   [NodeExecutionPhase.UNDEFINED]: {
     badgeColor: statusColors.UNKNOWN,
-    text: 'Unknown',
+    text: t('unknown'),
     textColor: secondaryTextColor,
   },
 };
@@ -139,42 +140,42 @@ export const taskExecutionPhaseConstants: {
 } = {
   [TaskExecutionPhase.ABORTED]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Aborted',
+    text: t('aborted'),
     textColor: negativeTextColor,
   },
   [TaskExecutionPhase.FAILED]: {
     badgeColor: statusColors.FAILURE,
-    text: 'Failed',
+    text: t('failed'),
     textColor: negativeTextColor,
   },
   [TaskExecutionPhase.WAITING_FOR_RESOURCES]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Waiting',
+    text: t('waiting'),
     textColor: secondaryTextColor,
   },
   [TaskExecutionPhase.QUEUED]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Queued',
+    text: t('queued'),
     textColor: secondaryTextColor,
   },
   [TaskExecutionPhase.INITIALIZING]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Initializing',
+    text: t('initializing'),
     textColor: secondaryTextColor,
   },
   [TaskExecutionPhase.RUNNING]: {
     badgeColor: statusColors.RUNNING,
-    text: 'Running',
+    text: t('running'),
     textColor: secondaryTextColor,
   },
   [TaskExecutionPhase.SUCCEEDED]: {
     badgeColor: statusColors.SUCCESS,
-    text: 'Succeeded',
+    text: t('succeeded'),
     textColor: positiveTextColor,
   },
   [TaskExecutionPhase.UNDEFINED]: {
     badgeColor: statusColors.UNKNOWN,
-    text: 'Unknown',
+    text: t('unknown'),
     textColor: secondaryTextColor,
   },
 };
@@ -197,12 +198,13 @@ export const taskTypeToNodeExecutionDisplayType: {
 };
 
 export const cacheStatusMessages: { [k in CatalogCacheStatus]: string } = {
-  [CatalogCacheStatus.CACHE_DISABLED]: 'Caching was disabled for this execution.',
-  [CatalogCacheStatus.CACHE_HIT]: 'Output for this execution was read from cache.',
-  [CatalogCacheStatus.CACHE_LOOKUP_FAILURE]: 'Failed to lookup cache information.',
-  [CatalogCacheStatus.CACHE_MISS]: 'No cached output was found for this execution.',
-  [CatalogCacheStatus.CACHE_POPULATED]: 'The result of this execution was written to cache.',
-  [CatalogCacheStatus.CACHE_PUT_FAILURE]: 'Failed to write output for this execution to cache.',
+  [CatalogCacheStatus.CACHE_DISABLED]: t('cacheDisabledMessage'),
+  [CatalogCacheStatus.CACHE_HIT]: t('cacheHitMessage'),
+  [CatalogCacheStatus.CACHE_LOOKUP_FAILURE]: t('cacheLookupFailureMessage'),
+  [CatalogCacheStatus.CACHE_MISS]: t('cacheMissMessage'),
+  [CatalogCacheStatus.CACHE_POPULATED]: t('cachePopulatedMessage'),
+  [CatalogCacheStatus.CACHE_PUT_FAILURE]: t('cachePutFailure'),
+  [CatalogCacheStatus.MAP_CACHE]: t('mapCacheMessage'),
 };
-export const unknownCacheStatusString = 'Cache status is unknown';
-export const viewSourceExecutionString = 'View source execution';
+export const unknownCacheStatusString = t('unknownCacheStatusString');
+export const viewSourceExecutionString = t('viewSourceExecutionString');

@@ -28,12 +28,21 @@ describe('ExecutionDetails > Timeline > BarChart', () => {
 
   it('generateChartData properly generates map of data for ChartBars', () => {
     const chartData = generateChartData(mockbarItems);
-    expect(chartData.durations).toEqual([15, 11, 23, 0]);
-    expect(chartData.startOffset).toEqual([0, 5, 17, 39]);
-    expect(chartData.offsetColor).toEqual([TRANSPARENT, CASHED_GREEN, TRANSPARENT, TRANSPARENT]);
+    expect(chartData.durations).toEqual([15, 11, 23, 0, 11]);
+    expect(chartData.startOffset).toEqual([0, 5, 17, 39, 5]);
+    expect(chartData.offsetColor).toEqual([
+      TRANSPARENT,
+      CASHED_GREEN,
+      TRANSPARENT,
+      TRANSPARENT,
+      TRANSPARENT,
+    ]);
     // labels looks as expected
     expect(chartData.barLabel[0]).toEqual(formatSecondsToHmsFormat(mockbarItems[0].durationSec));
     expect(chartData.barLabel[1]).toEqual('\u229A From cache');
     expect(chartData.barLabel[3]).toEqual('');
+    expect(chartData.barLabel[4]).toEqual(
+      "\u229A Check the detail panel for each task's cache status.",
+    );
   });
 });

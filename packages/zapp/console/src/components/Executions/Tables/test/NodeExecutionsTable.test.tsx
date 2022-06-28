@@ -243,6 +243,8 @@ describe('NodeExecutionsTable', () => {
         CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
         CatalogCacheStatus.CACHE_POPULATED,
         CatalogCacheStatus.CACHE_PUT_FAILURE,
+        CatalogCacheStatus.CACHE_MISS,
+        CatalogCacheStatus.CACHE_DISABLED,
       ].forEach((cacheStatusValue) =>
         it(`renders correct icon for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
           taskNodeMetadata.cacheStatus = cacheStatusValue;
@@ -253,19 +255,6 @@ describe('NodeExecutionsTable', () => {
             expect(getByTitle(cacheStatusMessages[cacheStatusValue])).toBeDefined(),
           );
         }),
-      );
-
-      [CatalogCacheStatus.CACHE_DISABLED, CatalogCacheStatus.CACHE_MISS].forEach(
-        (cacheStatusValue) =>
-          it(`renders no icon for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
-            taskNodeMetadata.cacheStatus = cacheStatusValue;
-            updateNodeExecutions([cachedNodeExecution]);
-            const { getByText, queryByTitle } = renderTable();
-            await waitFor(() => {
-              getByText(cachedNodeExecution.id.nodeId);
-            });
-            expect(queryByTitle(cacheStatusMessages[cacheStatusValue])).toBeNull();
-          }),
       );
     });
   });

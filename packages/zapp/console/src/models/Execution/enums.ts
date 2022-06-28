@@ -17,6 +17,9 @@ export type NodeExecutionPhase = Core.NodeExecution.Phase;
 export const NodeExecutionPhase = Core.NodeExecution.Phase;
 export type TaskExecutionPhase = Core.TaskExecution.Phase;
 export const TaskExecutionPhase = Core.TaskExecution.Phase;
-export type CatalogCacheStatus = Core.CatalogCacheStatus;
-export const CatalogCacheStatus = Core.CatalogCacheStatus;
+enum MapCacheStatus {
+  MAP_CACHE = 10,
+}
+export const CatalogCacheStatus = { ...Core.CatalogCacheStatus, ...MapCacheStatus };
+export type CatalogCacheStatus = Core.CatalogCacheStatus | MapCacheStatus;
 /* eslint-enable @typescript-eslint/no-redeclare */

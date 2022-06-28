@@ -5,6 +5,7 @@ import { Core } from 'flyteidl';
 import { getTaskIndex, getTaskLogName } from 'components/Executions/TaskExecutionsList/utils';
 import { MapTaskExecution, TaskExecution } from 'models/Execution/types';
 import { noLogsFoundString } from 'components/Executions/constants';
+import { CacheStatus } from 'components/Executions/NodeExecutionCacheStatus';
 import { useCommonStyles } from '../styles';
 
 interface StyleProps {
@@ -35,26 +36,37 @@ export const TaskNameList = ({ taskExecution, logs, onTaskSelected }: TaskNameLi
 
   return (
     <>
-      {logs.map((log) => {
+      {logs.map((log, taskIndex) => {
         const styles = useStyles({ isLink: !!log.uri });
         const taskLogName = getTaskLogName(taskExecution.id.taskId.name, log.name ?? '');
-        const taskIndex = getTaskIndex(taskExecution, log);
+        const cacheStatus =
+          taskIndex != null
+            ? taskExecution.closure?.metadata?.externalResources?.[taskIndex]?.cacheStatus
+            : null;
 
         const handleClick = () => {
           onTaskSelected({ ...taskExecution, taskIndex });
         };
 
         return (
-          <Typography
-            variant="body1"
-            color={log.uri ? 'primary' : 'textPrimary'}
-            onClick={log.uri ? handleClick : undefined}
-            key={taskLogName}
-            className={styles.taskTitle}
-            data-testid="map-task-log"
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
           >
-            {taskLogName}
-          </Typography>
+            <Typography
+              variant="body1"
+              color={log.uri ? 'primary' : 'textPrimary'}
+              onClick={log.uri ? handleClick : undefined}
+              key={taskLogName}
+              className={styles.taskTitle}
+              data-testid="map-task-log"
+            >
+              {taskLogName}
+            </Typography>
+            <CacheStatus cacheStatus={cacheStatus} variant="iconOnly" />
+          </div>
         );
       })}
     </>

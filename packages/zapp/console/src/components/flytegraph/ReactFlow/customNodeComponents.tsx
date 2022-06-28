@@ -7,6 +7,7 @@ import { CatalogCacheStatus, TaskExecutionPhase } from 'models/Execution/enums';
 import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
 import { RENDER_ORDER } from 'components/Executions/TaskExecutionsList/constants';
 import { whiteColor } from 'components/Theme/constants';
+import { CacheStatus } from 'components/Executions/NodeExecutionCacheStatus';
 import {
   COLOR_TASK_TYPE,
   COLOR_GRAPH_BACKGROUND,
@@ -333,17 +334,6 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
     );
   };
 
-  const renderCacheIcon = (cacheStatus) => {
-    switch (cacheStatus) {
-      case CatalogCacheStatus.CACHE_HIT:
-        return <CachedOutlined style={cacheIconStyles} />;
-      case CatalogCacheStatus.CACHE_POPULATED:
-        return <PublishedWithChangesOutlined style={cacheIconStyles} />;
-      default:
-        return null;
-    }
-  };
-
   const renderTaskPhases = (logsByPhase) => {
     return (
       <div style={mapTaskWrapper}>
@@ -375,7 +365,11 @@ export const ReactFlowCustomTaskNode = ({ data }: any) => {
       {data.nodeLogsByPhase ? renderTaskName() : data.taskType ? renderTaskType() : null}
       <div style={styles}>
         {data.nodeLogsByPhase ? renderTaskPhases(data.nodeLogsByPhase) : data.text}
-        {renderCacheIcon(data.cacheStatus)}
+        <CacheStatus
+          cacheStatus={data.cacheStatus}
+          variant="iconOnly"
+          iconStyles={cacheIconStyles}
+        />
       </div>
       {renderDefaultHandles(
         data.scopedId,

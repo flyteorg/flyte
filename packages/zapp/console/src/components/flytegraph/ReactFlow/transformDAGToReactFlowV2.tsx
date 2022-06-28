@@ -3,6 +3,7 @@ import { Edge, Node, Position } from 'react-flow-renderer';
 import { CatalogCacheStatus, NodeExecutionPhase, TaskExecutionPhase } from 'models/Execution/enums';
 import { createDebugLogger } from 'common/log';
 import { LogsByPhase } from 'models/Execution/types';
+import { isMapTaskType } from 'models/Task/utils';
 import { ReactFlowGraphConfig } from './utils';
 import { ConvertDagProps } from './types';
 
@@ -84,9 +85,12 @@ const buildReactFlowDataProps = (props: BuildDataProps) => {
 
   const nodeLogsByPhase: LogsByPhase = nodeExecutionsById?.[node.scopedId]?.logsByPhase;
 
-  const cacheStatus: CatalogCacheStatus =
-    nodeExecutionsById?.[scopedId]?.closure.taskNodeMetadata?.cacheStatus ??
-    CatalogCacheStatus.CACHE_DISABLED;
+  // get the cache status for mapped task
+  const isMapCache = isMapTaskType(taskType) && nodeValue?.template?.metadata?.cacheSerializable;
+
+  const cacheStatus: CatalogCacheStatus = isMapCache
+    ? CatalogCacheStatus.MAP_CACHE
+    : nodeExecutionsById?.[scopedId]?.closure.taskNodeMetadata?.cacheStatus;
 
   const dataProps = {
     nodeExecutionStatus,

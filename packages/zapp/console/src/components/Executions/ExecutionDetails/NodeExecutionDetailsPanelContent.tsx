@@ -364,7 +364,7 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
   if (nodeExecution) {
     detailsContent = (
       <>
-        <NodeExecutionCacheStatus taskNodeMetadata={nodeExecution.closure.taskNodeMetadata} />
+        <NodeExecutionCacheStatus execution={nodeExecution} />
         <ExecutionTypeDetails details={details} execution={nodeExecution} />
       </>
     );

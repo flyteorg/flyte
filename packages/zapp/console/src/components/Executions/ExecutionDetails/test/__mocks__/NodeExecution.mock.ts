@@ -60,10 +60,41 @@ const getMockNodeExecution = (
 };
 
 export const mockbarItems = [
-  { phase: NodeExecutionPhase.FAILED, startOffsetSec: 0, durationSec: 15, isFromCache: false },
-  { phase: NodeExecutionPhase.SUCCEEDED, startOffsetSec: 5, durationSec: 11, isFromCache: true },
-  { phase: NodeExecutionPhase.RUNNING, startOffsetSec: 17, durationSec: 23, isFromCache: false },
-  { phase: NodeExecutionPhase.QUEUED, startOffsetSec: 39, durationSec: 0, isFromCache: false },
+  {
+    phase: NodeExecutionPhase.FAILED,
+    startOffsetSec: 0,
+    durationSec: 15,
+    isFromCache: false,
+    isMapTaskCache: false,
+  },
+  {
+    phase: NodeExecutionPhase.SUCCEEDED,
+    startOffsetSec: 5,
+    durationSec: 11,
+    isFromCache: true,
+    isMapTaskCache: false,
+  },
+  {
+    phase: NodeExecutionPhase.RUNNING,
+    startOffsetSec: 17,
+    durationSec: 23,
+    isFromCache: false,
+    isMapTaskCache: false,
+  },
+  {
+    phase: NodeExecutionPhase.QUEUED,
+    startOffsetSec: 39,
+    durationSec: 0,
+    isFromCache: false,
+    isMapTaskCache: false,
+  },
+  {
+    phase: NodeExecutionPhase.SUCCEEDED,
+    startOffsetSec: 5,
+    durationSec: 11,
+    isFromCache: false,
+    isMapTaskCache: true,
+  },
 ];
 
 export const getMockExecutionsForBarChart = (startTimeSec: number) => {
@@ -73,5 +104,6 @@ export const getMockExecutionsForBarChart = (startTimeSec: number) => {
     getMockNodeExecution(start, NodeExecutionPhase.SUCCEEDED, 5, 11, CatalogCacheStatus.CACHE_HIT),
     getMockNodeExecution(start, NodeExecutionPhase.RUNNING, 17, 23, CatalogCacheStatus.CACHE_MISS),
     getMockNodeExecution(start, NodeExecutionPhase.QUEUED, 39, 0),
+    getMockNodeExecution(start, NodeExecutionPhase.SUCCEEDED, 5, 11, CatalogCacheStatus.MAP_CACHE),
   ];
 };
