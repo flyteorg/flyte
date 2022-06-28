@@ -276,10 +276,10 @@ github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fatih/structtag v1.2.0/go.mod h1:mBJUNpUnHmRKrKlQQlmCrh5PuhftFbNv8Ys4/aAZl94=
-github.com/flyteorg/flyteidl v1.1.7-0.20220608052921-d6e455ce8da6 h1:cHCB6hhRqP+eAKFP1gEa6UaIEqOWhzHsRVTxy6gMklo=
-github.com/flyteorg/flyteidl v1.1.7-0.20220608052921-d6e455ce8da6/go.mod h1:uvXCvYVld98+Ab7cxJyIvo/8P0F7OoNR+3DB4Lv5dkQ=
-github.com/flyteorg/flytestdlib v1.0.4-0.20220601010535-57c1386c358f h1:0JVqzJOc4O/Z7LEuCg6leofJW6iNtRUwJDxSw+07K1k=
-github.com/flyteorg/flytestdlib v1.0.4-0.20220601010535-57c1386c358f/go.mod h1:WTe0k3DmmrKFjj3hwiIbjjdCK89X63MBzBbXhQ4Yxf0=
+github.com/flyteorg/flyteidl v1.1.8-0.20220628045429-5aaea4ba607a h1:EI4wjRf4WS9iTSMImW1RCiXyhtaaJXlY6Y4g+fsjpzE=
+github.com/flyteorg/flyteidl v1.1.8-0.20220628045429-5aaea4ba607a/go.mod h1:TM9AyQ44x5/SqTykzaGTVH65Lreg/1zOP2jrwmJd3HY=
+github.com/flyteorg/flytestdlib v1.0.5-0.20220628044039-2918e6121725 h1:SkrYbBke1xWJYo+7rvvXj4WFyOGUfSVb9xQqoAXHw/w=
+github.com/flyteorg/flytestdlib v1.0.5-0.20220628044039-2918e6121725/go.mod h1:WTe0k3DmmrKFjj3hwiIbjjdCK89X63MBzBbXhQ4Yxf0=
 github.com/flyteorg/stow v0.3.4 h1:gJVz1LCcEQ5ESWoedRxKh4uUv/V/c1eYLVAQVy07PPY=
 github.com/flyteorg/stow v0.3.4/go.mod h1:2T2f6KaIWoWCLgI6EFZQgjb83Vg5SolmBwc2O06WQU4=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
