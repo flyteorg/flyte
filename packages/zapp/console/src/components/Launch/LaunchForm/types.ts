@@ -65,6 +65,7 @@ export interface WorkflowInitialLaunchParameters extends BaseInitialLaunchParame
 
 export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
   workflowId: NamedEntityIdentifier;
+  securityContext?: Core.ISecurityContext;
   initialParameters?: WorkflowInitialLaunchParameters;
 }
 

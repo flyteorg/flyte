@@ -26,6 +26,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
     service,
     workflowSourceSelectorState,
   } = useLaunchWorkflowFormState(props);
+  const { securityContext } = props;
 
   const styles = useStyles();
   const baseState = state as BaseInterpretedLaunchState;
@@ -56,6 +57,15 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
     ![LaunchState.LOADING_LAUNCH_PLANS, LaunchState.FAILED_LOADING_LAUNCH_PLANS].some(
       state.matches,
     );
+
+  const roleInitialValue = React.useMemo(() => {
+    if (securityContext) return { securityContext };
+    return (
+      state.context.defaultAuthRole ||
+      selectedLaunchPlan?.data.spec.securityContext ||
+      selectedLaunchPlan?.data.spec.authRole
+    );
+  }, [securityContext, state.context.defaultAuthRole, selectedLaunchPlan]);
 
   return (
     <>
@@ -97,11 +107,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
           <AccordionDetails classes={{ root: styles.detailsWrapper }}>
             {isEnterInputsState(baseState) ? (
               <LaunchRoleInput
-                initialValue={
-                  state.context.defaultAuthRole ||
-                  selectedLaunchPlan?.data.spec.securityContext ||
-                  selectedLaunchPlan?.data.spec.authRole
-                }
+                initialValue={roleInitialValue}
                 ref={roleInputRef}
                 showErrors={state.context.showErrors}
               />

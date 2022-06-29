@@ -117,6 +117,7 @@ const RelaunchWorkflowForm: React.FC<RelaunchExecutionFormProps> = (props) => {
   const { initialParameters } = useRelaunchWorkflowFormState(props);
   const {
     closure: { workflowId },
+    spec: { securityContext },
   } = props.execution;
 
   return (
@@ -127,6 +128,7 @@ const RelaunchWorkflowForm: React.FC<RelaunchExecutionFormProps> = (props) => {
           onClose={props.onClose}
           referenceExecutionId={props.execution.id}
           workflowId={workflowId}
+          securityContext={securityContext}
         />
       ) : null}
     </WaitForData>
