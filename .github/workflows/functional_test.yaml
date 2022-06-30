@@ -37,6 +37,11 @@ jobs:
         run: |
           flytectl sandbox start --image ghcr.io/flyteorg/flyte-sandbox:local --imagePullPolicy Never
           flytectl config init
+      - name: Check sandbox
+        run: |
+          echo $KUBECONFIG
+          echo $FLYTECTL_CONFIG
+          cat /home/runner/.flyte/config-sandbox.yaml
       - name: Register examples
         uses: unionai/flyte-register-action@v0.0.2
         with:
