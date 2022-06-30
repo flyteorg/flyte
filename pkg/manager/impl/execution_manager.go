@@ -481,12 +481,7 @@ func mergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 		workflowExecConfig.Annotations = spec.GetAnnotations()
 	}
 
-	// Override interruptible flag if workflow execution config does not have a value set or the spec sets a different
-	// value that defined as the workflow default. This allows for workflows to have their interruptible setting
-	// explicitly turned on and off for a single execution.
-	if (workflowExecConfig.GetInterruptible() == nil && spec.GetInterruptible() != nil) ||
-		(workflowExecConfig.GetInterruptible() != nil && spec.GetInterruptible() != nil &&
-			workflowExecConfig.GetInterruptible().GetValue() != spec.GetInterruptible().GetValue()) {
+	if workflowExecConfig.GetInterruptible() == nil && spec.GetInterruptible() != nil {
 		workflowExecConfig.Interruptible = spec.GetInterruptible()
 	}
 	return workflowExecConfig
