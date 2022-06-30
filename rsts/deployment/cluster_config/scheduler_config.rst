@@ -272,6 +272,16 @@ Command for external authentication token generation
   []
   
 
+defaultServiceConfig (string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.Duration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -501,6 +511,9 @@ Defines Auth options for users.
 
   cookieBlockKeySecretName: cookie_block_key
   cookieHashKeySecretName: cookie_hash_key
+  cookieSetting:
+    domain: ""
+    sameSitePolicy: DefaultMode
   openId:
     baseUrl: ""
     clientId: ""
@@ -1004,6 +1017,46 @@ OPTIONAL: Secret name to use for cookie block key.
   cookie_block_key
   
 
+cookieSetting (`config.CookieSettings`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+settings used by cookies created for user auth
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  domain: ""
+  sameSitePolicy: DefaultMode
+  
+
+config.CookieSettings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sameSitePolicy (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: Allows you to declare if your cookie should be restricted to a first-party or same-site context.Wrapper around http.SameSite.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  DefaultMode
+  
+
+domain (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: Allows you to set the domain attribute on the auth cookies.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.OpenIDOptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1422,7 +1475,7 @@ maxOpenConnections sets the maximum number of open connections to the database.
 
 .. code-block:: yaml
 
-  "1000"
+  "100"
   
 
 connMaxLifeTime (`config.Duration`_)
@@ -1814,7 +1867,7 @@ k8sServiceAccount (string)
 
 .. code-block:: yaml
 
-  default
+  ""
   
 
 outputLocationPrefix (string)
@@ -2908,6 +2961,21 @@ An optional prefix for all published metrics.
 .. code-block:: yaml
 
   flyte
+  
+
+metrics-keys ([]string)
+--------------------------------------------------------------------------------
+
+Metrics labels applied to prometheus metrics emitted by the service.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - project
+  - domain
+  - wf
+  - task
   
 
 enable-admin-launcher (bool)
@@ -4101,6 +4169,8 @@ Defines data proxy configuration.
 
 .. code-block:: yaml
 
+  download:
+    maxExpiresIn: 1h0m0s
   upload:
     defaultFileNameLength: 20
     maxExpiresIn: 1h0m0s
@@ -4124,6 +4194,33 @@ Defines data proxy upload configuration.
   maxExpiresIn: 1h0m0s
   maxSize: 6Mi
   storagePrefix: ""
+  
+
+download (`config.DataProxyDownloadConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines data proxy download configuration.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxExpiresIn: 1h0m0s
+  
+
+config.DataProxyDownloadConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+maxExpiresIn (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum allowed expiration duration.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
   
 
 config.DataProxyUploadConfig
