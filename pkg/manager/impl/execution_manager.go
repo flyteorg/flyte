@@ -489,7 +489,6 @@ func mergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 			workflowExecConfig.GetInterruptible().GetValue() != spec.GetInterruptible().GetValue()) {
 		workflowExecConfig.Interruptible = spec.GetInterruptible()
 	}
-
 	return workflowExecConfig
 }
 
@@ -538,6 +537,12 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	}
 	//  merge the application config into workflowExecConfig. If even the deprecated fields are not set
 	workflowExecConfig = mergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
+	// Explicitly set the security context if its nil since downstream we expect this settings to be available
+	if workflowExecConfig.GetSecurityContext() == nil {
+		workflowExecConfig.SecurityContext = &core.SecurityContext{
+			RunAs: &core.Identity{},
+		}
+	}
 	logger.Infof(ctx, "getting the workflow execution config from application configuration")
 	// Defaults to one from the application config
 	return &workflowExecConfig, nil
