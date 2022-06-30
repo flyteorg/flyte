@@ -42,3 +42,10 @@ test_unit_codecov:
 .PHONY: generate_ssl
 generate_ssl:
 	./script/generate_ssl.sh
+
+PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
+
+.PHONY: update_npmversion
+update_npmversion:
+	grep "$(PLACEHOLDER_NPM)" "packages/zapp/console/package.json"
+	sed -i "s/$(PLACEHOLDER_NPM)/\"version\":  \"${VERSION}\"/g" "packages/zapp/console/package.json"

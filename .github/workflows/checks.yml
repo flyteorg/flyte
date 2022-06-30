@@ -110,14 +110,27 @@ jobs:
           echo "::set-output name=currentTag::$CURRENT_TAG"
 
   push_docker_image:
-    name: Build & Push Flyteconsole Image
+    name: Push to Github Registry
     needs: [check_for_tag]
-    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
-    with:
-      version: ${{ needs.check_for_tag.outputs.currentTag }}
-      dockerfile: Dockerfile
-      push: true
-      repository: ${{ github.repository }}
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Autobump version
+        env:
+          TAG: ${{ needs.check_for_tag.outputs.currentTag }}
+        run: |
+          VERSION=${TAG:1} make update_npmversion
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: evalsocket
+          image_name: flyteorg/flyteconsole
+          image_tag: latest,${{ github.sha }},${{ needs.check_for_tag.outputs.currentTag }}
+          push_git_tag: true
+          push_image_and_stages: false
+          dockerfile: Dockerfile
+          registry: ghcr.io
+          build_extra_args: "--compress=true"
