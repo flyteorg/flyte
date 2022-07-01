@@ -29,6 +29,12 @@ jobs:
           version: ${{ inputs.components_version }}
           domain: development
           config: /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
+      - name: Archive config.yaml artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: config.yaml
+          path: |
+            /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
       - name: Setup Flytekit
         shell: bash
         run: |
