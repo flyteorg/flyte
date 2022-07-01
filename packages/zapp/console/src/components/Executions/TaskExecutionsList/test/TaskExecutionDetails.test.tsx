@@ -7,7 +7,7 @@ import { TaskExecutionDetails } from '../TaskExecutionDetails';
 const date = { seconds: long(5), nanos: 0 };
 const duration = { seconds: long(0), nanos: 0 };
 
-const dateContent = '1/1/1970 12:00:05 AM UTC (52 years ago)';
+const dateContent = '1/1/1970 12:00:05 AM UTC (53 years ago)';
 
 describe('TaskExecutionDetails', () => {
   it('should render details with task started info and duration', () => {
