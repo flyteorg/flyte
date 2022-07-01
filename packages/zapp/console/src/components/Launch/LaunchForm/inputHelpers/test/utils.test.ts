@@ -1,6 +1,8 @@
 import {
   collectionInputTypeDefinition,
+  mapInputTypeDefinition,
   nestedCollectionInputTypeDefinition,
+  nestedMapInputTypeDefinition,
 } from '../../__mocks__/utils';
 import { InputTypeDefinition } from '../../types';
 import { typeIsSupported } from '../utils';
@@ -25,6 +27,16 @@ describe('Launch/inputHelpers/utils', () => {
         nestedCollectionInputTypeDefinition(typeDefinition),
         true,
       ]),
+      ...supportedPrimitives.map<TypeIsSupportedTestCase>((typeDefinition) => [
+        `supports 1-dimension map of type ${typeDefinition.type}`,
+        mapInputTypeDefinition(typeDefinition),
+        true,
+      ]),
+      ...supportedPrimitives.map<TypeIsSupportedTestCase>((typeDefinition) => [
+        `supports 2-dimension map of type: ${typeDefinition.type}`,
+        nestedMapInputTypeDefinition(typeDefinition),
+        true,
+      ]),
       ...unsupportedTypes.map<TypeIsSupportedTestCase>((typeDefinition) => [
         `does NOT support type ${typeDefinition.type}`,
         typeDefinition,
@@ -38,6 +50,16 @@ describe('Launch/inputHelpers/utils', () => {
       ...unsupportedTypes.map<TypeIsSupportedTestCase>((typeDefinition) => [
         `does NOT support 2-dimension collection of type: ${typeDefinition.type}`,
         nestedCollectionInputTypeDefinition(typeDefinition),
+        false,
+      ]),
+      ...unsupportedTypes.map<TypeIsSupportedTestCase>((typeDefinition) => [
+        `does NOT support 1-dimension map of type ${typeDefinition.type}`,
+        mapInputTypeDefinition(typeDefinition),
+        false,
+      ]),
+      ...unsupportedTypes.map<TypeIsSupportedTestCase>((typeDefinition) => [
+        `does NOT support 2-dimension map of type: ${typeDefinition.type}`,
+        nestedMapInputTypeDefinition(typeDefinition),
         false,
       ]),
     ];

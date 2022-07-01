@@ -5,7 +5,9 @@ import { BlobDimensionality, SimpleType } from 'models/Common/types';
 import { InputProps, InputType, InputTypeDefinition } from '../../types';
 import {
   collectionInputTypeDefinition,
+  mapInputTypeDefinition,
   nestedCollectionInputTypeDefinition,
+  nestedMapInputTypeDefinition,
   primitiveLiteral,
 } from '../../__mocks__/utils';
 import { literalNone } from '../constants';
@@ -32,6 +34,22 @@ const baseInputProps: InputProps = {
 
 function makeSimpleInput(typeDefinition: InputTypeDefinition, value: any): InputProps {
   return { ...baseInputProps, value, typeDefinition };
+}
+
+function makeMapInput(typeDefinition: InputTypeDefinition, value: string): InputProps {
+  return {
+    ...baseInputProps,
+    value,
+    typeDefinition: mapInputTypeDefinition(typeDefinition),
+  };
+}
+
+function makeNestedMapInput(typeDefinition: InputTypeDefinition, value: string): InputProps {
+  return {
+    ...baseInputProps,
+    value,
+    typeDefinition: nestedMapInputTypeDefinition(typeDefinition),
+  };
 }
 
 function makeCollectionInput(typeDefinition: InputTypeDefinition, value: string): InputProps {
@@ -64,6 +82,36 @@ describe('literalToInputValue', () => {
 
     it('should correctly convert noneType to undefined', () =>
       expect(literalToInputValue(inputTypes.none, literalNone())).toEqual(undefined));
+  });
+
+  describe('Map', () => {
+    literalToInputTestCases.map(([typeDefinition, input, output]) => {
+      it(`should correctly convert map of ${typeDefinition.type}: ${stringifyValue(input)}`, () => {
+        const map: Core.ILiteral = {
+          map: {
+            literals: { a: input },
+          },
+        };
+        const expectedString = stringifyValue({ a: output });
+        const result = literalToInputValue(mapInputTypeDefinition(typeDefinition), map);
+        expect(result).toEqual(expectedString);
+      });
+    });
+
+    it('should return empty for noneType literals', () => {
+      const map: Core.ILiteral = {
+        map: {
+          literals: { a: literalNone() },
+        },
+      };
+
+      const typeDefinition: InputTypeDefinition = {
+        literalType: { simple: Core.SimpleType.NONE },
+        type: InputType.None,
+      };
+
+      expect(literalToInputValue(mapInputTypeDefinition(typeDefinition), map)).toEqual('{}');
+    });
   });
 
   describe('Collections', () => {
@@ -125,6 +173,49 @@ describe('inputToLiteral', () => {
         input,
       )} (${typeof input})`, () =>
         expect(inputToLiteral(makeSimpleInput(typeDefinition, input))).toEqual(output));
+    });
+  });
+
+  describe('Map', () => {
+    literalTestCases.map(([typeDefinition, input, output]) => {
+      let singleMapValue: any;
+      let nestedMapValue: any;
+      if (typeDefinition.type === InputType.Struct) {
+        const objValue = JSON.parse(input);
+        singleMapValue = stringifyValue({ a: objValue });
+        nestedMapValue = stringifyValue({ a: { b: objValue } });
+      } else if (['boolean', 'number'].includes(typeof input)) {
+        singleMapValue = `{"a":${input}}`;
+        nestedMapValue = `{"a":{"b":${input}}}`;
+      } else if (input == null) {
+        singleMapValue = '{"a":null}';
+        nestedMapValue = '{"a":{"b":null}}';
+      } else if (typeof input === 'string' || Long.isLong(input)) {
+        singleMapValue = `{"a":"${input}"}`;
+        nestedMapValue = `{"a":{"b":"${input}"}}`;
+      } else if (input instanceof Date) {
+        const dateString = input.toISOString();
+        singleMapValue = `{"a":"${dateString}"}`;
+        nestedMapValue = `{"a":{"b":"${dateString}"}}`;
+      } else {
+        const stringValue = stringifyValue(input);
+        singleMapValue = `{"a":${stringValue}}`;
+        nestedMapValue = `{"a":{"b":${stringValue}}}`;
+      }
+
+      it(`should correctly convert map of type ${
+        typeDefinition.type
+      }: ${singleMapValue} (${typeof input})`, () => {
+        const result = inputToLiteral(makeMapInput(typeDefinition, singleMapValue));
+        expect(result.map!.literals!.a).toEqual(output);
+      });
+
+      it(`should correctly convert nested map of type ${
+        typeDefinition.type
+      }: ${nestedMapValue} (${typeof input})`, () => {
+        const result = inputToLiteral(makeNestedMapInput(typeDefinition, nestedMapValue));
+        expect(result.map!.literals!.a.map!.literals!.b).toEqual(output);
+      });
     });
   });
 

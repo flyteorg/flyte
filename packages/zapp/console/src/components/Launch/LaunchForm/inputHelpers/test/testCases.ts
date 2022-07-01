@@ -67,6 +67,10 @@ export const inputTypes: Record<InputTypeKey, InputTypeDefinition> = {
     literalType: {
       mapValueType: { simple: Core.SimpleType.STRING },
     },
+    subtype: {
+      literalType: { simple: Core.SimpleType.NONE },
+      type: InputType.None,
+    },
     type: InputType.Map,
   },
   none: {
@@ -112,7 +116,6 @@ export const supportedPrimitives: InputTypeDefinition[] = [
 export const unsupportedTypes: InputTypeDefinition[] = [
   inputTypes.binary,
   inputTypes.error,
-  inputTypes.map,
   inputTypes.none,
 ];
 

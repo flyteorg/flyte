@@ -33,7 +33,6 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
   switch (type) {
     case InputType.Binary:
     case InputType.Error:
-    case InputType.Map:
     case InputType.None:
     case InputType.Unknown:
       return false;
@@ -48,6 +47,11 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
     case InputType.String:
     case InputType.Struct:
       return true;
+    case InputType.Map:
+      if (!subtype) {
+        return false;
+      }
+      return typeIsSupported(subtype);
     case InputType.Collection: {
       if (!subtype) {
         console.error('Unexpected missing subtype for collection input', typeDefinition);

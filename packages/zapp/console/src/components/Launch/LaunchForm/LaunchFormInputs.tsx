@@ -4,6 +4,7 @@ import { BlobInput } from './BlobInput';
 import { CollectionInput } from './CollectionInput';
 import { formStrings, inputsDescription } from './constants';
 import { LaunchState } from './launchMachine';
+import { MapInput } from './MapInput';
 import { NoInputsNeeded } from './NoInputsNeeded';
 import { SimpleInput } from './SimpleInput';
 import { StructInput } from './StructInput';
@@ -24,6 +25,7 @@ function getComponentForInput(input: InputProps, showErrors: boolean) {
     case InputType.Struct:
       return <StructInput {...props} />;
     case InputType.Map:
+      return <MapInput {...props} />;
     case InputType.Unknown:
     case InputType.None:
       return <UnsupportedInput {...props} />;

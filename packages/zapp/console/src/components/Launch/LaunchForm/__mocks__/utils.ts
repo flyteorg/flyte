@@ -51,3 +51,31 @@ export function nestedCollectionInputTypeDefinition(
     },
   };
 }
+
+export function mapInputTypeDefinition(typeDefinition: InputTypeDefinition): InputTypeDefinition {
+  return {
+    literalType: {
+      mapValueType: typeDefinition.literalType,
+    },
+    type: InputType.Map,
+    subtype: typeDefinition,
+  };
+}
+
+export function nestedMapInputTypeDefinition(
+  typeDefinition: InputTypeDefinition,
+): InputTypeDefinition {
+  return {
+    literalType: {
+      mapValueType: {
+        mapValueType: typeDefinition.literalType,
+      },
+    },
+    type: InputType.Map,
+    subtype: {
+      literalType: { mapValueType: typeDefinition.literalType },
+      type: InputType.Map,
+      subtype: typeDefinition,
+    },
+  };
+}
