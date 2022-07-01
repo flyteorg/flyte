@@ -8,6 +8,27 @@
             href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Open+Sans:400,700"
             rel="stylesheet"
         />
+        <!-- Minimal set of favicons, aligned with https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs -->
+        <link
+            rel="manifest"
+            href="<%= htmlWebpackPlugin.options.publicPath %>/manifest.webmanifest"
+        />
+        <!-- 16x16, 32x32 -->
+        <link
+            rel="icon"
+            href="<%= htmlWebpackPlugin.options.publicPath %>/favicon.ico"
+            sizes="any"
+        />
+        <link
+            rel="icon"
+            href="<%= htmlWebpackPlugin.options.publicPath %>/favicon.svg"
+            type="image/svg+xml"
+        />
+        <!-- 180x180 -->
+        <link
+            rel="apple-touch-icon"
+            href="<%= htmlWebpackPlugin.options.publicPath %>/apple-touch-icon.png"
+        />
     </head>
     <body>
         <div id="react-app"></div>

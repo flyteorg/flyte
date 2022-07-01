@@ -1,6 +1,7 @@
 import * as webpack from 'webpack';
 import * as CompressionWebpackPlugin from 'compression-webpack-plugin';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
+import { ASSETS_PATH as publicPath } from './env';
 
 const { merge } = require('webpack-merge');
 
@@ -48,6 +49,7 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
     }),
     new HTMLWebpackPlugin({
       template: './src/assets/index.html',
+      publicPath,
       inject: 'body',
       minify: {
         minifyCSS: true,

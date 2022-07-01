@@ -2,7 +2,12 @@ import * as webpack from 'webpack';
 import * as HTMLWebpackPlugin from 'html-webpack-plugin';
 import * as path from 'path';
 import chalk from 'chalk';
-import { LOCAL_DEV_HOST, CERTIFICATE_PATH, ADMIN_API_USE_SSL } from './env';
+import {
+  LOCAL_DEV_HOST,
+  CERTIFICATE_PATH,
+  ADMIN_API_USE_SSL,
+  ASSETS_PATH as publicPath,
+} from './env';
 
 const { merge } = require('webpack-merge');
 const fs = require('fs');
@@ -64,6 +69,7 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
   plugins: [
     new HTMLWebpackPlugin({
       template: './src/assets/index.html',
+      publicPath,
       inject: 'body',
       minify: false,
       hash: false,

@@ -6,8 +6,8 @@ import * as webpack from 'webpack';
 import { processEnv as env, ASSETS_PATH as publicPath } from './env';
 
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
-const FavIconWebpackPlugin = require('favicons-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 
 /** Current service name */
@@ -38,13 +38,6 @@ export const imageAndFontsRule: webpack.RuleSetRule = {
   test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
   type: 'asset/resource',
 };
-
-export const favIconPlugin = new FavIconWebpackPlugin({
-  logo: path.resolve(__dirname, 'src/assets/favicon.png'),
-  // we can add '[fullhash:8]/' to the end of the file in future
-  // if this one will be changed - ensure that OneClick will still be working
-  prefix: './',
-});
 
 /** Write client stats to a JSON file for production */
 export const statsWriterPlugin = new StatsWriterPlugin({
@@ -133,9 +126,16 @@ export const clientConfig: webpack.Configuration = {
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin({ typescript: { configFile, build: true } }),
-    favIconPlugin,
     statsWriterPlugin,
     getDefinePlugin(false),
+    new CopyPlugin({
+      patterns: [
+        // copy all to root, to ensure FlyteOneClick support
+        { from: './src/assets/public', to: '' },
+        { from: './src/assets/favicon.ico', to: '' },
+        { from: './src/assets/favicon.svg', to: '' },
+      ],
+    }),
   ],
 };
 
