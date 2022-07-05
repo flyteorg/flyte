@@ -125,7 +125,7 @@ type K8sPluginConfig struct {
 	// DeleteResourceOnFinalize instructs the system to delete the resource on finalize. This ensures that no resources
 	// are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as
 	// soon as the resource is finalized.
-	DeleteResourceOnFinalize bool `json:"delete-resource-on-finalize" pflag:",Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized."`
+	DeleteResourceOnFinalize bool `json:"delete-resource-on-finalize" pflag:",Instructs the system to delete the resource upon successful execution of a k8s pod rather than have the k8s garbage collector clean it up. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized."`
 
 	// Time to wait for transient CreateContainerError errors to be resolved. If the
 	// error persists past this grace period, it will be inferred to be a permanent
