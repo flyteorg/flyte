@@ -29,7 +29,7 @@ images:
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v1.1.3 # FLYTECONSOLE_TAG  the tag
+    newTag: v1.1.6 # FLYTECONSOLE_TAG  the tag
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
