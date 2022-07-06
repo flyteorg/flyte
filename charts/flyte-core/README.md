@@ -139,7 +139,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v1.1.29"` |  |
+| flyteadmin.image.tag | string | `"v1.1.29-hotfix"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
