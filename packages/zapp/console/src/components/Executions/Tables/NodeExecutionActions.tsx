@@ -3,7 +3,7 @@ import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 import InputsAndOutputsIcon from '@material-ui/icons/Tv';
 import { RerunIcon } from '@flyteconsole/ui-atoms';
-import { Identifier, ResourceIdentifier, Variable } from 'models/Common/types';
+import { Identifier, ResourceIdentifier } from 'models/Common/types';
 import { LaunchFormDialog } from 'components/Launch/LaunchForm/LaunchFormDialog';
 import { getTask } from 'models/Task/api';
 import { useNodeExecutionData } from 'components/hooks/useNodeExecution';
@@ -27,13 +27,12 @@ export const NodeExecutionActions = (props: NodeExecutionActionsProps): JSX.Elem
   const [nodeExecutionDetails, setNodeExecutionDetails] = React.useState<
     NodeExecutionDetails | undefined
   >();
-  const [taskInputsTypes, setTaskInputsTypes] = React.useState<
-    Record<string, Variable> | undefined
-  >();
+  const [initialParameters, setInitialParameters] = React.useState<
+    TaskInitialLaunchParameters | undefined
+  >(undefined);
 
   const executionData = useNodeExecutionData(execution.id);
-  const literals = executionData.value.fullInputs?.literals;
-  const id = nodeExecutionDetails?.taskTemplate?.id as ResourceIdentifier;
+  const id = nodeExecutionDetails?.taskTemplate?.id;
 
   React.useEffect(() => {
     detailsContext.getNodeExecutionDetails(execution).then((res) => {
@@ -42,11 +41,23 @@ export const NodeExecutionActions = (props: NodeExecutionActionsProps): JSX.Elem
   });
 
   React.useEffect(() => {
-    const fetchTask = async () => {
+    if (!id) {
+      return;
+    }
+
+    (async () => {
       const task = await getTask(id as Identifier);
-      setTaskInputsTypes(task.closure.compiledTask.template?.interface?.inputs?.variables);
-    };
-    if (id) fetchTask();
+
+      const literals = executionData.value.fullInputs?.literals;
+      const taskInputsTypes = task.closure.compiledTask.template?.interface?.inputs?.variables;
+
+      const tempInitialParameters: TaskInitialLaunchParameters = {
+        values: literals && taskInputsTypes && literalsToLiteralValueMap(literals, taskInputsTypes),
+        taskId: id as Identifier | undefined,
+      };
+
+      setInitialParameters(tempInitialParameters);
+    })();
   }, [id]);
 
   // open the side panel for selected execution's detail
@@ -63,14 +74,10 @@ export const NodeExecutionActions = (props: NodeExecutionActionsProps): JSX.Elem
   };
 
   const renderRerunAction = () => {
-    if (!id) {
+    if (!id || !initialParameters) {
       return <></>;
     }
 
-    const initialParameters: TaskInitialLaunchParameters = {
-      values: literals && taskInputsTypes && literalsToLiteralValueMap(literals, taskInputsTypes),
-      taskId: id as Identifier | undefined,
-    };
     return (
       <>
         <Tooltip title={t('rerunTooltip')}>
@@ -79,7 +86,7 @@ export const NodeExecutionActions = (props: NodeExecutionActionsProps): JSX.Elem
           </IconButton>
         </Tooltip>
         <LaunchFormDialog
-          id={id}
+          id={id as ResourceIdentifier}
           initialParameters={initialParameters}
           showLaunchForm={showLaunchForm}
           setShowLaunchForm={setShowLaunchForm}

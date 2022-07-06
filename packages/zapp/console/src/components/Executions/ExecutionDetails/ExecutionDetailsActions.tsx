@@ -1,6 +1,6 @@
 import { Button, Dialog, IconButton } from '@material-ui/core';
 import * as React from 'react';
-import { ResourceIdentifier, Identifier, Variable } from 'models/Common/types';
+import { ResourceIdentifier, Identifier } from 'models/Common/types';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { getTask } from 'models/Task/api';
 import { LaunchFormDialog } from 'components/Launch/LaunchForm/LaunchFormDialog';
@@ -67,36 +67,41 @@ export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JS
   const styles = useStyles();
 
   const [showLaunchForm, setShowLaunchForm] = React.useState<boolean>(false);
-  const [taskInputsTypes, setTaskInputsTypes] = React.useState<
-    Record<string, Variable> | undefined
-  >();
+
+  const [initialParameters, setInitialParameters] = React.useState<
+    TaskInitialLaunchParameters | undefined
+  >(undefined);
 
   const executionData = useNodeExecutionData(nodeExecutionId);
   const execution = useNodeExecution(nodeExecutionId);
-
-  const id = details.taskTemplate?.id as ResourceIdentifier | undefined;
+  const id = details.taskTemplate?.id;
 
   React.useEffect(() => {
-    const fetchTask = async () => {
-      const task = await getTask(id as Identifier);
-      setTaskInputsTypes(task.closure.compiledTask.template?.interface?.inputs?.variables);
-    };
-    if (id) fetchTask();
-  }, [id]);
+    if (!id) {
+      return;
+    }
+
+    (async () => {
+      const task = await getTask(id!);
+
+      const literals = executionData.value.fullInputs?.literals;
+      const taskInputsTypes = task.closure.compiledTask.template?.interface?.inputs?.variables;
+
+      const tempInitialParameters: TaskInitialLaunchParameters = {
+        values: literals && taskInputsTypes && literalsToLiteralValueMap(literals, taskInputsTypes),
+        taskId: id as Identifier | undefined,
+      };
+
+      setInitialParameters(tempInitialParameters);
+    })();
+  }, [details]);
 
   const [showDeck, setShowDeck] = React.useState(false);
   const onCloseDeck = () => setShowDeck(false);
 
-  if (!id) {
+  if (!id || !initialParameters) {
     return <></>;
   }
-
-  const literals = executionData.value.fullInputs?.literals;
-
-  const initialParameters: TaskInitialLaunchParameters = {
-    values: literals && taskInputsTypes && literalsToLiteralValueMap(literals, taskInputsTypes),
-    taskId: id as Identifier | undefined,
-  };
 
   const rerunOnClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -121,7 +126,7 @@ export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JS
         </Button>
       </div>
       <LaunchFormDialog
-        id={id}
+        id={id as ResourceIdentifier}
         initialParameters={initialParameters}
         showLaunchForm={showLaunchForm}
         setShowLaunchForm={setShowLaunchForm}
