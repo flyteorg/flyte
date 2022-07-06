@@ -93,6 +93,9 @@ def nested_parent_wf(a: int) -> Tuple[int, str, str, str]:
 if __name__ == "__main__":
     print(f"Running nested_parent_wf(a=3) {nested_parent_wf(a=3)}")
 
+# %%
+# .. note:: You can chain and execute subworkflows similar to chained :ref:`Flyte tasks<Chain Flyte Tasks>`.
+
 
 # %%
 # External Workflow
