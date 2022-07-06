@@ -21,7 +21,7 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v1.1.28 # FLYTEADMIN_TAG override the tag
+    newTag: v1.1.29-hotfix # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
