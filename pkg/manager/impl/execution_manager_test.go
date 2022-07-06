@@ -2912,6 +2912,38 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 	assert.EqualError(t, err, expectedError.Error())
 }
 
+func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
+	var expectedError = errors.New("expected error")
+
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
+	mockExecutor.OnID().Return("customMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+
+	repository := repositoryMocks.NewMockRepository()
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+			return models.Execution{
+				Phase: core.WorkflowExecution_SUCCEEDED.String(),
+			}, nil
+		})
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	resp, err := execManager.TerminateExecution(context.Background(), admin.ExecutionTerminateRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Cause: "abort cause",
+	})
+
+	assert.Nil(t, resp)
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.PermissionDenied, s.Code())
+}
+
 func TestGetExecutionData(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)

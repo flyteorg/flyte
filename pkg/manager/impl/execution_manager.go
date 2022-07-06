@@ -1650,6 +1650,9 @@ func (m *ExecutionManager) TerminateExecution(
 		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", request.Id)
 		return nil, err
 	}
+	if common.IsExecutionTerminal(core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])) {
+		return nil, errors.NewFlyteAdminError(codes.PermissionDenied, "Cannot abort an already terminate workflow execution")
+	}
 
 	err = transformers.SetExecutionAborting(&executionModel, request.Cause, getUser(ctx))
 	if err != nil {
