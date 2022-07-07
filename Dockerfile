@@ -35,7 +35,7 @@ RUN make linux_compile
 ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
-FROM alpine:3.15
+FROM alpine:3.16
 LABEL org.opencontainers.image.source https://github.com/flyteorg/flyteadmin
 
 COPY --from=builder /artifacts /bin
