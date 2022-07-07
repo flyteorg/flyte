@@ -1,0 +1,49 @@
+name: Test Flytesnacks Example Run Commands
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test_run_cmds:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.7 and 3.10 have dependency issues:
+        # - https://github.com/flyteorg/flytesnacks/runs/7201286735?check_suite_focus=true
+        # - https://github.com/flyteorg/flytesnacks/runs/7201286962?check_suite_focus=true
+        python-version: ["3.8", "3.9"]
+
+    env:
+      RUN_CMDS_CI: "1"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        # This path is specific to Ubuntu
+        path: ~/.cache/pip
+        # Look to see if there is a cache hit for the corresponding requirements files
+        key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.txt')) }}
+    - name: Install dependencies
+      run: |
+        cd cookbook
+        python -m pip install --upgrade pip
+        pip install -r dev-requirements.txt
+    - uses: unionai/flytectl-setup-action@v0.0.1
+    - name: setup sandbox
+      run: |
+        make setup
+        flytectl config init
+    - name: Unit tests with pytest
+      run: pytest cookbook/tests/run_cmds

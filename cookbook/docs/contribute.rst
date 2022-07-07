@@ -1,120 +1,344 @@
-##############################
-Flytesnacks Contribution Guide
-##############################
+Example Contribution Guide
+###########################
 
-First off, thank you for thinking about contributing! 
-Below you’ll find instructions that will hopefully guide you through how to contribute to and improve Flytesnacks.
+The examples documentation provides an easy way for the community to learn about the rich set of
+features that Flyte offers, and we are constantly improving them with your help!
 
-💻 Contribute to Examples
-=========================
+Whether you're a novice or experienced software engineer, data scientist, or machine learning
+practitioner, all contributions are welcome!
 
-1. Determine where to put your new code.
+How to Contribute
+=================
+
+The Flyte documentation examples guides are broken up into three types:
+
+1. :ref:`User Guides <userguide>`: These are short, simple guides that demonstrate how to use a particular Flyte feature.
+   These examples should be runnable locally.
+2. :ref:`Tutorials <tutorials>`: These are longer, more advanced guides that use multiple Flyte features to solve
+   real-world problems. Tutorials are generally more complex examples that may require extra setup or that can only run
+   on larger clusters.
+3. :ref:`Integrations <integrations>`: These examples showcase how to use the Flyte plugins that integrate with the
+   broader data and ML ecosystem.
+
+The first step to contributing an example is to open up a
+`documentation issue <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+)>`_
+to articulate the kind of example you want to write. The Flyte maintainers will guide and help you figure out where
+your example would fit best.
+
+Creating an Example
+===================
+
+.. admonition:: Prerequisites
+
+   Follow the :ref:`env_setup` guide to get your development environment ready.
+
+The ``flytesnacks`` repo examples live in the ``cookbook`` directory, and are organized as
+follows:
+
+.. code-block::
+
+   cookbook
+   ├── core          # User Guide Basics features
+   ├── deployment    # User Guide Production Config guides
+   ├── larger_apps   # User Guide Building Large Apps
+   ├── remote_access # User Guide Remote Access guides
+   ├── testing       # User Guide Testing guides
+   ├── case_studies  # Tutorials live here
+   └── integrations  # Integrations live here
+
+.. important::
+
+   If you're creating a new example in ``integrations`` or ``case_studies`` that doesn'takes
+   fit into any of the existing subdirectories, you'll need to setup a new example directory.
+
+   Create a new directory with ``mkdir {integrations, case_studies}/path/to/new/example_dir``
    
-   * `Core <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/core>`__: Contains examples that demonstrate functionality available within core flytekit. These examples should be runnable locally.
-   * `Integrations <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/integrations>`__: Contains examples that leverage one or more of the available plugins.
-   * `Case Studies <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/case_studies>`__: Contains examples that demonstrate the usage of Flyte to solve real-world problems. These are generally more complex examples that may require extra setup or that can only run on larger clusters.
-       
-2. Create a directory. (applicable for ``integrations`` and ``case_studies`` directories)
+   Each example directory should contain:
 
-   After determining where to put your example, create a directory under the appropriate parent directory. Each example directory should contain:
+   * ``Dockerfile``
+   * ``Makefile``
+   * ``README.rst``
+   * ``__init__.py``
+   * ``requirements.in``
+   * ``sandbox.config``
 
-   * Dockerfile
-   * Makefile
-   * README.rst
-   * __init__.py
-   * requirements.in
-   * sandbox.config
+   You can copy one of the existing examples and modify it to your needs.
 
-   It might be easier to copy one of the existing examples and modify it to your needs.
+Create your example by going to the appropriate example directory and creating a ``.py`` file with
+a descriptive name for your example. Be sure to follow the `percent <https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format>`_
+format for delimiting code and markdown in your script.
 
-3. Add the example to CI.
+.. note::
+   
+   ``flytesnacks`` uses `sphinx gallery <https://sphinx-gallery.github.io/stable/index.html>`_
+   to convert the python files to ``.rst`` format so that the examples can be rendered in the
+   documentation.
 
-   Add the example to `flyte_tests_manifest.json <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/flyte_tests_manifest.json>`__.
+Write a README
+===============
 
-4. Test your code!
+The ``README.md`` file needs to capture the *what*, *why*, and *how* of the example.
 
-   * If the Python code can be run locally, just use ``python <my file>`` to run it.
-   * If the Python code has to be tested in a cluster:
-      * Install Flytectl by running ``brew install flyteorg/homebrew-tap/flytectl``. Learn more about installation and configuration of Flytectl `here <https://docs.flyte.org/projects/flytectl/en/latest/index.html>`__.
-      * Run the ``flytectl sandbox start --source=$(pwd)`` command in the directory that's one level above the directory that has workflows. 
-      For example, to register `house price prediction <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/case_studies/ml_training/house_price_prediction>`__ example, run the start command in the ``ml_training`` directory. 
-      To register ``core`` examples, run the start command in the ``cookbook`` directory. So, ``cd`` to the required directory and run all the consequent commands in there!
+* What is the integration about? Its features, etc.
+* Why do we need this integration? How is it going to benefit the Flyte users?
+* Showcase the uniqueness of the integration
+* How to install the plugin?
+  
+.. tip::
+   Refer to any subdirectory in the ``cookbook`` directory for examples
 
-      Following are the commands to run if examples in ``core`` directory are to be tested on sandbox:
-        1. Build Docker container using the command: ``flytectl sandbox exec -- docker build . --tag "core:v1" -f core/Dockerfile``. 
-        2. Package the examples by running ``pyflyte --pkgs core package --image core:v1 -f``.
-        3. Register the examples by running ``flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v1``.
-        4. Visit https://localhost:30081/console to view the Flyte console, which consists of the examples present in the ``flytesnacks/cookbook/core`` directory.
-        5. To fetch new dependencies and rebuild the image, run 
-        ``flytectl sandbox exec -- docker build . --tag "core:v2" -f core/Dockerfile``, 
-        ``pyflyte --pkgs core package --image core:v2 -f``, and 
-        ``flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v2``.
-        6. Refer to `this doc <https://docs.flyte.org/projects/cookbook/en/latest/auto/larger_apps/larger_apps_iterate.html#quickly-re-deploy-your-application>`__ if the code in itself is updated and requirements.txt is the same.
+Explain What the Code Does
+===========================
+
+Following the `literate programming <https://en.wikipedia.org/wiki/Literate_programming>`__ paradigm, make sure to
+interleave explanations in the ``*.py`` files containing the code example.
+
+.. admonition:: A Simple Example
+   :class: tip
+
+   Here's a code snippet that defines a function that takes two positional arguments and one keyword argument:
+
+   .. code-block:: python
+
+      def function(x, y, z=3):
+          return x + y * z
+
+   As you can see, ``function`` adds the two first arguments and multiplies the sum with the third keyword
+   argument. Can you think of a better name for this ``function``?
+
+Explanations don't have to be this detailed for such a simple example, but you can imagine how this makes for a better
+reading experience for more complicated examples.
+
+Add Run Commands (Optional)
+============================
+
+For each example, you can also create *run commands*, which specify how to run the example using
+``pyflyte run`` or ``FlyteRemote``. To do so, create a ``_run`` subdirectory in the same directory
+as the example script.
+
+.. prompt:: bash
+
+   mkdir _run
+
+Let's suppose our example script is called ``my_example.py`` with the following contents:
+
+.. code-block:: python
+   
+   from flytekit import task, workflow
+
+   @task
+   def example_task(input: str) -> str:
+       return f"hello {input}"
+
+   @workflow
+   def wf(input: str) -> str:
+       return example_task(input=input)
+
+
+In the ``_run`` subdirectory, create a
+bash and python script with the same name, but with a ``run_`` prefix:
+
+.. prompt:: bash
+
+   touch _run/run_my_example.sh
+   touch _run/run_my_example.py
+
+The ``run_my_example.sh.sh`` script should contain the terminal command that users need to invoke to run the script with
+``pyflyte run``, for example:
+
+.. code-block:: bash
+   
+   pyflyte run --remote my_example.py:wf --input there
+
+Similarly, the ``run_my_example.py`` script should contain the python code that users need to invoke to run the script
+with ``FlyteRemote``, for example:
+
+.. code-block:: python
+
+   from flytekit.configuration import Config
+   from flytekit.remote import FlyteRemote
+
+   from my_example import wf
+
+   remote = FlyteRemote(
+       config=Config.auto(),
+       default_project="flytesnacks",
+       default_domain="development",
+   )
+
+   registered_workflow = remote.register_script(wf)
+
+   execution = remote.execute(registered_workflow, inputs={"input": "there"})
+   print(f"Execution successfully started: {execution.id.name}")
+
+Finally, in the ``my_example.py`` example script, place the following custom sphinx directive:
+
+.. code-block::
+
+   .. run-example-cmds::
+
+This will insert a dropdown in the rendered documentation page with instructions on how to run the example
+you just created:
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/run_commands.png
+   :alt: Example run commands
+
+Finally, to test the run commands in CI, add an ``ExampleTestCase`` entry to
+the ``test_example_suite`` function in ``cookbook/tests/run_cmds/test_run_examples.py``. For
+example:
+
+.. code-block:: python
+
+   @pytest.mark.parametrize(
+       "example_test_case",
+       [
+           ExampleTestCase("hello-world", "core/flyte_basics/hello_world.py", {"o0": "hello world"}),
+           ExampleTestCase("task", "core/flyte_basics/task.py", {"o0": 16}),
+           ExampleTestCase("basic-workflow", "core/flyte_basics/basic_workflow.py", {"o0": 102, "o1": "helloworld"}),
+
+           # add a new example test case
+           ExampleTestCase(
+               id="my-example",
+               script_rel_path="path/to/my_example.py",
+               expected_output={"o0": "hello there"},
+           )
+       ],
+       ids=lambda x: x.id
+   )
+   @pytest.mark.parametrize(
+       "run_type", ["pyflyte_run", "flytekit_remote"], ids=lambda x: x.replace("_", "-")
+   )
+   def test_example_suite(flyte_remote: FlyteRemote, example_test_case: ExampleTestCase, run_type: str):
+       ...
+
+
+Test your code
+===============
+
+If the example code can be run locally, just use ``python <my file>.py`` to run it.
+
+Testing on a Cluster
+---------------------
+
+Install :doc:`flytectl <flytectl:index>`, the commandline interface for flyte.
+
+.. note::
+
+   Learn more about installation and configuration of Flytectl `here <https://docs.flyte.org/projects/flytectl/en/latest/index.html>`__.
+
+Start a Flyte demo cluster with:
+
+.. code-block::
+
+   flytectl demo start
+
+
+Testing ``core`` directory examples on sandbox
+-----------------------------------------------
+
+Build Docker container:
+
+.. prompt:: bash
+
+   flytectl demo exec -- docker build . --tag "core:v1" -f core/Dockerfile
+
+Package the examples by running
+
+.. prompt:: bash
+   
+   pyflyte --pkgs core package --image core:v1 -f
+
+Register the examples by running
+
+.. prompt:: bash
+   flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v1
+
+Visit ``https://localhost:30081/console`` to view the Flyte console, which consists of the examples present in the
+``flytesnacks/cookbook/core`` directory.
+
+To fetch new dependencies and rebuild the image, run 
+
+.. prompt:: bash
+
+   flytectl demo exec -- docker build . --tag "core:v2" -f core/Dockerfile
+   pyflyte --pkgs core package --image core:v2 -f
+   flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v2
+
+Refer to `this guide <https://docs.flyte.org/projects/cookbook/en/latest/auto/larger_apps/larger_apps_iterate.html#quickly-re-deploy-your-application>`__
+if the code in itself is updated and requirements.txt is the same.
 
 
 Pre-commit hooks
-^^^^^^^^^^^^^^^^
+----------------
 
 We use `pre-commit <https://pre-commit.com/>`__ to automate linting and code formatting on every commit.
-Configured hooks include `black <https://github.com/psf/black>`__, `isort <https://github.com/PyCQA/isort>`__, `flake8 <https://github.com/PyCQA/flake8>`__ and linters to ensure newlines are added to the end of files, and there is proper spacing in files.
+Configured hooks include `black <https://github.com/psf/black>`__, `isort <https://github.com/PyCQA/isort>`__,
+`flake8 <https://github.com/PyCQA/flake8>`__ and linters to ensure newlines are added to the end of files, and there is
+proper spacing in files.
 
-We run all those hooks in CI, but if you want to run them locally on every commit, run `pre-commit install` after installing the dev environment requirements. In case you want to disable `pre-commit` hooks locally, run `pre-commit uninstall`. More info `here <https://pre-commit.com/>`__.
+We run all those hooks in CI, but if you want to run them locally on every commit, run `pre-commit install` after
+installing the dev environment requirements. In case you want to disable `pre-commit` hooks locally, run
+`pre-commit uninstall`. More info `here <https://pre-commit.com/>`__.
 
 
 Formatting
-^^^^^^^^^^
+----------
 
-We use `black <https://github.com/psf/black>`__ and `isort <https://github.com/PyCQA/isort>`__ to autoformat code. They are configured as git hooks in `pre-commit`. Run ``make fmt`` to format your code.
+We use `black <https://github.com/psf/black>`__ and `isort <https://github.com/PyCQA/isort>`__ to autoformat code. They
+are configured as git hooks in `pre-commit`. Run ``make fmt`` to format your code.
 
 Spell-checking
-^^^^^^^^^^^^^^
+--------------
 
-We use `codespell <https://github.com/codespell-project/codespell>`__ to catch common misspellings. Run ``make spellcheck`` to spell-check the changes.
+We use `codespell <https://github.com/codespell-project/codespell>`__ to catch common misspellings. Run
+``make spellcheck`` to spell-check the changes.
 
+Update Documentation Pages
+==========================
 
-📝 Contribute to Documentation
-==============================
+The ``cookbook/docs/conf.py`` contains the sphinx configuration for building the ``flytesnacks`` documentation.
 
-The ``docs`` folder in ``flytesnacks`` houses the required documentation configuration. The core, case_studies, and integrations docs are written in the respective README.md and the Python code files. 
-
-1. README.md file needs to capture the *what*, *why*, and *how*.
-
-   * What is the integration about? Its features, etc.
-   * Why do we need this integration? How is it going to benefit the Flyte users?
-   * Showcase the uniqueness of the integration
-   * How to install the plugin?
-  
-   .. tip::
-      Refer to any repo in the cookbook directory to understand this better.
-
-2. Explain what the code does.
-3. Update `conf.py <https://github.com/flyteorg/flytesnacks/tree/master/cookbook/docs/conf.py>`__ (imagine you have added ``snowflake`` to the ``integrations/external_services`` folder):
+For example, if you added the ``snowflake`` directory to the ``integrations/external_services`` folder, you then need
+to:
    
-   * Add the Python file names to the ``CUSTOM_FILE_SORT_ORDER`` list
-   * Add ``../integrations/external_services/snowflake`` to ``example_dirs``
-   * Add ``auto/integrations/external_services/snowflake`` to ``gallery_dirs``
+- Add the Python file names to the ``CUSTOM_FILE_SORT_ORDER`` list
+- Add ``../integrations/external_services/snowflake`` to ``example_dirs``
+- Add ``auto/integrations/external_services/snowflake`` to ``gallery_dirs``
 
-4. Add the code for panel and TOC in the required RST file.
+If you've created a new section in the examples guides, you need to update the table of contents and navigation panels in
+the appropriate ``rst`` file.
 
-     .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/panel_and_toc.png
-         :alt: panel and TOC
+.. note::
 
-5. Add the name and path to ``.github/workflows/ghcr_push.yml`` if you're adding an integration or a tutorial.
+   You will need to update the entries in the ``.. toc::`` directive *and* ``.. panels::`` directive.
 
-6. Add an entry to cookbook/flyte_tests_manifest.json if you're adding an integration or a tutorial.
+   .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/panel_and_toc.png
+      :alt: panel and TOC
 
-7. Verify that the code and documentation look as expected.
+Update CI Workflows
+===================
+
+To make sure your example is tested in CI/CD, add the name and path to ``.github/workflows/ghcr_push.yml`` if you're
+adding an integration or a tutorial.
+
+QA your Changes
+===============
+
+Verify that the code and documentation look as expected:
    
-   1. Learn about the documentation tools `here <https://docs.flyte.org/en/latest/community/contribute.html#documentation>`__
-   2. Install the requirements by running ``pip install -r docs-requirements.txt`` in the ``cookbook`` folder
-   3. Run ``make html`` in the ``docs`` folder
+- Learn about the documentation tools `here <https://docs.flyte.org/en/latest/community/contribute.html#documentation>`__
+- Install the requirements by running ``pip install -r docs-requirements.txt`` in the ``cookbook`` folder
+- Run ``make html`` in the ``docs`` folder
 
    .. tip::
       For implicit targets, run ``make -C docs html``.
-   4. Open the HTML pages present in the ``docs/_build`` directory in the browser
 
+- Open the HTML pages present in the ``docs/_build`` directory in the browser
 
-8. After creating the pull request, ensure that the docs are rendered correctly by clicking on the documentation check. 
+Create a Pull request
+======================
+
+Create the pull request, then ensure that the docs are rendered correctly by clicking on the documentation check. 
    
    .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/test_docs_link.png
        :alt: Docs link in a PR

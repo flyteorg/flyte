@@ -75,3 +75,7 @@ if __name__ == "__main__":
 
 # %%
 # To know more about workflows, take a look at the conceptual :std:ref:`discussion <flyte:divedeep-workflow-nodes>`.
+
+
+# %%
+# .. run-example-cmds::

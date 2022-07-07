@@ -21,6 +21,7 @@ codespell
 isort
 mock
 pytest
+pytest-xdist[psutil]
 mypy
 google-cloud-bigquery
 google-cloud-bigquery-storage

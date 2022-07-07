@@ -154,7 +154,7 @@ Table of Contents
    Scheduling Workflows <auto/core/scheduled_workflows/index>
    Extending Flyte <auto/core/extend_flyte/index>
    Building Large Apps <auto/larger_apps/index>
-   contribute
+   Example Contribution Guide <contribute>
 
 .. toctree::
    :maxdepth: -1

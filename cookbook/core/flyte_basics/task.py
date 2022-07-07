@@ -58,61 +58,79 @@ if __name__ == "__main__":
     print(square(n=10))
 
 # %%
+#
+# Invoke a Task within a Workflow
+# ===============================
+#
+# The primary way to use Flyte tasks is to invoke them in the context of a workflow.
+
+from flytekit import workflow
+
+
+@workflow
+def wf(n: int) -> int:
+    return square(n=square(n=n))
+
+# %%
+# In this toy example, we're calling the ``square`` task twice and returning the reult.
+
+
+# %%
 # .. _single_task_execution:
 #
-# Single Task Execution
-# =====================
+# .. dropdown:: Execute a Single Task without a Workflow
 #
-# Tasks are the atomic units of execution in Flyte.
-# Although workflows are traditionally composed of multiple tasks with dependencies defined by shared inputs and outputs,
-# it can be helpful to execute a single task during the process of iterating on its definition.
-# It can be tedious to write a new workflow definition every time you want to execute a single task under development
-# but "single task executions" can be used to iterate on task logic easily.
+#    Although workflows are traditionally composed of multiple tasks with dependencies defined by shared inputs and outputs,
+#    it can be helpful to execute a single task during the process of iterating on its definition.
+#    It can be tedious to write a new workflow definition every time you want to execute a single task under development
+#    but "single task executions" can be used to iterate on task logic easily.
 #
-# You can launch a task on Flyte console by inputting an IAM role or a Kubernetes service account.
+#    You can launch a task on Flyte console by providing a Kubernetes service account.
 #
-# Alternatively, you can use ``flytectl`` to launch the task. Run the following commands in the ``cookbook`` directory.
+#    Alternatively, you can use ``flytectl`` to launch the task. Run the following commands in the ``cookbook`` directory.
 #
-# .. note::
-#   This example is building a Docker image and pushing it only for sandbox
-#   (for non-sandbox, you will have to push the image to a Docker registry).
+#    .. note::
+#      This example is building a Docker image and pushing it only for sandbox
+#      (for non-sandbox, you will have to push the image to a Docker registry).
 #
-# Build a Docker image to package the task.
+#    Build a Docker image to package the task.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   flytectl sandbox exec -- docker build . --tag "flytebasics:v1" -f core/Dockerfile
+#      flytectl sandbox exec -- docker build . --tag "flytebasics:v1" -f core/Dockerfile
 #
-# Package the task.
+#    Package the task.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   pyflyte --pkgs core.flyte_basics package --image flytebasics:v1
+#      pyflyte --pkgs core.flyte_basics package --image flytebasics:v1
 #
-# Register the task.
+#    Register the task.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
+#      flytectl register files --project flytesnacks --domain development --archive flyte-package.tgz --version v1
 #
-# Generate an execution spec file.
+#    Generate an execution spec file.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   flytectl get task --domain development --project flytesnacks core.flyte_basics.task.square --version v1 --execFile exec_spec.yaml
+#      flytectl get task --domain development --project flytesnacks core.flyte_basics.task.square --version v1 --execFile exec_spec.yaml
 #
-# Create an execution using the exec spec file.
+#    Create an execution using the exec spec file.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
+#      flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
 #
-# .. note::
-#   For subsequent executions, you can simply run ``flytectl create execution ...`` and skip the previous commands.
-#   Alternatively, you can launch the task from the Flyte console.
+#    .. note::
+#      For subsequent executions, you can simply run ``flytectl create execution ...`` and skip the previous commands.
+#      Alternatively, you can launch the task from the Flyte console.
 #
-# Monitor the execution by providing the execution name from the create execution command.
+#    Monitor the execution by providing the execution name from the create execution command.
 #
-# .. prompt:: bash $
+#    .. prompt:: bash $
 #
-#   flytectl get execution --project flytesnacks --domain development <execname>
+#      flytectl get execution --project flytesnacks --domain development <execname>
+#
+# .. run-example-cmds::

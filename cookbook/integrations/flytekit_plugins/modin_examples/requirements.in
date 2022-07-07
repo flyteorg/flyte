@@ -1,4 +1,4 @@
 # -r ../../../common/requirements-common.in
-flytekit==0.31.0 # ray 1.11.0 accepts grpcio<=1.43.0 but not grpcio>=1.44.0 required by flytekit==0.32.3
+flytekit>=0.31.0 # ray 1.11.0 accepts grpcio<=1.43.0 but not grpcio>=1.44.0 required by flytekit==0.32.3
 flytekitplugins-modin>=0.31.0
 scikit-learn

@@ -42,35 +42,35 @@ def t3(a: typing.List[str]) -> str:
 
 # %%
 # Start by creating an imperative style workflow, which is aliased to just ``Workflow`` from ``flytekit``
-wb = Workflow(name="my.imperative.workflow.example")
+wf = Workflow(name="my.imperative.workflow.example")
 
 
 # %%
 # Inputs have to be added to the workflow before they can be used. Add them by specifying the name and the type.
-wb.add_workflow_input("in1", str)
+wf.add_workflow_input("in1", str)
 
 # %%
 # Next associate a task, and pass in the workflow level input.
-node_t1 = wb.add_entity(t1, a=wb.inputs["in1"])
+node_t1 = wf.add_entity(t1, a=wf.inputs["in1"])
 
 # %%
 # Create a workflow output linked to the output of that task.
-wb.add_workflow_output("output_from_t1", node_t1.outputs["o0"])
+wf.add_workflow_output("output_from_t1", node_t1.outputs["o0"])
 
 # %%
 # To add a task that has no inputs or outputs, just add the entity. We don't need to capture the resulting node
 # because we have no use for it.
-wb.add_entity(t2)
+wf.add_entity(t2)
 
 # %%
 # We can also pass in a list to a task. Also creating a workflow input returns an object that can be used as an
 # alternate way of linking workflow inputs. Here, ``t3`` uses both workflow inputs.
-wf_in2 = wb.add_workflow_input("in2", str)
-node_t3 = wb.add_entity(t3, a=[wb.inputs["in1"], wf_in2])
+wf_in2 = wf.add_workflow_input("in2", str)
+node_t3 = wf.add_entity(t3, a=[wf.inputs["in1"], wf_in2])
 
 # %%
 # You can also create a workflow input as a list from multiple task outputs
-wb.add_workflow_output(
+wf.add_workflow_output(
     "output_list",
     [node_t1.outputs["o0"], node_t3.outputs["o0"]],
     python_type=typing.List[str],
@@ -78,5 +78,8 @@ wb.add_workflow_output(
 
 
 if __name__ == "__main__":
-    print(wb)
-    print(wb(in1="hello", in2="foo"))
+    print(wf)
+    print(wf(in1="hello", in2="foo"))
+
+# %%
+# .. run-example-cmds::
