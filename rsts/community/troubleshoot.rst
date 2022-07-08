@@ -105,6 +105,14 @@ Troubles With Flytectl Commands With Auth Enabled
     - Verify that you have an entry for localhost in your ``/etc/hosts`` file.
     - It could also mean that the callback took longer than the default 15 secs, and the Flytectl wait deadline expired. 
 
+Troubles With Inconsistent Names for Pods and Downstream Resources
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Don't rely on the name of a Kubernetes pod or downstream resource to always match the names of their Flyte nodes
+- Flyte assigns names to Kubernetes pods and downstream resources with either the format ``executionid-node-id-attempt`` or a hash value
+- Flyte assigns a hash value when the downstream resource limits the size of the resource's name
+
+
 
 I Still Need Help!
 ^^^^^^^^^^^^^^^^^^
