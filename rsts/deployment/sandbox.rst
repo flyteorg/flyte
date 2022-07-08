@@ -17,14 +17,14 @@ The follow section explains how you can use each of these modes and provides mor
 many features are intentionally removed from this environment to ensure that the startup times and runtime footprints are low.
 
 *******************************************
-Flyte Sandbox as a single Docker container
+Flyte Sandbox as a Single Docker Container
 *******************************************
 
 :std:ref:`flytectl_sandbox` starts a local sandbox environment for Flyte. This is mini-replica of an entire Flyte deployment, without the scalability and with minimal extensions. The idea for this environment originated from the desire of the core team to make it extremely simple for users of Flyte to
 try out the platform and get a feel for the user experience, without having to understand Kubernetes or dabble with configuration etc. The Flyte single container sandbox is also used by the team to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. The sandbox can be run
 in most any environment that supports Docker containers and an Ubuntu docker base image.
 
-Architecture and reasons why we built it
+Architecture and Reasons Why We Built It
 ========================================
 Within the single container environment, a mini Kubernetes cluster is installed using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container Docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.
 
@@ -46,7 +46,7 @@ Use the Flyte Sandbox to:
 * Provide snapshot environments for various Flyte versions, to identify regressions
 
 ***************************************************************
-Deploying your own Flyte Sandbox environment to a K8s cluster
+Deploying your own Flyte Sandbox Environment to a K8s Cluster
 ***************************************************************
 
 This installs all the dependencies as Kubernetes deployments. We call this a Sandbox deployment. Flyte sandbox deployment can be deployed using the default Helm chart.
@@ -64,9 +64,10 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
 .. _deploy-sandbox-local:
 
-Deploy Flyte Sandbox environment on laptop/workstation/single machine
-=======================================================================
+Deploy Flyte Sandbox on Your Local Machine
+==========================================
 
+You can deploy the sandbox environment on your laptop workstation to run locally.
 
 Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
@@ -80,11 +81,11 @@ Recommended using ``flytectl sandbox start`` as described in :ref:`getting-start
 
 .. _deployment-sandbox-dedicated-k8s-cluster:
 
-Deploy a Flyte Sandbox environment to a Cloud Kubernetes cluster
-==================================================================
+Deploy Flyte Sandbox to a Cloud Kubernetes Cluster
+==================================================
 
 Cluster Requirements
----------------------
+--------------------
 
 Ensure you have kubernetes up and running on your choice of cloud provider:
 
@@ -95,8 +96,18 @@ Ensure you have kubernetes up and running on your choice of cloud provider:
 If you can access your cluster with ``kubectl cluster-info``, you're ready to deploy Flyte.
 
 
+.. note::
+
+   Don't rely on the name of a Flyte node to always match the name of
+   its corresponding Kubernetes pod or downstream resource. Flyte
+   assigns names to Kubernetes pods and downstream resources with
+   either the format ``executionid-node-id-attempt`` or a hash
+   value. Flyte assigns a hash value when the downstream resource
+   limits the size of the resource's name.
+
+
 Deployment
------------
+----------
 
 We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with deploying the sandbox
 Flyte configuration on your remote cluster.
