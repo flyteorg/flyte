@@ -6,11 +6,9 @@ on:
       - master
     paths-ignore:
       - 'cookbook/docs/**'
-      - 'cookbook/deployment/**'
   pull_request:
     paths-ignore:
       - 'cookbook/docs/**'
-      - 'cookbook/deployment/**'
 jobs:
 
   # Lists all directories that have Dockerfile in them...
