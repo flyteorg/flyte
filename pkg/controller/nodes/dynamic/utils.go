@@ -76,19 +76,3 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 
 	return compiledTasks, nil
 }
-
-func makeArrayInterface(varMap *core.VariableMap) *core.VariableMap {
-	if varMap == nil || len(varMap.Variables) == 0 {
-		return varMap
-	}
-
-	for _, val := range varMap.Variables {
-		val.Type = &core.LiteralType{
-			Type: &core.LiteralType_CollectionType{
-				CollectionType: val.Type,
-			},
-		}
-	}
-
-	return varMap
-}
