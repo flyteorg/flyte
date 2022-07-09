@@ -130,6 +130,7 @@ class CustomSorter(FileNameSortKey):
         ## External Services
         "hive.py",
         "snowflake.py",
+        "airflow.py",
         # Extending Flyte
         "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
         "custom_types.py",
@@ -292,6 +293,7 @@ examples_dirs = [
     "../integrations/gcp/bigquery",
     "../integrations/external_services/hive",
     "../integrations/external_services/snowflake",
+    "../integrations/external_services/airflow",
     "../core/extend_flyte",
     "../larger_apps",
 ]
@@ -329,6 +331,7 @@ gallery_dirs = [
     "auto/integrations/gcp/bigquery",
     "auto/integrations/external_services/hive",
     "auto/integrations/external_services/snowflake",
+    "auto/integrations/external_services/airflow",
     "auto/core/extend_flyte",
     "auto/larger_apps",
 ]
