@@ -109,8 +109,9 @@ Troubles With Inconsistent Names for Pods and Downstream Resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Don't rely on the name of a Flyte node to always match the name of its corresponding Kubernetes pod or downstream resource
-- Flyte assigns names to Kubernetes pods and downstream resources with either the format ``executionid-node-id-attempt`` or a hash value
-- Flyte assigns a hash value when the downstream resource limits the size of the resource's name
+- Flyte uses the format ``executionid-node-id-attempt`` from the node to assign a name to a Kubernetes pod or downstream resource.
+- But if this is an invalid name for a Kubernetes pod, Flyte assigns a valid name of random characters.
+
 
 
 

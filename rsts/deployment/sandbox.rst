@@ -99,6 +99,15 @@ If you can access your cluster with ``kubectl cluster-info``, you're ready to de
 .. note::
 
    Don't rely on the name of a Flyte node to always match the name of
+   its corresponding Kubernetes pod or downstream resource. Flyte uses
+   the format ``executionid-node-id-attempt`` from the node to assign
+   a name to a Kubernetes pod or downstream resource. But if this is
+   an invalid name for a Kubernetes pod, Flyte assigns a valid name of
+   random characters.
+
+
+   
+   Don't rely on the name of a Flyte node to always match the name of
    its corresponding Kubernetes pod or downstream resource. Flyte
    assigns names to Kubernetes pods and downstream resources with
    either the format ``executionid-node-id-attempt`` or a hash
