@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
 	"github.com/flyteorg/flytectl/pkg/k8s"
 	k8sMocks "github.com/flyteorg/flytectl/pkg/k8s/mocks"
+	"github.com/flyteorg/flytectl/pkg/sandbox"
 	"github.com/flyteorg/flytectl/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -36,7 +37,7 @@ func TestTearDownFunc(t *testing.T) {
 		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		k8s.ContextMgr = mockK8sContextMgr
 		mockK8sContextMgr.OnRemoveContextMatch(mock.Anything).Return(nil)
-		err := tearDownDemo(ctx, mockDocker)
+		err := sandbox.Teardown(ctx, mockDocker)
 		assert.Nil(t, err)
 	})
 	t.Run("Error", func(t *testing.T) {
@@ -44,7 +45,15 @@ func TestTearDownFunc(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
 		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("err"))
-		err := tearDownDemo(ctx, mockDocker)
+		err := sandbox.Teardown(ctx, mockDocker)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		ctx := context.Background()
+		mockDocker := &mocks.Docker{}
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(nil, fmt.Errorf("err"))
+		err := sandbox.Teardown(ctx, mockDocker)
 		assert.NotNil(t, err)
 	})
 
