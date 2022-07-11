@@ -1,28 +1,23 @@
 """
-.. _advanced_custom_task_plugin:
+.. _user_container:
 
-Writing Your Own Flytekit Task Plugins
----------------------------------------
+User Container Task Plugin
+--------------------------
 
-Flytekit is designed to be extremely extensible. You can add new task-types that are useful only for your use-cases.
-Flyte does come with the capability of extending the backend, but that is only required if you want the capability to be
-extended to all users of Flyte, or there is a cost/visibility benefit of doing so.
+A user container task plugin runs a user-defined container that has the user code.
 
-The following demo shows how to build Flyte container task extensions, with an SQLAlchemy extension as an example:
-
-.. youtube:: hfKbfcJbawE
-
-This tutorial will walk you through writing your own Sensor style plugin, that allows users to wait for a file to land
-in the object store. Remember, if you follow the Flyte/flytekit constructs, you will automatically make your plugin portable
+This tutorial will walk you through writing your own sensor-style plugin that allows users to wait for a file to land
+in the object store. Remember that if you follow the flyte/flytekit constructs, you will automatically make your plugin portable
 across all cloud platforms that Flyte supports.
 
 Sensor Plugin
-^^^^^^^^^^^^^^
-A sensor Plugin waits for some event to happen, before marking the task as success. You do not need to worry about the
-timeout as that will be handled by the flyte engine itself, when running in production
+*************
+
+A sensor plugin waits for some event to happen before marking the task as success. You need not worry about the
+timeout as that will be handled by the flyte engine itself when running in production.
 
 Plugin API
-^^^^^^^^^^^^
+^^^^^^^^^^
 
 .. code-block:: python
 
@@ -46,14 +41,15 @@ from flytekit.extend import Interface, PythonTask, context_manager
 
 # %%
 # Plugin Structure
-# ^^^^^^^^^^^^^^^^^
-# As illustrated above to achieve this structure we need to create a Class called  ``WaitForObjectStoreFile``, which
+# ^^^^^^^^^^^^^^^^
+#
+# As illustrated above, to achieve this structure we need to create a class named ``WaitForObjectStoreFile``, which
 # derives from :py:class:`flytekit.PythonFunctionTask` as follows.
 #
 class WaitForObjectStoreFile(PythonTask):
     """
-    Add documentation here for your Plugin.
-    This plugin creates an object store file sensor, that waits and exits only when the file exists.
+    Add documentation here for your plugin.
+    This plugin creates an object store file sensor that waits and exits only when the file exists.
     """
 
     _VAR_NAME: str = "path"
@@ -76,7 +72,7 @@ class WaitForObjectStoreFile(PythonTask):
         self._poll_interval = poll_interval
 
     def execute(self, **kwargs) -> typing.Any:
-        # No need to check for existence, as that is guaranteed
+        # No need to check for existence, as that is guaranteed.
         path = kwargs[self._VAR_NAME]
         ctx = context_manager.FlyteContext.current_context()
         user_context = ctx.user_space_params
@@ -90,28 +86,28 @@ class WaitForObjectStoreFile(PythonTask):
 
 
 # %%
-# Note about Config Objects
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^
+# Config Objects
+# ==============
 #
-# Flytekit routes to the right plugin only based on the type of task_config class, if using the @task decorator.
-# Config is very useful for cases when one wants to customize the behavior of the plugin or pass the config information
-# to the backend plugin, but in this case we have no real configuration. The config object is any class, that your
-# plugin understands
-#
-# .. note::
-#
-#   Observe that the base class is Generic, it is parameterized with the desired config class
+# Flytekit routes to the right plugin based on the type of ``task_config`` class if using the ``@task`` decorator.
+# Config is very useful for cases when you want to customize the behavior of the plugin or pass the config information
+# to the backend plugin; however, in this case there's no real configuration. The config object can be any class that your
+# plugin understands.
 #
 # .. note::
 #
-#   To create a task decorator based plugin the Config is required In this example, we are creating a named class plugin
-#   This construct does not need a plugin
+#   Observe that the base class is Generic; it is parameterized with the desired config class.
 #
-# We will try to cover an example of Config objects in a subsequent tutorial
+# .. note::
+#
+#   To create a task decorator-based plugin, ``task_config`` is required.
+#   In this example, we are creating a named class plugin, and hence, this construct does not need a plugin.
+#
+# Refer to the `spark plugin <https://github.com/flyteorg/flytekit/tree/master/plugins/flytekit-spark>`__ for an example of a config object.
 
 # %%
 # Actual Usage
-# ^^^^^^^^^^^^^
+# ^^^^^^^^^^^^
 
 sensor = WaitForObjectStoreFile(
     name="my-objectstore-sensor",
@@ -132,10 +128,16 @@ def my_workflow(path: str) -> str:
 
 
 # %%
-# Ofcourse you can run the workflow using your own new shiny plugin locally
+# And of course, you can run the workflow locally using your own new shiny plugin!
 if __name__ == "__main__":
     f = "/tmp/some-file"
     with open(f, "w") as w:
         w.write("Hello World!")
 
     print(my_workflow(path=f))
+
+# %%
+# The key takeaways of a user container task plugin are:
+#
+# - The task object that gets serialized at compile-time is recreated using the user's code at run time.
+# - At platform-run-time, the user-decorated function is executed.
