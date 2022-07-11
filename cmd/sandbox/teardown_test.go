@@ -1,8 +1,6 @@
 package sandbox
 
 import (
-	"context"
-	"fmt"
 	"testing"
 
 	"github.com/docker/docker/api/types"
@@ -17,40 +15,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var containers []types.Container
-
-func TestTearDownFunc(t *testing.T) {
-	container1 := types.Container{
-		ID: "FlyteSandboxClusterName",
-		Names: []string{
-			docker.FlyteSandboxClusterName,
-		},
-	}
-	containers = append(containers, container1)
-
-	t.Run("Success", func(t *testing.T) {
-		ctx := context.Background()
-		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
-		mockK8sContextMgr := &k8sMocks.ContextOps{}
-		k8s.ContextMgr = mockK8sContextMgr
-		mockK8sContextMgr.OnRemoveContextMatch(mock.Anything).Return(nil)
-		err := tearDownSandbox(ctx, mockDocker)
-		assert.Nil(t, err)
-	})
-	t.Run("Error", func(t *testing.T) {
-		ctx := context.Background()
-		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("err"))
-		err := tearDownSandbox(ctx, mockDocker)
-		assert.NotNil(t, err)
-	})
-
-}
-
 func TestTearDownClusterFunc(t *testing.T) {
+	var containers []types.Container
 	_ = util.SetupFlyteDir()
 	_ = util.WriteIntoFile([]byte("data"), configutil.FlytectlConfig)
 	s := testutils.Setup()
@@ -58,6 +24,10 @@ func TestTearDownClusterFunc(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
 	mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
+	mockK8sContextMgr := &k8sMocks.ContextOps{}
+	mockK8sContextMgr.OnRemoveContext(mock.Anything).Return(nil)
+	k8s.ContextMgr = mockK8sContextMgr
+
 	docker.Client = mockDocker
 	err := teardownSandboxCluster(ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)

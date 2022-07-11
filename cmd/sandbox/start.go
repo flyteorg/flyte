@@ -76,7 +76,6 @@ eg : for passing multiple environment variables
 
 Usage
 `
-	sandboxContextName = "flyte-sandbox"
 )
 
 func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
