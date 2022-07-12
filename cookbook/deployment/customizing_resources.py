@@ -7,12 +7,12 @@ Flytekit makes it possible to specify these requirements declaratively and close
 
 # %%
 # In this example, the memory required by the function increases as the dataset size increases.
-# Large datasets may not be able to run locally, so we would want to provide hints to flyte backend to request for more memory.
-# This is done by simply decorating the task with the hints as shown in the following code sample.
+# Large datasets may not be able to run locally, so we would want to provide hints to the Flyte backend to request for more memory.
+# This is done by decorating the task with the hints as shown in the following code sample.
 #
-# Tasks can have ``requests`` and ``limits`` which mirror the native `equivalents in kubernetes <https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits>`__
+# Tasks can have ``requests`` and ``limits`` which mirror the native `equivalents in Kubernetes <https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits>`__.
 # A task can possibly be allocated more resources than it requests, but never more than its limit.
-# Requests are treated as hints which are used to schedule tasks on nodes with available resources, whereas limits
+# Requests are treated as hints to schedule tasks on nodes with available resources, whereas limits
 # are hard constraints.
 #
 # For either a request or limit, refer to the :py:class:`flytekit:flytekit.Resources` documentation.
@@ -66,6 +66,9 @@ def my_workflow(x: typing.List[int]) -> int:
 if __name__ == "__main__":
     print(count_unique_numbers(x=[1, 1, 2]))
     print(my_workflow(x=[1, 1, 2]))
+
+# %%
+# .. note:: To alter the limits of the default platform configuration, change the `admin config <https://github.com/flyteorg/flyte/blob/b16ffd76934d690068db1265ac9907a278fba2ee/deployment/eks/flyte_helm_generated.yaml#L203-L213>`_ and `namespace level quota <https://github.com/flyteorg/flyte/blob/b16ffd76934d690068db1265ac9907a278fba2ee/deployment/eks/flyte_helm_generated.yaml#L214-L240>`_ on the cluster.
 
 # %%
 # Using ``with_overrides``
@@ -124,4 +127,3 @@ if __name__ == "__main__":
 #    :alt: Resource allocated using "with_overrides" method
 #
 #    Resource allocated using "with_overrides" method
-
