@@ -16,7 +16,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.1.30 # FLYTEADMIN_TAG
+      tag: v1.1.29-hotfix # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
