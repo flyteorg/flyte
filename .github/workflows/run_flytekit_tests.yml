@@ -38,10 +38,10 @@ jobs:
       - name: Setup Flytekit
         shell: bash
         run: |
-          #          python -m pip install --upgrade pip
-          #          pip install flytekit
-          #          pip install --upgrade importlib-metadata
-          #          pip show importlib-metadata
+          python -m pip install --upgrade pip
+          pip install flytekit
+          pip install --upgrade importlib-metadata
+          pip show importlib-metadata
           curl -sL https://ctl.flyte.org/install | bash
           flytectl -c /home/runner/work/flyte/flyte/.github/ci_config/config.yaml get projects
       # TODO: add a badge for when test is running
