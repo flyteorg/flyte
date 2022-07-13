@@ -61,6 +61,16 @@ sql_task = SQLAlchemyTask(
 # %%
 # Next, we define a task that computes the mean length of sequences in the subset of RNA sequences that our query
 # returned.
+# Note for those running this in your live Flyte backend via ``pyflyte run``.  ``run`` will use the default flytekit
+# image if one is not specified.  The default flytekit image does not have the sqlalchemy flytekit plugin installed.
+# To correctly kick off an execution of this task, you'll need to use the following command.
+#
+# .. code::
+#
+# pyflyte --config ~/.flyte/your-config.yaml run --destination-dir /app --remote --image ghcr.io/flyteorg/flytekit:py3.8-sqlalchemy-latest integrations/flytekit_plugins/sql/sql_alchemy.py my_wf --min_length 3 --max_length 100 --limit 50
+#
+# Note also we added the ``destination-dir`` argument, since by default ``pyflyte run`` copies code into ``/root`` which
+# is not what that image's workdir is set to.
 @task
 def get_mean_length(data: DataSchema) -> float:
     dataframe = data.open().all()
