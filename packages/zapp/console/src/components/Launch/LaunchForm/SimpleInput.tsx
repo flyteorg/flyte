@@ -68,6 +68,7 @@ export const SimpleInput: React.FC<InputProps> = (props) => {
         <TextField
           error={hasError}
           id={getLaunchInputId(name)}
+          key={getLaunchInputId(name)}
           helperText={helperText}
           fullWidth={true}
           label={label}

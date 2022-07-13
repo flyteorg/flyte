@@ -12,6 +12,7 @@ const str = {
   securityContextHeader: 'Security Context',
   serviceAccountHeader: 'Service Account',
   noMatchingResults: 'No matching results',
+  missingUnionListOfSubType: 'Unexpected missing type for union',
   missingMapSubType: 'Unexpected missing subtype for map',
   mapMissingMapProperty: 'Map literal missing `map` property',
   mapMissingMapLiteralsProperty: 'Map literal missing `map.literals` property',
@@ -22,6 +23,8 @@ const str = {
   valueNotParse: 'Value did not parse to an object',
   valueKeyRequired: "Value's key is required",
   valueValueInvalid: "Value's value is invalid",
+  valueMustBeObject: 'Value must be an object',
+  type: 'Type',
 };
 
 export { patternKey } from '@flyteconsole/locale';

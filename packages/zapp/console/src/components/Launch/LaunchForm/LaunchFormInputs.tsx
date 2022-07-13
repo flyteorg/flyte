@@ -8,6 +8,7 @@ import { MapInput } from './MapInput';
 import { NoInputsNeeded } from './NoInputsNeeded';
 import { SimpleInput } from './SimpleInput';
 import { StructInput } from './StructInput';
+import { UnionInput } from './UnionInput';
 import { useStyles } from './styles';
 import { BaseInterpretedLaunchState, InputProps, InputType, LaunchFormInputsRef } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
@@ -15,9 +16,12 @@ import { UnsupportedRequiredInputsError } from './UnsupportedRequiredInputsError
 import { useFormInputsState } from './useFormInputsState';
 import { isEnterInputsState } from './utils';
 
-function getComponentForInput(input: InputProps, showErrors: boolean) {
+export function getComponentForInput(input: InputProps, showErrors: boolean) {
   const props = { ...input, error: showErrors ? input.error : undefined };
+
   switch (input.typeDefinition.type) {
+    case InputType.Union:
+      return <UnionInput {...props} />;
     case InputType.Blob:
       return <BlobInput {...props} />;
     case InputType.Collection:

@@ -159,6 +159,7 @@ export enum InputType {
   Schema = 'SCHEMA',
   String = 'STRING',
   Struct = 'STRUCT',
+  Union = 'Union',
   Unknown = 'UNKNOWN',
 }
 
@@ -166,6 +167,7 @@ export interface InputTypeDefinition {
   literalType: LiteralType;
   type: InputType;
   subtype?: InputTypeDefinition;
+  listOfSubTypes?: InputTypeDefinition[];
 }
 
 export interface BlobValue {
@@ -174,7 +176,12 @@ export interface BlobValue {
   uri: string;
 }
 
-export type InputValue = string | number | boolean | Date | BlobValue;
+export interface UnionValue {
+  value: InputValue;
+  typeDefinition: InputTypeDefinition;
+}
+
+export type InputValue = string | number | boolean | Date | BlobValue | UnionValue;
 export type InputChangeHandler = (newValue: InputValue) => void;
 
 export interface InputProps {

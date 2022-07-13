@@ -75,12 +75,19 @@ export function getTaskInputs(task: Task): Record<string, Variable> {
 /** Returns a formatted string based on an InputTypeDefinition.
  * ex. `string`, `string[]`, `map<string, number>`
  */
-export function formatType({ type, subtype }: InputTypeDefinition): string {
+export function formatType({ type, subtype, listOfSubTypes }: InputTypeDefinition): string {
   if (type === InputType.Collection) {
     return subtype ? `${formatType(subtype)}[]` : 'collection';
   }
   if (type === InputType.Map) {
     return subtype ? `map<string, ${formatType(subtype)}>` : 'map';
+  }
+  if (type === InputType.Union) {
+    if (!listOfSubTypes) return typeLabels[type];
+
+    const concatListOfSubTypes = listOfSubTypes.map((subtype) => formatType(subtype)).join(' | ');
+
+    return `${typeLabels[type]} [${concatListOfSubTypes}]`;
   }
   return typeLabels[type];
 }
@@ -157,6 +164,11 @@ export function getInputDefintionForLiteralType(literalType: LiteralType): Input
     result.type = simpleTypeToInputType[literalType.simple];
   } else if (literalType.enumType) {
     result.type = InputType.Enum;
+  } else if (literalType.unionType) {
+    result.type = InputType.Union;
+    result.listOfSubTypes = literalType.unionType.variants?.map((variant) =>
+      getInputDefintionForLiteralType(variant as LiteralType),
+    );
   }
   return result;
 }

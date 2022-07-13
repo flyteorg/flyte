@@ -1,6 +1,6 @@
 import { assertNever, stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
-import { get } from 'lodash';
+import { get, has } from 'lodash';
 import { BlobDimensionality } from 'models/Common/types';
 import { InputType, InputTypeDefinition } from '../types';
 
@@ -8,11 +8,10 @@ import { InputType, InputTypeDefinition } from '../types';
  * if the given property doesn't exist.
  */
 export function extractLiteralWithCheck<T>(literal: Core.ILiteral, path: string): T {
-  const value = get(literal, path);
-  if (value === undefined) {
+  if (!has(literal, path)) {
     throw new Error(`Failed to extract literal value with path ${path}`);
   }
-  return value as T;
+  return get(literal, path) as T;
 }
 
 /** Converts a value within a collection to the appropriate string
@@ -29,7 +28,7 @@ export function collectionChildToString(type: InputType, value: any) {
  * supported for use in the Launch form.
  */
 export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
-  const { type, subtype } = typeDefinition;
+  const { type, subtype, listOfSubTypes } = typeDefinition;
   switch (type) {
     case InputType.Binary:
     case InputType.Error:
@@ -47,6 +46,17 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
     case InputType.String:
     case InputType.Struct:
       return true;
+    case InputType.Union:
+      if (listOfSubTypes?.length) {
+        var isSupported = true;
+        listOfSubTypes.forEach((subtype) => {
+          if (!typeIsSupported(subtype)) {
+            isSupported = false;
+          }
+        });
+        return isSupported;
+      }
+      return false;
     case InputType.Map:
       if (!subtype) {
         return false;

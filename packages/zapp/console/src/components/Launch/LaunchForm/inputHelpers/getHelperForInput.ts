@@ -11,6 +11,7 @@ import { noneHelper } from './none';
 import { schemaHelper } from './schema';
 import { stringHelper } from './string';
 import { structHelper } from './struct';
+import { unionHelper } from './union';
 import { InputHelper } from './types';
 
 const unsupportedHelper = noneHelper;
@@ -32,6 +33,7 @@ const inputHelpers: Record<InputType, InputHelper> = {
   [InputType.Schema]: schemaHelper,
   [InputType.String]: stringHelper,
   [InputType.Struct]: structHelper,
+  [InputType.Union]: unionHelper,
   [InputType.Unknown]: unsupportedHelper,
 };
 
