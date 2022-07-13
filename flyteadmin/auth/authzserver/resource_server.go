@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	jwtgo "github.com/golang-jwt/jwt/v4"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -28,17 +29,21 @@ type ResourceServer struct {
 }
 
 func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudience, tokenStr string) (interfaces.IdentityContext, error) {
-	raw, err := r.signatureVerifier.VerifySignature(ctx, tokenStr)
+	_, err := r.signatureVerifier.VerifySignature(ctx, tokenStr)
 	if err != nil {
 		return nil, err
 	}
 
-	claimsRaw := map[string]interface{}{}
-	if err = json.Unmarshal(raw, &claimsRaw); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal user info claim into UserInfo type. Error: %w", err)
+	t, _, err := jwtgo.NewParser().ParseUnverified(tokenStr, jwtgo.MapClaims{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse token: %v", err)
 	}
 
-	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), claimsRaw)
+	if err = t.Claims.Valid(); err != nil {
+		return nil, fmt.Errorf("failed to validate token: %v", err)
+	}
+
+	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), t.Claims.(jwtgo.MapClaims))
 }
 
 func doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
