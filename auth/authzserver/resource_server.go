@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	jwtgo "github.com/golang-jwt/jwt/v4"
 	"io/ioutil"
 	"mime"
 	"net/http"
 	"net/url"
 	"strings"
+
+	jwtgo "github.com/golang-jwt/jwt/v4"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
