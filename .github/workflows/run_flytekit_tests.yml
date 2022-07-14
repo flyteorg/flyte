@@ -48,7 +48,7 @@ jobs:
       - name: Run tests
         id: run-tests
         env:
-          VERSION: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+          VERSION: ${{ inputs.components_version }}
           PRIORITIES: P0,P1
         shell: bash
         run: |
