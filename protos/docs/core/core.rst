@@ -645,7 +645,7 @@ Represents the error message from the execution.
 NodeExecution
 ------------------------------------------------------------------
 
-Indicates various phases of Node Execution
+Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
 
 
 
