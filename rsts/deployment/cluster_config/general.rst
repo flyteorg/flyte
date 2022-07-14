@@ -166,6 +166,20 @@ The **attributes** associated with an execution queue must match the **tags** fo
 
 You can view existing attributes for which tags can be assigned by visiting ``protocol://<host>/api/v1/matchable_attributes?resource_type=2`` and substitute the protocol and host appropriately.
 
+Workflow Execution Config
+=========================
+This helps with overriding the config used for workflows execution which includes `security context <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/core/core.html#securitycontext>`__, `annotations or labels <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/workflow_labels_annotations.html#sphx-glr-auto-core-containerization-workflow-labels-annotations-py>`__  etc
+in the `Worflow execution config <https://github.com/flyteorg/flyteidl/blob/master/gen/pb-go/flyteidl/service/flyteadmin/model_admin_workflow_execution_config.go#L14-L23>`__.
+And these can be defined at two levels of project-domain or project-domain-workflow
+
+.. prompt:: bash
+
+    flytectl update workflow-execution-config
+
+    Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
+
+
+
 *********
 Hierarchy
 *********
