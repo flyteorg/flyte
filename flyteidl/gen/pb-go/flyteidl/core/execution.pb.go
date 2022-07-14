@@ -288,7 +288,7 @@ func (m *WorkflowExecution) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_WorkflowExecution proto.InternalMessageInfo
 
-// Indicates various phases of Node Execution
+// Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
 type NodeExecution struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

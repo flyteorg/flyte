@@ -22,7 +22,7 @@ message WorkflowExecution {
     }
 }
 
-// Indicates various phases of Node Execution
+// Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
 message NodeExecution {
     enum Phase {
         UNDEFINED = 0;
