@@ -93,10 +93,10 @@ jobs:
         with:
           terraform_version: 1.0.0
           terraform_wrapper: false
-      - name: Pin Python 3.8
-        uses: actions/setup-python@v2
+      - name: Pin Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: setup node 16.8.0
         uses: actions/setup-node@v2
         with:
