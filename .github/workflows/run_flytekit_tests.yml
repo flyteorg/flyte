@@ -35,6 +35,9 @@ jobs:
           name: config.yaml
           path: |
             /home/runner/work/flyte/flyte/.github/ci_config/config.yaml
+      # TODO: No-install flytectl, nor runit
+      # TODO: is needed to upgrade importlib-metadata?
+      # TODO: remove alpha reference for flytekit, and just use latest
       - name: Setup Flytekit
         shell: bash
         run: |
@@ -42,7 +45,6 @@ jobs:
           pip install flytekit==v1.2.0a0
           pip install --upgrade importlib-metadata
           pip show importlib-metadata
-          pip freeze
           curl -sL https://ctl.flyte.org/install | bash
           flytectl -c /home/runner/work/flyte/flyte/.github/ci_config/config.yaml get projects
       # TODO: add a badge for when test is running
