@@ -106,6 +106,7 @@ jobs:
         shell: bash
         run: |
           cd /home/runner/work/flyte/flyte/opta/aws
+          opta force-unlock --auto-approve
           opta apply -c flyte.yaml --auto-approve
     outputs:
       dns: ${{ steps.output-dns.outputs.dns }}
