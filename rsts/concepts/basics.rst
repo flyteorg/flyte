@@ -152,3 +152,4 @@ The diagram below shows how inputs flow through tasks and workflows to produce o
     flyte_console
     catalog
     versioning
+    workflow_lifecycle

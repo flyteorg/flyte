@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1.3
+
+
 ARG FLYTE_VERSION="latest"
 FROM ghcr.io/flyteorg/flyteconsole-release:${FLYTE_VERSION} AS flyteconsole
 
@@ -13,7 +16,7 @@ RUN go mod download
 COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 
 COPY cmd/ /app/flyte/cmd/
-RUN go build -tags console -v -o /flyte cmd/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build go build -tags console -v -o /flyte cmd/main.go
 
 FROM alpine:3.15 AS base
 

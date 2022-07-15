@@ -62,7 +62,7 @@ Currently, the entire control plane is handled by a single service called **Flyt
 
 FlyteAdmin is stateless. It processes requests to create entities like tasks, workflows, and schedules by persisting data in a relational database.
 
-While FlyteAdmin serves the Workflow Exeuction API, it does not itself execute workflows. To launch workflow executions, FlyteAdmin sends the workflow DAG to the DataPlane. For added scalability and fault-tolerance, FlyteAdmin can be configured to load-balance workflows across multiple isolated data-plane clusters.
+While FlyteAdmin serves the Workflow Execution API, it does not itself execute workflows. To launch workflow executions, FlyteAdmin sends the workflow DAG to the DataPlane. For added scalability and fault-tolerance, FlyteAdmin can be configured to load-balance workflows across multiple isolated data-plane clusters.
 
 
 Data Plane

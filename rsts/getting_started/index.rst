@@ -227,7 +227,7 @@ Unlike the previous ``pyflyte run`` invocation, passing the ``--remote`` flag wi
 
       .. prompt :: bash $
 
-        pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2 --image <registry/repo:version>
+        pyflyte run --image <registry/repo:version> --remote example.py wf --n 500 --mean 42 --sigma 2
 
     * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 

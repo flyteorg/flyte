@@ -116,11 +116,11 @@ Flyte configuration on your remote cluster.
 
 #. Make sure all pods are in Running condition, If you see anything that's crashing, check them in this order: postgres, minio, flyteadmin, datacatalog, flytepropeller, Verify Flyte deployment using the following command ::
 
-    kubect get pods -n flyte
+    kubectl get pods -n flyte
 
 #. Get the URL of the ingress service ::
 
-    kubect get ingress -n flyte
+    kubectl get ingress -n flyte
 
 #. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
 
