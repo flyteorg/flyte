@@ -88,19 +88,19 @@ jobs:
           name: opta-flyte
           path: |
             /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-      - name: Pin terraform version
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.0
-          terraform_wrapper: false
+#      - name: Pin terraform version
+#        uses: hashicorp/setup-terraform@v2
+#        with:
+#          terraform_version: 1.2.5
+#          terraform_wrapper: false
 #      - name: Pin Python 3.8
 #        uses: actions/setup-python@v4
 #        with:
 #          python-version: 3.8
-      - name: setup node 16.8.0
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16.8.0"
+#      - name: setup node 16.8.0
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: "16.8.0"
       - name: SETUP OPTA & APPLY FLYTE
         shell: bash
         run: |
