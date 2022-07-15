@@ -3742,7 +3742,7 @@ config.NodeConfig
 default-deadlines (`config.DefaultDeadlines`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value for timeouts
+Default value for timeouts.
 
 **Default Value**: 
 
@@ -3768,7 +3768,7 @@ Maximum number of retries per node for node failure due to infra issues
 interruptible-failure-threshold (int64)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-number of failures for a node to be still considered interruptible'
+number of failures for a node to be still considered interruptible.
 
 **Default Value**: 
 
@@ -3783,7 +3783,7 @@ config.DefaultDeadlines
 node-execution-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node execution timeout
+Default value of node execution timeout that includes the time spent to run the node/workflow.
 
 **Default Value**: 
 
@@ -3795,7 +3795,7 @@ Default value of node execution timeout
 node-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node timeout
+Default value of node timeout that includes the time spent queued.
 
 **Default Value**: 
 
@@ -3807,7 +3807,7 @@ Default value of node timeout
 workflow-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of workflow timeout
+Default value of workflow timeout that includes the time spent queued.
 
 **Default Value**: 
 
