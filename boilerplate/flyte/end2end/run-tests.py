@@ -38,21 +38,21 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         ("core.control_flow.subworkflows.parent_wf", {"a": 3}),
         ("core.control_flow.subworkflows.nested_parent_wf", {"a": 3}),
         ("core.flyte_basics.basic_workflow.my_wf", {"a": 50, "b": "hello"}),
-        # TODO: enable new files and folders workflows
-        # ("core.flyte_basics.files.rotate_one_workflow", {"in_image": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"}),
-        # ("core.flyte_basics.folders.download_and_rotate", {}),
-        ("core.flyte_basics.hello_world.my_wf", {}),
-        ("core.flyte_basics.lp.my_wf", {"val": 4}),
-        ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
-        ("core.flyte_basics.named_outputs.my_wf", {}),
-        # # Getting a 403 for the wikipedia image
-        # # ("core.flyte_basics.reference_task.wf", {}),
-        ("core.type_system.custom_objects.wf", {"x": 10, "y": 20}),
-        # Enums are not supported in flyteremote
-        # ("core.type_system.enums.enum_wf", {"c": "red"}),
-        ("core.type_system.schema.df_wf", {"a": 42}),
-        ("core.type_system.typed_schema.wf", {}),
-        ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
+        # # TODO: enable new files and folders workflows
+        # # ("core.flyte_basics.files.rotate_one_workflow", {"in_image": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"}),
+        # # ("core.flyte_basics.folders.download_and_rotate", {}),
+        # ("core.flyte_basics.hello_world.my_wf", {}),
+        # ("core.flyte_basics.lp.my_wf", {"val": 4}),
+        # ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
+        # ("core.flyte_basics.named_outputs.my_wf", {}),
+        # # # Getting a 403 for the wikipedia image
+        # # # ("core.flyte_basics.reference_task.wf", {}),
+        # ("core.type_system.custom_objects.wf", {"x": 10, "y": 20}),
+        # # Enums are not supported in flyteremote
+        # # ("core.type_system.enums.enum_wf", {"c": "red"}),
+        # ("core.type_system.schema.df_wf", {"a": 42}),
+        # ("core.type_system.typed_schema.wf", {}),
+        # ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
 }
 
