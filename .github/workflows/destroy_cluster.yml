@@ -31,12 +31,19 @@ jobs:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN_FOR_GITHUB }}
           role-session-name: DestroySession
           aws-region: ${{ inputs.aws-region }}
-      - name: SETUP AND DESTROY OPTA
+      - name: SETUP OPTA
         shell: bash
         run: |
           sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
       - name: DESTROY FLYTE Opta
+        id: destroy-flyte-opta
+        shell: bash
+        run: |
+          cd /home/runner/work/flyte/flyte/opta/cloud/
+          opta destroy -c flyte.yaml --auto-approve
+      - name: initial destroy fail ( likely timeout )
+        if: ${{ steps.destroy-flyte-opta.conclusion == 'failure' }}
         shell: bash
         run: |
           cd /home/runner/work/flyte/flyte/opta/cloud/
