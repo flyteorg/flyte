@@ -333,9 +333,11 @@ export function useAllChildNodeExecutionGroupsQuery(
   const shouldEnableFn = (groups) => {
     if (groups.length > 0) {
       return groups.some((group) => {
-        if (group.nodeExecutions?.length > 0) {
+        // non-empty groups are wrapped in array
+        const unwrappedGroup = Array.isArray(group) ? group[0] : group;
+        if (unwrappedGroup.nodeExecutions?.length > 0) {
           /* Return true is any executions are not yet terminal (ie, they can change) */
-          return group.nodeExecutions.some((ne) => {
+          return unwrappedGroup.nodeExecutions.some((ne) => {
             return !nodeExecutionIsTerminal(ne);
           });
         } else {
@@ -347,9 +349,11 @@ export function useAllChildNodeExecutionGroupsQuery(
     }
   };
 
+  const key = `${nodeExecutions?.[0]?.scopedId}-${nodeExecutions?.[0]?.closure?.phase}`;
+
   return useConditionalQuery<Array<NodeExecutionGroup[]>>(
     {
-      queryKey: [QueryType.NodeExecutionChildList, nodeExecutions[0]?.id, config],
+      queryKey: [QueryType.NodeExecutionChildList, key, config],
       queryFn: () => fetchAllChildNodeExecutions(queryClient, nodeExecutions, config),
     },
     shouldEnableFn,
