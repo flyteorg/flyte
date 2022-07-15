@@ -16,11 +16,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
+        name: download flyte yaml
         id: download-flyte-yaml
         with:
           name: opta-flyte
           path: /home/runner/work/flyte/flyte/opta/cloud
       - uses: actions/download-artifact@v3
+        name: download env yaml
         id: download-env-yaml
         with:
           name: opta-env
