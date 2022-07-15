@@ -42,9 +42,20 @@ jobs:
           pip install flytekit==v1.2.0a0
           pip install --upgrade importlib-metadata
           pip show importlib-metadata
+          pip freeze
           curl -sL https://ctl.flyte.org/install | bash
           flytectl -c /home/runner/work/flyte/flyte/.github/ci_config/config.yaml get projects
       # TODO: add a badge for when test is running
+      # TODO: REMOVE PIP FREEZE once done debugging!
+      - name: PIP FREEZE!
+        shell: bash
+        run: |
+          pip freeze
+      # TODO: REMOVE Python -V once done debugging!
+      - name: python -v
+        shell: bash
+        run: |
+          python -V
       - name: Run tests
         id: run-tests
         env:

@@ -3,7 +3,7 @@ admin:
   endpoint: dns:///<dns_of_cluster>
   # Change insecure flag to ensure that you use the right setting for your environment
   insecureSkipVerify: true
-  #insecure: false
+  insecure: false
 logger:
   # Logger settings to control logger output. Useful to debug logger:
   show-source: true
