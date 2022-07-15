@@ -87,4 +87,4 @@ jobs:
       - set-env-vars
       - calculate-pre-reqs
       - create-opta-aws
-      #- run-flytekit-tests
+      - run-flytekit-tests
