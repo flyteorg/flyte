@@ -38,9 +38,9 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         ("core.control_flow.subworkflows.parent_wf", {"a": 3}),
         ("core.control_flow.subworkflows.nested_parent_wf", {"a": 3}),
         ("core.flyte_basics.basic_workflow.my_wf", {"a": 50, "b": "hello"}),
-        # TODO: enable new files and folders workflows
+        # Getting a 403 for the wikipedia image
         # ("core.flyte_basics.files.rotate_one_workflow", {"in_image": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"}),
-        # ("core.flyte_basics.folders.download_and_rotate", {}),
+        ("core.flyte_basics.folders.download_and_rotate", {}),
         ("core.flyte_basics.hello_world.my_wf", {}),
         ("core.flyte_basics.lp.my_wf", {"val": 4}),
         ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
@@ -53,35 +53,6 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         ("core.type_system.schema.df_wf", {"a": 42}),
         ("core.type_system.typed_schema.wf", {}),
         ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
-    ],
-    "integrations-k8s-spark": [
-        ("k8s_spark.pyspark_pi.my_spark", {"triggered_date": datetime.datetime.now()}),
-    ],
-    "integrations-kfpytorch": [
-        ("kfpytorch.pytorch_mnist.pytorch_training_wf", {}),
-    ],
-    "integrations-kftensorflow": [
-        ("kftensorflow.tf_mnist.mnist_tensorflow_workflow", {}),
-    ],
-    "integrations-pod": [
-        ("pod.pod.pod_workflow", {}),
-    ],
-    "integrations-pandera_examples": [
-        ("pandera_examples.basic_schema_example.process_data", {}),
-        # TODO: investigate type mismatch float -> numpy.float64
-        # ("pandera_examples.validating_and_testing_ml_pipelines.pipeline", {"data_random_state": 42, "model_random_state": 99}),
-    ],
-    "integrations-modin_examples": [
-        ("modin_examples.knn_classifier.pipeline", {}),
-    ],
-    "integrations-papermilltasks": [
-        ("papermilltasks.simple.nb_to_python_wf", {"f": 3.1415926535}),
-    ],
-    "integrations-greatexpectations": [
-        ("greatexpectations.task_example.simple_wf", {}),
-        ("greatexpectations.task_example.file_wf", {}),
-        ("greatexpectations.task_example.schema_wf", {}),
-        ("greatexpectations.task_example.runtime_wf", {}),
     ],
 }
 
