@@ -51,8 +51,8 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         # Enums are not supported in flyteremote
         # ("core.type_system.enums.enum_wf", {"c": "red"}),
         ("core.type_system.schema.df_wf", {"a": 42}),
-        #("core.type_system.typed_schema.wf", {}),
-        ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
+        ("core.type_system.typed_schema.wf", {}),
+        #("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
     # UNCOMMENT BELOW!?
     # "integrations-k8s-spark": [
