@@ -15,7 +15,7 @@ from flytekit.remote.executions import FlyteWorkflowExecution
 
 
 WAIT_TIME = 10
-MAX_ATTEMPTS = 60
+MAX_ATTEMPTS = 200
 
 # This dictionary maps the names found in the flytesnacks manifest to a list of workflow names and
 # inputs. This is so we can progressively cover all priorities in the original flytesnacks manifest,
@@ -92,16 +92,23 @@ def execute_workflow(remote, version, workflow_name, inputs):
     return remote.execute(wf, inputs=inputs, wait=False)
 
 def executions_finished(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]) -> bool:
-    for executions in executions_by_wfgroup.values():
-        if not all([execution.is_done for execution in executions]):
-            return False
+    try:
+        for executions in executions_by_wfgroup.values():
+            if not all([execution.is_done for execution in executions]):
+                return False
+    except:
+        return False
     return True
 
 def sync_executions(remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
-    for executions in executions_by_wfgroup.values():
-        for execution in executions:
-            print(f"About to sync execution_id={execution.id.name}")
-            remote.sync(execution)
+    try:
+        for executions in executions_by_wfgroup.values():
+            for execution in executions:
+                print(f"About to sync execution_id={execution.id.name}")
+                remote.sync(execution)
+    except:
+        pass
+
 
 def report_executions(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
     for executions in executions_by_wfgroup.values():
