@@ -63,9 +63,9 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
     "integrations-kftensorflow": [
         ("kftensorflow.tf_mnist.mnist_tensorflow_workflow", {}),
     ],
-    "integrations-pod": [
-        ("pod.pod.pod_workflow", {}),
-    ],
+    # "integrations-pod": [
+    #     ("pod.pod.pod_workflow", {}),
+    # ],
     "integrations-pandera_examples": [
         ("pandera_examples.basic_schema_example.process_data", {}),
         # TODO: investigate type mismatch float -> numpy.float64
