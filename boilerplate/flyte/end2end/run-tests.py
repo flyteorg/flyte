@@ -15,7 +15,7 @@ from flytekit.remote.executions import FlyteWorkflowExecution
 
 
 WAIT_TIME = 10
-MAX_ATTEMPTS = 200
+MAX_ATTEMPTS = 300
 
 # This dictionary maps the names found in the flytesnacks manifest to a list of workflow names and
 # inputs. This is so we can progressively cover all priorities in the original flytesnacks manifest,
@@ -63,9 +63,9 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
     "integrations-kftensorflow": [
         ("kftensorflow.tf_mnist.mnist_tensorflow_workflow", {}),
     ],
-    # "integrations-pod": [
-    #     ("pod.pod.pod_workflow", {}),
-    # ],
+    "integrations-pod": [
+        ("pod.pod.pod_workflow", {}),
+    ],
     "integrations-pandera_examples": [
         ("pandera_examples.basic_schema_example.process_data", {}),
         # TODO: investigate type mismatch float -> numpy.float64
@@ -267,6 +267,7 @@ def cli(
     return_non_zero_on_failure,
     terminate_workflow_on_failure,
 ):
+    start_time = time.time()
     print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
     results = run(
         flytesnacks_release_tag, priorities, config_file, terminate_workflow_on_failure
@@ -280,6 +281,9 @@ def cli(
         for result in results:
             if result["status"] not in ("passing", "coming soon"):
                 sys.exit(1)
+            else:
+                print("--- %s seconds ---" % (time.time() - start_time))
+
 
 
 if __name__ == "__main__":
