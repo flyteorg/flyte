@@ -55,15 +55,12 @@ jobs:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN_FOR_GITHUB }}
           role-session-name: ApplySession
           aws-region: ${{ inputs.aws-region }}
-      # TODO: REMOVE/DELETE COMMENTED LINES IN BASH BELOW, ONCE NOT NEEDED
       - name: SETUP AND APPLY OPTA
         shell: bash
         run: |
           sudo chmod +x /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh
           /home/runner/work/flyte/flyte/.github/scripts/ci_helper.sh setup_opta
-          # cat /home/runner/work/flyte/flyte/opta/aws/env.yaml
           opta apply -c /home/runner/work/flyte/flyte/opta/aws/env.yaml --auto-approve
-          # opta output -c /home/runner/work/flyte/flyte/opta/aws/env.yaml
       - name: OPTA DNS
         id: output-dns
         shell: bash
@@ -89,19 +86,6 @@ jobs:
           name: opta-flyte
           path: |
             /home/runner/work/flyte/flyte/opta/aws/flyte.yaml
-#      - name: Pin terraform version
-#        uses: hashicorp/setup-terraform@v2
-#        with:
-#          terraform_version: 1.2.5
-#          terraform_wrapper: false
-#      - name: Pin Python 3.8
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: 3.8
-#      - name: setup node 16.8.0
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: "16.8.0"
       - name: SETUP OPTA & APPLY FLYTE
         shell: bash
         run: |

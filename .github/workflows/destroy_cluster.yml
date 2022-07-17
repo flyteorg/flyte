@@ -44,12 +44,12 @@ jobs:
         run: |
           cd /home/runner/work/flyte/flyte/opta/cloud/
           opta destroy -c flyte.yaml --auto-approve
-      - name: initial destroy fail ( likely timeout )
-        if: ${{ steps.destroy-flyte-opta.conclusion == 'failure' }}
-        shell: bash
-        run: |
-          cd /home/runner/work/flyte/flyte/opta/cloud/
-          opta destroy -c flyte.yaml --auto-approve
+#      - name: initial destroy fail ( likely timeout )
+#        if: ${{ steps.destroy-flyte-opta.conclusion == 'failure' }}
+#        shell: bash
+#        run: |
+#          cd /home/runner/work/flyte/flyte/opta/cloud/
+#          opta destroy -c flyte.yaml --auto-approve
       - name: DESTROY OPTA ENV
         shell: bash
         run: |
