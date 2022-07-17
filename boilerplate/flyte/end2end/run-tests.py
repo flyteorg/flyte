@@ -92,12 +92,9 @@ def execute_workflow(remote, version, workflow_name, inputs):
     return remote.execute(wf, inputs=inputs, wait=False)
 
 def executions_finished(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]) -> bool:
-    try:
-        for executions in executions_by_wfgroup.values():
-            if not all([execution.is_done for execution in executions]):
-                return False
-    except:
-        return False
+    for executions in executions_by_wfgroup.values():
+        if not all([execution.is_done for execution in executions]):
+            return False
     return True
 
 def sync_executions(remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
