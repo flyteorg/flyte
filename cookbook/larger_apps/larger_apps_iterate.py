@@ -16,7 +16,7 @@ Open ``example.py`` in your favorite editor.
    .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
       :language: python
 
-Add ``message: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of
+Add ``message: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Next, update the body of
 ``say_hello`` to consume that argument.
 
 .. code-block:: python
@@ -55,8 +55,8 @@ When you run this file locally, it should output ``hello world, what a nice day 
 Quickly Re-deploy Your Application
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To re-deploy this workflow to the sandbox Flyte cluster, you can repeat the steps previously covered in
-:ref:`getting-started-build-deploy`. Flyte provides a **faster** way to iterate on your workflows. Since you have not
+To re-deploy this workflow to the sandbox Flyte cluster, you can repeat the steps covered in
+:ref:`previous section <larger_apps_deploy>`. Flyte provides a **faster** way to iterate on your workflows. Since you have not
 updated any of the dependencies in your requirements file, it is possible to push just the code to Flyte backend without
 re-building the entire Docker container. To do so, run the following commands.
 
@@ -70,17 +70,15 @@ re-building the entire Docker container. To do so, run the following commands.
 
 .. caution::
 
-   The ``fast`` registration method can only be used if you do not modify any requirements (that is, you re-use an existing environment). But, if you add a dependency to your requirements file or env you have to follow the :ref:`getting-started-build-deploy` method.
+   The ``fast`` registration method can only be used if you do not modify any requirements (that is, you re-use an existing environment). But, if you add a dependency to your requirements file or env you have to follow the :ref:`larger_apps_deploy` method.
 
-The code can now be deployed using Flytectl, similar to what we've done previously. ``flytectl`` automatically understands
+The code can now be deployed using flytectl, similar to what we've done previously. ``flytectl`` automatically recognizes
 that the package is for fast registration.
-
-For this to work, a new ``storage`` block has to be added to the Flytectl configuration with appropriate permissions at
-runtime. The storage block configures Flytectl to write to a specific ``S3 / GCS bucket``.
+The admin provides a signed URL link to the configured bucket (S3/GCS bucket) for the client to upload the package.
 
 .. tip::
 
-   If you're using the sandbox, this is automatically configured by Flytectl.
+   If you're using the sandbox, this is automatically configured by flytectl.
 
    The dropdown below provides more information on the required configuration depending on your cloud infrastructure.
 
@@ -162,8 +160,8 @@ Execute Your Re-deployed Workflow
 
 Finally, you can execute the updated workflow programmatically with ``flytectl``.
 
-To pass arguments to the workflow, update the execution spec file that we previously generated in the
-:ref:`Deploying to the Cloud <larger_apps_deploy>` step.
+To pass arguments to the workflow, update the execution spec file that we generated in the
+:ref:`previous step<larger_apps_deploy>`.
 
 Generate an execution spec file. This will prompt you to overwrite and answer 'y' on it.
 
@@ -187,7 +185,7 @@ Create an execution using the exec spec file.
 
    flytectl create execution --project flytesnacks --domain development --execFile exec_spec.yaml
 
-You should see an output that looks like:
+You should see an output like:
 
 .. prompt:: text
 
