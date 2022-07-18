@@ -272,6 +272,7 @@ def cli(
 
     # Write a json object in its own line describing the result of this run to stdout
     print(f"Result of run:\n{json.dumps(results)}")
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # Return a non-zero exit code if core fails
     if return_non_zero_on_failure:
