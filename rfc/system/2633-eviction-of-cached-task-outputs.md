@@ -32,12 +32,12 @@ Our proposed implementation consists of two parts, which - while related to one 
 Similar to the `interruptible` override flag provided for a single execution of a workflow or task, we propose adding a flag (e.g. `cache_override`) to evict the cached output of an execution and force its calculation to be performed (and cached) again.  
 This cleanup would be performed automatically by Flyte during the execution of a new workflow or task, returning the updated results:
 
-![cache eviction flowchart](https://i.imgur.com/rsJIlWt.png)
+![cache eviction flowchart](https://i.imgur.com/0NeoYGy.png)
 
 * During the execution preparation, `flytepropeller` would query `datacatalog` as before, trying to find the cached output for a task and its inputs.
 * If no cache entry was found, the current behaviour remains the same - the task is executed and its result is stored (if caching has been enabled for the task).
 * Should a cache hit occur, `flytepropeller` would check the `cache_override` flag of the execution config:
-    * If the override has been set, `flytepropeller` would skip retrieving the entry from `datacatalog` and continue execution, removing the cached data before storing the updated results after the task finished successfully.
+    * If the override has been set, `flytepropeller` would skip retrieving the entry from `datacatalog` and continue execution, overwriting the cached data with the updated results after the task finished successfully.
     * If no override has been set, the cached value is returned as before.
 * As a slight variation, the cache eviction of existing entries could be performed before the tasks is executed again (although that might require additional synchronization to avoid race conditions during concurrent executions).
 
@@ -68,7 +68,17 @@ The protobuf definitions in `flyteidl` need to include a new (optional) paramete
 
 Similar to the `interruptible` override currently available, we propose to add an optional execution launch setting to `flyteconsole` to easily trigger a single task to be executed again using identical inputs.
 
+#### `flytekit`
+
+We should extend the [`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) functionality to support setting the `skip_cache` flag for a single execution.
+
+#### `flytectl`
+
+`flytectl` should support the new `skip_cache` override while creating executions via CLI.
+
 ### Evicting cache of a past execution
+
+#### Standalone `flyteadmin` endpoints
 
 In addition to the cache eviction override while launching a workflow, we propose to expose the same functionality via `flyteadmin` as an extension to the existing `AdminService`:
 
@@ -84,7 +94,29 @@ In addition to the cache eviction override while launching a workflow, we propos
 
 As most of the required functionality should already be added while implementing the cache eviction override for an execution, this additional change would likely only require some smaller extension of the `flyteadmin` service.
 
-Whilst our main intent for this `AdminService` extension is for automated/scripted cleanup using user-provided scripts, this functionality could also be added to either `flyteconsole` or `flytectl` if so desired, providing a quick, predefined way of accessing this new feature via already established Flyte tools.
+#### Extension of existing `flyteadmin` endpoints
+
+As an alternative to the standalone endpoints suggested above, we could extend existing `flyteadmin` endpoints to support eviction of cached workflow/task results:
+
+* The [`UpdateExecution`](https://github.com/flyteorg/flyteidl/blob/ac94eb4c6ffbe17df5b146337135f59914ffe3bf/protos/flyteidl/service/admin.proto#L281) endpoints and its [`ExecutionUpdateRequest`](https://github.com/flyteorg/flyteidl/blob/e749b82a70027d3364f4e5b98ce2cfbffb4eef54/protos/flyteidl/admin/execution.proto#L351) could be extended to include an `evict_cache` flag.
+    * If the new flag is set, `UpdateExecution` would evict the cache of the referenced workflow and all of its sub-workflows/-tasks.
+* As no similar equivalent exists for task execution, we'd either have to add a `UpdateTask` endpoint or extend `UpdateExecution` to handle tasks as well.
+    * Since there's currently no need for updating task executions aside from evicting their cache, this new endpoint would only support cache eviction for the time being.
+    * We could modify the [`id`](https://github.com/flyteorg/flyteidl/blob/e749b82a70027d3364f4e5b98ce2cfbffb4eef54/protos/flyteidl/admin/execution.proto#L353) field of `ExecutionUpdateRequest` to be a `oneof` including a task identifier, however this would diverge from the general convention of endpoints performing CRUD operations on the entity specified in the message name and is thus considered a less feasible option.
+
+Whilst our main intent for this `AdminService` extension is for automated/scripted cleanup using user-provided scripts, this functionality could also be added to other Flyte tools:
+
+#### `flytekit`
+
+[`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) could be extended to support eviction of a task/workflow's cached results remotely.
+
+#### `flytectl`
+
+`flytectl` should support the task/workflow execution update to evict the cache, similar to the existing `--activate` flag: `flytectl update execution <task/workflow execution identifier> --evictCache`.
+
+#### `flyteconsole`
+
+We propose extending `flyteconsole` to allow users to evict the cache of a finished execution via a button click (including confirmation) using the web UI.
 
 ## 4 Metrics & Dashboards
 
@@ -116,9 +148,13 @@ The potential for malicious exploitation is deemed non-existant as no access to 
 
 1. When should cache eviction happen during a repeated execution?
    Should we evict the cache entry immediately before starting task execution, potentially leaving no cached output available if the execution fails, or postpone the removal until the task has finished (successfully) and new data can be stored right away?
+    - **RESOLVED**: eviction will happen after the successfull execution of a task, overwriting the existing data.
 2. Should the `cache_override` flag also be added to `flytekit`'s task decorator?
    This would allow users to define tasks/workflows which will automatically evict their cached results, however does not strictly fit with the actual task "definition".
 3. Which Flyte tools (`flyteconsole`/`flytectl`) should support the proposed `AdminService` API extension for `flyteadmin`, if any?
+    - **RESOLVED**: `flytectl`, `flytekit.remote`, `flyteconsole`
+4. Should we support automatic eviction of cached results on workflow archival (opt-out via `flyteconsole`)?
+5. Should we evict [Infratask Checkpoints](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/checkpoint.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
 
 ## 9 Conclusion
 
