@@ -6,11 +6,11 @@ Notifications
 """
 
 # %%
-# When a workflow is completed, users can be notified through:
+# When a workflow is completed, users can be notified by:
 #
-# * email
-# * `pagerduty <https://www.pagerduty.com/>`__
-# * `slack <https://slack.com/>`__
+# *  Email
+# * `Pagerduty <https://support.pagerduty.com/docs/email-integration-guide#integrating-with-a-pagerduty-service>`__
+# * `Slack <https://slack.com/help/articles/206819278-Send-emails-to-Slack>`__
 #
 # The content of these notifications is configurable at the platform level.
 #
