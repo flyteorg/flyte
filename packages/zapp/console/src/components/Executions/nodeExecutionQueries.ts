@@ -335,7 +335,7 @@ export function useAllChildNodeExecutionGroupsQuery(
       return groups.some((group) => {
         // non-empty groups are wrapped in array
         const unwrappedGroup = Array.isArray(group) ? group[0] : group;
-        if (unwrappedGroup.nodeExecutions?.length > 0) {
+        if (unwrappedGroup?.nodeExecutions?.length > 0) {
           /* Return true is any executions are not yet terminal (ie, they can change) */
           return unwrappedGroup.nodeExecutions.some((ne) => {
             return !nodeExecutionIsTerminal(ne);
