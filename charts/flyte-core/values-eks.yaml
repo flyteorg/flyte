@@ -141,7 +141,7 @@ common:
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
       alb.ingress.kubernetes.io/group.name: flyte
     separateGrpcIngressAnnotations:
-      alb.ingress.kubernetes.io/backend-protocol-version: HTTP2
+      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
   databaseSecret:
     name: db-pass
     secretManifest:
