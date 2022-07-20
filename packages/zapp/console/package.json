@@ -45,7 +45,7 @@
         "lodash": "^4.17.21",
         "morgan": "^1.8.2",
         "react-chartjs-2": "^4.0.0",
-        "react-flow-renderer": "10.1.1",
+        "react-flow-renderer": "10.3.8",
         "react-ga4": "^1.4.1",
         "react-json-view": "^1.21.3",
         "react-transition-group": "^2.3.1",
