@@ -126,7 +126,7 @@ jobs:
         uses: whoan/docker-build-with-cache-action@v5
         with:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: evalsocket
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: flyteorg/flyteconsole
           image_tag: latest,${{ github.sha }},${{ needs.check_for_tag.outputs.currentTag }}
           push_git_tag: true
