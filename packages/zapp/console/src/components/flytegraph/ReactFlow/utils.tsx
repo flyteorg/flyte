@@ -142,7 +142,6 @@ export const getNestedContainerStyle = (nodeExecutionStatus) => {
   const style = {
     border: `1px dashed ${getStatusColor(nodeExecutionStatus)}`,
     borderRadius: '8px',
-    background: 'rgba(255,255,255,.9)',
     width: '100%',
     height: '100%',
     padding: '.25rem',

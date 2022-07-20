@@ -49,7 +49,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
       ...state,
       shouldUpdate: true,
       nodes: rfGraphJson.nodes,
-      edges: rfGraphJson.edges,
+      edges: rfGraphJson.edges.map(edge => ({ ...edge, zIndex: 0 })),
     }));
   }, [rfGraphJson]);
 
@@ -109,6 +109,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
       style={reactFlowStyle}
       onInit={onLoad}
       fitView
+      defaultEdgeOptions={{ zIndex: 0 }}
     >
       <Background
         style={backgroundStyle.background}
