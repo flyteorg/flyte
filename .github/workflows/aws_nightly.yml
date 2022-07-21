@@ -35,9 +35,6 @@ jobs:
   set-env-vars:
     runs-on: ubuntu-latest
     steps:
-     - name: Checkout repo
-       uses: actions/checkout@v3
-       id: checkout
      - name: set env variables
        id: set-env-vars
        shell: bash
@@ -46,56 +43,48 @@ jobs:
          echo "::set-output name=your_company::$YOUR_COMPANY"
          echo "::set-output name=env_name::$ENV_NAME"
          echo "::set-output name=flyte_storage_bucket::$FLYTE_STORAGE_BUCKET"
-         echo "::set-output name=branch::${GITHUB_REF##*/}"
     outputs:
       aws-region: ${{ steps.set-env-vars.outputs.aws_region }}
       your-company: ${{ steps.set-env-vars.outputs.your_company }}
       env-name: ${{ steps.set-env-vars.outputs.env_name }}
       flyte-bucket: ${{ steps.set-env-vars.outputs.flyte_storage_bucket }}
-      branch: ${{ steps.set-env-vars.outputs.branch }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO @main
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out repository
-      uses: actions/checkout@v3
-    - name: Use local my-action
-      uses: .github/workflows/calculate_pre_reqs.yml
-      with:
-        mode: ${{ github.event.inputs.mode }}
-        components_version: ${{ github.event.inputs.components_version }}
-#  create-opta-aws:
-#    needs:
-#      - set-env-vars
-#      - calculate-pre-reqs
-#      - checkout
-#    # TODO: UPDATE THIS TO @main
-#    uses: flyteorg/flyte/.github/workflows/create_opta_aws.yml@opta-aws
-#    with:
-#      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-#      your-company: ${{ needs.set-env-vars.outputs.your-company }}
-#      env-name: ${{ needs.set-env-vars.outputs.env-name }}
-#      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
-#      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
-#    secrets: inherit
-#  run-flytekit-tests:
-#    needs:
-#      - create-opta-aws
-#      - calculate-pre-reqs
-#    # TODO: UPDATE TO @main
-#    uses: flyteorg/flyte/.github/workflows/run_flytekit_tests.yml@opta-aws
-#    with:
-#      dns: ${{ needs.create-opta-aws.outputs.dns }}
-#      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
-#  destroy-cluster:
-#    # TODO: UPDATE THIS TO @main
-#    uses: flyteorg/flyte/.github/workflows/destroy_cluster.yml@opta-aws
-#    with:
-#      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
-#    secrets: inherit
-#    needs:
-#      - set-env-vars
-#      - calculate-pre-reqs
-#      - create-opta-aws
-#      - run-flytekit-tests
+    uses: ./.github/workflows/calculate_pre_reqs.yml
+    with:
+      mode: ${{ github.event.inputs.mode }}
+      components_version: ${{ github.event.inputs.components_version }}
+  create-opta-aws:
+    needs:
+      - set-env-vars
+      - calculate-pre-reqs
+    # TODO: UPDATE THIS TO @main
+    uses: flyteorg/flyte/.github/workflows/create_opta_aws.yml@opta-aws
+    with:
+      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+      your-company: ${{ needs.set-env-vars.outputs.your-company }}
+      env-name: ${{ needs.set-env-vars.outputs.env-name }}
+      mode: ${{ needs.calculate-pre-reqs.outputs.mode }}
+      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+      flyte-storage-bucket: ${{ needs.set-env-vars.outputs.flyte-bucket }}
+    secrets: inherit
+  run-flytekit-tests:
+    needs:
+      - create-opta-aws
+      - calculate-pre-reqs
+    # TODO: UPDATE TO @main
+    uses: flyteorg/flyte/.github/workflows/run_flytekit_tests.yml@opta-aws
+    with:
+      dns: ${{ needs.create-opta-aws.outputs.dns }}
+      components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
+  destroy-cluster:
+    # TODO: UPDATE THIS TO @main
+    uses: flyteorg/flyte/.github/workflows/destroy_cluster.yml@opta-aws
+    with:
+      aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
+    secrets: inherit
+    needs:
+      - set-env-vars
+      - calculate-pre-reqs
+      - create-opta-aws
+      - run-flytekit-tests
