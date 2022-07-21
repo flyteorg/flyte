@@ -35,6 +35,9 @@ jobs:
   set-env-vars:
     runs-on: ubuntu-latest
     steps:
+     - name: Checkout repo
+       uses: actions/checkout@v3
+       id: checkout
      - name: set env variables
        id: set-env-vars
        shell: bash
@@ -52,7 +55,7 @@ jobs:
       branch: ${{ steps.set-env-vars.outputs.branch }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO @main
-    uses: flyteorg/flyte/.github/workflows/calculate_pre_reqs.yml@${{needs.set-env-vars.outputs.branch}}
+    uses: /home/runner/work/flyte/flyte/.github/workflows/calculate_pre_reqs.yml
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
@@ -60,6 +63,7 @@ jobs:
     needs:
       - set-env-vars
       - calculate-pre-reqs
+      - checkout
     # TODO: UPDATE THIS TO @main
     uses: flyteorg/flyte/.github/workflows/create_opta_aws.yml@opta-aws
     with:
