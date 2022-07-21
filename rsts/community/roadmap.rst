@@ -57,7 +57,6 @@ Helm Charts
 ^^^^^^^^^^^
 Helm charts deserve a special mention here. Unlike the other components which will have patch versions that differ, the Flyte release version and the Helm chart version will always be identical down to the patch. That is, a Flyte release is a Helm release and vice-versa.
 
-
 Release Branches and Patching
 -----------------------------
 After each minor release, a release branch will be created. There will be no alignment of patch versions across the components. That is, by the end of the ``1.3.x`` release cycle, ``flyteadmin`` may be on ``1.3.8`` and ``flytepropeller`` may be on ``1.3.2``.
@@ -78,6 +77,13 @@ To remediate this, we propose the following:
 * Documentation should be pinned only to Major.Minor on all the repos that have their versions "aligned".
     * This means that as we release patch versions of Admin, Propeller, etc., if we're on v1.1 for instance, as Admin code/auto-generated documentation changes, the v1.1 listing of readthedocs will automatically pick it up.
 * Repos that are not aligned will just default to the "latest" documentation version.
+
+Planning Process
+================
+
+Quarterly Planning
+------------------
+Members of the community should feel free to join these! Core members of the Flyte team will come prepared with general initiatives in mind. We will use these meetings to prioritize these ideas, assess community interest and impact, and decide what goes into the GitHub milestone for the next release. Members of the community looking to contribute should also join. Please look for this meeting invite on the calendar - it may not be set up as a recurring meeting simply because it will likely change by a few days each quarter.
 
 Change Management
 ------------------
