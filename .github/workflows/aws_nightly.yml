@@ -59,11 +59,15 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v3
-    - name: Use local my-action
-      uses: /home/runner/work/flyte/flyte/.github/workflows/calculate_pre_reqs.yml
-      with:
-        mode: ${{ github.event.inputs.mode }}
-        components_version: ${{ github.event.inputs.components_version }}
+    - name: bash
+      run: |
+        ls
+        pwd
+#    - name: Use local my-action
+#      uses: /home/runner/work/flyte/flyte/.github/workflows/calculate_pre_reqs.yml
+#      with:
+#        mode: ${{ github.event.inputs.mode }}
+#        components_version: ${{ github.event.inputs.components_version }}
   create-opta-aws:
     needs:
       - set-env-vars
