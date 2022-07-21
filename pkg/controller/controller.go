@@ -41,6 +41,8 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+
 	"github.com/pkg/errors"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -444,6 +446,10 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	handler := NewPropellerHandler(ctx, cfg, controller.workflowStore, workflowExecutor, scope)
 	controller.workerPool = NewWorkerPool(ctx, scope, workQ, handler)
+
+	if cfg.EnableGrpcLatencyMetrics {
+		grpc_prometheus.EnableClientHandlingTimeHistogram()
+	}
 
 	logger.Info(ctx, "Setting up event handlers")
 	// Set up an event handler for when FlyteWorkflow resources change
