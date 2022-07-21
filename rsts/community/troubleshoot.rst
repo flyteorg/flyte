@@ -101,9 +101,18 @@ Troubles With Flytectl Commands With Auth Enabled
 
 - Flytectl commands use OpenID connect if auth is enabled in the Flyte environment
 - It opens an ``HTTP`` server port on localhost:53593. It has a callback endpoint for the OpenID connect server to call into for the response.
-    - If the callback server call fails, please check if Flytectl failed to run the server.
+    - If the callback server call fails, please check if flytectl failed to run the server.
     - Verify that you have an entry for localhost in your ``/etc/hosts`` file.
-    - It could also mean that the callback took longer than the default 15 secs, and the Flytectl wait deadline expired. 
+    - It could also mean that the callback took longer than the default 15 secs, and the flytectl wait deadline expired. 
+
+Troubles With Inconsistent Names for Pods and Downstream Resources
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Don't rely on the name of a Flyte node to always match the name of its corresponding Kubernetes pod or downstream resource
+- Flyte uses the format ``executionid-node-id-attempt`` from the node to assign a name to a Kubernetes pod or downstream resource.
+- But if this is an invalid name for a Kubernetes pod, Flyte assigns a valid name of random characters instead.
+
+
 
 
 I Still Need Help!
