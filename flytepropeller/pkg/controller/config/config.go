@@ -120,37 +120,38 @@ var (
 // the base configuration to start propeller
 // NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 type Config struct {
-	KubeConfigPath         string               `json:"kube-config" pflag:",Path to kubernetes client config file."`
-	MasterURL              string               `json:"master"`
-	Workers                int                  `json:"workers" pflag:",Number of threads to process workflows"`
-	WorkflowReEval         config.Duration      `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
-	DownstreamEval         config.Duration      `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
-	LimitNamespace         string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
-	ProfilerPort           config.Port          `json:"prof-port" pflag:",Profiler port"`
-	MetadataPrefix         string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
-	DefaultRawOutputPrefix string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
-	Queue                  CompositeQueueConfig `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
-	MetricsPrefix          string               `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
-	MetricKeys             []string             `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
-	EnableAdminLauncher    bool                 `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
-	MaxWorkflowRetries     int                  `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
-	MaxTTLInHours          int                  `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
-	GCInterval             config.Duration      `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
-	LeaderElection         LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
-	PublishK8sEvents       bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
-	MaxDatasetSizeBytes    int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
-	KubeConfig             KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
-	NodeConfig             NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
-	MaxStreakLength        int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
-	EventConfig            EventConfig          `json:"event-config,omitempty" pflag:",Configures execution event behavior."`
-	IncludeShardKeyLabel   []string             `json:"include-shard-key-label" pflag:",Include the specified shard key label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeShardKeyLabel   []string             `json:"exclude-shard-key-label" pflag:",Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector"`
-	IncludeProjectLabel    []string             `json:"include-project-label" pflag:",Include the specified project label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeProjectLabel    []string             `json:"exclude-project-label" pflag:",Exclude the specified project label from the k8s FlyteWorkflow CRD label selector"`
-	IncludeDomainLabel     []string             `json:"include-domain-label" pflag:",Include the specified domain label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeDomainLabel     []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
-	ClusterID              string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
-	CreateFlyteWorkflowCRD bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
+	KubeConfigPath           string               `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	MasterURL                string               `json:"master"`
+	Workers                  int                  `json:"workers" pflag:",Number of threads to process workflows"`
+	WorkflowReEval           config.Duration      `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
+	DownstreamEval           config.Duration      `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
+	LimitNamespace           string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
+	ProfilerPort             config.Port          `json:"prof-port" pflag:",Profiler port"`
+	MetadataPrefix           string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
+	DefaultRawOutputPrefix   string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
+	Queue                    CompositeQueueConfig `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
+	MetricsPrefix            string               `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	MetricKeys               []string             `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
+	EnableAdminLauncher      bool                 `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
+	MaxWorkflowRetries       int                  `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
+	MaxTTLInHours            int                  `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
+	GCInterval               config.Duration      `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
+	LeaderElection           LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
+	PublishK8sEvents         bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
+	MaxDatasetSizeBytes      int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
+	EnableGrpcLatencyMetrics bool                 `json:"enable-grpc-latency-metrics" pflag:",Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers."`
+	KubeConfig               KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
+	NodeConfig               NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
+	MaxStreakLength          int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
+	EventConfig              EventConfig          `json:"event-config,omitempty" pflag:",Configures execution event behavior."`
+	IncludeShardKeyLabel     []string             `json:"include-shard-key-label" pflag:",Include the specified shard key label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeShardKeyLabel     []string             `json:"exclude-shard-key-label" pflag:",Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector"`
+	IncludeProjectLabel      []string             `json:"include-project-label" pflag:",Include the specified project label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeProjectLabel      []string             `json:"exclude-project-label" pflag:",Exclude the specified project label from the k8s FlyteWorkflow CRD label selector"`
+	IncludeDomainLabel       []string             `json:"include-domain-label" pflag:",Include the specified domain label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
+	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
+	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
