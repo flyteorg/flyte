@@ -43,14 +43,17 @@ jobs:
          echo "::set-output name=your_company::$YOUR_COMPANY"
          echo "::set-output name=env_name::$ENV_NAME"
          echo "::set-output name=flyte_storage_bucket::$FLYTE_STORAGE_BUCKET"
+         echo "::set-output name=branch::${GITHUB_REF##*/}"
     outputs:
       aws-region: ${{ steps.set-env-vars.outputs.aws_region }}
       your-company: ${{ steps.set-env-vars.outputs.your_company }}
       env-name: ${{ steps.set-env-vars.outputs.env_name }}
       flyte-bucket: ${{ steps.set-env-vars.outputs.flyte_storage_bucket }}
+      branch: ${{ steps.set-env-vars.outputs.branch }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO @main
-    uses: flyteorg/flyte/.github/workflows/calculate_pre_reqs.yml@opta-aws
+    # ${{needs.set-env-vars.outputs.branch}}
+    uses: flyteorg/flyte/.github/workflows/calculate_pre_reqs.yml@${GITHUB_REF##*/}
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
