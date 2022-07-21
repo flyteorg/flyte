@@ -55,10 +55,15 @@ jobs:
       branch: ${{ steps.set-env-vars.outputs.branch }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO @main
-    uses: /home/runner/work/flyte/flyte/.github/workflows/calculate_pre_reqs.yml
-    with:
-      mode: ${{ github.event.inputs.mode }}
-      components_version: ${{ github.event.inputs.components_version }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    - name: Use local my-action
+      uses: /home/runner/work/flyte/flyte/.github/workflows/calculate_pre_reqs.yml
+      with:
+        mode: ${{ github.event.inputs.mode }}
+        components_version: ${{ github.event.inputs.components_version }}
   create-opta-aws:
     needs:
       - set-env-vars
