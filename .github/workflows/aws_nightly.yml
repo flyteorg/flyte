@@ -52,8 +52,7 @@ jobs:
       branch: ${{ steps.set-env-vars.outputs.branch }}
   calculate-pre-reqs:
     # TODO: UPDATE THIS TO @main
-    # ${{needs.set-env-vars.outputs.branch}}
-    uses: flyteorg/flyte/.github/workflows/calculate_pre_reqs.yml@${GITHUB_REF##*/}
+    uses: flyteorg/flyte/.github/workflows/calculate_pre_reqs.yml@${{needs.set-env-vars.outputs.branch}}
     with:
       mode: ${{ github.event.inputs.mode }}
       components_version: ${{ github.event.inputs.components_version }}
