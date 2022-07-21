@@ -74,7 +74,9 @@ Documentation Versioning
 We also currently have an issue with our documentation versioning. While our readthedocs page does have versioning enabled and we publish the [docs version](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/rsts/conf.py#L33), all the [intersphinx mappings](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/rsts/conf.py#L219) just point to `latest`. Keep in mind that this mapping not only exists in this `flyte` repo, but also in all the other repos that that mapping points to. That is, to maintain an accurate mapping of different versions of documentation, we'll need to update the mapping in all the repos.
 
 To remediate this, we propose the following:
+
 * Documentation should be pinned only to Major.Minor on all the repos that have their versions "aligned".
+
     * This means that as we release patch versions of Admin, Propeller, etc., if we're on v1.1 for instance, as Admin code/auto-generated documentation changes, the v1.1 listing of readthedocs will automatically pick it up.
 * Repos that are not aligned will just default to the "latest" documentation version.
 
