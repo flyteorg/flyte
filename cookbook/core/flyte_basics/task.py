@@ -72,7 +72,7 @@ def wf(n: int) -> int:
     return square(n=square(n=n))
 
 # %%
-# In this toy example, we're calling the ``square`` task twice and returning the reult.
+# In this toy example, we're calling the ``square`` task twice and returning the result.
 
 
 # %%

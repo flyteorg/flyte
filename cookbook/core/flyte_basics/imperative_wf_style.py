@@ -69,7 +69,7 @@ wf_in2 = wf.add_workflow_input("in2", str)
 node_t3 = wf.add_entity(t3, a=[wf.inputs["in1"], wf_in2])
 
 # %%
-# You can also create a workflow input as a list from multiple task outputs
+# You can also create a workflow output as a list from multiple task outputs
 wf.add_workflow_output(
     "output_list",
     [node_t1.outputs["o0"], node_t3.outputs["o0"]],

@@ -99,13 +99,15 @@ To view workflow on the browser:
 
 .. prompt:: bash $
 
-   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o doturl
+   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version <version> -o doturl
 
 To view workflow as a ``strict digraph`` on the command line:
 
 .. prompt:: bash $
 
-   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version v1 -o dot
+   flytectl get workflows --project flytesnacks --domain development flyte.workflows.example.my_wf --version <version> -o dot
+
+Replace ``<version>`` with version from console UI, it may look something like ``BLrGKJaYsW2ME1PaoirK1g==``
 
 .. tip::
 
