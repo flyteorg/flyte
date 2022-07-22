@@ -39,7 +39,7 @@ This cleanup would be performed automatically by Flyte during the execution of a
 * Should a cache hit occur, `flytepropeller` would check the `cache_override` flag of the execution config:
     * If the override has been set, `flytepropeller` would skip retrieving the entry from `datacatalog` and continue execution, overwriting the cached data with the updated results after the task finished successfully.
     * If no override has been set, the cached value is returned as before.
-* As a slight variation, the cache eviction of existing entries could be performed before the tasks is executed again (although that might require additional synchronization to avoid race conditions during concurrent executions).
+* ~~As a slight variation, the cache eviction of existing entries could be performed before the tasks is executed again (although that might require additional synchronization to avoid race conditions during concurrent executions).~~
 
 We propose to add the new override flag to the existing execution config, allowing for single tasks to be picked out and re-computed on demand. Whilst this would also expose the override on a workflow level, support for evicting a whole workflow from cache during an execution is not strictly necessary as this would be very similar to incrementing the (already implemented) `cache_version` - using the workflow value as a default for all its tasks (if set) should be relatively easy to add though.
 
@@ -155,6 +155,7 @@ The potential for malicious exploitation is deemed non-existant as no access to 
     - **RESOLVED**: `flytectl`, `flytekit.remote`, `flyteconsole`
 4. Should we support automatic eviction of cached results on workflow archival (opt-out via `flyteconsole`)?
 5. Should we evict [Infratask Checkpoints](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/checkpoint.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
+    - **RESOLVED**: not for the initial implementation. Infratask checkpoints are only relevant for consecutive retries of a task - their results would not be considered when launching another execution with a `cache_override` flag set. 
 
 ## 9 Conclusion
 
