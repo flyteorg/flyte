@@ -7,7 +7,7 @@ docker_build: ;
 
 .PHONY: docker_push
 docker_push: ;
-	
+
 .PHONY: register
 register: ;
 

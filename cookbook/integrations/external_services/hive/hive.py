@@ -81,7 +81,7 @@ demo_all = HiveSelectTask(
     inputs=kwtypes(ds=str, earlier_schema=FlyteSchema),
     task_config=HiveConfig(cluster_label="flyte"),
     select_query="""
-    SELECT '.PerRetryUniqueKey' as template_key, '{{ .PerRetryUniqueKey }}' as template_value 
+    SELECT '.PerRetryUniqueKey' as template_key, '{{ .PerRetryUniqueKey }}' as template_value
     UNION
     SELECT '.RawOutputDataPrefix' as template_key, '{{ .RawOutputDataPrefix }}' as template_value
     UNION

@@ -1,5 +1,5 @@
 <html>
-    <p align="center"> 
+    <p align="center">
         <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flyte_circle_gradient_1_4x4.png" alt="Flyte Logo" width="100">
     </p>
     <h1 align="center">
@@ -23,7 +23,7 @@
 </html>
 
 <html>
-    <h2 id="quick-start"> 
+    <h2 id="quick-start">
         🚀 Quick Start
     </h2>
 </html>
@@ -37,15 +37,15 @@
 > Flytesnacks currently has all examples in Python (Flytekit Python SDK). In the future, Java examples employing Flytekit Java will be added.
 
 <html>
-    <h2 id="contribution-guide"> 
+    <h2 id="contribution-guide">
         📖 How to Contribute to Flytesnacks
     </h2>
 </html>
 
-You can find the detailed contribution guide [here](cookbook/docs/contribute.rst). 
+You can find the detailed contribution guide [here](cookbook/docs/contribute.rst).
 
 <html>
-    <h2 id="file-an-issue"> 
+    <h2 id="file-an-issue">
         🐞 File an Issue
     </h2>
 </html>

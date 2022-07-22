@@ -19,7 +19,7 @@ Clone the ``flytesnacks`` repo and install its dependencies, which includes :doc
 
     **[Recommended]** Create a new python virtual environment to make sure it doesn't interfere with your
     development environment, e.g. with ``python -m venv <path/to/env>``.
-    
+
 .. prompt:: bash
 
     git clone https://github.com/flyteorg/flytesnacks
@@ -83,7 +83,7 @@ Finally, let's run a workflow that takes some inputs, for example the ``basic_wo
 .. prompt:: bash
 
     pyflyte run --remote core/flyte_basics/basic_workflow.py my_wf --a 5 --b hello
-    
+
 .. note::
 
     We're passing in the workflow inputs as additional options to ``pyflyte run``, in the above example the
@@ -114,7 +114,7 @@ Replace ``<version>`` with version from console UI, it may look something like `
     Running most of the examples in the **User Guide** only requires the default Docker image that ships with Flyte.
     Many examples in the :ref:`tutorials` and :ref:`integrations` section depend on additional libraries, ``sklearn``,
     ``pytorch``, or ``tensorflow``, which will not work with the default docker image used by ``pyflyte run``.
-    
+
     These examples will explicitly show you which images to use for running these examples by passing in the docker
     image you want to use with the ``--image`` option in ``pyflyte run``.
 

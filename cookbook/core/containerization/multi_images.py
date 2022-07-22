@@ -5,7 +5,7 @@ Multiple Container Images in a Single Workflow
 ----------------------------------------------
 
 When working locally, it is recommended to install all requirements of your project locally (maybe in a single virtual environment). It gets complicated when you want to deploy your code to a remote
-environment since most tasks in Flyte (function tasks) are deployed using a Docker Container. 
+environment since most tasks in Flyte (function tasks) are deployed using a Docker Container.
 
 For every :py:class:`flytekit.PythonFunctionTask` type task or simply a task decorated with the ``@task`` decorator, users can supply rules of how the container image should be bound. By default, flytekit binds one container image, i.e., the ``default`` image to all tasks.
 To alter the image, use the ``container_image`` parameter available in the :py:func:`flytekit.task` decorator. Any one of the following is an acceptable:
@@ -22,20 +22,20 @@ If you wish to build and push your Docker image to Dockerhub through your accoun
 
 1. Create an account with `Dockerhub <https://hub.docker.com/signup>`__.
 2. Build a Docker image using the Dockerfile:
-    
+
 .. code-block::
 
    docker build . -f ./<dockerfile-folder>/<dockerfile-name> -t <your-name>/<docker-image-name>:<version>
 3. Once the Docker image is built, login to your Dockerhub account from the CLI:
-    
+
 .. code-block::
 
    docker login
 4. It prompts you to enter the username and the password.
 5. Push the Docker image to Dockerhub:
-    
+
 .. code-block::
-        
+
    docker push <your-dockerhub-name>/<docker-image-name>
 
 Example: Suppose your Dockerfile is named `Dockerfile.prediction`, Docker image name is `multi-images-prediction` with the `latest` version, your build and push commands would look like:
@@ -47,7 +47,7 @@ Example: Suppose your Dockerfile is named `Dockerfile.prediction`, Docker image 
    docker push dockerhub_name/multi-images-prediction
 
 .. tip::
-   
+
    Sometimes, ``docker login`` may not be successful. In such cases, execute ``docker logout`` and ``docker login``.
 
 Let's dive into the example.
@@ -73,9 +73,7 @@ dataset_url = "https://raw.githubusercontent.com/harika-bonthu/SupportVectorClas
 
 # %%
 # Define a task that fetches data and splits the data into train and test sets.
-@task(
-    container_image="{{.image.trainer.fqn }}:{{.image.trainer.version}}" 
-)
+@task(container_image="{{.image.trainer.fqn }}:{{.image.trainer.version}}")
 def svm_trainer() -> split_data:
     fish_data = pd.read_csv(dataset_url)
     X = fish_data.drop(["Species"], axis="columns")
@@ -95,7 +93,7 @@ def svm_trainer() -> split_data:
 # %%
 # .. note ::
 #
-#     To use your own Docker image, replace the value of `container_image` with the fully qualified name that identifies where the image has been pushed. 
+#     To use your own Docker image, replace the value of `container_image` with the fully qualified name that identifies where the image has been pushed.
 #     The recommended usage (specified in the example) is:
 #
 #     ``container_image= "{{.image.default.fqn}}:{{.image.default.version}}"``
@@ -111,9 +109,7 @@ def svm_trainer() -> split_data:
 
 # %%
 # Define another task that trains the model on the data and computes the accuracy score.
-@task(
-    container_image="{{.image.predictor.fqn }}:{{.image.predictor.version}}"
-)
+@task(container_image="{{.image.predictor.fqn }}:{{.image.predictor.version}}")
 def svm_predictor(
     X_train: pd.DataFrame,
     X_test: pd.DataFrame,
@@ -125,6 +121,7 @@ def svm_predictor(
     svm_pred = model.predict(X_test)
     accuracy_score = float(model.score(X_test, y_test.values.ravel()))
     return accuracy_score
+
 
 # %%
 # Define a workflow.
@@ -139,6 +136,7 @@ def my_workflow() -> float:
     )
     return svm_accuracy
 
+
 if __name__ == "__main__":
     print(f"Running my_workflow(), accuracy: {my_workflow()}")
 
@@ -146,7 +144,7 @@ if __name__ == "__main__":
 # Configuring sandbox.config
 # ==========================
 #
-# The container image referenced in the tasks above is specified in the sandbox.config file. Provided a name to every Docker image, and reference that in ``container_image``. In this example, we have used the ``core`` image for both the tasks for illustration purposes. 
+# The container image referenced in the tasks above is specified in the sandbox.config file. Provided a name to every Docker image, and reference that in ``container_image``. In this example, we have used the ``core`` image for both the tasks for illustration purposes.
 #
 # sandbox.config
 # ^^^^^^^^^^^^^^

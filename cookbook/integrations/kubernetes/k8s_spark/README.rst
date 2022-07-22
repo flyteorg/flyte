@@ -124,7 +124,7 @@ Setup Spark Driver and Executor Logs
 
 This can be configured by configuring the ``logs`` configuration for the Spark plugin. Spark Plugin uses the same default log configuration as explained in :ref:`configure-logging`.
 
-SparkPlugin supports separating User (spark user code) vs. System (spark core logs) to enhance visibility into Spark, which is only available if you can route the spark user logs separately from the core logs. 
+SparkPlugin supports separating User (spark user code) vs. System (spark core logs) to enhance visibility into Spark, which is only available if you can route the spark user logs separately from the core logs.
 **Flyte does not automatically separate the logs.** Checkout the configuration structure `here <https://github.com/flyteorg/flyteplugins/blob/2e8a22b1b5569d6f24373495fdfec68c5e7d344f/go/tasks/plugins/k8s/spark/config.go#L31>`__.
 
 - *Mixed*: Get unseparated logs from Spark Driver (both user and system), which follow the same structure as all log plugins. You can get links to the K8s dashboard, or a log aggregator of your choice, as long as it can generate standardized links.

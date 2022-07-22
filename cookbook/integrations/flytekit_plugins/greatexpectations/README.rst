@@ -104,4 +104,3 @@ To use the Great Expectations Flyte plugin, run the following command:
 
 .. note::
     Make sure to run workflows from the "flytekit_plugins" directory.
-

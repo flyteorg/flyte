@@ -44,6 +44,8 @@ class CustomSorter(FileNameSortKey):
         "lp.py",
         "deck.py",
         "task_cache.py",
+        "deck.py",
+        "task_cache.py",
         "shell_task.py",
         "reference_task.py",
         "files.py",

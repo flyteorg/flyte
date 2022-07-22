@@ -2,7 +2,7 @@
 
 # WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
 # ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
-# 
+#
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
 set -e
@@ -12,7 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 OUT="$(mktemp -d)"
 trap 'rm -fr $OUT' EXIT
 
-git clone https://github.com/flyteorg/boilerplate.git "${OUT}" 
+git clone https://github.com/flyteorg/boilerplate.git "${OUT}"
 
 echo "Updating the update.sh script."
 cp "${OUT}/boilerplate/update.sh" "${DIR}/update.sh"
@@ -22,7 +22,7 @@ README="https://github.com/flyteorg/boilerplate/blob/master/Readme.rst"
 
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "$CONFIG_FILE not found."
-  echo "This file is required in order to select which features to include." 
+  echo "This file is required in order to select which features to include."
   echo "See $README for more details."
   exit 1
 fi

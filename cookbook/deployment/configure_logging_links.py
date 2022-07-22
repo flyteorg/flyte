@@ -5,7 +5,7 @@ Configuring Logging Links in UI
 -------------------------------
 
 Oftentimes to debug your workflows in production, you want to access logs from your tasks as they run.
-These logs are different from the core Flyte platform logs, are specific to execution, and may vary from plugin to plugin; 
+These logs are different from the core Flyte platform logs, are specific to execution, and may vary from plugin to plugin;
 for example, Spark may have driver and executor logs.
 
 Every organization potentially uses different log aggregators, making it hard to create a one-size-fits-all solution.

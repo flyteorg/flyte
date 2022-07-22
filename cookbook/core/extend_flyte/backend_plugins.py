@@ -57,5 +57,5 @@ The backend plugin is where the actual logic of the execution is implemented. Th
 .. TODO: write content for Kubernetes operator Plugin
 .. TODO: write content for Web API plugin
 .. TODO: write content for Catch-all - Core Plugin
-  
+
 """

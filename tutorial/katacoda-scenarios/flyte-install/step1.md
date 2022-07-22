@@ -2,7 +2,7 @@ flyte Components
 
 <img src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/executions/flyte_wf_execution_overview.svg?sanitize=true" >
 
-# Component Repos 
+# Component Repos
 Repo | Language | Purpose | Status
 --- | --- | --- | ---
 [flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine | Production-grade

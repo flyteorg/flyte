@@ -9,7 +9,7 @@ run through the body of the function at compile time, using the subsequent calls
 and record the workflow structure. This is the declarative style and makes sense when a human is writing it up by hand.
 
 For cases where workflows are constructed programmatically, an imperative style makes more sense. For example, when tasks have already been defined, their order and dependencies have
-been specified in text format of some kind (perhaps you're converting from a legacy system), and your goal is to orchestrate those tasks. 
+been specified in text format of some kind (perhaps you're converting from a legacy system), and your goal is to orchestrate those tasks.
 
 """
 import typing

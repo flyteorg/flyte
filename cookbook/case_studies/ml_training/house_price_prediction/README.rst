@@ -13,11 +13,11 @@ Where Does Flyte Fit In?
 - Easier backtracking to the error source.
 - Provides a Rich UI to view and manage the pipeline.
 
-House price prediction pipeline for one region doesn't require a :py:func:`~flytekit:flytekit.dynamic` workflow. When multiple regions are involved, to iterate through the regions at run-time and thereby build the DAG, Flyte workflow has to be :py:func:`~flytekit:flytekit.dynamic`. 
+House price prediction pipeline for one region doesn't require a :py:func:`~flytekit:flytekit.dynamic` workflow. When multiple regions are involved, to iterate through the regions at run-time and thereby build the DAG, Flyte workflow has to be :py:func:`~flytekit:flytekit.dynamic`.
 
 .. tip::
 
-    Refer to :ref:`sphx_glr_auto_core_control_flow_dynamics.py` section to learn more about dynamic workflows. 
+    Refer to :ref:`sphx_glr_auto_core_control_flow_dynamics.py` section to learn more about dynamic workflows.
 
 Dataset
 ========

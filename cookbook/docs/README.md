@@ -7,7 +7,7 @@ make html
 ```
 
 ## How do the docs work?
-Flytesnacks uses the concept of `Literate Programming<https://en.wikipedia.org/wiki/Literate_programming>`_  to generate the documentation from the examples themselves. To achieve this it uses the excellent `Sphinx-Gallery Plugin<https://sphinx-gallery.github.io/stable/index.html>`_ to render comments and codes inline in the docs. 
+Flytesnacks uses the concept of `Literate Programming<https://en.wikipedia.org/wiki/Literate_programming>`_  to generate the documentation from the examples themselves. To achieve this it uses the excellent `Sphinx-Gallery Plugin<https://sphinx-gallery.github.io/stable/index.html>`_ to render comments and codes inline in the docs.
 To make this work, it is essential that the examples are written with comments following the Sphinx-Gallery style of coding. Some important things to note:
  - The example directory should have a README.rst.
  - The example itself should have a header comment, which should have a heading
@@ -19,7 +19,7 @@ To make this work, it is essential that the examples are written with comments f
   # my very important comment
   #
   # some other stuff
-  def foo(): 
+  def foo():
     ...
   ```
  - prompts should use
@@ -28,4 +28,3 @@ To make this work, it is essential that the examples are written with comments f
 
        flytectl --version
    ```
-

@@ -65,9 +65,9 @@ The workflow can be run locally, simply by running it as a Python script:
 .. prompt:: bash (flyte)$
 
     python flyte/workflows/example.py
-   
+
 .. note::
-  
+
    The workflow needs to be invoked after the ``if __name__ == "__main__"``
    entrypoint at the bottom of ``flyte/workflows/example.py``.
 

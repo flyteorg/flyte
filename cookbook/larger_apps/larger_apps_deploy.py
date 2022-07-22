@@ -22,7 +22,7 @@ Then you can setup a local :ref:`Flyte Sandbox <deployment-sandbox>` cluster or 
 pre-provisioned remote Flyte cluster.
 
 .. tip::
-   
+
    Learn how to deploy to a Flyte Cluster using the :ref:`Deployment Guides <deployment>`.
 
 .. tabs::
@@ -168,7 +168,7 @@ Monitor the execution by providing the execution name from the ``create executio
    flytectl get execution --project flytesnacks --domain development <execution_name>
 
 
-**Alternatively, you can FlyteConsole to launch an execution.** 
+**Alternatively, you can FlyteConsole to launch an execution.**
 
 .. tabs::
 
@@ -180,7 +180,7 @@ Monitor the execution by providing the execution name from the ``create executio
 
       Visit ``{FLYTEADMIN_URL}/console`` on your browser
 
-Then use the FlyteConsole to launch an execution: 
+Then use the FlyteConsole to launch an execution:
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/index/getting_started_reg.gif
     :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.

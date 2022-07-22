@@ -1,6 +1,6 @@
-# Flyte 
+# Flyte
 
-[Flyte](https://github.com/lyft/flyte) is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python. 
+[Flyte](https://github.com/lyft/flyte) is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python.
 
 # Introduction
 Flyte is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
@@ -19,4 +19,3 @@ You will learn how to:
 3. How to use Flyteconsole to execute your first workflow
 
 Once the Flyte is in place, it can be extended to support ..... These are discussed in more advanced scenarios.
-

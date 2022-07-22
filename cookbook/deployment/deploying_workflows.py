@@ -143,7 +143,7 @@ Fast Registration
 Re-building a new Docker container image for every code change you make can become cumbersome and slow.
 If you're making purely code changes that **do not** require updating your container definition, you can make use of
 fast serialization and registration to speed up your iteration process and reduce the time it takes to upload new entity
-versions and development code to your hosted Flyte deployment. 
+versions and development code to your hosted Flyte deployment.
 
 First, run the fast serialization target:
 

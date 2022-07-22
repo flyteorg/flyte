@@ -15,4 +15,4 @@ python:
   install:
     - requirements: cookbook/dev-requirements.txt
     - requirements: cookbook/docs-requirements.txt
-    
+

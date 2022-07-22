@@ -2,7 +2,7 @@
 Feature Store Dataclass
 -----------------------
 
-This dataclass provides a unified interface to access Feast methods from within a feature store. 
+This dataclass provides a unified interface to access Feast methods from within a feature store.
 """
 
 import os

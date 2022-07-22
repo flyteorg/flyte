@@ -20,9 +20,6 @@ Verify minio deployment status
 Verify minio deployment status
 `kubectl -n flyte rollout status deployment contour`{{execute HOST1}}
 
-We are ready for the Demo 
+We are ready for the Demo
 
 After All pods are in running condition then visit flyte console https://[[HOST_SUBDOMAIN]]-30081-[[KATACODA_HOST]].environments.katacoda.com/console
-
-
-

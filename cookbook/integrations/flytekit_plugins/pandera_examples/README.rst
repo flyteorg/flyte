@@ -35,7 +35,7 @@ of a column.
        @pa.check("column_3")
        def check_str_length(cls, series):
            return series.str.len() > 5
-   
+
    @pa.check_types
    def processing_fn(df: DataFrame[Schema]) -> DataFrame[Schema]:
        df["column_1"] = df["column_1"] * 2
@@ -63,7 +63,7 @@ Informative errors are raised if invalid data is passed into ``processing_fn``,
 indicating the failure case and the index where they were found in the dataframe:
 
 .. testcode:: pandera-quickstart
-   
+
    invalid_df = pd.DataFrame({
       "column_1": [-1, 2, -3],
       "column_2": [1.5, 2.21, 3.9],

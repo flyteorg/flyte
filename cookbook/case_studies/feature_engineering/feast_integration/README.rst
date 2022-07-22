@@ -8,7 +8,7 @@ But it provides no way to serve these features to production when the model matu
 
 This is where Feast comes into the picture.
 
-By leveraging the collective capabilities, Flyte adds the ability to engineer the features, and Feast provides the feature registry and online feature serving system. 
+By leveraging the collective capabilities, Flyte adds the ability to engineer the features, and Feast provides the feature registry and online feature serving system.
 Moreover, Flyte can help us ensure incremental development of features and enables us to turn on the sync to online stores only when one is confident about the features.
 
 In this tutorial, we'll walk through how Feast can be used to store and retrieve features to train and test the model through a pipeline curated using Flyte.
@@ -48,7 +48,7 @@ The dataset will have the following columns:
       - surgical lesion
       - timestamp
 
-The horse colic dataset will be a compressed zip file consisting of the SQLite DB. 
+The horse colic dataset will be a compressed zip file consisting of the SQLite DB.
 For this example, we just wanted a dataset available online, but this could be easily plugged into another dataset/data management system like Snowflake, Athena, Hive, BigQuery, or Spark, all of which are supported by Flyte.
 
 Takeaways
