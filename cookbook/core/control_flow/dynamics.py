@@ -2,14 +2,14 @@
 Dynamic Workflows
 ------------------
 
-A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time.
-However, in cases where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure, you can use dynamic workflows by decorating a function with ``@dynamic``.
+A workflow is typically static when the directed acyclic graph's (DAG) structure is known at compile-time.
+However, in cases where a run-time parameter (for example, the output of an earlier task) determines the full DAG structure, you can use dynamic workflows by decorating a function with ``@dynamic``.
 
 A dynamic workflow is similar to the :py:func:`~flytekit.workflow`, in that it represents a python-esque DSL to
 declare task interactions or new workflows. One significant difference between a regular workflow and dynamic (workflow) is that
-the latter is evaluated at runtime. This means that the inputs are first materialized and sent to the actual function,
-as if it were a task. However, the return value from a dynamic workflow is a promise rather than an actual value,
-which can be fulfilled by evaluating the various tasks that were invoked in the dynamic workflow.
+the latter is evaluated at runtime. This means the inputs are first materialized and sent to the actual function,
+as if it were a task. However, the return value from a dynamic workflow is a Promise object instead of an actual value,
+which is fulfilled by evaluating the various tasks invoked in the dynamic workflow.
 
 Within the ``@dynamic`` context (function), every invocation of a :py:func:`~flytekit.task` or a derivative of
 :py:class:`~flytekit.core.base_task.Task` class will result in deferred evaluation using a promise, instead
@@ -82,7 +82,7 @@ def derive_count(freq1: typing.List[int], freq2: typing.List[int]) -> int:
 #
 # .. note::
 #    The dynamic pattern isn't the most efficient method to iterate over a list. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_
-# might be more efficient in certain cases. But they only work for Python tasks (tasks decorated with the @task decorator) not SQL/Spark/etc,.
+# might be more efficient in certain cases. But they only work for Python tasks (tasks decorated with the @task decorator) not SQL, Spark, and so on.
 #
 # We now define a dynamic workflow that encapsulates the above mentioned points.
 @dynamic
@@ -135,3 +135,68 @@ def wf(s1: str, s2: str) -> int:
 
 if __name__ == "__main__":
     print(wf(s1="Pear", s2="Earth"))
+
+
+# %%
+# Dynamic Workflows from Execution POV
+# ------------------------------------
+#
+# What Is a Dynamic Workflow?
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# A workflow whose directed acyclic graph (DAG) is computed at run-time is a :ref:`dynamic workflow <Dynamic Workflows>`. The tasks in a dynamic workflow are executed at runtime using dynamic inputs.
+#
+# Think of a dynamic workflow as a combination of a task and a workflow. It is used to dynamically decide the parameters of a workflow at runtime. It is both compiled and executed at run-time. You can define a dynamic workflow using the ``@dynamic`` decorator.
+#
+# Why Use Dynamic Workflows?
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Flexibility
+# """""""""""
+#
+# Dynamic workflows simplify your pipelines, providing the flexibility to design workflows based on your project’s requirements, which can’t be achieved using static workflows.
+#
+# Lower Pressure on etcd
+# """""""""""""""""""""""
+#
+# The workflow CRD and the states associated with static workflows are stored in etcd, which is the Kubernetes database. This database stores Flyte workflow CRD as key-value pairs and keeps track of the status of each node’s execution.
+# A limitation of etcd is that the aggregate of the size of the workflow and the status of the nodes shouldn't exceed 2 MB.
+# Due to this limitation, you need to ensure that your static workflows don’t consume too much memory.
+# In contrast, dynamic workflows are not stored in etcd, thereby eliminating the concept of storage space limitation.
+# You can create large dynamic workflows or multiple dynamic workflows that are nested in a static workflow that saves storage space on etcd for memory-intensive jobs.
+#
+# How Is a Dynamic Workflow Executed?
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# FlytePropeller executes the dynamic task in its k8s pod and results in a compiled Flyte DAG which is made available in the FlyteConsole.
+# FlytePropeller uses the information obtained by executing the dynamic task to schedule and execute every node within the dynamic task.
+# You can visualize the dynamic workflow’s graph in the UI only after the dynamic task has completed execution.
+#
+# When a dynamic task is executed, it generates the entire workflow as its output. This output is known as the **futures file**.
+# It is named so because the workflow is yet to be executed and all the subsequent outputs are futures.
+#
+# How Does Flyte Handle Dynamic Workflows?
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# A dynamic workflow is modeled as a task in the backend, but the body of the function is executed to produce a workflow at run-time. In both dynamic and static workflows, the output of tasks are Promise objects.
+#
+#
+# .. note:: When a dynamic (or static) workflow calls a task, the workflow returns a :ref:`Promise <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.extend.Promise.html#flytekit-extend-promise>` object. You can’t interact with this Promise object directly since it uses lazy evaluation (it defers the evaluation until absolutely needed). You can unwrap the Promise object by passing it to a task or a dynamic workflow.
+#
+# :ref:`Here<Predicting House Price in Multiple Regions Using XGBoost and Dynamic Workflows>` is an example of house price prediction using dynamic workflows.
+#
+# Where Are Dynamic Workflows Used?
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Dynamic workflow comes into the picture when you need to:
+#
+# #. Modify the logic of the code at runtime
+# #. Change or decide on feature extraction parameters on-the-go
+# #. Build AutoML pipelines
+# #. Tune hyperparameters during execution
+#
+# Dynamic versus Map Tasks
+# ^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Dynamic tasks have overhead for large fan-out tasks because they store metadata for the entire workflow. In contrast, map tasks are efficient for these large fan-out tasks since they don’t store the metadata, as a consequence of which overhead is less apparent.
+#
