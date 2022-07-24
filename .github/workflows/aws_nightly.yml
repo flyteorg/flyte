@@ -23,7 +23,7 @@ on:
         type: string
 
 concurrency:
-  group: '${{ github.workflow }}
+  group: ${{ github.workflow }}
 
 permissions:
   id-token: write
