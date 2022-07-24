@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - opta-aws
+
   # TODO:  ADD SCHEDULE
   workflow_dispatch:
     inputs:
@@ -20,6 +21,9 @@ on:
         required: true
         default: "latest"
         type: string
+
+concurrency:
+  group: '${{ github.workflow }}
 
 permissions:
   id-token: write
@@ -49,7 +53,6 @@ jobs:
       env-name: ${{ steps.set-env-vars.outputs.env_name }}
       flyte-bucket: ${{ steps.set-env-vars.outputs.flyte_storage_bucket }}
   calculate-pre-reqs:
-    # TODO: UPDATE THIS TO @main
     uses: ./.github/workflows/calculate_pre_reqs.yml
     with:
       mode: ${{ github.event.inputs.mode }}
@@ -58,8 +61,7 @@ jobs:
     needs:
       - set-env-vars
       - calculate-pre-reqs
-    # TODO: UPDATE THIS TO @main
-    uses: flyteorg/flyte/.github/workflows/create_opta_aws.yml@opta-aws
+    uses: ./.github/workflows/create_opta_aws.yml
     with:
       aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
       your-company: ${{ needs.set-env-vars.outputs.your-company }}
@@ -72,14 +74,12 @@ jobs:
     needs:
       - create-opta-aws
       - calculate-pre-reqs
-    # TODO: UPDATE TO @main
-    uses: flyteorg/flyte/.github/workflows/run_flytekit_tests.yml@opta-aws
+    uses: ./.github/workflows/run_flytekit_tests.yml
     with:
       dns: ${{ needs.create-opta-aws.outputs.dns }}
       components_version: ${{ needs.calculate-pre-reqs.outputs.components_version }}
   destroy-cluster:
-    # TODO: UPDATE THIS TO @main
-    uses: flyteorg/flyte/.github/workflows/destroy_cluster.yml@opta-aws
+    uses: ./.github/workflows/destroy_cluster.yml
     with:
       aws-region: ${{ needs.set-env-vars.outputs.aws-region }}
     secrets: inherit
