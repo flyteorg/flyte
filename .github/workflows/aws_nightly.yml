@@ -22,8 +22,8 @@ on:
         default: "latest"
         type: string
 
-concurrency:
-  group: ${{ github.workflow }}
+#concurrency:
+#  group: ${{ github.workflow }}
 
 permissions:
   id-token: write
