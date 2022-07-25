@@ -14,7 +14,7 @@ on:
 jobs:
   trigger-upgrade:
     name: ${{ github.event.inputs.component }} Upgrade
-    if: ${{ github.event.inputs.component  == "boilerplate" }}
+    if: ${{ github.event.inputs.component  == 'boilerplate' }}
     uses: flyteorg/flytetools/.github/workflows/flyte_automation.yml@master
     with:
       component: ${{ github.event.inputs.component }}
@@ -24,7 +24,7 @@ jobs:
   upgrade_flyteidl:
     name: Upgrade Flyteidl
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.component  == "flyteidl" }}
+    if: ${{ github.event.inputs.component  == 'flyteidl' }}
     steps:
       - uses: actions/checkout@v2
         with:

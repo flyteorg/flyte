@@ -107,12 +107,14 @@ jobs:
         # a tag, update our target
         run: |
           CURRENT_TAG=$(git tag --sort=-refname --points-at ${{ github.ref }} | head -n 1)
+          echo $CURRENT_TAG
           echo "::set-output name=currentTag::$CURRENT_TAG"
 
   push_docker_image:
     name: Push to Github Registry
     needs: [check_for_tag]
     runs-on: ubuntu-latest
+    if: ${{ needs.check_for_tag.outputs.currentTag != '' }}
     steps:
       - uses: actions/checkout@v2
         with:
