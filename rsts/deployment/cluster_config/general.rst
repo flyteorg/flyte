@@ -73,7 +73,7 @@ Cluster Resources
 =================
 These are free-form key-value pairs used when filling the templates that the admin feeds into the cluster manager; the process that syncs Kubernetes resources.
 
-The keys represent templatized variables in `cluster resource template YAML <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__ and the values are what you want to see filled in.
+The keys represent templatized variables in `cluster resource template <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L737,L760>`__ and the values are what you want to see filled in.
 
 In the absence of custom override values, you can use ``templateData`` from the `FlyteAdmin config <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L719,L734>`__ as a default. Flyte specifies these defaults by domain and applies them to every project-domain namespace combination.
 
@@ -162,7 +162,7 @@ The **attributes** associated with an execution queue must match the **tags** fo
 
     flytectl update execution-queue-attribute
 
-    Refer to the :ref:`docs <flytectl:flytectl_update_execution-queue-attribute>` to learn more about the command and its supported flag(s).
+Refer to the :ref:`docs <flytectl:flytectl_update_execution-queue-attribute>` to learn more about the command and its supported flag(s).
 
 You can view existing attributes for which tags can be assigned by visiting ``protocol://<host>/api/v1/matchable_attributes?resource_type=2`` and substitute the protocol and host appropriately.
 
@@ -176,8 +176,8 @@ And these can be defined at two levels of project-domain or project-domain-workf
 
     flytectl update workflow-execution-config
 
-    Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
 
+Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
 
 
 *********
@@ -212,3 +212,31 @@ Any inbound ``CreateExecution`` requests with **[Domain: Production, Project: wi
 Any inbound ``CreateExecution`` requests with **[Domain: Production, Project: widgetmodels]** for any workflow other than ``Demand`` and any launch plan will have a tag value "critical".
 
 All other inbound CreateExecution requests will use the default values specified in the FlyteAdmin config (if any).
+
+
+Configuring K8s Pod using a Default PodTemplate
+------------------------------------------------
+
+FlytePropeller supports configuration of all K8s Pods executed using the Pod plugin. This is accomplished by creating a default PodTemplate. This functionality requires the `default-pod-template-name <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__ configuration option to be set in FlytePropeller.
+
+When executing the K8s Pods, FlytePropeller attempts to use the PodTemplate in the namespace where the Pod would be created (for example, by default, a pod in the project ``flytesnacks`` and domain ``development`` will look for a PodTemplate in the ``flytesnacks-development`` namespace). If that PodTemplate doesn't exist, FlytePropeller attempts to find it in the namespace that it runs in.
+
+This PodTemplate is used as the base Pod. All other configuration options (such as task specific resources, Pod plugin configuration options, etc.) override the values set in the PodTemplate.
+
+.. note :: When setting up this configuration, K8s require PodTemplates to have a set container. In the implementation, we override this value because Flyte requires certain containers to be running. Therefore, when defining the default PodTemplates, you may set a noop container.
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-default-template
+      namespace: flyte
+    template:
+      metadata:
+      spec:
+        containers:
+          - name: noop
+            image: [docker.io/rwgrim/docker-noop](http://docker.io/rwgrim/docker-noop)
+
+The above defined container is never initialized or executed. It serves as a placeholder to validate the PodTemplate.
