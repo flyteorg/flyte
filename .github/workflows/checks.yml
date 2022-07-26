@@ -132,7 +132,7 @@ jobs:
           image_name: flyteorg/flyteconsole
           image_tag: latest,${{ github.sha }},${{ needs.check_for_tag.outputs.currentTag }}
           push_git_tag: true
-          push_image_and_stages: false
+          push_image_and_stages: true
           dockerfile: Dockerfile
           registry: ghcr.io
           build_extra_args: "--compress=true"
