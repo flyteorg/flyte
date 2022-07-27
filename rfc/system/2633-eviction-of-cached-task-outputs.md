@@ -78,9 +78,23 @@ We should extend the [`flytekit.remote`](https://docs.flyte.org/projects/flyteki
 
 ### Evicting cache of a past execution
 
+In addition to the cache eviction override while launching a workflow, we propose to expose the same functionality via `flyteadmin` as an extension to the existing `AdminService`:
+
+#### Extension of existing `flyteadmin` endpoints
+
+We could extend existing `flyteadmin` endpoints (and introduce some new ones) to support eviction of cached workflow/task results:
+
+* The [`UpdateExecution`](https://github.com/flyteorg/flyteidl/blob/ac94eb4c6ffbe17df5b146337135f59914ffe3bf/protos/flyteidl/service/admin.proto#L281) endpoints and its [`ExecutionUpdateRequest`](https://github.com/flyteorg/flyteidl/blob/e749b82a70027d3364f4e5b98ce2cfbffb4eef54/protos/flyteidl/admin/execution.proto#L351) could be extended to include an `evict_cache` flag.
+    * If the new flag is set, `UpdateExecution` would evict the cache of the referenced workflow and all of its sub-workflows/-tasks.
+    * If a [dynamic](https://github.com/flyteorg/flyteidl/blob/aded40037d1a4d2ea32c6dd18644ccf16072124f/protos/flyteidl/admin/node_execution.proto#L116) or [workflow](https://github.com/flyteorg/flyteidl/blob/aded40037d1a4d2ea32c6dd18644ccf16072124f/protos/flyteidl/admin/node_execution.proto#L108) node are encountered, `flyteadmin` would [list executions](https://github.com/flyteorg/flyteidl/blob/aded40037d1a4d2ea32c6dd18644ccf16072124f/protos/flyteidl/service/admin.proto#L343) for the node and recursively evict the cache of all child executions as well.
+    * `flyteadmin` would tolerate partial failures while evicting the cache of an execution - any errors encountered would be propagated back to the user. Running the eviction again would attempt to remove the remaining cached entries.
+* We further propose adding a new endpoint equivalent to `UpdateExecution` for handling tasks execution entities (e.g. `UpdateTaskExecution`), supporting the `evict_cache` flag mentioned above.
+    * The task execution would be identified using a `TaskExecutionIdentifier`.
+    * Whilst `UpdateTaskExecuion` would only contain the `evict_cache` flag at the moment, this approach would be preferred to not break convention of performing CRUD operations on the entity specified in the message name by e.g. re-using `UpdateExecution` to also handle tasks as well.
+
 #### Standalone `flyteadmin` endpoints
 
-In addition to the cache eviction override while launching a workflow, we propose to expose the same functionality via `flyteadmin` as an extension to the existing `AdminService`:
+As a (less preferred) alternative to the extension of existing functionality mentioned above, we could implement new, completely independent endpoints:
 
 * Similar to `GetExecutionData`, provide an endpoint such as `EvictExecutionCache`, removing all cached outputs of all tasks within the specified workflow execution.
     * The workflow execution would be identified using a `WorkflowExecutionIdentifier`.
@@ -93,16 +107,6 @@ In addition to the cache eviction override while launching a workflow, we propos
     * If any reservations exist for the cached resource to be deleted, `flyteadmin` would wait until it can ensure no other executor is accessing the data.
 
 As most of the required functionality should already be added while implementing the cache eviction override for an execution, this additional change would likely only require some smaller extension of the `flyteadmin` service.
-
-#### Extension of existing `flyteadmin` endpoints
-
-As an alternative to the standalone endpoints suggested above, we could extend existing `flyteadmin` endpoints to support eviction of cached workflow/task results:
-
-* The [`UpdateExecution`](https://github.com/flyteorg/flyteidl/blob/ac94eb4c6ffbe17df5b146337135f59914ffe3bf/protos/flyteidl/service/admin.proto#L281) endpoints and its [`ExecutionUpdateRequest`](https://github.com/flyteorg/flyteidl/blob/e749b82a70027d3364f4e5b98ce2cfbffb4eef54/protos/flyteidl/admin/execution.proto#L351) could be extended to include an `evict_cache` flag.
-    * If the new flag is set, `UpdateExecution` would evict the cache of the referenced workflow and all of its sub-workflows/-tasks.
-* As no similar equivalent exists for task execution, we'd either have to add a `UpdateTask` endpoint or extend `UpdateExecution` to handle tasks as well.
-    * Since there's currently no need for updating task executions aside from evicting their cache, this new endpoint would only support cache eviction for the time being.
-    * We could modify the [`id`](https://github.com/flyteorg/flyteidl/blob/e749b82a70027d3364f4e5b98ce2cfbffb4eef54/protos/flyteidl/admin/execution.proto#L353) field of `ExecutionUpdateRequest` to be a `oneof` including a task identifier, however this would diverge from the general convention of endpoints performing CRUD operations on the entity specified in the message name and is thus considered a less feasible option.
 
 Whilst our main intent for this `AdminService` extension is for automated/scripted cleanup using user-provided scripts, this functionality could also be added to other Flyte tools:
 
