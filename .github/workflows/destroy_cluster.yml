@@ -50,7 +50,7 @@ jobs:
 #        run: |
 #          cd /home/runner/work/flyte/flyte/opta/cloud/
 #          opta destroy -c flyte.yaml --auto-approve
-      - name: DESTROY OPTA ENV
+      - name: DESTROY ENV Opta
         shell: bash
         run: |
           cd /home/runner/work/flyte/flyte/opta/cloud/

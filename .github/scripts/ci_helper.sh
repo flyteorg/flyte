@@ -3,7 +3,7 @@ set -ex
 setup_opta () {
   sudo apt-get update
   sudo apt-get install -y locales locales-all
-  /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
+  VERSION=0.33.2 /bin/bash -c "$(curl -fsSL https://docs.opta.dev/install.sh)"
   sudo ln -fs ~/.opta/opta /usr/local/bin/opta
   export PATH=$PATH:/home/runner/.opta
 }
