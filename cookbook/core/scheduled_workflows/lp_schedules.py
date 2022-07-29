@@ -43,14 +43,14 @@ def date_formatter_wf(kickoff_time: datetime):
 #
 # `Cron <https://en.wikipedia.org/wiki/Cron>`_ expression strings use this :ref:`syntax <concepts-schedules>`.
 # An incorrect cron schedule expression would lead to failure in triggering the schedule.
-from flytekit import CronSchedule, LaunchPlan
+from flytekit import CronSchedule, LaunchPlan  # noqa: E402
 
 # creates a launch plan that runs every minute.
 cron_lp = LaunchPlan.get_or_create(
     name="my_cron_scheduled_lp",
     workflow=date_formatter_wf,
     schedule=CronSchedule(
-        # Note that kickoff_time_input_arg matches the workflow input we defined above: kickoff_time
+        # Note that the ``kickoff_time_input_arg`` matches the workflow input we defined above: kickoff_time
         # But in case you are using the AWS scheme of schedules and not using the native scheduler then switch over the schedule parameter with cron_expression
         schedule="*/1 * * * *",  # Following schedule runs every min
         kickoff_time_input_arg="kickoff_time",
@@ -70,9 +70,9 @@ cron_lp = LaunchPlan.get_or_create(
 #
 # Here's an example:
 
-from datetime import timedelta
+from datetime import timedelta  # noqa: E402
 
-from flytekit import FixedRate, LaunchPlan
+from flytekit import FixedRate, LaunchPlan  # noqa: E402
 
 
 @task
@@ -101,24 +101,14 @@ fixed_rate_lp = LaunchPlan.get_or_create(
 # Activating a Schedule
 # #####################
 #
-# Once you've initialized your launch plan, don't forget to set it to active so that the schedule is run.
-# You can use pyflyte in container:
-#
-# .. code-block:: bash
-#
-#   pyflyte lp -p {{ your project }} -d {{ your domain }} activate-all
-
-# %%
-# or with Flytectl:
-#
-# - Activate launch plan:
+# After initializing your launch plan, activate it so that the schedule runs.
 #
 # .. code-block:: bash
 #
 #   flytectl update launchplan -p flyteexamples -d development {{ name_of_lp }} --activate
 
 # %%
-# - Verify if your launch plan got activated:
+# Verify if your launch plan was activated:
 #
 # .. code-block:: bash
 #
