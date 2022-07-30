@@ -223,7 +223,7 @@ func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx ha
 
 	status := nCtx.NodeStatus()
 	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
-	return s.startAndHandleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
+	return s.handleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
 func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
