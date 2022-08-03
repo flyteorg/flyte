@@ -162,7 +162,7 @@ The **attributes** associated with an execution queue must match the **tags** fo
 
     flytectl update execution-queue-attribute
 
-    Refer to the :ref:`docs <flytectl:flytectl_update_execution-queue-attribute>` to learn more about the command and its supported flag(s).
+Refer to the :ref:`docs <flytectl:flytectl_update_execution-queue-attribute>` to learn more about the command and its supported flag(s).
 
 You can view existing attributes for which tags can be assigned by visiting ``protocol://<host>/api/v1/matchable_attributes?resource_type=2`` and substitute the protocol and host appropriately.
 
@@ -176,8 +176,7 @@ And these can be defined at two levels of project-domain or project-domain-workf
 
     flytectl update workflow-execution-config
 
-    Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
-
+Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
 
 
 *********
