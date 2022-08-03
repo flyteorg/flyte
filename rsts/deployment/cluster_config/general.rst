@@ -214,56 +214,92 @@ Any inbound ``CreateExecution`` requests with **[Domain: Production, Project: wi
 All other inbound CreateExecution requests will use the default values specified in the FlyteAdmin config (if any).
 
 
-Configuring K8s Plugin for the Entire Platform
-----------------------------------------------
-
-You can set the configuration on FlytePropeller for the K8s pod and container plugins `here <https://github.com/flyteorg/flyteplugins/blob/902b902fcf487f30ebb5dbeee3bb14e17eb0ec21/go/tasks/pluginmachinery/flytek8s/config/config.go#L67-L162>`__. When you create a new pod in K8s, it is essentially an empty Pod, to begin with. In this empty Pod, the configuration values set in the previous step are applied to construct the Pod. 
-
-For example, if you have the configuration value set for ``EnableHostNetworkingPod`` in the K8s plugin configuration, the Pod would be initially empty. 
-
-.. code-block:: text
-
-    Pod {
-    }
-
-Once you apply the configuration, the Pod reflects the value set.
-
-.. code-block:: text
-
-    Pod {
-        EnableHostNetworkingPod: true,
-    }
-
 Configuring the K8s Pod using a Default PodTemplate
 ---------------------------------------------------
 
-A better technique would be to use the default PodTemplate that allows you to start with a base Pod and configure it in K8s. This method supports any configuration option within Flyte without requiring you to add a separate configuration option in the K8s plugin configuration. 
+You can use the default PodTemplate to configure a K8s Pod. Start with a base Pod and specify the configuration options to the Pod within Flyte. Thus, when a Pod is created in Flyte, it uses the default PodTemplate as the base Pod configuration. This default template supports any configuration options within Flyte without having to update the codebase, thereby eliminating the need to add a `separate configuration <https://github.com/flyteorg/flyteplugins/blob/902b902fcf487f30ebb5dbeee3bb14e17eb0ec21/go/tasks/pluginmachinery/flytek8s/config/config.go#L67-L162>`__ option in the K8s plugin configuration (which was previously the norm). 
 
-In addition to this, you can set the configuration based on namespace. Before this (as seen in the previous section), the K8s plugin configuration would apply to everything that FlytePropeller launched.
+Previously, when a new Pod was created in K8s, it used to be an empty Pod, to begin with. In this empty Pod, the separate configuration values updated in the codebase were applied to construct the new Pod. Thus, the K8s plugin configuration would apply to all Pods launched by FlytePropeller. 
 
-FlytePropeller supports the configuration of all K8s Pods executed using the Pod plugin. This is done by creating a default `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__. This functionality requires the `default-pod-template-name <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__ configuration option to be set in FlytePropeller.
+An empty K8s PodTemplate:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-template
+      namespace: flyte
+     
+When the configuration values are applied to it:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-template
+      namespace: flyte
+    template:
+      metadata:
+       spec:
+        EnableHostNetworkingPod: true,
+
+
+Currently, FlytePropeller supports configuring all K8s Pods executed using the Pod plugin. This is done by creating a default `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__ that uses the `default-pod-template-name <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__ configuration option that is set in FlytePropeller.
 
 This PodTemplate configuration is used as a base to construct every Pod. All other configuration options (such as task-specific resources, Pod plugin configuration options, etc.) override the values set in the PodTemplate.
 
-Using the previous example, you can create a PodTemplate in K8s.
+A default PodTemplate looks like this:
 
-.. code-block:: text
+.. code-block:: yaml
 
-    PodTemplate {
-        EnableHostNetworkingPod: true,
-    }
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-default-template
+      namespace: flytesnacks-development
+    template:
+      metadata:
+        labels:
+        - foo
+      spec:
+        containers:
+          - name: noop
+            image: docker.io/rwgrim/docker-noop
+        subdomain: "default-subdomain"
+        hostNetworking: true
 
-Next, create a Pod in Flyte, whose base configuration will be the same as the PodTemplate you created previously.
+You can build the Pod spec using the above PodTemplate. A sample spec is shown:
 
-.. code-block:: text
+.. code-block:: yaml
 
-    Pod {
-        EnableHostNetworkingPod: true,
-    }
+    plugins:
+      k8s:
+        default-annotations:
+          - annotationKey1: annotationValue1
 
-When executing the K8s Pods, FlytePropeller attempts to use the PodTemplate in the namespace where the Pod would be created (for example, by default, a pod in the project ``flytesnacks`` and domain ``development`` will look for a PodTemplate in the ``flytesnacks-development`` namespace). If that PodTemplate doesn't exist, FlytePropeller attempts to find the PodTemplate in the namespace that FlytePropeller runs in.
+After applying the above Pod spec to the K8s plugin configuration, the manifest looks like this:
 
-.. note :: When you are setting up this configuration, K8s requires PodTemplates to have a set container. In the implementation, we override this value because Flyte requires certain containers to be running. Therefore, when defining the default PodTemplates, you may set a noop container.
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+      - annotationKey1: annotationValue1
+      labels:
+      - foo
+    spec:
+      containers:
+      subdomain: "default-subdomain"
+
+Configuring Pods Based on Namespace
+------------------------------------
+
+When executing the K8s Pods, FlytePropeller attempts to use the PodTemplate in the namespace where the Pod would have been created (for example, by default, a Pod in the project ``flytesnacks`` and domain ``development`` will look for a PodTemplate in the ``flytesnacks-development`` namespace). If that PodTemplate doesn't exist, FlytePropeller attempts to find the PodTemplate in the namespace that FlytePropeller runs in.
+
+.. note :: When you are setting up the configuration, K8s requires PodTemplates to have a set container. In the implementation, you have to override this value because Flyte requires certain containers to be running. Therefore, when defining the default PodTemplates, you may set a noop container.
 
 .. code-block:: yaml
 
