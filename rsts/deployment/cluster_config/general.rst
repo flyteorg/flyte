@@ -178,13 +178,22 @@ And these can be defined at two levels of project-domain or project-domain-workf
 
 Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
 
+Configuring Service Roles
+=========================
+You can configure service roles along 3 levels:
+
+#. Project + domain defaults (every execution launched in this project/domain uses this service account)
+
+#. Launch plan default (every invocation of this launch plan uses this service account)
+
+#. Execution time override (overrides at invocation for a specific execution only)
 
 *********
 Hierarchy
 *********
 Increasing specificity defines how matchable resource attributes get applied. The available configurations, in order of decreasing specifity are:
 
-#. Domain, project, workflow name, and launch plan.
+#. Domain, project, workflow name, and launch plan
 
 #. Domain, project, and workflow name
 
