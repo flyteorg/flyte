@@ -176,7 +176,6 @@ And these can be defined at two levels of project-domain or project-domain-workf
 
     flytectl update workflow-execution-config
 
-
 Refer to the :ref:`docs <flytectl:flytectl_update_workflow-execution-config>` to learn more about the command and its supported flag(s).
 
 
