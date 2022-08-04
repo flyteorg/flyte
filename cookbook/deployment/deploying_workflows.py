@@ -23,7 +23,7 @@ Using remote Flyte gives you the ability to:
 
 Please refer to the :doc:`Getting Started <flyte:getting_started>` for details on getting started with the Flyte installation.
 
-Build your Dockerfile
+Build Your Dockerfile
 ^^^^^^^^^^^^^^^^^^^^^^
 
 1. First commit your changes. Some of the steps below default to referencing the git sha.
@@ -73,7 +73,7 @@ Build your Dockerfile
 .. note::
    ``core`` is the directory being considered in the above Dockerfile.
 
-Serialize your workflows and tasks
+Serialize Your Workflows and Tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Getting your tasks, workflows, and launch plans to run on a Flyte platform is effectively a two-step process.  Serialization is the first step of that process. It is the translation of all your Flyte entities defined in Python, into Flyte IDL entities, defined in protobuf.
 
@@ -96,7 +96,7 @@ The make target is a handy wrapper around the following:
 - :code:`--in-container-config-path` maps to the location within your Docker container image where the above config file will be copied over too
 - :code:`--image` is the non-optional fully qualified name of the container image housing your code
 
-In-container serialization
+In-Container Serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigorous, serialization should be done within the container for the following reasons.
@@ -110,7 +110,7 @@ Take a look at this make target to see how it's done.
 
    make serialize
 
-Register your Workflows and Tasks
+Register Your Workflows and Tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Once you've serialized your workflows and tasks to proto, you'll need to register them with your deployed Flyte installation.
 Again, you can make use of the included make target like so:
@@ -167,9 +167,9 @@ As fast registration serializes code from your local workstation and uploads it 
 
 Building Images
 ^^^^^^^^^^^^^^^
-If you are just iterating locally, there is no need to push your Docker image. For Docker for Desktop at least, locally built images will be available for use in its K8s cluster.
+If you are iterating locally, you don't need to push your Docker image. For Docker Desktop, locally built images will be available for use in its K8s cluster.
 
-If you would like to later push your image to a registry (Dockerhub, ECR, etc.), you can run,
+If you wish to later push your image to a registry (Dockerhub, ECR, etc.), run:
 
 
 .. code-block::
@@ -178,5 +178,27 @@ If you would like to later push your image to a registry (Dockerhub, ECR, etc.),
 
 
 .. _working_hosted_service:
+
+Pulling Images from a Private Container Image Registry
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can use different private container registries (`AWS ECR <https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html>`__, `Docker Hub <https://docs.docker.com/docker-hub/repos/#private-repositories>`__, `GitLab Container Registry <https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#access-an-image-from-a-private-container-registry>`__). Ensure that you have the command line tools and login information associated with the registry.
+
+A general trivia while using these private registries has been discussed below.
+
+1. Using the default service account or a new service account.
+
+   #. Add the authorization token and name to the default/new service account.
+   #. Ensure that the service account you are using for authentication has permissions to access the container registry.
+   #. Use this default/new service account to login into the private registry and pull the image.
+
+
+2. Using a private registry in Docker Hub.
+
+   #. `Use <https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/>`__ a custom pod template to create a pod. This template is automatically added to every ``pod`` that Flyte creates.
+   #. Update `FlytePropeller <https://github.com/flyteorg/flyteplugins/blob/e2971efbefd9126aca0290ddc931663605dec348/go/tasks/pluginmachinery/flytek8s/config/config.go#L157>`__ about the pod created in the previous step.
+   #. Specify the pod spec and ImagePullSecrets (or any other customization for the pod) in the pod's manifest (YAML file). The pods with their keys can log in and access the images in the private registry.
+
+Once you set up the token to authenticate with the private registry, you can pull images from them.
 
 """
