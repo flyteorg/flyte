@@ -277,13 +277,14 @@ An example PodTemplate is shown:
 In addition, the K8s plugin configuration in FlytePropeller defines the default Pod Labels, Annotations, and enables the host networking.
 
 .. code-block:: yaml
+    
     plugins:
        k8s:
         default-labels:
-           - bar
+          - bar
         default-annotations:
-           - foo: overridden-value
-           - baz: non-overridden-value
+          - foo: overridden-value
+          - baz: non-overridden-value
         enable-host-networking-pod: true
 
 To construct a Pod, FlytePropeller initializes a Pod definition using the default PodTemplate. This definition is applied to the K8s plugin configuration values, and any task-specific configuration is overlaid. During the process, when lists are merged, values are appended and when maps are merged, the values are overridden. 
