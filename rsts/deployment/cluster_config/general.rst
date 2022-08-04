@@ -255,21 +255,22 @@ If you have the default PodTemplate defined in the ``flyte`` namespace (where Fl
 An example PodTemplate is shown:
 
 .. code-block:: yaml
-     apiVersion: v1
-     kind: PodTemplate
-     metadata:
-       name: flyte-template
-       namespace: flyte
-     template:
-       metadata:
-         labels:
-         - foo
-         annotations:
-         - foo: initial-value
-         - bar: initial-value
-       spec:
-         containers:
-           - name: noop
+    
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-template
+      namespace: flyte
+    template:
+      metadata:
+        labels:
+          - foo
+        annotations:
+          - foo: initial-value
+          - bar: initial-value
+      spec:
+        containers:
+          - name: noop
            image: docker.io/rwgrim/docker-noop
          hostNetwork: false
 
@@ -293,17 +294,17 @@ The resultant Pod using the above default PodTemplate and K8s Plugin configurati
     apiVersion: v1
     kind: Pod
     metadata:
-       name: example-pod
-       namespace: flytesnacks-development
-       labels:
-       - foo // maintained initial value
-       - bar // value appended by k8s plugin configuration
-       annotations:
-       - foo: overridden-value // value overridden by k8s plugin configuration
-       - bar: initial-value // maintained initial value
-       - baz: non-overridden-value // value added by k8s plugin configuration
+      name: example-pod
+      namespace: flytesnacks-development
+      labels:
+        - foo // maintained initial value
+        - bar // value appended by k8s plugin configuration
+      annotations:
+        - foo: overridden-value // value overridden by k8s plugin configuration
+        - bar: initial-value // maintained initial value
+        - baz: non-overridden-value // value added by k8s plugin configuration
     spec:
-       containers:
+      containers:
          // omitted Flyte-specific overridden containers
        hostNetwork: true // overridden by the k8s plugin configuration
 
