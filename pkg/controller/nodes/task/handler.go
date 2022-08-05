@@ -484,15 +484,16 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			pluginTrns.ObservedExecutionError(ee)
 		} else {
 			var deckURI *storage.DataReference
-			exists, err := tCtx.ow.GetReader().DeckExists(ctx)
-			if err != nil {
-				logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
-				return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
-			} else if exists {
-				deckURIValue := tCtx.ow.GetDeckPath()
-				deckURI = &deckURIValue
+			if tCtx.ow.GetReader() != nil {
+				exists, err := tCtx.ow.GetReader().DeckExists(ctx)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+					return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
+				} else if exists {
+					deckURIValue := tCtx.ow.GetDeckPath()
+					deckURI = &deckURIValue
+				}
 			}
-
 			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
 				&event.TaskNodeMetadata{
 					CacheStatus: cacheStatus.GetCacheStatus(),
