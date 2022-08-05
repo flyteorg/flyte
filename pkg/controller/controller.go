@@ -160,21 +160,20 @@ func (c *Controller) enqueueFlyteWorkflow(obj interface{}) {
 	c.workQueue.AddRateLimited(key.String())
 }
 
-func (c *Controller) enqueueWorkflowForNodeUpdates(wID v1alpha1.WorkflowID) {
-	if wID == "" {
+func (c *Controller) enqueueWorkflowForNodeUpdates(workflowID v1alpha1.WorkflowID) {
+	ctx := context.TODO()
+
+	// validate workflowID
+	_, _, err := cache.SplitMetaNamespaceKey(workflowID)
+	if err != nil {
+		logger.Warnf(ctx, "failed to add incorrectly formatted workflowID '%s' to subqueue", workflowID)
 		return
 	}
-	namespace, name, err := cache.SplitMetaNamespaceKey(wID)
-	if err != nil {
-		if _, err2 := c.workflowStore.Get(context.TODO(), namespace, name); err2 != nil {
-			if workflowstore.IsNotFound(err) {
-				// Workflow is not found in storage, was probably deleted, but one of the sub-objects sent an event
-				return
-			}
-		}
-		c.metrics.EnqueueCountTask.Inc()
-		c.workQueue.AddToSubQueue(wID)
-	}
+
+	// add workflowID to subqueue
+	c.workQueue.AddToSubQueue(workflowID)
+	c.metrics.EnqueueCountTask.Inc()
+	logger.Debugf(ctx, "added workflowID '%s' to subqueue", workflowID)
 }
 
 func (c *Controller) getWorkflowUpdatesHandler() cache.ResourceEventHandler {
