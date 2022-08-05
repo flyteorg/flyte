@@ -7,45 +7,43 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/validation"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/cache"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
-	v1 "k8s.io/api/core/v1"
-
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	stdErrors "github.com/flyteorg/flytestdlib/errors"
-	"k8s.io/client-go/util/workqueue"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	k8stypes "k8s.io/apimachinery/pkg/types"
 
+	compiler "github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
+	nodeTaskConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+
+	"github.com/flyteorg/flytestdlib/contextutils"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+
+	"golang.org/x/time/rate"
+
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	k8stypes "k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/validation"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
 
-	nodeTaskConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 const finalizer = "flyte/flytek8s"
@@ -533,12 +531,22 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 				if evt.ObjectNew == nil {
 					logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
 				} else if evt.ObjectOld == nil || evt.ObjectOld.GetResourceVersion() != evt.ObjectNew.GetResourceVersion() {
+					// attempt to enqueue this tasks owner by retrieving the workfowID from the resource labels
 					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
-					logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
-					if err := enqueueOwner(k8stypes.NamespacedName{Name: evt.ObjectNew.GetName(), Namespace: evt.ObjectNew.GetNamespace()}); err != nil {
-						logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", evt.ObjectNew.GetName())
+
+					workflowID, exists := evt.ObjectNew.GetLabels()[compiler.ExecutionIDLabel]
+					if exists {
+						logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
+						namespacedName := k8stypes.NamespacedName{
+							Name:      workflowID,
+							Namespace: evt.ObjectNew.GetNamespace(),
+						}
+
+						if err := enqueueOwner(namespacedName); err != nil {
+							logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", namespacedName)
+						}
+						updateCount.Inc(newCtx)
 					}
-					updateCount.Inc(newCtx)
 				} else {
 					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
 					droppedUpdateCount.Inc(newCtx)
@@ -552,10 +560,10 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 				genericCount.Inc(ctx)
 			},
 		},
-		// Queue
-		// TODO: a more unique workqueue name
-		workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(),
-			entry.ResourceToWatch.GetObjectKind().GroupVersionKind().Kind),
+		// Queue - configured for high throughput so we very infrequently rate limit node updates
+		workqueue.NewNamedRateLimitingQueue(&workqueue.BucketRateLimiter{
+			Limiter: rate.NewLimiter(rate.Limit(10000), 10000),
+		}, entry.ResourceToWatch.GetObjectKind().GroupVersionKind().Kind),
 		// Predicates
 		predicate.Funcs{
 			CreateFunc: func(createEvent event.CreateEvent) bool {
