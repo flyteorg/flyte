@@ -137,7 +137,6 @@ message TaskTemplate {
     // to use as required.
     // reserve the field numbers 1 through 15 for very frequently occurring message elements
     map<string, string> config = 16;
-
 }
 
 // ----------------- First class Plugins

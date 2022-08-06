@@ -299,6 +299,166 @@ of a hive task's TaskTemplate
 
 
 
+.. _ref_flyteidl/plugins/ray.proto:
+
+flyteidl/plugins/ray.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.plugins.HeadGroupSpec:
+
+HeadGroupSpec
+------------------------------------------------------------------
+
+HeadGroupSpec are the spec for the head pod
+
+
+
+.. csv-table:: HeadGroupSpec type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "ray_start_params", ":ref:`ref_flyteidl.plugins.HeadGroupSpec.RayStartParamsEntry`", "repeated", "Optional. RayStartParams are the params of the start command: address, object-store-memory. Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start"
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.HeadGroupSpec.RayStartParamsEntry:
+
+HeadGroupSpec.RayStartParamsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: HeadGroupSpec.RayStartParamsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.RayCluster:
+
+RayCluster
+------------------------------------------------------------------
+
+Define Ray cluster defines the desired state of RayCluster
+
+
+
+.. csv-table:: RayCluster type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "head_group_spec", ":ref:`ref_flyteidl.plugins.HeadGroupSpec`", "", "HeadGroupSpecs are the spec for the head pod"
+   "worker_group_spec", ":ref:`ref_flyteidl.plugins.WorkerGroupSpec`", "repeated", "WorkerGroupSpecs are the specs for the worker pods"
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.RayJob:
+
+RayJob
+------------------------------------------------------------------
+
+RayJobSpec defines the desired state of RayJob
+
+
+
+.. csv-table:: RayJob type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "ray_cluster", ":ref:`ref_flyteidl.plugins.RayCluster`", "", "RayClusterSpec is the cluster template to run the job"
+   "runtime_env", ":ref:`ref_string`", "", "runtime_env is base64 encoded. Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments"
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.WorkerGroupSpec:
+
+WorkerGroupSpec
+------------------------------------------------------------------
+
+WorkerGroupSpec are the specs for the worker pods
+
+
+
+.. csv-table:: WorkerGroupSpec type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "group_name", ":ref:`ref_string`", "", "Required. RayCluster can have multiple worker groups, and it distinguishes them by name"
+   "replicas", ":ref:`ref_int32`", "", "Required. Desired replicas of the worker group. Defaults to 1."
+   "min_replicas", ":ref:`ref_int32`", "", "Optional. Min replicas of the worker group. MinReplicas defaults to 1."
+   "max_replicas", ":ref:`ref_int32`", "", "Optional. Max replicas of the worker group. MaxReplicas defaults to maxInt32"
+   "ray_start_params", ":ref:`ref_flyteidl.plugins.WorkerGroupSpec.RayStartParamsEntry`", "repeated", "Optional. RayStartParams are the params of the start command: address, object-store-memory. Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start"
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.WorkerGroupSpec.RayStartParamsEntry:
+
+WorkerGroupSpec.RayStartParamsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: WorkerGroupSpec.RayStartParamsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+..
+   end messages
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
+
+
+
+
 .. _ref_flyteidl/plugins/spark.proto:
 
 flyteidl/plugins/spark.proto
