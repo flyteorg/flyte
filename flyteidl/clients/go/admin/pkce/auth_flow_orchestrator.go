@@ -112,7 +112,7 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 		pkceCodeChallenge + "&code_challenge_method=S256"
 
 	serveMux := http.NewServeMux()
-	server := &http.Server{Addr: redirectURL.Host, Handler: serveMux}
+	server := &http.Server{Addr: redirectURL.Host, Handler: serveMux, ReadHeaderTimeout: 0}
 	// Register the call back handler
 	serveMux.HandleFunc(redirectURL.Path, getAuthServerCallbackHandler(f.clientConfig, pkceCodeVerifier,
 		tokenChannel, errorChannel, stateString)) // the oauth2 callback endpoint
