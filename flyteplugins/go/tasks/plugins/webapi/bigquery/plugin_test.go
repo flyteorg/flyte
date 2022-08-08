@@ -42,6 +42,26 @@ func TestFormatJobReference(t *testing.T) {
 	})
 }
 
+func TestConstructOutputLocation(t *testing.T) {
+	job := &bigquery.Job{
+		Configuration: &bigquery.JobConfiguration{
+			Query: &bigquery.JobConfigurationQuery{
+				DestinationTable: &bigquery.TableReference{
+					ProjectId: "project",
+					DatasetId: "dataset",
+					TableId:   "table",
+				},
+			},
+		},
+	}
+	ol := constructOutputLocation(context.Background(), job)
+	assert.Equal(t, ol, "bq://project:dataset.table")
+
+	job.Configuration.Query.DestinationTable = nil
+	ol = constructOutputLocation(context.Background(), job)
+	assert.Equal(t, ol, "")
+}
+
 func TestCreateTaskInfo(t *testing.T) {
 	t.Run("create task info", func(t *testing.T) {
 		resourceMeta := ResourceMetaWrapper{

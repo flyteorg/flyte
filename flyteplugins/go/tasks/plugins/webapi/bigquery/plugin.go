@@ -33,8 +33,11 @@ import (
 )
 
 const (
-	bigqueryQueryJobTask = "bigquery_query_job_task"
-	bigqueryConsolePath  = "https://console.cloud.google.com/bigquery"
+	bigqueryQueryJobTask  = "bigquery_query_job_task"
+	bigqueryConsolePath   = "https://console.cloud.google.com/bigquery"
+	bigqueryStatusRunning = "RUNNING"
+	bigqueryStatusPending = "PENDING"
+	bigqueryStatusDone    = "DONE"
 )
 
 type Plugin struct {
@@ -148,7 +151,22 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err, "failed to create query job")
 	}
 
-	resource := ResourceWrapper{Status: resp.Status}
+	var outputLocation string
+	if resp.Status != nil && resp.Status.State == bigqueryStatusDone {
+		getResp, err := client.Jobs.Get(job.JobReference.ProjectId, job.JobReference.JobId).Do()
+
+		if err != nil {
+			err := pluginErrors.Wrapf(
+				pluginErrors.RuntimeFailure,
+				err,
+				"failed to get job [%s]",
+				formatJobReference(*job.JobReference))
+
+			return nil, nil, err
+		}
+		outputLocation = constructOutputLocation(ctx, getResp)
+	}
+	resource := ResourceWrapper{Status: resp.Status, OutputLocation: outputLocation}
 	resourceMeta := ResourceMetaWrapper{
 		JobReference:      *job.JobReference,
 		Namespace:         namespace,
@@ -214,9 +232,7 @@ func (p Plugin) getImpl(ctx context.Context, taskCtx webapi.GetContext) (wrapper
 		return nil, err
 	}
 
-	dst := job.Configuration.Query.DestinationTable
-	outputLocation := fmt.Sprintf("bq://%v:%v.%v", dst.ProjectId, dst.DatasetId, dst.TableId)
-
+	outputLocation := constructOutputLocation(ctx, job)
 	return &ResourceWrapper{
 		Status:         job.Status,
 		OutputLocation: outputLocation,
@@ -267,13 +283,13 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 	}
 
 	switch resource.Status.State {
-	case "PENDING":
+	case bigqueryStatusPending:
 		return core.PhaseInfoQueuedWithTaskInfo(version, "Query is PENDING", taskInfo), nil
 
-	case "RUNNING":
+	case bigqueryStatusRunning:
 		return core.PhaseInfoRunning(version, taskInfo), nil
 
-	case "DONE":
+	case bigqueryStatusDone:
 		if resource.Status.ErrorResult != nil {
 			return handleErrorResult(
 				resource.Status.ErrorResult.Reason,
@@ -289,6 +305,16 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 	}
 
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", resource.Status.State)
+}
+
+func constructOutputLocation(ctx context.Context, job *bigquery.Job) string {
+	if job == nil || job.Configuration == nil || job.Configuration.Query == nil || job.Configuration.Query.DestinationTable == nil {
+		return ""
+	}
+	dst := job.Configuration.Query.DestinationTable
+	outputLocation := fmt.Sprintf("bq://%v:%v.%v", dst.ProjectId, dst.DatasetId, dst.TableId)
+	logger.Debugf(ctx, "BigQuery saves query results to [%v]", outputLocation)
+	return outputLocation
 }
 
 func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation string) error {

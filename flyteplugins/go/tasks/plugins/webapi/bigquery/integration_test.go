@@ -25,6 +25,11 @@ import (
 	"google.golang.org/api/bigquery/v2"
 )
 
+const (
+	httpPost string = "POST"
+	httpGet  string = "GET"
+)
+
 func TestEndToEnd(t *testing.T) {
 	server := newFakeBigQueryServer()
 	defer server.Close()
@@ -44,18 +49,45 @@ func TestEndToEnd(t *testing.T) {
 	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext())
 	assert.NoError(t, err)
 
+	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	template := flyteIdlCore.TaskTemplate{
+		Type:   bigqueryQueryJobTask,
+		Target: &flyteIdlCore.TaskTemplate_Sql{Sql: &flyteIdlCore.Sql{Statement: "SELECT 1", Dialect: flyteIdlCore.Sql_ANSI}},
+	}
+
 	t.Run("SELECT 1", func(t *testing.T) {
 		queryJobConfig := QueryJobConfig{
 			ProjectID: "flyte",
 		}
 
-		inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 		custom, _ := pluginUtils.MarshalObjToStruct(queryJobConfig)
-		template := flyteIdlCore.TaskTemplate{
-			Type:   bigqueryQueryJobTask,
-			Custom: custom,
-			Target: &flyteIdlCore.TaskTemplate_Sql{Sql: &flyteIdlCore.Sql{Statement: "SELECT 1", Dialect: flyteIdlCore.Sql_ANSI}},
+		template.Custom = custom
+
+		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
+
+		assert.Equal(t, true, phase.Phase().IsSuccess())
+	})
+
+	t.Run("cache job result", func(t *testing.T) {
+		queryJobConfig := QueryJobConfig{
+			ProjectID: "cache",
 		}
+
+		custom, _ := pluginUtils.MarshalObjToStruct(queryJobConfig)
+		template.Custom = custom
+
+		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
+
+		assert.Equal(t, true, phase.Phase().IsSuccess())
+	})
+
+	t.Run("pending job", func(t *testing.T) {
+		queryJobConfig := QueryJobConfig{
+			ProjectID: "pending",
+		}
+
+		custom, _ := pluginUtils.MarshalObjToStruct(queryJobConfig)
+		template.Custom = custom
 
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
 
@@ -65,21 +97,57 @@ func TestEndToEnd(t *testing.T) {
 
 func newFakeBigQueryServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path == "/projects/flyte/jobs" && request.Method == "POST" {
+		if request.URL.Path == "/projects/flyte/jobs" && request.Method == httpPost {
 			writer.WriteHeader(200)
-			job := bigquery.Job{Status: &bigquery.JobStatus{State: "RUNNING"}}
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusRunning}}
 			bytes, _ := json.Marshal(job)
 			_, _ = writer.Write(bytes)
 			return
 		}
 
-		if strings.HasPrefix(request.URL.Path, "/projects/flyte/jobs/") && request.Method == "GET" {
+		if strings.HasPrefix(request.URL.Path, "/projects/flyte/jobs/") && request.Method == httpGet {
 			writer.WriteHeader(200)
-			job := bigquery.Job{Status: &bigquery.JobStatus{State: "DONE"},
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusDone},
 				Configuration: &bigquery.JobConfiguration{
 					Query: &bigquery.JobConfigurationQuery{
 						DestinationTable: &bigquery.TableReference{
 							ProjectId: "project", DatasetId: "dataset", TableId: "table"}}}}
+			bytes, _ := json.Marshal(job)
+			_, _ = writer.Write(bytes)
+			return
+		}
+
+		if request.URL.Path == "/projects/cache/jobs" && request.Method == httpPost {
+			writer.WriteHeader(200)
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusDone}}
+			bytes, _ := json.Marshal(job)
+			_, _ = writer.Write(bytes)
+			return
+		}
+
+		if strings.HasPrefix(request.URL.Path, "/projects/cache/jobs/") && request.Method == httpGet {
+			writer.WriteHeader(200)
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusDone},
+				Configuration: &bigquery.JobConfiguration{
+					Query: &bigquery.JobConfigurationQuery{
+						DestinationTable: &bigquery.TableReference{
+							ProjectId: "project", DatasetId: "dataset", TableId: "table"}}}}
+			bytes, _ := json.Marshal(job)
+			_, _ = writer.Write(bytes)
+			return
+		}
+
+		if request.URL.Path == "/projects/pending/jobs" && request.Method == httpPost {
+			writer.WriteHeader(200)
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusPending}}
+			bytes, _ := json.Marshal(job)
+			_, _ = writer.Write(bytes)
+			return
+		}
+
+		if strings.HasPrefix(request.URL.Path, "/projects/pending/jobs/") && request.Method == httpGet {
+			writer.WriteHeader(200)
+			job := bigquery.Job{Status: &bigquery.JobStatus{State: bigqueryStatusDone}}
 			bytes, _ := json.Marshal(job)
 			_, _ = writer.Write(bytes)
 			return
