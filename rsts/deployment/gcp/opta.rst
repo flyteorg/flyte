@@ -6,26 +6,31 @@ GCP (GKE) Automated Setup with Opta
 In order to handle production load robustly, securely and with high availability, there are a number of important tasks that need to
 be done independently from the sandbox deployment:
 
-* The kubernetes cluster needs to run securely and robustly
+* The Kubernetes cluster needs to run securely and robustly
 * The sandbox's object store must be replaced by a production grade storage system
 * The sandbox's PostgreSQL database must be replaced by a production grade deployment of postgres
 * A production grade task queueing system must be provisioned and configured
 * A production grade notification system must be provisioned and configured
-* All the above must be done in a secure fashion
-* (Optionally) An official dns domain must be created
-* (Optionally) A production grade email sending system must be provisioned and configured
+
+All the above must be done in a secure fashion
+
+* (Optional) Create an official dns domain
+* (Optional) Provision and configure a production grade email sending system
 
 A Flyte user may provision and orchestrate this setup by themselves, but the Flyte team has partnered with the
 `Opta <https://github.com/run-x/opta>`_ team to create a streamlined production deployment strategy for GCP with
 ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta/gcp>`_.
-The following demo and documentation specifies how to use and further configure them for AWS (GCP has basically the same steps).
+
+.. warning:: Opta is no longer actively in development. You can `migrate to terraform  <https://docs.opta.dev/features/terraform/#migrate-from-opta-to-terraform>`__ to generate terraform code from the opta file.
+
+The following demo and documentation specifies how to use and further configure them for AWS (GCP has the same steps).
 
 .. youtube:: CMp04-mdtQQ
 
 Deploying Opta Environment and Service for Flyte
 ************************************************
 **The Environment**
-To begin using Opta, please first `download the latest version <https://docs.opta.dev/installation/>`_ and all the listed
+To begin using Opta, `download the latest version <https://docs.opta.dev/installation/>`_ and all the listed
 prerequisites and make sure that you have setup gcloud credentials locally as someone with admin privileges (run ``gcloud auth application-default login`` and ``gcloud auth login``).
 With that prepared, go to the `Opta gcp subdirectory <https://github.com/flyteorg/flyte/tree/master/opta/gcp>`_ in the Flyte repo, and open up env.yaml in your editor. Please find and
 replace the following values with your desired ones:
