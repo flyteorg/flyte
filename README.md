@@ -344,10 +344,17 @@ Videos and recordings can be found on Flyte's YouTube channel under the [Confere
 
 2022
 
-- DataCouncil Austin - Type-Safe Data Processing and Machine Learning Pipelines with Flyte and Pandera [session](https://www.datacouncil.ai/talks/type-safe-data-processing-and-machine-learning-pipelines-with-flyte-and-pandera?hsLang=en)
+- DataCouncil Austin - Type-Safe Data Processing and Machine Learning Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=R-6Q2E9DT8Q&list=PLAesBe-zAQmEod2ARZjjAHmGFoGcjaXK6)
+- Data @Scale Spring 2022 - Making Data Quality an integral part of developing Machine Learning and Data Products [video](https://atscaleconference.com/videos/making-data-quality-an-integral-part-of-developing-machine-learning-and-data-products/)
+- KCD Chennai 2022 - MLOps with Flyte: Remove the Barriers to Successfully Implement Machine Learning for Production Workloads [video](https://www.youtube.com/watch?v=9DMAkrM_gOA&list=PLj6h78yzYM2PyeHXo0wdOp9oCf45SZS86)
+- MLOps World 2022 - µlearn: a Microframework for Building Machine Learning Applications *video coming soon!*
+- Scipy 2022 - Reliable, Reproducible, Recoverable & Auditable Machine Learning for Production Workloads with Flyte [video](https://www.youtube.com/watch?v=EykWaiHHDNg)
 
 ### Podcasts
 
+- MLOps Coffee Session - [Why You Need More Than Airflow](http://go.mlops.community/Oz48gY)
+- Kelsey Hightower Twitter Space - [Machine Learning in Production](https://twitter.com/i/spaces/1ZkKzbXLekWKv)
+- Contributor.fyi - [Flyte with Ketan Umare](https://www.contributor.fyi/flyte)
 - TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
