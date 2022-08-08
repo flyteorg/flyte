@@ -10,12 +10,14 @@ load robustly and securely.
 * The sandbox's object store must be replaced with a production-grade storage system
 * The sandbox's PostgreSQL database must be replaced with a production-grade deployment of PostgreSQL
 * All the above have to be done in a secure manner
-* (Optionally) An official DNS domain must be created
-* (Optionally) A production-grade email sending system must be provisioned and configured
+* (Optional) Create an official DNS domain
+* (Optional) Provision and configure a production-grade email sending system
 
 A Flyte user may provision and orchestrate this setup by themselves, but the Flyte team has partnered with the
 `Opta <https://github.com/run-x/opta>`_ team to create a streamlined production deployment strategy for AWS with
 ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta/aws>`__.
+
+.. note:: Opta is no longer actively in development. You can `migrate to terraform  <https://docs.opta.dev/features/terraform/#migrate-from-opta-to-terraform>`__ to generate terraform code from the opta file.
 
 The following demo and documentation specify how to use, and further configure them.
 
