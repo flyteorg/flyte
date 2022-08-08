@@ -70,6 +70,14 @@ Flytekit functionality. These plugins can be anything and for comparison can be 
    ^^^^^^^^^^^^
    Version your SQL database with ``dolt``.
 
+   ---
+   .. link-button:: auto/integrations/flytekit_plugins/whylogs_examples/index
+      :type: ref
+      :text: whylogs
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   ``whylogs``, the open standard for data logging.
+
 
 .. dropdown:: :fa:`info-circle` Using flytekit plugins
    :animate: fade-in-slide-down

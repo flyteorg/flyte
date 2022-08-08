@@ -4,6 +4,7 @@
 -r ./integrations/flytekit_plugins/dolt/requirements.in
 -r ./integrations/flytekit_plugins/pandera_examples/requirements.in
 -r ./integrations/flytekit_plugins/modin_examples/requirements.in
+-r ./integrations/flytekit_plugins/whylogs/requirements.in
 -r ./integrations/kubernetes/pod/requirements.in
 -r ./integrations/kubernetes/k8s_spark/requirements.in
 -r ./integrations/kubernetes/kfpytorch/requirements.in

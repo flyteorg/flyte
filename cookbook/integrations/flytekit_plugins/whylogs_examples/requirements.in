@@ -1,0 +1,6 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-whylogs>=1.1.1b0
+scikit-learn
+whylogs[s3]
+whylogs[mlflow]
+whylogs[whylabs]

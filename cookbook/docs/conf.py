@@ -117,6 +117,7 @@ class CustomSorter(FileNameSortKey):
         "knn_classifier.py",
         "sqlite3_integration.py",
         "sql_alchemy.py",
+        "whylogs_example.py",
         ## Kubernetes
         "pod.py",
         "pyspark_pi.py",
@@ -283,6 +284,7 @@ examples_dirs = [
     "../integrations/flytekit_plugins/pandera_examples",
     "../integrations/flytekit_plugins/modin_examples",
     "../integrations/flytekit_plugins/dolt",
+    "../integrations/flytekit_plugins/whylogs_examples",
     "../integrations/kubernetes/pod",
     "../integrations/kubernetes/k8s_spark",
     "../integrations/kubernetes/kftensorflow",
@@ -321,6 +323,7 @@ gallery_dirs = [
     "auto/integrations/flytekit_plugins/pandera_examples",
     "auto/integrations/flytekit_plugins/modin_examples",
     "auto/integrations/flytekit_plugins/dolt",
+    "auto/integrations/flytekit_plugins/whylogs_examples",
     "auto/integrations/kubernetes/pod",
     "auto/integrations/kubernetes/k8s_spark",
     "auto/integrations/kubernetes/kftensorflow",
@@ -451,6 +454,7 @@ intersphinx_mapping = {
         "https://www.tensorflow.org/api_docs/python",
         "https://github.com/GPflow/tensorflow-intersphinx/raw/master/tf2_py_objects.inv",
     ),
+    "whylogs": ("https://whylogs.readthedocs.io/", None),
 }
 
 # Sphinx-tabs config

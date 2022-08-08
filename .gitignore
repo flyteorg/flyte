@@ -30,3 +30,4 @@ cookbook/release-snacks
 download-artifact/
 typescript
 .bash_history
+.venv/
