@@ -347,7 +347,6 @@ Videos and recordings can be found on Flyte's YouTube channel under the [Confere
 - DataCouncil Austin - Type-Safe Data Processing and Machine Learning Pipelines with Flyte and Pandera [video](https://www.youtube.com/watch?v=R-6Q2E9DT8Q&list=PLAesBe-zAQmEod2ARZjjAHmGFoGcjaXK6)
 - Data @Scale Spring 2022 - Making Data Quality an integral part of developing Machine Learning and Data Products [video](https://atscaleconference.com/videos/making-data-quality-an-integral-part-of-developing-machine-learning-and-data-products/)
 - KCD Chennai 2022 - MLOps with Flyte: Remove the Barriers to Successfully Implement Machine Learning for Production Workloads [video](https://www.youtube.com/watch?v=9DMAkrM_gOA&list=PLj6h78yzYM2PyeHXo0wdOp9oCf45SZS86)
-- MLOps World 2022 - µlearn: a Microframework for Building Machine Learning Applications *video coming soon!*
 - Scipy 2022 - Reliable, Reproducible, Recoverable & Auditable Machine Learning for Production Workloads with Flyte [video](https://www.youtube.com/watch?v=EykWaiHHDNg)
 
 ### Podcasts
