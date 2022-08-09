@@ -11,7 +11,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
-	mpi "github.com/kubeflow/mpi-operator/v2/pkg/apis/kubeflow/v2beta1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -150,7 +150,7 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 }
 
 func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
-	workers int32, launcher int32, slots int32, conditionType mpiOp.JobConditionType) *mpi.MPIJob {
+	workers int32, launcher int32, slots int32, conditionType mpiOp.JobConditionType) *kubeflowv1.MPIJob {
 	var jobConditions []mpiOp.JobCondition
 
 	now := time.Now()
@@ -256,12 +256,12 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 		panic(err)
 	}
 
-	return &mpi.MPIJob{
+	return &kubeflowv1.MPIJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      jobName,
 			Namespace: jobNamespace,
 		},
-		Spec: resource.(*mpi.MPIJob).Spec,
+		Spec: resource.(*kubeflowv1.MPIJob).Spec,
 		Status: mpiOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
@@ -282,10 +282,10 @@ func TestBuildResourceMPI(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
-	mpiJob, ok := resource.(*mpi.MPIJob)
+	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
 	assert.True(t, ok)
-	assert.Equal(t, int32(50), *mpiJob.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeLauncher].Replicas)
-	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(50), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
+	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
 	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
 
 	for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
@@ -315,18 +315,18 @@ func TestBuildResourceMPIForWrongInput(t *testing.T) {
 	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
 
 	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
-	app, ok := resource.(*mpi.MPIJob)
+	app, ok := resource.(*kubeflowv1.MPIJob)
 	assert.Nil(t, err)
 	assert.Equal(t, true, ok)
-	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeWorker].Template.Spec.Containers[0].Command)
-	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeWorker].Template.Spec.Containers[0].Args)
+	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Command)
+	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 }
 
 func TestGetTaskPhase(t *testing.T) {
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyMPIJobResourceCreator := func(conditionType mpiOp.JobConditionType) *mpi.MPIJob {
+	dummyMPIJobResourceCreator := func(conditionType mpiOp.JobConditionType) *kubeflowv1.MPIJob {
 		return dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, conditionType)
 	}
 

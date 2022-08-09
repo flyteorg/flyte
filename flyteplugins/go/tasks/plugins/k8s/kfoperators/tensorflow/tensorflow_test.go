@@ -11,7 +11,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -28,10 +28,9 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	tfOp "github.com/kubeflow/tf-operator/pkg/apis/tensorflow/v1"
 )
 
 const testImage = "image://"
@@ -152,7 +151,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 }
 
 func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorResourceHandler,
-	workers int32, psReplicas int32, chiefReplicas int32, conditionType commonOp.JobConditionType) *tfOp.TFJob {
+	workers int32, psReplicas int32, chiefReplicas int32, conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
 	var jobConditions []commonOp.JobCondition
 
 	now := time.Now()
@@ -258,12 +257,12 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 		panic(err)
 	}
 
-	return &tfOp.TFJob{
+	return &kubeflowv1.TFJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      jobName,
 			Namespace: jobNamespace,
 		},
-		Spec: resource.(*tfOp.TFJob).Spec,
+		Spec: resource.(*kubeflowv1.TFJob).Spec,
 		Status: commonOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
@@ -284,17 +283,17 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
-	tensorflowJob, ok := resource.(*tfOp.TFJob)
+	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
 	assert.True(t, ok)
-	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeWorker].Replicas)
-	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypePS].Replicas)
-	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeChief].Replicas)
+	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas)
+	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas)
 
 	for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
 		var hasContainerWithDefaultTensorFlowName = false
 
 		for _, container := range replicaSpec.Template.Spec.Containers {
-			if container.Name == tfOp.DefaultContainerName {
+			if container.Name == kubeflowv1.TFJobDefaultContainerName {
 				hasContainerWithDefaultTensorFlowName = true
 			}
 
@@ -310,7 +309,7 @@ func TestGetTaskPhase(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyTensorFlowJobResourceCreator := func(conditionType commonOp.JobConditionType) *tfOp.TFJob {
+	dummyTensorFlowJobResourceCreator := func(conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
 		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, conditionType)
 	}
 

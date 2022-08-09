@@ -11,7 +11,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	ptOp "github.com/kubeflow/pytorch-operator/pkg/apis/pytorch/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 )
 
 const testImage = "image://"
@@ -160,7 +160,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	return taskCtx
 }
 
-func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandler, workers int32, conditionType commonOp.JobConditionType) *ptOp.PyTorchJob {
+func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandler, workers int32, conditionType commonOp.JobConditionType) *kubeflowv1.PyTorchJob {
 	var jobConditions []commonOp.JobCondition
 
 	now := time.Now()
@@ -266,12 +266,12 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 		panic(err)
 	}
 
-	return &ptOp.PyTorchJob{
+	return &kubeflowv1.PyTorchJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      jobName,
 			Namespace: jobNamespace,
 		},
-		Spec: resource.(*ptOp.PyTorchJob).Spec,
+		Spec: resource.(*kubeflowv1.PyTorchJob).Spec,
 		Status: commonOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
@@ -292,15 +292,15 @@ func TestBuildResourcePytorch(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
-	pytorchJob, ok := resource.(*ptOp.PyTorchJob)
+	pytorchJob, ok := resource.(*kubeflowv1.PyTorchJob)
 	assert.True(t, ok)
-	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[ptOp.PyTorchReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
 
 	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 		var hasContainerWithDefaultPytorchName = false
 
 		for _, container := range replicaSpec.Template.Spec.Containers {
-			if container.Name == ptOp.DefaultContainerName {
+			if container.Name == kubeflowv1.PytorchJobDefaultContainerName {
 				hasContainerWithDefaultPytorchName = true
 			}
 
@@ -316,7 +316,7 @@ func TestGetTaskPhase(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyPytorchJobResourceCreator := func(conditionType commonOp.JobConditionType) *ptOp.PyTorchJob {
+	dummyPytorchJobResourceCreator := func(conditionType commonOp.JobConditionType) *kubeflowv1.PyTorchJob {
 		return dummyPytorchJobResource(pytorchResourceHandler, 2, conditionType)
 	}
 

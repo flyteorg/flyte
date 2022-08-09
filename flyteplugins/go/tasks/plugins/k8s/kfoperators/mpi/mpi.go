@@ -14,7 +14,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 	commonKf "github.com/kubeflow/common/pkg/apis/common/v1"
-	mpi "github.com/kubeflow/mpi-operator/v2/pkg/apis/kubeflow/v2beta1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -34,10 +34,10 @@ func (mpiOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
 // resources.
 func (mpiOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
-	return &mpi.MPIJob{
+	return &kubeflowv1.MPIJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       mpi.Kind,
-			APIVersion: mpi.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.MPIJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
 }
@@ -83,17 +83,17 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		return nil, fmt.Errorf("number of launch worker should be more then 1")
 	}
 
-	jobSpec := mpi.MPIJobSpec{
+	jobSpec := kubeflowv1.MPIJobSpec{
 		SlotsPerWorker: &slots,
-		MPIReplicaSpecs: map[mpi.MPIReplicaType]*commonKf.ReplicaSpec{
-			mpi.MPIReplicaTypeLauncher: &commonKf.ReplicaSpec{
+		MPIReplicaSpecs: map[commonKf.ReplicaType]*commonKf.ReplicaSpec{
+			kubeflowv1.MPIJobReplicaTypeLauncher: {
 				Replicas: &launcherReplicas,
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
 				},
 				RestartPolicy: commonKf.RestartPolicyNever,
 			},
-			mpi.MPIReplicaTypeWorker: &commonKf.ReplicaSpec{
+			kubeflowv1.MPIJobReplicaTypeWorker: {
 				Replicas: &workers,
 				Template: v1.PodTemplateSpec{
 					Spec: *workersPodSpec,
@@ -103,10 +103,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		},
 	}
 
-	job := &mpi.MPIJob{
+	job := &kubeflowv1.MPIJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       mpi.Kind,
-			APIVersion: mpi.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.MPIJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 		Spec: jobSpec,
 	}
@@ -119,13 +119,13 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 // background.
 func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	var numWorkers, numLauncherReplicas *int32
-	app, ok := resource.(*mpi.MPIJob)
+	app, ok := resource.(*kubeflowv1.MPIJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
 	}
 
-	numWorkers = app.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeWorker].Replicas
-	numLauncherReplicas = app.Spec.MPIReplicaSpecs[mpi.MPIReplicaTypeLauncher].Replicas
+	numWorkers = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas
+	numLauncherReplicas = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas
 
 	taskLogs, err := common.GetLogs(common.MPITaskType, app.Name, app.Namespace,
 		*numWorkers, *numLauncherReplicas, 0)
@@ -150,7 +150,7 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 }
 
 func init() {
-	if err := mpi.AddToScheme(scheme.Scheme); err != nil {
+	if err := kubeflowv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
 
@@ -158,7 +158,7 @@ func init() {
 		k8s.PluginEntry{
 			ID:                  common.MPITaskType,
 			RegisteredTaskTypes: []pluginsCore.TaskType{common.MPITaskType},
-			ResourceToWatch:     &mpi.MPIJob{},
+			ResourceToWatch:     &kubeflowv1.MPIJob{},
 			Plugin:              mpiOperatorResourceHandler{},
 			IsDefault:           false,
 		})
