@@ -11,5 +11,5 @@ inputs:
 kubeServiceAcct: "kubeServiceAcct"
 targetDomain: "development"
 targetProject: "flytesnacks"
-task: core.advanced.run_merge_sort.merge
+task: core.control_flow.merge_sort.merge
 version: v2

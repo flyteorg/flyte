@@ -24,7 +24,7 @@ Example: content of tra.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     defaults:
       cpu: "1"
       memory: "150Mi"
@@ -38,13 +38,13 @@ Example: content of tra.yaml:
 
 Update task resource attribute for project, domain, and workflow combination. This will take precedence over any other
 resource attribute defined at project domain level.
-For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
+For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
 
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
-    workflow: core.control_flow.run_merge_sort.merge_sort
+    project: flytesnacks
+    workflow: core.control_flow.merge_sort.merge_sort
     defaults:
       cpu: "1"
       memory: "150Mi"

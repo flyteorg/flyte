@@ -17,7 +17,7 @@ There are three steps to generate an execution, as outlined below:
 1. Generate the execution spec file using the :ref:`get task <flytectl_get_task>` command.
 ::
 
-	flytectl get tasks -d development -p flytectldemo core.advanced.run_merge_sort.merge --version v2 --execFile execution_spec.yaml
+	flytectl get tasks -d development -p flytesnacks core.control_flow.merge_sort.merge --version v2 --execFile execution_spec.yaml
 
 The generated file would look similar to the following:
 
@@ -32,7 +32,7 @@ The generated file would look similar to the following:
 	kubeServiceAcct: ""
 	targetDomain: ""
 	targetProject: ""
-	task: core.advanced.run_merge_sort.merge
+	task: core.control_flow.merge_sort.merge
 	version: "v2"
 
 2. [Optional] Update the inputs for the execution, if needed.
@@ -53,7 +53,7 @@ The generated spec file can be modified to change the input values, as shown bel
 	kubeServiceAcct: ""
 	targetDomain: ""
 	targetProject: ""
-	task: core.advanced.run_merge_sort.merge
+	task: core.control_flow.merge_sort.merge
 	version: "v2"
 
 3. Run the execution by passing the generated YAML file.
@@ -67,13 +67,13 @@ To relaunch an execution, pass the current execution ID as follows:
 
 ::
 
- flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytectldemo -d development
+ flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytesnacks -d development
 
 To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
 
 ::
 
- flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytectldemo -d development
+ flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytesnacks -d development
 
 See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
 
@@ -82,7 +82,7 @@ The following is an example of how generic data can be specified while creating 
 
 ::
 
- flytectl get task -d development -p flytectldemo  core.type_system.custom_objects.add --execFile adddatanum.yaml
+ flytectl get task -d development -p flytesnacks  core.type_system.custom_objects.add --execFile adddatanum.yaml
 
 The generated file would look similar to this. Here, empty values have been dumped for generic data types 'x' and 'y'.
 ::

@@ -31,7 +31,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 			mock.Anything).Return(nil)
 		err := updateClusterResourceAttributesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, s.Writer, `Updated attributes from flytectldemo project and domain development`)
+		tearDownAndVerify(t, s.Writer, `Updated attributes from flytesnacks project and domain development`)
 	})
 	t.Run("failed to update project domain attribute", func(t *testing.T) {
 		s := setup()
@@ -54,7 +54,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 			mock.Anything, mock.Anything).Return(nil)
 		err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, s.Writer, `Updated attributes from flytectldemo project and domain development and workflow core.control_flow.run_merge_sort.merge_sort`)
+		tearDownAndVerify(t, s.Writer, `Updated attributes from flytesnacks project and domain development and workflow core.control_flow.merge_sort.merge_sort`)
 	})
 	t.Run("failed to update workflow attribute", func(t *testing.T) {
 		s := setup()

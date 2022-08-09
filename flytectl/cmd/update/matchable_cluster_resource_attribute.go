@@ -21,7 +21,7 @@ Example: content of cra.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     attributes:
       foo: "bar"
       buzz: "lightyear"
@@ -35,13 +35,13 @@ resource attribute defined at project domain level.
 This will completely overwrite any existing custom project, domain and workflow combination attributes.
 It is preferable to do get and generate an attribute file if there is an existing attribute that is already set and then update it to have new values.
 Refer to get cluster-resource-attribute section on how to generate this file.
-For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
+For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
 
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
-    workflow: core.control_flow.run_merge_sort.merge_sort
+    project: flytesnacks
+    workflow: core.control_flow.merge_sort.merge_sort
     attributes:
       foo: "bar"
       buzz: "lightyear"

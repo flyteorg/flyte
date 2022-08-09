@@ -12,10 +12,10 @@ Synopsis
 
 Delete workflow execution config for the given project and domain combination or additionally the workflow name.
 
-For project flytectldemo and development domain, run:
+For project flytesnacks and development domain, run:
 ::
 
- flytectl delete workflow-execution-config -p flytectldemo -d development
+ flytectl delete workflow-execution-config -p flytesnacks -d development
 
 To delete workflow execution config using the config file which was used to create it, run:
 
@@ -28,7 +28,7 @@ For example, here's the config file wec.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     max_parallelism: 5
 	security_context:
   		run_as:
@@ -36,11 +36,11 @@ For example, here's the config file wec.yaml:
 
 Max_parallelism is optional in the file as it is unread during the delete command but can be retained since the same file can be used for get, update and delete commands.
 
-To delete workflow execution config for the workflow 'core.control_flow.run_merge_sort.merge_sort', run:
+To delete workflow execution config for the workflow 'core.control_flow.merge_sort.merge_sort', run:
 
 ::
 
- flytectl delete workflow-execution-config -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl delete workflow-execution-config -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Usage
 

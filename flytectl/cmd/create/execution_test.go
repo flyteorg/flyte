@@ -111,7 +111,7 @@ func createExecutionSetup(s *testutils.TestStruct) (t TestStruct) {
 	}
 	launchPlan1 := &admin.LaunchPlan{
 		Id: &core.Identifier{
-			Name:    "core.advanced.run_merge_sort.merge_sort",
+			Name:    "core.control_flow.merge_sort.merge_sort",
 			Version: "v3",
 		},
 		Spec: &admin.LaunchPlanSpec{
@@ -131,7 +131,7 @@ func createExecutionSetup(s *testutils.TestStruct) (t TestStruct) {
 			ResourceType: core.ResourceType_LAUNCH_PLAN,
 			Project:      config.GetConfig().Project,
 			Domain:       config.GetConfig().Domain,
-			Name:         "core.advanced.run_merge_sort.merge_sort",
+			Name:         "core.control_flow.merge_sort.merge_sort",
 			Version:      "v2",
 		},
 	}

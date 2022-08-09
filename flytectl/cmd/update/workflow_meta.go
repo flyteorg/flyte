@@ -16,17 +16,17 @@ const (
 Update the description on the workflow:
 ::
 
- flytectl update workflow -p flytectldemo -d development core.advanced.run_merge_sort.merge_sort --description "Mergesort workflow example"
+ flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --description "Mergesort workflow example"
 
-Archiving workflow named entity would cause this to disapper from flyteconsole UI:
+Archiving workflow named entity would cause this to disappear from flyteconsole UI:
 ::
 
- flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
+ flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --archive
 
 Activate workflow named entity:
 ::
 
- flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
+ flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --activate
 
 Usage
 `
