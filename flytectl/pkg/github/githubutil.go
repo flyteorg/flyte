@@ -169,22 +169,23 @@ func GetUpgradeMessage(latest string, goos platformutil.Platform) (string, error
 		return "", err
 	}
 
-	var message string
-	if isGreater {
-		message = fmt.Sprintf(commonMessage, stdlibversion.Version, latest)
-		symlink, err := CheckBrewInstall(goos)
-		if err != nil {
-			return "", err
-		}
-		if len(symlink) > 0 {
-			message += brewMessage
-		} else if goos == platformutil.Darwin {
-			message += darwinMessage
-		} else if goos == platformutil.Linux {
-			message += linuxMessage
-		}
-		message += fmt.Sprintf(releaseURL, latest)
+	if !isGreater {
+		return "", err
 	}
+	message := fmt.Sprintf(commonMessage, stdlibversion.Version, latest)
+
+	symlink, err := CheckBrewInstall(goos)
+	if err != nil {
+		return "", err
+	}
+	if len(symlink) > 0 {
+		message += brewMessage
+	} else if goos == platformutil.Darwin {
+		message += darwinMessage
+	} else if goos == platformutil.Linux {
+		message += linuxMessage
+	}
+	message += fmt.Sprintf(releaseURL, latest)
 
 	return message, nil
 }
