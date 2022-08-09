@@ -136,15 +136,15 @@ type ClientCredentialsTokenSourceProvider struct {
 func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config,
 	clientMetadata *service.PublicClientAuthConfigResponse, tokenURL string) (TokenSourceProvider, error) {
 	var secret string
-	if len(cfg.ClientSecretLocation) > 0 {
+	if len(cfg.ClientSecretEnvVar) > 0 {
+		secret = os.Getenv(cfg.ClientSecretEnvVar)
+	} else if len(cfg.ClientSecretLocation) > 0 {
 		secretBytes, err := ioutil.ReadFile(cfg.ClientSecretLocation)
 		if err != nil {
 			logger.Errorf(ctx, "Error reading secret from location %s", cfg.ClientSecretLocation)
 			return nil, err
 		}
 		secret = string(secretBytes)
-	} else if len(cfg.ClientSecretEnvVar) > 0 {
-		secret = os.Getenv(cfg.ClientSecretEnvVar)
 	}
 	secret = strings.TrimSpace(secret)
 
