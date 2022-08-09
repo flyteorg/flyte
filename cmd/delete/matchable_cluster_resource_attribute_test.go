@@ -54,7 +54,7 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 		err := deleteClusterResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
 		s.DeleterExt.AssertCalled(t, "DeleteProjectDomainAttributes",
-			s.Ctx, "flytectldemo", "development", admin.MatchableResource_CLUSTER_RESOURCE)
+			s.Ctx, "flytesnacks", "development", admin.MatchableResource_CLUSTER_RESOURCE)
 	})
 	t.Run("successful workflow attribute deletion", func(t *testing.T) {
 		s := setup()
@@ -96,7 +96,7 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 		err := deleteClusterResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
 		s.DeleterExt.AssertCalled(t, "DeleteWorkflowAttributes",
-			s.Ctx, "flytectldemo", "development", "core.control_flow.run_merge_sort.merge_sort",
+			s.Ctx, "flytesnacks", "development", "core.control_flow.merge_sort.merge_sort",
 			admin.MatchableResource_CLUSTER_RESOURCE)
 	})
 	t.Run("workflow attribute deletion non existent file", func(t *testing.T) {
@@ -110,7 +110,7 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 		err := deleteClusterResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		s.DeleterExt.AssertNotCalled(t, "DeleteWorkflowAttributes",
-			s.Ctx, "flytectldemo", "development", "core.control_flow.run_merge_sort.merge_sort",
+			s.Ctx, "flytesnacks", "development", "core.control_flow.merge_sort.merge_sort",
 			admin.MatchableResource_CLUSTER_RESOURCE)
 	})
 	t.Run("attribute deletion invalid file", func(t *testing.T) {
@@ -125,6 +125,6 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 			fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""),
 			err)
 		s.DeleterExt.AssertNotCalled(t, "DeleteProjectDomainAttributes",
-			s.Ctx, "flytectldemo", "development", admin.MatchableResource_CLUSTER_RESOURCE)
+			s.Ctx, "flytesnacks", "development", admin.MatchableResource_CLUSTER_RESOURCE)
 	})
 }

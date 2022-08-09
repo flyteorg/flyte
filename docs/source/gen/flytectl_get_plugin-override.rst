@@ -11,18 +11,18 @@ Synopsis
 
 
 Retrieve the plugin override for the given project and domain.
-For project flytectldemo and development domain:
+For project flytesnacks and development domain:
 
 ::
 
- flytectl get plugin-override -p flytectldemo -d development 
+ flytectl get plugin-override -p flytesnacks -d development
 
 Example: output from the command
 
 .. code-block:: json
 
  {
-	"project": "flytectldemo",
+	"project": "flytesnacks",
 	"domain": "development",
 	"overrides": [{
 		"task_type": "python_task",
@@ -32,19 +32,19 @@ Example: output from the command
  }
 
 Retrieve the plugin override for the given project, domain, and workflow.
-For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort':
+For project flytesnacks, development domain and workflow 'core.control_flow.merge_sort.merge_sort':
 ::
 
- flytectl get plugin-override -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl get plugin-override -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Example: output from the command:
 
 .. code-block:: json
 
  {
-	"project": "flytectldemo",
+	"project": "flytesnacks",
 	"domain": "development",
-    "workflow": "core.control_flow.run_merge_sort.merge_sort"
+    "workflow": "core.control_flow.merge_sort.merge_sort"
 	"overrides": [{
 		"task_type": "python_task",
 		"plugin_id": ["pluginoverride1", "pluginoverride2"],
@@ -64,7 +64,7 @@ Example: content of po.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     overrides:
        - task_type: python_task # Task type for which to apply plugin implementation overrides
          plugin_id:             # Plugin id(s) to be used in place of the default for the task type.

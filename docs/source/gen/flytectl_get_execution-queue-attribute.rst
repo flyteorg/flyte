@@ -11,28 +11,28 @@ Synopsis
 
 
 Retrieve the execution queue attribute for the given project and domain.
-For project flytectldemo and development domain:
+For project flytesnacks and development domain:
 ::
 
- flytectl get execution-queue-attribute -p flytectldemo -d development 
+ flytectl get execution-queue-attribute -p flytesnacks -d development
 
 Example: output from the command:
 
 .. code-block:: json
 
- {"project":"flytectldemo","domain":"development","tags":["foo", "bar"]}
+ {"project":"flytesnacks","domain":"development","tags":["foo", "bar"]}
 
 Retrieve the execution queue attribute for the given project, domain, and workflow.
-For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort':
+For project flytesnacks, development domain, and workflow 'core.control_flow.merge_sort.merge_sort':
 ::
 
- flytectl get execution-queue-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl get execution-queue-attribute -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Example: output from the command:
 
 .. code-block:: json
 
- {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","tags":["foo", "bar"]}
+ {"project":"flytesnacks","domain":"development","workflow":"core.control_flow.merge_sort.merge_sort","tags":["foo", "bar"]}
 
 Write the execution queue attribute to a file. If there are no execution queue attributes, the command throws an error.
 The config file is written to era.yaml file.
@@ -46,7 +46,7 @@ Example: content of era.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     tags:
       - foo
       - bar

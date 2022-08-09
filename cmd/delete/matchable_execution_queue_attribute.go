@@ -15,10 +15,10 @@ const (
 	executionQueueAttributesLong  = `
 Delete execution queue attributes for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain, run:
+For project flytesnacks and development domain, run:
 ::
 
- flytectl delete execution-queue-attribute -p flytectldemo -d development
+ flytectl delete execution-queue-attribute -p flytesnacks -d development
 
 Delete execution queue attribute using the config file which was used to create it.
 
@@ -31,7 +31,7 @@ For example, here's the config file era.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     tags:
       - foo
       - bar
@@ -40,11 +40,11 @@ For example, here's the config file era.yaml:
 
 Value is optional in the file as it is unread during the delete command but it can be retained since the same file can be used for get, update and delete commands.
 
-To delete the execution queue attribute for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
+To delete the execution queue attribute for the workflow 'core.control_flow.merge_sort.merge_sort', run the following command:
 
 ::
 
- flytectl delete execution-queue-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl delete execution-queue-attribute -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Usage
 `

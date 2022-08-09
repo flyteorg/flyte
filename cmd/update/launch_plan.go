@@ -19,12 +19,12 @@ const (
 Activates a launch plan which activates the scheduled job associated with it:
 ::
 
- flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --activate
+ flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --activate
 
 Archives a launch plan which deschedules any scheduled job associated with it:
 ::
 
- flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --version v1 --archive
+ flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --archive
 
 
 Usage

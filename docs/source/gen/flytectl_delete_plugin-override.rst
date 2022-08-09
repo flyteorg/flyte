@@ -12,10 +12,10 @@ Synopsis
 
 Delete plugin override for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain, run:
+For project flytesnacks and development domain, run:
 ::
 
- flytectl delete plugin-override -p flytectldemo -d development
+ flytectl delete plugin-override -p flytesnacks -d development
 
 
 To delete plugin override using the config file which was used to create it, run:
@@ -28,7 +28,7 @@ For example, here's the config file po.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     overrides:
        - task_type: python_task # Task type for which to apply plugin implementation overrides
          plugin_id:             # Plugin id(s) to be used in place of the default for the task type.
@@ -38,11 +38,11 @@ For example, here's the config file po.yaml:
 
 Overrides are optional in the file as they are unread during the delete command but can be retained since the same file can be used for get, update and delete commands.
 
-To delete plugin override for the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following command:
+To delete plugin override for the workflow 'core.control_flow.merge_sort.merge_sort', run the following command:
 
 ::
 
- flytectl delete plugin-override -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl delete plugin-override -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Usage
 

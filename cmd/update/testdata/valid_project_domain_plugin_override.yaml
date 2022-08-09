@@ -1,5 +1,5 @@
 domain: development
-project: flytectldemo
+project: flytesnacks
 overrides:
   - task_type: python_task
     plugin_id:

@@ -11,28 +11,28 @@ Synopsis
 
 
 Retrieve cluster resource attributes for the given project and domain.
-For project flytectldemo and development domain:
+For project flytesnacks and development domain:
 ::
 
- flytectl get cluster-resource-attribute -p flytectldemo -d development 
+ flytectl get cluster-resource-attribute -p flytesnacks -d development
 
 Example: output from the command:
 
 .. code-block:: json
 
- {"project":"flytectldemo","domain":"development","attributes":{"buzz":"lightyear","foo":"bar"}}
+ {"project":"flytesnacks","domain":"development","attributes":{"buzz":"lightyear","foo":"bar"}}
 
 Retrieve cluster resource attributes for the given project, domain, and workflow.
-For project flytectldemo, development domain, and workflow 'core.control_flow.run_merge_sort.merge_sort':
+For project flytesnacks, development domain, and workflow 'core.control_flow.merge_sort.merge_sort':
 ::
 
- flytectl get cluster-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl get cluster-resource-attribute -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Example: output from the command:
 
 .. code-block:: json
 
- {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","attributes":{"buzz":"lightyear","foo":"bar"}}
+ {"project":"flytesnacks","domain":"development","workflow":"core.control_flow.merge_sort.merge_sort","attributes":{"buzz":"lightyear","foo":"bar"}}
 
 Write the cluster resource attributes to a file. If there are no cluster resource attributes, the command throws an error.
 The config file is written to cra.yaml file.
@@ -46,7 +46,7 @@ Example: content of cra.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     attributes:
       foo: "bar"
       buzz: "lightyear"

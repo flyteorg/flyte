@@ -1,5 +1,5 @@
 domain: development
-project: flytectldemo
+project: flytesnacks
 attributes:
   "foo": "bar"
   "buzz": "lightyear"

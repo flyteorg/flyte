@@ -22,7 +22,7 @@ Example: content of po.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     overrides:
        - task_type: python_task # Task type for which to apply plugin implementation overrides
          plugin_id:             # Plugin id(s) to be used in place of the default for the task type.
@@ -36,13 +36,13 @@ Example: content of po.yaml:
 
 Update plugin override for project, domain, and workflow combination. This will take precedence over any other
 plugin overrides defined at project domain level.
-For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
+For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
 
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
-    workflow: core.control_flow.run_merge_sort.merge_sort
+    project: flytesnacks
+    workflow: core.control_flow.merge_sort.merge_sort
     overrides:
        - task_type: python_task # Task type for which to apply plugin implementation overrides
          plugin_id:             # Plugin id(s) to be used in place of the default for the task type.

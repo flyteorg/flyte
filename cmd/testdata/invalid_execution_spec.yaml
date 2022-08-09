@@ -8,5 +8,5 @@ kubeServiceAcct: ""
 targetDomain: ""
 targetProject: ""
 version: v3
-workflow: core.advanced.run_merge_sort.merge_sort
-task: core.advanced.run_merge_sort.merge
+workflow: core.control_flow.merge_sort.merge_sort
+task: core.control_flow.merge_sort.merge

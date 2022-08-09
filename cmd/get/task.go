@@ -78,7 +78,7 @@ Retrieve tasks within project and domain for a version and generate the executio
 
 ::
 
- flytectl get tasks -d development -p flytesnacks core.advanced.run_merge_sort.merge --execFile execution_spec.yaml --version v2
+ flytectl get tasks -d development -p flytesnacks core.control_flow.merge_sort.merge --execFile execution_spec.yaml --version v2
 
 The generated file would look similar to this:
 
@@ -93,7 +93,7 @@ The generated file would look similar to this:
 	 kubeServiceAcct: ""
 	 targetDomain: ""
 	 targetProject: ""
-	 task: core.advanced.run_merge_sort.merge
+	 task: core.control_flow.merge_sort.merge
 	 version: v2
 
 Check the create execution section on how to launch one using the generated file.

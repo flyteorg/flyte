@@ -15,10 +15,10 @@ const (
 	executionClusterLabelLong  = `
 Delete execution cluster label for a given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain, run:
+For project flytesnacks and development domain, run:
 ::
 
- flytectl delete execution-cluster-label -p flytectldemo -d development
+ flytectl delete execution-cluster-label -p flytesnacks -d development
 
 To delete execution cluster label using the config file that was used to create it, run:
 
@@ -31,16 +31,16 @@ For example, here's the config file ecl.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     value: foo
 
 Value is optional in the file as it is unread during the delete command, but it can be retained since the same file can be used for 'get', 'update' and 'delete' commands.
 
-To delete the execution cluster label of the workflow 'core.control_flow.run_merge_sort.merge_sort', run the following:
+To delete the execution cluster label of the workflow 'core.control_flow.merge_sort.merge_sort', run the following:
 
 ::
 
- flytectl delete execution-cluster-label -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl delete execution-cluster-label -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Usage
 `

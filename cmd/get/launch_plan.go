@@ -97,7 +97,7 @@ Retrieve a launch plan within the project and domain as per a version and genera
 
 ::
 
- flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yaml
+ flytectl get launchplan -d development -p flytesnacks core.control_flow.merge_sort.merge_sort --execFile execution_spec.yaml
 
 The generated file would look similar to this:
 
@@ -113,7 +113,7 @@ The generated file would look similar to this:
 	 targetDomain: ""
 	 targetProject: ""
 	 version: v3
-	 workflow: core.advanced.run_merge_sort.merge_sort
+	 workflow: core.control_flow.merge_sort.merge_sort
 
 Check the :ref:` + "`create execution section<flytectl_create_execution>`" + ` on how to launch one using the generated file.
 Usage

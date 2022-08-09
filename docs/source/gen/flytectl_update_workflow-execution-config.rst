@@ -22,7 +22,7 @@ Example: content of wec.yaml:
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     max_parallelism: 5
 	security_context:
 	  run_as:
@@ -34,13 +34,13 @@ Example: content of wec.yaml:
 
 Update workflow execution config for project, domain, and workflow combination. This will take precedence over any other
 execution config defined at project domain level.
-For workflow 'core.control_flow.run_merge_sort.merge_sort' in flytectldemo project, development domain, it is:
+For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
 
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
-    workflow: core.control_flow.run_merge_sort.merge_sort
+    project: flytesnacks
+    workflow: core.control_flow.merge_sort.merge_sort
     max_parallelism: 5
 	security_context:
 	  run_as:

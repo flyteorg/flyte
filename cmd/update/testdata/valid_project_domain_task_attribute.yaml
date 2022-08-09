@@ -1,5 +1,5 @@
 domain: development
-project: flytectldemo
+project: flytesnacks
 defaults:
   cpu: "1"
   memory: 150Mi

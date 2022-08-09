@@ -19,12 +19,12 @@ const (
 Activate an execution; and it shows up in the CLI and UI:
 ::
 
- flytectl update execution -p flytectldemo -d development  oeh94k9r2r --activate
+ flytectl update execution -p flytesnacks -d development  oeh94k9r2r --activate
 
 Archive an execution; and it is hidden from the CLI and UI:
 ::
 
- flytectl update execution -p flytectldemo -d development  oeh94k9r2r --archive
+ flytectl update execution -p flytesnacks -d development  oeh94k9r2r --archive
 
 
 Usage

@@ -20,37 +20,37 @@ const (
 	workflowExecutionConfigLong  = `
 Retrieve workflow execution config for the given project and domain, in combination with the workflow name.
 
-For project flytectldemo and development domain:
+For project flytesnacks and development domain:
 
 ::
 
- flytectl get workflow-execution-config -p flytectldemo -d development 
+ flytectl get workflow-execution-config -p flytesnacks -d development
 
 Example: output from the command:
 
 .. code-block:: json
 
  {
-	"project": "flytectldemo",
+	"project": "flytesnacks",
 	"domain": "development",
 	"max_parallelism": 5
  }
 
 Retrieve workflow execution config for the project, domain, and workflow.
-For project flytectldemo, development domain and workflow 'core.control_flow.run_merge_sort.merge_sort':
+For project flytesnacks, development domain and workflow 'core.control_flow.merge_sort.merge_sort':
 
 ::
 
- flytectl get workflow-execution-config -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+ flytectl get workflow-execution-config -p flytesnacks -d development core.control_flow.merge_sort.merge_sort
 
 Example: output from the command:
 
 .. code-block:: json
 
  {
-	"project": "flytectldemo",
+	"project": "flytesnacks",
 	"domain": "development",
-    "workflow": "core.control_flow.run_merge_sort.merge_sort"
+    "workflow": "core.control_flow.merge_sort.merge_sort"
 	"max_parallelism": 5
  }
 
@@ -60,13 +60,13 @@ Example: content of wec.yaml:
 
 ::
 
- flytectl get workflow-execution-config -p flytectldemo -d development --attrFile wec.yaml
+ flytectl get workflow-execution-config -p flytesnacks -d development --attrFile wec.yaml
 
 
 .. code-block:: yaml
 
     domain: development
-    project: flytectldemo
+    project: flytesnacks
     max_parallelism: 5
 
 Generate a sample workflow execution config file to be used for creating a new workflow execution config at project domain
