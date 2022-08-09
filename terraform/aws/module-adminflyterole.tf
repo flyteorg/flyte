@@ -1,5 +1,5 @@
 module adminflyterole {
-  source = ./modules/aws_iam_role/tf_module
+  source = "unionai-oss/opta/unionai//modules/aws_iam_role"
 
   env_name = var.env_name
 
@@ -8,7 +8,7 @@ module adminflyterole {
   module_name = adminflyterole
 
   iam_policy = {
-    Version = 2012-10-17
+    Version = "2012-10-17"
 
     Statement = {
       Sid = PolicySimulatorAPI
@@ -17,7 +17,7 @@ module adminflyterole {
 
       Effect = Allow
 
-      Resource = *
+      Resource = "*"
     }
 
     Statement = {
@@ -27,7 +27,7 @@ module adminflyterole {
 
       Effect = Allow
 
-      Resource = *
+      Resource = "*"
     }
 
     Statement = {

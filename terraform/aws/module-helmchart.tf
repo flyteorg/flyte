@@ -1,189 +1,183 @@
 module helmchart {
-  source = "app.terraform.io/unionpoc/union/aws//modules/aws_helmchart"
+	source = "unionai-oss/opta/unionai//modules/helm_chart"
 
-  env_name = var.env_name
+	env_name = var.env_name
 
-  layer_name = var.layer_name
+	layer_name = var.layer_name
 
-  module_name = helmchart
+	module_name = helmchart
 
-  chart = ../../charts/flyte-core
+	chart = var.chart
 
-  release_name = ""
+	release_name = var.release_name
 
-  repository = ""
+	repository = var.repository
 
-  namespace = flyte
+	namespace = var.namespace
 
-  create_namespace = true
+	create_namespace = true
 
-  atomic = true
+	atomic = true
 
-  cleanup_on_fail = true
+	cleanup_on_fail = true
 
-  chart_version = ""
+	chart_version = ""
 
-  values_files = [./../../charts/flyte-core/values-eks.yaml]
+	values_files = var.values_files
 
-  values_file = ../../charts/flyte-core/values-eks.yaml
+	values_file = var.values_file
 
-  values db datacatalog database {
-    port = 5432
+	values db datacatalog database {
+		port = 5432
 
-    username = ${module.postgres.db_user}
+		username = "${module.postgres.db_user}"
 
-    host = ${module.postgres.db_host}
+		host = "${module.postgres.db_host}"
 
-    dbname = ${module.postgres.db_name}
-  }
+		dbname = "${module.postgres.db_name}"
+	}
 
-  values db admin database {
-    port = 5432
+	values db admin database {
+		port = 5432
 
-    username = ${module.postgres.db_user}
+		username = "${module.postgres.db_user}"
 
-    host = ${module.postgres.db_host}
+		host = "${module.postgres.db_host}"
 
-    dbname = ${module.postgres.db_name}
-  }
+		dbname = "${module.postgres.db_name}"
+	}
 
-  values common ingress {
-    albSSLRedirect = false
+	values common ingress {
+		albSSLRedirect = false
 
-    host = ${data.terraform_remote_state.parent.outputs.domain}
+		host = "${data.terraform_remote_state.parent.outputs.domain}"
 
-    annotations = {
-      kubernetes.io/ingress.class = nginx
+		annotations = {
+			"kubernetes.io/ingress.class" = "nginx"
 
-      nginx.ingress.kubernetes.io/app-root = /console
-    }
-  }
+			"nginx.ingress.kubernetes.io/app-root" = "/console"
+		}
+	}
 
-  values common databaseSecret secretManifest stringData {
-    pass.txt = ${module.postgres.db_password}
-  }
+	values common databaseSecret secretManifest stringData {
+		# pass.txt = "${module.postgres.db_password}"
+	}
 
-  values storage {
-    bucketName = production-service-flyte
+	values storage {
+		bucketName = production-service-flyte
 
-    s3 = {
-      region = us-east-2
-    }
-  }
+		s3 = {
+			region = us-east-2
+		}
+	}
 
-  values flyteadmin serviceAccount {
-    create = true
+	values flyteadmin serviceAccount {
+		create = true
 
-    annotations = {
-      eks.amazonaws.com/role-arn = ${module.adminflyterole.role_arn}
-    }
-  }
+		annotations = {
+			eks.amazonaws.com/role-arn = "${module.adminflyterole.role_arn}"
+		}
+	}
 
-  values datacatalog serviceAccount {
-    create = true
+	values datacatalog serviceAccount {
+		create = true
 
-    annotations = {
-      eks.amazonaws.com/role-arn = ${module.adminflyterole.role_arn}
-    }
-  }
+		annotations = {
+			eks.amazonaws.com/role-arn = "${module.adminflyterole.role_arn}"
+		}
+	}
 
-  values flytepropeller serviceAccount {
-    create = true
+	values flytepropeller serviceAccount {
+		create = true
 
-    annotations = {
-      eks.amazonaws.com/role-arn = ${module.adminflyterole.role_arn}
-    }
-  }
+		annotations = {
+			eks.amazonaws.com/role-arn = "${module.adminflyterole.role_arn}"
+		}
+	}
 
-  values flytescheduler serviceAccount {
-    create = true
+	values flytescheduler serviceAccount {
+		create = true
 
-    annotations = {
-      eks.amazonaws.com/role-arn = ${module.adminflyterole.role_arn}
-    }
-  }
+		annotations = {
+			eks.amazonaws.com/role-arn = "${module.adminflyterole.role_arn}"
+		}
+	}
 
-  values workflow_scheduler {
-    enabled = true
-  }
+	values workflow_scheduler {
+		enabled = true
+	}
 
-  values workflow_notifications {
-    enabled = false
-  }
+	values workflow_notifications {
+		enabled = false
+	}
 
-  values configmap remoteData remoteData {
-    region = us-east-2
+	values configmap remoteData remoteData {
+		region = us-east-2
 
-    scheme = aws
+		scheme = aws
 
-    signedUrls = {
-      durationMinutes = 3
-    }
-  }
+		signedUrls = {
+			durationMinutes = 3
+		}
+	}
 
-  values configmap task_logs plugins logs {
-    cloudwatch-region = us-east-2
-  }
+	values configmap task_logs plugins logs {
+		cloudwatch-region = us-east-2
+	}
 
-  values configmap core propeller {
-    rawoutput-prefix = s3://production-service-flyte
-  }
+	values configmap core propeller {
+		rawoutput-prefix = "s3://production-service-flyte"
+	}
 
-  values cluster_resource_manager {
-    enabled = true
+	values cluster_resource_manager {
+		enabled = true
 
-    config cluster_resources {
-      customData = {
-        production defaultIamRole {
-          value = ${module.userflyterole.role_arn}
-        }
+		config cluster_resources {
+			customData = {
+				production = {
+					defaultIamRole = {
+						value = "${module.iam_role.role_arn}"
+					}
+				}
+				production = {
+					projectQuotaCpu = {
+						value = 6
+					}
+				}
+				projectQuotaMemory = {
+					defaultIamRole = {
+						value = "6000Mi"
+					}
+				}
 
-        production projectQuotaCpu {
-          value = 6
-        }
+				staging = {
+					defaultIamRole = {
+						value = "${module.iam_role.role_arn}"
+					}
+				}
+				staging = {
+					projectQuotaCpu = {
+						value = 6
+					}
+				}
+				staging = {
+					defaultIamRole = {
+						value = "6000Mi"
+					}
+				}
 
-        production projectQuotaMemory {
-          value = 6000Mi
-        }
-      }
+			}
 
-      customData = {
-        staging defaultIamRole {
-          value = ${module.userflyterole.role_arn}
-        }
+		}
+	}
 
-        staging projectQuotaCpu {
-          value = 6
-        }
+	timeout = 600
 
-        staging projectQuotaMemory {
-          value = 6000Mi
-        }
-      }
+	dependency_update = true
 
-      customData = {
-        development defaultIamRole {
-          value = ${module.userflyterole.role_arn}
-        }
+	wait = true
 
-        development projectQuotaCpu {
-          value = 6
-        }
+	wait_for_jobs = false
 
-        development projectQuotaMemory {
-          value = 6000Mi
-        }
-      }
-    }
-  }
-
-  timeout = 600
-
-  dependency_update = true
-
-  wait = true
-
-  wait_for_jobs = false
-
-  max_history = 25
+	max_history = 25
 }

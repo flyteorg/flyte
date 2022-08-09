@@ -1,5 +1,5 @@
 module userflyterole {
-  source = "app.terraform.io/unionpoc/union/aws//modules/aws_iam_role"
+  source = "unionai-oss/opta/unionai//modules/aws_iam_role"
   env_name = var.env_name
 
   layer_name = var.layer_name
@@ -7,7 +7,7 @@ module userflyterole {
   module_name = userflyterole
 
   iam_policy = {
-    Version = 2012-10-17
+    Version = "2012-10-17"
 
     Statement = {
       Sid = PolicySimulatorAPI
@@ -16,17 +16,17 @@ module userflyterole {
 
       Effect = Allow
 
-      Resource = *
+      Resource = "*"
     }
 
     Statement = {
       Sid = PolicySimulatorConsole
 
-      Action = [iam:GetGroup, iam:GetGroupPolicy, iam:GetPolicy, iam:GetPolicyVersion, iam:GetRole, iam:GetRolePolicy, iam:GetUser, iam:GetUserPolicy, iam:ListAttachedGroupPolicies, iam:ListAttachedRolePolicies, iam:ListAttachedUserPolicies, iam:ListGroups, iam:ListGroupPolicies, iam:ListGroupsForUser, iam:ListRolePolicies, iam:ListRoles, iam:ListUserPolicies, iam:ListUsers]
+	  Action = ["iam:GetGroup", "iam:GetGroupPolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:GetRole", "iam:GetRolePolicy", "iam:GetUser", "iam:GetUserPolicy", "iam:ListAttachedGroupPolicies", "iam:ListAttachedRolePolicies", "iam:ListAttachedUserPolicies", "iam:ListGroups", "iam:ListGroupPolicies", "iam:ListGroupsForUser", "iam:ListRolePolicies", "iam:ListRoles", "iam:ListUserPolicies", "iam:ListUsers"]
 
-      Effect = Allow
+	  Effect = Allow
 
-      Resource = *
+      Resource = "*"
     }
 
     Statement = {
@@ -41,26 +41,26 @@ module userflyterole {
   }
 
   allowed_k8s_services = {
-    namespace = *
+    namespace = "*"
 
-    service_name = *
+    service_name = "*"
   }
 
   allowed_iams = []
 
-  extra_iam_policies = [arn:aws:iam::aws:policy/CloudWatchEventsFullAccess]
+  extra_iam_policies = ["arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"]
 
   links = {
     s3 = [write]
   }
 
   kubernetes_trusts = {
-    open_id_url = ${data.terraform_remote_state.parent.outputs.k8s_openid_provider_url}
+    open_id_url = "${data.terraform_remote_state.parent.outputs.k8s_openid_provider_url}"
 
-    open_id_arn = ${data.terraform_remote_state.parent.outputs.k8s_openid_provider_arn}
+    open_id_arn = "${data.terraform_remote_state.parent.outputs.k8s_openid_provider_arn}"
 
-    service_name = *
+    service_name = "*"
 
-    namespace = *
+    namespace = "*"
   }
 }
