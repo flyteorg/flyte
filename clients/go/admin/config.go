@@ -49,6 +49,7 @@ type Config struct {
 	DeprecatedUseAuth    bool     `json:"useAuth" pflag:",Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information."`
 	ClientID             string   `json:"clientId" pflag:",Client ID"`
 	ClientSecretLocation string   `json:"clientSecretLocation" pflag:",File containing the client secret"`
+	ClientSecretEnvVar   string   `json:"clientSecretEnvVar" pflag:",Environment variable containing the client secret"`
 	Scopes               []string `json:"scopes" pflag:",List of scopes to request"`
 
 	// There are two ways to get the token URL. If the authorization server url is provided, the client will try to use RFC 8414 to

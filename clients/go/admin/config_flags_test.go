@@ -267,6 +267,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_clientSecretEnvVar", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("clientSecretEnvVar", testValue)
+			if vString, err := cmdFlags.GetString("clientSecretEnvVar"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ClientSecretEnvVar)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_scopes", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
