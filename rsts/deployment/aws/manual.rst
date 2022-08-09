@@ -602,7 +602,7 @@ Add :<FLYTE-ENDPOINT>  to ~/.flyte/config.yaml eg ;
      # For GRPC endpoints you might want to use dns:///flyte.myexample.com
      endpoint: dns:///<FLYTE-ENDPOINT>
      insecureSkipVerify: true # only required if using a self-signed cert. Caution: not to be used in production
-     insecure: true # only required when using insecure ingress. Secure ingress may cause an unavailable desc error to true option.
+     insecure: false # only set to true when using insecure ingress. Secure ingress may cause an unavailable desc error to true option, self-signed cert can be seen as secure ingress but should not be used in production
     logger:
      show-source: true
      level: 0
@@ -636,6 +636,12 @@ Eg: to check for run-migrations init container do this:
 .. code-block:: bash
 
    kubectl logs -f <flyteadmin-pod-instance> run-migrations -n flyte
+
+If the ADDRESS column is empty after getting the ingress, describe ingress to find out if there are error messages.
+
+.. code-block:: bash
+
+   kubectl describe ingress -n flyte
 
 If you see connectivity issues, then check your security group rules on the DB and eks cluster. 
 
