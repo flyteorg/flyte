@@ -19,9 +19,8 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	//commonOp "github.com/kubeflow/common/pkg/apis/common/v1" // switch to real 'common' once https://github.com/kubeflow/pytorch-operator/issues/263 resolved
-	ptOp "github.com/kubeflow/pytorch-operator/pkg/apis/pytorch/v1"
-	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -38,10 +37,10 @@ func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
 // resources.
 func (pytorchOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
-	return &ptOp.PyTorchJob{
+	return &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       ptOp.Kind,
-			APIVersion: ptOp.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.PytorchJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
 }
@@ -67,20 +66,19 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 
-	common.OverrideDefaultContainerName(taskCtx, podSpec, ptOp.DefaultContainerName)
+	common.OverrideDefaultContainerName(taskCtx, podSpec, kubeflowv1.PytorchJobDefaultContainerName)
 
 	workers := pytorchTaskExtraArgs.GetWorkers()
 
-	jobSpec := ptOp.PyTorchJobSpec{
-		TTLSecondsAfterFinished: nil,
-		PyTorchReplicaSpecs: map[ptOp.PyTorchReplicaType]*commonOp.ReplicaSpec{
-			ptOp.PyTorchReplicaTypeMaster: {
+	jobSpec := kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+			kubeflowv1.PyTorchJobReplicaTypeMaster: {
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,
 			},
-			ptOp.PyTorchReplicaTypeWorker: {
+			kubeflowv1.PyTorchJobReplicaTypeWorker: {
 				Replicas: &workers,
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
@@ -90,10 +88,10 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		},
 	}
 
-	job := &ptOp.PyTorchJob{
+	job := &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       ptOp.Kind,
-			APIVersion: ptOp.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.PytorchJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 		Spec: jobSpec,
 	}
@@ -105,9 +103,9 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
 func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
-	app := resource.(*ptOp.PyTorchJob)
+	app := resource.(*kubeflowv1.PyTorchJob)
 
-	workersCount := app.Spec.PyTorchReplicaSpecs[ptOp.PyTorchReplicaTypeWorker].Replicas
+	workersCount := app.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas
 
 	taskLogs, err := common.GetLogs(common.PytorchTaskType, app.Name, app.Namespace, *workersCount, 0, 0)
 	if err != nil {
@@ -131,7 +129,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 }
 
 func init() {
-	if err := ptOp.AddToScheme(scheme.Scheme); err != nil {
+	if err := kubeflowv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
 
@@ -139,7 +137,7 @@ func init() {
 		k8s.PluginEntry{
 			ID:                  common.PytorchTaskType,
 			RegisteredTaskTypes: []pluginsCore.TaskType{common.PytorchTaskType},
-			ResourceToWatch:     &ptOp.PyTorchJob{},
+			ResourceToWatch:     &kubeflowv1.PyTorchJob{},
 			Plugin:              pytorchOperatorResourceHandler{},
 			IsDefault:           false,
 		})

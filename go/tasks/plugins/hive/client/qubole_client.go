@@ -243,7 +243,6 @@ func (q *quboleClient) KillCommand(ctx context.Context, commandID string, accoun
 	}
 	killPath := q.commandURL.ResolveReference(commandStatus)
 	requestBody := RequestBody{Status: killStatus}
-
 	response, err := q.executeRequest(ctx, http.MethodPut, killPath, &requestBody, accountKey)
 	defer closeBody(ctx, response)
 	return err

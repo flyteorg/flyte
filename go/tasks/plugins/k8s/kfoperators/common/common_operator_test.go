@@ -7,24 +7,22 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 
-	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
-
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 )
 
 func TestExtractMPICurrentCondition(t *testing.T) {
-	jobCreated := mpiOp.JobCondition{
-		Type:   mpiOp.JobCreated,
+	jobCreated := commonOp.JobCondition{
+		Type:   commonOp.JobCreated,
 		Status: corev1.ConditionTrue,
 	}
-	jobRunningActive := mpiOp.JobCondition{
-		Type:   mpiOp.JobRunning,
+	jobRunningActive := commonOp.JobCondition{
+		Type:   commonOp.JobRunning,
 		Status: corev1.ConditionFalse,
 	}
-	jobConditions := []mpiOp.JobCondition{
+	jobConditions := []commonOp.JobCondition{
 		jobCreated,
 		jobRunningActive,
 	}
@@ -35,7 +33,7 @@ func TestExtractMPICurrentCondition(t *testing.T) {
 	jobConditions = nil
 	currentCondition, err = ExtractMPICurrentCondition(jobConditions)
 	assert.Error(t, err)
-	assert.Equal(t, currentCondition, mpiOp.JobCondition{})
+	assert.Equal(t, currentCondition, commonOp.JobCondition{})
 	assert.Equal(t, err, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions))
 }
 
@@ -111,8 +109,8 @@ func TestGetPhaseInfo(t *testing.T) {
 }
 
 func TestGetMPIPhaseInfo(t *testing.T) {
-	jobCreated := mpiOp.JobCondition{
-		Type: mpiOp.JobCreated,
+	jobCreated := commonOp.JobCondition{
+		Type: commonOp.JobCreated,
 	}
 	taskPhase, err := GetMPIPhaseInfo(jobCreated, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -120,8 +118,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobSucceeded := mpiOp.JobCondition{
-		Type: mpiOp.JobSucceeded,
+	jobSucceeded := commonOp.JobCondition{
+		Type: commonOp.JobSucceeded,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobSucceeded, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -129,8 +127,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobFailed := mpiOp.JobCondition{
-		Type: mpiOp.JobFailed,
+	jobFailed := commonOp.JobCondition{
+		Type: commonOp.JobFailed,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobFailed, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -138,8 +136,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting := mpiOp.JobCondition{
-		Type: mpiOp.JobRestarting,
+	jobRestarting := commonOp.JobCondition{
+		Type: commonOp.JobRestarting,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -147,8 +145,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting = mpiOp.JobCondition{
-		Type: mpiOp.JobRunning,
+	jobRestarting = commonOp.JobCondition{
+		Type: commonOp.JobRunning,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)

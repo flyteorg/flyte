@@ -63,7 +63,7 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.cpu"), defaultK8sConfig.CoPilot.CPU, "Used to set cpu for co-pilot containers")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.memory"), defaultK8sConfig.CoPilot.Memory, "Used to set memory for co-pilot containers")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.storage"), defaultK8sConfig.CoPilot.Storage, "Default storage limit for individual inputs / outputs")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "delete-resource-on-finalize"), defaultK8sConfig.DeleteResourceOnFinalize, "Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This,  however,  will cause k8s log links to expire as soon as the resource is finalized.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "delete-resource-on-finalize"), defaultK8sConfig.DeleteResourceOnFinalize, "Instructs the system to delete the resource upon successful execution of a k8s pod rather than have the k8s garbage collector clean it up. This ensures that no resources are kept around (potentially consuming cluster resources). This,  however,  will cause k8s log links to expire as soon as the resource is finalized.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-pod-template-name"), defaultK8sConfig.DefaultPodTemplateName, "Name of the PodTemplate to use as the base for all k8s pods created by FlytePropeller.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-pod-template-resync"), defaultK8sConfig.DefaultPodTemplateResync.String(), "Frequency of resyncing default pod templates")
 	return cmdFlags

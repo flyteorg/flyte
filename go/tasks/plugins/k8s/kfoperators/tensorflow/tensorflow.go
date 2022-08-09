@@ -19,9 +19,8 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	//commonOp "github.com/kubeflow/common/pkg/apis/common/v1" // switch to real 'common' once https://github.com/kubeflow/pytorch-operator/issues/263 resolved
-	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
-	tfOp "github.com/kubeflow/tf-operator/pkg/apis/tensorflow/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -38,10 +37,10 @@ func (tensorflowOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
 // resources.
 func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
-	return &tfOp.TFJob{
+	return &kubeflowv1.TFJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       tfOp.Kind,
-			APIVersion: tfOp.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.TFJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
 }
@@ -67,30 +66,29 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 
-	common.OverrideDefaultContainerName(taskCtx, podSpec, tfOp.DefaultContainerName)
+	common.OverrideDefaultContainerName(taskCtx, podSpec, kubeflowv1.TFJobDefaultContainerName)
 
 	workers := tensorflowTaskExtraArgs.GetWorkers()
 	psReplicas := tensorflowTaskExtraArgs.GetPsReplicas()
 	chiefReplicas := tensorflowTaskExtraArgs.GetChiefReplicas()
 
-	jobSpec := tfOp.TFJobSpec{
-		TTLSecondsAfterFinished: nil,
-		TFReplicaSpecs: map[tfOp.TFReplicaType]*commonOp.ReplicaSpec{
-			tfOp.TFReplicaTypePS: {
+	jobSpec := kubeflowv1.TFJobSpec{
+		TFReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+			kubeflowv1.TFJobReplicaTypePS: {
 				Replicas: &psReplicas,
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,
 			},
-			tfOp.TFReplicaTypeChief: {
+			kubeflowv1.TFJobReplicaTypeChief: {
 				Replicas: &chiefReplicas,
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,
 			},
-			tfOp.TFReplicaTypeWorker: {
+			kubeflowv1.TFJobReplicaTypeWorker: {
 				Replicas: &workers,
 				Template: v1.PodTemplateSpec{
 					Spec: *podSpec,
@@ -100,10 +98,10 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		},
 	}
 
-	job := &tfOp.TFJob{
+	job := &kubeflowv1.TFJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       tfOp.Kind,
-			APIVersion: tfOp.SchemeGroupVersion.String(),
+			Kind:       kubeflowv1.TFJobKind,
+			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 		Spec: jobSpec,
 	}
@@ -115,11 +113,11 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
 func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
-	app := resource.(*tfOp.TFJob)
+	app := resource.(*kubeflowv1.TFJob)
 
-	workersCount := app.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeWorker].Replicas
-	psReplicasCount := app.Spec.TFReplicaSpecs[tfOp.TFReplicaTypePS].Replicas
-	chiefCount := app.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeChief].Replicas
+	workersCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas
+	psReplicasCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas
+	chiefCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas
 
 	taskLogs, err := common.GetLogs(common.TensorflowTaskType, app.Name, app.Namespace,
 		*workersCount, *psReplicasCount, *chiefCount)
@@ -144,7 +142,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 }
 
 func init() {
-	if err := tfOp.AddToScheme(scheme.Scheme); err != nil {
+	if err := kubeflowv1.AddToScheme(scheme.Scheme); err != nil {
 		panic(err)
 	}
 
@@ -152,7 +150,7 @@ func init() {
 		k8s.PluginEntry{
 			ID:                  common.TensorflowTaskType,
 			RegisteredTaskTypes: []pluginsCore.TaskType{common.TensorflowTaskType},
-			ResourceToWatch:     &tfOp.TFJob{},
+			ResourceToWatch:     &kubeflowv1.TFJob{},
 			Plugin:              tensorflowOperatorResourceHandler{},
 			IsDefault:           false,
 		})
