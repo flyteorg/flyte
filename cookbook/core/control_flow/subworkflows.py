@@ -1,42 +1,44 @@
 """
-Subworkflows
+.. _subworkflows:
+
+SubWorkflows
 ------------
 
-Subworkflows are similar to :ref:`launch plans <Launch plans>`, since they allow users to kick off one workflow from inside another.
+Subworkflows are similar to :ref:`launch plans <Launch plans>` since they allow users to kick off one workflow from within another.
 
-What's the difference?
-Think of launch plans as pass by pointer and subworkflows as pass by value.
+What's the Difference?
+Consider launch plans as pass by pointer and subworkflows as pass by value.
 
 .. note::
 
-    The reason why subworkflows exist is that this is how Flyte handles dynamic workflows.
-    Instead of hiding this functionality, we expose it at the user level. There are pros and cons of
-    using subworkflows as described below.
+    Flyte's handling of dynamic workflows necessitates the use of subworkflows.
+    We provide this capability at the user level rather than hiding it. The pros and cons of
+    using subworkflows are discussed below.
 
 When Should I Use SubWorkflows?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you want to limit parallelism within a workflow and its launched sub-flows, subworkflows provide a clean way
-to achieve that because they execute within the same context of the parent workflow.
-Thus, all nodes of a subworkflow are constrained to the total constraint on the parent workflow.
+Subworkflows provide a clean solution to control parallelism between a workflow and its launched sub-flows 
+because they execute within the same context as the parent workflow. 
+Thus, all nodes of a subworkflow are bound by the total constraint on the parent workflow.
 
-Consider this: When you include Workflow A as a subworkflow of Workflow B, and when Workflow B is run, the entire graph of workflow A is
-copied into workflow B at the point where it is called.
+Consider this: When Workflow A is included as a subworkflow of Workflow B, and when Workflow B is run, the entire graph of workflow A is
+copied into workflow B at the point where it is invoked.
 
-Let's understand subworkflow with an example.
+Let's look at an example of subworkflow.
 """
 
 # %%
 # Example
 # ^^^^^^^^
-# We import the required dependencies into the environment.
+# Import the required dependencies into the environment.
 import typing
 from typing import Tuple
 
 from flytekit import task, workflow
 
 # %%
-# Next, we define a task that uses named outputs.
-# We usually try and define ``NamedTuple`` as a distinct type as a best practice (although it can be defined inline).
+# Next, define a task that uses named outputs.
+# As a best practice, usually try and define ``NamedTuple`` as a distinct type (although it can be defined inline).
 op = typing.NamedTuple("OutputsBC", t1_int_output=int, c=str)
 
 
@@ -46,7 +48,7 @@ def t1(a: int) -> op:
 
 
 # %%
-# Then we define a subworkflow like a typical workflow that can run like any other workflow.
+# Then define a subworkflow like a typical workflow.
 @workflow
 def my_subwf(a: int = 42) -> Tuple[str, str]:
     x, y = t1(a=a)
@@ -55,12 +57,12 @@ def my_subwf(a: int = 42) -> Tuple[str, str]:
 
 
 # %%
-# We call the workflow declared above in a `parent` workflow below
-# which showcases how to override the node name of a task (or subworkflow in this case).
+# We call the above-mentioned workflow above in a `parent` workflow below
+# which demonstrates how to override the node name of a task (or subworkflow in this case).
 #
-# Typically, nodes are just named sequentially: ``n0``, ``n1``, and so on. Since the inner ``my_subwf`` also has a ``n0``, you may
-# wish to change the name of the first one. Not changing the name is fine because Flyte automatically prepends an attribute
-# to the inner ``n0`` since node IDs must be distinct within a workflow graph.
+# Nodes are typically named sequentially: ``n0``, ``n1``, and so on. Since the inner ``my_subwf`` also has a ``n0``, you might
+# want to modify the first node's name. Because node IDs must be different within a workflow graph, 
+# Flyte automatically prepends an attribute to the inner ``n0``.
 @workflow
 def parent_wf(a: int) -> Tuple[int, str, str]:
     x, y = t1(a=a).with_overrides(node_name="node-t1-parent")
@@ -70,7 +72,7 @@ def parent_wf(a: int) -> Tuple[int, str, str]:
 
 # %%
 # .. note::
-#      The with_overrides method provides a new name to the graph-node for better rendering or readability.
+#      For improved presentation or readability, the ``with_overrides`` method provides a new name to the graph-node.
 
 # %%
 # You can run the subworkflows locally.
@@ -79,7 +81,7 @@ if __name__ == "__main__":
 
 
 # Interestingly, we can nest a workflow that has a subworkflow within a workflow.
-# Workflows can be simply composed from other workflows, even if the other workflows are standalone entities. Each of the
+# Workflows can be simply composed from other workflows, even if they are standalone entities. Each of the
 # workflows in this module can exist and run independently.
 @workflow
 def nested_parent_wf(a: int) -> Tuple[int, str, str, str]:
@@ -112,10 +114,10 @@ if __name__ == "__main__":
 #
 #    If your deployment uses :ref:`multicluster-setup <Using Multiple Kubernetes Clusters>`, then external workflows may allow you to distribute the workload of a workflow to multiple clusters.
 #
-# Here is an example demonstrating external workflows:
+# Here's an example demonstrating external workflows:
 
 # %%
-# We import the required dependencies into the environment.
+# Import the required dependencies into the environment.
 import typing  # noqa: E402
 from collections import Counter  # noqa: E402
 from typing import Dict, Tuple  # noqa: E402
@@ -123,9 +125,7 @@ from typing import Dict, Tuple  # noqa: E402
 from flytekit import LaunchPlan, task, workflow  # noqa: E402
 
 # %%
-# We define a task that computes the frequency of every word in a string, and returns a dictionary mapping every word to its count.
-
-
+# Define a task that computes the frequency of each word in a string, and returns a dictionary mapping every word to its count.
 @task
 def count_freq_words(input_string1: str) -> Dict:
     # input_string = "The cat sat on the mat"
@@ -135,7 +135,7 @@ def count_freq_words(input_string1: str) -> Dict:
 
 
 # %%
-# We define a workflow that executes the previously defined task.
+# Construct a workflow that executes the previously-defined task.
 @workflow
 def ext_workflow(my_input: str) -> Dict:
     result = count_freq_words(input_string1=my_input)
@@ -143,16 +143,14 @@ def ext_workflow(my_input: str) -> Dict:
 
 
 # %%
-# Next, we create a launch plan.
+# Next, create a launch plan.
 external_lp = LaunchPlan.get_or_create(
     ext_workflow,
     "parent_workflow_execution",
 )
 
 # %%
-# We define another task that returns the repeated keys (in our case, words) from a dictionary.
-
-
+# Define another task that returns the repeated keys (in our case, words) from a dictionary.
 @task
 def count_repetitive_words(word_counter: Dict) -> typing.List[str]:
     repeated_words = [key for key, value in word_counter.items() if value > 1]
@@ -160,7 +158,7 @@ def count_repetitive_words(word_counter: Dict) -> typing.List[str]:
 
 
 # %%
-# We define a workflow that triggers the launch plan of the previously-defined workflow.
+# Define a workflow that triggers the launch plan of the previously-defined workflow.
 @workflow
 def parent_workflow(my_input1: str) -> typing.List[str]:
     my_op1 = external_lp(my_input=my_input1)
@@ -169,7 +167,8 @@ def parent_workflow(my_input1: str) -> typing.List[str]:
 
 
 # %%
-# Here, ``parent_workflow`` is an external workflow. This can be run locally too.
+# Here, ``parent_workflow`` is an external workflow. This can also be run locally.
 if __name__ == "__main__":
     print("Running parent workflow...")
     print(parent_workflow(my_input1="the cat took the apple and ate the apple"))
+
