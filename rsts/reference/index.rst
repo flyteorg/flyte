@@ -10,7 +10,7 @@ API Reference
 
    .. link-button:: https://flytectl.readthedocs.io
       :type: url
-      :text: FlyteCTL
+      :text: Flytectl
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
    The official Flyte Command-line Interface.
@@ -49,7 +49,7 @@ API Reference
       :text: FlyteAdmin
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
-   Flyte Backend REST / gRPC API specification.
+   Flyte Backend REST/gRPC API specification.
 
    ---
 
