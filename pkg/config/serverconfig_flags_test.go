@@ -435,4 +435,18 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_readHeaderTimeoutSeconds", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("readHeaderTimeoutSeconds", testValue)
+			if vInt, err := cmdFlags.GetInt("readHeaderTimeoutSeconds"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vInt), &actual.ReadHeaderTimeoutSeconds)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
