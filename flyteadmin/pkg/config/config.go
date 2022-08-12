@@ -25,7 +25,8 @@ type ServerConfig struct {
 	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
 	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
 
-	DataProxy DataProxyConfig `json:"dataProxy" pflag:",Defines data proxy configuration."`
+	DataProxy                DataProxyConfig `json:"dataProxy" pflag:",Defines data proxy configuration."`
+	ReadHeaderTimeoutSeconds int             `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
 }
 
 type DataProxyConfig struct {
@@ -95,6 +96,7 @@ var defaultServerConfig = &ServerConfig{
 			MaxExpiresIn: config.Duration{Duration: time.Hour},
 		},
 	},
+	ReadHeaderTimeoutSeconds: 32, // just shy of requestTimeoutUpperBound
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
 

@@ -15,14 +15,14 @@ from flytekit.remote.executions import FlyteWorkflowExecution
 
 
 WAIT_TIME = 10
-MAX_ATTEMPTS = 60
+MAX_ATTEMPTS = 200
 
 # This dictionary maps the names found in the flytesnacks manifest to a list of workflow names and
 # inputs. This is so we can progressively cover all priorities in the original flytesnacks manifest,
 # starting with "core".
 FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
     "core": [
-        ("core.control_flow.chain_tasks.chain_tasks_wf", {}),
+        ("core.control_flow.chain_entities.chain_workflows_wf", {}),
         ("core.control_flow.dynamics.wf", {"s1": "Pear", "s2": "Earth"}),
         ("core.control_flow.map_task.my_map_workflow", {"a": [1, 2, 3, 4, 5]}),
         # Workflows that use nested executions cannot be launched via flyteremote.

@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -401,6 +402,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 			Certificates: []tls.Certificate{*cert},
 			NextProtos:   []string{"h2"},
 		},
+		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
 	}
 
 	err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
