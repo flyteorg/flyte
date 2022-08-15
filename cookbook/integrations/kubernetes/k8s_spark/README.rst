@@ -61,7 +61,11 @@ Spark needs a special service account (with associated role and role bindings) t
 If you use IAM for Service accounts or GCP Workload identity, you need to update the service account to include this.
 
 You can use ``Flyte cluster resource manager`` to manage creating the spark service account per namespace.
-For this, you need to add the cluster resource templates as shown `here <https://github.com/flyteorg/flyte/tree/376f61acc37d885d17aa6b4d003db502c4cb6bcf/kustomize/overlays/eks/flyte/config/clusterresource-templates>`__ (refer to the ``*spark*.yaml`` files).
+For this, you need to add the cluster resource templates as shown `here <https://github.com/flyteorg/flyte/tree/376f61acc37d885d17aa6b4d003db502c4cb6bcf/kustomize/overlays/eks/flyte/config/clusterresource-templates>`__ (refer to the ``spark.yaml`` files).
+
+.. note::
+
+   Refer to `this <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator/blob/master/docs/gcp.md>`__ guide to use GCP instead of AWS.
 
 Step 2: Environment Setup
 -------------------------

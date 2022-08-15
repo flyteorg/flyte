@@ -1,6 +1,6 @@
 """
 Snowflake Query
-############
+###############
 
 This example shows how to use a Flyte SnowflakeTask to execute a query.
 """

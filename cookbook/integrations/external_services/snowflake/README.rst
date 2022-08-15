@@ -1,5 +1,5 @@
 Snowflake
-====
+=========
 
 Flyte backend can be connected with snowflake service. Once enabled it can allow you to query a snowflake service.
 This section will provide how to use the Snowflake Query Plugin using flytekit python.
@@ -19,7 +19,7 @@ This plugin is purely a spec. Since SQL is completely portable there is no need 
 
 
 Configuring the backend to get snowflake working
----------------------------------------------
+-------------------------------------------------
 1. Make sure to add "snowflake" in ``tasks.task-plugins.enabled-plugin`` in `enabled_plugins.yaml <https://github.com/flyteorg/flyte/blob/master/deployment/sandbox/flyte_generated.yaml#L2296>`_
 
 2. Add snowflake JWT token to Flytepropeller. `here <https://docs.snowflake.com/en/developer-guide/sql-api/guide.html#using-key-pair-authentication>`_ to see more detail to setup snowflake JWT token.
