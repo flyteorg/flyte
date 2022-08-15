@@ -9,6 +9,7 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/mpi"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/pytorch"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/ray"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/athena"

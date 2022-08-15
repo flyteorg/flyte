@@ -26,8 +26,11 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	"k8s.io/client-go/rest"
 	"k8s.io/klog"
 
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
@@ -123,9 +126,11 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		limitNamespace = cfg.LimitNamespace
 	}
 	options := manager.Options{
-		Namespace:     limitNamespace,
-		SyncPeriod:    &cfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")),
+		Namespace:  limitNamespace,
+		SyncPeriod: &cfg.DownstreamEval.Duration,
+		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
+		},
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, cfg, options)
