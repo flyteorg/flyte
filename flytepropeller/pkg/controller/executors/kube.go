@@ -9,8 +9,6 @@ import (
 
 	"k8s.io/client-go/rest"
 
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -50,12 +48,22 @@ func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, 
 	return
 }
 
+// ClientBuilder builder is the interface for the client builder.
+type ClientBuilder interface {
+	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
+	// for this client. This function can be called multiple times, it should append to an internal slice.
+	WithUncached(objs ...client.Object) ClientBuilder
+
+	// Build returns a new client.
+	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
+}
+
 type FallbackClientBuilder struct {
 	uncached []client.Object
 	scope    promutils.Scope
 }
 
-func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) cluster.ClientBuilder {
+func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
 	f.uncached = append(f.uncached, objs...)
 	return f
 }
@@ -96,7 +104,7 @@ type writeThroughCachingWriter struct {
 }
 
 func IDFromObject(obj client.Object, op string) []byte {
-	return []byte(fmt.Sprintf("%s:%s:%s:%s:%s", obj.GetClusterName(), obj.GetObjectKind().GroupVersionKind().String(), obj.GetNamespace(), obj.GetName(), op))
+	return []byte(fmt.Sprintf("%s:%s:%s:%s", obj.GetObjectKind().GroupVersionKind().String(), obj.GetNamespace(), obj.GetName(), op))
 }
 
 // Create first checks the local cache if the object with id was previously successfully saved, if not then

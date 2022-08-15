@@ -41,7 +41,7 @@ func NewResourceLock(corev1 v1.CoreV1Interface, coordinationV1 v12.CoordinationV
 	}
 
 	// Leader id, needs to be unique
-	return resourcelock.New(resourcelock.ConfigMapsResourceLock,
+	return resourcelock.New(resourcelock.ConfigMapsLeasesResourceLock,
 		options.LockConfigMap.Namespace,
 		options.LockConfigMap.Name,
 		corev1,

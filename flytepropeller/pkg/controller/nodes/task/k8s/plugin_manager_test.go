@@ -19,7 +19,6 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/cache/informertest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -238,7 +237,7 @@ func dummySetupContext(fakeClient client.Client) pluginsCore.SetupContext {
 
 	kubeClient := &pluginsCoreMock.KubeClient{}
 	kubeClient.On("GetClient").Return(fakeClient)
-	kubeClient.On("GetCache").Return(&informertest.FakeInformers{})
+	kubeClient.On("GetCache").Return(&mocks.FakeInformers{})
 	setupContext.On("KubeClient").Return(kubeClient)
 
 	setupContext.On("OwnerKind").Return("x")

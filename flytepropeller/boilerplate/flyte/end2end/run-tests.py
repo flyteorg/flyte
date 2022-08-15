@@ -22,7 +22,7 @@ MAX_ATTEMPTS = 60
 # starting with "core".
 FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
     "core": [
-        ("core.control_flow.chain_tasks.chain_tasks_wf", {}),
+        ("core.control_flow.chain_entities.chain_workflows_wf", {}),
         ("core.control_flow.dynamics.wf", {"s1": "Pear", "s2": "Earth"}),
         ("core.control_flow.map_task.my_map_workflow", {"a": [1, 2, 3, 4, 5]}),
         # Workflows that use nested executions cannot be launched via flyteremote.
