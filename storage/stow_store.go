@@ -9,25 +9,22 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/errors"
-
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/flyteorg/stow"
 	"github.com/flyteorg/stow/azure"
 	"github.com/flyteorg/stow/google"
 	"github.com/flyteorg/stow/local"
 	"github.com/flyteorg/stow/oracle"
 	"github.com/flyteorg/stow/s3"
 	"github.com/flyteorg/stow/swift"
+	errs "github.com/pkg/errors"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
 	"github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/flyteorg/stow"
-	errs "github.com/pkg/errors"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 const (
@@ -345,30 +342,17 @@ func (s *StowStore) getLocation(id locationID) stow.Location {
 	}
 }
 
-func NewStowRawStore(baseContainerFQN DataReference, loc, signedURLLoc stow.Location, enableDynamicContainerLoading bool, metricsScope promutils.Scope) (*StowStore, error) {
-	failureTypeOption := labeled.AdditionalLabelsOption{Labels: []string{FailureTypeLabel.String()}}
+func NewStowRawStore(baseContainerFQN DataReference, loc, signedURLLoc stow.Location, enableDynamicContainerLoading bool, metrics *dataStoreMetrics) (*StowStore, error) {
 	self := &StowStore{
 		loc:                           loc,
 		signedURLLoc:                  signedURLLoc,
 		baseContainerFQN:              baseContainerFQN,
 		enableDynamicContainerLoading: enableDynamicContainerLoading,
 		dynamicContainerMap:           sync.Map{},
-		metrics: &stowMetrics{
-			BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", metricsScope, labeled.EmitUnlabeledMetric),
-			BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", metricsScope, labeled.EmitUnlabeledMetric),
-
-			HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", metricsScope, labeled.EmitUnlabeledMetric),
-			HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
-
-			ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", metricsScope, labeled.EmitUnlabeledMetric, failureTypeOption),
-			ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
-
-			WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", metricsScope, labeled.EmitUnlabeledMetric, failureTypeOption),
-			WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
-		},
+		metrics:                       metrics.stowMetrics,
 	}
 
-	self.copyImpl = newCopyImpl(self, metricsScope)
+	self.copyImpl = newCopyImpl(self, metrics.copyMetrics)
 	_, c, _, err := baseContainerFQN.Split()
 	if err != nil {
 		return nil, err
@@ -381,8 +365,25 @@ func NewStowRawStore(baseContainerFQN DataReference, loc, signedURLLoc stow.Loca
 	return self, nil
 }
 
+func newStowMetrics(scope promutils.Scope) *stowMetrics {
+	failureTypeOption := labeled.AdditionalLabelsOption{Labels: []string{FailureTypeLabel.String()}}
+	return &stowMetrics{
+		BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", scope, labeled.EmitUnlabeledMetric),
+		BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", scope, labeled.EmitUnlabeledMetric),
+
+		HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
+		HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+
+		ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+
+		WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+	}
+}
+
 // Constructor for the StowRawStore
-func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error) {
+func newStowRawStore(cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
 	if cfg.InitContainer == "" {
 		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
 	}
@@ -419,7 +420,7 @@ func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error
 		}
 	}
 
-	return NewStowRawStore(fn(cfg.InitContainer), loc, signedURLLoc, cfg.MultiContainerEnabled, metricsScope)
+	return NewStowRawStore(fn(cfg.InitContainer), loc, signedURLLoc, cfg.MultiContainerEnabled, metrics)
 }
 
 func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {

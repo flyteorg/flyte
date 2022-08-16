@@ -41,6 +41,7 @@ type Metadata interface {
 type DataStore struct {
 	ComposedProtobufStore
 	ReferenceConstructor
+	metrics *dataStoreMetrics
 }
 
 // SignedURLProperties encapsulates properties about the signedURL operation.

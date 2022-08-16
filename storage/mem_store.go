@@ -7,8 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-
-	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type rawFile = []byte
@@ -70,11 +68,11 @@ func (s *InMemoryStore) CreateSignedURL(ctx context.Context, reference DataRefer
 	return SignedURLResponse{}, fmt.Errorf("unsupported")
 }
 
-func NewInMemoryRawStore(_ *Config, scope promutils.Scope) (RawStore, error) {
+func NewInMemoryRawStore(_ *Config, metrics *dataStoreMetrics) (RawStore, error) {
 	self := &InMemoryStore{
 		cache: map[DataReference]rawFile{},
 	}
 
-	self.copyImpl = newCopyImpl(self, scope)
+	self.copyImpl = newCopyImpl(self, metrics.copyMetrics)
 	return self, nil
 }

@@ -6,18 +6,18 @@ import (
 	"io"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flyteorg/flytestdlib/ioutils"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	errs "github.com/pkg/errors"
 )
 
 type copyImpl struct {
 	rawStore RawStore
-	metrics  copyMetrics
+	metrics  *copyMetrics
 }
 
 type copyMetrics struct {
@@ -64,8 +64,8 @@ func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference
 	return nil
 }
 
-func newCopyMetrics(scope promutils.Scope) copyMetrics {
-	return copyMetrics{
+func newCopyMetrics(scope promutils.Scope) *copyMetrics {
+	return &copyMetrics{
 		CopyLatency:                  labeled.NewStopWatch("overall", "Overall copy latency", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		ComputeLengthLatency:         labeled.NewStopWatch("length", "Latency involved in computing length of content before writing.", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		WriteFailureUnrelatedToCache: scope.MustNewCounter("write_failure_unrelated_to_cache", "Raw store write failures that are not caused by ErrFailedToWriteCache"),
@@ -73,9 +73,9 @@ func newCopyMetrics(scope promutils.Scope) copyMetrics {
 	}
 }
 
-func newCopyImpl(store RawStore, metricsScope promutils.Scope) copyImpl {
+func newCopyImpl(store RawStore, metrics *copyMetrics) copyImpl {
 	return copyImpl{
 		rawStore: store,
-		metrics:  newCopyMetrics(metricsScope.NewSubScope("copy")),
+		metrics:  metrics,
 	}
 }

@@ -5,15 +5,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInMemoryStore_Head(t *testing.T) {
 	t.Run("Empty store", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		s, err := NewInMemoryRawStore(&Config{}, testScope)
+		s, err := NewInMemoryRawStore(&Config{}, metrics)
 		assert.NoError(t, err)
 		metadata, err := s.Head(context.TODO(), DataReference("hello"))
 		assert.NoError(t, err)
@@ -21,8 +18,7 @@ func TestInMemoryStore_Head(t *testing.T) {
 	})
 
 	t.Run("Existing Item", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		s, err := NewInMemoryRawStore(&Config{}, testScope)
+		s, err := NewInMemoryRawStore(&Config{}, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("hello"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -35,8 +31,7 @@ func TestInMemoryStore_Head(t *testing.T) {
 
 func TestInMemoryStore_ReadRaw(t *testing.T) {
 	t.Run("Empty store", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		s, err := NewInMemoryRawStore(&Config{}, testScope)
+		s, err := NewInMemoryRawStore(&Config{}, metrics)
 		assert.NoError(t, err)
 
 		raw, err := s.ReadRaw(context.TODO(), DataReference("hello"))
@@ -45,8 +40,7 @@ func TestInMemoryStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("Existing Item", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		s, err := NewInMemoryRawStore(&Config{}, testScope)
+		s, err := NewInMemoryRawStore(&Config{}, metrics)
 		assert.NoError(t, err)
 
 		err = s.WriteRaw(context.TODO(), DataReference("hello"), 0, Options{}, bytes.NewReader([]byte{}))
@@ -58,8 +52,7 @@ func TestInMemoryStore_ReadRaw(t *testing.T) {
 }
 
 func TestInMemoryStore_Clear(t *testing.T) {
-	testScope := promutils.NewTestScope()
-	m, err := NewInMemoryRawStore(&Config{}, testScope)
+	m, err := NewInMemoryRawStore(&Config{}, metrics)
 	assert.NoError(t, err)
 
 	mStore := m.(*InMemoryStore)
