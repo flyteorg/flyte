@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-
+	"github.com/flyteorg/stow/s3"
 	"github.com/golang/protobuf/proto"
 	errs "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type mockProtoMessage struct {
@@ -55,6 +59,36 @@ func TestDefaultProtobufStore(t *testing.T) {
 		err = s.ReadProtobuf(context.TODO(), "hello", m)
 		assert.NoError(t, err)
 		assert.Equal(t, int64(5), m.X)
+	})
+
+	t.Run("RefreshConfig", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
+		require.NoError(t, err)
+		require.IsType(t, DefaultProtobufStore{}, s.ComposedProtobufStore)
+		require.IsType(t, &InMemoryStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+
+		oldMetrics := s.metrics
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer server.Close()
+
+		err = s.RefreshConfig(&Config{
+			Type: TypeMinio,
+			Stow: StowConfig{
+				Kind: TypeS3,
+				Config: map[string]string{
+					s3.ConfigAccessKeyID: "key",
+					s3.ConfigSecretKey:   "sec",
+					s3.ConfigEndpoint:    server.URL,
+				}},
+			InitContainer: "b"})
+
+		assert.NoError(t, err)
+		require.IsType(t, DefaultProtobufStore{}, s.ComposedProtobufStore)
+		assert.IsType(t, &StowStore{}, s.ComposedProtobufStore.(DefaultProtobufStore).RawStore)
+		assert.Equal(t, oldMetrics, s.metrics)
 	})
 
 	t.Run("invalid type", func(t *testing.T) {
