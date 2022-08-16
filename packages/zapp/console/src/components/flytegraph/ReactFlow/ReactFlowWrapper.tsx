@@ -41,7 +41,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
     edges: rfGraphJson.edges,
     version: version,
     reactFlowInstance: null,
-    needFitView: false
+    needFitView: false,
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
       ...state,
       shouldUpdate: true,
       nodes: rfGraphJson.nodes,
-      edges: rfGraphJson.edges.map(edge => ({ ...edge, zIndex: 0 })),
+      edges: rfGraphJson.edges.map((edge) => ({ ...edge, zIndex: 0 })),
     }));
   }, [rfGraphJson]);
 
@@ -96,8 +96,8 @@ export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({
   };
 
   const onNodeClick = () => {
-    setState((state) => ({ ...state, needFitView: false }))
-  }
+    setState((state) => ({ ...state, needFitView: false }));
+  };
 
   return (
     <ReactFlow

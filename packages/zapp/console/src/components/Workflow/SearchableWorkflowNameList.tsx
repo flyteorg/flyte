@@ -5,6 +5,7 @@ import { useNamedEntityListStyles } from 'components/common/SearchableNamedEntit
 import { useCommonStyles } from 'components/common/styles';
 import { separatorColor, primaryTextColor, workflowLabelColor } from 'components/Theme/constants';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes/routes';
 import { Shimmer } from 'components/common/Shimmer';
@@ -23,7 +24,6 @@ import ArchiveOutlined from '@material-ui/icons/ArchiveOutlined';
 import { useMutation } from 'react-query';
 import { NamedEntityState } from 'models/enums';
 import { updateWorkflowState } from 'models/Workflow/api';
-import { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { padExecutionPaths, padExecutions } from 'common/utils';
 import { WorkflowListStructureItem } from './types';
@@ -322,18 +322,22 @@ export const SearchableWorkflowNameList: React.FC<SearchableWorkflowNameListProp
   showArchived,
 }) => {
   const styles = useStyles();
-  const [search, setSearch] = React.useState('');
+  const [search, setSearch] = useState('');
   const { results, setSearchString } = useSearchableListState({
     items: workflows,
     propertyGetter: ({ id }) => id.name,
   });
 
+  useEffect(() => {
+    const debouncedSearch = debounce(() => setSearchString(search), 1000);
+    debouncedSearch();
+  }, [search]);
+
   const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchString = event.target.value;
     setSearch(searchString);
-    const debouncedSearch = debounce(() => setSearchString(searchString), 1000);
-    debouncedSearch();
   };
+
   const onClear = () => setSearch('');
 
   return (

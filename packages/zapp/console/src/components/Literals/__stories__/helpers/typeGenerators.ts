@@ -1,8 +1,5 @@
 import { Core } from 'flyteidl';
-import {
-  blobScalars,
-  schemaScalars,
-} from '../scalarValues';
+import { blobScalars, schemaScalars } from '../scalarValues';
 
 // SIMPLE
 type GeneratedSimpleType = {

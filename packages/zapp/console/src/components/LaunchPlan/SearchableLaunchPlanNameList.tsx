@@ -4,10 +4,11 @@ import { useNamedEntityListStyles } from 'components/common/SearchableNamedEntit
 import { useCommonStyles } from 'components/common/styles';
 import { separatorColor, primaryTextColor, launchPlanLabelColor } from 'components/Theme/constants';
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes/routes';
 import { debounce } from 'lodash';
-import { Typography, FormGroup } from '@material-ui/core';
+import { FormGroup } from '@material-ui/core';
 import { ResourceType } from 'models/Common/types';
 import { MuiLaunchPlanIcon } from '@flyteconsole/ui-atoms';
 import { LaunchPlanListStructureItem } from './types';
@@ -120,18 +121,22 @@ export const SearchableLaunchPlanNameList: React.FC<SearchableLaunchPlanNameList
   launchPlans,
 }) => {
   const styles = useStyles();
-  const [search, setSearch] = React.useState('');
+  const [search, setSearch] = useState('');
   const { results, setSearchString } = useSearchableListState({
     items: launchPlans,
     propertyGetter: ({ id }) => id.name,
   });
 
+  useEffect(() => {
+    const debouncedSearch = debounce(() => setSearchString(search), 1000);
+    debouncedSearch();
+  }, [search]);
+
   const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchString = event.target.value;
     setSearch(searchString);
-    const debouncedSearch = debounce(() => setSearchString(searchString), 1000);
-    debouncedSearch();
   };
+
   const onClear = () => setSearch('');
 
   return (

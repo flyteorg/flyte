@@ -2,6 +2,7 @@ import { Checkbox, debounce, FormControlLabel, FormGroup } from '@material-ui/co
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { NamedEntity } from 'models/Common/types';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { NoResults } from './NoResults';
 import { SearchableInput, SearchResult } from './SearchableList';
 import { useCommonStyles } from './styles';
@@ -60,18 +61,21 @@ export const FilterableNamedEntityList: React.FC<FilterableNamedEntityListProps>
   archiveCheckboxLabel,
 }) => {
   const styles = useStyles();
-  const [search, setSearch] = React.useState('');
+  const [search, setSearch] = useState('');
 
   const { results, setSearchString } = useSearchableListState({
     items: names,
     propertyGetter: ({ id }) => id.name,
   });
 
+  useEffect(() => {
+    const debouncedSearch = debounce(() => setSearchString(search), 1000);
+    debouncedSearch();
+  }, [search]);
+
   const onSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchString = event.target.value;
     setSearch(searchString);
-    const debouncedSearch = debounce(() => setSearchString(searchString), 1000);
-    debouncedSearch();
   };
 
   const onClear = () => setSearch('');
