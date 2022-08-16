@@ -199,6 +199,18 @@ File containing the client secret
   /etc/secrets/client_secret
   
 
+clientSecretEnvVar (string)
+--------------------------------------------------------------------------------
+
+Environment variable containing the client secret
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 scopes ([]string)
 --------------------------------------------------------------------------------
 
@@ -4176,6 +4188,18 @@ Defines data proxy configuration.
     maxExpiresIn: 1h0m0s
     maxSize: 6Mi
     storagePrefix: ""
+  
+
+readHeaderTimeoutSeconds (int)
+--------------------------------------------------------------------------------
+
+The amount of time allowed to read request headers.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "32"
   
 
 config.DataProxyConfig
