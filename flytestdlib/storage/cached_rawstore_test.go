@@ -10,57 +10,44 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flytestdlib/ioutils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewCachedStore(t *testing.T) {
-	resetMetricKeys()
-
 	t.Run("CachingDisabled", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		cfg := &Config{}
-		assert.Nil(t, newCachedRawStore(cfg, nil, testScope))
-		store, err := NewInMemoryRawStore(cfg, testScope)
+		assert.Nil(t, newCachedRawStore(cfg, nil, metrics.cacheMetrics))
+		store, err := NewInMemoryRawStore(cfg, metrics)
 		assert.NoError(t, err)
-		assert.Equal(t, store, newCachedRawStore(cfg, store, testScope))
+		assert.Equal(t, store, newCachedRawStore(cfg, store, metrics.cacheMetrics))
 	})
 
 	t.Run("CachingEnabled", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		cfg := &Config{
 			Cache: CachingConfig{
 				MaxSizeMegabytes: 1,
 				TargetGCPercent:  20,
 			},
 		}
-		store, err := NewInMemoryRawStore(cfg, testScope)
+		store, err := NewInMemoryRawStore(cfg, metrics)
 		assert.NoError(t, err)
-		cStore := newCachedRawStore(cfg, store, testScope)
+		cStore := newCachedRawStore(cfg, store, metrics.cacheMetrics)
 		assert.Equal(t, 20, debug.SetGCPercent(100))
 		assert.NotNil(t, cStore)
 		assert.NotNil(t, cStore.(*cachedRawStore).cache)
 	})
 }
 
-func resetMetricKeys() {
-	labeled.UnsetMetricKeys()
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-}
-
-func dummyCacheStore(t *testing.T, store RawStore, scope promutils.Scope) *cachedRawStore {
+func dummyCacheStore(t *testing.T, store RawStore, metrics *cacheMetrics) *cachedRawStore {
 	cfg := &Config{
 		Cache: CachingConfig{
 			MaxSizeMegabytes: 1,
 			TargetGCPercent:  20,
 		},
 	}
-	cStore := newCachedRawStore(cfg, store, scope)
+	cStore := newCachedRawStore(cfg, store, metrics)
 	assert.NotNil(t, cStore)
 	return cStore.(*cachedRawStore)
 }
@@ -94,7 +81,6 @@ func (d *dummyStore) WriteRaw(ctx context.Context, reference DataReference, size
 }
 
 func TestCachedRawStore(t *testing.T) {
-	resetMetricKeys()
 	ctx := context.TODO()
 	k1 := DataReference("k1")
 	k2 := DataReference("k2")
@@ -145,11 +131,10 @@ func TestCachedRawStore(t *testing.T) {
 			return nil, fmt.Errorf("err")
 		},
 	}
-	testScope := promutils.NewTestScope()
 
-	store.copyImpl = newCopyImpl(store, testScope.NewSubScope("copy"))
+	store.copyImpl = newCopyImpl(store, metrics.copyMetrics)
 
-	cStore := dummyCacheStore(t, store, testScope.NewSubScope("x"))
+	cStore := dummyCacheStore(t, store, metrics.cacheMetrics)
 
 	t.Run("HeadExists", func(t *testing.T) {
 		m, err := cStore.Head(ctx, k1)

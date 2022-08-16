@@ -15,7 +15,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
-
+	"github.com/flyteorg/stow"
 	"github.com/flyteorg/stow/azure"
 	"github.com/flyteorg/stow/google"
 	"github.com/flyteorg/stow/local"
@@ -23,14 +23,11 @@ import (
 	"github.com/flyteorg/stow/s3"
 	"github.com/flyteorg/stow/swift"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/stow"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/internal/utils"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
@@ -154,11 +151,8 @@ func TestAwsBucketIsNotFound(t *testing.T) {
 }
 
 func TestStowStore_CreateSignedURL(t *testing.T) {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-
 	const container = "container"
 	t.Run("Happy Path", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -173,7 +167,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 
 		actual, err := s.CreateSignedURL(context.TODO(), DataReference("https://container/path"), SignedURLProperties{})
@@ -182,7 +176,6 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 	})
 
 	t.Run("Invalid URL", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -197,7 +190,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 
 		_, err = s.CreateSignedURL(context.TODO(), DataReference("://container/path"), SignedURLProperties{})
@@ -205,7 +198,6 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 	})
 
 	t.Run("Non existing container", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -220,7 +212,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 
 		_, err = s.CreateSignedURL(context.TODO(), DataReference("s3://container2/path"), SignedURLProperties{})
@@ -229,11 +221,8 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 }
 
 func TestStowStore_ReadRaw(t *testing.T) {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-
 	const container = "container"
 	t.Run("Happy Path", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -248,7 +237,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -264,7 +253,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("Exceeds limit", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
@@ -280,7 +268,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -294,7 +282,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("No Limit", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		GetConfig().Limits.GetLimitMegabytes = 0
 
@@ -311,7 +298,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, false, testScope)
+		}, nil, false, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -323,7 +310,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("Happy Path multi-container enabled", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -340,7 +326,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, true, testScope)
+		}, nil, true, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), "s3://bad-container/path", 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -357,7 +343,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("Happy Path multi-container bad", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -372,7 +357,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, true, testScope)
+		}, nil, true, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), "s3://bad-container/path", 0, Options{}, bytes.NewReader([]byte{}))
 		assert.Error(t, err)
@@ -386,7 +371,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 func TestNewLocalStore(t *testing.T) {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	t.Run("Valid config", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		store, err := newStowRawStore(&Config{
 			Stow: StowConfig{
 				Kind: local.Kind,
@@ -395,7 +379,7 @@ func TestNewLocalStore(t *testing.T) {
 				},
 			},
 			InitContainer: "testdata",
-		}, testScope.NewSubScope("x"))
+		}, metrics)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, store)
@@ -409,13 +393,11 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("Invalid config", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
-		_, err := newStowRawStore(&Config{}, testScope)
+		_, err := newStowRawStore(&Config{}, metrics)
 		assert.Error(t, err)
 	})
 
 	t.Run("Initialize container", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		tmpDir, err := ioutil.TempDir("", "stdlib_local")
 		assert.NoError(t, err)
 
@@ -431,7 +413,7 @@ func TestNewLocalStore(t *testing.T) {
 				},
 			},
 			InitContainer: "tmp",
-		}, testScope.NewSubScope("y"))
+		}, metrics)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, store)
@@ -444,7 +426,6 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("missing init container", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		tmpDir, err := ioutil.TempDir("", "stdlib_local")
 		assert.NoError(t, err)
 
@@ -459,14 +440,13 @@ func TestNewLocalStore(t *testing.T) {
 					local.ConfigKeyPath: tmpDir,
 				},
 			},
-		}, testScope.NewSubScope("y"))
+		}, metrics)
 
 		assert.Error(t, err)
 		assert.Nil(t, store)
 	})
 
 	t.Run("multi-container enabled", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		tmpDir, err := ioutil.TempDir("", "stdlib_local")
 		assert.NoError(t, err)
 
@@ -483,7 +463,7 @@ func TestNewLocalStore(t *testing.T) {
 			},
 			InitContainer:         "tmp",
 			MultiContainerEnabled: true,
-		}, testScope.NewSubScope("y"))
+		}, metrics)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, store)
@@ -498,15 +478,14 @@ func TestNewLocalStore(t *testing.T) {
 
 func Test_newStowRawStore(t *testing.T) {
 	type args struct {
-		cfg          *Config
-		metricsScope promutils.Scope
+		cfg *Config
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{"fail", args{&Config{}, promutils.NewTestScope()}, true},
+		{"fail", args{&Config{}}, true},
 		{"google", args{&Config{
 			InitContainer: "flyte",
 			Stow: StowConfig{
@@ -516,18 +495,18 @@ func Test_newStowRawStore(t *testing.T) {
 					google.ConfigScopes:    "y",
 				},
 			},
-		}, promutils.NewTestScope()}, true},
+		}}, true},
 		{"minio", args{&Config{
 			Type:          TypeMinio,
 			InitContainer: "some-container",
 			Connection: ConnectionConfig{
 				Endpoint: config.URL{URL: utils.MustParseURL("http://minio:9000")},
 			},
-		}, promutils.NewTestScope()}, true},
+		}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newStowRawStore(tt.args.cfg, tt.args.metricsScope)
+			got, err := newStowRawStore(tt.args.cfg, metrics)
 			if tt.wantErr {
 				assert.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -598,7 +577,6 @@ func TestStowStore_WriteRaw(t *testing.T) {
 	const container = "container"
 	fn := fQNFn["s3"]
 	t.Run("create container when not found", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		var createCalled bool
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -618,7 +596,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, true, testScope)
+		}, nil, true, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -634,7 +612,6 @@ func TestStowStore_WriteRaw(t *testing.T) {
 		assert.True(t, containerStoredInDynamicContainerMap)
 	})
 	t.Run("bubble up generic put errors", func(t *testing.T) {
-		testScope := promutils.NewTestScope()
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
 				if id == container {
@@ -646,7 +623,7 @@ func TestStowStore_WriteRaw(t *testing.T) {
 				}
 				return nil, fmt.Errorf("container is not supported")
 			},
-		}, nil, true, testScope)
+		}, nil, true, metrics)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.EqualError(t, err, "Failed to write data [0b] to path [path].: foo")

@@ -42,19 +42,35 @@ func (m mockBigDataProtoMessage) String() string {
 func (mockBigDataProtoMessage) ProtoMessage() {
 }
 
-func TestDefaultProtobufStore_ReadProtobuf(t *testing.T) {
+func TestDefaultProtobufStore(t *testing.T) {
 	t.Run("Read after Write", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
 		s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
 		assert.NoError(t, err)
 
-		err = s.WriteProtobuf(context.TODO(), DataReference("hello"), Options{}, &mockProtoMessage{X: 5})
+		err = s.WriteProtobuf(context.TODO(), "hello", Options{}, &mockProtoMessage{X: 5})
 		assert.NoError(t, err)
 
 		m := &mockProtoMessage{}
-		err = s.ReadProtobuf(context.TODO(), DataReference("hello"), m)
+		err = s.ReadProtobuf(context.TODO(), "hello", m)
 		assert.NoError(t, err)
 		assert.Equal(t, int64(5), m.X)
+	})
+
+	t.Run("invalid type", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+
+		_, err := NewDataStore(&Config{Type: "invalid"}, testScope)
+
+		assert.EqualError(t, err, "type is of an invalid value [invalid]")
+	})
+
+	t.Run("coudln't create store", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+
+		_, err := NewDataStore(&Config{Type: TypeS3}, testScope)
+
+		assert.EqualError(t, err, "initContainer is required even with `enable-multicontainer`")
 	})
 }
 
@@ -107,8 +123,7 @@ func TestDefaultProtobufStore_HardErrors(t *testing.T) {
 			return nil, fmt.Errorf(dummyReadErrorMsg)
 		},
 	}
-	testScope := promutils.NewTestScope()
-	pbErroneousStore := NewDefaultProtobufStore(store, testScope)
+	pbErroneousStore := NewDefaultProtobufStore(store, metrics.protoMetrics)
 	t.Run("Test if hard write errors are handled correctly", func(t *testing.T) {
 		err := pbErroneousStore.WriteProtobuf(ctx, k1, Options{}, &mockProtoMessage{X: 5})
 		assert.False(t, IsFailedWriteToCache(err))

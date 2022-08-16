@@ -9,9 +9,9 @@ import (
 
 	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/ioutils"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flytestdlib/ioutils"
 )
 
 type notSeekerReader struct {
@@ -44,7 +44,6 @@ func newNotSeekerReader(bytesCount int) *notSeekerReader {
 }
 
 func TestCopyRaw(t *testing.T) {
-	resetMetricKeys()
 	t.Run("Called", func(t *testing.T) {
 		readerCalled := false
 		writerCalled := false
@@ -59,7 +58,7 @@ func TestCopyRaw(t *testing.T) {
 			},
 		}
 
-		copier := newCopyImpl(&store, promutils.NewTestScope())
+		copier := newCopyImpl(&store, metrics.copyMetrics)
 		assert.NoError(t, copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{}))
 		assert.True(t, readerCalled)
 		assert.True(t, writerCalled)
@@ -79,7 +78,7 @@ func TestCopyRaw(t *testing.T) {
 			},
 		}
 
-		copier := newCopyImpl(&store, promutils.NewTestScope())
+		copier := newCopyImpl(&store, metrics.copyMetrics)
 		assert.NoError(t, copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{}))
 		assert.True(t, readerCalled)
 		assert.True(t, writerCalled)
@@ -87,7 +86,6 @@ func TestCopyRaw(t *testing.T) {
 }
 
 func TestCopyRaw_CachingErrorHandling(t *testing.T) {
-	resetMetricKeys()
 	t.Run("CopyRaw with Caching Error", func(t *testing.T) {
 		readerCalled := false
 		writerCalled := false
@@ -108,7 +106,7 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 			},
 		}
 
-		copier := newCopyImpl(&store, promutils.NewTestScope())
+		copier := newCopyImpl(&store, metrics.copyMetrics)
 		assert.NoError(t, copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{}))
 		assert.True(t, readerCalled)
 		assert.True(t, writerCalled)
@@ -134,7 +132,7 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 			},
 		}
 
-		copier := newCopyImpl(&store, promutils.NewTestScope())
+		copier := newCopyImpl(&store, metrics.copyMetrics)
 		err = copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{})
 		assert.Error(t, err)
 		assert.True(t, readerCalled)

@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
-type dataStoreCreateFn func(cfg *Config, metricsScope promutils.Scope) (RawStore, error)
+type dataStoreCreateFn func(cfg *Config, metrics *dataStoreMetrics) (RawStore, error)
 
 var stores = map[string]dataStoreCreateFn{
 	TypeMemory: NewInMemoryRawStore,
@@ -54,27 +54,27 @@ func createHTTPClient(cfg HTTPClientConfig) *http.Client {
 	return c
 }
 
-// NewDataStore creates a new Data Store with the supplied config.
-func NewDataStore(cfg *Config, metricsScope promutils.Scope) (s *DataStore, err error) {
-	defaultClient := http.DefaultClient
-	defer func() {
-		http.DefaultClient = defaultClient
-	}()
+type dataStoreMetrics struct {
+	cacheMetrics *cacheMetrics
+	protoMetrics *protoMetrics
+	copyMetrics  *copyMetrics
+	stowMetrics  *stowMetrics
+}
 
-	http.DefaultClient = createHTTPClient(cfg.DefaultHTTPClient)
-
-	var rawStore RawStore
-	if fn, found := stores[cfg.Type]; found {
-		rawStore, err = fn(cfg, metricsScope)
-		if err != nil {
-			return &emptyStore, err
-		}
-
-		protoStore := NewDefaultProtobufStore(newCachedRawStore(cfg, rawStore, metricsScope), metricsScope)
-		return NewCompositeDataStore(NewURLPathConstructor(), protoStore), nil
+// newDataStoreMetrics initialises all metrics required for DataStore
+func newDataStoreMetrics(scope promutils.Scope) *dataStoreMetrics {
+	return &dataStoreMetrics{
+		cacheMetrics: newCacheMetrics(scope),
+		protoMetrics: newProtoMetrics(scope),
+		copyMetrics:  newCopyMetrics(scope.NewSubScope("copy")),
+		stowMetrics:  newStowMetrics(scope),
 	}
+}
 
-	return &emptyStore, fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
+// NewDataStore creates a new Data Store with the supplied config.
+func NewDataStore(cfg *Config, scope promutils.Scope) (s *DataStore, err error) {
+	ds := &DataStore{metrics: newDataStoreMetrics(scope)}
+	return ds, ds.RefreshConfig(cfg)
 }
 
 // NewCompositeDataStore composes a new DataStore.
@@ -83,4 +83,31 @@ func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobuf
 		ReferenceConstructor:  refConstructor,
 		ComposedProtobufStore: composedProtobufStore,
 	}
+}
+
+// RefreshConfig re-initialises the data store client leaving metrics untouched.
+// This is NOT thread-safe!
+func (ds *DataStore) RefreshConfig(cfg *Config) error {
+	defaultClient := http.DefaultClient
+	defer func() {
+		http.DefaultClient = defaultClient
+	}()
+
+	http.DefaultClient = createHTTPClient(cfg.DefaultHTTPClient)
+
+	fn, found := stores[cfg.Type]
+	if !found {
+		return fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
+	}
+
+	rawStore, err := fn(cfg, ds.metrics)
+	if err != nil {
+		return err
+	}
+
+	rawStore = newCachedRawStore(cfg, rawStore, ds.metrics.cacheMetrics)
+	protoStore := NewDefaultProtobufStore(rawStore, ds.metrics.protoMetrics)
+	newDS := NewCompositeDataStore(NewURLPathConstructor(), protoStore)
+	*ds = *newDS
+	return nil
 }
