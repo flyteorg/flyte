@@ -91,7 +91,7 @@ That's it! You now have a new matchable attribute to configure as the needs of y
 Flyte ResourceManager
 ---------------------
 
-**Flyte ResourceManager** is a configurable component that allows plugins to manage resource allocations independently. It helps track resource utilization of tasks that run on Flyte. The default deployments are configured as ``noop``, which means they are disabled and you would fallback to the platform specific resource management, like K8s, which tells you that you can't schedule more tasks.
+**Flyte ResourceManager** is a configurable component that allows plugins to manage resource allocations independently. It helps track resource utilization of tasks that run on Flyte. The default deployments are configured as ``noop``, which indicates that the ResourceManager provided by Flyte is disabled and plugins rely on each independent platform to manage resource utilization. In situations like the K8s plugin, where the platform has a robust mechanism to manage resource scheduling, this may work well. However, in a scenario like a simple web API plugin, the rate at which Flyte sends requests may overwhelm a service and benefit from additional resource management.
 
 The below attribute is configurable within FlytePropeller, which can be disabled with:
 
@@ -134,9 +134,8 @@ During runtime, the ResourceManager:
 
 How are resources allocated?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can request resources using **ResourceName**, which is a unique token and a fully qualified **resource request** (which is typically an integer). If the resource pool has sufficient capacity to fulfil your request, then the resources requested are allocated, and the plugin proceeds further.
 
-When a Flyte task execution needs to send a request to an external service, the plugin claims a unit of the corresponding resource. This is done using a ResourceName, and a fully qualified resource request. The execution generates this unique token and registers this token with the ResourceManager by calling the ResourceManager’s **AllocateResource** function. The ResourceManager inspects the current utilization of resources and the allocation policy to determine if the request should be granted or not.
+When a Flyte task execution needs to send a request to an external service, the plugin claims a unit of the corresponding resource. This is done using a **ResourceName**, which is a unique token and a fully qualified resource request (which is typically an integer). The execution generates this unique token and registers this token with the ResourceManager by calling the ResourceManager’s **"AllocateResource function"**. If the resource pool has sufficient capacity to fulfil your request, then the resources requested are allocated, and the plugin proceeds further.
 
 When the status is **"AllocationGranted"**, the execution moves forward and sends out the request for those resources.
 
