@@ -13,17 +13,17 @@ Synopsis
 Update the description on the launch plan:
 ::
 
- flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --description "Mergesort example"
+ flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --description "Mergesort example"
 
 Archiving launch plan named entity is not supported and would throw an error:
 ::
 
- flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --archive
+ flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --archive
 
 Activating launch plan named entity would be a noop:
 ::
 
- flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --activate
+ flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --activate
 
 Usage
 
@@ -53,6 +53,7 @@ Options inherited from parent commands
       --admin.authorizationServerUrl string        This is the URL to your IdP's authorization server. It'll default to Endpoint
       --admin.caCertFilePath string                Use specified certificate file to verify the admin server peer.
       --admin.clientId string                      Client ID (default "flytepropeller")
+      --admin.clientSecretEnvVar string            Environment variable containing the client secret
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                      Command for external authentication token generation
       --admin.defaultServiceConfig string          

@@ -75,6 +75,7 @@ Options inherited from parent commands
       --admin.authorizationServerUrl string        This is the URL to your IdP's authorization server. It'll default to Endpoint
       --admin.caCertFilePath string                Use specified certificate file to verify the admin server peer.
       --admin.clientId string                      Client ID (default "flytepropeller")
+      --admin.clientSecretEnvVar string            Environment variable containing the client secret
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                      Command for external authentication token generation
       --admin.defaultServiceConfig string          
