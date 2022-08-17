@@ -92,6 +92,7 @@ export interface NodeExecution extends Admin.INodeExecution {
   closure: NodeExecutionClosure;
   metadata?: NodeExecutionMetadata;
   scopedId?: string;
+  fromUniqueParentId?: string;
 }
 
 export interface NodeExecutionsById {

@@ -280,86 +280,6 @@ function fetchChildNodeExecutionGroups(
   return fetchGroupsForTaskExecutionNode(queryClient, nodeExecution, config);
 }
 
-/**
- * Query returns all children for a list of `nodeExecutions`
- * Will recursively gather all children for anyone that isParent()
- */
-async function fetchAllChildNodeExecutions(
-  queryClient: QueryClient,
-  nodeExecutions: NodeExecution[],
-  config: RequestConfig,
-): Promise<Array<NodeExecutionGroup[]>> {
-  const executionGroups: Array<NodeExecutionGroup[]> = await Promise.all(
-    nodeExecutions.map((exe) => fetchChildNodeExecutionGroups(queryClient, exe, config)),
-  );
-
-  /** Recursive check for nested/dynamic nodes */
-  const childrenFromChildrenNodes: NodeExecution[] = [];
-  executionGroups.map((group) =>
-    group.map((attempt) => {
-      attempt.nodeExecutions.map((execution) => {
-        if (isParentNode(execution)) {
-          childrenFromChildrenNodes.push(execution);
-        }
-      });
-    }),
-  );
-
-  /** Request and concact data from children */
-  if (childrenFromChildrenNodes.length > 0) {
-    const childGroups = await fetchAllChildNodeExecutions(
-      queryClient,
-      childrenFromChildrenNodes,
-      config,
-    );
-    for (const group in childGroups) {
-      executionGroups.push(childGroups[group]);
-    }
-  }
-  return executionGroups;
-}
-
-/**
- *
- * @param nodeExecutions list of parent node executionId's
- * @param config
- * @returns
- */
-export function useAllChildNodeExecutionGroupsQuery(
-  nodeExecutions: NodeExecution[],
-  config: RequestConfig,
-): QueryObserverResult<Array<NodeExecutionGroup[]>, Error> {
-  const queryClient = useQueryClient();
-  const shouldEnableFn = (groups) => {
-    if (groups.length > 0) {
-      return groups.some((group) => {
-        // non-empty groups are wrapped in array
-        const unwrappedGroup = Array.isArray(group) ? group[0] : group;
-        if (unwrappedGroup?.nodeExecutions?.length > 0) {
-          /* Return true is any executions are not yet terminal (ie, they can change) */
-          return unwrappedGroup.nodeExecutions.some((ne) => {
-            return !nodeExecutionIsTerminal(ne);
-          });
-        } else {
-          return false;
-        }
-      });
-    } else {
-      return false;
-    }
-  };
-
-  const key = `${nodeExecutions?.[0]?.scopedId}-${nodeExecutions?.[0]?.closure?.phase}`;
-
-  return useConditionalQuery<Array<NodeExecutionGroup[]>>(
-    {
-      queryKey: [QueryType.NodeExecutionChildList, key, config],
-      queryFn: () => fetchAllChildNodeExecutions(queryClient, nodeExecutions, config),
-    },
-    shouldEnableFn,
-  );
-}
-
 /** Fetches and groups `NodeExecution`s which are direct children of the given
  * `NodeExecution`.
  */
@@ -438,15 +358,29 @@ export function useAllTreeNodeExecutionGroupsQuery(
 ): QueryObserverResult<NodeExecution[], Error> {
   const queryClient = useQueryClient();
   const shouldEnableFn = (groups) => {
-    if (nodeExecutions.some((ne) => !nodeExecutionIsTerminal(ne))) {
-      return true;
+    if (groups.length > 0) {
+      return groups.some((group) => {
+        // non-empty groups are wrapped in array
+        const unwrappedGroup = Array.isArray(group) ? group[0] : group;
+        if (unwrappedGroup?.nodeExecutions?.length > 0) {
+          /* Return true is any executions are not yet terminal (ie, they can change) */
+          return unwrappedGroup.nodeExecutions.some((ne) => {
+            return !nodeExecutionIsTerminal(ne);
+          });
+        } else {
+          return false;
+        }
+      });
+    } else {
+      return false;
     }
-    return groups.some((group) => !nodeExecutionIsTerminal(group));
   };
+
+  const key = `${nodeExecutions?.[0]?.scopedId}-${nodeExecutions?.[0]?.closure?.phase}`;
 
   return useConditionalQuery<NodeExecution[]>(
     {
-      queryKey: [QueryType.NodeExecutionTreeList, nodeExecutions[0]?.id, config],
+      queryKey: [QueryType.NodeExecutionTreeList, key, config],
       queryFn: () => fetchAllTreeNodeExecutions(queryClient, nodeExecutions, config),
       refetchInterval: executionRefreshIntervalMs,
     },

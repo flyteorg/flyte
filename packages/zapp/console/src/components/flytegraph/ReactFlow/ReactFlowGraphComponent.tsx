@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformDAGToReactFlowV2';
+import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
 import { RFWrapperProps, RFGraphTypes, ConvertDagProps } from './types';
 import { getRFBackground } from './utils';
 import { ReactFlowWrapper } from './ReactFlowWrapper';
@@ -50,9 +51,9 @@ const ReactFlowGraphComponent = (props) => {
     onPhaseSelectionChanged,
     selectedPhase,
     isDetailsTabClosed,
-    nodeExecutionsById,
     dynamicWorkflows,
   } = props;
+  const nodeExecutionsById = useContext(NodeExecutionsByIdContext);
   const [state, setState] = useState({
     data,
     dynamicWorkflows,

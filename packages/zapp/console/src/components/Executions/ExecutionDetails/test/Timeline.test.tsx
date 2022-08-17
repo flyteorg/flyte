@@ -1,5 +1,6 @@
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { render, waitFor } from '@testing-library/react';
+import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
 import { muiTheme } from 'components/Theme/muiTheme';
 import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
 import { insertFixture } from 'mocks/data/insertFixture';
@@ -14,6 +15,10 @@ import { ExecutionNodesTimeline } from '../Timeline';
 // difficult to make it work correctly in a test environment.
 jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
   ExecutionWorkflowGraph: () => null,
+}));
+
+jest.mock('../Timeline/ExecutionTimeline.tsx', () => ({
+  ExecutionTimeline: () => null,
 }));
 
 jest.mock('chart.js', () => ({
@@ -59,7 +64,9 @@ describe('ExecutionDetails > Timeline', () => {
     render(
       <ThemeProvider theme={muiTheme}>
         <QueryClientProvider client={queryClient}>
-          <ExecutionNodesTimeline nodeExecutions={[]} />
+          <NodeExecutionsByIdContext.Provider value={{}}>
+            <ExecutionNodesTimeline />
+          </NodeExecutionsByIdContext.Provider>
         </QueryClientProvider>
       </ThemeProvider>,
     );

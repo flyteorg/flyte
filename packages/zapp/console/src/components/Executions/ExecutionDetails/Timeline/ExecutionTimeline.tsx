@@ -6,8 +6,12 @@ import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWo
 import { isEndNode, isStartNode, isExpanded } from 'components/WorkflowGraph/utils';
 import { tableHeaderColor } from 'components/Theme/constants';
 import { timestampToDate } from 'common/utils';
-import { NodeExecution } from 'models/Execution/types';
 import { dNode } from 'models/Graph/types';
+import { makeNodeExecutionDynamicWorkflowQuery } from 'components/Workflow/workflowQueries';
+import { useQuery } from 'react-query';
+import { createRef, useContext, useEffect, useRef, useState } from 'react';
+import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
+import { checkForDynamicExecutions } from 'components/common/utils';
 import { convertToPlainNodes } from './helpers';
 import { ChartHeader } from './chartHeader';
 import { useScaleContext } from './scaleContext';
@@ -67,40 +71,50 @@ const useStyles = makeStyles((theme) => ({
 const INTERVAL_LENGTH = 110;
 
 interface ExProps {
-  nodeExecutions: NodeExecution[];
   chartTimezone: string;
 }
 
-export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTimezone }) => {
-  const [chartWidth, setChartWidth] = React.useState(0);
-  const [labelInterval, setLabelInterval] = React.useState(INTERVAL_LENGTH);
-  const durationsRef = React.useRef<HTMLDivElement>(null);
-  const durationsLabelsRef = React.useRef<HTMLDivElement>(null);
-  const taskNamesRef = React.createRef<HTMLDivElement>();
+export const ExecutionTimeline: React.FC<ExProps> = ({ chartTimezone }) => {
+  const [chartWidth, setChartWidth] = useState(0);
+  const [labelInterval, setLabelInterval] = useState(INTERVAL_LENGTH);
+  const durationsRef = useRef<HTMLDivElement>(null);
+  const durationsLabelsRef = useRef<HTMLDivElement>(null);
+  const taskNamesRef = createRef<HTMLDivElement>();
 
-  const [originalNodes, setOriginalNodes] = React.useState<dNode[]>([]);
-  const [showNodes, setShowNodes] = React.useState<dNode[]>([]);
-  const [startedAt, setStartedAt] = React.useState<Date>(new Date());
+  const [originalNodes, setOriginalNodes] = useState<dNode[]>([]);
+  const [showNodes, setShowNodes] = useState<dNode[]>([]);
+  const [startedAt, setStartedAt] = useState<Date>(new Date());
 
   const { compiledWorkflowClosure } = useNodeExecutionContext();
   const { chartInterval: chartTimeInterval } = useScaleContext();
+  const { staticExecutionIdsMap } = compiledWorkflowClosure
+    ? transformerWorkflowToDag(compiledWorkflowClosure)
+    : [];
 
-  React.useEffect(() => {
+  const nodeExecutionsById = useContext(NodeExecutionsByIdContext);
+
+  const dynamicParents = checkForDynamicExecutions(nodeExecutionsById, staticExecutionIdsMap);
+
+  const { data: dynamicWorkflows } = useQuery(
+    makeNodeExecutionDynamicWorkflowQuery(dynamicParents),
+  );
+
+  useEffect(() => {
     const nodes: dNode[] = compiledWorkflowClosure
-      ? transformerWorkflowToDag(compiledWorkflowClosure).dag.nodes
+      ? transformerWorkflowToDag(compiledWorkflowClosure, dynamicWorkflows).dag.nodes
       : [];
     // we remove start/end node info in the root dNode list during first assignment
     const initializeNodes = convertToPlainNodes(nodes);
     setOriginalNodes(initializeNodes);
-  }, [compiledWorkflowClosure]);
+  }, [dynamicWorkflows, compiledWorkflowClosure]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const initializeNodes = convertToPlainNodes(originalNodes);
     const updatedShownNodesMap = initializeNodes.map((node) => {
-      const index = nodeExecutions.findIndex((exe) => exe.scopedId === node.scopedId);
+      const execution = nodeExecutionsById[node.scopedId];
       return {
         ...node,
-        execution: index >= 0 ? nodeExecutions[index] : undefined,
+        execution,
       };
     });
     setShowNodes(updatedShownNodesMap);
@@ -110,12 +124,12 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ nodeExecutions, chartTime
     if (firstStartedAt) {
       setStartedAt(timestampToDate(firstStartedAt));
     }
-  }, [originalNodes, nodeExecutions]);
+  }, [originalNodes, nodeExecutionsById]);
 
   const { items: barItemsData, totalDurationSec } = getChartDurationData(showNodes, startedAt);
   const styles = useStyles({ chartWidth: chartWidth, itemsShown: showNodes.length });
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Sync width of elements and intervals of ChartHeader (time labels) and TimelineChart
     const calcWidth = Math.ceil(totalDurationSec / chartTimeInterval) * INTERVAL_LENGTH;
     if (durationsRef.current && calcWidth < durationsRef.current.clientWidth) {

@@ -5,16 +5,24 @@ import { WaitForQuery } from 'components/common/WaitForQuery';
 import { DataError } from 'components/Errors/DataError';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
-import { Execution, NodeExecution } from 'models/Execution/types';
+import { Execution, ExternalResource, LogsByPhase, NodeExecution } from 'models/Execution/types';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { keyBy } from 'lodash';
+import { isMapTaskV1 } from 'models/Task/utils';
+import { useQueryClient } from 'react-query';
+import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { NodeExecutionDetailsContextProvider } from '../contextProvider/NodeExecutionDetails';
-import { NodeExecutionsRequestConfigContext } from '../contexts';
+import { NodeExecutionsByIdContext, NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
 import { tabs } from './constants';
-import { ExecutionChildrenLoader } from './ExecutionChildrenLoader';
 import { useExecutionNodeViewsState } from './useExecutionNodeViewsState';
 import { ExecutionNodesTimeline } from './Timeline';
+import { fetchTaskExecutionList } from '../taskExecutionQueries';
+import { getGroupedLogs } from '../TaskExecutionsList/utils';
+import { useAllTreeNodeExecutionGroupsQuery } from '../nodeExecutionQueries';
+import { ExecutionWorkflowGraph } from './ExecutionWorkflowGraph';
 
 const useStyles = makeStyles((theme: Theme) => ({
   filters: {
@@ -31,7 +39,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     background: secondaryBackgroundColor,
     paddingLeft: theme.spacing(3.5),
   },
+  loading: {
+    margin: 'auto',
+  },
 }));
+
+interface WorkflowNodeExecution extends NodeExecution {
+  logsByPhase?: LogsByPhase;
+}
 
 export interface ExecutionNodeViewsProps {
   execution: Execution;
@@ -43,10 +58,21 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
   const styles = useStyles();
   const filterState = useNodeExecutionFiltersState();
   const tabState = useTabState(tabs, defaultTab);
+  const queryClient = useQueryClient();
+  const requestConfig = useContext(NodeExecutionsRequestConfigContext);
 
   const {
-    closure: { abortMetadata },
+    closure: { abortMetadata, workflowId },
   } = execution;
+
+  const [nodeExecutions, setNodeExecutions] = useState<NodeExecution[]>([]);
+  const [nodeExecutionsWithResources, setNodeExecutionsWithResources] = useState<
+    WorkflowNodeExecution[]
+  >([]);
+
+  const nodeExecutionsById = useMemo(() => {
+    return keyBy(nodeExecutionsWithResources, 'scopedId');
+  }, [nodeExecutionsWithResources]);
 
   /* We want to maintain the filter selection when switching away from the Nodes
     tab and back, but do not want to filter the nodes when viewing the graph. So,
@@ -58,6 +84,61 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
     appliedFilters,
   );
 
+  useEffect(() => {
+    let isCurrent = true;
+    async function fetchData(baseNodeExecutions, queryClient) {
+      const newValue = await Promise.all(
+        baseNodeExecutions.map(async (baseNodeExecution) => {
+          const taskExecutions = await fetchTaskExecutionList(queryClient, baseNodeExecution.id);
+
+          const useNewMapTaskView = taskExecutions.every((taskExecution) => {
+            const {
+              closure: { taskType, metadata, eventVersion = 0 },
+            } = taskExecution;
+            return isMapTaskV1(
+              eventVersion,
+              metadata?.externalResources?.length ?? 0,
+              taskType ?? undefined,
+            );
+          });
+          const externalResources: ExternalResource[] = taskExecutions
+            .map((taskExecution) => taskExecution.closure.metadata?.externalResources)
+            .flat()
+            .filter((resource): resource is ExternalResource => !!resource);
+
+          const logsByPhase: LogsByPhase = getGroupedLogs(externalResources);
+
+          return {
+            ...baseNodeExecution,
+            ...(useNewMapTaskView && logsByPhase.size > 0 && { logsByPhase }),
+          };
+        }),
+      );
+
+      if (isCurrent) {
+        setNodeExecutionsWithResources(newValue);
+      }
+    }
+
+    if (nodeExecutions.length > 0) {
+      fetchData(nodeExecutions, queryClient);
+    }
+    return () => {
+      isCurrent = false;
+    };
+  }, [nodeExecutions]);
+
+  const childGroupsQuery = useAllTreeNodeExecutionGroupsQuery(
+    nodeExecutionsQuery.data ?? [],
+    requestConfig,
+  );
+
+  useEffect(() => {
+    if (!childGroupsQuery.isLoading && childGroupsQuery.data) {
+      setNodeExecutions(childGroupsQuery.data);
+    }
+  }, [childGroupsQuery.data]);
+
   const renderNodeExecutionsTable = (nodeExecutions: NodeExecution[]) => (
     <NodeExecutionsRequestConfigContext.Provider value={nodeExecutionsRequestConfig}>
       <NodeExecutionsTable
@@ -67,18 +148,34 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
     </NodeExecutionsRequestConfigContext.Provider>
   );
 
-  const renderExecutionLoader = (nodeExecutions: NodeExecution[]) => {
+  const renderExecutionChildrenLoader = () =>
+    nodeExecutions.length > 0 ? <ExecutionWorkflowGraph workflowId={workflowId} /> : null;
+
+  const renderExecutionLoader = () => {
     return (
-      <ExecutionChildrenLoader
-        nodeExecutions={nodeExecutions}
-        workflowId={execution.closure.workflowId}
-      />
+      <WaitForQuery errorComponent={DataError} query={childGroupsQuery}>
+        {renderExecutionChildrenLoader}
+      </WaitForQuery>
     );
   };
 
-  const renderExecutionsTimeline = (nodeExecutions: NodeExecution[]) => (
-    <ExecutionNodesTimeline nodeExecutions={nodeExecutions} />
+  const renderExecutionsTimeline = () => (
+    <WaitForQuery
+      errorComponent={DataError}
+      query={childGroupsQuery}
+      loadingComponent={TimelineLoading}
+    >
+      {() => <ExecutionNodesTimeline />}
+    </WaitForQuery>
   );
+
+  const TimelineLoading = () => {
+    return (
+      <div className={styles.loading}>
+        <LargeLoadingSpinner />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -87,29 +184,31 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
         <Tab value={tabs.graph.id} label={tabs.graph.label} />
         <Tab value={tabs.timeline.id} label={tabs.timeline.label} />
       </Tabs>
-      <NodeExecutionDetailsContextProvider workflowId={execution.closure.workflowId}>
-        <div className={styles.nodesContainer}>
-          {tabState.value === tabs.nodes.id && (
-            <>
-              <div className={styles.filters}>
-                <ExecutionFilters {...filterState} />
-              </div>
+      <NodeExecutionDetailsContextProvider workflowId={workflowId}>
+        <NodeExecutionsByIdContext.Provider value={nodeExecutionsById}>
+          <div className={styles.nodesContainer}>
+            {tabState.value === tabs.nodes.id && (
+              <>
+                <div className={styles.filters}>
+                  <ExecutionFilters {...filterState} />
+                </div>
+                <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
+                  {renderNodeExecutionsTable}
+                </WaitForQuery>
+              </>
+            )}
+            {tabState.value === tabs.graph.id && (
               <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-                {renderNodeExecutionsTable}
+                {renderExecutionLoader}
               </WaitForQuery>
-            </>
-          )}
-          {tabState.value === tabs.graph.id && (
-            <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-              {renderExecutionLoader}
-            </WaitForQuery>
-          )}
-          {tabState.value === tabs.timeline.id && (
-            <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-              {renderExecutionsTimeline}
-            </WaitForQuery>
-          )}
-        </div>
+            )}
+            {tabState.value === tabs.timeline.id && (
+              <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
+                {renderExecutionsTimeline}
+              </WaitForQuery>
+            )}
+          </div>
+        </NodeExecutionsByIdContext.Provider>
       </NodeExecutionDetailsContextProvider>
     </>
   );

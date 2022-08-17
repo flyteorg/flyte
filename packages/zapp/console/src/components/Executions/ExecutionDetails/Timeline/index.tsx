@@ -1,12 +1,8 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core';
-import { NodeExecution, NodeExecutionIdentifier } from 'models/Execution/types';
-import { WaitForQuery } from 'components/common/WaitForQuery';
-import { NodeExecutionsRequestConfigContext } from 'components/Executions/contexts';
-import { useAllTreeNodeExecutionGroupsQuery } from 'components/Executions/nodeExecutionQueries';
-import { DataError } from 'components/Errors/DataError';
+import { NodeExecutionIdentifier } from 'models/Execution/types';
 import { DetailsPanel } from 'components/common/DetailsPanel';
-import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
+import { useMemo, useState } from 'react';
 import { NodeExecutionDetailsPanelContent } from '../NodeExecutionDetailsPanelContent';
 import { NodeExecutionsTimelineContext } from './context';
 import { ExecutionTimelineFooter } from './ExecutionTimelineFooter';
@@ -25,58 +21,28 @@ const useStyles = makeStyles(() => ({
     flex: '1 1 0',
     overflowY: 'auto',
   },
-  loading: {
-    margin: 'auto',
-  },
 }));
 
-interface TimelineProps {
-  nodeExecutions: NodeExecution[];
-}
-
-export const ExecutionNodesTimeline = (props: TimelineProps) => {
+export const ExecutionNodesTimeline = () => {
   const styles = useStyles();
 
-  const [selectedExecution, setSelectedExecution] = React.useState<NodeExecutionIdentifier | null>(
-    null,
-  );
-  const [chartTimezone, setChartTimezone] = React.useState(TimeZone.Local);
+  const [selectedExecution, setSelectedExecution] = useState<NodeExecutionIdentifier | null>(null);
+  const [chartTimezone, setChartTimezone] = useState(TimeZone.Local);
 
   const onCloseDetailsPanel = () => setSelectedExecution(null);
   const handleTimezoneChange = (tz) => setChartTimezone(tz);
 
-  const requestConfig = React.useContext(NodeExecutionsRequestConfigContext);
-  const childGroupsQuery = useAllTreeNodeExecutionGroupsQuery(props.nodeExecutions, requestConfig);
-
-  const timelineContext = React.useMemo(
+  const timelineContext = useMemo(
     () => ({ selectedExecution, setSelectedExecution }),
     [selectedExecution, setSelectedExecution],
   );
-
-  const renderExecutionsTimeline = (nodeExecutions: NodeExecution[]) => {
-    return <ExecutionTimeline nodeExecutions={nodeExecutions} chartTimezone={chartTimezone} />;
-  };
-
-  const TimelineLoading = () => {
-    return (
-      <div className={styles.loading}>
-        <LargeLoadingSpinner />
-      </div>
-    );
-  };
 
   return (
     <ScaleProvider>
       <div className={styles.wrapper}>
         <div className={styles.container}>
           <NodeExecutionsTimelineContext.Provider value={timelineContext}>
-            <WaitForQuery
-              errorComponent={DataError}
-              query={childGroupsQuery}
-              loadingComponent={TimelineLoading}
-            >
-              {renderExecutionsTimeline}
-            </WaitForQuery>
+            <ExecutionTimeline chartTimezone={chartTimezone} />;
           </NodeExecutionsTimelineContext.Provider>
         </div>
         <ExecutionTimelineFooter onTimezoneChange={handleTimezoneChange} />
