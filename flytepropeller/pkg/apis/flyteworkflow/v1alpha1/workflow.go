@@ -64,6 +64,11 @@ type FlyteWorkflow struct {
 	// so that it can be used downstream without any confusion.
 	// This field is here because it's easier to put it here than pipe through a new object through all of propeller.
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
+
+	// WorkflowClosureReference is the location containing an offloaded WorkflowClosure. This is used to offload
+	// portions of the CRD to an external data store to reduce CRD size. If this exists, FlytePropeller must retrieve
+	// and parse the static data prior to processing.
+	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
 }
 
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {
