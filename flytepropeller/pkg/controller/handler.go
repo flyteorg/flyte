@@ -7,21 +7,23 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // TODO Lets move everything to use controller runtime
@@ -35,6 +37,7 @@ type propellerMetrics struct {
 	PanicObserved            labeled.Counter
 	RoundSkipped             prometheus.Counter
 	WorkflowNotFound         prometheus.Counter
+	WorkflowClosureReadTime  labeled.StopWatch
 	StreakLength             labeled.Counter
 	RoundTime                labeled.StopWatch
 }
@@ -50,6 +53,7 @@ func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 		PanicObserved:            labeled.NewCounter("panic", "Panic during handling or aborting workflow", roundScope, labeled.EmitUnlabeledMetric),
 		RoundSkipped:             roundScope.MustNewCounter("skipped", "Round Skipped because of stale workflow"),
 		WorkflowNotFound:         roundScope.MustNewCounter("not_found", "workflow not found in the cache"),
+		WorkflowClosureReadTime:  labeled.NewStopWatch("closure_read", "Total time taken to read and parse the offloaded WorkflowClosure", time.Millisecond, roundScope, labeled.EmitUnlabeledMetric),
 		StreakLength:             labeled.NewCounter("streak_length", "Number of consecutive rounds used in fast follow mode", roundScope, labeled.EmitUnlabeledMetric),
 		RoundTime:                labeled.NewStopWatch("round_time", "Total time taken by one round traversing, copying and storing a workflow", time.Millisecond, roundScope, labeled.EmitUnlabeledMetric),
 	}
@@ -67,6 +71,7 @@ func RecordSystemError(w *v1alpha1.FlyteWorkflow, err error) *v1alpha1.FlyteWork
 
 // Core Propeller structure that houses the Reconciliation loop for Flytepropeller
 type Propeller struct {
+	store            *storage.DataStore
 	wfStore          workflowstore.FlyteWorkflow
 	workflowExecutor executors.Workflow
 	metrics          *propellerMetrics
@@ -192,6 +197,32 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 			return nil
 		}
 	}
+
+	// if the FlyteWorkflow CRD has the WorkflowClosureReference set then we have offloaded the
+	// static fields to the blobstore to reduce CRD size. we must read and parse the workflow
+	// closure so that these fields may be temporarily repopulated.
+	var wfClosureCrdFields *k8s.WfClosureCrdFields
+	if len(w.WorkflowClosureReference) > 0 {
+		t := p.metrics.WorkflowClosureReadTime.Start(ctx)
+
+		wfClosure := &admin.WorkflowClosure{}
+		err := p.store.ReadProtobuf(ctx, w.WorkflowClosureReference, wfClosure)
+		if err != nil {
+			t.Stop()
+			logger.Errorf(ctx, "Failed to retrieve workflow closure data from '%s' with error '%s'", w.WorkflowClosureReference, err)
+			return err
+		}
+
+		wfClosureCrdFields, err = k8s.BuildWfClosureCrdFields(wfClosure.CompiledWorkflow)
+		if err != nil {
+			t.Stop()
+			logger.Errorf(ctx, "Failed to parse workflow closure data from '%s' with error '%s'", w.WorkflowClosureReference, err)
+			return err
+		}
+
+		t.Stop()
+	}
+
 	streak := 0
 	defer p.metrics.StreakLength.Add(ctx, float64(streak))
 
@@ -201,8 +232,25 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	}
 
 	for streak = 0; streak < maxLength; streak++ {
+		// if the wfClosureCrdFields struct is not nil then it contains static workflow data which
+		// has been offloaded to the blobstore. we must set these fields so they're available
+		// during workflow processing and immediately remove them afterwards so they do not
+		// accidentally get written to the workflow store once the new state is stored.
+		if wfClosureCrdFields != nil {
+			w.WorkflowSpec = wfClosureCrdFields.WorkflowSpec
+			w.Tasks = wfClosureCrdFields.Tasks
+			w.SubWorkflows = wfClosureCrdFields.SubWorkflows
+		}
+
 		t := p.metrics.RoundTime.Start(ctx)
 		mutatedWf, err := p.TryMutateWorkflow(ctx, w)
+
+		if wfClosureCrdFields != nil {
+			// strip data populated from WorkflowClosureReference
+			w.SubWorkflows, w.Tasks, w.WorkflowSpec = nil, nil, nil
+			mutatedWf.SubWorkflows, mutatedWf.Tasks, mutatedWf.WorkflowSpec = nil, nil, nil
+		}
+
 		if err != nil {
 			// NOTE We are overriding the deepcopy here, as we are essentially ingnoring all mutations
 			// We only want to increase failed attempts and discard any other partial changes to the CRD.
@@ -319,11 +367,12 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 }
 
 // NewPropellerHandler creates a new Propeller and initializes metrics
-func NewPropellerHandler(_ context.Context, cfg *config.Config, wfStore workflowstore.FlyteWorkflow, executor executors.Workflow, scope promutils.Scope) *Propeller {
+func NewPropellerHandler(_ context.Context, cfg *config.Config, store *storage.DataStore, wfStore workflowstore.FlyteWorkflow, executor executors.Workflow, scope promutils.Scope) *Propeller {
 
 	metrics := newPropellerMetrics(scope)
 	return &Propeller{
 		metrics:          metrics,
+		store:            store,
 		wfStore:          wfStore,
 		workflowExecutor: executor,
 		cfg:              cfg,
