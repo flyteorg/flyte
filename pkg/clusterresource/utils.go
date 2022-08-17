@@ -18,7 +18,7 @@ func (s *strategicMergeFromPatch) Type() types.PatchType {
 }
 
 // Data implements Patch.
-func (s *strategicMergeFromPatch) Data(obj runtime.Object) ([]byte, error) {
+func (s *strategicMergeFromPatch) Data(obj client.Object) ([]byte, error) {
 	originalJSON, err := json.Marshal(s.from)
 	if err != nil {
 		return nil, err
