@@ -443,7 +443,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		return nil, err
 	}
 
-	handler := NewPropellerHandler(ctx, cfg, controller.workflowStore, workflowExecutor, scope)
+	handler := NewPropellerHandler(ctx, cfg, store, controller.workflowStore, workflowExecutor, scope)
 	controller.workerPool = NewWorkerPool(ctx, scope, workQ, handler)
 
 	if cfg.EnableGrpcLatencyMetrics {
