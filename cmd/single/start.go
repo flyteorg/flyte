@@ -2,6 +2,9 @@ package single
 
 import (
 	"context"
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -101,11 +104,13 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 	}
 
 	options := manager.Options{
-		Namespace:     limitNamespace,
-		SyncPeriod:    &propellerCfg.DownstreamEval.Duration,
-		ClientBuilder: executors.NewFallbackClientBuilder(propellerScope),
-		CertDir:       webhookConfig.GetConfig().CertDir,
-		Port:           webhookConfig.GetConfig().ListenPort,
+		Namespace:  limitNamespace,
+		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
+		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
+		},
+		CertDir: webhookConfig.GetConfig().CertDir,
+		Port:    webhookConfig.GetConfig().ListenPort,
 	}
 
 	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)

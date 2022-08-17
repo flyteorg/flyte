@@ -842,6 +842,21 @@ qubole (`config.Config`_)
   workers: 15
   
 
+ray (`ray.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dashboardHost: 0.0.0.0
+  includeDashboard: true
+  nodeIPAddress: $MY_POD_IP
+  serviceType: NodePort
+  shutdownAfterJobFinishes: true
+  ttlSecondsAfterFinished: 3600
+  
+
 sagemaker (`config.Config (sagemaker)`_)
 --------------------------------------------------------------------------------
 
@@ -1759,7 +1774,7 @@ Co-Pilot Configuration
 delete-resource-on-finalize (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
+Instructs the system to delete the resource upon successful execution of a k8s pod rather than have the k8s garbage collector clean it up. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
 
 **Default Value**: 
 
@@ -2633,6 +2648,69 @@ templates ([]logs.TemplateLogPluginConfig)
   null
   
 
+ray.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+shutdownAfterJobFinishes (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+ttlSecondsAfterFinished (int32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "3600"
+  
+
+serviceType (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NodePort
+  
+
+includeDashboard (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+dashboardHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0.0.0.0
+  
+
+nodeIPAddress (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  $MY_POD_IP
+  
+
 snowflake.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3153,6 +3231,18 @@ Maximum size of outputs per task
 .. code-block:: yaml
 
   "10485760"
+  
+
+enable-grpc-latency-metrics (bool)
+--------------------------------------------------------------------------------
+
+Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 kube-client-config (`config.KubeClientConfig`_)
@@ -3783,7 +3873,7 @@ config.DefaultDeadlines
 node-execution-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node execution timeout
+Default value of node execution timeout that includes the time spent to run the node/workflow
 
 **Default Value**: 
 
@@ -3795,7 +3885,7 @@ Default value of node execution timeout
 node-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node timeout
+Default value of node timeout that includes the time spent queued.
 
 **Default Value**: 
 
@@ -3807,7 +3897,7 @@ Default value of node timeout
 workflow-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of workflow timeout
+Default value of workflow timeout that includes the time spent queued.
 
 **Default Value**: 
 
