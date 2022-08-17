@@ -146,6 +146,15 @@ orchestrated by Flyte itself, within its provisioned Kubernetes clusters.
     ^^^^^^^^^^^^
     Run distributed deep learning training jobs using Horovod and MPI.
 
+    ---
+
+    .. link-button:: auto/integrations/kubernetes/ray_example/index
+       :type: ref
+       :text: Ray Task
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Run Ray jobs on a K8s Cluster.
+
 .. _external_service_backend_plugins:
 
 ********************************

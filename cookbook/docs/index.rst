@@ -184,6 +184,7 @@ Table of Contents
    auto/integrations/kubernetes/kfpytorch/index
    auto/integrations/kubernetes/kftensorflow/index
    auto/integrations/kubernetes/kfmpi/index
+   auto/integrations/kubernetes/ray_example/index
    auto/integrations/aws/sagemaker_training/index
    auto/integrations/aws/sagemaker_pytorch/index
    auto/integrations/aws/athena/index
