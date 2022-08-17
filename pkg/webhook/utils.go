@@ -48,7 +48,7 @@ func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
 				Items: []corev1.KeyToPath{
 					{
 						Key:  secret.Key,
-						Path: secret.Key,
+						Path: strings.ToLower(secret.Key),
 					},
 				},
 			},
@@ -60,7 +60,7 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 	return corev1.VolumeMount{
 		Name:      volumeName,
 		ReadOnly:  true,
-		MountPath: filepath.Join(filepath.Join(K8sSecretPathPrefix...), secret.Group),
+		MountPath: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.Group)),
 	}
 }
 
