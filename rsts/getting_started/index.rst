@@ -11,6 +11,7 @@ Requirements
 
 - Install `Docker <https://docs.docker.com/get-docker/>`__
 - Ensure Docker Daemon is running
+- Python 3.9
 
 Installation
 ^^^^^^^^^^^^
@@ -19,7 +20,7 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 
 .. prompt:: bash
 
-  pip install flytekit
+  pip3.9 install flytekit
 
 
 .. dropdown:: :fa:`info-circle` Please read on if you're running python 3.10 on a Mac M1
