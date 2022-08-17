@@ -21,7 +21,7 @@ Activates a launch plan which activates the scheduled job associated with it:
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --activate
 
-Archives a launch plan which deschedules any scheduled job associated with it:
+Archives (deactivates) a launch plan which deschedules any scheduled job associated with it:
 ::
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --archive
