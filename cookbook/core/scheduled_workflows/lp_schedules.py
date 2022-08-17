@@ -101,11 +101,11 @@ fixed_rate_lp = LaunchPlan.get_or_create(
 # Activating a Schedule
 # #####################
 #
-# After initializing your launch plan, activate it so that the schedule runs.
+# After initializing your launch plan, `activate the specific version of the launch plan <https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_update_launchplan.html>`__ so that the schedule runs.
 #
 # .. code-block:: bash
 #
-#   flytectl update launchplan -p flyteexamples -d development {{ name_of_lp }} --activate
+#   flytectl update launchplan -p flyteexamples -d development {{ name_of_lp }} --version <foo> --activate
 
 # %%
 # Verify if your launch plan was activated:
@@ -113,6 +113,16 @@ fixed_rate_lp = LaunchPlan.get_or_create(
 # .. code-block:: bash
 #
 #   flytectl get launchplan -p flytesnacks -d development
+
+# %%
+# Deactivating a Schedule
+# #######################
+#
+# You can `archive/deactivate the launch plan <https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_update_launchplan.html>`__ to deschedule any scheduled job associated with it.
+#
+# .. code-block:: bash
+#
+#   flytectl update launchplan -p flyteexamples -d development {{ name_of_lp }} --version <foo> --archive
 
 # %%
 # Platform Configuration Changes For AWS Scheduler
