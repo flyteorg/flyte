@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/flyteorg/datacatalog v1.0.1
-	github.com/flyteorg/flyteadmin v1.1.33
+	github.com/flyteorg/flyteadmin v1.1.34
 	github.com/flyteorg/flytepropeller v1.1.26
 	github.com/flyteorg/flytestdlib v1.0.6
 	github.com/golang/glog v1.0.0
@@ -219,5 +219,3 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
-
-replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v1.1.34-0.20220816200429-59310583e5e6
