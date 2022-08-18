@@ -199,6 +199,23 @@ data:
         gpu: 1
         memory: 1Gi
         storage: 2000Mi
+  notifications.yaml: 
+    notifications:
+      type: aws
+      region: <AWS_REGION>
+      publisher: 
+      topicName: arn:aws:sns:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-notifications-topic
+      processor: 
+      accountId: '<ACCOUNT_NUMBER>'
+      queueName: flyte-notifications-queue
+      emailer: 
+      body: |
+        "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+         Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+         {{ error }}"
+      sender: flyte@example.com
+      subject: 'Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has ''{{ phase
+        }}'''
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -846,7 +863,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "76b8ca5476cbbb2d029c2c19776657074c77ce14d12e4c9bd4611e97d78b158"
+        configChecksum: "23847833ca0bb01253635d195c4e11a76908ef7aab476818da1e0acab94360e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
