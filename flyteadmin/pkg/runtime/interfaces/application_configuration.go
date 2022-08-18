@@ -87,6 +87,9 @@ type ApplicationConfig struct {
 
 	// Prefix for where offloaded data from user workflows will be written
 	OutputLocationPrefix string `json:"outputLocationPrefix"`
+
+	// Enabling will use Storage (s3/gcs/etc) to offload static parts of CRDs.
+	UseOffloadedWorkflowClosure bool `json:"useOffloadedWorkflowClosure"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {

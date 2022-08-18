@@ -8,6 +8,8 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 	execClusterIfaces "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
 	clusterMock "github.com/flyteorg/flyteadmin/pkg/executioncluster/mocks"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -132,6 +134,13 @@ func TestExecute(t *testing.T) {
 		assert.Equal(t, namespace, ns)
 		return &fakeFlyteWorkflow
 	}
+
+	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
+	mockApplicationConfig.SetTopLevelConfig(runtimeInterfaces.ApplicationConfig{
+		UseOffloadedWorkflowClosure: false,
+	})
+	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
+
 	mockBuilder := mocks.FlyteWorkflowBuilder{}
 	workflowClosure := core.CompiledWorkflowClosure{
 		Primary: &core.CompiledWorkflow{
@@ -153,6 +162,7 @@ func TestExecute(t *testing.T) {
 		return proto.Equal(executionID, execID)
 	}), namespace).Return(flyteWf, nil)
 	executor := K8sWorkflowExecutor{
+		config:           mockRuntime,
 		workflowBuilder:  &mockBuilder,
 		executionCluster: getFakeExecutionCluster(),
 	}
@@ -188,9 +198,17 @@ func TestExecute_AlreadyExists(t *testing.T) {
 		assert.Equal(t, namespace, ns)
 		return &fakeFlyteWorkflow
 	}
+
+	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
+	mockApplicationConfig.SetTopLevelConfig(runtimeInterfaces.ApplicationConfig{
+		UseOffloadedWorkflowClosure: false,
+	})
+	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
+
 	mockBuilder := mocks.FlyteWorkflowBuilder{}
 	mockBuilder.OnBuildMatch(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
 	executor := K8sWorkflowExecutor{
+		config:           mockRuntime,
 		workflowBuilder:  &mockBuilder,
 		executionCluster: getFakeExecutionCluster(),
 	}
@@ -224,9 +242,17 @@ func TestExecute_MiscError(t *testing.T) {
 		assert.Equal(t, namespace, ns)
 		return &fakeFlyteWorkflow
 	}
+
+	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
+	mockApplicationConfig.SetTopLevelConfig(runtimeInterfaces.ApplicationConfig{
+		UseOffloadedWorkflowClosure: false,
+	})
+	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
+
 	mockBuilder := mocks.FlyteWorkflowBuilder{}
 	mockBuilder.OnBuildMatch(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
 	executor := K8sWorkflowExecutor{
+		config:           mockRuntime,
 		workflowBuilder:  &mockBuilder,
 		executionCluster: getFakeExecutionCluster(),
 	}
@@ -313,4 +339,78 @@ func TestAbort_MiscError(t *testing.T) {
 		Cluster:     clusterID,
 	})
 	assert.EqualError(t, err, "failed to terminate execution: project:\"proj\" domain:\"domain\" name:\"name\"  with err call failed")
+}
+
+func TestExecute_OffloadWorkflowClosure(t *testing.T) {
+	offloadedFlyteWf := &v1alpha1.FlyteWorkflow{
+		ExecutionID: v1alpha1.ExecutionID{
+			WorkflowExecutionIdentifier: execID,
+		},
+		WorkflowSpec: &v1alpha1.WorkflowSpec{},
+		Tasks:        make(map[v1alpha1.TaskID]*v1alpha1.TaskSpec),
+		SubWorkflows: make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec),
+	}
+
+	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
+	mockApplicationConfig.SetTopLevelConfig(runtimeInterfaces.ApplicationConfig{
+		UseOffloadedWorkflowClosure: true,
+	})
+	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
+
+	mockBuilder := mocks.FlyteWorkflowBuilder{}
+	workflowClosure := core.CompiledWorkflowClosure{
+		Primary: &core.CompiledWorkflow{
+			Template: &core.WorkflowTemplate{
+				Id: &core.Identifier{
+					Project: "p",
+					Domain:  "d",
+					Name:    "n",
+					Version: "version",
+				},
+			},
+		},
+		SubWorkflows: []*core.CompiledWorkflow{},
+		Tasks:        []*core.CompiledTask{},
+	}
+	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
+		return proto.Equal(wfClosure, &workflowClosure)
+	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
+		return proto.Equal(inputs, testInputs)
+	}), mock.MatchedBy(func(executionID *core.WorkflowExecutionIdentifier) bool {
+		return proto.Equal(executionID, execID)
+	}), namespace).Return(offloadedFlyteWf, nil)
+	executor := K8sWorkflowExecutor{
+		config:           mockRuntime,
+		workflowBuilder:  &mockBuilder,
+		executionCluster: getFakeExecutionCluster(),
+	}
+
+	assert.NotNil(t, offloadedFlyteWf.WorkflowSpec)
+	assert.NotNil(t, offloadedFlyteWf.Tasks)
+	assert.NotNil(t, offloadedFlyteWf.SubWorkflows)
+
+	resp, err := executor.Execute(context.TODO(), interfaces.ExecutionData{
+		Namespace:               namespace,
+		ExecutionID:             execID,
+		ReferenceWorkflowName:   "ref_workflow_name",
+		ReferenceLaunchPlanName: "ref_lp_name",
+		WorkflowClosure:         &workflowClosure,
+		ExecutionParameters: interfaces.ExecutionParameters{
+			Inputs: testInputs,
+			ExecutionConfig: &admin.WorkflowExecutionConfig{
+				SecurityContext: &core.SecurityContext{
+					RunAs: &core.Identity{
+						IamRole:           testRoleSc,
+						K8SServiceAccount: testK8sServiceAccountSc,
+					},
+				},
+			},
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, resp.Cluster, clusterID)
+
+	assert.Nil(t, offloadedFlyteWf.WorkflowSpec)
+	assert.Nil(t, offloadedFlyteWf.Tasks)
+	assert.Nil(t, offloadedFlyteWf.SubWorkflows)
 }

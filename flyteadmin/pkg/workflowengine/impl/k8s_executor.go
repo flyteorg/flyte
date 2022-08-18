@@ -6,8 +6,10 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 	execClusterInterfaces "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,8 +22,10 @@ const defaultIdentifier = "DefaultK8sExecutor"
 // K8sWorkflowExecutor directly creates and delete Flyte workflow execution CRD objects using the configured execution
 // cluster interface.
 type K8sWorkflowExecutor struct {
+	config           runtimeInterfaces.Configuration
 	executionCluster execClusterInterfaces.ClusterInterface
 	workflowBuilder  interfaces.FlyteWorkflowBuilder
+	storageClient    *storage.DataStore
 }
 
 func (e K8sWorkflowExecutor) ID() string {
@@ -29,7 +33,6 @@ func (e K8sWorkflowExecutor) ID() string {
 }
 
 func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.ExecutionData) (interfaces.ExecutionResponse, error) {
-	// TODO: Reduce CRD size and use offloaded input URI to blob store instead.
 	flyteWf, err := e.workflowBuilder.Build(data.WorkflowClosure, data.ExecutionParameters.Inputs, data.ExecutionID, data.Namespace)
 	if err != nil {
 		logger.Infof(ctx, "failed to build the workflow [%+v] %v",
@@ -39,6 +42,16 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	err = PrepareFlyteWorkflow(data, flyteWf)
 	if err != nil {
 		return interfaces.ExecutionResponse{}, err
+	}
+
+	if e.config.ApplicationConfiguration().GetTopLevelConfig().UseOffloadedWorkflowClosure {
+		// if offloading workflow closure is enabled we set the WorkflowClosureReference and remove
+		// the closure generated static fields from the FlyteWorkflow CRD. They are read from the
+		// storage client and temporarily repopulated during execution to reduce the CRD size.
+		flyteWf.WorkflowClosureReference = data.WorkflowClosureReference
+		flyteWf.WorkflowSpec = nil
+		flyteWf.SubWorkflows = nil
+		flyteWf.Tasks = nil
 	}
 
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
@@ -81,11 +94,12 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	return nil
 }
 
-func NewK8sWorkflowExecutor(executionCluster execClusterInterfaces.ClusterInterface,
-	workflowBuilder interfaces.FlyteWorkflowBuilder) *K8sWorkflowExecutor {
+func NewK8sWorkflowExecutor(config runtimeInterfaces.Configuration, executionCluster execClusterInterfaces.ClusterInterface, workflowBuilder interfaces.FlyteWorkflowBuilder, client *storage.DataStore) *K8sWorkflowExecutor {
 
 	return &K8sWorkflowExecutor{
+		config:           config,
 		executionCluster: executionCluster,
 		workflowBuilder:  workflowBuilder,
+		storageClient:    client,
 	}
 }
