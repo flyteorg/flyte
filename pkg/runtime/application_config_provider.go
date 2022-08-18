@@ -27,11 +27,12 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 		contextutils.WorkflowIDKey.String(), contextutils.TaskIDKey.String(), contextutils.PhaseKey.String(),
 		contextutils.TaskTypeKey.String(), common.RuntimeTypeKey.String(), common.RuntimeVersionKey.String(),
 		contextutils.AppNameKey.String()},
-	MetadataStoragePrefix: []string{"metadata", "admin"},
-	EventVersion:          2,
-	AsyncEventsBufferSize: 100,
-	MaxParallelism:        25,
-	K8SServiceAccount:     "",
+	MetadataStoragePrefix:       []string{"metadata", "admin"},
+	EventVersion:                2,
+	AsyncEventsBufferSize:       100,
+	MaxParallelism:              25,
+	K8SServiceAccount:           "",
+	UseOffloadedWorkflowClosure: false,
 })
 
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{

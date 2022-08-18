@@ -5,9 +5,11 @@ import (
 	"time"
 
 	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 //go:generate mockery -name=WorkflowExecutor -output=../mocks/ -case=underscore
@@ -44,6 +46,8 @@ type ExecutionData struct {
 	ReferenceLaunchPlanName string
 	// Compiled workflow closure used to build the flyte workflow
 	WorkflowClosure *core.CompiledWorkflowClosure
+	// Storage Data Reference for the WorkflowClosure
+	WorkflowClosureReference storage.DataReference
 	// Additional parameters used to build a workflow execution
 	ExecutionParameters ExecutionParameters
 }
