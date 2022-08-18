@@ -10,7 +10,7 @@ All we need to do to use pod tasks are:
 1. Define a pod spec
 2. Specify the name of the primary container
 
-`The primary container is the driver for Flyte task execution, for example, producing inputs and outputs.`
+The primary container is the driver for Flyte task execution, for example, producing inputs and outputs.
 
 Pod tasks accept arguments that ordinary container tasks usually accept, such as resource specifications, etc.
 However, these are only applied to the primary container.
