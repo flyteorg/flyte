@@ -81,10 +81,10 @@ The following table provides a quick overview of how types are converted from th
      - Schema
      - Automatic
      - Use python 3 type hints. Column types are not preserved. Install ``flytekitplugins-spark`` plugin using pip
-   * - FlyteSchema[Columns, format]
-     - Schema
+   * - torch.Tensor & torch.nn.Module
+     - Blob - Single
      - Automatic
-     - Use python 3 type hints. Column types are not preserved
+     - Use PyTorch type hints.
    * - User defined types
      - Any
      - Custom Transformers

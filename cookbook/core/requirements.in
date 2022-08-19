@@ -1,3 +1,4 @@
 -r ../common/requirements-common.in
 scikit-learn
+torch
 boto3
