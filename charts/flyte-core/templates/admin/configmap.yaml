@@ -42,9 +42,21 @@ data:
   task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- if .Values.workflow_notifications.enabled }}
-  {{- with .Values.workflow_notifications.config }}
-  notifications.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-  {{- end }}
+  notifications.yaml: 
+    notifications:
+      type: {{ .Values.workflow_notifications.config.notifications.type }}
+      {{- with .Values.workflow_notifications.config.notifications.region }}
+      region: {{ tpl (.) $ }}
+      {{- end }} 
+      {{- with .Values.workflow_notifications.config.notifications.publisher }}
+      publisher: {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}  
+      {{- with .Values.workflow_notifications.config.notifications.processor }}
+      processor: {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
+      {{- with .Values.workflow_notifications.config.notifications.emailer }}
+      emailer: {{ toYaml . | nindent 6 }}
+      {{- end }}  
 {{- end }}
 {{- if .Values.external_events.enable }}
 {{- with .Values.external_events }}

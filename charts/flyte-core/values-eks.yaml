@@ -321,9 +321,9 @@ workflow_notifications:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
         sender: "flyte@example.com"
         body: |
-          Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+         "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
           Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-          {{ error }}
+          {{ error }}"
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
