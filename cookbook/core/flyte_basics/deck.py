@@ -14,7 +14,6 @@ scatter plots or markdown text. In addition, users can create new decks to rende
 their data with custom renderers.
 Let's dive into an example.
 """
-import flytekit
 
 # %%
 # Import the dependencies.
