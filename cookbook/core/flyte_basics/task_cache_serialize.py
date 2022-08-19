@@ -1,6 +1,6 @@
 """
 Cache Serializing
---------
+-----------------
 
 Serializing means only executing a single instance of a unique cacheable task (determined by the cache_version parameter and task signature) at a time. Using this mechanism, Flyte ensures that during multiple concurrent executions of a task only a single instance is evaluated and all others wait until completion and reuse the resulting cached outputs.
 
@@ -41,8 +41,8 @@ def square(n: int) -> int:
 # Concurrently evaluated tasks will wait for completion of the first instance before reusing the cached results and subsequent evaluations will instantly reuse existing cache results.
 
 # %%
-# How serializing caches works
-# ############################
+# How Does Serializing Caches Work?
+# #################################
 #
 # The cache serialize paradigm introduces a new artifact reservation system. Tasks may use this reservation system to acquire an artifact reservation, indicating that they are actively evaluating the task, and release the reservation, once the execution is completed. Flyte uses a clock-skew algorithm to define reservation timeouts. Therefore, tasks are required to periodically extend the reservation during execution.
 #
