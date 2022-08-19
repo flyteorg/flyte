@@ -28,22 +28,6 @@ export function isExpanded(node: any) {
 }
 
 /**
- * Utility funciton assumes (loose) parity between [a]->[b] if matching
- * keys have matching values.
- * @param a     object
- * @param b     object
- * @returns     boolean
- */
-export const checkIfObjectsAreSame = (a, b) => {
-  for (const k in a) {
-    if (a[k] != b[k]) {
-      return false;
-    }
-  }
-  return true;
-};
-
-/**
  * Returns a display name from either workflows or nodes
  * @param context input can be either CompiledWorkflow or CompiledNode
  * @returns Display name
@@ -110,11 +94,12 @@ export const getNodeTypeFromCompiledNode = (node: CompiledNode): dTypes => {
 };
 
 export const getSubWorkflowFromId = (id, workflow) => {
+  const _ = require('lodash');
   const { subWorkflows } = workflow;
   /* Find current matching entitity from subWorkflows */
   for (const k in subWorkflows) {
     const subWorkflowId = subWorkflows[k].template.id;
-    if (checkIfObjectsAreSame(subWorkflowId, id)) {
+    if (_.isEqual(subWorkflowId, id)) {
       return subWorkflows[k];
     }
   }
@@ -122,11 +107,12 @@ export const getSubWorkflowFromId = (id, workflow) => {
 };
 
 export const getTaskTypeFromCompiledNode = (taskNode: TaskNode, tasks: CompiledTask[]) => {
+  const _ = require('lodash');
   for (let i = 0; i < tasks.length; i++) {
     const compiledTask: CompiledTask = tasks[i];
     const taskTemplate: TaskTemplate = compiledTask.template;
     const templateId: Identifier = taskTemplate.id;
-    if (checkIfObjectsAreSame(templateId, taskNode.referenceId)) {
+    if (_.isEqual(templateId, taskNode.referenceId)) {
       return compiledTask;
     }
   }

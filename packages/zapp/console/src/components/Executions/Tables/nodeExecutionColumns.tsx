@@ -3,8 +3,7 @@ import { formatDateLocalTimezone, formatDateUTC, millisecondsToHMS } from 'commo
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { isEqual } from 'lodash';
-import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
-import { TaskNodeMetadata } from 'models/Execution/types';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
 import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
@@ -106,15 +105,6 @@ const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => 
 
   return <Typography color="textSecondary">{type}</Typography>;
 };
-
-const hiddenCacheStatuses = [CatalogCacheStatus.CACHE_MISS, CatalogCacheStatus.CACHE_DISABLED];
-function hasCacheStatus(taskNodeMetadata?: TaskNodeMetadata): taskNodeMetadata is TaskNodeMetadata {
-  if (!taskNodeMetadata) {
-    return false;
-  }
-  const { cacheStatus } = taskNodeMetadata;
-  return !hiddenCacheStatuses.includes(cacheStatus);
-}
 
 export function generateColumns(
   styles: ReturnType<typeof useColumnStyles>,
