@@ -16,7 +16,7 @@ import (
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the launch plan
 	lp, err := cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -51,11 +51,11 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, securityContext, authRole), nil
+	return createExecutionRequest(lp.Id, inputs, securityContext, authRole, targetExecName), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the task
 	task, err := cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -97,11 +97,11 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Version:      task.Id.Version,
 	}
 
-	return createExecutionRequest(id, inputs, securityContext, authRole), nil
+	return createExecutionRequest(id, inputs, securityContext, authRole, targetExecName), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecutionName string) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RelaunchExecution request (DryRun)")
 		return nil
@@ -112,6 +112,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 			Project: project,
 			Domain:  domain,
 		},
+		Name: targetExecutionName,
 	})
 	if err != nil {
 		return err
@@ -121,7 +122,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 }
 
 func recoverExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RecoverExecution request (DryRun)")
 		return nil
@@ -132,6 +133,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 			Project: project,
 			Domain:  domain,
 		},
+		Name: targetExecName,
 	})
 	if err != nil {
 		return err
@@ -141,12 +143,15 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 }
 
 func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securityContext *core.SecurityContext,
-	authRole *admin.AuthRole) *admin.ExecutionCreateRequest {
+	authRole *admin.AuthRole, targetExecName string) *admin.ExecutionCreateRequest {
 
+	if len(targetExecName) == 0 {
+		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
+	}
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
 		Domain:  executionConfig.TargetDomain,
-		Name:    "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19],
+		Name:    targetExecName,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: ID,
 			Metadata: &admin.ExecutionMetadata{

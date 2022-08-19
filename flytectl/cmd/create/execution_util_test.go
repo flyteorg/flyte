@@ -49,7 +49,7 @@ func TestCreateExecutionForRelaunch(t *testing.T) {
 	s := setup()
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
-	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.Nil(t, err)
 }
 
@@ -57,7 +57,7 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 	s := setup()
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
-	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("unknown execution"))
@@ -67,7 +67,7 @@ func TestCreateExecutionForRecovery(t *testing.T) {
 	s := setup()
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(executionCreateResponse, nil)
-	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.Nil(t, err)
 }
 
@@ -75,7 +75,7 @@ func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 	s := setup()
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
-	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("unknown execution"))
 }
@@ -86,7 +86,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
-		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 	})
@@ -101,7 +101,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 			},
 		}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
-		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.NotNil(t, err)
 		assert.Nil(t, execCreateRequest)
 		assert.Equal(t, fmt.Errorf("parameter [nilparam] has nil Variable"), err)
@@ -110,7 +110,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		s := setup()
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.NotNil(t, err)
 		assert.Nil(t, execCreateRequest)
 		assert.Equal(t, err, errors.New("failed"))
@@ -122,7 +122,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
 		s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, mock.Anything).Return(launchPlan, nil)
-		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 		executionConfig.KubeServiceAcct = ""
@@ -139,7 +139,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 			},
 		}
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
-		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 	})
@@ -162,7 +162,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 			},
 		}
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
-		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.NotNil(t, err)
 		assert.Nil(t, execCreateRequest)
 		assert.Equal(t, fmt.Errorf("variable [nilvar] has nil type"), err)
@@ -171,7 +171,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		s := setup()
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.NotNil(t, err)
 		assert.Nil(t, execCreateRequest)
 		assert.Equal(t, err, errors.New("failed"))
@@ -186,7 +186,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 			},
 		}
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
-		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig)
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 		executionConfig.KubeServiceAcct = ""

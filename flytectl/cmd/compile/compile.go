@@ -140,6 +140,7 @@ func CreateCompileCommand() map[string]cmdCore.CommandEntry {
 			CmdFunc:                  compile,
 			PFlagProvider:            config.DefaultCompileConfig,
 			ProjectDomainNotRequired: true,
+			DisableFlyteClient:       true,
 		},
 	}
 	return compileResourcesFuncs
