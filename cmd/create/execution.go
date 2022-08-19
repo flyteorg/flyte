@@ -66,13 +66,13 @@ It is worth noting that the source's and target's project and domain can be diff
 
 	flytectl create execution --execFile execution_spec.yaml -p flytesnacks -d staging --targetProject flytesnacks
 
-To relaunch an execution, pass the current execution ID as follows:
+4. To relaunch an execution, pass the current execution ID as follows:
 
 ::
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytesnacks -d development
 
-To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
+5. To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
 
 ::
 
@@ -80,7 +80,15 @@ To recover an execution, i.e., recreate it from the last known failure point for
 
 See :ref:` + "`ref_flyteidl.admin.ExecutionRecoverRequest`" + ` for more details.
 
-Generic data types are supported for execution in a similar manner.
+6. You can create executions idempotently by naming them. This is also a way to *name* an execution for discovery. Note,
+an execution id has to be unique within a project domain. So if the *name* matches an existing execution an already exists exceptioj
+will be raised.
+
+::
+
+   flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytesnacks -d development custom_name
+
+7. Generic/Struct/Dataclass/JSON types are supported for execution in a similar manner.
 The following is an example of how generic data can be specified while creating the execution.
 
 ::
@@ -100,7 +108,7 @@ The generated file would look similar to this. Here, empty values have been dump
     task: core.type_system.custom_objects.add
     version: v3
 
-Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
+8. Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
 
 ::
 
@@ -171,21 +179,27 @@ func createExecutionCommand(ctx context.Context, args []string, cmdCtx cmdCore.C
 	var err error
 	sourceProject := config.GetConfig().Project
 	sourceDomain := config.GetConfig().Domain
+
+	var targetExecName string
+	if len(args) > 0 {
+		targetExecName = args[0]
+	}
+
 	if execParams, err = readConfigAndValidate(config.GetConfig().Project, config.GetConfig().Domain); err != nil {
 		return err
 	}
 	var executionRequest *admin.ExecutionCreateRequest
 	switch execParams.execType {
 	case Relaunch:
-		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
+		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
 	case Recover:
-		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
+		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
 	case Task:
-		if executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig); err != nil {
+		if executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName); err != nil {
 			return err
 		}
 	case Workflow:
-		if executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig); err != nil {
+		if executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName); err != nil {
 			return err
 		}
 	default:

@@ -46,16 +46,16 @@ func CreateSandboxCommand() *cobra.Command {
 	sandboxResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"start": {CmdFunc: startSandboxCluster, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: startShort,
-			Long:  startLong, PFlagProvider: sandboxCmdConfig.DefaultConfig},
+			Long:  startLong, PFlagProvider: sandboxCmdConfig.DefaultConfig, DisableFlyteClient: true},
 		"teardown": {CmdFunc: teardownSandboxCluster, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: teardownShort,
-			Long:  teardownLong},
+			Long:  teardownLong, DisableFlyteClient: true},
 		"status": {CmdFunc: sandboxClusterStatus, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: statusShort,
 			Long:  statusLong},
 		"exec": {CmdFunc: sandboxClusterExec, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: execShort,
-			Long:  execLong},
+			Long:  execLong, DisableFlyteClient: true},
 	}
 
 	cmdcore.AddCommands(sandbox, sandboxResourcesFuncs)

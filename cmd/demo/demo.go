@@ -46,16 +46,16 @@ func CreateDemoCommand() *cobra.Command {
 	demoResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"start": {CmdFunc: startDemoCluster, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: startShort,
-			Long:  startLong, PFlagProvider: sandboxCmdConfig.DefaultConfig},
+			Long:  startLong, PFlagProvider: sandboxCmdConfig.DefaultConfig, DisableFlyteClient: true},
 		"teardown": {CmdFunc: teardownDemoCluster, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: teardownShort,
-			Long:  teardownLong},
+			Long:  teardownLong, DisableFlyteClient: true},
 		"status": {CmdFunc: demoClusterStatus, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: statusShort,
 			Long:  statusLong},
 		"exec": {CmdFunc: demoClusterExec, Aliases: []string{}, ProjectDomainNotRequired: true,
 			Short: execShort,
-			Long:  execLong},
+			Long:  execLong, DisableFlyteClient: true},
 	}
 
 	cmdcore.AddCommands(demo, demoResourcesFuncs)

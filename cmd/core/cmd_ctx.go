@@ -18,14 +18,23 @@ type CommandContext struct {
 	out                   io.Writer
 }
 
+// NewCommandContextNoClient returns a new commandContext
+func NewCommandContextNoClient(out io.Writer) CommandContext {
+	return NewCommandContext(nil, out)
+}
+
 func NewCommandContext(clientSet *admin.Clientset, out io.Writer) CommandContext {
-	return CommandContext{
-		clientSet:             clientSet,
-		out:                   out,
-		adminClientFetcherExt: &ext.AdminFetcherExtClient{AdminClient: clientSet.AdminClient()},
-		adminClientUpdateExt:  &ext.AdminUpdaterExtClient{AdminClient: clientSet.AdminClient()},
-		adminClientDeleteExt:  &ext.AdminDeleterExtClient{AdminClient: clientSet.AdminClient()},
+	var adminClient service.AdminServiceClient
+	if clientSet != nil {
+		adminClient = clientSet.AdminClient()
 	}
+	return NewCommandContextWithExt(
+		clientSet,
+		&ext.AdminFetcherExtClient{AdminClient: adminClient},
+		&ext.AdminUpdaterExtClient{AdminClient: adminClient},
+		&ext.AdminDeleterExtClient{AdminClient: adminClient},
+		out,
+	)
 }
 
 // NewCommandContextWithExt construct command context with injected extensions. Helps in injecting mocked ones for testing.

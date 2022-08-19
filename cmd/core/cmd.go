@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/pkg/pkce"
 	"github.com/flyteorg/flyteidl/clients/go/admin"
@@ -23,6 +27,7 @@ type CommandEntry struct {
 	Short                    string
 	Long                     string
 	PFlagProvider            PFlagProvider
+	DisableFlyteClient       bool
 }
 
 func AddCommands(rootCmd *cobra.Command, cmdFuncs map[string]CommandEntry) {
@@ -65,14 +70,29 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 			return cmdEntry.CmdFunc(ctx, args, CommandContext{})
 		}
 
-		clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
-			WithTokenCache(pkce.TokenCacheKeyringProvider{
-				ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
-				ServiceName: pkce.KeyRingServiceName,
-			}).Build(ctx)
+		cmdCtx := NewCommandContextNoClient(cmd.OutOrStdout())
+		if !cmdEntry.DisableFlyteClient {
+			clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
+				WithTokenCache(pkce.TokenCacheKeyringProvider{
+					ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
+					ServiceName: pkce.KeyRingServiceName,
+				}).Build(ctx)
+			if err != nil {
+				return err
+			}
+			cmdCtx = NewCommandContext(clientSet, cmd.OutOrStdout())
+		}
+
+		err := cmdEntry.CmdFunc(ctx, args, cmdCtx)
 		if err != nil {
+			if s, ok := status.FromError(err); ok {
+				if s.Code() == codes.Unavailable || s.Code() == codes.Unauthenticated || s.Code() == codes.Unknown {
+					return errors.WithMessage(err,
+						fmt.Sprintf("Connection Info: [Endpoint: %s, InsecureConnection?: %v, AuthMode: %v]", adminCfg.Endpoint.String(), adminCfg.UseInsecureConnection, adminCfg.AuthType))
+				}
+			}
 			return err
 		}
-		return cmdEntry.CmdFunc(ctx, args, NewCommandContext(clientSet, cmd.OutOrStdout()))
+		return nil
 	}
 }

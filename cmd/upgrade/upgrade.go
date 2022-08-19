@@ -54,9 +54,14 @@ var (
 // SelfUpgrade will return self upgrade command
 func SelfUpgrade(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 	getResourcesFuncs := map[string]cmdCore.CommandEntry{
-		"upgrade": {CmdFunc: selfUpgrade, Aliases: []string{"upgrade"}, ProjectDomainNotRequired: true,
-			Short: upgradeCmdShort,
-			Long:  upgradeCmdLong},
+		"upgrade": {
+			CmdFunc:                  selfUpgrade,
+			Aliases:                  []string{"upgrade"},
+			ProjectDomainNotRequired: true,
+			Short:                    upgradeCmdShort,
+			Long:                     upgradeCmdLong,
+			DisableFlyteClient:       true,
+		},
 	}
 	return getResourcesFuncs
 }
