@@ -7160,6 +7160,7 @@ spec:
             mountPath: /etc/flyte/config
           - name: auth
             mountPath: /etc/secrets/
+        terminationMessagePolicy: "FallbackToLogsOnError"
       serviceAccountName: flytepropeller
       volumes:
       - configMap:

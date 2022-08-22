@@ -209,6 +209,8 @@ flytepropeller:
       ephemeral-storage: 50Mi
       memory: 100Mi
   cacheSizeMbs: 0
+  # -- Error reporting
+  terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 

@@ -189,6 +189,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to FlytePropeller pods |
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flytepropeller.terminationMessagePolicy | string | `"FallbackToLogsOnError"` | Error reporting |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
 | flytescheduler.affinity | object | `{}` | affinity for Flytescheduler deployment |
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
