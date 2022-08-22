@@ -127,8 +127,8 @@ export const MapInput = (props: InputProps) => {
     setData((data) => [...data, getNewMapItem(data.length)]);
   };
 
-  const updateUpperStream = () => {
-    const newPairs = data
+  const updateUpperStream = (newData: MapInputItem[]) => {
+    const newPairs = newData
       .filter((item) => {
         // we filter out delted values and items with errors or empty keys/values
         return item.id !== null && !!item.key && !!item.value;
@@ -145,32 +145,29 @@ export const MapInput = (props: InputProps) => {
 
   const onSetKey = (id: number | null, key: string) => {
     if (id === null) return;
-    setData((data) => {
-      data[id].key = key;
-      return [...data];
-    });
-    updateUpperStream();
+    const newData = [...data];
+    newData[id].key = key;
+    setData([...newData]);
+    updateUpperStream([...newData]);
   };
 
   const onSetValue = (id: number | null, value: string) => {
     if (id === null) return;
-    setData((data) => {
-      data[id].value = value;
-      return [...data];
-    });
-    updateUpperStream();
+    const newData = [...data];
+    newData[id].value = value;
+    setData([...newData]);
+    updateUpperStream([...newData]);
   };
 
   const onDeleteItem = (id: number | null) => {
     if (id === null) return;
-    setData((data) => {
-      const dataIndex = data.findIndex((item) => item.id === id);
-      if (dataIndex >= 0 && dataIndex < data.length) {
-        data[dataIndex].id = null;
-      }
-      return [...data];
-    });
-    updateUpperStream();
+    const newData = [...data];
+    const dataIndex = newData.findIndex((item) => item.id === id);
+    if (dataIndex >= 0 && dataIndex < newData.length) {
+      newData[dataIndex].id = null;
+    }
+    setData([...newData]);
+    updateUpperStream([...newData]);
   };
 
   const isValid = (id: number | null, value: string) => {
