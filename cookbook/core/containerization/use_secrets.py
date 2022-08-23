@@ -6,10 +6,10 @@
 Using Secrets in a Task
 =======================
 
-Flyte supports running a wide variety of tasks, from containers to SQL queries and service calls. In order for Flyte-run
+Flyte supports running a variety of tasks, from containers to SQL queries and service calls. For Flyte-run
 containers to request and access secrets, Flyte provides a native Secret construct.
 
-For a simple task that launches a Pod, the flow will look something like this:
+For a simple task that launches a Pod, the flow would look similar to this:
 
 .. image:: https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgUHJvcGVsbGVyLT4-K1BsdWdpbnM6IENyZWF0ZSBLOHMgUmVzb3VyY2VcbiAgICBQbHVnaW5zLT4-LVByb3BlbGxlcjogUmVzb3VyY2UgT2JqZWN0XG4gICAgUHJvcGVsbGVyLT4-K1Byb3BlbGxlcjogU2V0IExhYmVscyAmIEFubm90YXRpb25zXG4gICAgUHJvcGVsbGVyLT4-K0FwaVNlcnZlcjogQ3JlYXRlIE9iamVjdCAoZS5nLiBQb2QpXG4gICAgQXBpU2VydmVyLT4-K1BvZCBXZWJob29rOiAvbXV0YXRlXG4gICAgUG9kIFdlYmhvb2stPj4rUG9kIFdlYmhvb2s6IExvb2t1cCBnbG9iYWxzXG4gICAgUG9kIFdlYmhvb2stPj4rUG9kIFdlYmhvb2s6IEluamVjdCBTZWNyZXQgQW5ub3RhdGlvbnMgKGUuZy4gSzhzLCBWYXVsdC4uLiBldGMuKVxuICAgIFBvZCBXZWJob29rLT4-LUFwaVNlcnZlcjogTXV0YXRlZCBQb2RcbiAgICBcbiAgICAgICAgICAgICIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ
    :target: https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgUHJvcGVsbGVyLT4-K1BsdWdpbnM6IENyZWF0ZSBLOHMgUmVzb3VyY2VcbiAgICBQbHVnaW5zLT4-LVByb3BlbGxlcjogUmVzb3VyY2UgT2JqZWN0XG4gICAgUHJvcGVsbGVyLT4-K1Byb3BlbGxlcjogU2V0IExhYmVscyAmIEFubm90YXRpb25zXG4gICAgUHJvcGVsbGVyLT4-K0FwaVNlcnZlcjogQ3JlYXRlIE9iamVjdCAoZS5nLiBQb2QpXG4gICAgQXBpU2VydmVyLT4-K1BvZCBXZWJob29rOiAvbXV0YXRlXG4gICAgUG9kIFdlYmhvb2stPj4rUG9kIFdlYmhvb2s6IExvb2t1cCBnbG9iYWxzXG4gICAgUG9kIFdlYmhvb2stPj4rUG9kIFdlYmhvb2s6IEluamVjdCBTZWNyZXQgQW5ub3RhdGlvbnMgKGUuZy4gSzhzLCBWYXVsdC4uLiBldGMuKVxuICAgIFBvZCBXZWJob29rLT4-LUFwaVNlcnZlcjogTXV0YXRlZCBQb2RcbiAgICBcbiAgICAgICAgICAgICIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ
@@ -18,19 +18,19 @@ Where:
 
 1. Flyte invokes a plugin to create the K8s object. This can be a Pod or a more complex CRD (e.g. Spark, PyTorch, etc.)
 
-   .. tip:: The plugin will ensure that labels and annotations are passed through to any Pod that will be spawned due to the creation of the CRD.
+   .. tip:: The plugin ensures that the labels and annotations are passed to any Pod that is spawned due to the creation of the CRD.
 
-2. Flyte will apply labels and annotations that are referenced to all secrets the task is requesting access to.
-3. Flyte will send a POST request to ApiServer to create the object.
-4. Before persisting the Pod, ApiServer will invoke all registered Pod Webhooks. Flyte's Pod Webhook will be called.
-5. Flyte Pod Webhook will then, using the labels and annotiations attached in step 2, lookup globally mounted secrets for each of the requested secrets.
-6. If found, Pod Webhook will mount them directly in the Pod. If not found, it will inject the appropriate annotations to load the secrets for K8s (or Vault or Confidant or any other secret management system plugin configured) into the task pod.
+2. Flyte applies labels and annotations that are referenced to all secrets the task is requesting access to.
+3. Flyte sends a POST request to ApiServer to create the object.
+4. Before persisting the Pod, ApiServer invokes all the registered Pod Webhooks. Flyte's Pod Webhook is called.
+5. Using the labels and annotiations attached in step 2, Flyte Pod Webhook looks up globally mounted secrets for each of the requested secrets.
+6. If found, the Pod Webhook mounts them directly in the Pod. If not found, the Pod Webhook injects the appropriate annotations to load the secrets for K8s (or Vault or Confidant or any secret management system plugin configured) into the task pod.
 
 Once the secret is injected into the task pod, Flytekit can read it using the secret manager (see examples below).
 
 The webhook is included in all overlays in the Flytekit repo. The deployment file creates (mainly) two things; a Job and a Deployment.
 
-1) ``flyte-pod-webhook-secrets`` Job: This job runs ``flytepropeller webhook init-certs`` command that issues self-signed CA Certificate as well as a derived TLS certificate and its private key. It stores them into a new secret ``flyte-pod-webhook-secret``.
+1) ``flyte-pod-webhook-secrets`` Job: This job runs ``flytepropeller webhook init-certs`` command that issues self-signed CA Certificate as well as a derived TLS certificate and its private key. Ensure that the private key is in lower case, that is, ``my_token`` in contrast to ``MY_TOKEN``. It stores them into a new secret ``flyte-pod-webhook-secret``.
 2) ``flyte-pod-webhook`` Deployment: This deployment creates the Webhook pod which creates a MutatingWebhookConfiguration on startup. This serves as the registration contract with the ApiServer to know about the Webhook before it starts serving traffic.
 
 Secret Discovery
@@ -50,7 +50,7 @@ Flytekit relies on the following environment variables to load secrets (defined 
 When running a workflow on a Flyte cluster, the configured secret manager will use the secret Group and Key to try and retrieve a secret.
 If successful, it will make the secret available as either file or environment variable and will if necessary modify the above variables automatically so that the task can load and use the secrets.
 
-Configuring a secret management system plugin into use
+Configuring a Secret Management System Plugin into Use
 ======================================================
 
 When a task requests a secret Flytepropeller will try to retrieve secrets in the following order: 1.) checking for global secrets (secrets mounted as files or environment variables on the flyte-pod-webhook pod) and 2.) checking with an additional configurable secret manager.
