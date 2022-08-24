@@ -20,7 +20,7 @@ Where:
 
    .. tip:: The plugin ensures that the labels and annotations are passed to any Pod that is spawned due to the creation of the CRD.
 
-2. Flyte applies labels and annotations that are referenced to all secrets the task is requesting access to.
+2. Flyte applies labels and annotations that are referenced to all secrets the task is requesting access to. Note that secrets are not case sensitive. 
 3. Flyte sends a POST request to ApiServer to create the object.
 4. Before persisting the Pod, ApiServer invokes all the registered Pod Webhooks. Flyte's Pod Webhook is called.
 5. Using the labels and annotiations attached in step 2, Flyte Pod Webhook looks up globally mounted secrets for each of the requested secrets.
