@@ -240,7 +240,7 @@ Using Default K8s PodTemplates
 
 To initialize a default PodTemplate in Flyte:
 
-#. **Set the 'default-pod-template-name' in FlytePropeller:** This `option <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__ initializes a K8s informer internally to track system PodTemplate updates (creates, updates, etc) so that FlytePropeller is aware of the latest PodTemplate definitions in the K8s environment.
+#. **Set the 'default-pod-template-name' in FlytePropeller:** This `option <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__ initializes a K8s informer internally to track system PodTemplate updates (creates, updates, etc) so that FlytePropeller is aware of the latest PodTemplate definitions in the K8s environment. You can find this setting in `FlytePropeller <https://github.com/flyteorg/flyte/blob/e3e4978838f3caee0d156348ca966b7f940e3d45/deployment/eks/flyte_generated.yaml#L8222-L8381>`__ config map, which is not set by default. 
  
 #. **Create a PodTemplate resource:** Flyte recognizes PodTemplate definitions with the ``default-pod-template-name`` at two granularities. 
 
