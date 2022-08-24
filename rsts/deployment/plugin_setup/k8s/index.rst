@@ -84,6 +84,16 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
        export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
        kustomize build mpi-operator/manifests/overlays/kubeflow | kubectl apply -f -
 
+.. tabbed:: Ray Operator
+
+  * Install Ray Operator
+
+    .. code-block:: bash
+
+        export KUBERAY_VERSION=v0.3.0
+        kubectl create -k "github.com/ray-project/kuberay/manifests/cluster-scope-resources?ref=${KUBERAY_VERSION}&timeout=90s"
+        kubectl apply -k "github.com/ray-project/kuberay/manifests/base?ref=${KUBERAY_VERSION}&timeout=90s"
+
 .. tabbed:: Spark Operator
 
   * Add Spark repository
@@ -175,6 +185,31 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                  sidecar: sidecar
                  container_array: k8s-array
                  mpi: mpi
+
+.. tabbed:: Ray Operator
+
+  * Enable Ray backend plugin
+
+    .. code-block:: yaml
+
+       configmap:
+         enabled_plugins:
+           # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+           tasks:
+             # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+             task-plugins:
+               # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+               # plugins
+               enabled-plugins:
+                 - container
+                 - sidecar
+                 - k8s-array
+                 - ray
+               default-for-task-types:
+                 container: container
+                 sidecar: sidecar
+                 container_array: k8s-array
+                 ray: ray
 
 .. tabbed:: Spark Operator
 
@@ -487,26 +522,33 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-kfpytorch.tar.gz --archive -p flytesnacks -d development --version latest
 
 .. tabbed:: TensorFlow Operator
 
     .. code-block:: bash
 
        # TODO: https://github.com/flyteorg/flyte/issues/1757
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kftensorflow.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-kftensorflow.tar.gz --archive -p flytesnacks -d development --version latest
 
 .. tabbed:: MPI Operator
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-kfmpi.tar.gz --archive -p flytesnacks -d development --version latest
+
+.. tabbed:: Ray Operator
+
+    .. code-block:: bash
+
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-ray_example.tar.gz --archive -p flytesnacks -d development --version latest
+
 
 .. tabbed:: Spark Operator
 
     .. code-block:: bash
 
-       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-k8s_spark.tar.gz --archive -p flytesnacks -d development --version latest
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-k8s_spark.tar.gz --archive -p flytesnacks -d development --version latest
 
 
 7. Launch an execution
@@ -555,6 +597,20 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
         .. code-block:: bash
 
            flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development kfmpi.mpi_mnist.horovod_training_wf  --latest --execFile exec_spec.yaml
+
+      * Launch! 🚀
+
+        .. code-block:: bash
+
+           flytectl --config ~/.flyte/config.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
+
+    .. tabbed:: Ray Operator
+
+      * Retrieve an execution in the form of a YAML file
+
+        .. code-block:: bash
+
+           flytectl get launchplan --config ~/.flyte/config.yaml --project flytesnacks --domain development ray_example.ray_example.ray_workflow  --latest --execFile exec_spec.yaml
 
       * Launch! 🚀
 
