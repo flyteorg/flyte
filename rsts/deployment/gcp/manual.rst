@@ -255,6 +255,17 @@ Development
 Create a GKE Cluster
 ====================
 Create a GKE cluster with VPC-native networking and workload identity enabled.
+You can enable the GKE workload identity by adding the below lines to `this Dockerfile <https://github.com/flyteorg/flytekit/blob/master/Dockerfile.py3.8>`__. 
+
+.. code-block:: bash
+
+ FROM ghcr.io/flyteorg/flytekit:py3.8-1.0.3
+
+ # Required for gsutil to work with workload-identity
+ RUN echo '[GoogleCompute]\nservice_account = default' > /etc/boto.cfg
+
+Adding the above specified lines (``boto.cfg`` configuration) to the Dockerfile also authenticates standalone ``gsutil``. This way, the pod starts without any hiccups. 
+
 Navigate to the gcloud console and Kubernetes Engine tab to start creating the k8s cluster.
 
 Ensure that VPC native traffic routing is enabled under Security enable Workload identity and use project default pool
