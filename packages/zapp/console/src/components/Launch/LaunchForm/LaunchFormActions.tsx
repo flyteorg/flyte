@@ -12,12 +12,14 @@ export interface LaunchFormActionsProps {
   state: BaseInterpretedLaunchState;
   service: BaseLaunchService;
   onClose(): void;
+  isError: boolean;
 }
 /** Renders the Submit/Cancel buttons for a LaunchForm */
 export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
   state,
   service,
   onClose,
+  isError,
 }) => {
   const styles = useStyles();
   const submissionInFlight = state.matches(LaunchState.SUBMITTING);
@@ -68,7 +70,7 @@ export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
         </Button>
         <Button
           color="primary"
-          disabled={!canSubmit}
+          disabled={!canSubmit || isError}
           id="launch-workflow-submit"
           onClick={submit}
           type="submit"

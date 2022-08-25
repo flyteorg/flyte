@@ -195,6 +195,7 @@ export interface InputProps {
   typeDefinition: InputTypeDefinition;
   value?: InputValue;
   onChange: InputChangeHandler;
+  setIsError: (boolean) => void;
 }
 
 export interface ParsedInput

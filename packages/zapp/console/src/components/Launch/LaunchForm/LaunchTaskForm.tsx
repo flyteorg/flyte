@@ -27,6 +27,7 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
   const styles = useStyles();
   const baseState = state as BaseInterpretedLaunchState;
   const baseService = service as BaseLaunchService;
+  const [isError, setIsError] = React.useState<boolean>(false);
 
   // Any time the inputs change (even if it's just re-ordering), we must
   // change the form key so that the inputs component will re-mount.
@@ -69,13 +70,24 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
             showErrors={state.context.showErrors}
           />
         ) : null}
-        <LaunchFormInputs key={formKey} ref={formInputsRef} state={baseState} variant="task" />
+        <LaunchFormInputs
+          key={formKey}
+          ref={formInputsRef}
+          state={baseState}
+          variant="task"
+          setIsError={setIsError}
+        />
         <LaunchInterruptibleInput
           initialValue={state.context.interruptible}
           ref={interruptibleInputRef}
         />
       </DialogContent>
-      <LaunchFormActions state={baseState} service={baseService} onClose={props.onClose} />
+      <LaunchFormActions
+        state={baseState}
+        service={baseService}
+        onClose={props.onClose}
+        isError={isError}
+      />
     </>
   );
 };

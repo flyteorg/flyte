@@ -57,7 +57,16 @@ const generateListOfSearchableSelectorOptions = (
 };
 
 export const UnionInput = (props: InputProps) => {
-  const { initialValue, required, label, onChange, typeDefinition, error, description } = props;
+  const {
+    initialValue,
+    required,
+    label,
+    onChange,
+    typeDefinition,
+    error,
+    description,
+    setIsError,
+  } = props;
 
   const classes = useStyles();
 
@@ -149,6 +158,7 @@ export const UnionInput = (props: InputProps) => {
               error: error,
             } as InputProps,
             true,
+            setIsError,
           )}
         </div>
       </CardContent>
