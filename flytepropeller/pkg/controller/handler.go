@@ -248,7 +248,9 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 		if wfClosureCrdFields != nil {
 			// strip data populated from WorkflowClosureReference
 			w.SubWorkflows, w.Tasks, w.WorkflowSpec = nil, nil, nil
-			mutatedWf.SubWorkflows, mutatedWf.Tasks, mutatedWf.WorkflowSpec = nil, nil, nil
+			if mutatedWf != nil {
+				mutatedWf.SubWorkflows, mutatedWf.Tasks, mutatedWf.WorkflowSpec = nil, nil, nil
+			}
 		}
 
 		if err != nil {

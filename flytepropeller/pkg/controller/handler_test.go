@@ -894,4 +894,25 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
 	})
+
+	t.Run("TryMutate failure is handled", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+
+		protoStore := &storagemocks.ComposedProtobufStore{}
+		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			return fmt.Errorf("foo")
+		}
+		dataStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, protoStore)
+		p := NewPropellerHandler(ctx, cfg, dataStore, s, exec, scope)
+
+		err := p.Handle(ctx, namespace, name)
+		assert.Error(t, err, "foo")
+
+		r, err := s.Get(ctx, namespace, name)
+		assert.NoError(t, err)
+		assert.Nil(t, r.WorkflowSpec)
+		assert.Nil(t, r.SubWorkflows)
+		assert.Nil(t, r.Tasks)
+	})
 }
