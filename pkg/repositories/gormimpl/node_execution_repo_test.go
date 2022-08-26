@@ -448,3 +448,36 @@ func TestNodeExecutionExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, exists)
 }
+
+func TestCountNodeExecutions(t *testing.T) {
+	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT count(*) FROM "node_executions"`).WithReply([]map[string]interface{}{{"rows": 2}})
+
+	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), count)
+}
+
+func TestCountNodeExecutions_Filters(t *testing.T) {
+	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT count(*) FROM "node_executions" INNER JOIN node_executions ON node_event_executions.node_execution_id = node_executions.id INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND "error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
+
+	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.NodeExecution, "phase", core.NodeExecution_FAILED.String()),
+		},
+		MapFilters: []common.MapFilter{
+			common.NewMapFilter(map[string]interface{}{
+				"error_code": nil,
+			}),
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(3), count)
+}

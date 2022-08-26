@@ -33,7 +33,8 @@ var (
 // GetInitSecretsCommand creates a command to issue secrets to be used for Auth settings. It writes the secrets to the
 // working directory. The expectation is that they are put in a location and made available to the serve command later.
 // To configure where the serve command looks for secrets, update this config:
-// 	secrets:
+//
+//	secrets:
 //	  secrets-prefix: <my custom path>
 func GetInitSecretsCommand() *cobra.Command {
 	cmd := &cobra.Command{

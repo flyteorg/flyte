@@ -41,7 +41,8 @@ func (e *flyteAdminErrorImpl) String() string {
 }
 
 // enclose the error in the format that grpc server expect from golang:
-//   https://github.com/grpc/grpc-go/blob/master/status/status.go#L133
+//
+//	https://github.com/grpc/grpc-go/blob/master/status/status.go#L133
 func (e *flyteAdminErrorImpl) WithDetails(details *admin.EventFailureReason) (FlyteAdminError, error) {
 	s, err := e.status.WithDetails(details)
 	if err != nil {

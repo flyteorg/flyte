@@ -64,11 +64,11 @@ func (q qualityOfServiceAllocator) getQualityOfServiceFromDb(ctx context.Context
 /*
 Users can specify the quality of service for an execution (in order of decreasing specificity)
 
-- At CreateExecution request time
-- In the LaunchPlan spec
-- In the Workflow spec
-- As an overridable MatchableResource (https://lyft.github.io/flyte/administrator/install/managing_customizable_resources.html)
-  for the underlying workflow
+  - At CreateExecution request time
+  - In the LaunchPlan spec
+  - In the Workflow spec
+  - As an overridable MatchableResource (https://lyft.github.io/flyte/administrator/install/managing_customizable_resources.html)
+    for the underlying workflow
 
 System administrators can specify default QualityOfService specs
 (https://github.com/flyteorg/flyteidl/blob/e9727afcedf8d4c30a1fc2eeac45593e426d9bb0/protos/flyteidl/core/execution.proto#L92)s

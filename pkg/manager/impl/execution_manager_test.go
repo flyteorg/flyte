@@ -2294,7 +2294,7 @@ func TestUpdateExecution(t *testing.T) {
 			updateExecFuncCalled = true
 			return nil
 		}
-		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecFunc)
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
 		r := plugins.NewRegistry()
 		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2315,7 +2315,7 @@ func TestUpdateExecution(t *testing.T) {
 			updateExecFuncCalled = true
 			return nil
 		}
-		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecFunc)
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
 		r := plugins.NewRegistry()
 		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2333,7 +2333,7 @@ func TestUpdateExecution(t *testing.T) {
 		updateExecFunc := func(ctx context.Context, execModel models.Execution) error {
 			return fmt.Errorf("some db error")
 		}
-		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecFunc)
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
 		r := plugins.NewRegistry()
 		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2818,7 +2818,7 @@ func TestTerminateExecution(t *testing.T) {
 		}, unmarshaledClosure.GetAbortMetadata()))
 		return nil
 	}
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecutionFunc)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.AbortData) bool {
@@ -2860,7 +2860,7 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 
 	updateCalled := false
 	repository := repositoryMocks.NewMockRepository()
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(func(
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(func(
 		context context.Context, execution models.Execution) error {
 		updateCalled = true
 		assert.Equal(t, core.WorkflowExecution_ABORTING.String(), execution.Phase)
@@ -2892,7 +2892,7 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 		context context.Context, execution models.Execution) error {
 		return expectedError
 	}
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecutionFunc)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(nil)
 	mockExecutor.OnID().Return("testMockExecutor")

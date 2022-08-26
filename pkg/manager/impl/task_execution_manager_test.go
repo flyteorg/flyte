@@ -304,10 +304,11 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
-	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).ExistsFunction = func(
-		ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
-		return false, expectedErr
-	}
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetExistsCallback(
+		func(
+			ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+			return false, expectedErr
+		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.EqualError(t, err, "Failed to get existing node execution id: [node_id:\"node-id\""+
@@ -315,10 +316,11 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 		"with err: expected error")
 	assert.Nil(t, resp)
 
-	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).ExistsFunction = func(
-		ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
-		return false, nil
-	}
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetExistsCallback(
+		func(
+			ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+			return false, nil
+		})
 	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
 	resp, err = taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.EqualError(t, err, "failed to get existing node execution id: [node_id:\"node-id\""+

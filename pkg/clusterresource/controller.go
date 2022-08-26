@@ -269,10 +269,10 @@ func prepareDynamicCreate(target executioncluster.ExecutionTarget, config string
 
 // This function loops through the kubernetes resource template files in the configured template directory.
 // For each unapplied template file (wrt the namespace) this func attempts to
-//   1) create k8s object resource from template by performing:
-//      a) read template file
-//      b) substitute templatized variables with their resolved values
-//   2) create the resource on the kubernetes cluster and cache successful outcomes
+//  1. create k8s object resource from template by performing:
+//     a) read template file
+//     b) substitute templatized variables with their resolved values
+//  2. create the resource on the kubernetes cluster and cache successful outcomes
 func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, domain *admin.Domain, namespace NamespaceName,
 	templateValues, customTemplateValues templateValuesType) error {
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
@@ -445,8 +445,9 @@ func addResourceVersion(patch []byte, rv string) ([]byte, error) {
 }
 
 // createResourceFromTemplate this method perform following processes:
-//      1) read template file pointed by templateDir and templateFileName
-//      2) substitute templatized variables with their resolved values
+//  1. read template file pointed by templateDir and templateFileName
+//  2. substitute templatized variables with their resolved values
+//
 // the method will return the kubernetes raw manifest
 func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir string,
 	templateFileName string, project *admin.Project, domain *admin.Domain, namespace NamespaceName,

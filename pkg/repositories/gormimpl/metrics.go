@@ -16,6 +16,7 @@ type gormMetrics struct {
 	ListIdentifiersDuration promutils.StopWatch
 	DeleteDuration          promutils.StopWatch
 	ExistsDuration          promutils.StopWatch
+	CountDuration           promutils.StopWatch
 }
 
 func newMetrics(scope promutils.Scope) gormMetrics {
@@ -31,7 +32,11 @@ func newMetrics(scope promutils.Scope) gormMetrics {
 			"list", "time taken to list entries", time.Millisecond),
 		ListIdentifiersDuration: scope.MustNewStopWatch(
 			"list_identifiers", "time taken to list identifier entries", time.Millisecond),
-		DeleteDuration: scope.MustNewStopWatch("delete", "time taken to delete an individual entry", time.Millisecond),
-		ExistsDuration: scope.MustNewStopWatch("exists", "time taken to determine whether an individual entry exists", time.Millisecond),
+		DeleteDuration: scope.MustNewStopWatch(
+			"delete", "time taken to delete an individual entry", time.Millisecond),
+		ExistsDuration: scope.MustNewStopWatch(
+			"exists", "time taken to determine whether an individual entry exists", time.Millisecond),
+		CountDuration: scope.MustNewStopWatch(
+			"count", "time taken to count entries", time.Millisecond),
 	}
 }

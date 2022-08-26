@@ -24,18 +24,18 @@ type ResourceRepo struct {
 const priorityDescending = "priority desc"
 
 /*
-	The data in the Resource repo maps to the following rules:
-	* Domain and ResourceType can never be empty.
-	* Empty string can be interpreted as all. Example: "" for Project field can be interpreted as all Projects for a domain.
-	* One cannot provide specific value for Project, unless a specific value for Domain is provided.
-	** Project is always scoped within a domain.
-	**	Example: Domain="" Project="Lyft" is invalid.
-	* One cannot provide specific value for Workflow, unless a specific value for Domain and Project is provided.
-	** Workflow is always scoped within a domain and project.
-	**	Example: Domain="staging" Project="" Workflow="W1" is invalid.
-	* One cannot provide specific value for Launch plan, unless a specific value for Domain, Project and Workflow is provided.
-	** Launch plan is always scoped within a domain, project and workflow.
-	**	Example: Domain="staging" Project="Lyft" Workflow="" LaunchPlan= "l1" is invalid.
+The data in the Resource repo maps to the following rules:
+* Domain and ResourceType can never be empty.
+* Empty string can be interpreted as all. Example: "" for Project field can be interpreted as all Projects for a domain.
+* One cannot provide specific value for Project, unless a specific value for Domain is provided.
+** Project is always scoped within a domain.
+**	Example: Domain="" Project="Lyft" is invalid.
+* One cannot provide specific value for Workflow, unless a specific value for Domain and Project is provided.
+** Workflow is always scoped within a domain and project.
+**	Example: Domain="staging" Project="" Workflow="W1" is invalid.
+* One cannot provide specific value for Launch plan, unless a specific value for Domain, Project and Workflow is provided.
+** Launch plan is always scoped within a domain, project and workflow.
+**	Example: Domain="staging" Project="Lyft" Workflow="" LaunchPlan= "l1" is invalid.
 */
 func validateCreateOrUpdateResourceInput(project, domain, workflow, launchPlan, resourceType string) bool {
 	if domain == "" || resourceType == "" {
