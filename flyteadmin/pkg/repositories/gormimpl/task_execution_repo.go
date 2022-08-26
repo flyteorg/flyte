@@ -99,7 +99,7 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	tx := r.db.Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecution")
 
 	// And add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// We are joining on task -> taskExec->NodeExec -> Exec.
+	// We are joining on task -> taskExec -> NodeExec -> Exec.
 	// NOTE: the order in which the joins are called below are important because postgres will only know about certain
 	// tables as they are joined. So we should do it in the order specified above.
 	tx = tx.Joins(leftJoinTaskToTaskExec)
@@ -127,6 +127,35 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	return interfaces.TaskExecutionCollectionOutput{
 		TaskExecutions: taskExecutions,
 	}, nil
+}
+
+func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+	var err error
+	tx := r.db.Model(&models.TaskExecution{})
+
+	// Add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
+	// We are joining on task -> taskExec -> NodeExec -> Exec.
+	// NOTE: the order in which the joins are called below are important because postgres will only know about certain
+	// tables as they are joined. So we should do it in the order specified above.
+	tx = tx.Joins(leftJoinTaskToTaskExec)
+	tx = tx.Joins(innerJoinNodeExecToTaskExec)
+	tx = tx.Joins(innerJoinExecToNodeExec)
+
+	// Apply filters
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	if err != nil {
+		return 0, err
+	}
+
+	// Run the query
+	timer := r.metrics.CountDuration.Start()
+	var count int64
+	tx = tx.Count(&count)
+	timer.Stop()
+	if tx.Error != nil {
+		return 0, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return count, nil
 }
 
 // Returns an instance of TaskExecutionRepoInterface

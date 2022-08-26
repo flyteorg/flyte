@@ -110,6 +110,41 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}, nil
 }
 
+func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+	var err error
+	tx := r.db.Model(&models.Execution{})
+
+	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
+	if ok := input.JoinTableEntities[common.LaunchPlan]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.launch_plan_id = %s.id",
+			launchPlanTableName, executionTableName, launchPlanTableName))
+	}
+	if ok := input.JoinTableEntities[common.Workflow]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.workflow_id = %s.id",
+			workflowTableName, executionTableName, workflowTableName))
+	}
+	if ok := input.JoinTableEntities[common.Task]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.task_id = %s.id",
+			taskTableName, executionTableName, taskTableName))
+	}
+
+	// Apply filters
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	if err != nil {
+		return 0, err
+	}
+
+	// Run the query
+	timer := r.metrics.CountDuration.Start()
+	var count int64
+	tx = tx.Count(&count)
+	timer.Stop()
+	if tx.Error != nil {
+		return 0, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return count, nil
+}
+
 // Returns an instance of ExecutionRepoInterface
 func NewExecutionRepo(
 	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ExecutionRepoInterface {

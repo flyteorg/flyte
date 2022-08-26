@@ -201,3 +201,36 @@ func TestListTaskExecutionsForTaskExecution(t *testing.T) {
 		assert.Equal(t, time.Hour, taskExecution.Duration)
 	}
 }
+
+func TestCountTaskExecutions(t *testing.T) {
+	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT count(*) FROM "task_executions"`).WithReply([]map[string]interface{}{{"rows": 2}})
+
+	count, err := taskExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), count)
+}
+
+func TestCountTaskExecutions_Filters(t *testing.T) {
+	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT count(*) FROM "task_executions" LEFT JOIN tasks ON task_executions.project = tasks.project AND task_executions.domain = tasks.domain AND task_executions.name = tasks.name AND task_executions.version = tasks.version INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE task_executions.phase = $1 AND "task_execution_updated_at" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
+
+	count, err := taskExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.TaskExecution, "phase", core.TaskExecution_FAILED.String()),
+		},
+		MapFilters: []common.MapFilter{
+			common.NewMapFilter(map[string]interface{}{
+				"task_execution_updated_at": nil,
+			}),
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(3), count)
+}

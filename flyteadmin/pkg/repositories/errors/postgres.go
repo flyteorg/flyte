@@ -2,7 +2,9 @@
 // This errors utility translates postgres application error codes into internal error types.
 // The go postgres driver defines possible error codes here: https://github.com/lib/pq/blob/master/error.go
 // And the postgres standard defines error responses here:
-// 		https://www.postgresql.org/docs/current/static/protocol-error-fields.html
+//
+//	https://www.postgresql.org/docs/current/static/protocol-error-fields.html
+//
 // Inspired by https://www.codementor.io/tamizhvendan/managing-data-in-golang-using-gorm-part-1-a9cdjb8nb
 package errors
 

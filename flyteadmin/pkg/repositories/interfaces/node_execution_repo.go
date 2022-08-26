@@ -15,15 +15,17 @@ type NodeExecutionRepoInterface interface {
 	Update(ctx context.Context, execution *models.NodeExecution) error
 	// Get returns a matching execution if it exists.
 	Get(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
-	// GetWithChildren Returns a matching execution with preloaded child node executions. This should only be called for legacy node executions
+	// GetWithChildren returns a matching execution with preloaded child node executions. This should only be called for legacy node executions
 	// which were created with eventVersion == 0
 	GetWithChildren(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
-	// List eturns node executions matching query parameters. A limit must be provided for the results page size.
+	// List returns node executions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (NodeExecutionCollectionOutput, error)
-	// ListEvents eturns node execution events matching query parameters. A limit must be provided for the results page size.
+	// ListEvents returns node execution events matching query parameters. A limit must be provided for the results page size.
 	ListEvents(ctx context.Context, input ListResourceInput) (NodeExecutionEventCollectionOutput, error)
 	// Exists returns whether a matching execution exists.
 	Exists(ctx context.Context, input NodeExecutionResource) (bool, error)
+	// Returns count of node executions matching query parameters.
+	Count(ctx context.Context, input CountResourceInput) (int64, error)
 }
 
 type NodeExecutionResource struct {

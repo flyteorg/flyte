@@ -16,6 +16,8 @@ type ExecutionRepoInterface interface {
 	Get(ctx context.Context, input Identifier) (models.Execution, error)
 	// Returns executions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (ExecutionCollectionOutput, error)
+	// Returns count of executions matching query parameters.
+	Count(ctx context.Context, input CountResourceInput) (int64, error)
 }
 
 // Response format for a query on workflows.

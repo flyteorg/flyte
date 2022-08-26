@@ -305,7 +305,13 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		handler = httpServer
 	}
 
-	err = http.ListenAndServe(cfg.GetHostAddress(), handler)
+	server := &http.Server{
+		Addr:              cfg.GetHostAddress(),
+		Handler:           handler,
+		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
+	}
+
+	err = server.ListenAndServe()
 	if err != nil {
 		return errors.Wrapf(err, "failed to Start HTTP Server")
 	}
