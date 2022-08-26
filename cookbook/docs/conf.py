@@ -287,6 +287,7 @@ examples_dirs = [
     "../integrations/flytekit_plugins/modin_examples",
     "../integrations/flytekit_plugins/dolt",
     "../integrations/flytekit_plugins/whylogs_examples",
+    "../integrations/flytekit_plugins/onnx_examples",
     "../integrations/kubernetes/pod",
     "../integrations/kubernetes/k8s_spark",
     "../integrations/kubernetes/kftensorflow",
@@ -327,6 +328,7 @@ gallery_dirs = [
     "auto/integrations/flytekit_plugins/modin_examples",
     "auto/integrations/flytekit_plugins/dolt",
     "auto/integrations/flytekit_plugins/whylogs_examples",
+    "auto/integrations/flytekit_plugins/onnx_examples",
     "auto/integrations/kubernetes/pod",
     "auto/integrations/kubernetes/k8s_spark",
     "auto/integrations/kubernetes/kftensorflow",
@@ -447,6 +449,7 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
     "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
+    "flytekitplugins": ("https://docs.flyte.org/projects/flytekit/en/latest/", None),
     "flyte": ("https://flyte.readthedocs.io/en/latest/", None),
     # Uncomment for local development and change to your username
     # "flytekit": ("/Users/ytong/go/src/github.com/lyft/flytekit/docs/build/html", None),

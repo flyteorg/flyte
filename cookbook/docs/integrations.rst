@@ -76,7 +76,15 @@ Flytekit functionality. These plugins can be anything and for comparison can be 
       :text: whylogs
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
-   ``whylogs``, the open standard for data logging.
+   ``whylogs``: the open standard for data logging.
+
+   ---
+   .. link-button:: auto/integrations/flytekit_plugins/onnx_examples/index
+      :type: ref
+      :text: ONNX
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   Convert ML models to ONNX models seamlessly.
 
 
 .. dropdown:: :fa:`info-circle` Using flytekit plugins

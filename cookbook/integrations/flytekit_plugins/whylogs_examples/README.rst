@@ -7,12 +7,12 @@ to logs produced by regular software applications.
 
 
 whylogs with Flyte
-==================
+------------------
 The integration we've built consists on a type registration and also renderers.
 
 
 whylogs Flyte Type
-------------------
+^^^^^^^^^^^^^^^^^^
 The first part of the integration consists on the ability to pass a ``DatasetProfileView`` in and out of
 the desired tasks. whylogs' DatasetProfileView is the representation of a snapshot of your dataset.
 With this integration under Flyte's type system, users will benefit from profiling their desired dataset once
@@ -80,7 +80,7 @@ systems automatically.
 
 
 Installing the plugin
-=====================
+---------------------
 
 In order to have the whylogs plugin installed, simply run:
 
