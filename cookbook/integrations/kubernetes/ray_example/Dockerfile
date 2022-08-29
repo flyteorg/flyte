@@ -1,34 +1,41 @@
-FROM rayproject/ray:1.13.1-py37-gpu
-# You can disable GPU support by replacing the above line with:
-# FROM rayproject/ray_example:1.13.1-py37-cpu
-USER ray
+FROM python:3.8-slim-buster
 LABEL org.opencontainers.image.source=https://github.com/flyteorg/flytesnacks
 
-USER ray
-ARG HOME=/home/ray
-WORKDIR $HOME
+WORKDIR /root
+ENV VENV /opt/venv
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV DEBIAN_FRONTEND noninteractive
-ENV TERM linux
+ENV PYTHONPATH /root
+
+RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg build-essential curl git
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip install awscli
 
-# Install wheel after venv is activated
-RUN pip3 install wheel
+WORKDIR /opt
+RUN curl https://sdk.cloud.google.com > install.sh
+RUN bash /opt/install.sh --install-dir=/opt
+ENV PATH $PATH:/opt/google-cloud-sdk/bin
+WORKDIR /root
+
+ENV VENV /opt/venv
+# Virtual environment
+RUN python3 -m venv ${VENV}
+ENV PATH="${VENV}/bin:$PATH"
 
 # Install Python dependencies
-RUN pip3 install flytekit "git+https://github.com/flyteorg/flytekit@master#egg=flytekitplugins-ray&subdirectory=plugins/flytekit-ray"
-RUN pip3 install ray[default]
+COPY ray_example/requirements.txt /root
+RUN pip install -r /root/requirements.txt
+RUN pip freeze
 
-# Copy the makefile targets to expose on the container. This makes it easier to register.
-COPY ray_example/in_container.mk /$HOME/Makefile
-COPY ray_example/sandbox.config /$HOME
+# Copy the makefile targets to expose on the container. This makes it easier to register
+COPY in_container.mk /root/Makefile
+COPY ray_example/sandbox.config /root
 
-# Note: when we start the container using this image, we'll run "ray_example start" first at "/home/ray_example/anaconda3/lib/python3.7", and then
-# run "pyflyte-execute" to run a ray_example job. Therefore, actual code should be copy to "/home/ray_example/anaconda3/lib/python3.7"
-COPY ray_example/ /home/ray/anaconda3/lib/python3.7/ray_example
+# Copy the actual code
+COPY ray_example /root/ray_example
+
+
 # This tag is supplied by the build script and will be used to determine the version
 # when registering tasks, workflows, and launch plans
 ARG tag

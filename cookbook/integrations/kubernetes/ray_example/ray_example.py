@@ -39,7 +39,7 @@ def f(x):
 #
 ray_config = RayJobConfig(
     head_node_config=HeadNodeConfig(ray_start_params={"log-color": "True"}),
-    worker_node_config=[WorkerNodeConfig(group_name="ray-group", replicas=5)],
+    worker_node_config=[WorkerNodeConfig(group_name="ray-group", replicas=2)],
     runtime_env={"pip": ["numpy", "pandas"]},  # or runtime_env="./requirements.txt"
 )
 
@@ -52,7 +52,7 @@ ray_config = RayJobConfig(
 #
 # .. note::
 #    The Resources here is used to define the resource of worker nodes
-@task(task_config=ray_config, limits=Resources(mem="2000Mi", cpu="2"))
+@task(task_config=ray_config, limits=Resources(mem="2000Mi", cpu="1"))
 def ray_task(n: int) -> typing.List[int]:
     futures = [f.remote(i) for i in range(n)]
     return ray.get(futures)
