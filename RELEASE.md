@@ -15,4 +15,4 @@
    It will create a tag and then publish all deployment manifest in github release and will create a discussion thread in github release
 1. Kick off a run of the functional tests in https://github.com/unionai/genesis-device/actions/workflows/update_cluster_and_run_tests.yml
 1. Close the milestone
-1. Ping #core (slack channel) to: Send announcements about the milestone with the contents of the CHANGELOG to all social channels..
+1. Ping #core ([slack](https://slack.flyte.org/) channel) to send announcements about the milestone with the contents of the CHANGELOG to all social channels.
