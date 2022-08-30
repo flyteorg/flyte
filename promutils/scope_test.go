@@ -24,6 +24,19 @@ func TestDurationToString(t *testing.T) {
 	assert.Equal(t, "ns", DurationToString(1))
 }
 
+func ExampleStopWatch_Start() {
+	scope := NewTestScope()
+	stopWatch, _ := scope.NewStopWatch("test", "This is a test stop watch", time.Millisecond)
+
+	{
+		timer := stopWatch.Start()
+		defer timer.Stop()
+
+		// Do the operation you want to measure
+		time.Sleep(time.Second)
+	}
+}
+
 func TestNewScope(t *testing.T) {
 	assert.Panics(t, func() {
 		NewScope("")

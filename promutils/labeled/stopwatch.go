@@ -23,12 +23,6 @@ type StopWatch struct {
 }
 
 // Start creates a new Instance of the StopWatch called a Timer that is closeable/stoppable.
-// Common pattern to time a scope would be
-// {
-//   timer := stopWatch.Start(ctx)
-//   defer timer.Stop()
-//   ....
-// }
 func (c StopWatch) Start(ctx context.Context) Timer {
 	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, c.labels...))
 	if err != nil {

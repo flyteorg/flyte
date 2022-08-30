@@ -15,13 +15,11 @@ var marshaller = &jsonpb.Marshaler{}
 
 func fromHashToByteArray(input [32]byte) []byte {
 	output := make([]byte, 32)
-	for idx, val := range input {
-		output[idx] = val
-	}
+	copy(output, input[:])
 	return output
 }
 
-// Generate a deterministic hash in bytes for the pb object
+// ComputeHash generate a deterministic hash in bytes for the pb object
 func ComputeHash(ctx context.Context, pb proto.Message) ([]byte, error) {
 	// We marshal the pb object to JSON first which should provide a consistent mapping of pb to json fields as stated
 	// here: https://developers.google.com/protocol-buffers/docs/proto3#json

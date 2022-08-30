@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   tests-lint:
-    name: Run tests and lint
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -13,7 +13,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.17'
+          go-version: '1.18'
       - name: Unit Tests
         run: make mod_download && make test_unit_codecov
       - name: Push CodeCov
@@ -22,13 +22,13 @@ jobs:
           file: coverage.txt
           flags: unittests
           fail_ci_if_error: true
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '1.17'
-      - name: Lint
-        run: make install && make lint
       - name: Bench tests
         run: make install && make test_benchmark
+  lint:
+    name: Lint
+    uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+    with:
+      go-version: '1.18'
   test-generate-integrity:
     name: Ensure go generate has run
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.17'
+          go-version: '1.18'
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate
 

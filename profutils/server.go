@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -94,7 +95,13 @@ func configHandler(w http.ResponseWriter, req *http.Request) {
 // Starts an http server on the given port
 func StartProfilingServer(ctx context.Context, pprofPort int) error {
 	logger.Infof(ctx, "Starting profiling server on port [%v]", pprofPort)
-	e := http.ListenAndServe(fmt.Sprintf(":%d", pprofPort), nil)
+	srv := &http.Server{
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Addr:         fmt.Sprintf(":%d", pprofPort),
+	}
+
+	e := srv.ListenAndServe()
 	if e != nil {
 		logger.Errorf(ctx, "Failed to start profiling server. Error: %v", e)
 		return fmt.Errorf("failed to start profiling server, %s", e)

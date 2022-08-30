@@ -81,15 +81,14 @@ const (
 	Update
 )
 
-// Your implementation of this function for your cache instance is responsible for returning
-//   1. The new Item, and
-//   2. What action should be taken.  The sync function has no insight into your object, and needs to be
-//      told explicitly if the new item is different from the old one.
+// SyncFunc func type. Your implementation of this function for your cache instance is responsible for returning
+// The new Item and what action should be taken.  The sync function has no insight into your object, and needs to be
+// told explicitly if the new item is different from the old one.
 type SyncFunc func(ctx context.Context, batch Batch) (
 	updatedBatch []ItemSyncResponse, err error)
 
-// Your implementation of this function for your cache instance is responsible for subdividing
-// the list of cache items into batches.
+// CreateBatchesFunc is a func type. Your implementation of this function for your cache instance is responsible for
+// subdividing the list of cache items into batches.
 type CreateBatchesFunc func(ctx context.Context, snapshot []ItemWrapper) (batches []Batch, err error)
 
 type itemWrapper struct {
@@ -202,10 +201,8 @@ func (w *autoRefresh) DeleteDelayed(id ItemID) error {
 	return nil
 }
 
-// This function is called internally by its own timer. Roughly, it will,
-//  - List keys
-//  - Create batches of keys based on createBatchesCb
-//  - Enqueue all the batches into the workqueue
+// This function is called internally by its own timer. Roughly, it will list keys, create batches of keys based on
+// createBatchesCb and, enqueue all the batches into the workqueue.
 func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	keys := w.lruMap.Keys()
 	w.metrics.Size.Set(float64(len(keys)))
@@ -236,15 +233,15 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 }
 
 // There are w.parallelizm instances of this function running all the time, each one will:
-//  - Retrieve an item from the workqueue
-//  - For each batch of the keys, call syncCb, which tells us if the items have been updated
-//    - If any has, then overwrite the item in the cache.
+// - Retrieve an item from the workqueue
+// - For each batch of the keys, call syncCb, which tells us if the items have been updated
+// -- If any has, then overwrite the item in the cache.
 //
 // What happens when the number of things that a user is trying to keep track of exceeds the size
 // of the cache?  Trivial case where the cache is size 1 and we're trying to keep track of two things.
-//  * Plugin asks for update on item 1 - cache evicts item 2, stores 1 and returns it unchanged
-//  * Plugin asks for update on item 2 - cache evicts item 1, stores 2 and returns it unchanged
-//  * Sync loop updates item 2, repeat
+// * Plugin asks for update on item 1 - cache evicts item 2, stores 1 and returns it unchanged
+// * Plugin asks for update on item 2 - cache evicts item 1, stores 2 and returns it unchanged
+// * Sync loop updates item 2, repeat
 func (w *autoRefresh) sync(ctx context.Context) (err error) {
 	defer func() {
 		var isErr bool

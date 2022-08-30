@@ -14,6 +14,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func ExampleStopWatch_Start() {
+	ctx := context.Background()
+	stopWatch := NewStopWatch("test", "this is an example stopwatch", time.Millisecond, promutils.NewTestScope())
+	{
+		timer := stopWatch.Start(ctx)
+		defer timer.Stop()
+
+		// An operation you want to measure the time for.
+		time.Sleep(time.Second)
+	}
+}
+
 func TestLabeledStopWatch(t *testing.T) {
 	UnsetMetricKeys()
 	assert.NotPanics(t, func() {

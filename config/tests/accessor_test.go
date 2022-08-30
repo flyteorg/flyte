@@ -39,7 +39,7 @@ func getRandInt() uint64 {
 	return binary.BigEndian.Uint64(b)
 }
 
-func tempFileName(pattern string) string {
+func tempFileName(dir, pattern string) string {
 	// TODO: Remove this hack after we use Go1.11 everywhere:
 	// https://github.com/golang/go/commit/191efbc419d7e5dec842c20841f6f716da4b561d
 
@@ -50,7 +50,11 @@ func tempFileName(pattern string) string {
 		prefix = pattern
 	}
 
-	return filepath.Join(os.TempDir(), prefix+k8sRand.String(6)+suffix)
+	if len(dir) == 0 {
+		dir = os.TempDir()
+	}
+
+	return filepath.Join(dir, prefix+k8sRand.String(6)+suffix)
 }
 
 func populateConfigData(configPath string) (TestConfig, error) {
@@ -434,7 +438,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler", provider(config.Options{}).ID()), func(t *testing.T) {
-			configFile := tempFileName("config-*.yaml")
+			configFile := tempFileName("", "config-*.yaml")
 			defer func() { assert.NoError(t, os.Remove(configFile)) }()
 			cfg, err := populateConfigData(configFile)
 			assert.NoError(t, err)
@@ -456,38 +460,6 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.True(t, called)
-		})
-
-		t.Run(fmt.Sprintf("[%v] Change handler on change", provider(config.Options{}).ID()), func(t *testing.T) {
-			configFile := tempFileName("config-*.yaml")
-			defer func() { assert.NoError(t, os.Remove(configFile)) }()
-			_, err := populateConfigData(configFile)
-			assert.NoError(t, err)
-
-			reg := config.NewRootSection()
-			_, err = reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
-			assert.NoError(t, err)
-
-			opts := config.Options{
-				SearchPaths: []string{configFile},
-				RootSection: reg,
-			}
-			v := provider(opts)
-			err = v.UpdateConfig(context.TODO())
-			assert.NoError(t, err)
-
-			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			firstValue := r.StringValue
-
-			_, err = populateConfigData(configFile)
-			assert.NoError(t, err)
-
-			// Wait enough for the file change notification to propagate.
-			time.Sleep(5 * time.Second)
-
-			r = reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			secondValue := r.StringValue
-			assert.NotEqual(t, firstValue, secondValue)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler k8s configmaps", provider(config.Options{}).ID()), func(t *testing.T) {
@@ -562,7 +534,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 }
 
 func changeSymLink(targetPath, symLink string) error {
-	tmpLink := tempFileName("temp-sym-link-*")
+	tmpLink := tempFileName("", "temp-sym-link-*")
 	if runtime.GOOS == "windows" {
 		// #nosec G204
 		err := exec.Command("mklink", filepath.Clean(tmpLink), filepath.Clean(targetPath)).Run()
@@ -586,12 +558,13 @@ func changeSymLink(targetPath, symLink string) error {
 	return exec.Command("ln", "-sfn", filepath.Clean(targetPath), filepath.Clean(symLink)).Run()
 }
 
-// 1. Create Dir structure:
-//    |_ data1
-//       |_ config.yaml
-//    |_ data (symlink for data1)
-//    |_ config.yaml (symlink for data/config.yaml -recursively a symlink of data1/config.yaml)
 func newSymlinkedConfigFile(t *testing.T) (watchDir, configFile string, cleanup func()) {
+	// 1. Create Dir structure:
+	//    |_ data1
+	//       |_ config.yaml
+	//    |_ data (symlink for data1)
+	//    |_ config.yaml (symlink for data/config.yaml -recursively a symlink of data1/config.yaml)
+
 	watchDir, err := ioutil.TempDir("", "config-test-")
 	assert.NoError(t, err)
 
@@ -686,7 +659,7 @@ func runEqualTest(t *testing.T, accessor accessorCreatorFn, expected interface{}
 
 	raw, err := yaml.Marshal(m)
 	assert.NoError(t, err)
-	f := tempFileName("test_type_*.yaml")
+	f := tempFileName("", "test_type_*.yaml")
 	assert.NoError(t, err)
 	defer func() { assert.NoError(t, os.Remove(f)) }()
 
