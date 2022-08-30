@@ -94,7 +94,7 @@ Connect to an EKS Cluster
 
        export AWS_ACCESS_KEY_ID=<YOUR-AWS-ACCOUNT-ACCESS-KEY-ID>
        export AWS_SECRET_ACCESS_KEY=<YOUR-AWS-SECRET-ACCESS-KEY>
-       exportAWS_SESSION_TOKEN=<YOUR-AWS-SESSION-TOKEN>
+       export AWS_SESSION_TOKEN=<YOUR-AWS-SESSION-TOKEN>
 
 * Switch to the EKS cluster context <Name-EKS-Cluster>
 
