@@ -47,10 +47,9 @@ const (
 	Delete
 )
 
-// Your implementation of this function for your cache instance is responsible for returning
-//   1. The new CacheItem, and
-//   2. What action should be taken.  The sync function has no insight into your object, and needs to be
-//      told explicitly if the new item is different from the old one.
+// CacheSyncItem is a func type. Your implementation of this function for your cache instance is responsible for returning
+// The new CacheItem what action should be taken.  The sync function has no insight into your object, and needs to be
+// told explicitly if the new item is different from the old one.
 // Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 type CacheSyncItem func(ctx context.Context, obj CacheItem) (
 	newItem CacheItem, result CacheSyncAction, err error)
@@ -123,17 +122,15 @@ func (w *autoRefreshCache) GetOrCreate(item CacheItem) (CacheItem, error) {
 	return item, nil
 }
 
-// This function is called internally by its own timer. Roughly, it will,
-//  - List keys
-//  - For each of the keys, call syncCb, which tells us if the item has been updated
-//    - If it has, then do a remove followed by an add.  We can get away with this because it is guaranteed that
-//      this loop will run to completion before the next one begins.
+// This function is called internally by its own timer. Roughly, it will list keys and for each of the keys, call
+// syncCb, which tells us if the item has been updated. If it has, then do a remove followed by an add. We can get away
+// with this because it is guaranteed that this loop will run to completion before the next one begins.
 //
 // What happens when the number of things that a user is trying to keep track of exceeds the size
 // of the cache?  Trivial case where the cache is size 1 and we're trying to keep track of two things.
-//  * Plugin asks for update on item 1 - cache evicts item 2, stores 1 and returns it unchanged
-//  * Plugin asks for update on item 2 - cache evicts item 1, stores 2 and returns it unchanged
-//  * Sync loop updates item 2, repeat
+// * Plugin asks for update on item 1 - cache evicts item 2, stores 1 and returns it unchanged
+// * Plugin asks for update on item 2 - cache evicts item 1, stores 2 and returns it unchanged
+// * Sync loop updates item 2, repeat
 func (w *autoRefreshCache) sync(ctx context.Context) {
 	keys := w.lruMap.Keys()
 	for _, k := range keys {

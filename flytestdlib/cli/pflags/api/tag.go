@@ -13,9 +13,9 @@ const (
 	JSONTagName = "json"
 )
 
-// Represents parsed PFlag Go-struct tag.
+// Tag represents parsed PFlag Go-struct tag.
 // type Foo struct {
-//     StringValue      string            `json:"str" pflag:"\"hello world\",This is a string value"`
+// StringValue string `json:"str" pflag:"\"hello world\",This is a string value"`
 // }
 // Name will be "str", Default value is "hello world" and Usage is "This is a string value"
 type Tag struct {
@@ -24,7 +24,7 @@ type Tag struct {
 	Usage        string
 }
 
-// Parses tag. Name is computed from json tag, defaultvalue is the name of the pflag tag and usage is the concatenation
+// ParseTag parses tag. Name is computed from json tag, defaultvalue is the name of the pflag tag and usage is the concatenation
 // of all options for pflag tag.
 // e.g. `json:"name" pflag:"2,this is a useful param"`
 func ParseTag(tag string) (t Tag, err error) {

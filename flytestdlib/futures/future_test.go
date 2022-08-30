@@ -10,6 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Example() {
+	ctx := context.Background()
+	f := NewAsyncFuture(ctx, func(ctx2 context.Context) (interface{}, error) {
+		// can do large async / non-blocking work
+		time.Sleep(time.Second)
+		return "hello", nil
+	})
+
+	f.Ready()         // can be checked for completion
+	_, _ = f.Get(ctx) // will block till the given sub-routine returns
+}
+
 func TestNewSyncFuture(t *testing.T) {
 	type args struct {
 		val interface{}
