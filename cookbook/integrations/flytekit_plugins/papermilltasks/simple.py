@@ -33,6 +33,7 @@ nb = NotebookTask(
     notebook_path=os.path.join(
         pathlib.Path(__file__).parent.absolute(), "nb-simple.ipynb"
     ),
+    render_deck=True,
     inputs=kwtypes(v=float),
     outputs=kwtypes(square=float),
 )
@@ -41,6 +42,12 @@ nb = NotebookTask(
 #
 #  - Note the notebook_path. This is the absolute path to the actual notebook.
 #  - Note the inputs and outputs. The variable names match the variable names in the jupyter notebook.
+#  - You can see the notebook on Flyte deck if ``render_deck`` is set to true.
+
+#%%
+# .. figure:: https://i.imgur.com/ogfVpr2.png
+#   :alt: Notebook
+#   :class: with-shadow
 #
 # Other tasks
 # ^^^^^^^^^^^^^^^
