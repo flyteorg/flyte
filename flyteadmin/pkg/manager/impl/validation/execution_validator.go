@@ -16,7 +16,8 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-const allowedExecutionNameLength = 20
+// Maximum value length of a Kubernetes label
+const allowedExecutionNameLength = 63
 
 var executionIDRegex = regexp.MustCompile(`^[a-z][a-z\-0-9]*$`)
 
