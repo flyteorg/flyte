@@ -10,6 +10,7 @@
         "resolveJsonModule": true,
         "removeComments": false,
         "importHelpers": true,
+        "forceConsistentCasingInFileNames": false,
 
         "jsx": "react",
         "lib": ["dom", "dom.iterable", "es6", "es2021"],

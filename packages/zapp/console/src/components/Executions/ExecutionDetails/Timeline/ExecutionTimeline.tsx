@@ -114,13 +114,14 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ chartTimezone }) => {
       const execution = nodeExecutionsById[node.scopedId];
       return {
         ...node,
+        startedAt: execution?.closure.startedAt,
         execution,
       };
     });
     setShowNodes(updatedShownNodesMap);
 
     // set startTime for all timeline offset and duration calculations.
-    const firstStartedAt = updatedShownNodesMap[0]?.execution?.closure.startedAt;
+    const firstStartedAt = updatedShownNodesMap[0]?.startedAt;
     if (firstStartedAt) {
       setStartedAt(timestampToDate(firstStartedAt));
     }

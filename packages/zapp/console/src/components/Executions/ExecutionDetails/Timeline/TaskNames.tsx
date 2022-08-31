@@ -5,7 +5,6 @@ import { RowExpander } from 'components/Executions/Tables/RowExpander';
 import { getNodeTemplateName } from 'components/WorkflowGraph/utils';
 import { dNode } from 'models/Graph/types';
 import { NodeExecutionName } from './NodeExecutionName';
-import { NodeExecutionsTimelineContext } from './context';
 
 const useStyles = makeStyles((theme: Theme) => ({
   taskNamesList: {
@@ -55,7 +54,6 @@ interface TaskNamesProps {
 }
 
 export const TaskNames = React.forwardRef<HTMLDivElement, TaskNamesProps>((props, ref) => {
-  const state = React.useContext(NodeExecutionsTimelineContext);
   const { nodes, onScroll, onToggle } = props;
   const styles = useStyles();
 
@@ -85,7 +83,6 @@ export const TaskNames = React.forwardRef<HTMLDivElement, TaskNamesProps>((props
               <NodeExecutionName
                 name={node.name}
                 execution={node.execution!} // some nodes don't have associated execution
-                state={state}
               />
               <Typography variant="subtitle1" color="textSecondary" className={styles.displayName}>
                 {templateName}

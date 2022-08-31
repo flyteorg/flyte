@@ -8,7 +8,6 @@ import { dTypes } from 'models/Graph/types';
 import {
   DISPLAY_NAME_START,
   DISPLAY_NAME_END,
-  checkIfObjectsAreSame,
   getDisplayName,
   getNodeTypeFromCompiledNode,
   isStartNode,
@@ -21,36 +20,6 @@ describe('getDisplayName', () => {
     expect(getDisplayName(mockCompiledEndNode)).toBe(DISPLAY_NAME_END);
     expect(getDisplayName(mockCompiledTaskNode)).toBe('DEADBEEF');
     expect(getDisplayName(mockCompiledWorkflow)).toBe('myWorkflowName');
-  });
-});
-
-describe('checkIfObjectsAreSame', () => {
-  const a = {
-    red: 'red',
-    blue: 'blue',
-    green: 'green',
-  };
-  const b = {
-    red: 'red',
-    blue: 'blue',
-    green: 'green',
-  };
-  const fail_a = {
-    red: 'red',
-    blue: 'not blue',
-    green: 'green',
-  };
-  const fail_b = {
-    red: 'red',
-    green: 'green',
-    orange: 'orange',
-  };
-  it('should return true when a-keys match b-values', () => {
-    expect(checkIfObjectsAreSame(a, b)).toEqual(true);
-  });
-  it("should return false when a-keys don't match b-values", () => {
-    expect(checkIfObjectsAreSame(fail_a, b)).toEqual(false);
-    expect(checkIfObjectsAreSame(a, fail_b)).toEqual(false);
   });
 });
 

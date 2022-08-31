@@ -5,6 +5,7 @@ import { useCommonStyles } from 'components/common/styles';
 import { isEqual } from 'lodash';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
@@ -16,9 +17,9 @@ import { NodeExecutionCellRendererData, NodeExecutionColumnDefinition } from './
 
 const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, state }) => {
   const detailsContext = useNodeExecutionContext();
-  const [displayName, setDisplayName] = React.useState<string | undefined>();
+  const [displayName, setDisplayName] = useState<string | undefined>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     let isCurrent = true;
     detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
@@ -32,9 +33,9 @@ const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, sta
 
   const commonStyles = useCommonStyles();
   const styles = useColumnStyles();
+  const { selectedExecution, setSelectedExecution } = state;
 
-  const isSelected =
-    state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
+  const isSelected = state.selectedExecution != null && isEqual(execution.id, selectedExecution);
 
   const name = displayName ?? execution.id.nodeId;
   const truncatedName = name?.split('.').pop() || name;
@@ -48,7 +49,7 @@ const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, sta
       className={commonStyles.primaryLink}
       execution={execution}
       linkText={truncatedName || ''}
-      state={state}
+      setSelectedExecution={setSelectedExecution}
     />
   );
 
@@ -65,9 +66,9 @@ const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, sta
 const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
   const commonStyles = useCommonStyles();
   const detailsContext = useNodeExecutionContext();
-  const [displayId, setDisplayId] = React.useState<string | undefined>();
+  const [displayId, setDisplayId] = useState<string | undefined>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     let isCurrent = true;
     detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
@@ -89,9 +90,9 @@ const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
 
 const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
   const detailsContext = useNodeExecutionContext();
-  const [type, setType] = React.useState<string | undefined>();
+  const [type, setType] = useState<string | undefined>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     let isCurrent = true;
     detailsContext.getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {

@@ -18,11 +18,10 @@ import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersStat
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
 import { tabs } from './constants';
 import { useExecutionNodeViewsState } from './useExecutionNodeViewsState';
-import { ExecutionNodesTimeline } from './Timeline';
 import { fetchTaskExecutionList } from '../taskExecutionQueries';
 import { getGroupedLogs } from '../TaskExecutionsList/utils';
 import { useAllTreeNodeExecutionGroupsQuery } from '../nodeExecutionQueries';
-import { ExecutionWorkflowGraph } from './ExecutionWorkflowGraph';
+import { ExecutionTab } from './ExecutionTab';
 
 const useStyles = makeStyles((theme: Theme) => ({
   filters: {
@@ -148,24 +147,13 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
     </NodeExecutionsRequestConfigContext.Provider>
   );
 
-  const renderExecutionChildrenLoader = () =>
-    nodeExecutions.length > 0 ? <ExecutionWorkflowGraph workflowId={workflowId} /> : null;
-
-  const renderExecutionLoader = () => {
-    return (
-      <WaitForQuery errorComponent={DataError} query={childGroupsQuery}>
-        {renderExecutionChildrenLoader}
-      </WaitForQuery>
-    );
-  };
-
-  const renderExecutionsTimeline = () => (
+  const renderTab = (tabType) => (
     <WaitForQuery
       errorComponent={DataError}
       query={childGroupsQuery}
       loadingComponent={TimelineLoading}
     >
-      {() => <ExecutionNodesTimeline />}
+      {() => <ExecutionTab tabType={tabType} />}
     </WaitForQuery>
   );
 
@@ -186,28 +174,24 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
       </Tabs>
       <NodeExecutionDetailsContextProvider workflowId={workflowId}>
         <NodeExecutionsByIdContext.Provider value={nodeExecutionsById}>
-          <div className={styles.nodesContainer}>
-            {tabState.value === tabs.nodes.id && (
-              <>
-                <div className={styles.filters}>
-                  <ExecutionFilters {...filterState} />
-                </div>
+          {nodeExecutions.length > 0 ? (
+            <div className={styles.nodesContainer}>
+              {tabState.value === tabs.nodes.id ? (
+                <>
+                  <div className={styles.filters}>
+                    <ExecutionFilters {...filterState} />
+                  </div>
+                  <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
+                    {renderNodeExecutionsTable}
+                  </WaitForQuery>
+                </>
+              ) : (
                 <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-                  {renderNodeExecutionsTable}
+                  {() => renderTab(tabState.value)}
                 </WaitForQuery>
-              </>
-            )}
-            {tabState.value === tabs.graph.id && (
-              <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-                {renderExecutionLoader}
-              </WaitForQuery>
-            )}
-            {tabState.value === tabs.timeline.id && (
-              <WaitForQuery errorComponent={DataError} query={nodeExecutionsQuery}>
-                {renderExecutionsTimeline}
-              </WaitForQuery>
-            )}
-          </div>
+              )}
+            </div>
+          ) : null}
         </NodeExecutionsByIdContext.Provider>
       </NodeExecutionDetailsContextProvider>
     </>

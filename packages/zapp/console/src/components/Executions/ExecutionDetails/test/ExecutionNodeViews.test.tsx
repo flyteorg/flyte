@@ -11,12 +11,6 @@ import { createTestQueryClient } from 'test/utils';
 import { tabs } from '../constants';
 import { ExecutionNodeViews } from '../ExecutionNodeViews';
 
-// We don't need to verify the content of the graph component here and it is
-// difficult to make it work correctly in a test environment.
-jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
-  ExecutionWorkflowGraph: () => null,
-}));
-
 jest.mock('chart.js', () => ({
   Chart: { register: () => null },
   Tooltip: { positioners: { cursor: () => null } },

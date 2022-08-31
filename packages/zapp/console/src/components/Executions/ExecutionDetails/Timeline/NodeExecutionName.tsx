@@ -5,12 +5,12 @@ import { SelectNodeExecutionLink } from 'components/Executions/Tables/SelectNode
 import { isEqual } from 'lodash';
 import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
-import { NodeExecutionsTimelineContextData } from './context';
+import { useContext } from 'react';
+import { NodeExecutionsTimelineContext } from './context';
 
 interface NodeExecutionTimelineNameData {
   name: string;
   execution: NodeExecution;
-  state: NodeExecutionsTimelineContextData;
 }
 
 const useStyles = makeStyles((_theme: Theme) => ({
@@ -19,13 +19,11 @@ const useStyles = makeStyles((_theme: Theme) => ({
   },
 }));
 
-export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({
-  name,
-  execution,
-  state,
-}) => {
+export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({ name, execution }) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
+
+  const { selectedExecution, setSelectedExecution } = useContext(NodeExecutionsTimelineContext);
 
   if (!execution) {
     // to avoid crash - disable items which do not have associated execution.
@@ -33,8 +31,7 @@ export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({
     return <Typography variant="body1">{name}</Typography>;
   }
 
-  const isSelected =
-    state.selectedExecution != null && isEqual(execution.id, state.selectedExecution);
+  const isSelected = selectedExecution != null && isEqual(execution.id, selectedExecution);
   return isSelected ? (
     <Typography variant="body1" className={styles.selectedExecutionName}>
       {name}
@@ -44,7 +41,7 @@ export const NodeExecutionName: React.FC<NodeExecutionTimelineNameData> = ({
       className={commonStyles.primaryLink}
       execution={execution}
       linkText={name}
-      state={state}
+      setSelectedExecution={setSelectedExecution}
     />
   );
 };
