@@ -162,9 +162,9 @@ func TestValidExecutionId(t *testing.T) {
 }
 
 func TestValidExecutionIdInvalidLength(t *testing.T) {
-	err := CheckValidExecutionID("abcdeasdasdasdasdasdasdasd123", "a")
+	err := CheckValidExecutionID("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc", "a")
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, "size of a exceeded length 20 : abcdeasdasdasdasdasdasdasd123")
+	assert.EqualError(t, err, "size of a exceeded length 63 : abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc")
 }
 
 func TestValidExecutionIdInvalidChars(t *testing.T) {
