@@ -33,8 +33,8 @@ Task resources also include limits which specify the maximum value that a task r
 - `ephemeral storage <https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#local-ephemeral-storage>`__
 
 In the absence of an override, the global
-`default values <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L35,L43>`__
-in the FlyteAdmin config are used.
+`default values <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values.yaml#L520-L531>`__
+in `task_resource_defaults` are used.
 
 The override values from the database are assigned at execution, rather than registration time.
 
