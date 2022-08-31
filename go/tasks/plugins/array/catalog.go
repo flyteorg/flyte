@@ -30,7 +30,7 @@ const AwsBatchTaskType = "aws-batch"
 // which is different than their original location. To find the original index we construct an indexLookup array.
 // The subtask can find it's original index value in indexLookup[JOB_ARRAY_INDEX] where JOB_ARRAY_INDEX is an
 // environment variable in the pod
-func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State) (
+func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContext, maxArrayJobSize int64, state *arrayCore.State) (
 	*arrayCore.State, error) {
 
 	// Check that the taskTemplate is valid
@@ -109,6 +109,13 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), literalCollection.Literals, discoveredInputName)
 	}
 
+	if arrayJobSize > maxArrayJobSize {
+		ee := fmt.Errorf("array size > max allowed. requested [%v]. allowed [%v]", arrayJobSize, maxArrayJobSize)
+		logger.Info(ctx, ee)
+		state = state.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason(ee.Error())
+		return state, nil
+	}
+
 	// If the task is not discoverable, then skip data catalog work and move directly to launch
 	if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
 		logger.Infof(ctx, "Task is not discoverable, moving to launch phase...")
@@ -121,6 +128,18 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// Otherwise, run the data catalog steps - create and submit work items to the catalog processor,
+
+	// check that the number of items in the cache index LRU cache is greater than the number of
+	// jobs in the array. if not we will never complete the cache lookup and be stuck in an
+	// infinite loop.
+	cfg := catalog.GetConfig()
+	if int(arrayJobSize) > cfg.WriterWorkqueueConfig.IndexCacheMaxItems || int(arrayJobSize) > cfg.ReaderWorkqueueConfig.IndexCacheMaxItems {
+		ee := fmt.Errorf("array size > max allowed for cache lookup. requested [%v]. writer allowed [%v] reader allowed [%v]",
+			arrayJobSize, cfg.WriterWorkqueueConfig.IndexCacheMaxItems, cfg.ReaderWorkqueueConfig.IndexCacheMaxItems)
+		logger.Error(ctx, ee)
+		state = state.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason(ee.Error())
+		return state, nil
+	}
 
 	// build output writers
 	outputWriters, err := ConstructOutputWriters(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), int(arrayJobSize))

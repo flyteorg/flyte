@@ -68,7 +68,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	switch p {
 	case arrayCore.PhaseStart:
-		pluginState.State, err = array.DetermineDiscoverability(ctx, tCtx, pluginState.State)
+		pluginState.State, err = array.DetermineDiscoverability(ctx, tCtx, pluginConfig.MaxArrayJobSize, pluginState.State)
 
 	case arrayCore.PhasePreLaunch:
 		pluginState, err = EnsureJobDefinition(ctx, tCtx, pluginConfig, e.jobStore.Client, e.jobDefinitionCache, pluginState)
@@ -108,8 +108,8 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	// Always attempt to augment phase with task logs.
 	var logLinks []*idlCore.TaskLog
 	var externalResources []*core.ExternalResource
-	switch p {
-	case arrayCore.PhaseStart:
+
+	if p == arrayCore.PhasePreLaunch {
 		externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, pluginState.State,
 			func(tCtx core.TaskExecutionContext, childIndex int) string {
 				// subTaskIDs for the the aws_batch are generated based on the job ID, therefore
@@ -117,7 +117,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 				return ""
 			},
 		)
-	default:
+	} else if p != arrayCore.PhaseStart {
 		logLinks, externalResources, err = GetTaskLinks(ctx, tCtx.TaskExecutionMetadata(), e.jobStore, pluginState)
 	}
 

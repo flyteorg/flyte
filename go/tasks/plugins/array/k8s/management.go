@@ -66,12 +66,6 @@ func deallocateResource(ctx context.Context, tCtx core.TaskExecutionContext, con
 func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient,
 	config *Config, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference, currentState *arrayCore.State) (
 	newState *arrayCore.State, externalResources []*core.ExternalResource, err error) {
-	if int64(currentState.GetExecutionArraySize()) > config.MaxArrayJobSize {
-		ee := fmt.Errorf("array size > max allowed. Requested [%v]. Allowed [%v]", currentState.GetExecutionArraySize(), config.MaxArrayJobSize)
-		logger.Info(ctx, ee)
-		currentState = currentState.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason(ee.Error())
-		return currentState, externalResources, nil
-	}
 
 	newState = currentState
 	messageCollector := errorcollector.NewErrorMessageCollector()

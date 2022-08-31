@@ -55,7 +55,7 @@ func TestCatalogBitsetToLiteralCollection(t *testing.T) {
 }
 
 func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTemplate, future catalog.DownloadFuture,
-	expectedState *arrayCore.State, expectedError error) {
+	expectedState *arrayCore.State, maxArrayJobSize int64, expectedError error) {
 
 	ctx := context.Background()
 
@@ -126,7 +126,7 @@ func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTempla
 		CurrentPhase: arrayCore.PhaseStart,
 	}
 
-	got, err := DetermineDiscoverability(ctx, tCtx, state)
+	got, err := DetermineDiscoverability(ctx, tCtx, maxArrayJobSize, state)
 	if expectedError != nil {
 		assert.Error(t, err)
 		assert.True(t, errors.Is(err, expectedError))
@@ -151,7 +151,7 @@ func TestDetermineDiscoverability(t *testing.T) {
 	f.OnGetResponse().Return(download, nil)
 
 	t.Run("Bad Task Spec", func(t *testing.T) {
-		runDetermineDiscoverabilityTest(t, template, f, nil, stdErrors.Errorf(pluginErrors.BadTaskSpecification, ""))
+		runDetermineDiscoverabilityTest(t, template, f, nil, 0, stdErrors.Errorf(pluginErrors.BadTaskSpecification, ""))
 	})
 
 	template = &core.TaskTemplate{
@@ -186,7 +186,7 @@ func TestDetermineDiscoverability(t *testing.T) {
 			OriginalMinSuccesses: 1,
 			IndexesToCache:       toCache,
 			Reason:               "Task is not discoverable.",
-		}, nil)
+		}, 1, nil)
 	})
 
 	t.Run("Not discoverable", func(t *testing.T) {
@@ -200,7 +200,7 @@ func TestDetermineDiscoverability(t *testing.T) {
 			OriginalMinSuccesses: 1,
 			IndexesToCache:       toCache,
 			Reason:               "Task is not discoverable.",
-		}, nil)
+		}, 1, nil)
 	})
 
 	template.Metadata = &core.TaskMetadata{
@@ -221,7 +221,7 @@ func TestDetermineDiscoverability(t *testing.T) {
 			OriginalMinSuccesses: 1,
 			IndexesToCache:       toCache,
 			Reason:               "Finished cache lookup.",
-		}, nil)
+		}, 1, nil)
 	})
 
 	t.Run("Discoverable and cached", func(t *testing.T) {
@@ -239,7 +239,30 @@ func TestDetermineDiscoverability(t *testing.T) {
 			OriginalMinSuccesses: 1,
 			IndexesToCache:       toCache,
 			Reason:               "Finished cache lookup.",
-		}, nil)
+		}, 1, nil)
+	})
+
+	t.Run("DiscoveryNotYetComplete ", func(t *testing.T) {
+		future := &catalogMocks.DownloadFuture{}
+		future.OnGetResponseStatus().Return(catalog.ResponseStatusNotReady)
+		future.On("OnReady", mock.Anything).Return(func(_ context.Context, _ catalog.Future) {})
+
+		runDetermineDiscoverabilityTest(t, template, future, &arrayCore.State{
+			CurrentPhase:         arrayCore.PhaseStart,
+			PhaseVersion:         core2.DefaultPhaseVersion,
+			OriginalArraySize:    1,
+			OriginalMinSuccesses: 1,
+		}, 1, nil)
+	})
+
+	t.Run("MaxArrayJobSizeFailure", func(t *testing.T) {
+		runDetermineDiscoverabilityTest(t, template, f, &arrayCore.State{
+			CurrentPhase:         arrayCore.PhasePermanentFailure,
+			PhaseVersion:         core2.DefaultPhaseVersion,
+			OriginalArraySize:    1,
+			OriginalMinSuccesses: 1,
+			Reason:               "array size > max allowed. requested [1]. allowed [0]",
+		}, 0, nil)
 	})
 }
 
@@ -301,6 +324,6 @@ func TestDiscoverabilityTaskType1(t *testing.T) {
 			OriginalMinSuccesses: 2,
 			IndexesToCache:       toCache,
 			Reason:               "Task is not discoverable.",
-		}, nil)
+		}, 3, nil)
 	})
 }
