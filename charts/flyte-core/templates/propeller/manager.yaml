@@ -46,6 +46,9 @@ template:
           mountPath: /etc/flyte/config
         - name: auth
           mountPath: /etc/secrets/
+      {{- if .Values.flytepropeller.terminationMessagePolicy }}
+      terminationMessagePolicy: "{{ .Values.flytepropeller.terminationMessagePolicy }}"
+      {{- end }}
     serviceAccountName: {{ template "flytepropeller.name" . }}
     volumes:
     - configMap:
