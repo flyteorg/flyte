@@ -86,21 +86,20 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	switch p, version := pluginState.GetPhase(); p {
 	case arrayCore.PhaseStart:
-		nextState, err = array.DetermineDiscoverability(ctx, tCtx, pluginState)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
+		nextState, err = array.DetermineDiscoverability(ctx, tCtx, pluginConfig.MaxArrayJobSize, pluginState)
 
+	case arrayCore.PhasePreLaunch:
+		nextState = pluginState.SetPhase(arrayCore.PhaseLaunch, core.DefaultPhaseVersion).SetReason("Nothing to do in PreLaunch phase.")
+
+		// we wait for PhasePreLaunch to InitializeExternalResources because then the array job
+		// configuration has been validated and all of the metadata necessary to report subtask
+		// status (ie. cache hit / etc) is available.
 		externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, pluginState,
 			func(tCtx core.TaskExecutionContext, childIndex int) string {
 				subTaskExecutionID := NewSubTaskExecutionID(tCtx.TaskExecutionMetadata().GetTaskExecutionID(), childIndex, 0)
 				return subTaskExecutionID.GetGeneratedName()
 			},
 		)
-
-	case arrayCore.PhasePreLaunch:
-		nextState = pluginState.SetPhase(arrayCore.PhaseLaunch, core.DefaultPhaseVersion).SetReason("Nothing to do in PreLaunch phase.")
-		err = nil
 
 	case arrayCore.PhaseWaitingForResources:
 		fallthrough

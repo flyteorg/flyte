@@ -18,12 +18,12 @@ var defaultConfig = &Config{
 	ReaderWorkqueueConfig: workqueue.Config{
 		MaxRetries:         3,
 		Workers:            10,
-		IndexCacheMaxItems: 1000,
+		IndexCacheMaxItems: 10000,
 	},
 	WriterWorkqueueConfig: workqueue.Config{
 		MaxRetries:         3,
 		Workers:            10,
-		IndexCacheMaxItems: 1000,
+		IndexCacheMaxItems: 10000,
 	},
 }
 
