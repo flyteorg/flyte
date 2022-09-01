@@ -1892,6 +1892,16 @@ outputLocationPrefix (string)
   ""
   
 
+useOffloadedWorkflowClosure (bool)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: logger
 ================================================================================
 
@@ -2535,7 +2545,7 @@ Co-Pilot Configuration
 delete-resource-on-finalize (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
+Instructs the system to delete the resource upon successful execution of a k8s pod rather than have the k8s garbage collector clean it up. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized.
 
 **Default Value**: 
 
@@ -3080,6 +3090,18 @@ Maximum size of outputs per task
   "10485760"
   
 
+enable-grpc-latency-metrics (bool)
+--------------------------------------------------------------------------------
+
+Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 kube-client-config (`config.KubeClientConfig`_)
 --------------------------------------------------------------------------------
 
@@ -3562,7 +3584,7 @@ config.DefaultDeadlines
 node-execution-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node execution timeout
+Default value of node execution timeout that includes the time spent to run the node/workflow
 
 **Default Value**: 
 
@@ -3574,7 +3596,7 @@ Default value of node execution timeout
 node-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of node timeout
+Default value of node timeout that includes the time spent queued.
 
 **Default Value**: 
 
@@ -3586,7 +3608,7 @@ Default value of node timeout
 workflow-active-deadline (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Default value of workflow timeout
+Default value of workflow timeout that includes the time spent queued.
 
 **Default Value**: 
 
