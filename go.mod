@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/flyteorg/datacatalog v1.0.1
-	github.com/flyteorg/flyteadmin v1.1.34
-	github.com/flyteorg/flytepropeller v1.1.26
-	github.com/flyteorg/flytestdlib v1.0.6
+	github.com/flyteorg/flyteadmin v1.1.37
+	github.com/flyteorg/flytepropeller v1.1.30
+	github.com/flyteorg/flytestdlib v1.0.7
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -73,7 +73,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/flyteorg/flyteidl v1.1.11 // indirect
 	github.com/flyteorg/flyteplugins v1.0.10 // indirect
-	github.com/flyteorg/stow v0.3.5 // indirect
+	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0 // indirect
