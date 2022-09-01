@@ -98,7 +98,7 @@ spec:
         - {{ .Values.flyteadmin.configPath }}
         - serve
         {{- with .Values.flyteadmin.extraArgs }}
-        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
         {{- if .Values.flyteadmin.env }}
         env:

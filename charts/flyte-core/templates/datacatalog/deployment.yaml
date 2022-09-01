@@ -45,7 +45,7 @@ spec:
         - {{ .Values.datacatalog.configPath }}
         - serve
         {{- with .Values.datacatalog.extraArgs }}
-        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
         image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
