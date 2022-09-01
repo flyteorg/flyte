@@ -77,6 +77,8 @@ flyteadmin:
   secrets: {}
   additionalVolumes: []
   additionalVolumeMounts: []
+  # -- Appends additional containers to the containers list. May include template values.
+  additionalContainers: {}
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
