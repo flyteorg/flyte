@@ -33,7 +33,8 @@ func TestResourceVersionCaching_Get_NotInCache(t *testing.T) {
 
 	scope := promutils.NewTestScope()
 	l := &mockWFNamespaceLister{}
-	wfStore := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+	wfStore, err := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+	assert.NoError(t, err)
 
 	t.Run("notFound", func(t *testing.T) {
 		l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
@@ -162,7 +163,8 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 		newWf := wf.DeepCopy()
 		newWf.Status.Phase = v1alpha1.WorkflowPhaseSucceeding
 
-		wfStore := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		wfStore, err := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		assert.NoError(t, err)
 		// Insert a new workflow with R1
 		_, err = wfStore.Update(ctx, newWf, PriorityClassCritical)
 		assert.NoError(t, err)
@@ -181,9 +183,10 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 
 		scope := promutils.NewTestScope()
 		l := &mockWFNamespaceLister{}
-		wfStore := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		wfStore, err := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		assert.NoError(t, err)
 		// Insert a new workflow with R1
-		_, err := wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
 		assert.NoError(t, err)
 
 		// Update the workflow version
@@ -213,7 +216,8 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 
 		scope := promutils.NewTestScope()
 		l := &mockWFNamespaceLister{}
-		wfStore := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		wfStore, err := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+		assert.NoError(t, err)
 		// Insert a new workflow with R1
 		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
 		assert.NoError(t, err)
@@ -250,7 +254,8 @@ func TestResourceVersionCaching_UpdateTerminated(t *testing.T) {
 
 	scope := promutils.NewTestScope()
 	l := &mockWFNamespaceLister{}
-	wfStore := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+	wfStore, err := NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l}))
+	assert.NoError(t, err)
 	// Insert a new workflow with R1
 	_, err = wfStore.Update(ctx, newWf, PriorityClassCritical)
 	assert.NoError(t, err)
@@ -269,4 +274,11 @@ func TestResourceVersionCaching_UpdateTerminated(t *testing.T) {
 	assert.False(t, ok)
 	assert.Nil(t, v)
 
+	// validate that terminated workflows are not retrievable
+	terminated := rvStore.terminatedFilter.Contains(ctx, []byte(resourceVersionKey(namespace, name)))
+	assert.True(t, terminated)
+
+	terminatedWf, err := wfStore.Get(ctx, namespace, name)
+	assert.Nil(t, terminatedWf)
+	assert.True(t, IsWorkflowTerminated(err))
 }
