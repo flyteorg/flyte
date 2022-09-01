@@ -181,6 +181,11 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] not found, may be deleted.", namespace, name)
 			return nil
 		}
+		if workflowstore.IsWorkflowTerminated(fetchErr) {
+			p.metrics.RoundSkipped.Inc()
+			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] has already been terminated.", namespace, name)
+			return nil
+		}
 		if workflowstore.IsWorkflowStale(fetchErr) {
 			p.metrics.RoundSkipped.Inc()
 			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] Stale.", namespace, name)
