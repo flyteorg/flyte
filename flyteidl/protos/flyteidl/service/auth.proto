@@ -41,6 +41,9 @@ message OAuth2MetadataResponse {
 
     // JSON array containing a list of the OAuth 2.0 grant type values that this authorization server supports.
     repeated string grant_types_supported = 9;
+
+    // URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+    string device_authorization_endpoint = 10;
 }
 
 message PublicClientAuthConfigRequest {}

@@ -445,6 +445,20 @@ class OAuth2MetadataResponse final :
   ::std::string* release_jwks_uri();
   void set_allocated_jwks_uri(::std::string* jwks_uri);
 
+  // string device_authorization_endpoint = 10;
+  void clear_device_authorization_endpoint();
+  static const int kDeviceAuthorizationEndpointFieldNumber = 10;
+  const ::std::string& device_authorization_endpoint() const;
+  void set_device_authorization_endpoint(const ::std::string& value);
+  #if LANG_CXX11
+  void set_device_authorization_endpoint(::std::string&& value);
+  #endif
+  void set_device_authorization_endpoint(const char* value);
+  void set_device_authorization_endpoint(const char* value, size_t size);
+  ::std::string* mutable_device_authorization_endpoint();
+  ::std::string* release_device_authorization_endpoint();
+  void set_allocated_device_authorization_endpoint(::std::string* device_authorization_endpoint);
+
   // @@protoc_insertion_point(class_scope:flyteidl.service.OAuth2MetadataResponse)
  private:
   class HasBitSetters;
@@ -459,6 +473,7 @@ class OAuth2MetadataResponse final :
   ::google::protobuf::internal::ArenaStringPtr authorization_endpoint_;
   ::google::protobuf::internal::ArenaStringPtr token_endpoint_;
   ::google::protobuf::internal::ArenaStringPtr jwks_uri_;
+  ::google::protobuf::internal::ArenaStringPtr device_authorization_endpoint_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fauth_2eproto;
 };
@@ -1325,6 +1340,59 @@ inline ::google::protobuf::RepeatedPtrField<::std::string>*
 OAuth2MetadataResponse::mutable_grant_types_supported() {
   // @@protoc_insertion_point(field_mutable_list:flyteidl.service.OAuth2MetadataResponse.grant_types_supported)
   return &grant_types_supported_;
+}
+
+// string device_authorization_endpoint = 10;
+inline void OAuth2MetadataResponse::clear_device_authorization_endpoint() {
+  device_authorization_endpoint_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& OAuth2MetadataResponse::device_authorization_endpoint() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+  return device_authorization_endpoint_.GetNoArena();
+}
+inline void OAuth2MetadataResponse::set_device_authorization_endpoint(const ::std::string& value) {
+  
+  device_authorization_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+}
+#if LANG_CXX11
+inline void OAuth2MetadataResponse::set_device_authorization_endpoint(::std::string&& value) {
+  
+  device_authorization_endpoint_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+}
+#endif
+inline void OAuth2MetadataResponse::set_device_authorization_endpoint(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  device_authorization_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+}
+inline void OAuth2MetadataResponse::set_device_authorization_endpoint(const char* value, size_t size) {
+  
+  device_authorization_endpoint_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+}
+inline ::std::string* OAuth2MetadataResponse::mutable_device_authorization_endpoint() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+  return device_authorization_endpoint_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* OAuth2MetadataResponse::release_device_authorization_endpoint() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
+  
+  return device_authorization_endpoint_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void OAuth2MetadataResponse::set_allocated_device_authorization_endpoint(::std::string* device_authorization_endpoint) {
+  if (device_authorization_endpoint != nullptr) {
+    
+  } else {
+    
+  }
+  device_authorization_endpoint_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), device_authorization_endpoint);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.OAuth2MetadataResponse.device_authorization_endpoint)
 }
 
 // -------------------------------------------------------------------

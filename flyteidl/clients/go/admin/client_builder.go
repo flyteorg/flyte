@@ -5,13 +5,13 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
+	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 )
 
 // ClientsetBuilder is used to build the clientset. This allows custom token cache implementations to be plugged in.
 type ClientsetBuilder struct {
 	config     *Config
-	tokenCache pkce.TokenCache
+	tokenCache cache.TokenCache
 	opts       []grpc.DialOption
 }
 
@@ -27,7 +27,7 @@ func (cb *ClientsetBuilder) WithConfig(config *Config) *ClientsetBuilder {
 }
 
 // WithTokenCache allows pluggable token cache implemetations. eg; flytectl uses keyring as tokenCache
-func (cb *ClientsetBuilder) WithTokenCache(tokenCache pkce.TokenCache) *ClientsetBuilder {
+func (cb *ClientsetBuilder) WithTokenCache(tokenCache cache.TokenCache) *ClientsetBuilder {
 	cb.tokenCache = tokenCache
 	return cb
 }
@@ -40,7 +40,7 @@ func (cb *ClientsetBuilder) WithDialOptions(opts ...grpc.DialOption) *ClientsetB
 // Build the clientset using the current state of the ClientsetBuilder
 func (cb *ClientsetBuilder) Build(ctx context.Context) (*Clientset, error) {
 	if cb.tokenCache == nil {
-		cb.tokenCache = &pkce.TokenCacheInMemoryProvider{}
+		cb.tokenCache = &cache.TokenCacheInMemoryProvider{}
 	}
 
 	if cb.config == nil {

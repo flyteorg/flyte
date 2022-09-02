@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
 )
 
-func getAuthServerCallbackHandler(c *oauth2.Config, codeVerifier string, tokenChannel chan *oauth2.Token,
+func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenChannel chan *oauth2.Token,
 	errorChannel chan error, stateString string) func(rw http.ResponseWriter, req *http.Request) {
 
 	return func(rw http.ResponseWriter, req *http.Request) {

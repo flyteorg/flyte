@@ -685,6 +685,24 @@ public final class Auth {
      */
     com.google.protobuf.ByteString
         getGrantTypesSupportedBytes(int index);
+
+    /**
+     * <pre>
+     * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+     * </pre>
+     *
+     * <code>string device_authorization_endpoint = 10;</code>
+     */
+    java.lang.String getDeviceAuthorizationEndpoint();
+    /**
+     * <pre>
+     * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+     * </pre>
+     *
+     * <code>string device_authorization_endpoint = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeviceAuthorizationEndpointBytes();
   }
   /**
    * <pre>
@@ -713,6 +731,7 @@ public final class Auth {
       jwksUri_ = "";
       codeChallengeMethodsSupported_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       grantTypesSupported_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      deviceAuthorizationEndpoint_ = "";
     }
 
     @java.lang.Override
@@ -806,6 +825,12 @@ public final class Auth {
                 mutable_bitField0_ |= 0x00000100;
               }
               grantTypesSupported_.add(s);
+              break;
+            }
+            case 82: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deviceAuthorizationEndpoint_ = s;
               break;
             }
             default: {
@@ -1259,6 +1284,48 @@ public final class Auth {
       return grantTypesSupported_.getByteString(index);
     }
 
+    public static final int DEVICE_AUTHORIZATION_ENDPOINT_FIELD_NUMBER = 10;
+    private volatile java.lang.Object deviceAuthorizationEndpoint_;
+    /**
+     * <pre>
+     * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+     * </pre>
+     *
+     * <code>string device_authorization_endpoint = 10;</code>
+     */
+    public java.lang.String getDeviceAuthorizationEndpoint() {
+      java.lang.Object ref = deviceAuthorizationEndpoint_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deviceAuthorizationEndpoint_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+     * </pre>
+     *
+     * <code>string device_authorization_endpoint = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeviceAuthorizationEndpointBytes() {
+      java.lang.Object ref = deviceAuthorizationEndpoint_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deviceAuthorizationEndpoint_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1299,6 +1366,9 @@ public final class Auth {
       }
       for (int i = 0; i < grantTypesSupported_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 9, grantTypesSupported_.getRaw(i));
+      }
+      if (!getDeviceAuthorizationEndpointBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 10, deviceAuthorizationEndpoint_);
       }
       unknownFields.writeTo(output);
     }
@@ -1361,6 +1431,9 @@ public final class Auth {
         size += dataSize;
         size += 1 * getGrantTypesSupportedList().size();
       }
+      if (!getDeviceAuthorizationEndpointBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(10, deviceAuthorizationEndpoint_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1394,6 +1467,8 @@ public final class Auth {
           .equals(other.getCodeChallengeMethodsSupportedList())) return false;
       if (!getGrantTypesSupportedList()
           .equals(other.getGrantTypesSupportedList())) return false;
+      if (!getDeviceAuthorizationEndpoint()
+          .equals(other.getDeviceAuthorizationEndpoint())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1433,6 +1508,8 @@ public final class Auth {
         hash = (37 * hash) + GRANT_TYPES_SUPPORTED_FIELD_NUMBER;
         hash = (53 * hash) + getGrantTypesSupportedList().hashCode();
       }
+      hash = (37 * hash) + DEVICE_AUTHORIZATION_ENDPOINT_FIELD_NUMBER;
+      hash = (53 * hash) + getDeviceAuthorizationEndpoint().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1589,6 +1666,8 @@ public final class Auth {
         bitField0_ = (bitField0_ & ~0x00000080);
         grantTypesSupported_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000100);
+        deviceAuthorizationEndpoint_ = "";
+
         return this;
       }
 
@@ -1646,6 +1725,7 @@ public final class Auth {
           bitField0_ = (bitField0_ & ~0x00000100);
         }
         result.grantTypesSupported_ = grantTypesSupported_;
+        result.deviceAuthorizationEndpoint_ = deviceAuthorizationEndpoint_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1759,6 +1839,10 @@ public final class Auth {
             ensureGrantTypesSupportedIsMutable();
             grantTypesSupported_.addAll(other.grantTypesSupported_);
           }
+          onChanged();
+        }
+        if (!other.getDeviceAuthorizationEndpoint().isEmpty()) {
+          deviceAuthorizationEndpoint_ = other.deviceAuthorizationEndpoint_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -2817,6 +2901,95 @@ public final class Auth {
   checkByteStringIsUtf8(value);
         ensureGrantTypesSupportedIsMutable();
         grantTypesSupported_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object deviceAuthorizationEndpoint_ = "";
+      /**
+       * <pre>
+       * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+       * </pre>
+       *
+       * <code>string device_authorization_endpoint = 10;</code>
+       */
+      public java.lang.String getDeviceAuthorizationEndpoint() {
+        java.lang.Object ref = deviceAuthorizationEndpoint_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deviceAuthorizationEndpoint_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+       * </pre>
+       *
+       * <code>string device_authorization_endpoint = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeviceAuthorizationEndpointBytes() {
+        java.lang.Object ref = deviceAuthorizationEndpoint_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deviceAuthorizationEndpoint_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+       * </pre>
+       *
+       * <code>string device_authorization_endpoint = 10;</code>
+       */
+      public Builder setDeviceAuthorizationEndpoint(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deviceAuthorizationEndpoint_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+       * </pre>
+       *
+       * <code>string device_authorization_endpoint = 10;</code>
+       */
+      public Builder clearDeviceAuthorizationEndpoint() {
+        
+        deviceAuthorizationEndpoint_ = getDefaultInstance().getDeviceAuthorizationEndpoint();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+       * </pre>
+       *
+       * <code>string device_authorization_endpoint = 10;</code>
+       */
+      public Builder setDeviceAuthorizationEndpointBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deviceAuthorizationEndpoint_ = value;
         onChanged();
         return this;
       }
@@ -4717,7 +4890,7 @@ public final class Auth {
       "\n\033flyteidl/service/auth.proto\022\020flyteidl." +
       "service\032\034google/api/annotations.proto\032,p" +
       "rotoc-gen-swagger/options/annotations.pr" +
-      "oto\"\027\n\025OAuth2MetadataRequest\"\246\002\n\026OAuth2M" +
+      "oto\"\027\n\025OAuth2MetadataRequest\"\315\002\n\026OAuth2M" +
       "etadataResponse\022\016\n\006issuer\030\001 \001(\t\022\036\n\026autho" +
       "rization_endpoint\030\002 \001(\t\022\026\n\016token_endpoin" +
       "t\030\003 \001(\t\022 \n\030response_types_supported\030\004 \003(" +
@@ -4725,26 +4898,27 @@ public final class Auth {
       "point_auth_methods_supported\030\006 \003(\t\022\020\n\010jw" +
       "ks_uri\030\007 \001(\t\022(\n code_challenge_methods_s" +
       "upported\030\010 \003(\t\022\035\n\025grant_types_supported\030" +
-      "\t \003(\t\"\037\n\035PublicClientAuthConfigRequest\"\234" +
-      "\001\n\036PublicClientAuthConfigResponse\022\021\n\tcli" +
-      "ent_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sc" +
-      "opes\030\003 \003(\t\022\"\n\032authorization_metadata_key" +
-      "\030\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t2\374\003" +
-      "\n\023AuthMetadataService\022\365\001\n\021GetOAuth2Metad" +
-      "ata\022\'.flyteidl.service.OAuth2MetadataReq" +
-      "uest\032(.flyteidl.service.OAuth2MetadataRe" +
-      "sponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oauth-auth" +
-      "orization-server\222AZ\032XRetrieves OAuth2 au" +
-      "thorization server metadata. This endpoi" +
-      "nt is anonymously accessible.\022\354\001\n\025GetPub" +
-      "licClientConfig\022/.flyteidl.service.Publi" +
-      "cClientAuthConfigRequest\0320.flyteidl.serv" +
-      "ice.PublicClientAuthConfigResponse\"p\202\323\344\223" +
-      "\002\031\022\027/config/v1/flyte_client\222AN\032LRetrieve" +
-      "s public flyte client info. This endpoin" +
-      "t is anonymously accessible.B9Z7github.c" +
-      "om/flyteorg/flyteidl/gen/pb-go/flyteidl/" +
-      "serviceb\006proto3"
+      "\t \003(\t\022%\n\035device_authorization_endpoint\030\n" +
+      " \001(\t\"\037\n\035PublicClientAuthConfigRequest\"\234\001" +
+      "\n\036PublicClientAuthConfigResponse\022\021\n\tclie" +
+      "nt_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sco" +
+      "pes\030\003 \003(\t\022\"\n\032authorization_metadata_key\030" +
+      "\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t2\374\003\n" +
+      "\023AuthMetadataService\022\365\001\n\021GetOAuth2Metada" +
+      "ta\022\'.flyteidl.service.OAuth2MetadataRequ" +
+      "est\032(.flyteidl.service.OAuth2MetadataRes" +
+      "ponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oauth-autho" +
+      "rization-server\222AZ\032XRetrieves OAuth2 aut" +
+      "horization server metadata. This endpoin" +
+      "t is anonymously accessible.\022\354\001\n\025GetPubl" +
+      "icClientConfig\022/.flyteidl.service.Public" +
+      "ClientAuthConfigRequest\0320.flyteidl.servi" +
+      "ce.PublicClientAuthConfigResponse\"p\202\323\344\223\002" +
+      "\031\022\027/config/v1/flyte_client\222AN\032LRetrieves" +
+      " public flyte client info. This endpoint" +
+      " is anonymously accessible.B9Z7github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/s" +
+      "erviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4771,7 +4945,7 @@ public final class Auth {
     internal_static_flyteidl_service_OAuth2MetadataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_OAuth2MetadataResponse_descriptor,
-        new java.lang.String[] { "Issuer", "AuthorizationEndpoint", "TokenEndpoint", "ResponseTypesSupported", "ScopesSupported", "TokenEndpointAuthMethodsSupported", "JwksUri", "CodeChallengeMethodsSupported", "GrantTypesSupported", });
+        new java.lang.String[] { "Issuer", "AuthorizationEndpoint", "TokenEndpoint", "ResponseTypesSupported", "ScopesSupported", "TokenEndpointAuthMethodsSupported", "JwksUri", "CodeChallengeMethodsSupported", "GrantTypesSupported", "DeviceAuthorizationEndpoint", });
     internal_static_flyteidl_service_PublicClientAuthConfigRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_service_PublicClientAuthConfigRequest_fieldAccessorTable = new
