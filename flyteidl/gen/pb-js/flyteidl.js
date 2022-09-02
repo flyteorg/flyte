@@ -39141,6 +39141,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [jwksUri] OAuth2MetadataResponse jwksUri
              * @property {Array.<string>|null} [codeChallengeMethodsSupported] OAuth2MetadataResponse codeChallengeMethodsSupported
              * @property {Array.<string>|null} [grantTypesSupported] OAuth2MetadataResponse grantTypesSupported
+             * @property {string|null} [deviceAuthorizationEndpoint] OAuth2MetadataResponse deviceAuthorizationEndpoint
              */
 
             /**
@@ -39236,6 +39237,14 @@ export const flyteidl = $root.flyteidl = (() => {
             OAuth2MetadataResponse.prototype.grantTypesSupported = $util.emptyArray;
 
             /**
+             * OAuth2MetadataResponse deviceAuthorizationEndpoint.
+             * @member {string} deviceAuthorizationEndpoint
+             * @memberof flyteidl.service.OAuth2MetadataResponse
+             * @instance
+             */
+            OAuth2MetadataResponse.prototype.deviceAuthorizationEndpoint = "";
+
+            /**
              * Creates a new OAuth2MetadataResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.service.OAuth2MetadataResponse
@@ -39282,6 +39291,8 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.grantTypesSupported != null && message.grantTypesSupported.length)
                     for (let i = 0; i < message.grantTypesSupported.length; ++i)
                         writer.uint32(/* id 9, wireType 2 =*/74).string(message.grantTypesSupported[i]);
+                if (message.deviceAuthorizationEndpoint != null && message.hasOwnProperty("deviceAuthorizationEndpoint"))
+                    writer.uint32(/* id 10, wireType 2 =*/82).string(message.deviceAuthorizationEndpoint);
                 return writer;
             };
 
@@ -39339,6 +39350,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (!(message.grantTypesSupported && message.grantTypesSupported.length))
                             message.grantTypesSupported = [];
                         message.grantTypesSupported.push(reader.string());
+                        break;
+                    case 10:
+                        message.deviceAuthorizationEndpoint = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -39406,6 +39420,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (!$util.isString(message.grantTypesSupported[i]))
                             return "grantTypesSupported: string[] expected";
                 }
+                if (message.deviceAuthorizationEndpoint != null && message.hasOwnProperty("deviceAuthorizationEndpoint"))
+                    if (!$util.isString(message.deviceAuthorizationEndpoint))
+                        return "deviceAuthorizationEndpoint: string expected";
                 return null;
             };
 

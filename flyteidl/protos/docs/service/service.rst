@@ -138,6 +138,7 @@ as defined in https://tools.ietf.org/html/rfc8414
    "jwks_uri", ":ref:`ref_string`", "", "URL of the authorization server's JWK Set [JWK] document. The referenced document contains the signing key(s) the client uses to validate signatures from the authorization server."
    "code_challenge_methods_supported", ":ref:`ref_string`", "repeated", "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by this authorization server."
    "grant_types_supported", ":ref:`ref_string`", "repeated", "JSON array containing a list of the OAuth 2.0 grant type values that this authorization server supports."
+   "device_authorization_endpoint", ":ref:`ref_string`", "", "URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]"
 
 
 

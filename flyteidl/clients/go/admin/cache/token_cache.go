@@ -1,4 +1,4 @@
-package pkce
+package cache
 
 import "golang.org/x/oauth2"
 

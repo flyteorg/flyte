@@ -7,17 +7,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/logger"
-
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health/grpc_health_v1"
+
+	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
@@ -172,7 +172,7 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 
 // initializeClients creates an AdminClient, AuthServiceClient and IdentityServiceClient with a shared Admin connection
 // for the process. Note that if called with different cfg/dialoptions, it will not refresh the connection.
-func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
+func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
 	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg)
 	if err != nil {
 		logger.Panicf(ctx, "failed to initialize Auth Metadata Client. Error: %v", err)
@@ -215,7 +215,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache pkce.TokenCa
 }
 
 // Deprecated: Please use NewClientsetBuilder() instead.
-func InitializeAdminClientFromConfig(ctx context.Context, tokenCache pkce.TokenCache, opts ...grpc.DialOption) (service.AdminServiceClient, error) {
+func InitializeAdminClientFromConfig(ctx context.Context, tokenCache cache.TokenCache, opts ...grpc.DialOption) (service.AdminServiceClient, error) {
 	clientSet, err := initializeClients(ctx, GetConfig(ctx), tokenCache, opts...)
 	if err != nil {
 		return nil, err
