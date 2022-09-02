@@ -17,6 +17,7 @@ Let's dive into an example.
 
 # %%
 # Import the dependencies.
+import flytekit
 import pandas as pd
 import plotly.express as px
 from flytekit import task, workflow
