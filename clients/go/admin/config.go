@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
 	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
-
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
 )
@@ -27,12 +27,14 @@ var DefaultClientSecretLocation = filepath.Join(string(filepath.Separator), "etc
 type AuthType uint8
 
 const (
-	// Chooses Client Secret OAuth2 protocol (ref: https://tools.ietf.org/html/rfc6749#section-4.4)
+	// AuthTypeClientSecret Chooses Client Secret OAuth2 protocol (ref: https://tools.ietf.org/html/rfc6749#section-4.4)
 	AuthTypeClientSecret AuthType = iota
-	// Chooses Proof Key Code Exchange OAuth2 extension protocol (ref: https://tools.ietf.org/html/rfc7636)
+	// AuthTypePkce Chooses Proof Key Code Exchange OAuth2 extension protocol (ref: https://tools.ietf.org/html/rfc7636)
 	AuthTypePkce
-	// Chooses an external authentication process
+	// AuthTypeExternalCommand Chooses an external authentication process
 	AuthTypeExternalCommand
+	// AuthTypeDeviceFlow Uses device flow to authenticate in a constrained environment with no access to browser
+	AuthTypeDeviceFlow
 )
 
 type Config struct {
@@ -67,6 +69,8 @@ type Config struct {
 
 	PkceConfig pkce.Config `json:"pkceConfig" pflag:",Config for Pkce authentication flow."`
 
+	DeviceFlowConfig deviceflow.Config `json:"deviceFlowConfig" pflag:",Config for Device authentication flow."`
+
 	Command []string `json:"command" pflag:",Command for external authentication token generation"`
 
 	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
@@ -86,7 +90,12 @@ var (
 		ClientSecretLocation: DefaultClientSecretLocation,
 		PkceConfig: pkce.Config{
 			TokenRefreshGracePeriod: config.Duration{Duration: 5 * time.Minute},
-			BrowserSessionTimeout:   config.Duration{Duration: 15 * time.Second},
+			BrowserSessionTimeout:   config.Duration{Duration: 2 * time.Minute},
+		},
+		DeviceFlowConfig: deviceflow.Config{
+			TokenRefreshGracePeriod: config.Duration{Duration: 5 * time.Minute},
+			Timeout:                 config.Duration{Duration: 10 * time.Minute},
+			PollInterval:            config.Duration{Duration: 5 * time.Second},
 		},
 		TokenRefreshWindow: config.Duration{Duration: 0},
 	}

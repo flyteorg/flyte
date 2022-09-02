@@ -106,6 +106,10 @@
             "type": "string"
           },
           "description": "JSON array containing a list of the OAuth 2.0 grant type values that this authorization server supports."
+        },
+        "device_authorization_endpoint": {
+          "type": "string",
+          "title": "URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]"
         }
       },
       "title": "OAuth2MetadataResponse defines an RFC-Compliant response for /.well-known/oauth-authorization-server metadata\nas defined in https://tools.ietf.org/html/rfc8414"

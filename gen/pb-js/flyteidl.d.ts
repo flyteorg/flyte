@@ -16805,6 +16805,9 @@ export namespace flyteidl {
 
             /** OAuth2MetadataResponse grantTypesSupported */
             grantTypesSupported?: (string[]|null);
+
+            /** OAuth2MetadataResponse deviceAuthorizationEndpoint */
+            deviceAuthorizationEndpoint?: (string|null);
         }
 
         /** Represents a OAuth2MetadataResponse. */
@@ -16842,6 +16845,9 @@ export namespace flyteidl {
 
             /** OAuth2MetadataResponse grantTypesSupported. */
             public grantTypesSupported: string[];
+
+            /** OAuth2MetadataResponse deviceAuthorizationEndpoint. */
+            public deviceAuthorizationEndpoint: string;
 
             /**
              * Creates a new OAuth2MetadataResponse instance using the specified properties.
