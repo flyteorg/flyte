@@ -19,6 +19,7 @@
    :hidden:
 
    getting_started/index
+   getting_started/custom_dependencies
 
 .. toctree::
    :caption: Concepts
