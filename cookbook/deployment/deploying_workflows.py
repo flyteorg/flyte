@@ -183,6 +183,7 @@ Pulling Images from a Private Container Image Registry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can use different private container registries (`AWS ECR <https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html>`__, `Docker Hub <https://docs.docker.com/docker-hub/repos/#private-repositories>`__, `GitLab Container Registry <https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#access-an-image-from-a-private-container-registry>`__). Ensure that you have the command line tools and login information associated with the registry.
+An ``imagePullSecret`` is required to pull a private image.
 
 A general trivia while using these private registries has been discussed below.
 
@@ -190,14 +191,18 @@ A general trivia while using these private registries has been discussed below.
 
    #. Add the authorization token and name to the default/new service account.
    #. Ensure that the service account you are using for authentication has permissions to access the container registry.
+   #. Add your ``imagePullSecrets`` to this `service account <https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-image-pull-secret-to-service-account>`__.
    #. Use this default/new service account to login into the private registry and pull the image.
 
+**OR**
 
 2. Using a private registry in Docker Hub.
 
    #. `Use <https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/>`__ a custom pod template to create a pod. This template is automatically added to every ``pod`` that Flyte creates.
+   #. Add your ``imagePullSecrets`` to this custom pod template.
    #. Update `FlytePropeller <https://github.com/flyteorg/flyteplugins/blob/e2971efbefd9126aca0290ddc931663605dec348/go/tasks/pluginmachinery/flytek8s/config/config.go#L157>`__ about the pod created in the previous step.
-   #. Specify the pod spec and ImagePullSecrets (or any other customization for the pod) in the pod's manifest (YAML file). The pods with their keys can log in and access the images in the private registry.
+   #. FlytePropeller adds ``imagePullSecrets`` (and other customization for the pod) to the PodSpec which would look similar to this `manifest <https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret>`__.
+   #. The pods with their keys can log in and access the images in the private registry.
 
 Once you set up the token to authenticate with the private registry, you can pull images from them.
 
