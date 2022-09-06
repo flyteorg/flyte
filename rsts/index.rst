@@ -19,6 +19,7 @@
    :hidden:
 
    getting_started/index
+   getting_started/scaling_to_a_repo
 
 .. toctree::
    :caption: Concepts
