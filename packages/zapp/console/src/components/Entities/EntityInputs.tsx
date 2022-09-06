@@ -19,6 +19,13 @@ import * as React from 'react';
 import t from './strings';
 import { transformLiterals } from '../Literals/helpers';
 
+const coerceDefaultValue = (value: string | object | undefined): string | undefined => {
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
+};
+
 const useStyles = makeStyles((theme: Theme) => ({
   header: {
     marginBottom: theme.spacing(1),
@@ -179,7 +186,7 @@ export const EntityInputs: React.FC<{
                       <TableCell align="center">
                         {required ? <CheckIcon fontSize="small" /> : ''}
                       </TableCell>
-                      <TableCell>{defaultValue || '-'}</TableCell>
+                      <TableCell>{coerceDefaultValue(defaultValue) || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -214,7 +221,7 @@ export const EntityInputs: React.FC<{
                   {fixedInputs.map(({ name, defaultValue }) => (
                     <TableRow key={name}>
                       <TableCell>{name}</TableCell>
-                      <TableCell>{defaultValue || '-'}</TableCell>
+                      <TableCell>{coerceDefaultValue(defaultValue) || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
