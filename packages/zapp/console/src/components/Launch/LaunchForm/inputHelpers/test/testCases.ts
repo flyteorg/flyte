@@ -111,13 +111,10 @@ export const supportedPrimitives: InputTypeDefinition[] = [
   inputTypes.integer,
   inputTypes.schema,
   inputTypes.struct,
-];
-
-export const unsupportedTypes: InputTypeDefinition[] = [
-  inputTypes.binary,
-  inputTypes.error,
   inputTypes.none,
 ];
+
+export const unsupportedTypes: InputTypeDefinition[] = [inputTypes.binary, inputTypes.error];
 
 export const validityTestCases = {
   boolean: {

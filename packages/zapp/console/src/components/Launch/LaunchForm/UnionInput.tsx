@@ -23,7 +23,7 @@ const generateInputTypeToValueMap = (
   listOfSubTypes: InputTypeDefinition[] | undefined,
   initialInputValue: UnionValue | undefined,
   initialType: InputTypeDefinition,
-): Record<InputType, InputValue> | {} => {
+): Record<InputType, UnionValue> | {} => {
   if (!listOfSubTypes?.length) {
     return {};
   }
@@ -95,7 +95,7 @@ export const UnionInput = (props: InputProps) => {
   }
 
   const [inputTypeToValueMap, setInputTypeToValueMap] = React.useState<
-    Record<InputType, InputValue> | {}
+    Record<InputType, UnionValue> | {}
   >(generateInputTypeToValueMap(listOfSubTypes, initialInputValue, initialInputTypeDefinition));
 
   const [selectedInputType, setSelectedInputType] = React.useState<InputType>(
@@ -105,6 +105,13 @@ export const UnionInput = (props: InputProps) => {
   const selectedInputTypeDefintion = inputTypeToInputTypeDefinition[
     selectedInputType
   ] as InputTypeDefinition;
+
+  // change the selected union input value when change the selected union input type
+  React.useEffect(() => {
+    if (inputTypeToValueMap[selectedInputType]) {
+      handleSubTypeOnChange(inputTypeToValueMap[selectedInputType].value);
+    }
+  }, [selectedInputTypeDefintion]);
 
   const handleTypeOnSelectionChanged = (value: SearchableSelectorOption<InputType>) => {
     setSelectedInputType(value.data);

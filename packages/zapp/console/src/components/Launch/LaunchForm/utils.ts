@@ -84,7 +84,6 @@ export function formatType({ type, subtype, listOfSubTypes }: InputTypeDefinitio
   }
   if (type === InputType.Union) {
     if (!listOfSubTypes) return typeLabels[type];
-
     const concatListOfSubTypes = listOfSubTypes.map((subtype) => formatType(subtype)).join(' | ');
 
     return `${typeLabels[type]} [${concatListOfSubTypes}]`;
@@ -169,6 +168,8 @@ export function getInputDefintionForLiteralType(literalType: LiteralType): Input
     result.listOfSubTypes = literalType.unionType.variants?.map((variant) =>
       getInputDefintionForLiteralType(variant as LiteralType),
     );
+  } else if (literalType.simple === 0 && literalType.structure?.tag === 'none') {
+    result.type = simpleTypeToInputType[literalType.simple];
   }
   return result;
 }

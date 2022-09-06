@@ -181,7 +181,9 @@ export interface UnionValue {
   typeDefinition: InputTypeDefinition;
 }
 
-export type InputValue = string | number | boolean | Date | BlobValue | UnionValue;
+export interface NoneValue {}
+
+export type InputValue = string | number | boolean | Date | BlobValue | UnionValue | NoneValue;
 export type InputChangeHandler = (newValue: InputValue) => void;
 
 export interface InputProps {

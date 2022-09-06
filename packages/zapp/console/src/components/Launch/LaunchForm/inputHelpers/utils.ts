@@ -32,9 +32,9 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
   switch (type) {
     case InputType.Binary:
     case InputType.Error:
-    case InputType.None:
     case InputType.Unknown:
       return false;
+    case InputType.None:
     case InputType.Boolean:
     case InputType.Blob:
     case InputType.Datetime:
