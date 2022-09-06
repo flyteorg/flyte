@@ -107,7 +107,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	// interruptible subtasks.
 	if len(currentState.SystemFailures.GetItems()) == 0 {
 		count := uint(currentState.GetExecutionArraySize())
-		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetInterruptibleFailureThreshold())
+		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetMaxAttempts())
 
 		systemFailuresArray, err := bitarray.NewCompactArray(count, maxValue)
 		if err != nil {
