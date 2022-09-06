@@ -54,7 +54,7 @@ spec:
         - {{ tpl (toYaml .) $ }}
         {{- end -}}
         {{- with .Values.flytepropeller.extraArgs }}
-        {{- tpl (toYaml $) . | nindent 6 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
         env:
         - name: POD_NAME
