@@ -20,6 +20,7 @@
 
    getting_started/index
    getting_started/custom_dependencies
+   getting_started/tasks_beyond_python
 
 .. toctree::
    :caption: Concepts
