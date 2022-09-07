@@ -4,14 +4,8 @@ deps:
   - remote: buf.build
     owner: googleapis
     repository: googleapis
-    branch: main
-    commit: 2aa0ce062bf84656ad01d979d5c64038
-    digest: b1-m2miB5uR65x_C-ImFfVIHaeVmyd1u5X7NugZ2vDbpJI=
-    create_time: 2022-06-01T15:05:55.95283Z
+    commit: 62f35d8aed1149c291d606d958a7ce32
   - remote: buf.build
     owner: unionai
     repository: protoc-gen-swagger
-    branch: main
-    commit: 560c4f34581045c4a4e59ffab94fceb0
-    digest: b1-eoEUXiWuST4tiiorwcO2Nvx_1pX0GHqRjUlc3sQocig=
-    create_time: 2022-06-02T06:14:15.441008Z
+    commit: fd9d94dc48154d5c94ccc43695df150f
