@@ -129,7 +129,7 @@ pandera==0.10.1
     # via
     #   -r requirements.in
     #   flytekitplugins-pandera
-pillow==9.1.0
+pillow==9.1.1
     # via matplotlib
 protobuf==3.20.0
     # via
