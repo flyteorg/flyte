@@ -261,45 +261,22 @@ describe('LaunchForm: Workflow', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    it('should not show validation errors until first submit', async () => {
+    it('should show disabled submit button if the value in input is invalid', async () => {
       const { container, getByLabelText } = renderForm();
       await waitFor(() => {});
 
       const integerInput = getByLabelText(integerInputName, {
         exact: false,
       });
+      const submitButton = getSubmitButton(container);
       fireEvent.change(integerInput, { target: { value: 'abc' } });
-
-      act(() => {
-        jest.runAllTimers();
-      });
-      await waitFor(() => {});
-      expect(integerInput).not.toBeInvalid();
-
-      fireEvent.click(getSubmitButton(container));
-      await waitFor(() => {});
-
-      expect(integerInput).toBeInvalid();
-    });
-
-    it('should update validation errors while typing', async () => {
-      const { container, getByLabelText } = renderForm();
-      await waitFor(() => {});
-
-      const integerInput = getByLabelText(integerInputName, {
-        exact: false,
-      });
-      fireEvent.change(integerInput, { target: { value: 'abc' } });
-      fireEvent.click(getSubmitButton(container));
-      await waitFor(() => {});
-      expect(integerInput).toBeInvalid();
+      await waitFor(() => expect(submitButton).toBeDisabled());
 
       fireEvent.change(integerInput, { target: { value: '123' } });
       act(() => {
         jest.runAllTimers();
       });
-      await waitFor(() => {});
-      expect(integerInput).toBeValid();
+      await waitFor(() => expect(submitButton).toBeEnabled());
     });
 
     it('should allow submission after fixing validation errors', async () => {
@@ -313,12 +290,10 @@ describe('LaunchForm: Workflow', () => {
       );
       const submitButton = getSubmitButton(container);
       fireEvent.change(integerInput, { target: { value: 'abc' } });
-      fireEvent.click(submitButton);
-      await waitFor(() => expect(integerInput).toBeInvalid());
-      expect(mockCreateWorkflowExecution).not.toHaveBeenCalled();
+      await waitFor(() => expect(submitButton).toBeDisabled());
 
       fireEvent.change(integerInput, { target: { value: '123' } });
-      await waitFor(() => expect(integerInput).toBeValid());
+      await waitFor(() => expect(submitButton).toBeEnabled());
       fireEvent.click(submitButton);
       await waitFor(() => expect(mockCreateWorkflowExecution).toHaveBeenCalled());
     });
