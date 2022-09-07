@@ -110,6 +110,7 @@ Please maintain an alphabetical order in the following list -->
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
 - [Lyft](https://www.lyft.com/)
 - [MethaneSAT](https://www.methanesat.org/)
+- [Pachama](https://pachama.com/)
 - [RunX.dev](https://runx.dev/)
 - [Spotify](https://www.spotify.com/)
 - [Striveworks](https://striveworks.us/)
