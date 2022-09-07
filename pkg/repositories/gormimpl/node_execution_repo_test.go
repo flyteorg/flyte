@@ -390,7 +390,7 @@ func TestCountNodeExecutions_Filters(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "node_executions" INNER JOIN node_executions ON node_event_executions.node_execution_id = node_executions.id INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND "error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
+		`SELECT count(*) FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND "node_executions"."error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
 
 	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -398,7 +398,7 @@ func TestCountNodeExecutions_Filters(t *testing.T) {
 		},
 		MapFilters: []common.MapFilter{
 			common.NewMapFilter(map[string]interface{}{
-				"error_code": nil,
+				"\"node_executions\".\"error_code\"": nil,
 			}),
 		},
 	})
