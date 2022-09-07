@@ -164,12 +164,14 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 
 func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
 	var err error
-	tx := r.db.Model(&models.NodeExecution{})
+	tx := r.db.Model(&models.NodeExecution{}).Preload("ChildNodeExecutions")
 
 	// Add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).
-	tx = tx.Joins(innerJoinNodeExecToNodeEvents)
-	tx = tx.Joins(innerJoinExecToNodeExec)
+	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
+		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
+		executionTableName, nodeExecutionTableName, executionTableName,
+		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
