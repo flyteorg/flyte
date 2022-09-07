@@ -142,40 +142,6 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}, nil
 }
 
-func (r *NodeExecutionRepo) ListEvents(
-	ctx context.Context, input interfaces.ListResourceInput) (interfaces.NodeExecutionEventCollectionOutput, error) {
-	// First validate input.
-	if err := ValidateListInput(input); err != nil {
-		return interfaces.NodeExecutionEventCollectionOutput{}, err
-	}
-	var nodeExecutionEvents []models.NodeExecutionEvent
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
-	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// (this query isn't called for deletes).
-	tx = tx.Joins(innerJoinNodeExecToNodeEvents)
-	tx = tx.Joins(innerJoinExecToNodeExec)
-
-	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
-	if err != nil {
-		return interfaces.NodeExecutionEventCollectionOutput{}, err
-	}
-	// Apply sort ordering.
-	if input.SortParameter != nil {
-		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
-	}
-
-	timer := r.metrics.ListDuration.Start()
-	tx = tx.Find(&nodeExecutionEvents)
-	timer.Stop()
-	if tx.Error != nil {
-		return interfaces.NodeExecutionEventCollectionOutput{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return interfaces.NodeExecutionEventCollectionOutput{
-		NodeExecutionEvents: nodeExecutionEvents,
-	}, nil
-}
-
 func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.ExistsDuration.Start()
