@@ -20,8 +20,6 @@ type NodeExecutionRepoInterface interface {
 	GetWithChildren(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
 	// List returns node executions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (NodeExecutionCollectionOutput, error)
-	// ListEvents returns node execution events matching query parameters. A limit must be provided for the results page size.
-	ListEvents(ctx context.Context, input ListResourceInput) (NodeExecutionEventCollectionOutput, error)
 	// Exists returns whether a matching execution exists.
 	Exists(ctx context.Context, input NodeExecutionResource) (bool, error)
 	// Returns count of node executions matching query parameters.
