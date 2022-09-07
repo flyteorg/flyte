@@ -30,6 +30,7 @@ const baseInputProps: InputProps = {
   onChange: () => {},
   required: false,
   typeDefinition: inputTypes.unknown,
+  setIsError: () => {},
 };
 
 function makeSimpleInput(typeDefinition: InputTypeDefinition, value: any): InputProps {
