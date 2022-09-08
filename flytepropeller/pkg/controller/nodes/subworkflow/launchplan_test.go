@@ -192,7 +192,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			RecoveryExecution: recoveredExecID,
 		}, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-		recoveryClient := recoveryMocks.RecoveryClient{}
+		recoveryClient := recoveryMocks.Client{}
 		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveredExecID, mock.Anything).Return(&admin.NodeExecution{
 			Closure: &admin.NodeExecutionClosure{
 				Phase: core.NodeExecution_SUCCEEDED,

@@ -25,8 +25,8 @@ func (_m Client_RecoverNodeExecution) Return(_a0 *admin.NodeExecution, _a1 error
 	return &Client_RecoverNodeExecution{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Client) OnRecoverNodeExecution(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) *Client_RecoverNodeExecution {
-	c_call := _m.On("RecoverNodeExecution", ctx, execID, id)
+func (_m *Client) OnRecoverNodeExecution(ctx context.Context, execID *core.WorkflowExecutionIdentifier, nodeID string) *Client_RecoverNodeExecution {
+	c_call := _m.On("RecoverNodeExecution", ctx, execID, nodeID)
 	return &Client_RecoverNodeExecution{Call: c_call}
 }
 
@@ -35,13 +35,13 @@ func (_m *Client) OnRecoverNodeExecutionMatch(matchers ...interface{}) *Client_R
 	return &Client_RecoverNodeExecution{Call: c_call}
 }
 
-// RecoverNodeExecution provides a mock function with given fields: ctx, execID, id
-func (_m *Client) RecoverNodeExecution(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) (*admin.NodeExecution, error) {
-	ret := _m.Called(ctx, execID, id)
+// RecoverNodeExecution provides a mock function with given fields: ctx, execID, nodeID
+func (_m *Client) RecoverNodeExecution(ctx context.Context, execID *core.WorkflowExecutionIdentifier, nodeID string) (*admin.NodeExecution, error) {
+	ret := _m.Called(ctx, execID, nodeID)
 
 	var r0 *admin.NodeExecution
-	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, *core.NodeExecutionIdentifier) *admin.NodeExecution); ok {
-		r0 = rf(ctx, execID, id)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, string) *admin.NodeExecution); ok {
+		r0 = rf(ctx, execID, nodeID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.NodeExecution)
@@ -49,8 +49,8 @@ func (_m *Client) RecoverNodeExecution(ctx context.Context, execID *core.Workflo
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, *core.NodeExecutionIdentifier) error); ok {
-		r1 = rf(ctx, execID, id)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, string) error); ok {
+		r1 = rf(ctx, execID, nodeID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -66,8 +66,8 @@ func (_m Client_RecoverNodeExecutionData) Return(_a0 *admin.NodeExecutionGetData
 	return &Client_RecoverNodeExecutionData{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Client) OnRecoverNodeExecutionData(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) *Client_RecoverNodeExecutionData {
-	c_call := _m.On("RecoverNodeExecutionData", ctx, execID, id)
+func (_m *Client) OnRecoverNodeExecutionData(ctx context.Context, execID *core.WorkflowExecutionIdentifier, nodeID string) *Client_RecoverNodeExecutionData {
+	c_call := _m.On("RecoverNodeExecutionData", ctx, execID, nodeID)
 	return &Client_RecoverNodeExecutionData{Call: c_call}
 }
 
@@ -76,13 +76,13 @@ func (_m *Client) OnRecoverNodeExecutionDataMatch(matchers ...interface{}) *Clie
 	return &Client_RecoverNodeExecutionData{Call: c_call}
 }
 
-// RecoverNodeExecutionData provides a mock function with given fields: ctx, execID, id
-func (_m *Client) RecoverNodeExecutionData(ctx context.Context, execID *core.WorkflowExecutionIdentifier, id *core.NodeExecutionIdentifier) (*admin.NodeExecutionGetDataResponse, error) {
-	ret := _m.Called(ctx, execID, id)
+// RecoverNodeExecutionData provides a mock function with given fields: ctx, execID, nodeID
+func (_m *Client) RecoverNodeExecutionData(ctx context.Context, execID *core.WorkflowExecutionIdentifier, nodeID string) (*admin.NodeExecutionGetDataResponse, error) {
+	ret := _m.Called(ctx, execID, nodeID)
 
 	var r0 *admin.NodeExecutionGetDataResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, *core.NodeExecutionIdentifier) *admin.NodeExecutionGetDataResponse); ok {
-		r0 = rf(ctx, execID, id)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, string) *admin.NodeExecutionGetDataResponse); ok {
+		r0 = rf(ctx, execID, nodeID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.NodeExecutionGetDataResponse)
@@ -90,8 +90,8 @@ func (_m *Client) RecoverNodeExecutionData(ctx context.Context, execID *core.Wor
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, *core.NodeExecutionIdentifier) error); ok {
-		r1 = rf(ctx, execID, id)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, string) error); ok {
+		r1 = rf(ctx, execID, nodeID)
 	} else {
 		r1 = ret.Error(1)
 	}

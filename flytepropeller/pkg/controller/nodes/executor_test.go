@@ -49,7 +49,7 @@ import (
 
 var fakeKubeClient = mocks4.NewFakeKubeClient()
 var catalogClient = catalog.NOOPCatalog{}
-var recoveryClient = &recoveryMocks.RecoveryClient{}
+var recoveryClient = &recoveryMocks.Client{}
 
 const taskID = "tID"
 const inputsPath = "inputs.pb"
@@ -2028,10 +2028,6 @@ func TestRecover(t *testing.T) {
 		Name:    "name",
 	}
 	nodeID := "recovering"
-	nodeExecID := &core.NodeExecutionIdentifier{
-		ExecutionId: wfExecID,
-		NodeId:      nodeID,
-	}
 
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -2074,6 +2070,7 @@ func TestRecover(t *testing.T) {
 			WorkflowExecutionIdentifier: recoveryID,
 		},
 	})
+	execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 
 	nm := &nodeHandlerMocks.NodeExecutionMetadata{}
 	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
@@ -2094,8 +2091,8 @@ func TestRecover(t *testing.T) {
 	nCtx.OnNodeStatus().Return(ns)
 
 	t.Run("recover task node successfully", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				Closure: &admin.NodeExecutionClosure{
 					Phase: core.NodeExecution_SUCCEEDED,
@@ -2105,7 +2102,7 @@ func TestRecover(t *testing.T) {
 				},
 			}, nil)
 
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullInputs:  fullInputs,
 				FullOutputs: fullOutputs,
@@ -2139,8 +2136,8 @@ func TestRecover(t *testing.T) {
 		assert.Equal(t, phaseInfo.GetPhase(), handler.EPhaseRecovered)
 	})
 	t.Run("recover cached, dynamic task node successfully", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				Closure: &admin.NodeExecutionClosure{
 					Phase: core.NodeExecution_SUCCEEDED,
@@ -2178,7 +2175,7 @@ func TestRecover(t *testing.T) {
 				},
 			},
 		}
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullInputs:      fullInputs,
 				FullOutputs:     fullOutputs,
@@ -2223,8 +2220,8 @@ func TestRecover(t *testing.T) {
 		}, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata))
 	})
 	t.Run("recover workflow node successfully", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				Closure: &admin.NodeExecutionClosure{
 					Phase: core.NodeExecution_SUCCEEDED,
@@ -2243,7 +2240,7 @@ func TestRecover(t *testing.T) {
 				},
 			}, nil)
 
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullInputs:  fullInputs,
 				FullOutputs: fullOutputs,
@@ -2280,8 +2277,8 @@ func TestRecover(t *testing.T) {
 	})
 
 	t.Run("nothing to recover", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				Closure: &admin.NodeExecutionClosure{
 					Phase: core.NodeExecution_FAILED,
@@ -2298,8 +2295,8 @@ func TestRecover(t *testing.T) {
 	})
 
 	t.Run("Fetch inputs", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				InputUri: "inputuri",
 				Closure: &admin.NodeExecutionClosure{
@@ -2310,7 +2307,7 @@ func TestRecover(t *testing.T) {
 				},
 			}, nil)
 
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullOutputs: fullOutputs,
 			}, nil)
@@ -2344,8 +2341,8 @@ func TestRecover(t *testing.T) {
 		mockPBStore.AssertNumberOfCalls(t, "ReadProtobuf", 1)
 	})
 	t.Run("Fetch outputs", func(t *testing.T) {
-		recoveryClient := &recoveryMocks.RecoveryClient{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				Closure: &admin.NodeExecutionClosure{
 					Phase: core.NodeExecution_SUCCEEDED,
@@ -2355,7 +2352,7 @@ func TestRecover(t *testing.T) {
 				},
 			}, nil)
 
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeExecID).Return(
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullInputs: fullInputs,
 			}, nil)

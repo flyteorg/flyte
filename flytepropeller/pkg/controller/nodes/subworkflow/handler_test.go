@@ -153,7 +153,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	wfStatus := &mocks2.MutableWorkflowNodeStatus{}
 	mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
-	recoveryClient := &mocks5.RecoveryClient{}
+	recoveryClient := &mocks5.Client{}
 
 	t.Run("happy v0", func(t *testing.T) {
 
@@ -232,7 +232,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
-	recoveryClient := &mocks5.RecoveryClient{}
+	recoveryClient := &mocks5.Client{}
 
 	t.Run("stillRunning V0", func(t *testing.T) {
 
@@ -304,7 +304,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
-	recoveryClient := &mocks5.RecoveryClient{}
+	recoveryClient := &mocks5.Client{}
 
 	t.Run("abort v0", func(t *testing.T) {
 
