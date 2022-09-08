@@ -23,7 +23,6 @@ const ID = "id"
 const executionTableName = "executions"
 const namedEntityMetadataTableName = "named_entity_metadata"
 const nodeExecutionTableName = "node_executions"
-const nodeExecutionEventTableName = "node_event_executions"
 const taskExecutionTableName = "task_executions"
 const taskTableName = "tasks"
 
@@ -43,10 +42,6 @@ var entityToTableName = map[common.Entity]string{
 	common.NamedEntity:         "entities",
 	common.NamedEntityMetadata: "named_entity_metadata",
 }
-
-var innerJoinNodeExecToNodeEvents = fmt.Sprintf(
-	"INNER JOIN %s ON %s.node_execution_id = %s.id",
-	nodeExecutionTableName, nodeExecutionEventTableName, nodeExecutionTableName)
 
 var innerJoinExecToNodeExec = fmt.Sprintf(
 	"INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
