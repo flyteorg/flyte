@@ -30,7 +30,6 @@
     "dependencies": {
         "@rjsf/core": "^3.2.1",
         "@rjsf/material-ui": "^3.2.1",
-        "cache": "^2.1.0",
         "chalk": "^2.0.1",
         "chart.js": "^3.6.2",
         "chartjs-plugin-datalabels": "^2.0.0",
