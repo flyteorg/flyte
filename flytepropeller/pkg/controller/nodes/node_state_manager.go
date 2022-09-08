@@ -79,6 +79,7 @@ func (n nodeStateManager) GetWorkflowNodeState() handler.WorkflowNodeState {
 	ws := handler.WorkflowNodeState{}
 	if wn != nil {
 		ws.Phase = wn.GetWorkflowNodePhase()
+		ws.Error = wn.GetExecutionError()
 	}
 	return ws
 }

@@ -83,11 +83,12 @@ func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx handler
 		}
 
 		err = nCtx.NodeStateWriter().PutWorkflowNodeState(workflowNodeState)
-		if subworkflow.GetOnFailureNode() != nil {
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailingErr(state.Err, nil)), err
+		if err != nil {
+			logger.Warnf(ctx, "failed to store failing subworkflow state with err: [%v]", err)
+			return handler.UnknownTransition, err
 		}
 
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(state.Err, nil)), err
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 	}
 
 	if state.IsComplete() {
@@ -190,14 +191,24 @@ func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx 
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.SubWorkflowExecutionFailed, err.Error(), nil)), nil
 	}
 
-	status := nCtx.NodeStatus()
-	status.GetWorkflowNodeStatus()
-	if subWorkflow.GetOnFailureNode() == nil {
-		logger.Infof(ctx, "Subworkflow has no failure nodes, failing immediately.")
-		return handler.DoTransition(handler.TransitionTypeEphemeral,
-			handler.PhaseInfoFailureErr(nCtx.NodeStateReader().GetWorkflowNodeState().Error, nil)), err
+	if err := s.HandleAbort(ctx, nCtx, "subworkflow failed"); err != nil {
+		logger.Warnf(ctx, "failed to abort failing subworkflow with err: [%v]", err)
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 	}
 
+	if subWorkflow.GetOnFailureNode() == nil {
+		logger.Infof(ctx, "Subworkflow has no failure nodes, failing immediately.")
+		state := nCtx.NodeStateReader().GetWorkflowNodeState()
+		if state.Error != nil {
+			return handler.DoTransition(handler.TransitionTypeEphemeral,
+				handler.PhaseInfoFailureErr(state.Error, nil)), nil
+		}
+
+		return handler.DoTransition(handler.TransitionTypeEphemeral,
+			handler.PhaseInfoFailure(core.ExecutionError_UNKNOWN, "SubworkflowNodeFailing", "", nil)), nil
+	}
+
+	status := nCtx.NodeStatus()
 	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
 	return s.HandleFailureNodeOfSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
