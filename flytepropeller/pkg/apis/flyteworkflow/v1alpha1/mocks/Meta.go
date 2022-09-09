@@ -84,6 +84,38 @@ func (_m *Meta) GetCreationTimestamp() v1.Time {
 	return r0
 }
 
+type Meta_GetDefinitionVersion struct {
+	*mock.Call
+}
+
+func (_m Meta_GetDefinitionVersion) Return(_a0 v1alpha1.WorkflowDefinitionVersion) *Meta_GetDefinitionVersion {
+	return &Meta_GetDefinitionVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Meta) OnGetDefinitionVersion() *Meta_GetDefinitionVersion {
+	c_call := _m.On("GetDefinitionVersion")
+	return &Meta_GetDefinitionVersion{Call: c_call}
+}
+
+func (_m *Meta) OnGetDefinitionVersionMatch(matchers ...interface{}) *Meta_GetDefinitionVersion {
+	c_call := _m.On("GetDefinitionVersion", matchers...)
+	return &Meta_GetDefinitionVersion{Call: c_call}
+}
+
+// GetDefinitionVersion provides a mock function with given fields:
+func (_m *Meta) GetDefinitionVersion() v1alpha1.WorkflowDefinitionVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.WorkflowDefinitionVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.WorkflowDefinitionVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.WorkflowDefinitionVersion)
+	}
+
+	return r0
+}
+
 type Meta_GetEventVersion struct {
 	*mock.Call
 }

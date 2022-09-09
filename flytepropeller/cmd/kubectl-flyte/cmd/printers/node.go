@@ -58,7 +58,7 @@ func (p NodeStatusPrinter) BaseNodeInfo(node v1alpha1.BaseNode, nodeStatus v1alp
 }
 
 func (p NodeStatusPrinter) NodeInfo(wName string, node v1alpha1.BaseNode, nodeStatus v1alpha1.ExecutableNodeStatus) []string {
-	resourceName, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, wName, node.GetID(), strconv.Itoa(int(nodeStatus.GetAttempts())))
+	resourceName, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{wName, node.GetID(), strconv.Itoa(int(nodeStatus.GetAttempts()))})
 	if err != nil {
 		resourceName = "na"
 	}

@@ -78,9 +78,15 @@ type Propeller struct {
 	cfg              *config.Config
 }
 
-// Initializes all downstream executors
+// Initialize initializes all downstream executors
 func (p *Propeller) Initialize(ctx context.Context) error {
 	return p.workflowExecutor.Initialize(ctx)
+}
+
+func SetDefinitionVersionIfEmpty(wf *v1alpha1.FlyteWorkflow, version v1alpha1.WorkflowDefinitionVersion) {
+	if wf.Status.DefinitionVersion == nil {
+		wf.Status.DefinitionVersion = &version
+	}
 }
 
 // TryMutateWorkflow will try to mutate the workflow by traversing it and reconciling the desired and actual state.
@@ -120,6 +126,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	if !mutableW.GetExecutionStatus().IsTerminated() {
 		var err error
 		SetFinalizerIfEmpty(mutableW, FinalizerKey)
+		SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
 
 		func() {
 			t := p.metrics.RawWorkflowTraversalTime.Start(ctx)
