@@ -67,7 +67,6 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 	mockNodeStatus.On("GetAttempts").Return(attempts)
 
 	t.Run("happy", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
 
 		h := launchPlanHandler{
@@ -248,6 +247,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 
 		nCtx.OnNodeExecutionMetadata().Return(nm)
 		ectx := &execMocks.ExecutionContext{}
+		ectx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		ectx.OnGetEventVersion().Return(1)
 		ectx.OnGetParentInfo().Return(nil)
 		ectx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{

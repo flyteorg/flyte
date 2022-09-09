@@ -56,10 +56,12 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
-	childID, err := GetChildWorkflowExecutionID(
+
+	childID, err := GetChildWorkflowExecutionIDForExecution(
 		parentNodeExecutionID,
-		nCtx.CurrentAttempt(),
+		nCtx,
 	)
+
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "failed to create unique ID", nil)), nil
 	}
@@ -120,15 +122,31 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	})), nil
 }
 
+func GetChildWorkflowExecutionIDForExecution(parentNodeExecID *core.NodeExecutionIdentifier, nCtx handler.NodeExecutionContext) (*core.WorkflowExecutionIdentifier, error) {
+	// Handle launch plan
+	if nCtx.ExecutionContext().GetDefinitionVersion() == v1alpha1.WorkflowDefinitionVersion0 {
+		return GetChildWorkflowExecutionID(
+			parentNodeExecID,
+			nCtx.CurrentAttempt(),
+		)
+	}
+
+	return GetChildWorkflowExecutionIDV2(
+		parentNodeExecID,
+		nCtx.CurrentAttempt(),
+	)
+}
+
 func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
 	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
+
 	// Handle launch plan
-	childID, err := GetChildWorkflowExecutionID(
+	childID, err := GetChildWorkflowExecutionIDForExecution(
 		parentNodeExecutionID,
-		nCtx.CurrentAttempt(),
+		nCtx,
 	)
 
 	if err != nil {
@@ -213,9 +231,9 @@ func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx handler.NodeEx
 	if err != nil {
 		return err
 	}
-	childID, err := GetChildWorkflowExecutionID(
+	childID, err := GetChildWorkflowExecutionIDForExecution(
 		parentNodeExecutionID,
-		nCtx.CurrentAttempt(),
+		nCtx,
 	)
 	if err != nil {
 		// THIS SHOULD NEVER HAPPEN

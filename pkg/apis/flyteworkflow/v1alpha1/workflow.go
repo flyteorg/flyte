@@ -23,6 +23,15 @@ const ShardKeyspaceSize = 32
 const StartNodeID = "start-node"
 const EndNodeID = "end-node"
 
+type WorkflowDefinitionVersion uint32
+
+var LatestWorkflowDefinitionVersion = WorkflowDefinitionVersion1
+
+const (
+	WorkflowDefinitionVersion0 WorkflowDefinitionVersion = iota
+	WorkflowDefinitionVersion1
+)
+
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -80,6 +89,14 @@ func (in *FlyteWorkflow) GetEventVersion() EventVersion {
 		return in.WorkflowMeta.EventVersion
 	}
 	return EventVersion0
+}
+
+func (in *FlyteWorkflow) GetDefinitionVersion() WorkflowDefinitionVersion {
+	if in.Status.DefinitionVersion != nil {
+		return *in.Status.DefinitionVersion
+	}
+
+	return WorkflowDefinitionVersion0
 }
 
 func (in *FlyteWorkflow) GetExecutionConfig() ExecutionConfig {

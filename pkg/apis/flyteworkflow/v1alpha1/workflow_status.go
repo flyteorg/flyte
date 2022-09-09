@@ -35,6 +35,12 @@ type WorkflowStatus struct {
 	// Stores the Error during the Execution of the Workflow. It is optional and usually associated with Failing/Failed state only
 	Error *ExecutionError `json:"error,omitempty"`
 
+	// DefinitionVersion allows propeller code that populates the CRD to evolve (in backward incompatible ways) without
+	// affecting in-flight executions. Once an execution starts, propeller will populate this field with the current or
+	// latest version. If a newer propeller version is deployed midway that comes with a newer version, code that relies
+	// on the latest version should be gated behind this.
+	DefinitionVersion *WorkflowDefinitionVersion `json:"defVersion,omitempty"`
+
 	// non-Serialized fields
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }

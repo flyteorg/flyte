@@ -204,7 +204,7 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 // access to this location and can be passed in per execution.
 // the function also returns the uniqueID generated
 func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx handler.NodeExecutionContext, currentNodeUniqueID v1alpha1.NodeID, currentAttempt uint32) (io.RawOutputPaths, string, error) {
-	uniqueID, err := encoding.FixedLengthUniqueIDForParts(length, nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(currentAttempt)))
+	uniqueID, err := encoding.FixedLengthUniqueIDForParts(length, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(currentAttempt))})
 	if err != nil {
 		// SHOULD never really happen
 		return nil, uniqueID, err

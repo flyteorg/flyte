@@ -11,7 +11,7 @@ import (
 
 const maxUniqueIDLength = 20
 
-// The UniqueId of a node is unique within a given workflow execution.
+// GenerateUniqueID is the UniqueId of a node is unique within a given workflow execution.
 // In order to achieve that we track the lineage of the node.
 // To compute the uniqueID of a node, we use the uniqueID and retry attempt of the parent node
 // For nodes in level 0, there is no parent, and parentInfo is nil
@@ -24,10 +24,11 @@ func GenerateUniqueID(parentInfo executors.ImmutableParentInfo, nodeID string) (
 		parentRetryAttempt = strconv.Itoa(int(parentInfo.CurrentAttempt()))
 	}
 
-	return encoding.FixedLengthUniqueIDForParts(maxUniqueIDLength, parentUniqueID, parentRetryAttempt, nodeID)
+	return encoding.FixedLengthUniqueIDForParts(maxUniqueIDLength, []string{parentUniqueID, parentRetryAttempt, nodeID})
 }
 
-// When creating parentInfo, the unique id of parent is dependent on the unique id and the current attempt of the grand parent to track the lineage.
+// CreateParentInfo creates a unique parent id, the unique id of parent is dependent on the unique id and the current
+// attempt of the grandparent to track the lineage.
 func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID string, parentAttempt uint32) (executors.ImmutableParentInfo, error) {
 	uniqueID, err := GenerateUniqueID(grandParentInfo, nodeID)
 	if err != nil {

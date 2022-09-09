@@ -113,6 +113,7 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	ex.OnGetAnnotations().Return(nil)
 	ex.OnGetLabels().Return(nil)
 	ex.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+	ex.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 
 	nCtx.OnExecutionContext().Return(ex)
 
@@ -156,7 +157,6 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("happy v0", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
 		mockLPExec.OnLaunchMatch(
@@ -321,6 +321,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		).Return(nil)
 
 		eCtx := &execMocks.ExecutionContext{}
+		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
 		err := h.Abort(ctx, nCtx, "test")
@@ -342,6 +343,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		).Return(nil)
 
 		eCtx := &execMocks.ExecutionContext{}
+		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
 		err := h.Abort(ctx, nCtx, "test")
@@ -362,6 +364,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
+		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
 
