@@ -223,6 +223,7 @@ func TestStripTypeMetadata(t *testing.T) {
 											},
 										},
 									},
+									Structure: &core.TypeStructure{Tag: "str"},
 								},
 							},
 						},

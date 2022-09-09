@@ -185,6 +185,72 @@ func TestBuildFlyteWorkflow_withInputs(t *testing.T) {
 	assert.Equal(t, int64(123), wf.Inputs.Literals["x"].GetScalar().GetPrimitive().GetInteger())
 }
 
+func TestBuildFlyteWorkflow_withUnionInputs(t *testing.T) {
+	w := createSampleMockWorkflow()
+
+	startNode := w.GetNodes()[common.StartNodeID].(*mockNode)
+	strType := core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}, Structure: &core.TypeStructure{Tag: "str"}}
+	floatType := core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}, Structure: &core.TypeStructure{Tag: "float"}}
+	vars := []*core.Variable{
+		{
+			Type: &core.LiteralType{Type: &core.LiteralType_UnionType{UnionType: &core.UnionType{Variants: []*core.LiteralType{&strType, &floatType}}}},
+		},
+		{
+			Type: &core.LiteralType{Type: &core.LiteralType_UnionType{UnionType: &core.UnionType{Variants: []*core.LiteralType{&strType, &floatType}}}},
+		},
+	}
+
+	w.Template.Interface = &core.TypedInterface{
+		Inputs: &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": vars[0],
+				"y": vars[1],
+			},
+		},
+	}
+
+	startNode.iface = &core.TypedInterface{
+		Outputs: &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": vars[0],
+				"y": vars[1],
+			},
+		},
+	}
+
+	stringLiteral, err := coreutils.MakePrimitiveLiteral("hello")
+	assert.NoError(t, err)
+	floatLiteral, err := coreutils.MakePrimitiveLiteral(1.0)
+	assert.NoError(t, err)
+	inputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"x": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: floatLiteral, Type: &floatType}}}}},
+			"y": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: stringLiteral, Type: &strType}}}}},
+		},
+	}
+
+	errors.SetConfig(errors.Config{IncludeSource: true})
+	wf, err := BuildFlyteWorkflow(
+		&core.CompiledWorkflowClosure{
+			Primary: w.GetCoreWorkflow(),
+			Tasks: []*core.CompiledTask{
+				{
+					Template: &core.TaskTemplate{
+						Id: &core.Identifier{Name: "ref_1"},
+					},
+				},
+			},
+		},
+		inputs, nil, "")
+	assert.NoError(t, err)
+	assert.NotNil(t, wf)
+	errors.SetConfig(errors.Config{})
+
+	assert.Equal(t, 2, len(wf.Inputs.Literals))
+	assert.Equal(t, 1.0, wf.Inputs.Literals["x"].GetScalar().GetUnion().GetValue().GetScalar().GetPrimitive().GetFloatValue())
+	assert.Equal(t, "hello", wf.Inputs.Literals["y"].GetScalar().GetUnion().GetValue().GetScalar().GetPrimitive().GetStringValue())
+}
+
 func TestGenerateName(t *testing.T) {
 	t.Run("Invalid params", func(t *testing.T) {
 		_, _, _, _, _, err := generateName(nil, nil)
