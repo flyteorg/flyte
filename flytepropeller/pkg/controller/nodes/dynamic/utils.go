@@ -28,7 +28,7 @@ func underlyingInterface(ctx context.Context, taskReader handler.TaskReader) (*c
 }
 
 func hierarchicalNodeID(parentNodeID, retryAttempt, nodeID string) (string, error) {
-	return encoding.FixedLengthUniqueIDForParts(20, parentNodeID, retryAttempt, nodeID)
+	return encoding.FixedLengthUniqueIDForParts(20, []string{parentNodeID, retryAttempt, nodeID})
 }
 
 func updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt string, binding *core.BindingData) (err error) {

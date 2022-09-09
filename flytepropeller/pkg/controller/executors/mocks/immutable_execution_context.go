@@ -85,6 +85,38 @@ func (_m *ImmutableExecutionContext) GetCreationTimestamp() v1.Time {
 	return r0
 }
 
+type ImmutableExecutionContext_GetDefinitionVersion struct {
+	*mock.Call
+}
+
+func (_m ImmutableExecutionContext_GetDefinitionVersion) Return(_a0 v1alpha1.WorkflowDefinitionVersion) *ImmutableExecutionContext_GetDefinitionVersion {
+	return &ImmutableExecutionContext_GetDefinitionVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableExecutionContext) OnGetDefinitionVersion() *ImmutableExecutionContext_GetDefinitionVersion {
+	c_call := _m.On("GetDefinitionVersion")
+	return &ImmutableExecutionContext_GetDefinitionVersion{Call: c_call}
+}
+
+func (_m *ImmutableExecutionContext) OnGetDefinitionVersionMatch(matchers ...interface{}) *ImmutableExecutionContext_GetDefinitionVersion {
+	c_call := _m.On("GetDefinitionVersion", matchers...)
+	return &ImmutableExecutionContext_GetDefinitionVersion{Call: c_call}
+}
+
+// GetDefinitionVersion provides a mock function with given fields:
+func (_m *ImmutableExecutionContext) GetDefinitionVersion() v1alpha1.WorkflowDefinitionVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.WorkflowDefinitionVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.WorkflowDefinitionVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.WorkflowDefinitionVersion)
+	}
+
+	return r0
+}
+
 type ImmutableExecutionContext_GetEventVersion struct {
 	*mock.Call
 }

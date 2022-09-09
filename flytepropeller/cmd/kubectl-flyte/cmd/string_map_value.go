@@ -22,7 +22,7 @@ func newStringMapValue() *stringMapValue {
 
 var entryRegex = regexp.MustCompile("(?P<EntryKey>[^,]+)=(?P<EntryValue>[^,]+)")
 
-// Parses val into a map. Accepted format: a=1,b=2
+// Set parses val into a map. Accepted format: a=1,b=2
 func (s *stringMapValue) Set(val string) error {
 	matches := entryRegex.FindAllStringSubmatch(val, -1)
 	out := make(map[string]string, len(matches))

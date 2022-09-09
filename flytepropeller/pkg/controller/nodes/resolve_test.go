@@ -34,6 +34,10 @@ type dummyBaseWorkflow struct {
 	Interruptible  bool
 }
 
+func (d *dummyBaseWorkflow) GetDefinitionVersion() v1alpha1.WorkflowDefinitionVersion {
+	return v1alpha1.WorkflowDefinitionVersion1
+}
+
 func (d *dummyBaseWorkflow) GetParentInfo() executors.ImmutableParentInfo {
 	return nil
 }
