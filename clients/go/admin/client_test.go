@@ -319,7 +319,7 @@ func ExampleClientSetBuilder() {
 	// See AuthType for a list of supported authentication types.
 	clientSet, err := NewClientsetBuilder().WithConfig(GetConfig(ctx)).Build(ctx)
 	if err != nil {
-		logger.Fatalf(ctx, "failed to initialize clientSet from config. Error: %v", err)
+		logger.Fatalf(ctx, "failed to initialized clientSet from config. Error: %v", err)
 	}
 
 	// Access and use the desired client:
