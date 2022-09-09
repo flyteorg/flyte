@@ -75,7 +75,8 @@ export function millisecondsToHMS(valueMS: number): string {
   }
 
   if (duration.seconds() >= 1) {
-    parts.push(`${duration.seconds()}s`);
+    // there may be a bug in Momemt.js that shows float number of seconds, so rounding it down to make sure it will be int
+    parts.push(`${Math.floor(duration.seconds())}s`);
   }
 
   return parts.length ? parts.join(' ') : unknownValueString;
