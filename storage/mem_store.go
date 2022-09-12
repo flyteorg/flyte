@@ -42,6 +42,17 @@ func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (i
 	return nil, os.ErrNotExist
 }
 
+// Delete removes the referenced data from the cache map.
+func (s *InMemoryStore) Delete(ctx context.Context, reference DataReference) error {
+	if _, found := s.cache[reference]; !found {
+		return os.ErrNotExist
+	}
+
+	delete(s.cache, reference)
+
+	return nil
+}
+
 func (s *InMemoryStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) (
 	err error) {
 

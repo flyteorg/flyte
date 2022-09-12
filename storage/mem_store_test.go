@@ -69,3 +69,26 @@ func TestInMemoryStore_Clear(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, IsNotFound(err))
 }
+
+func TestInMemoryStore_Delete(t *testing.T) {
+	m, err := NewInMemoryRawStore(&Config{}, metrics)
+	assert.NoError(t, err)
+
+	mStore := m.(*InMemoryStore)
+	err = m.WriteRaw(context.TODO(), DataReference("hello"), 0, Options{}, bytes.NewReader([]byte("world")))
+	assert.NoError(t, err)
+
+	_, err = m.ReadRaw(context.TODO(), DataReference("hello"))
+	assert.NoError(t, err)
+
+	err = mStore.Delete(context.TODO(), DataReference("hello"))
+	assert.NoError(t, err)
+
+	_, err = m.ReadRaw(context.TODO(), DataReference("hello"))
+	assert.Error(t, err)
+	assert.True(t, IsNotFound(err))
+
+	err = mStore.Delete(context.TODO(), DataReference("hello"))
+	assert.Error(t, err)
+	assert.True(t, IsNotFound(err))
+}

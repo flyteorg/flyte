@@ -87,6 +87,9 @@ type stowMetrics struct {
 
 	WriteFailure labeled.Counter
 	WriteLatency labeled.StopWatch
+
+	DeleteFailure labeled.Counter
+	DeleteLatency labeled.StopWatch
 }
 
 // Metadata that will be returned
@@ -284,6 +287,30 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 	return nil
 }
 
+// Delete removes the referenced data from the blob store.
+func (s *StowStore) Delete(ctx context.Context, reference DataReference) error {
+	_, c, k, err := reference.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return err
+	}
+
+	container, err := s.getContainer(ctx, locationIDMain, c)
+	if err != nil {
+		return err
+	}
+
+	t := s.metrics.DeleteLatency.Start(ctx)
+	defer t.Stop()
+
+	if err := container.RemoveItem(k); err != nil {
+		incFailureCounterForError(ctx, s.metrics.DeleteFailure, err)
+		return errs.Wrapf(err, "failed to remove item at path %q from container", k)
+	}
+
+	return nil
+}
+
 func (s *StowStore) GetBaseContainerFQN(ctx context.Context) DataReference {
 	return s.baseContainerFQN
 }
@@ -379,6 +406,9 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 
 		WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+
+		DeleteFailure: labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		DeleteLatency: labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 	}
 }
 

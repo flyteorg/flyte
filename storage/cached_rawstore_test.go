@@ -57,6 +57,7 @@ type dummyStore struct {
 	HeadCb     func(ctx context.Context, reference DataReference) (Metadata, error)
 	ReadRawCb  func(ctx context.Context, reference DataReference) (io.ReadCloser, error)
 	WriteRawCb func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error
+	DeleteCb   func(ctx context.Context, reference DataReference) error
 }
 
 // CreateSignedURL creates a signed url with the provided properties.
@@ -78,6 +79,10 @@ func (d *dummyStore) ReadRaw(ctx context.Context, reference DataReference) (io.R
 
 func (d *dummyStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 	return d.WriteRawCb(ctx, reference, size, opts, raw)
+}
+
+func (d *dummyStore) Delete(ctx context.Context, reference DataReference) error {
+	return d.DeleteCb(ctx, reference)
 }
 
 func TestCachedRawStore(t *testing.T) {
@@ -129,6 +134,12 @@ func TestCachedRawStore(t *testing.T) {
 				return ioutils.NewBytesReadCloser(bigD), nil
 			}
 			return nil, fmt.Errorf("err")
+		},
+		DeleteCb: func(ctx context.Context, reference DataReference) error {
+			if reference == "k1" {
+				return nil
+			}
+			return fmt.Errorf("err")
 		},
 	}
 
@@ -198,5 +209,15 @@ func TestCachedRawStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, b)
 		assert.True(t, readCalled)
+	})
+
+	t.Run("DeleteExists", func(t *testing.T) {
+		err := cStore.Delete(ctx, k1)
+		assert.NoError(t, err)
+	})
+
+	t.Run("DeleteNotExists", func(t *testing.T) {
+		err := cStore.Delete(ctx, k2)
+		assert.Error(t, err)
 	})
 }

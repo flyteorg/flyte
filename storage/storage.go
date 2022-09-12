@@ -79,6 +79,9 @@ type RawStore interface {
 
 	// CopyRaw copies from source to destination.
 	CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error
+
+	// Delete removes the referenced data from the blob store.
+	Delete(ctx context.Context, reference DataReference) error
 }
 
 //go:generate mockery -name ReferenceConstructor -case=underscore
