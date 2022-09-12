@@ -1662,10 +1662,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@flyteorg/flyteidl@1.1.11":
-  version "1.1.11"
-  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-1.1.11.tgz#3a0ef05932f9b89ea4077473b119553ddcf3ad60"
-  integrity sha512-mwVmoSbud7az4sFHhzeEaLyjGyqwOfG8Qq8cP3x+YhDtpFpAUA5sFnc4jIH9tokHM1UFVPmccOHL8RWsi45eAA==
+"@flyteorg/flyteidl@1.1.15":
+  version "1.1.15"
+  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-1.1.15.tgz#4c56585d9cc50080aa1ce480fa7e9ada62089ee1"
+  integrity sha512-JbF825NrBxOp4N9CeBjxmFggvoPVHtb/7RMtd2sd9AexswgmGk6agmgt1ygh7CSmwKlX0Ob9wiVPKOC3O/SR0A==
 
 "@flyteorg/flyteidl@1.1.4":
   version "1.1.4"
