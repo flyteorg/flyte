@@ -77,7 +77,13 @@ func (mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item, s
 	return []stow.Item{}, "", nil
 }
 
-func (mockStowContainer) RemoveItem(id string) error {
+func (m mockStowContainer) RemoveItem(id string) error {
+	if _, found := m.items[id]; !found {
+		return stow.ErrNotFound
+	}
+
+	delete(m.items, id)
+
 	return nil
 }
 
@@ -223,6 +229,7 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 func TestStowStore_ReadRaw(t *testing.T) {
 	const container = "container"
 	t.Run("Happy Path", func(t *testing.T) {
+		ctx := context.Background()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -239,12 +246,8 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, false, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-		metadata, err := s.Head(context.TODO(), DataReference("s3://container/path"))
-		assert.NoError(t, err)
-		assert.True(t, metadata.Exists())
-		raw, err := s.ReadRaw(context.TODO(), DataReference("s3://container/path"))
+		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
+		raw, err := s.ReadRaw(ctx, dataReference)
 		assert.NoError(t, err)
 		rawBytes, err := ioutil.ReadAll(raw)
 		assert.NoError(t, err)
@@ -253,6 +256,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 	})
 
 	t.Run("Exceeds limit", func(t *testing.T) {
+		ctx := context.Background()
 		fn := fQNFn["s3"]
 
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
@@ -270,18 +274,15 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, false, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-		metadata, err := s.Head(context.TODO(), DataReference("s3://container/path"))
-		assert.NoError(t, err)
-		assert.True(t, metadata.Exists())
-		_, err = s.ReadRaw(context.TODO(), DataReference("s3://container/path"))
+		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 3*MiB)
+		_, err = s.ReadRaw(ctx, dataReference)
 		assert.Error(t, err)
 		assert.True(t, IsExceedsLimit(err))
 		assert.NotNil(t, errors.Cause(err))
 	})
 
 	t.Run("No Limit", func(t *testing.T) {
+		ctx := context.Background()
 		fn := fQNFn["s3"]
 		GetConfig().Limits.GetLimitMegabytes = 0
 
@@ -300,16 +301,13 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, false, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-		metadata, err := s.Head(context.TODO(), DataReference("s3://container/path"))
-		assert.NoError(t, err)
-		assert.True(t, metadata.Exists())
-		_, err = s.ReadRaw(context.TODO(), DataReference("s3://container/path"))
+		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 3*MiB)
+		_, err = s.ReadRaw(ctx, dataReference)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Happy Path multi-container enabled", func(t *testing.T) {
+		ctx := context.Background()
 		fn := fQNFn["s3"]
 		s, err := NewStowRawStore(fn(container), &mockStowLoc{
 			ContainerCb: func(id string) (stow.Container, error) {
@@ -328,13 +326,8 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, true, metrics)
 		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), "s3://bad-container/path", 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-		metadata, err := s.Head(context.TODO(), "s3://bad-container/path")
-		if assert.NoError(t, err) {
-			assert.True(t, metadata.Exists())
-		}
-		raw, err := s.ReadRaw(context.TODO(), "s3://bad-container/path")
+		dataReference := writeTestFile(ctx, t, s, "s3://bad-container/path")
+		raw, err := s.ReadRaw(context.TODO(), dataReference)
 		assert.NoError(t, err)
 		rawBytes, err := ioutil.ReadAll(raw)
 		assert.NoError(t, err)
@@ -553,7 +546,7 @@ func TestLoadContainer(t *testing.T) {
 				},
 			},
 		}
-		_, err := stowStore.LoadContainer(context.Background(), "container", true)
+		_, err := stowStore.LoadContainer(context.TODO(), "container", true)
 		assert.EqualError(t, err, "unable to initialize container [container]. Error: foo")
 	})
 	t.Run("No create if not found", func(t *testing.T) {
@@ -567,7 +560,7 @@ func TestLoadContainer(t *testing.T) {
 				},
 			},
 		}
-		_, err := stowStore.LoadContainer(context.Background(), "container", false)
+		_, err := stowStore.LoadContainer(context.TODO(), "container", false)
 		assert.EqualError(t, err, stow.ErrNotFound.Error())
 	})
 }
@@ -637,4 +630,179 @@ func TestStowStore_fQNFn(t *testing.T) {
 	assert.Equal(t, DataReference("sw://bucket"), fQNFn[swift.Kind]("bucket"))
 	assert.Equal(t, DataReference("abfs://bucket"), fQNFn[azure.Kind]("bucket"))
 	assert.Equal(t, DataReference("file://bucket"), fQNFn[local.Kind]("bucket"))
+}
+
+func TestStowStore_Delete(t *testing.T) {
+	const container = "container"
+
+	t.Run("Happy Path", func(t *testing.T) {
+		ctx := context.TODO()
+		fn := fQNFn["s3"]
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+
+		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
+
+		err = s.Delete(ctx, dataReference)
+		assert.NoError(t, err)
+
+		metadata, err := s.Head(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.False(t, metadata.Exists())
+	})
+
+	t.Run("Happy Path multi-container enabled", func(t *testing.T) {
+		ctx := context.TODO()
+		fn := fQNFn["s3"]
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				} else if id == "bad-container" {
+					return newMockStowContainer("bad-container"), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, true, metrics)
+		assert.NoError(t, err)
+
+		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
+		dataReference2 := writeTestFile(ctx, t, s, "s3://bad-container/path")
+
+		err = s.Delete(ctx, dataReference)
+		assert.NoError(t, err)
+		err = s.Delete(ctx, dataReference2)
+		assert.NoError(t, err)
+
+		metadata, err := s.Head(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.False(t, metadata.Exists())
+		metadata, err = s.Head(ctx, dataReference2)
+		assert.NoError(t, err)
+		assert.False(t, metadata.Exists())
+	})
+
+	t.Run("Unknown item", func(t *testing.T) {
+		ctx := context.TODO()
+		fn := fQNFn["s3"]
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+
+		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
+
+		err = s.Delete(ctx, DataReference("s3://container/bad-path"))
+		assert.Error(t, err)
+		assert.True(t, errors.Is(err, stow.ErrNotFound))
+
+		metadata, err := s.Head(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.True(t, metadata.Exists())
+	})
+
+	t.Run("Unknown container", func(t *testing.T) {
+		ctx := context.TODO()
+		fn := fQNFn["s3"]
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+
+		dataReference := writeTestFile(ctx, t, s, "s3://container/path")
+
+		err = s.Delete(ctx, DataReference("s3://bad-container/path"))
+		assert.Error(t, err)
+		assert.True(t, errors.Is(err, stow.ErrNotFound))
+
+		metadata, err := s.Head(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.True(t, metadata.Exists())
+	})
+
+	t.Run("Invalid data reference", func(t *testing.T) {
+		ctx := context.TODO()
+		fn := fQNFn["s3"]
+
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+
+		err = s.Delete(ctx, DataReference("://bad-container/path"))
+		assert.Error(t, err)
+	})
+}
+
+func writeTestFile(ctx context.Context, t *testing.T, s *StowStore, path string) DataReference {
+	return writeTestFileWithSize(ctx, t, s, path, 0)
+}
+
+func writeTestFileWithSize(ctx context.Context, t *testing.T, s *StowStore, path string, size int64) DataReference {
+	reference := DataReference(path)
+
+	err := s.WriteRaw(ctx, reference, size, Options{}, bytes.NewReader([]byte{}))
+	assert.NoError(t, err)
+
+	metadata, err := s.Head(ctx, reference)
+	assert.NoError(t, err)
+	assert.True(t, metadata.Exists())
+
+	return reference
 }

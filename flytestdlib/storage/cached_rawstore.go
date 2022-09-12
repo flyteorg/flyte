@@ -33,7 +33,7 @@ type cachedRawStore struct {
 	metrics *cacheMetrics
 }
 
-// Head gets metadata about the reference. This should generally be a light weight operation.
+// Head gets metadata about the reference. This should generally be a lightweight operation.
 func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -98,6 +98,18 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 	}
 
 	return err
+}
+
+// Delete removes the referenced data from the cache as well as underlying store.
+func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) error {
+	key := []byte(reference)
+	if deleted := s.cache.Del(key); deleted {
+		s.metrics.CacheHit.Inc()
+	} else {
+		s.metrics.CacheMiss.Inc()
+	}
+
+	return s.RawStore.Delete(ctx, reference)
 }
 
 func newCacheMetrics(scope promutils.Scope) *cacheMetrics {
