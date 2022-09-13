@@ -105,6 +105,7 @@ Please maintain an alphabetical order in the following list -->
 - [Blackshark.ai](https://blackshark.ai/)
 - [Freenome](https://www.freenome.com/)
 - [Gojek](https://www.gojek.io/)
+- [Hurb](https://www.hurb.com/)
 - [Intel](https://www.intel.com/)
 - [LatchBio](https://www.latch.bio/)
 - [Level 5 Global Autonomous (Woven Planet)](https://level-5.global/)
