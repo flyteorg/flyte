@@ -117,6 +117,7 @@ Please maintain an alphabetical order in the following list -->
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
 - [Wolt](https://www.wolt.com)
+- [Zymergen](https://www.zymergen.com/)
 
 <html>
 <h2 id="roadmap">
