@@ -117,7 +117,7 @@ func newAuthMetadataServer(t testing.TB, port int, impl service2.AuthMetadataSer
 func Test_newAuthInterceptor(t *testing.T) {
 	t.Run("Other Error", func(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
-		interceptor := newAuthInterceptor(&Config{}, &mocks.TokenCache{}, f)
+		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, f)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -149,7 +149,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
-		interceptor := newAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
@@ -180,7 +180,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
-		interceptor := newAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
@@ -219,7 +219,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
-		interceptor := newAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
