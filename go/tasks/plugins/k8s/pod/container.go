@@ -5,6 +5,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
@@ -25,6 +26,14 @@ func (containerPodBuilder) buildPodSpec(ctx context.Context, task *core.TaskTemp
 	}
 
 	return podSpec, nil
+}
+
+func (containerPodBuilder) getPrimaryContainerName(task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) (string, error) {
+	primaryContainerName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	if primaryContainerName == "" {
+		return "", errors.Errorf(errors.BadTaskSpecification, "invalid TaskSpecification, missing generated name")
+	}
+	return primaryContainerName, nil
 }
 
 func (containerPodBuilder) updatePodMetadata(ctx context.Context, pod *v1.Pod, task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) error {

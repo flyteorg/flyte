@@ -34,6 +34,7 @@ var (
 
 type podBuilder interface {
 	buildPodSpec(ctx context.Context, task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error)
+	getPrimaryContainerName(task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) (string, error)
 	updatePodMetadata(ctx context.Context, pod *v1.Pod, task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) error
 }
 
@@ -61,7 +62,6 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		builder = p.defaultPodBuilder
 	}
 
-	// build pod
 	podSpec, err := builder.buildPodSpec(ctx, task, taskCtx)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,12 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	podTemplate := flytek8s.DefaultPodTemplateStore.LoadOrDefault(taskCtx.TaskExecutionMetadata().GetNamespace())
-	pod, err := flytek8s.BuildPodWithSpec(podTemplate, podSpec)
+	primaryContainerName, err := builder.getPrimaryContainerName(task, taskCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	pod, err := flytek8s.BuildPodWithSpec(podTemplate, podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}

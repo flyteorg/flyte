@@ -1016,6 +1016,14 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 func TestBuildPodWithSpec(t *testing.T) {
 	var priority int32 = 1
 	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Name: "foo",
+			},
+			v1.Container{
+				Name: "bar",
+			},
+		},
 		NodeSelector: map[string]string{
 			"baz": "bar",
 		},
@@ -1031,13 +1039,27 @@ func TestBuildPodWithSpec(t *testing.T) {
 		},
 	}
 
-	pod, err := BuildPodWithSpec(nil, &podSpec)
+	pod, err := BuildPodWithSpec(nil, &podSpec, "foo")
 	assert.Nil(t, err)
 	assert.True(t, reflect.DeepEqual(pod.Spec, podSpec))
+
+	defaultContainerTemplate := v1.Container{
+		Name:                   defaultContainerTemplateName,
+		TerminationMessagePath: "/dev/default-termination-log",
+	}
+
+	primaryContainerTemplate := v1.Container{
+		Name:                   primaryContainerTemplateName,
+		TerminationMessagePath: "/dev/primary-termination-log",
+	}
 
 	podTemplate := v1.PodTemplate{
 		Template: v1.PodTemplateSpec{
 			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					defaultContainerTemplate,
+					primaryContainerTemplate,
+				},
 				HostNetwork: true,
 				NodeSelector: map[string]string{
 					"foo": "bar",
@@ -1052,7 +1074,7 @@ func TestBuildPodWithSpec(t *testing.T) {
 		},
 	}
 
-	pod, err = BuildPodWithSpec(&podTemplate, &podSpec)
+	pod, err = BuildPodWithSpec(&podTemplate, &podSpec, "foo")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -1065,4 +1087,14 @@ func TestBuildPodWithSpec(t *testing.T) {
 	assert.Equal(t, len(podTemplate.Template.Spec.NodeSelector)+len(podSpec.NodeSelector), len(pod.Spec.NodeSelector))
 	// validate an appended array
 	assert.Equal(t, len(podTemplate.Template.Spec.Tolerations)+len(podSpec.Tolerations), len(pod.Spec.Tolerations))
+
+	// validate primary container
+	primaryContainer := pod.Spec.Containers[0]
+	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
+	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+
+	// validate default container
+	defaultContainer := pod.Spec.Containers[1]
+	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
+	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
 }
