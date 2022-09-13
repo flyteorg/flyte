@@ -260,7 +260,9 @@ An example configuration is:
 
    #. PodTemplates can be applied from the same namespace that the Pod will be created in. FlytePropeller always favours the PodTemplate with the more specific namespace. For example, a Pod created in the ``flytesnacks-development`` namespace will first look for a PodTemplate from the ``flytesnacks-development`` namespace. If that PodTemplate doesn't exist, it will look for a PodTemplate in the same namespace that FlytePropeller is running in (in our example, ``flyte``), and if that doesn't exist, it will begin configuration with an empty PodTemplate.
 
-Flyte configuration supports all the fields available in the PodTemplate resource. It is important to note the PodTemplate definitions need to contain the 'containers' field within the PodSpec. This is required by K8s to be a valid PodTemplate. Currently, Flyte overrides these values during configuration (so the containers are never initialized) with the platform-specific definitions it requires. Hence, a simple `noop` container is enough to satisfy K8s validation requirements.
+Flyte configuration supports all the fields available in the PodTemplate resource, including container-level configuration. Specifically, containers may be configured at two granularities, namely "default" and "primary". In this scheme, if the default PodTemplate contains a container with the name "default", that container will be used as the base configuration for all containers Flyte constructs. Similarly, a container named "primary" is used as the base container configuration for all primary containers. If both container names exist in the default PodTemplate, Flyte first applies the default configuration, followed by the primary configuration.
+
+The ``containers`` field is required in each k8s PodSpec. So if no default configuration is desired, specifying a container with a name other than "default" or "primary" (ex. "noop") is considered best practice. Since Flyte only processes the "default" or "primary" containers this value will always be dropped during Pod construction. Simiarly, each k8s container is required to have an ``image``. This value will always be overridden by Flyte, therefore this value may be set to anything. However, we recommend using a real image, for example ``docker.io/rwgrim/docker-noop``.
 
 *********************************
 Flyte's K8s Plugin Configuration
@@ -291,9 +293,10 @@ An example PodTemplate is shown:
           - bar: initial-value
       spec:
         containers:
-          - name: noop
-           image: docker.io/rwgrim/docker-noop
-         hostNetwork: false
+          - name: default
+            image: docker.io/rwgrim/docker-noop
+            terminationMessagePath: "/dev/foo"
+        hostNetwork: false
 
 In addition, the K8s plugin configuration in FlytePropeller defines the default Pod Labels, Annotations, and enables the host networking.
 
@@ -327,7 +330,10 @@ The resultant Pod using the above default PodTemplate and K8s Plugin configurati
         - baz: non-overridden-value // value added by k8s plugin configuration
     spec:
       containers:
-         // omitted Flyte-specific overridden containers
-       hostNetwork: true // overridden by the k8s plugin configuration
+        - name: ax9kd5xb4p8r45bpdv7v-n0-0
+          image: ghcr.io/flyteorg/flytecookbook:core-bfee7e549ad749bfb55922e130f4330a0ebc25b0
+          terminationMessagePath: "/dev/foo"
+          // remaining container configuration omitted
+      hostNetwork: true // overridden by the k8s plugin configuration
 
 The last step in constructing a Pod is to apply any task-specific configuration. These options follow the same rules as merging the default PodTemplate and K8s Plugin configuration (that is, list appends and map overrides). Task-specific options are intentionally robust to provide fine-grained control over task execution in diverse use-cases. Therefore, exploration is beyond this scope and has therefore been omitted from this documentation.
