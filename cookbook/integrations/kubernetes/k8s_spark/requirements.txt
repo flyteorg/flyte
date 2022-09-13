@@ -176,7 +176,7 @@ protoc-gen-swagger==0.1.0
     # via flyteidl
 py==1.11.0
     # via retry
-py4j==0.10.9.3
+py4j==0.10.9.5
     # via pyspark
 pyarrow==6.0.1
     # via flytekit
@@ -188,7 +188,7 @@ pyparsing==3.0.8
     # via
     #   matplotlib
     #   packaging
-pyspark==3.2.1
+pyspark==3.2.2
     # via
     #   -r requirements.in
     #   flytekitplugins-spark
