@@ -161,37 +161,6 @@ of the plugin.
    * - Implement once, use in any SDK or language!
      -
 
-====================
-Flyte Deck Renderer
-====================
-
-What Is a Flyte Deck Renderer?
-==============================
-
-Deck renderer is a part of the Deck plugin. Deck provides default and customized task visibility. Deck contains renderers that generate HTML files. The renderer renders html in the `Flyte console <https://i.ibb.co/vhB8Mnz/dataframe.png>`__, which can be used to visualize and document data associated with a task.
-
-Flyte context saves a list of deck objects, and these objects use renderers to render the data as HTML files when the task associated with it is executed.
-
-How to Use a Deck Renderer?
-===========================
-
-You can render `custom data <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-deck-standard/flytekitplugins/deck/renderer.py>`__ by creating `new decks <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-deck-standard/flytekitplugins/deck/renderer.py#L21-L30>`__ and using custom renderers. The input to the renderer is your data and the output is a html string.
-
-Every task has a minimum of three decks:
-
-#. Input deck;
-#. Output deck; and
-#. Default deck.
-
-The input and output decks render the input and output data associated with the task.
-The default deck renders line plots, scatter plots, and markdown text.
-
-How to Contribute Your Renderer?
-================================
-
-We would love any contributions to Flyte Deck. If your deck renderers can improve data visibility, feel free to add a renderer to `renderer.py <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-deck-standard/flytekitplugins/deck/renderer.py>`__. Feel free to open a pull request and help us enrich the Flyte Deck renderer ecosystem!
-
-
 =======
 Summary
 =======
