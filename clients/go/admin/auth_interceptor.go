@@ -46,7 +46,7 @@ func shouldAttemptToAuthenticate(errorCode codes.Code) bool {
 	return errorCode == codes.Unauthenticated
 }
 
-// newAuthInterceptor creates a new grpc.UnaryClientInterceptor that forwards the grpc call and inspects the error.
+// NewAuthInterceptor creates a new grpc.UnaryClientInterceptor that forwards the grpc call and inspects the error.
 // It will first invoke the grpc pipeline (to proceed with the request) with no modifications. It's expected for the grpc
 // pipeline to already have a grpc.WithPerRPCCredentials() DialOption. If the perRPCCredentials has already been initialized,
 // it'll take care of refreshing when tokens expire... etc.
@@ -56,7 +56,7 @@ func shouldAttemptToAuthenticate(errorCode codes.Code) bool {
 // more. It'll fail hard if it couldn't do so (i.e. it will no longer attempt to send an unauthenticated request). Once
 // a token source has been created, it'll invoke the grpc pipeline again, this time the grpc.PerRPCCredentials should
 // be able to find and acquire a valid AccessToken to annotate the request with.
-func newAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
+func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {

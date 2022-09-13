@@ -164,7 +164,7 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
 	credentialsFuture := NewPerRPCCredentialsFuture()
 	opts = append(opts,
-		grpc.WithChainUnaryInterceptor(newAuthInterceptor(cfg, tokenCache, credentialsFuture)),
+		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture)),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
 	if cfg.DefaultServiceConfig != "" {
