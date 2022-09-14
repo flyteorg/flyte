@@ -86,7 +86,7 @@ Now these credentials need to be included in the control plane.
       apiVersion: v1
       kind: Secret
       metadata:
-        name: cluster_credentials
+        name: cluster-credentials
         namespace: flyte
       type: Opaque
       data:
@@ -107,11 +107,11 @@ Now these credentials need to be included in the control plane.
 
       flyteadmin:
         additionalVolumes:
-        - name: cluster_credentials
+        - name: cluster-credentials
           secret:
-            secretName: cluster_credentials
+            secretName: cluster-credentials
         additionalVolumeMounts:
-        - name: cluster_credentials
+        - name: cluster-credentials
           mountPath: /var/run/credentials
       configmap:
         clusters:
@@ -134,8 +134,8 @@ Now these credentials need to be included in the control plane.
               certPath: "/var/run/credentials/cluster_1_cacert"
          - name: "cluster_2"
            endpoint: {{ your-cluster-2-kubeapi-endpoint.com }}
+           enabled: true
            auth:
-               enabled: true
                type: "file_path"
                tokenPath: "/var/run/credentials/cluster_2_token"
                certPath: "/var/run/credentials/cluster_2_cacert"
