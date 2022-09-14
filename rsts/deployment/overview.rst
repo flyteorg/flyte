@@ -19,7 +19,6 @@ Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart 
 * ``values-gcp.yaml`` should be additionally applied for GCP GKE deployments.
 * ``values-sandbox.yaml`` should be additionally applied for our sandbox install. See the :ref:`deployment-sandbox` page for more information.
 
-Specific instructions for Helm on AWS are covered in both the :ref:`automated Opta <deployment-aws-opta>` and :ref:`manual <deployment-aws-manual>` AWS setup guides.
 
 *********************
 Relational Database
