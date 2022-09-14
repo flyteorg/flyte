@@ -4,6 +4,7 @@ import { useUserProfile } from 'components/hooks/useUserProfile';
 import { useOnlyMineSelectedValue } from 'components/hooks/useOnlyMineSelectedValue';
 import { OnlyMyFilter } from 'basics/LocalCache/onlyMineDefaultConfig';
 import { FeatureFlag, useFeatureFlag } from 'basics/FeatureFlags';
+import { useFlyteApi } from '@flyteconsole/flyte-api';
 
 interface OnlyMyExecutionsFilterState {
   onlyMyExecutionsValue: boolean;
@@ -25,12 +26,14 @@ export function useOnlyMyExecutionsFilterState({
   initialValue,
 }: OnlyMyExecutionsFilterStateProps): OnlyMyExecutionsFilterState {
   const profile = useUserProfile();
+  const apiContext = useFlyteApi();
   const userId = profile.value?.subject ?? '';
   const isFlagEnabled = useFeatureFlag(FeatureFlag.OnlyMine);
   const onlyMineExecutionsSelectedValue = useOnlyMineSelectedValue(OnlyMyFilter.OnlyMyExecutions);
   const [onlyMyExecutionsValue, setOnlyMyExecutionsValue] = useState<boolean>(
     isFlagEnabled ? onlyMineExecutionsSelectedValue : initialValue ?? false, // if flag is enable let's use the value from only mine
   );
+  const defaultIsFilterDisabled = apiContext ? false : true;
 
   const getFilter = (): FilterOperation | null => {
     if (!onlyMyExecutionsValue) {
@@ -53,7 +56,7 @@ export function useOnlyMyExecutionsFilterState({
 
   return {
     onlyMyExecutionsValue,
-    isFilterDisabled: isFilterDisabled ?? false,
+    isFilterDisabled: isFilterDisabled ?? defaultIsFilterDisabled,
     onOnlyMyExecutionsFilterChange: setOnlyMyExecutionsValue,
     getFilter,
   };
