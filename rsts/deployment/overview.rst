@@ -4,10 +4,7 @@
 Deployment Overview
 ###################
 
-Up until now the Flyte backend you've been working with likely has been accessible only on ``localhost`` and likely ran
-entirely in one Docker container.  In order to handle production load, and make use of all the additional features
-Flyte offers, we'll need to replace, add, and configure some components. This page describes at a high-level what a
-production ready deployment might look like.
+Up until now, the Flyte backend you've been working with has likely been accessible only on ``localhost`` and likely entirely in one Docker container. In order to handle the production load and make use of all the additional features Flyte offers, you need to replace, add, and configure certain components. This page describes at a high-level what a production-ready deployment might look like.
 
 *******************
 Usage of Helm
@@ -19,7 +16,17 @@ Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart 
 * ``values-gcp.yaml`` should be additionally applied for GCP GKE deployments.
 * ``values-sandbox.yaml`` should be additionally applied for our sandbox install. See the :ref:`deployment-sandbox` page for more information.
 
-Specific instructions for Helm on AWS are covered in both the :ref:`automated Opta <deployment-aws-opta>` and :ref:`manual <deployment-aws-manual>` AWS setup guides.
+.. warning:: 
+   Opta is no longer actively in development. You can `migrate to terraform <https://docs.opta.dev/features/terraform/#migrate-from-opta-to-terraform>`__ to generate Terraform code from the Opta file. Briefly put, the steps would be as follows.
+   
+   1. Run ``opta appply`` on your Opta configuration files to migrate from Opta to Terraform and ensure that Terraform provisions your infrastructure. 
+   2. To migrate from existing infrastructure state,
+
+      1. Run ``opta generate-terraform --backend remote -c env.yaml`` for environment variable.
+      2. Run ``opta generate-terraform --backend remote -c flyte.yaml`` for Flyte service.
+
+   3. Run ``opta generate-terraform`` on every file to generate Terraform files.
+   4. Save these generated Terraform files.
 
 *********************
 Relational Database
