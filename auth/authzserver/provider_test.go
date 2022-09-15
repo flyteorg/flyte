@@ -11,16 +11,15 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	jwtgo "github.com/golang-jwt/jwt/v4"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/auth"
 	"github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
@@ -212,72 +211,4 @@ func TestProvider_ValidateAccessToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.False(t, identity.IsEmpty())
 	})
-}
-
-func Test_verifyClaims(t *testing.T) {
-	t.Run("Empty claims, fail", func(t *testing.T) {
-		_, err := verifyClaims(sets.NewString("https://myserver"), map[string]interface{}{})
-		assert.Error(t, err)
-	})
-
-	t.Run("All filled", func(t *testing.T) {
-		identityCtx, err := verifyClaims(sets.NewString("https://myserver"), map[string]interface{}{
-			"aud": []string{"https://myserver"},
-			"user_info": map[string]interface{}{
-				"preferred_name": "John Doe",
-			},
-			"sub":       "123",
-			"client_id": "my-client",
-			"scp":       []interface{}{"all", "offline"},
-		})
-
-		assert.NoError(t, err)
-		assert.Equal(t, sets.NewString("all", "offline"), identityCtx.Scopes())
-		assert.Equal(t, "my-client", identityCtx.AppID())
-		assert.Equal(t, "123", identityCtx.UserID())
-		assert.Equal(t, "https://myserver", identityCtx.Audience())
-	})
-
-	t.Run("Multiple audience", func(t *testing.T) {
-		identityCtx, err := verifyClaims(sets.NewString("https://myserver", "https://myserver2"),
-			map[string]interface{}{
-				"aud": []string{"https://myserver"},
-				"user_info": map[string]interface{}{
-					"preferred_name": "John Doe",
-				},
-				"sub":       "123",
-				"client_id": "my-client",
-				"scp":       []interface{}{"all", "offline"},
-			})
-
-		assert.NoError(t, err)
-		assert.Equal(t, "https://myserver", identityCtx.Audience())
-	})
-
-	t.Run("No matching audience", func(t *testing.T) {
-		_, err := verifyClaims(sets.NewString("https://myserver", "https://myserver2"),
-			map[string]interface{}{
-				"aud": []string{"https://myserver3"},
-			})
-
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid audience")
-	})
-
-	t.Run("Use first matching audience", func(t *testing.T) {
-		identityCtx, err := verifyClaims(sets.NewString("https://myserver", "https://myserver2", "https://myserver3"),
-			map[string]interface{}{
-				"aud": []string{"https://myserver", "https://myserver2"},
-				"user_info": map[string]interface{}{
-					"preferred_name": "John Doe",
-				},
-				"sub":       "123",
-				"client_id": "my-client",
-				"scp":       []interface{}{"all", "offline"},
-			})
-
-		assert.NoError(t, err)
-		assert.Equal(t, "https://myserver", identityCtx.Audience())
-	})
-
 }
