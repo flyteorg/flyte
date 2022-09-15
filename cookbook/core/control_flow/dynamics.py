@@ -85,7 +85,7 @@ def derive_count(freq1: typing.List[int], freq2: typing.List[int]) -> int:
 #
 # .. note::
 #    The dynamic pattern isn't the most efficient method to iterate over a list. `Map tasks <https://github.com/flyteorg/flytekit/blob/8528268a29a07fe7e9ce9f7f08fea68c41b6a60b/flytekit/core/map_task.py/>`_
-# might be more efficient in certain cases. But they only work for Python tasks (tasks decorated with the @task decorator) not SQL, Spark, and so on.
+#    might be more efficient in certain cases. But they only work for Python tasks (tasks decorated with the @task decorator) not SQL, Spark, and so on.
 #
 # We now define a dynamic workflow that encapsulates the above mentioned points.
 @dynamic
