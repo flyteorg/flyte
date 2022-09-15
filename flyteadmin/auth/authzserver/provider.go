@@ -5,7 +5,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"time"
@@ -16,8 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/lestrrat-go/jwx/jwk"
-
-	"github.com/ory/x/jwtx"
 
 	"github.com/flyteorg/flyteadmin/auth/interfaces"
 
@@ -129,53 +126,6 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 
 	claimsRaw := parsedToken.Claims.(jwtgo.MapClaims)
 	return verifyClaims(sets.NewString(expectedAudience), claimsRaw)
-}
-
-func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
-	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
-
-	foundAudIndex := -1
-	for audIndex, aud := range claims.Audience {
-		if expectedAudience.Has(aud) {
-			foundAudIndex = audIndex
-			break
-		}
-	}
-
-	if foundAudIndex < 0 {
-		return nil, fmt.Errorf("invalid audience [%v]", claims)
-	}
-
-	userInfo := &service.UserInfoResponse{}
-	if userInfoClaim, found := claimsRaw[UserIDClaim]; found && userInfoClaim != nil {
-		userInfoRaw := userInfoClaim.(map[string]interface{})
-		raw, err := json.Marshal(userInfoRaw)
-		if err != nil {
-			return nil, err
-		}
-
-		if err = json.Unmarshal(raw, userInfo); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal user info claim into UserInfo type. Error: %w", err)
-		}
-	}
-
-	clientID := ""
-	if clientIDClaim, found := claimsRaw[ClientIDClaim]; found {
-		clientID = clientIDClaim.(string)
-	}
-
-	scopes := sets.NewString()
-	if scopesClaim, found := claimsRaw[ScopeClaim]; found {
-		scopes = sets.NewString(interfaceSliceToStringSlice(scopesClaim.([]interface{}))...)
-	}
-
-	// If this is a user-only access token with no scopes defined then add `all` scope by default because it's equivalent
-	// to having a user's login cookie or an ID Token as means of accessing the service.
-	if len(clientID) == 0 && scopes.Len() == 0 {
-		scopes.Insert(auth.ScopeAll)
-	}
-
-	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw), nil
 }
 
 // NewProvider creates a new OAuth2 Provider that is able to do OAuth 2-legged and 3-legged flows. It'll lookup
