@@ -48,7 +48,7 @@
         ]
     },
     "dependencies": {
-        "@flyteorg/flyteidl": "1.1.15"
+        "@flyteorg/flyteidl": "1.1.16"
     },
     "devDependencies": {
         "@storybook/addon-actions": "^6.4.19",
