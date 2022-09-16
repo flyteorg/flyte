@@ -172,7 +172,7 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 	}
 
 	path := pm.GetMutatePath()
-	fail := admissionregistrationv1.Ignore
+	fail := admissionregistrationv1.Fail
 	sideEffects := admissionregistrationv1.SideEffectClassNoneOnDryRun
 
 	mutateConfig := &admissionregistrationv1.MutatingWebhookConfiguration{
