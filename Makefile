@@ -13,11 +13,11 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: compile
 compile:
-	go build -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
+	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
 
 .PHONY: linux_compile
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: update_boilerplate
 update_boilerplate:
