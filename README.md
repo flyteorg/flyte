@@ -117,6 +117,7 @@ Please maintain an alphabetical order in the following list -->
 - [RunX.dev](https://runx.dev/)
 - [Spotify](https://www.spotify.com/)
 - [Striveworks](https://striveworks.us/)
+- [Theorem](https://www.theoremlp.com/)
 - [Union.ai](https://union.ai/)
 - [USU Group](https://www.usu.com/)
 - [Wolt](https://www.wolt.com)
