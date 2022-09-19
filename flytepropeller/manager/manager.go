@@ -92,14 +92,6 @@ func (m *Manager) createPods(ctx context.Context) error {
 		"app": m.podApplication,
 	}
 
-	// disable leader election on all managed pods
-	container, err := utils.GetContainer(&podTemplate.Template.Spec, m.podTemplateContainerName)
-	if err != nil {
-		return fmt.Errorf("failed to retrieve flytepropeller container from pod template [%v]", err)
-	}
-
-	container.Args = append(container.Args, "--propeller.leader-election.enabled=false")
-
 	// retrieve existing pods
 	listOptions := metav1.ListOptions{
 		LabelSelector: labels.SelectorFromSet(podLabels).String(),
@@ -165,6 +157,7 @@ func (m *Manager) createPods(ctx context.Context) error {
 	errs := stderrors.ErrorCollection{}
 	for i, podName := range podNames {
 		if exists := podExists[podName]; !exists {
+			// initialize pod definition
 			baseObjectMeta := podTemplate.Template.ObjectMeta.DeepCopy()
 			objectMeta := metav1.ObjectMeta{
 				Annotations:     podAnnotations,
@@ -191,6 +184,16 @@ func (m *Manager) createPods(ctx context.Context) error {
 				continue
 			}
 
+			// override leader election namespaced name on managed flytepropeller instances
+			container, err := utils.GetContainer(&pod.Spec, m.podTemplateContainerName)
+			if err != nil {
+				return fmt.Errorf("failed to retrieve flytepropeller container from pod template [%v]", err)
+			}
+
+			injectLeaderNameArg := fmt.Sprintf("--propeller.leader-election.lock-config-map.Name=propeller-leader-%d", i)
+			container.Args = append(container.Args, injectLeaderNameArg)
+
+			// create pod
 			_, err = m.kubeClient.CoreV1().Pods(m.podNamespace).Create(ctx, pod, metav1.CreateOptions{})
 			if err != nil {
 				errs.Append(fmt.Errorf("failed to create pod '%s' [%v]", podName, err))
