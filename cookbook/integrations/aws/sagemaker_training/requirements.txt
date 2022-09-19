@@ -184,7 +184,7 @@ pandas==1.4.2
     # via flytekit
 paramiko==2.10.3
     # via sagemaker-training
-pillow==9.1.0
+pillow==9.1.1
     # via matplotlib
 promise==2.3
     # via tensorflow-datasets
