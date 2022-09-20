@@ -1,6 +1,7 @@
 """
+=================
 Dynamic Workflows
-------------------
+=================
 
 A workflow is typically static when the directed acyclic graph's (DAG) structure is known at compile-time.
 However, in cases where a run-time parameter (for example, the output of an earlier task) determines the full DAG structure, you can use dynamic workflows by decorating a function with ``@dynamic``.
@@ -141,8 +142,8 @@ if __name__ == "__main__":
 
 
 # %%
-# Dynamic Workflows from Execution POV
-# ------------------------------------
+# Dynamic Workflows Under the Hood
+# --------------------------------
 #
 # What Is a Dynamic Workflow?
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^
