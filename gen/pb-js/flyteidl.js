@@ -15482,6 +15482,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
              * @property {flyteidl.core.CatalogReservation.Status|null} [reservationStatus] TaskNodeMetadata reservationStatus
+             * @property {string|null} [checkpointUri] TaskNodeMetadata checkpointUri
              * @property {flyteidl.event.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] TaskNodeMetadata dynamicWorkflow
              */
 
@@ -15525,6 +15526,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskNodeMetadata.prototype.reservationStatus = 0;
 
             /**
+             * TaskNodeMetadata checkpointUri.
+             * @member {string} checkpointUri
+             * @memberof flyteidl.event.TaskNodeMetadata
+             * @instance
+             */
+            TaskNodeMetadata.prototype.checkpointUri = "";
+
+            /**
              * TaskNodeMetadata dynamicWorkflow.
              * @member {flyteidl.event.IDynamicWorkflowNodeMetadata|null|undefined} dynamicWorkflow
              * @memberof flyteidl.event.TaskNodeMetadata
@@ -15562,6 +15571,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.reservationStatus != null && message.hasOwnProperty("reservationStatus"))
                     writer.uint32(/* id 3, wireType 0 =*/24).int32(message.reservationStatus);
+                if (message.checkpointUri != null && message.hasOwnProperty("checkpointUri"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.checkpointUri);
                 if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
                     $root.flyteidl.event.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
@@ -15593,6 +15604,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 3:
                         message.reservationStatus = reader.int32();
+                        break;
+                    case 4:
+                        message.checkpointUri = reader.string();
                         break;
                     case 16:
                         message.dynamicWorkflow = $root.flyteidl.event.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
@@ -15644,6 +15658,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 4:
                         break;
                     }
+                if (message.checkpointUri != null && message.hasOwnProperty("checkpointUri"))
+                    if (!$util.isString(message.checkpointUri))
+                        return "checkpointUri: string expected";
                 if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
                     let error = $root.flyteidl.event.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
                     if (error)
@@ -30850,6 +30867,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskNodeMetadata
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
+             * @property {string|null} [checkpointUri] TaskNodeMetadata checkpointUri
              */
 
             /**
@@ -30884,6 +30902,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskNodeMetadata.prototype.catalogKey = null;
 
             /**
+             * TaskNodeMetadata checkpointUri.
+             * @member {string} checkpointUri
+             * @memberof flyteidl.admin.TaskNodeMetadata
+             * @instance
+             */
+            TaskNodeMetadata.prototype.checkpointUri = "";
+
+            /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.TaskNodeMetadata
@@ -30911,6 +30937,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.cacheStatus);
                 if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.checkpointUri != null && message.hasOwnProperty("checkpointUri"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.checkpointUri);
                 return writer;
             };
 
@@ -30937,6 +30965,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.checkpointUri = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -30974,6 +31005,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "catalogKey." + error;
                 }
+                if (message.checkpointUri != null && message.hasOwnProperty("checkpointUri"))
+                    if (!$util.isString(message.checkpointUri))
+                        return "checkpointUri: string expected";
                 return null;
             };
 

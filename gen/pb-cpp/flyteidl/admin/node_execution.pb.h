@@ -1474,6 +1474,20 @@ class TaskNodeMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // string checkpoint_uri = 4;
+  void clear_checkpoint_uri();
+  static const int kCheckpointUriFieldNumber = 4;
+  const ::std::string& checkpoint_uri() const;
+  void set_checkpoint_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_checkpoint_uri(::std::string&& value);
+  #endif
+  void set_checkpoint_uri(const char* value);
+  void set_checkpoint_uri(const char* value, size_t size);
+  ::std::string* mutable_checkpoint_uri();
+  ::std::string* release_checkpoint_uri();
+  void set_allocated_checkpoint_uri(::std::string* checkpoint_uri);
+
   // .flyteidl.core.CatalogMetadata catalog_key = 2;
   bool has_catalog_key() const;
   void clear_catalog_key();
@@ -1494,6 +1508,7 @@ class TaskNodeMetadata final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr checkpoint_uri_;
   ::flyteidl::core::CatalogMetadata* catalog_key_;
   int cache_status_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -3487,6 +3502,59 @@ inline void TaskNodeMetadata::set_allocated_catalog_key(::flyteidl::core::Catalo
   }
   catalog_key_ = catalog_key;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskNodeMetadata.catalog_key)
+}
+
+// string checkpoint_uri = 4;
+inline void TaskNodeMetadata::clear_checkpoint_uri() {
+  checkpoint_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& TaskNodeMetadata::checkpoint_uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+  return checkpoint_uri_.GetNoArena();
+}
+inline void TaskNodeMetadata::set_checkpoint_uri(const ::std::string& value) {
+  
+  checkpoint_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+}
+#if LANG_CXX11
+inline void TaskNodeMetadata::set_checkpoint_uri(::std::string&& value) {
+  
+  checkpoint_uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+}
+#endif
+inline void TaskNodeMetadata::set_checkpoint_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  checkpoint_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+}
+inline void TaskNodeMetadata::set_checkpoint_uri(const char* value, size_t size) {
+  
+  checkpoint_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+}
+inline ::std::string* TaskNodeMetadata::mutable_checkpoint_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+  return checkpoint_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* TaskNodeMetadata::release_checkpoint_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
+  
+  return checkpoint_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void TaskNodeMetadata::set_allocated_checkpoint_uri(::std::string* checkpoint_uri) {
+  if (checkpoint_uri != nullptr) {
+    
+  } else {
+    
+  }
+  checkpoint_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), checkpoint_uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskNodeMetadata.checkpoint_uri)
 }
 
 // -------------------------------------------------------------------

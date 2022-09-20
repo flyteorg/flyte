@@ -2463,6 +2463,7 @@ Metadata for the case in which the node is a TaskNode
 
    "cache_status", ":ref:`ref_flyteidl.core.CatalogCacheStatus`", "", "Captures the status of caching for this execution."
    "catalog_key", ":ref:`ref_flyteidl.core.CatalogMetadata`", "", "This structure carries the catalog artifact information"
+   "checkpoint_uri", ":ref:`ref_string`", "", "The latest checkpoint location"
 
 
 
