@@ -113,6 +113,8 @@ message TaskNodeMetadata {
     core.CatalogMetadata catalog_key = 2;
     // Captures the status of cache reservations for this execution.
     core.CatalogReservation.Status reservation_status = 3;
+    // The latest checkpoint location
+    string checkpoint_uri = 4;
 
     // In the case this task launched a dynamic workflow we capture its structure here.
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;

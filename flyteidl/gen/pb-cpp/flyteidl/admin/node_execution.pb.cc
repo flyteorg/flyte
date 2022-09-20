@@ -385,6 +385,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fnode_5fexecution
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskNodeMetadata, cache_status_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskNodeMetadata, catalog_key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskNodeMetadata, checkpoint_uri_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::DynamicWorkflowNodeMetadata, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -419,9 +420,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 52, -1, sizeof(::flyteidl::admin::NodeExecutionClosure)},
   { 70, -1, sizeof(::flyteidl::admin::WorkflowNodeMetadata)},
   { 76, -1, sizeof(::flyteidl::admin::TaskNodeMetadata)},
-  { 83, -1, sizeof(::flyteidl::admin::DynamicWorkflowNodeMetadata)},
-  { 90, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataRequest)},
-  { 96, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataResponse)},
+  { 84, -1, sizeof(::flyteidl::admin::DynamicWorkflowNodeMetadata)},
+  { 91, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataRequest)},
+  { 97, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -492,30 +493,30 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "\010deck_uri\030\013 \001(\tB\017\n\routput_resultB\021\n\017targ"
   "et_metadata\"W\n\024WorkflowNodeMetadata\022\?\n\013e"
   "xecutionId\030\001 \001(\0132*.flyteidl.core.Workflo"
-  "wExecutionIdentifier\"\200\001\n\020TaskNodeMetadat"
+  "wExecutionIdentifier\"\230\001\n\020TaskNodeMetadat"
   "a\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.core."
   "CatalogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132"
-  "\036.flyteidl.core.CatalogMetadata\"\207\001\n\033Dyna"
-  "micWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.fl"
-  "yteidl.core.Identifier\022A\n\021compiled_workf"
-  "low\030\002 \001(\0132&.flyteidl.core.CompiledWorkfl"
-  "owClosure\"Q\n\033NodeExecutionGetDataRequest"
-  "\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExecuti"
-  "onIdentifier\"\241\002\n\034NodeExecutionGetDataRes"
-  "ponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.U"
-  "rlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.a"
-  "dmin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031."
-  "flyteidl.core.LiteralMap\022/\n\014full_outputs"
-  "\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n\020dyn"
-  "amic_workflow\030\020 \001(\0132+.flyteidl.admin.Dyn"
-  "amicWorkflowNodeMetadataB7Z5github.com/f"
-  "lyteorg/flyteidl/gen/pb-go/flyteidl/admi"
-  "nb\006proto3"
+  "\036.flyteidl.core.CatalogMetadata\022\026\n\016check"
+  "point_uri\030\004 \001(\t\"\207\001\n\033DynamicWorkflowNodeM"
+  "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden"
+  "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt"
+  "eidl.core.CompiledWorkflowClosure\"Q\n\033Nod"
+  "eExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.f"
+  "lyteidl.core.NodeExecutionIdentifier\"\241\002\n"
+  "\034NodeExecutionGetDataResponse\022+\n\006inputs\030"
+  "\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007ou"
+  "tputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001"
+  "\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Li"
+  "teralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteid"
+  "l.core.LiteralMap\022E\n\020dynamic_workflow\030\020 "
+  "\001(\0132+.flyteidl.admin.DynamicWorkflowNode"
+  "MetadataB7Z5github.com/flyteorg/flyteidl"
+  "/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
-  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2569,
+  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2593,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto() {
@@ -4763,6 +4764,7 @@ void TaskNodeMetadata::clear_catalog_key() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int TaskNodeMetadata::kCacheStatusFieldNumber;
 const int TaskNodeMetadata::kCatalogKeyFieldNumber;
+const int TaskNodeMetadata::kCheckpointUriFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskNodeMetadata::TaskNodeMetadata()
@@ -4774,6 +4776,10 @@ TaskNodeMetadata::TaskNodeMetadata(const TaskNodeMetadata& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  checkpoint_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.checkpoint_uri().size() > 0) {
+    checkpoint_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.checkpoint_uri_);
+  }
   if (from.has_catalog_key()) {
     catalog_key_ = new ::flyteidl::core::CatalogMetadata(*from.catalog_key_);
   } else {
@@ -4786,6 +4792,7 @@ TaskNodeMetadata::TaskNodeMetadata(const TaskNodeMetadata& from)
 void TaskNodeMetadata::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_TaskNodeMetadata_flyteidl_2fadmin_2fnode_5fexecution_2eproto.base);
+  checkpoint_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&catalog_key_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&cache_status_) -
       reinterpret_cast<char*>(&catalog_key_)) + sizeof(cache_status_));
@@ -4797,6 +4804,7 @@ TaskNodeMetadata::~TaskNodeMetadata() {
 }
 
 void TaskNodeMetadata::SharedDtor() {
+  checkpoint_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete catalog_key_;
 }
 
@@ -4815,6 +4823,7 @@ void TaskNodeMetadata::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  checkpoint_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && catalog_key_ != nullptr) {
     delete catalog_key_;
   }
@@ -4857,6 +4866,22 @@ const char* TaskNodeMetadata::_InternalParse(const char* begin, const char* end,
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // string checkpoint_uri = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.TaskNodeMetadata.checkpoint_uri");
+        object = msg->mutable_checkpoint_uri();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -4872,6 +4897,10 @@ const char* TaskNodeMetadata::_InternalParse(const char* begin, const char* end,
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -4906,6 +4935,21 @@ bool TaskNodeMetadata::MergePartialFromCodedStream(
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_catalog_key()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string checkpoint_uri = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_checkpoint_uri()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.TaskNodeMetadata.checkpoint_uri"));
         } else {
           goto handle_unusual;
         }
@@ -4951,6 +4995,16 @@ void TaskNodeMetadata::SerializeWithCachedSizes(
       2, HasBitSetters::catalog_key(this), output);
   }
 
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.TaskNodeMetadata.checkpoint_uri");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->checkpoint_uri(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -4977,6 +5031,17 @@ void TaskNodeMetadata::SerializeWithCachedSizes(
         2, HasBitSetters::catalog_key(this), target);
   }
 
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.TaskNodeMetadata.checkpoint_uri");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->checkpoint_uri(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -4997,6 +5062,13 @@ size_t TaskNodeMetadata::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->checkpoint_uri());
+  }
 
   // .flyteidl.core.CatalogMetadata catalog_key = 2;
   if (this->has_catalog_key()) {
@@ -5038,6 +5110,10 @@ void TaskNodeMetadata::MergeFrom(const TaskNodeMetadata& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.checkpoint_uri().size() > 0) {
+
+    checkpoint_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.checkpoint_uri_);
+  }
   if (from.has_catalog_key()) {
     mutable_catalog_key()->::flyteidl::core::CatalogMetadata::MergeFrom(from.catalog_key());
   }
@@ -5071,6 +5147,8 @@ void TaskNodeMetadata::Swap(TaskNodeMetadata* other) {
 void TaskNodeMetadata::InternalSwap(TaskNodeMetadata* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  checkpoint_uri_.Swap(&other->checkpoint_uri_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(catalog_key_, other->catalog_key_);
   swap(cache_status_, other->cache_status_);
 }

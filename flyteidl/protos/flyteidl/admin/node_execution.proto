@@ -181,6 +181,8 @@ message TaskNodeMetadata {
     core.CatalogCacheStatus cache_status = 1;
     // This structure carries the catalog artifact information
     core.CatalogMetadata catalog_key = 2;
+    // The latest checkpoint location
+    string checkpoint_uri = 4;
 }
 
 // For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.

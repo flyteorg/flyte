@@ -459,6 +459,8 @@ func (m *TaskNodeMetadata) Validate() error {
 
 	// no validation rules for ReservationStatus
 
+	// no validation rules for CheckpointUri
+
 	if v, ok := interface{}(m.GetDynamicWorkflow()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TaskNodeMetadataValidationError{

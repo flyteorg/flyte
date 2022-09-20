@@ -10808,6 +10808,24 @@ public final class NodeExecutionOuterClass {
      * <code>.flyteidl.core.CatalogMetadata catalog_key = 2;</code>
      */
     flyteidl.core.Catalog.CatalogMetadataOrBuilder getCatalogKeyOrBuilder();
+
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    java.lang.String getCheckpointUri();
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getCheckpointUriBytes();
   }
   /**
    * <pre>
@@ -10827,6 +10845,7 @@ public final class NodeExecutionOuterClass {
     }
     private TaskNodeMetadata() {
       cacheStatus_ = 0;
+      checkpointUri_ = "";
     }
 
     @java.lang.Override
@@ -10870,6 +10889,12 @@ public final class NodeExecutionOuterClass {
                 catalogKey_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              checkpointUri_ = s;
               break;
             }
             default: {
@@ -10962,6 +10987,48 @@ public final class NodeExecutionOuterClass {
       return getCatalogKey();
     }
 
+    public static final int CHECKPOINT_URI_FIELD_NUMBER = 4;
+    private volatile java.lang.Object checkpointUri_;
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    public java.lang.String getCheckpointUri() {
+      java.lang.Object ref = checkpointUri_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        checkpointUri_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCheckpointUriBytes() {
+      java.lang.Object ref = checkpointUri_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        checkpointUri_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10982,6 +11049,9 @@ public final class NodeExecutionOuterClass {
       if (catalogKey_ != null) {
         output.writeMessage(2, getCatalogKey());
       }
+      if (!getCheckpointUriBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, checkpointUri_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10998,6 +11068,9 @@ public final class NodeExecutionOuterClass {
       if (catalogKey_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getCatalogKey());
+      }
+      if (!getCheckpointUriBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, checkpointUri_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11020,6 +11093,8 @@ public final class NodeExecutionOuterClass {
         if (!getCatalogKey()
             .equals(other.getCatalogKey())) return false;
       }
+      if (!getCheckpointUri()
+          .equals(other.getCheckpointUri())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -11037,6 +11112,8 @@ public final class NodeExecutionOuterClass {
         hash = (37 * hash) + CATALOG_KEY_FIELD_NUMBER;
         hash = (53 * hash) + getCatalogKey().hashCode();
       }
+      hash = (37 * hash) + CHECKPOINT_URI_FIELD_NUMBER;
+      hash = (53 * hash) + getCheckpointUri().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11182,6 +11259,8 @@ public final class NodeExecutionOuterClass {
           catalogKey_ = null;
           catalogKeyBuilder_ = null;
         }
+        checkpointUri_ = "";
+
         return this;
       }
 
@@ -11214,6 +11293,7 @@ public final class NodeExecutionOuterClass {
         } else {
           result.catalogKey_ = catalogKeyBuilder_.build();
         }
+        result.checkpointUri_ = checkpointUri_;
         onBuilt();
         return result;
       }
@@ -11267,6 +11347,10 @@ public final class NodeExecutionOuterClass {
         }
         if (other.hasCatalogKey()) {
           mergeCatalogKey(other.getCatalogKey());
+        }
+        if (!other.getCheckpointUri().isEmpty()) {
+          checkpointUri_ = other.checkpointUri_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11513,6 +11597,95 @@ public final class NodeExecutionOuterClass {
           catalogKey_ = null;
         }
         return catalogKeyBuilder_;
+      }
+
+      private java.lang.Object checkpointUri_ = "";
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public java.lang.String getCheckpointUri() {
+        java.lang.Object ref = checkpointUri_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          checkpointUri_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCheckpointUriBytes() {
+        java.lang.Object ref = checkpointUri_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          checkpointUri_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder setCheckpointUri(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        checkpointUri_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder clearCheckpointUri() {
+        
+        checkpointUri_ = getDefaultInstance().getCheckpointUri();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder setCheckpointUriBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        checkpointUri_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -15006,25 +15179,25 @@ public final class NodeExecutionOuterClass {
       "\010deck_uri\030\013 \001(\tB\017\n\routput_resultB\021\n\017targ" +
       "et_metadata\"W\n\024WorkflowNodeMetadata\022?\n\013e" +
       "xecutionId\030\001 \001(\0132*.flyteidl.core.Workflo" +
-      "wExecutionIdentifier\"\200\001\n\020TaskNodeMetadat" +
+      "wExecutionIdentifier\"\230\001\n\020TaskNodeMetadat" +
       "a\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.core." +
       "CatalogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132" +
-      "\036.flyteidl.core.CatalogMetadata\"\207\001\n\033Dyna" +
-      "micWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.fl" +
-      "yteidl.core.Identifier\022A\n\021compiled_workf" +
-      "low\030\002 \001(\0132&.flyteidl.core.CompiledWorkfl" +
-      "owClosure\"Q\n\033NodeExecutionGetDataRequest" +
-      "\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExecuti" +
-      "onIdentifier\"\241\002\n\034NodeExecutionGetDataRes" +
-      "ponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.U" +
-      "rlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.a" +
-      "dmin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031." +
-      "flyteidl.core.LiteralMap\022/\n\014full_outputs" +
-      "\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n\020dyn" +
-      "amic_workflow\030\020 \001(\0132+.flyteidl.admin.Dyn" +
-      "amicWorkflowNodeMetadataB7Z5github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/admi" +
-      "nb\006proto3"
+      "\036.flyteidl.core.CatalogMetadata\022\026\n\016check" +
+      "point_uri\030\004 \001(\t\"\207\001\n\033DynamicWorkflowNodeM" +
+      "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden" +
+      "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt" +
+      "eidl.core.CompiledWorkflowClosure\"Q\n\033Nod" +
+      "eExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.f" +
+      "lyteidl.core.NodeExecutionIdentifier\"\241\002\n" +
+      "\034NodeExecutionGetDataResponse\022+\n\006inputs\030" +
+      "\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007ou" +
+      "tputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001" +
+      "\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Li" +
+      "teralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteid" +
+      "l.core.LiteralMap\022E\n\020dynamic_workflow\030\020 " +
+      "\001(\0132+.flyteidl.admin.DynamicWorkflowNode" +
+      "MetadataB7Z5github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -15099,7 +15272,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_TaskNodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskNodeMetadata_descriptor,
-        new java.lang.String[] { "CacheStatus", "CatalogKey", });
+        new java.lang.String[] { "CacheStatus", "CatalogKey", "CheckpointUri", });
     internal_static_flyteidl_admin_DynamicWorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_DynamicWorkflowNodeMetadata_fieldAccessorTable = new

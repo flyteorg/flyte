@@ -6428,6 +6428,9 @@ export namespace flyteidl {
             /** TaskNodeMetadata reservationStatus */
             reservationStatus?: (flyteidl.core.CatalogReservation.Status|null);
 
+            /** TaskNodeMetadata checkpointUri */
+            checkpointUri?: (string|null);
+
             /** TaskNodeMetadata dynamicWorkflow */
             dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
         }
@@ -6449,6 +6452,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata reservationStatus. */
             public reservationStatus: flyteidl.core.CatalogReservation.Status;
+
+            /** TaskNodeMetadata checkpointUri. */
+            public checkpointUri: string;
 
             /** TaskNodeMetadata dynamicWorkflow. */
             public dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
@@ -12854,6 +12860,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey */
             catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata checkpointUri */
+            checkpointUri?: (string|null);
         }
 
         /** Represents a TaskNodeMetadata. */
@@ -12870,6 +12879,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey. */
             public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata checkpointUri. */
+            public checkpointUri: string;
 
             /**
              * Creates a new TaskNodeMetadata instance using the specified properties.

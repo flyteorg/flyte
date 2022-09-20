@@ -39,6 +39,7 @@ class FlyteidleventTaskNodeMetadata(object):
         'cache_status': 'CoreCatalogCacheStatus',
         'catalog_key': 'CoreCatalogMetadata',
         'reservation_status': 'CatalogReservationStatus',
+        'checkpoint_uri': 'str',
         'dynamic_workflow': 'FlyteidleventDynamicWorkflowNodeMetadata'
     }
 
@@ -46,15 +47,17 @@ class FlyteidleventTaskNodeMetadata(object):
         'cache_status': 'cache_status',
         'catalog_key': 'catalog_key',
         'reservation_status': 'reservation_status',
+        'checkpoint_uri': 'checkpoint_uri',
         'dynamic_workflow': 'dynamic_workflow'
     }
 
-    def __init__(self, cache_status=None, catalog_key=None, reservation_status=None, dynamic_workflow=None):  # noqa: E501
+    def __init__(self, cache_status=None, catalog_key=None, reservation_status=None, checkpoint_uri=None, dynamic_workflow=None):  # noqa: E501
         """FlyteidleventTaskNodeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._cache_status = None
         self._catalog_key = None
         self._reservation_status = None
+        self._checkpoint_uri = None
         self._dynamic_workflow = None
         self.discriminator = None
 
@@ -64,6 +67,8 @@ class FlyteidleventTaskNodeMetadata(object):
             self.catalog_key = catalog_key
         if reservation_status is not None:
             self.reservation_status = reservation_status
+        if checkpoint_uri is not None:
+            self.checkpoint_uri = checkpoint_uri
         if dynamic_workflow is not None:
             self.dynamic_workflow = dynamic_workflow
 
@@ -133,6 +138,27 @@ class FlyteidleventTaskNodeMetadata(object):
         """
 
         self._reservation_status = reservation_status
+
+    @property
+    def checkpoint_uri(self):
+        """Gets the checkpoint_uri of this FlyteidleventTaskNodeMetadata.  # noqa: E501
+
+
+        :return: The checkpoint_uri of this FlyteidleventTaskNodeMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._checkpoint_uri
+
+    @checkpoint_uri.setter
+    def checkpoint_uri(self, checkpoint_uri):
+        """Sets the checkpoint_uri of this FlyteidleventTaskNodeMetadata.
+
+
+        :param checkpoint_uri: The checkpoint_uri of this FlyteidleventTaskNodeMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._checkpoint_uri = checkpoint_uri
 
     @property
     def dynamic_workflow(self):

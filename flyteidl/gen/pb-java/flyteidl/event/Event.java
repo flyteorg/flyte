@@ -6844,6 +6844,24 @@ public final class Event {
 
     /**
      * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    java.lang.String getCheckpointUri();
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getCheckpointUriBytes();
+
+    /**
+     * <pre>
      * In the case this task launched a dynamic workflow we capture its structure here.
      * </pre>
      *
@@ -6882,6 +6900,7 @@ public final class Event {
     private TaskNodeMetadata() {
       cacheStatus_ = 0;
       reservationStatus_ = 0;
+      checkpointUri_ = "";
     }
 
     @java.lang.Override
@@ -6931,6 +6950,12 @@ public final class Event {
               int rawValue = input.readEnum();
 
               reservationStatus_ = rawValue;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              checkpointUri_ = s;
               break;
             }
             case 130: {
@@ -7061,6 +7086,48 @@ public final class Event {
       return result == null ? flyteidl.core.Catalog.CatalogReservation.Status.UNRECOGNIZED : result;
     }
 
+    public static final int CHECKPOINT_URI_FIELD_NUMBER = 4;
+    private volatile java.lang.Object checkpointUri_;
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    public java.lang.String getCheckpointUri() {
+      java.lang.Object ref = checkpointUri_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        checkpointUri_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The latest checkpoint location
+     * </pre>
+     *
+     * <code>string checkpoint_uri = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCheckpointUriBytes() {
+      java.lang.Object ref = checkpointUri_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        checkpointUri_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     public static final int DYNAMIC_WORKFLOW_FIELD_NUMBER = 16;
     private flyteidl.event.Event.DynamicWorkflowNodeMetadata dynamicWorkflow_;
     /**
@@ -7117,6 +7184,9 @@ public final class Event {
       if (reservationStatus_ != flyteidl.core.Catalog.CatalogReservation.Status.RESERVATION_DISABLED.getNumber()) {
         output.writeEnum(3, reservationStatus_);
       }
+      if (!getCheckpointUriBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, checkpointUri_);
+      }
       if (dynamicWorkflow_ != null) {
         output.writeMessage(16, getDynamicWorkflow());
       }
@@ -7140,6 +7210,9 @@ public final class Event {
       if (reservationStatus_ != flyteidl.core.Catalog.CatalogReservation.Status.RESERVATION_DISABLED.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(3, reservationStatus_);
+      }
+      if (!getCheckpointUriBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, checkpointUri_);
       }
       if (dynamicWorkflow_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -7167,6 +7240,8 @@ public final class Event {
             .equals(other.getCatalogKey())) return false;
       }
       if (reservationStatus_ != other.reservationStatus_) return false;
+      if (!getCheckpointUri()
+          .equals(other.getCheckpointUri())) return false;
       if (hasDynamicWorkflow() != other.hasDynamicWorkflow()) return false;
       if (hasDynamicWorkflow()) {
         if (!getDynamicWorkflow()
@@ -7191,6 +7266,8 @@ public final class Event {
       }
       hash = (37 * hash) + RESERVATION_STATUS_FIELD_NUMBER;
       hash = (53 * hash) + reservationStatus_;
+      hash = (37 * hash) + CHECKPOINT_URI_FIELD_NUMBER;
+      hash = (53 * hash) + getCheckpointUri().hashCode();
       if (hasDynamicWorkflow()) {
         hash = (37 * hash) + DYNAMIC_WORKFLOW_FIELD_NUMBER;
         hash = (53 * hash) + getDynamicWorkflow().hashCode();
@@ -7338,6 +7415,8 @@ public final class Event {
         }
         reservationStatus_ = 0;
 
+        checkpointUri_ = "";
+
         if (dynamicWorkflowBuilder_ == null) {
           dynamicWorkflow_ = null;
         } else {
@@ -7377,6 +7456,7 @@ public final class Event {
           result.catalogKey_ = catalogKeyBuilder_.build();
         }
         result.reservationStatus_ = reservationStatus_;
+        result.checkpointUri_ = checkpointUri_;
         if (dynamicWorkflowBuilder_ == null) {
           result.dynamicWorkflow_ = dynamicWorkflow_;
         } else {
@@ -7438,6 +7518,10 @@ public final class Event {
         }
         if (other.reservationStatus_ != 0) {
           setReservationStatusValue(other.getReservationStatusValue());
+        }
+        if (!other.getCheckpointUri().isEmpty()) {
+          checkpointUri_ = other.checkpointUri_;
+          onChanged();
         }
         if (other.hasDynamicWorkflow()) {
           mergeDynamicWorkflow(other.getDynamicWorkflow());
@@ -7750,6 +7834,95 @@ public final class Event {
       public Builder clearReservationStatus() {
         
         reservationStatus_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object checkpointUri_ = "";
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public java.lang.String getCheckpointUri() {
+        java.lang.Object ref = checkpointUri_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          checkpointUri_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCheckpointUriBytes() {
+        java.lang.Object ref = checkpointUri_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          checkpointUri_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder setCheckpointUri(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        checkpointUri_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder clearCheckpointUri() {
+        
+        checkpointUri_ = getDefaultInstance().getCheckpointUri();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The latest checkpoint location
+       * </pre>
+       *
+       * <code>string checkpoint_uri = 4;</code>
+       */
+      public Builder setCheckpointUriBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        checkpointUri_ = value;
         onChanged();
         return this;
       }
@@ -18612,54 +18785,55 @@ public final class Event {
       "\020\n\010deck_uri\030\023 \001(\tB\017\n\routput_resultB\021\n\017ta" +
       "rget_metadata\"X\n\024WorkflowNodeMetadata\022@\n" +
       "\014execution_id\030\001 \001(\0132*.flyteidl.core.Work" +
-      "flowExecutionIdentifier\"\215\002\n\020TaskNodeMeta" +
+      "flowExecutionIdentifier\"\245\002\n\020TaskNodeMeta" +
       "data\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.co" +
       "re.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001" +
       "(\0132\036.flyteidl.core.CatalogMetadata\022D\n\022re" +
       "servation_status\030\003 \001(\0162(.flyteidl.core.C" +
-      "atalogReservation.Status\022E\n\020dynamic_work" +
-      "flow\030\020 \001(\0132+.flyteidl.event.DynamicWorkf" +
-      "lowNodeMetadata\"\207\001\n\033DynamicWorkflowNodeM" +
-      "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden" +
-      "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt" +
-      "eidl.core.CompiledWorkflowClosure\"Q\n\033Par" +
-      "entTaskExecutionMetadata\0222\n\002id\030\001 \001(\0132&.f" +
-      "lyteidl.core.TaskExecutionIdentifier\".\n\033" +
-      "ParentNodeExecutionMetadata\022\017\n\007node_id\030\001" +
-      " \001(\t\"\224\005\n\022TaskExecutionEvent\022*\n\007task_id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022H\n\030paren" +
-      "t_node_execution_id\030\002 \001(\0132&.flyteidl.cor" +
-      "e.NodeExecutionIdentifier\022\025\n\rretry_attem" +
-      "pt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core." +
-      "TaskExecution.Phase\022\023\n\013producer_id\030\005 \001(\t" +
-      "\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\022/" +
-      "\n\013occurred_at\030\007 \001(\0132\032.google.protobuf.Ti" +
-      "mestamp\022\021\n\tinput_uri\030\010 \001(\t\022\024\n\noutput_uri" +
-      "\030\t \001(\tH\000\022.\n\005error\030\n \001(\0132\035.flyteidl.core." +
-      "ExecutionErrorH\000\0220\n\013output_data\030\021 \001(\0132\031." +
-      "flyteidl.core.LiteralMapH\000\022,\n\013custom_inf" +
-      "o\030\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphas" +
-      "e_version\030\014 \001(\r\022\016\n\006reason\030\r \001(\t\022\021\n\ttask_" +
-      "type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl." +
-      "event.TaskExecutionMetadata\022\025\n\revent_ver" +
-      "sion\030\022 \001(\005B\017\n\routput_result\"\343\001\n\024External" +
-      "ResourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n\005ind" +
-      "ex\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase" +
-      "\030\004 \001(\0162\".flyteidl.core.TaskExecution.Pha" +
-      "se\0227\n\014cache_status\030\005 \001(\0162!.flyteidl.core" +
-      ".CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyt" +
-      "eidl.core.TaskLog\"?\n\020ResourcePoolInfo\022\030\n" +
-      "\020allocation_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001" +
-      "(\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016generate" +
-      "d_name\030\001 \001(\t\022@\n\022external_resources\030\002 \003(\013" +
-      "2$.flyteidl.event.ExternalResourceInfo\022<" +
-      "\n\022resource_pool_info\030\003 \003(\0132 .flyteidl.ev" +
-      "ent.ResourcePoolInfo\022\031\n\021plugin_identifie" +
-      "r\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.flytei" +
-      "dl.event.TaskExecutionMetadata.InstanceC" +
-      "lass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rIN" +
-      "TERRUPTIBLE\020\001B7Z5github.com/flyteorg/fly" +
-      "teidl/gen/pb-go/flyteidl/eventb\006proto3"
+      "atalogReservation.Status\022\026\n\016checkpoint_u" +
+      "ri\030\004 \001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.fly" +
+      "teidl.event.DynamicWorkflowNodeMetadata\"" +
+      "\207\001\n\033DynamicWorkflowNodeMetadata\022%\n\002id\030\001 " +
+      "\001(\0132\031.flyteidl.core.Identifier\022A\n\021compil" +
+      "ed_workflow\030\002 \001(\0132&.flyteidl.core.Compil" +
+      "edWorkflowClosure\"Q\n\033ParentTaskExecution" +
+      "Metadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core.Tas" +
+      "kExecutionIdentifier\".\n\033ParentNodeExecut" +
+      "ionMetadata\022\017\n\007node_id\030\001 \001(\t\"\224\005\n\022TaskExe" +
+      "cutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl." +
+      "core.Identifier\022H\n\030parent_node_execution" +
+      "_id\030\002 \001(\0132&.flyteidl.core.NodeExecutionI" +
+      "dentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phas" +
+      "e\030\004 \001(\0162\".flyteidl.core.TaskExecution.Ph" +
+      "ase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026" +
+      ".flyteidl.core.TaskLog\022/\n\013occurred_at\030\007 " +
+      "\001(\0132\032.google.protobuf.Timestamp\022\021\n\tinput" +
+      "_uri\030\010 \001(\t\022\024\n\noutput_uri\030\t \001(\tH\000\022.\n\005erro" +
+      "r\030\n \001(\0132\035.flyteidl.core.ExecutionErrorH\000" +
+      "\0220\n\013output_data\030\021 \001(\0132\031.flyteidl.core.Li" +
+      "teralMapH\000\022,\n\013custom_info\030\013 \001(\0132\027.google" +
+      ".protobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022" +
+      "\016\n\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010me" +
+      "tadata\030\020 \001(\0132%.flyteidl.event.TaskExecut" +
+      "ionMetadata\022\025\n\revent_version\030\022 \001(\005B\017\n\rou" +
+      "tput_result\"\343\001\n\024ExternalResourceInfo\022\023\n\013" +
+      "external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretr" +
+      "y_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteid" +
+      "l.core.TaskExecution.Phase\0227\n\014cache_stat" +
+      "us\030\005 \001(\0162!.flyteidl.core.CatalogCacheSta" +
+      "tus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLo" +
+      "g\"?\n\020ResourcePoolInfo\022\030\n\020allocation_toke" +
+      "n\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecu" +
+      "tionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022" +
+      "external_resources\030\002 \003(\0132$.flyteidl.even" +
+      "t.ExternalResourceInfo\022<\n\022resource_pool_" +
+      "info\030\003 \003(\0132 .flyteidl.event.ResourcePool" +
+      "Info\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016insta" +
+      "nce_class\030\020 \001(\01623.flyteidl.event.TaskExe" +
+      "cutionMetadata.InstanceClass\"/\n\rInstance" +
+      "Class\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z" +
+      "5github.com/flyteorg/flyteidl/gen/pb-go/" +
+      "flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18703,7 +18877,7 @@ public final class Event {
     internal_static_flyteidl_event_TaskNodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskNodeMetadata_descriptor,
-        new java.lang.String[] { "CacheStatus", "CatalogKey", "ReservationStatus", "DynamicWorkflow", });
+        new java.lang.String[] { "CacheStatus", "CatalogKey", "ReservationStatus", "CheckpointUri", "DynamicWorkflow", });
     internal_static_flyteidl_event_DynamicWorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_event_DynamicWorkflowNodeMetadata_fieldAccessorTable = new

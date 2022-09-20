@@ -349,6 +349,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fevent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskNodeMetadata, cache_status_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskNodeMetadata, catalog_key_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskNodeMetadata, reservation_status_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskNodeMetadata, checkpoint_uri_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::TaskNodeMetadata, dynamic_workflow_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::DynamicWorkflowNodeMetadata, _internal_metadata_),
@@ -426,13 +427,13 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 13, -1, sizeof(::flyteidl::event::NodeExecutionEvent)},
   { 39, -1, sizeof(::flyteidl::event::WorkflowNodeMetadata)},
   { 45, -1, sizeof(::flyteidl::event::TaskNodeMetadata)},
-  { 54, -1, sizeof(::flyteidl::event::DynamicWorkflowNodeMetadata)},
-  { 61, -1, sizeof(::flyteidl::event::ParentTaskExecutionMetadata)},
-  { 67, -1, sizeof(::flyteidl::event::ParentNodeExecutionMetadata)},
-  { 73, -1, sizeof(::flyteidl::event::TaskExecutionEvent)},
-  { 96, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
-  { 107, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
-  { 114, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
+  { 55, -1, sizeof(::flyteidl::event::DynamicWorkflowNodeMetadata)},
+  { 62, -1, sizeof(::flyteidl::event::ParentTaskExecutionMetadata)},
+  { 68, -1, sizeof(::flyteidl::event::ParentNodeExecutionMetadata)},
+  { 74, -1, sizeof(::flyteidl::event::TaskExecutionEvent)},
+  { 97, -1, sizeof(::flyteidl::event::ExternalResourceInfo)},
+  { 108, -1, sizeof(::flyteidl::event::ResourcePoolInfo)},
+  { 115, -1, sizeof(::flyteidl::event::TaskExecutionMetadata)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -493,59 +494,60 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "\020\n\010deck_uri\030\023 \001(\tB\017\n\routput_resultB\021\n\017ta"
   "rget_metadata\"X\n\024WorkflowNodeMetadata\022@\n"
   "\014execution_id\030\001 \001(\0132*.flyteidl.core.Work"
-  "flowExecutionIdentifier\"\215\002\n\020TaskNodeMeta"
+  "flowExecutionIdentifier\"\245\002\n\020TaskNodeMeta"
   "data\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.co"
   "re.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001"
   "(\0132\036.flyteidl.core.CatalogMetadata\022D\n\022re"
   "servation_status\030\003 \001(\0162(.flyteidl.core.C"
-  "atalogReservation.Status\022E\n\020dynamic_work"
-  "flow\030\020 \001(\0132+.flyteidl.event.DynamicWorkf"
-  "lowNodeMetadata\"\207\001\n\033DynamicWorkflowNodeM"
-  "etadata\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Iden"
-  "tifier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyt"
-  "eidl.core.CompiledWorkflowClosure\"Q\n\033Par"
-  "entTaskExecutionMetadata\0222\n\002id\030\001 \001(\0132&.f"
-  "lyteidl.core.TaskExecutionIdentifier\".\n\033"
-  "ParentNodeExecutionMetadata\022\017\n\007node_id\030\001"
-  " \001(\t\"\224\005\n\022TaskExecutionEvent\022*\n\007task_id\030\001"
-  " \001(\0132\031.flyteidl.core.Identifier\022H\n\030paren"
-  "t_node_execution_id\030\002 \001(\0132&.flyteidl.cor"
-  "e.NodeExecutionIdentifier\022\025\n\rretry_attem"
-  "pt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core."
-  "TaskExecution.Phase\022\023\n\013producer_id\030\005 \001(\t"
-  "\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\022/"
-  "\n\013occurred_at\030\007 \001(\0132\032.google.protobuf.Ti"
-  "mestamp\022\021\n\tinput_uri\030\010 \001(\t\022\024\n\noutput_uri"
-  "\030\t \001(\tH\000\022.\n\005error\030\n \001(\0132\035.flyteidl.core."
-  "ExecutionErrorH\000\0220\n\013output_data\030\021 \001(\0132\031."
-  "flyteidl.core.LiteralMapH\000\022,\n\013custom_inf"
-  "o\030\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphas"
-  "e_version\030\014 \001(\r\022\016\n\006reason\030\r \001(\t\022\021\n\ttask_"
-  "type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl."
-  "event.TaskExecutionMetadata\022\025\n\revent_ver"
-  "sion\030\022 \001(\005B\017\n\routput_result\"\343\001\n\024External"
-  "ResourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n\005ind"
-  "ex\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase"
-  "\030\004 \001(\0162\".flyteidl.core.TaskExecution.Pha"
-  "se\0227\n\014cache_status\030\005 \001(\0162!.flyteidl.core"
-  ".CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyt"
-  "eidl.core.TaskLog\"\?\n\020ResourcePoolInfo\022\030\n"
-  "\020allocation_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001"
-  "(\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016generate"
-  "d_name\030\001 \001(\t\022@\n\022external_resources\030\002 \003(\013"
-  "2$.flyteidl.event.ExternalResourceInfo\022<"
-  "\n\022resource_pool_info\030\003 \003(\0132 .flyteidl.ev"
-  "ent.ResourcePoolInfo\022\031\n\021plugin_identifie"
-  "r\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.flytei"
-  "dl.event.TaskExecutionMetadata.InstanceC"
-  "lass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rIN"
-  "TERRUPTIBLE\020\001B7Z5github.com/flyteorg/fly"
-  "teidl/gen/pb-go/flyteidl/eventb\006proto3"
+  "atalogReservation.Status\022\026\n\016checkpoint_u"
+  "ri\030\004 \001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.fly"
+  "teidl.event.DynamicWorkflowNodeMetadata\""
+  "\207\001\n\033DynamicWorkflowNodeMetadata\022%\n\002id\030\001 "
+  "\001(\0132\031.flyteidl.core.Identifier\022A\n\021compil"
+  "ed_workflow\030\002 \001(\0132&.flyteidl.core.Compil"
+  "edWorkflowClosure\"Q\n\033ParentTaskExecution"
+  "Metadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core.Tas"
+  "kExecutionIdentifier\".\n\033ParentNodeExecut"
+  "ionMetadata\022\017\n\007node_id\030\001 \001(\t\"\224\005\n\022TaskExe"
+  "cutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl."
+  "core.Identifier\022H\n\030parent_node_execution"
+  "_id\030\002 \001(\0132&.flyteidl.core.NodeExecutionI"
+  "dentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phas"
+  "e\030\004 \001(\0162\".flyteidl.core.TaskExecution.Ph"
+  "ase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026"
+  ".flyteidl.core.TaskLog\022/\n\013occurred_at\030\007 "
+  "\001(\0132\032.google.protobuf.Timestamp\022\021\n\tinput"
+  "_uri\030\010 \001(\t\022\024\n\noutput_uri\030\t \001(\tH\000\022.\n\005erro"
+  "r\030\n \001(\0132\035.flyteidl.core.ExecutionErrorH\000"
+  "\0220\n\013output_data\030\021 \001(\0132\031.flyteidl.core.Li"
+  "teralMapH\000\022,\n\013custom_info\030\013 \001(\0132\027.google"
+  ".protobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022"
+  "\016\n\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010me"
+  "tadata\030\020 \001(\0132%.flyteidl.event.TaskExecut"
+  "ionMetadata\022\025\n\revent_version\030\022 \001(\005B\017\n\rou"
+  "tput_result\"\343\001\n\024ExternalResourceInfo\022\023\n\013"
+  "external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretr"
+  "y_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteid"
+  "l.core.TaskExecution.Phase\0227\n\014cache_stat"
+  "us\030\005 \001(\0162!.flyteidl.core.CatalogCacheSta"
+  "tus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLo"
+  "g\"\?\n\020ResourcePoolInfo\022\030\n\020allocation_toke"
+  "n\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecu"
+  "tionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022"
+  "external_resources\030\002 \003(\0132$.flyteidl.even"
+  "t.ExternalResourceInfo\022<\n\022resource_pool_"
+  "info\030\003 \003(\0132 .flyteidl.event.ResourcePool"
+  "Info\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016insta"
+  "nce_class\030\020 \001(\01623.flyteidl.event.TaskExe"
+  "cutionMetadata.InstanceClass\"/\n\rInstance"
+  "Class\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z"
+  "5github.com/flyteorg/flyteidl/gen/pb-go/"
+  "flyteidl/eventb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto,
-  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3398,
+  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 3422,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fevent_2eproto() {
@@ -3259,6 +3261,7 @@ void TaskNodeMetadata::clear_catalog_key() {
 const int TaskNodeMetadata::kCacheStatusFieldNumber;
 const int TaskNodeMetadata::kCatalogKeyFieldNumber;
 const int TaskNodeMetadata::kReservationStatusFieldNumber;
+const int TaskNodeMetadata::kCheckpointUriFieldNumber;
 const int TaskNodeMetadata::kDynamicWorkflowFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -3271,6 +3274,10 @@ TaskNodeMetadata::TaskNodeMetadata(const TaskNodeMetadata& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  checkpoint_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.checkpoint_uri().size() > 0) {
+    checkpoint_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.checkpoint_uri_);
+  }
   if (from.has_catalog_key()) {
     catalog_key_ = new ::flyteidl::core::CatalogMetadata(*from.catalog_key_);
   } else {
@@ -3290,6 +3297,7 @@ TaskNodeMetadata::TaskNodeMetadata(const TaskNodeMetadata& from)
 void TaskNodeMetadata::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_TaskNodeMetadata_flyteidl_2fevent_2fevent_2eproto.base);
+  checkpoint_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&catalog_key_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&reservation_status_) -
       reinterpret_cast<char*>(&catalog_key_)) + sizeof(reservation_status_));
@@ -3301,6 +3309,7 @@ TaskNodeMetadata::~TaskNodeMetadata() {
 }
 
 void TaskNodeMetadata::SharedDtor() {
+  checkpoint_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete catalog_key_;
   if (this != internal_default_instance()) delete dynamic_workflow_;
 }
@@ -3320,6 +3329,7 @@ void TaskNodeMetadata::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  checkpoint_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && catalog_key_ != nullptr) {
     delete catalog_key_;
   }
@@ -3376,6 +3386,22 @@ const char* TaskNodeMetadata::_InternalParse(const char* begin, const char* end,
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
+      // string checkpoint_uri = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.event.TaskNodeMetadata.checkpoint_uri");
+        object = msg->mutable_checkpoint_uri();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       // .flyteidl.event.DynamicWorkflowNodeMetadata dynamic_workflow = 16;
       case 16: {
         if (static_cast<::google::protobuf::uint8>(tag) != 130) goto handle_unusual;
@@ -3404,6 +3430,10 @@ const char* TaskNodeMetadata::_InternalParse(const char* begin, const char* end,
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -3452,6 +3482,21 @@ bool TaskNodeMetadata::MergePartialFromCodedStream(
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
           set_reservation_status(static_cast< ::flyteidl::core::CatalogReservation_Status >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string checkpoint_uri = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_checkpoint_uri()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.event.TaskNodeMetadata.checkpoint_uri"));
         } else {
           goto handle_unusual;
         }
@@ -3514,6 +3559,16 @@ void TaskNodeMetadata::SerializeWithCachedSizes(
       3, this->reservation_status(), output);
   }
 
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.event.TaskNodeMetadata.checkpoint_uri");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->checkpoint_uri(), output);
+  }
+
   // .flyteidl.event.DynamicWorkflowNodeMetadata dynamic_workflow = 16;
   if (this->has_dynamic_workflow()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -3552,6 +3607,17 @@ void TaskNodeMetadata::SerializeWithCachedSizes(
       3, this->reservation_status(), target);
   }
 
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->checkpoint_uri().data(), static_cast<int>(this->checkpoint_uri().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.event.TaskNodeMetadata.checkpoint_uri");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->checkpoint_uri(), target);
+  }
+
   // .flyteidl.event.DynamicWorkflowNodeMetadata dynamic_workflow = 16;
   if (this->has_dynamic_workflow()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -3579,6 +3645,13 @@ size_t TaskNodeMetadata::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string checkpoint_uri = 4;
+  if (this->checkpoint_uri().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->checkpoint_uri());
+  }
 
   // .flyteidl.core.CatalogMetadata catalog_key = 2;
   if (this->has_catalog_key()) {
@@ -3633,6 +3706,10 @@ void TaskNodeMetadata::MergeFrom(const TaskNodeMetadata& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.checkpoint_uri().size() > 0) {
+
+    checkpoint_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.checkpoint_uri_);
+  }
   if (from.has_catalog_key()) {
     mutable_catalog_key()->::flyteidl::core::CatalogMetadata::MergeFrom(from.catalog_key());
   }
@@ -3672,6 +3749,8 @@ void TaskNodeMetadata::Swap(TaskNodeMetadata* other) {
 void TaskNodeMetadata::InternalSwap(TaskNodeMetadata* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  checkpoint_uri_.Swap(&other->checkpoint_uri_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(catalog_key_, other->catalog_key_);
   swap(dynamic_workflow_, other->dynamic_workflow_);
   swap(cache_status_, other->cache_status_);
