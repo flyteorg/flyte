@@ -15,6 +15,7 @@ type FlyteidleventTaskNodeMetadata struct {
 	CatalogKey *CoreCatalogMetadata `json:"catalog_key,omitempty"`
 	// Captures the status of cache reservations for this execution.
 	ReservationStatus *CatalogReservationStatus `json:"reservation_status,omitempty"`
+	CheckpointUri string `json:"checkpoint_uri,omitempty"`
 	// In the case this task launched a dynamic workflow we capture its structure here.
 	DynamicWorkflow *FlyteidleventDynamicWorkflowNodeMetadata `json:"dynamic_workflow,omitempty"`
 }

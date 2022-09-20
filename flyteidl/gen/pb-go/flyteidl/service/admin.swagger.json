@@ -6917,6 +6917,10 @@
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
           "title": "This structure carries the catalog artifact information"
+        },
+        "checkpoint_uri": {
+          "type": "string",
+          "title": "The latest checkpoint location"
         }
       },
       "title": "Metadata for the case in which the node is a TaskNode"
@@ -6971,6 +6975,10 @@
         "reservation_status": {
           "$ref": "#/definitions/CatalogReservationStatus",
           "description": "Captures the status of cache reservations for this execution."
+        },
+        "checkpoint_uri": {
+          "type": "string",
+          "title": "The latest checkpoint location"
         },
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidleventDynamicWorkflowNodeMetadata",

@@ -831,6 +831,8 @@ func (m *TaskNodeMetadata) Validate() error {
 		}
 	}
 
+	// no validation rules for CheckpointUri
+
 	return nil
 }
 

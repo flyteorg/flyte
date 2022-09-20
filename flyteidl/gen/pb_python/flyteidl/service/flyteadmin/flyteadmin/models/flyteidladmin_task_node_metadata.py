@@ -35,25 +35,30 @@ class FlyteidladminTaskNodeMetadata(object):
     """
     swagger_types = {
         'cache_status': 'CoreCatalogCacheStatus',
-        'catalog_key': 'CoreCatalogMetadata'
+        'catalog_key': 'CoreCatalogMetadata',
+        'checkpoint_uri': 'str'
     }
 
     attribute_map = {
         'cache_status': 'cache_status',
-        'catalog_key': 'catalog_key'
+        'catalog_key': 'catalog_key',
+        'checkpoint_uri': 'checkpoint_uri'
     }
 
-    def __init__(self, cache_status=None, catalog_key=None):  # noqa: E501
+    def __init__(self, cache_status=None, catalog_key=None, checkpoint_uri=None):  # noqa: E501
         """FlyteidladminTaskNodeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._cache_status = None
         self._catalog_key = None
+        self._checkpoint_uri = None
         self.discriminator = None
 
         if cache_status is not None:
             self.cache_status = cache_status
         if catalog_key is not None:
             self.catalog_key = catalog_key
+        if checkpoint_uri is not None:
+            self.checkpoint_uri = checkpoint_uri
 
     @property
     def cache_status(self):
@@ -98,6 +103,27 @@ class FlyteidladminTaskNodeMetadata(object):
         """
 
         self._catalog_key = catalog_key
+
+    @property
+    def checkpoint_uri(self):
+        """Gets the checkpoint_uri of this FlyteidladminTaskNodeMetadata.  # noqa: E501
+
+
+        :return: The checkpoint_uri of this FlyteidladminTaskNodeMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._checkpoint_uri
+
+    @checkpoint_uri.setter
+    def checkpoint_uri(self, checkpoint_uri):
+        """Sets the checkpoint_uri of this FlyteidladminTaskNodeMetadata.
+
+
+        :param checkpoint_uri: The checkpoint_uri of this FlyteidladminTaskNodeMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._checkpoint_uri = checkpoint_uri
 
     def to_dict(self):
         """Returns the model properties as a dict"""
