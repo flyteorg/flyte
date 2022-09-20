@@ -690,6 +690,14 @@ func TestSchemaCasting(t *testing.T) {
 }
 
 func TestStructuredDatasetCasting(t *testing.T) {
+	emptyStructuredDataset := &core.LiteralType{
+		Type: &core.LiteralType_StructuredDatasetType{
+			StructuredDatasetType: &core.StructuredDatasetType{
+				Columns: []*core.StructuredDatasetType_DatasetColumn{},
+				Format:  "",
+			},
+		},
+	}
 	genericStructuredDataset := &core.LiteralType{
 		Type: &core.LiteralType_StructuredDatasetType{
 			StructuredDatasetType: &core.StructuredDatasetType{
@@ -817,6 +825,16 @@ func TestStructuredDatasetCasting(t *testing.T) {
 	t.Run("MismatchedColumnsFlipped", func(t *testing.T) {
 		castable := AreTypesCastable(mismatchedSubsetStructuredDataset, subsetStructuredDataset)
 		assert.False(t, castable, "StructuredDataset(a=Float) should not be castable to StructuredDataset(a=Integer, b=Collection)")
+	})
+
+	t.Run("GenericToEmptyFormat", func(t *testing.T) {
+		castable := AreTypesCastable(genericStructuredDataset, emptyStructuredDataset)
+		assert.True(t, castable, "StructuredDataset(format='Parquet') should be castable to StructuredDataset()")
+	})
+
+	t.Run("EmptyFormatToGeneric", func(t *testing.T) {
+		castable := AreTypesCastable(genericStructuredDataset, emptyStructuredDataset)
+		assert.True(t, castable, "StructuredDataset() should be castable to StructuredDataset(format='Parquet')")
 	})
 
 	t.Run("StructuredDatasetsAreNullable", func(t *testing.T) {
