@@ -37,6 +37,7 @@ COPY feast_integration/ /root/feast_integration/
 # when registering tasks, workflows, and launch plans
 ARG tag
 ENV FLYTE_INTERNAL_IMAGE $tag
+ENV DEMO 1
 
 # Copy over the helper script that the SDK relies on
 RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/

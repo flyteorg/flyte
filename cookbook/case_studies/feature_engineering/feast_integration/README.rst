@@ -6,16 +6,16 @@ Feast Integration
 Flyte provides a way to train models and perform feature engineering as a single pipeline.
 But it provides no way to serve these features to production when the model matures and is ready to be served in production.
 
-This is where Feast comes into the picture.
+This is where Feast can be helpful.
 
-By leveraging the collective capabilities, Flyte adds the ability to engineer the features, and Feast provides the feature registry and online feature serving system.
-Moreover, Flyte can help us ensure incremental development of features and enables us to turn on the sync to online stores only when one is confident about the features.
+On leveraging the collective capabilities, Flyte enables engineering the features, and Feast provides the feature registry and online feature serving system.
+Moreover, Flyte can help ensure incremental development of features and enables to turn on the sync to online stores only when one is confident about the features.
 
 In this tutorial, we'll walk through how Feast can be used to store and retrieve features to train and test the model through a pipeline curated using Flyte.
 
 Dataset
 =======
-We will use the horse colic dataset wherein we will determine if the lesion of the horse is surgical or not. This is a modified version of the original dataset.
+We'll use the horse colic dataset to determine if the lesion of the horse is surgical or not. This is a modified version of the original dataset.
 
 The dataset will have the following columns:
 
@@ -49,14 +49,12 @@ The dataset will have the following columns:
       - timestamp
 
 The horse colic dataset will be a compressed zip file consisting of the SQLite DB.
-For this example, we just wanted a dataset available online, but this could be easily plugged into another dataset/data management system like Snowflake, Athena, Hive, BigQuery, or Spark, all of which are supported by Flyte.
+For this example, we wanted a dataset available online, but this could be easily plugged into another dataset/data management system
+like Snowflake, Athena, Hive, BigQuery, or Spark, all of which are supported by Flyte.
 
 Takeaways
 =========
-The example we are trying to demonstrate is a simple feature engineering job. Here are the nitty-gritties:
 
 #. Source data is from SQL-like data sources
 #. Procreated feature transforms
-#. Ability to create a low-code platform
-#. Feast integration
 #. Serve features to production using Feast

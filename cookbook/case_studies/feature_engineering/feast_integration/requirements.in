@@ -2,4 +2,3 @@
 scikit-learn
 numpy
 feast[aws]
-proto-plus
