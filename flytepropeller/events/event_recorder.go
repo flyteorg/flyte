@@ -14,6 +14,7 @@ import (
 )
 
 const maxErrorMessageLength = 104857600 //100KB
+const truncationIndicator = "... <Message Truncated> ..."
 
 type recordingMetrics struct {
 	EventRecordingFailure           labeled.StopWatch
@@ -85,7 +86,7 @@ func (r *eventRecorder) RecordWorkflowEvent(ctx context.Context, e *event.Workfl
 // the beginning and the end of the message to capture the most relevant information.
 func truncateErrorMessage(err *core.ExecutionError, length int) {
 	if len(err.Message) > length {
-		err.Message = fmt.Sprintf("%s%s", err.Message[:length/2], err.Message[(len(err.Message)-length/2):])
+		err.Message = fmt.Sprintf("%s\n%s\n%s", err.Message[:length/2], truncationIndicator, err.Message[(len(err.Message)-length/2):])
 	}
 }
 

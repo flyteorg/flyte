@@ -48,14 +48,6 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 	}
 }
 
-func trimErrorMessage(original string, maxLength int) string {
-	if len(original) <= maxLength {
-		return original
-	}
-
-	return original[0:maxLength/2] + original[len(original)-maxLength/2:]
-}
-
 func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execContext executors.ExecutionContext) (*core.NodeExecutionIdentifier, error) {
 	nodeExecutionID := &core.NodeExecutionIdentifier{
 		ExecutionId: taskExecID.NodeExecutionId.ExecutionId,
