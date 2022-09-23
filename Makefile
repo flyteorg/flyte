@@ -13,11 +13,17 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: compile
 compile:
+	docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release
+	docker cp flyteconsole:/app/dist cmd/single
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
+	docker rm -f flyteconsole
 
 .PHONY: linux_compile
 linux_compile:
+	docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release
+	docker cp flyteconsole:/app/dist cmd/single
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
+	docker rm -f flyteconsole
 
 .PHONY: update_boilerplate
 update_boilerplate:
