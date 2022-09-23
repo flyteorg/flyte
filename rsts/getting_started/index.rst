@@ -125,7 +125,7 @@ Run your workflow locally using ``pyflyte``, the CLI that ships with ``flytekit`
        .. code-block:: python
 
           if __name__ == "__main__":
-              wf(n=100, mean=1, sigma=2.0)
+              wf(n=100, mean=1.0, sigma=2.0)
 
        This becomes even more verbose if you want to pass in arguments:
 
