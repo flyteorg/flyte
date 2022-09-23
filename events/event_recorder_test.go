@@ -96,6 +96,6 @@ func TestTruncateErrorMessage(t *testing.T) {
 		}
 
 		truncateErrorMessage(&executionError, length)
-		assert.True(t, len(executionError.Message) <= length)
+		assert.True(t, len(executionError.Message) <= length+len(truncationIndicator)+2)
 	}
 }

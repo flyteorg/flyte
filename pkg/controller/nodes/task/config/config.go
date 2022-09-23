@@ -29,7 +29,6 @@ var (
 			BaseSecond:  2,
 			MaxDuration: config.Duration{Duration: time.Second * 20},
 		},
-		MaxErrorMessageLength: 2048,
 	}
 
 	section = config.MustRegisterSection(SectionKey, defaultConfig)
@@ -40,7 +39,7 @@ type Config struct {
 	MaxPluginPhaseVersions int32            `json:"max-plugin-phase-versions" pflag:",Maximum number of plugin phase versions allowed for one phase."`
 	BarrierConfig          BarrierConfig    `json:"barrier" pflag:",Config for Barrier implementation"`
 	BackOffConfig          BackOffConfig    `json:"backoff" pflag:",Config for Exponential BackOff implementation"`
-	MaxErrorMessageLength  int              `json:"maxLogMessageLength" pflag:",Max length of error message."`
+	MaxErrorMessageLength  int              `json:"maxLogMessageLength" pflag:",Deprecated!!! Max length of error message."`
 }
 
 type BarrierConfig struct {
