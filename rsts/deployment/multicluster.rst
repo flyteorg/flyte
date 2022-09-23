@@ -42,13 +42,13 @@ Data Plane Deployment
 
     .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-dataplane.yaml --create-namespace flyte --install
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-eks.yaml -f values-dataplane.yaml --create-namespace flyte --install
 
 .. tabbed:: GCP
 
     .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-aws.yaml -f values-dataplane.yaml --create-namespace flyte --install
+        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml -f values-gcp.yaml -f values-dataplane.yaml --create-namespace flyte --install
 
 
 User and Control Plane Deployment
