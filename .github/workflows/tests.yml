@@ -7,6 +7,7 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
+    steps:
       - name: Fetch the code
         uses: actions/checkout@v2
       - name: Set up Python 3.8
