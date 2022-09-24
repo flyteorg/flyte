@@ -56,8 +56,7 @@ RETRIES = 3
 # This task shows how checkpoints can help resume execution in case of a failure. This is an example task and shows the API for
 # the checkpointer. The checkpoint system exposes other APIs. For a detailed understanding, refer to the `checkpointer code <https://github.com/flyteorg/flytekit/blob/master/flytekit/core/checkpointer.py>`__.
 #
-# The goal of this method is to return `a+4`. It performs this operation within 3 retries of the task, by recovering from the previous
-# failures. For each failure, it increments the value by 1.
+# The goal of this method is to loop for exactly n_iterations, checkpointing state and recovering from simualted failures.
 @task(retries=RETRIES)
 def use_checkpoint(n_iterations: int) -> int:
     cp = current_context().checkpoint
@@ -66,16 +65,16 @@ def use_checkpoint(n_iterations: int) -> int:
     if prev:
         start = int(prev.decode())
 
-    # create a failure interval so we can create failures for every 'n' iterations and then succeed within
+    # create a failure interval so we can create failures for across 'n' iterations and then succeed after
     # configured retries
-    failure_interval = n_iterations * 1.0 / RETRIES
+    failure_interval = n_iterations // RETRIES
     i = 0
     for i in range(start, n_iterations):
         # simulate a deterministic failure, for demonstration. We want to show how it eventually completes within
         # the given retries
         if i > start and i % failure_interval == 0:
             raise FlyteRecoverableException(
-                f"Failed at iteration {start}, failure_interval {failure_interval}"
+                f"Failed at iteration {i}, failure_interval {failure_interval}"
             )
         # save progress state. It is also entirely possible save state every few intervals.
         cp.write(f"{i + 1}".encode())
