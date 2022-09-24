@@ -71,8 +71,8 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.1.11 // indirect
-	github.com/flyteorg/flyteplugins v1.0.10 // indirect
+	github.com/flyteorg/flyteidl v1.1.17 // indirect
+	github.com/flyteorg/flyteplugins v1.0.13 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -218,4 +218,8 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+replace (
+	github.com/flyteorg/flyteadmin => /Users/andrew/dev/flyteorg/flyteadmin
+	github.com/flyteorg/flytepropeller => /Users/andrew/dev/forks/flytepropeller
+	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+)
