@@ -13,7 +13,7 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: compile
 compile:
-	go version && go build -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
+	go build -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
 
 .PHONY: linux_compile
 linux_compile:
