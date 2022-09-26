@@ -2,32 +2,32 @@
 Deploying Workflows - Registration
 -----------------------------------
 
-Locally, Flytekit relies on the Python interpreter to execute both tasks and workflows.
+Locally, Flytekit relies on the Python interpreter to execute tasks and workflows.
 To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
-on any Kubernetes cluster (e.g. a local cluster like `kind <https://kind.sigs.k8s.io/>`__), in a cloud environment,
-or on-prem. This process of deploying your workflows to a Flyte cluster is called as Registration. It involves the
-following steps,
+on any Kubernetes cluster (for example, a local cluster like `kind <https://kind.sigs.k8s.io/>`__), in a cloud environment,
+or on-prem. This process of deploying your workflows to a Flyte cluster is known as **registration**. It involves the
+following steps:
 
-1. Writing code, SQL etc
-2. Providing packaging in the form of Docker images, for code, when needed. Some cases you dont need packaging,
-   because the code itself is portable - example SQL, or the task references a remote service - Sagemaker Builtin
-   algorithms, or the code can be safely transferred over
-3. Alternatively, package with :ref:`deployment-fast-registration`
-4. Register the serialized workflows and tasks
+1. Writing code, SQL etc;
+2. Providing packaging in the form of Docker images for code when needed. In some cases packaging isn't needed,
+   because the code itself is portable- for example SQL, or the task references a remote service - SageMaker Builtin
+   algorithms, or the code can be safely transferred over;
+3. Alternatively, packaging with :ref:`deployment-fast-registration`;
+4. Registering the serialized workflows and tasks.
 
-Using remote Flyte gives you the ability to:
+Using remote Flyte provides:
 
-- Use caching to avoid calling the same task with the same inputs (for the same version)
-- Portability: You can reference pre-registered entities under any domain or project within your workflow code
-- Shareable executions: you can easily share links to your executions with your teammates
+- **Caching**: To avoid calling the same task with the same inputs (for the same version);
+- **Portability**: To reference pre-registered entities under any domain or project within your workflow code;
+- **Shareable executions**: To easily share links of your executions with your teammates.
 
-Please refer to the :doc:`Getting Started <flyte:getting_started>` for details on getting started with the Flyte installation.
+Refer to the :ref:`Getting Started <flyte:getting-started>` for details on Flyte installation.
 
 Build Your Dockerfile
 ^^^^^^^^^^^^^^^^^^^^^^
 
-1. First commit your changes. Some of the steps below default to referencing the git sha.
-2. Run `make serialize`. This will build the image tagged with just ``flytecookbook:<sha>``, no registry will be prefixed. See the image building section below for additional information.
+1. Commit your changes. Some of the steps below default to referencing the git sha.
+2. Run ``pyflyte register``. This :doc:`command <flytekit:pyflyte-register>` compiles all Flyte entities and sends it to the backend as specified by your config file.
 3. Build a container image that holds your code.
 
 .. code-block:: docker
@@ -71,66 +71,61 @@ Build Your Dockerfile
    ENV FLYTE_INTERNAL_IMAGE $tag
 
 .. note::
-   ``core`` is the directory being considered in the above Dockerfile.
+   In the above Dockerfile, ``core`` directory is considered.
 
-Serialize Your Workflows and Tasks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Getting your tasks, workflows, and launch plans to run on a Flyte platform is effectively a two-step process.  Serialization is the first step of that process. It is the translation of all your Flyte entities defined in Python, into Flyte IDL entities, defined in protobuf.
+Package Your Workflows and Tasks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Getting your tasks, workflows, and launch plans to run on a Flyte platform is a two-step process. **Serialization** is the first step of that process.
+It produces registerable protobuf files for your tasks and templates. For every task, one protobuf file is produced which represents one TaskTemplate object.
+For every workflow, one protofbuf file is produced which represents a WorkflowClosure object.
+The second step is to compress the folder into a zip file.
+Once you've built a Docker container image with your updated code changes, you can use the ``pyflyte package`` command to complete both the steps, that is:
 
-Once you've built a Docker container image with your updated code changes, you can use the predefined make target to easily serialize your tasks:
-
-.. code-block::
-
-   make serialize
-
-This runs the `pyflyte serialize` command to convert your workflow and task definitions to registerable protos.
-The make target is a handy wrapper around the following:
+1. Serialize your tasks;
+2. Compress the folder to a zip file.
 
 .. code-block::
 
-   pyflyte -c sandbox.config --pkgs core serialize --in-container-config-path /root/sandbox.config --local-source-root ${CURDIR} --image ${FULL_IMAGE_NAME}:${VERSION} workflows -f _pb_output/
+   pyflyte --pkgs <parent-package>.<child-package-with-the-workflow> package --image somedocker.com/myimage:someversion123
 
-- the :code:`-c` is the path to the config definition on your machine. This config specifies SDK default attributes.
-- the :code:`--pkgs` arg points to the packages within the
-- :code:`--local-source-root` which contains the code copied over into your Docker container image that will be serialized (and later, executed)
-- :code:`--in-container-config-path` maps to the location within your Docker container image where the above config file will be copied over too
-- :code:`--image` is the non-optional fully qualified name of the container image housing your code
+where
 
-In-Container Serialization
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+- :code:`--pkgs` arg points to the packages within the directory.
+- :code:`--image` is a non-optional fully qualified name of the container image housing your code.
 
-Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigorous, serialization should be done within the container for the following reasons.
-
-1. It ensures that the versions of all libraries used at execution time on the Flyte platform, are the same that are used during serialization.
-2. Since serialization runs part of flytekit, it helps ensure that your container is set up correctly.
-
-Take a look at this make target to see how it's done.
-
-.. code-block::
-
-   make serialize
 
 Register Your Workflows and Tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Once you've serialized your workflows and tasks to proto, you'll need to register them with your deployed Flyte installation.
-Again, you can make use of the included make target like so:
+Once you've packaged your workflows and tasks to proto, you'll need to register them with your deployed Flyte installation.
+You can register your workflows and tasks using ``pyflyte register`` command. This command ``fast regsisters`` by default.
+It compiles all your Flyte entities defined in Python, and sends these entities to the backend specified by your config file.
+It can be understood as combination of ``pyflyte package`` and ``flytectl register`` commands.
 
 .. code-block::
 
-   OUTPUT_DATA_PREFIX=s3://my-s3-bucket/raw_data FLYTE_HOST=flyte.example.com make register
+   pyflyte register -p project_name -d domain_name -i xyz.io/docker:latest -o output_directory -d tar_file_directory --service-account account_name --raw-data-prefix offloaded_data_location -v version
 
-making sure to appropriately substitute the correct output data location (to persist workflow execution outputs) along
-with the URL to your hosted Flyte deployment.
+where
 
-Under the hood this recipe again supplies some defaults you may find yourself wishing to customize. Specifically, this recipe calls:
+- :code:`-p` specifies the project to register your entities. This project itself must already be registered on your Flyte deployment.s
+- :code:`-d` specifies the domain to register your entities. This domain must already be configured in your Flyte deployment.
+- :code:`-i` specifies the fully qualified tag for a docker image. It is optional, and if not specified, the default image is used.
+- :code:`-o` specifies the directory where the zip file (containing protobuf definitions) is written to.
+- :code:`-d` specifies the directory inside the image where the tar file (containing the code) is copied to.
+- :code:``-service-account`` specifies the account used when creating launch plans. It is optional.
+- :code:`-v` is a unique string that identifies the version of your entities to be registered under a project and domain.
+
+Let us also understand how the combination of the ``pyflyte package`` and ``flytectl register`` commands works.
 
 .. code-block::
 
-   flytectl register files _pb_output/* -p flytetester -d development --version ${VERSION}  \
-       --k8sServiceAccount demo --outputLocationPrefix s3://my-s3-bucket/raw_data
+   pyflyte --pkgs <parent-package>.<child-package-with-the-workflow> package --image somedocker.com/myimage:someversion123
 
+.. code-block::
 
-Of interest are the following args:
+   flytectl register files _pb_output/* -p flytetester -d development --version ${VERSION}  --k8sServiceAccount demo --outputLocationPrefix s3://my-s3-bucket/raw_data --config path/to/config/yaml
+
+where
 
 - :code:`-p` specifies the project to register your entities. This project itself must already be registered on your Flyte deployment.
 - :code:`-d` specifies the domain to register your entities. This domain must already be configured in your Flyte deployment
@@ -140,7 +135,7 @@ Of interest are the following args:
 
 Fast Registration
 ^^^^^^^^^^^^^^^^^^
-Re-building a new Docker container image for every code change you make can become cumbersome and slow.
+Re-building a new Docker container image for every code change you make is cumbersome and slow.
 If you're making purely code changes that **do not** require updating your container definition, you can make use of
 fast serialization and registration to speed up your iteration process and reduce the time it takes to upload new entity
 versions and development code to your hosted Flyte deployment.
@@ -151,13 +146,18 @@ First, run the fast serialization target:
 
    pyflyte --pkgs core package --image core:v1 --fast --force
 
-And then the fast register target:
+where
+
+- ``--fast`` flag enables fast packaging, that is, it allows a no container build to deploy flyte tasks and workflows.
+- ``--force`` flag helps override existing output files. If an output file exists, the package exits with an error.
+
+Next, use ``pyflyte register`` which fast registers the target:
 
 .. code-block::
 
-   OUTPUT_DATA_PREFIX=s3://my-s3-bucket/raw_data FLYTE_HOST=flyte.example.com ADDL_DISTRIBUTION_DIR=s3://my-s3-bucket/archives make register
+   pyflyte register -p project_name -d domain_name --output s3://my-s3-bucket/raw_data
 
-and just like that you can update your code without requiring a rebuild of your container!
+And just like that, you can update your code without requiring a rebuild of your container!
 
 As fast registration serializes code from your local workstation and uploads it to the hosted flyte deployment, make sure to specify the following arguments correctly to ensure that the changes are picked up when the workflow is run.
 
@@ -167,9 +167,9 @@ As fast registration serializes code from your local workstation and uploads it 
 
 Building Images
 ^^^^^^^^^^^^^^^
-If you are iterating locally, you don't need to push your Docker image. For Docker Desktop, locally built images will be available for use in its K8s cluster.
+If you are iterating locally, you don't need to push your Docker image. For Docker Desktop, locally built images are available for use in its K8s cluster.
 
-If you wish to later push your image to a registry (Dockerhub, ECR, etc.), run:
+If you wish to push your image to a registry (Dockerhub, ECR, etc.) later, run:
 
 
 .. code-block::
