@@ -22,67 +22,63 @@ Before you begin, please ensure that you have the following tools installed.
 
 AWS Permissioning
 =================
-Start off by creating a series of roles. These roles control Flyte's access to the AWS account. Since this is a setup guide, we'll be making liberal use of the default policies that AWS IAM comes with, which may be too broad - please consult with your infrastructure team if necessary.
+Create a series of roles. These roles control Flyte's access to the AWS account. Since this is a setup guide, you can use the default policies that AWS IAM comes with. If this is too broad, you can consult with your infrastructure team.
 
 EKS Cluster Role
 ----------------
-First create a role for the EKS cluster. This is the role that the Kubernetes platform itself will use to monitor, scale, and create ASGs, run the etcd store, and the K8s API server, etc.
+Create a role for the EKS cluster. This is the role that the Kubernetes platform will use to monitor, scale, and create ASGs, run the etcd store, and the K8s API server, etc.
 
 * Navigate to your AWS console and choose the IAM Roles page.
-* Under the EKS service, select EKS-Cluster.
+* Under the EKS service, select ``EKS-Cluster``.
 * Ensure that the ``AmazonEKSClusterPolicy`` is selected.
 * Create this role without any permission boundary. Advanced users can try to restrict the permissions for their usecases.
 * Choose any tags that would help in you tracking this role based on your devops rules.
-* Choose a good name for your cluster role which is easier to search eg: <ClusterName-EKS-Cluster-Role>.
+* Choose a name for your cluster role which is easier to search, for example: <ClusterName-EKS-Cluster-Role>.
 
-Refer the following AWS docs for the details:
-https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
+Refer to the `AWS docs <https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role>`__ for details.
+
 
 EKS Node IAM Role
 -----------------
-Next create a role for your compute nodes to use. This is the role that will be given to the nodes that actually run user pods (including Flyte pods).
+Create a role that your compute nodes use. This is the role given to the nodes that actually run the user pods (including Flyte pods).
 
 * Navigate to your AWS console and choose IAM role service.
 * Choose EC2 as service while choosing the use case.
-* Choose the following policies as mentioned in the linked AWS doc:
+* Choose the following policies as mentioned in this `AWS doc <https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html>`__:
 
-  * AmazonEKSWorkerNodePolicy allows EKS nodes to connect to EKS clusters.
-  * AmazonEC2ContainerRegistryReadOnly if using Amazon ECR for container registry.
-  * AmazonEKS_CNI_Policy which allows pod and node networking within your VPC. You need this even though it is marked
-    as optional in the AWS guide linked below.
+  * ``AmazonEKSWorkerNodePolicy`` that allows EKS nodes to connect to EKS clusters.
+  * ``AmazonEC2ContainerRegistryReadOnly`` if using Amazon ECR for container registry.
+  * ``AmazonEKS_CNI_Policy`` that allows pod and node networking within your VPC. This is required even though it is marked as optional in the AWS guide.
 
-* Create this role without any permission boundary. Advanced users can try to restrict the permissions for their usecases.
-* Choose any tags that would help in you tracking this role based on your devops rules.
-* Choose a good name for your node role which is easier to search eg: <ClusterName-EKS-Node-Role>.
-
-Refer the following AWS docs for the details:
-https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html
+* Create this role without any permission boundary. Advanced users can try to restrict the permissions for their use cases.
+* Choose any tags that would help you in tracking this role based on your DevOps rules.
+* Choose a name for your node role which is easier to search, for example: <ClusterName-EKS-Node-Role>.
 
 Flyte System Role
 -----------------
-Next create a role for the Flyte platform. When pods run, they shouldn't run with the node role created above; they should assume a separate role with permissions suitable for that pod's containers. This role will be used for Flyte's own API servers and associated agents.
+Create a role for the Flyte platform. When pods run, they shouldn't run with the node role created above; they should assume a separate role with permissions suitable for that pod's containers. This role will be used for Flyte's own API servers and associated agents.
 
-Create a role ``iam-role-flyte`` from the IAM console. Select "AWS service" again for the type, and EC2 for the use case.
-Attach the ``AmazonS3FullAccess`` policy for now. S3 access can be tweaked later to narrow down the scope.
+Create a role ``iam-role-flyte`` from the IAM console. Select "AWS service" for the type, and EC2 for the use case.
+Add the ``AmazonS3FullAccess`` policy. S3 access can be tweaked later to narrow down the scope.
 
 Flyte User Role
 ----------------
-Finally create a role for Flyte users.  This is the role that user pods will end up assuming when Flyte kicks them off.
+Lastly, create a role for Flyte users.  This is the role that user pods will assume when Flyte kicks them off.
 
-Create a role ``flyte-user-role`` from the IAM console. Select "AWS service" again for the type, and EC2 for the use case. Also add the ``AmazonS3FullAccess`` policy for now.
+Create a role ``flyte-user-role`` from the IAM console. Select "AWS service" for the type, and EC2 for the use case. Add the ``AmazonS3FullAccess`` policy .
 
 Create an EKS Cluster
 =====================
 Create an EKS cluster from the AWS console:
 
-* Pick a good name for your cluster eg : <Name-EKS-Cluster>
+* Pick a name for your cluster, for example: <Name-EKS-Cluster>
 * Pick Kubernetes version >= 1.19
 * Choose the EKS cluster role <ClusterName-EKS-Cluster-Role>, created in previous steps.
-* Keep secrets encryption off.
-* Use the same VPC where you intend to deploy your RDS instance. Keep the default VPC if none were created and choose RDS to use the default as well.
+* Keep the secrets encryption off.
+* Use the same VPC that you intend to deploy your RDS instance. Keep the default VPC if none were created and choose RDS to use the default as well.
 * Use the subnets for all supported AZ's in that VPC.
-* Choose the security group to use for this cluster and the RDS instance (use default if using default VPC).
-* Provide public access to your cluster, or otherwise according to your devops settings.
+* Choose the security group to be used for this cluster and the RDS instance (use default if you use default VPC).
+* Provide public access to your cluster, or based on your DevOps settings.
 * Choose default version of the network add-ons.
 * You can choose to enable the control plane logging to CloudWatch.
 
@@ -96,20 +92,20 @@ Connect to an EKS Cluster
        export AWS_SECRET_ACCESS_KEY=<YOUR-AWS-SECRET-ACCESS-KEY>
        export AWS_SESSION_TOKEN=<YOUR-AWS-SESSION-TOKEN>
 
-* Switch to the EKS cluster context <Name-EKS-Cluster>
+* Switch to the EKS cluster context <Name-EKS-Cluster>:
 
   .. code-block::
 
      aws eks update-kubeconfig --name <Name-EKS-Cluster> --region <region>
 
-* Verify the context is switched
+* Verify the context is switched:
 
 .. code-block:: bash
 
    $ kubectl config current-context
    arn:aws:eks:<region>:<AWS_ACCOUNT_ID>:cluster/<Name-EKS-Cluster>
 
-* Test it with ``kubectl``. It should tell you there aren't any resources.
+* Test it with ``kubectl``. It should tell you there aren't any resources:
 
 .. code-block::
 
@@ -120,7 +116,7 @@ OIDC Provider for the EKS Cluster
 =================================
 Create the OIDC provider to be used for the EKS cluster and associate a trust relationship with the EKS cluster role <ClusterName-EKS-Cluster-Role>:
 
-* EKS cluster created should have a URL created and hence the following command would return the provider
+* EKS cluster created should have a URL created and hence the following command would return the provider:
 
 .. code-block::
 
@@ -138,9 +134,9 @@ Example output:
 
   eksctl utils associate-iam-oidc-provider --cluster <Name-EKS-Cluster> --approve
 
-Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) for additional reference.
+Follow this `AWS documentation <https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html>`__ for your reference.
 
-* Verify the OIDC provider is created by navigating to https://console.aws.amazon.com/iamv2/home?#/identity_providers and confirming that a new provider entry has been created with the same <UUID-OIDC> issuer as the cluster's.
+* Verify that the OIDC provider is created by navigating to https://console.aws.amazon.com/iamv2/home?#/identity_providers and confirming that a new provider entry has been created with the same <UUID-OIDC> issuer as the cluster's.
 
 * Next we need to add a trust relationship between this OIDC provider and the two Flyte roles:
    * Navigate to the newly created `OIDC Providers <https://console.aws.amazon.com/iamv2/home?#/identity_providers>`__ with <UUID-OIDC> and copy the ARN.
@@ -183,12 +179,12 @@ Create an EKS Node Group
 
 The initial EKS cluster will not have any instances configured to operate the cluster. Create a node group which provides resources for the kubernetes cluster:
 
-* Go to your EKS cluster navigate to the Configuration -> Compute tab.
-* Provide a suitable name <Name-EKS-Node-Group>
+* Navigate to your EKS cluster, that is, Configuration -> Compute tab.
+* Provide a suitable name <Name-EKS-Node-Group>.
 * Use the EKS node IAM role <ClusterName-EKS-Node-Role> created in the above steps.
 * Use without any launch template, kuebernetes labels,taints or tags.
 * Choose the default Amazon EC2 AMI (AL2_x86_64).
-* Capacity type on demand, Instance type and size can be chosen based on your devops requirements. Keep the default if in doubt.
+* Capacity type on demand, Instance type and size can be chosen based on your DevOps requirements. Keep the default if in doubt.
 * Create a node group with 5/10/5 instance min, max, desired.
 * Use the default subnets selected which would be chosen based on your EKS cluster accessible subnets.
 * Disallow remote access to the nodes (If needed provide the ssh access key pair to use from your account).
@@ -201,7 +197,7 @@ Next, create a relational database. This database will be used by both the prima
 * Leave the Template as Production.
 * Change the default cluster identifier to ``flyteadmin``.
 * Set the master username to ``flyteadmin``.
-* Choose a master password which you'll later use in your Helm template.
+* Choose a master password which you can later use in your Helm template.
 
   * `Password <https://github.com/flyteorg/flyte/blob/3600badd2ad49ec2cd1f62752780f201212de3f3/helm/values-eks.yaml#L196>`_
 
@@ -211,7 +207,7 @@ Next, create a relational database. This database will be used by both the prima
 * Go back to the RDS page and in the security group section, add the EKS cluster's security group (feel free to leave the default as well). This will ensure you don't have to play around with security group rules in order for pods running in the cluster to access the RDS instance.
 * Under the top level Additional configuration (there's a sub menu by the same name) under "Initial database name" enter ``flyteadmin`` as well.
 
-Leave all the other settings as is and hit Create.
+Leave all the other settings as is and hit ``Create``.
 
 Check Connectivity to the RDS Database From the EKS Cluster
 ===========================================================
@@ -253,7 +249,7 @@ Before we begin, make sure all the subnets are tagged correctly for subnet disco
 * Add 2 tags on all the three subnets
   Key kubernetes.io/role/elb Value 1
   Key kubernetes.io/cluster/<Name-EKS-Cluster> Value shared
-* Refer to this doc for additional details https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/deploy/subnet_discovery/
+* Refer to `this <https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/deploy/subnet_discovery/>`__ document for additional details.
 
 * Download the IAM policy for the AWS Load Balancer Controller:
 
@@ -323,16 +319,13 @@ Sample o/p
    aws-load-balancer-controller-674869f987-tpwvn   1/1     Running   0          11s
 
 
-* Use this doc for any additional installation instructions: 
-  https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/installation/
+* Use `this <https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/installation/>`__ document for any additional installation instructions.
 
 
 SSL Certificate
 ===============
-In order to use SSL (which we need to use gRPC clients), we now need to create an SSL certificate. We realize that
-you may need to work with your infrastructure team to acquire a legitimate certificate, so the first set of instructions
-help you get going with a self-signed certificate. These are of course not secure and will show up as a security warning
-to any users, so we recommend deploying a legitimate certificate as soon as possible.
+To use SSL (needed to use gRPC clients), you need to create an SSL certificate. To acquire a legitimate certificate, you will need to work with your infrastructure team. These are not secure and will show up as a security warning
+to any users, so it is recommended that you deploy a legitimate certificate.
 
 Self-Signed Method (Insecure)
 -----------------------------
@@ -341,26 +334,26 @@ Generate a self signed cert using open ssl and get the <KEY> and <CRT> file.
 
 #. Define req.conf file with the following contents.
 
-  .. code-block::
+   .. code-block::
 
-       [req]
-       distinguished_name = req_distinguished_name
-       x509_extensions = v3_req
-       prompt = no
-       [req_distinguished_name]
-       C = US
-       ST = WA
-       L = Seattle
-       O = Flyte
-       OU = IT
-       CN = flyte.example.org
-       emailAddress = dummyuser@flyte.org
-       [v3_req]
-       keyUsage = keyEncipherment, dataEncipherment
-       extendedKeyUsage = serverAuth
-       subjectAltName = @alt_names
-       [alt_names]
-       DNS.1 = flyte.example.org
+      [req]
+      distinguished_name = req_distinguished_name
+      x509_extensions = v3_req
+      prompt = no
+      [req_distinguished_name]
+      C = US
+      ST = WA
+      L = Seattle
+      O = Flyte
+      OU = IT
+      CN = flyte.example.org
+      emailAddress = dummyuser@flyte.org
+      [v3_req]
+      keyUsage = keyEncipherment, dataEncipherment
+      extendedKeyUsage = serverAuth
+      subjectAltName = @alt_names
+      [alt_names]
+      DNS.1 = flyte.example.org
 
 #. Use openssl to generate the KEY and CRT files.
 
@@ -380,9 +373,7 @@ Production
 Generate a cert from the CA used by your org and get the <KEY> and <CRT>.
 Flyte doesn't manage the lifecycle of certificates so this will need to be managed by your security or infrastructure team.
 
-Please refer to:
-AWS docs for importing the cert https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-prerequisites.html
-Requesting a public cert issued by ACM Private CA https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html#request-public-console
+Refer to `AWS docs <https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-prerequisites.html>`__ to import the cert. You can also `request <https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html#request-public-console>`__ a public cert issued by ACM Private CA
 
 Note the generated ARN. Let's calls it <CERT-ARN> in this doc which we will use to replace in our values-eks.yaml
 
@@ -392,14 +383,17 @@ Use the AWS Certificate manager for generating the SSL certificate to host your 
 Create an S3 Bucket
 ===================
 * Create an S3 bucket without public access.
-* Choose a good name for it  <ClusterName-Bucket>
+* Choose a name for it, for example: <ClusterName-Bucket>
 * Use the same region as the EKS cluster.
 
 
 Create a Log Group
 ==================
 Navigate to the `AWS Cloudwatch <https://console.aws.amazon.com/cloudwatch/home>`__ page and create a Log Group.
-Give it a reasonable name like ``flyteplatform``.
+Give it a name like ``flyteplatform``.
+
+.. note::
+   Pushing logs to CloudWatch logs is native to K8s. You need to use a `K8s agent <https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-EKS-logs.html>`__ to push logs.
 
 Time for Helm
 =============

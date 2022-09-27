@@ -17,6 +17,7 @@ compile:
 	docker cp flyteconsole:/app/dist cmd/single
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
 	docker rm -f flyteconsole
+	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
 linux_compile:
