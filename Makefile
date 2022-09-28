@@ -15,7 +15,7 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 compile:
 	docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release
 	docker cp flyteconsole:/app/dist cmd/single
-	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyte ${GOPATH}/bin
+	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
 	docker rm -f flyteconsole
 	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
