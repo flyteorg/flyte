@@ -65,7 +65,7 @@ func TestEndToEnd(t *testing.T) {
 func newFakeSnowflakeServer() *httptest.Server {
 	statementHandle := "019e7546-0000-278c-0000-40f10001a082"
 	return httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path == "/api/statements" && request.Method == "POST" {
+		if request.URL.Path == "/api/v2/statements" && request.Method == "POST" {
 			writer.WriteHeader(202)
 			bytes := []byte(fmt.Sprintf(`{
 			  "statementHandle": "%v",
@@ -75,7 +75,7 @@ func newFakeSnowflakeServer() *httptest.Server {
 			return
 		}
 
-		if request.URL.Path == "/api/statements/"+statementHandle && request.Method == "GET" {
+		if request.URL.Path == "/api/v2/statements/"+statementHandle && request.Method == "GET" {
 			writer.WriteHeader(200)
 			bytes := []byte(fmt.Sprintf(`{
 			  "statementHandle": "%v",
@@ -85,7 +85,7 @@ func newFakeSnowflakeServer() *httptest.Server {
 			return
 		}
 
-		if request.URL.Path == "/api/statements/"+statementHandle+"/cancel" && request.Method == "POST" {
+		if request.URL.Path == "/api/v2/statements/"+statementHandle+"/cancel" && request.Method == "POST" {
 			writer.WriteHeader(200)
 			return
 		}
