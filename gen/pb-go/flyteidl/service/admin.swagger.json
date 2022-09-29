@@ -1602,6 +1602,119 @@
         ]
       }
     },
+    "/api/v1/project_attributes/{attributes.project}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
+        "description": "Update the customized resource attributes associated with a project",
+        "operationId": "UpdateProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_attributes/{project}": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Retrieve the customized resource attributes associated with a project",
+        "operationId": "GetProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Delete the customized resource attributes associated with a project",
+        "operationId": "DeleteProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
@@ -4319,13 +4432,67 @@
         },
         "labels": {
           "$ref": "#/definitions/adminLabels",
-          "description": "Leverage Labels from flyteidel.admin.common.proto to\ntag projects with ownership information."
+          "description": "Leverage Labels from flyteidl.admin.common.proto to\ntag projects with ownership information."
         },
         "state": {
           "$ref": "#/definitions/ProjectProjectState"
         }
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."
+    },
+    "adminProjectAttributes": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id for which this set of attributes will be applied."
+        },
+        "matching_attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
+        }
+      },
+      "title": "Defines a set of custom matching attributes at the project level.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminProjectAttributesDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "title": "Unique project id which this set of attributes references.\n+required"
+        },
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource",
+          "title": "Which type of matchable attributes to delete.\n+required"
+        }
+      },
+      "title": "Request to delete a set matchable project level attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminProjectAttributesDeleteResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
+    "adminProjectAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectAttributes"
+        }
+      },
+      "title": "Response to get an individual project level attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminProjectAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectAttributes",
+          "title": "+required"
+        }
+      },
+      "title": "Sets custom attributes for a project\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminProjectAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminProjectDomainAttributes": {
       "type": "object",

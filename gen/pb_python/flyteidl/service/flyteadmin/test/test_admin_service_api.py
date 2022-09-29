@@ -78,6 +78,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_project_attributes(self):
+        """Test case for delete_project_attributes
+
+        Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
     def test_delete_project_domain_attributes(self):
         """Test case for delete_project_domain_attributes
 
@@ -138,6 +145,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """Test case for get_node_execution_data
 
         Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
+        """
+        pass
+
+    def test_get_project_attributes(self):
+        """Test case for get_project_attributes
+
+        Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
         """
         pass
 
@@ -361,6 +375,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """Test case for update_project
 
         Updates an existing :ref:`ref_flyteidl.admin.Project`  flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
+        """
+        pass
+
+    def test_update_project_attributes(self):
+        """Test case for update_project_attributes
+
+        Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
         """
         pass
 

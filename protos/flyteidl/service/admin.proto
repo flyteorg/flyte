@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
 import "google/api/annotations.proto";
 import "flyteidl/admin/project.proto";
 import "flyteidl/admin/project_domain_attributes.proto";
+import "flyteidl/admin/project_attributes.proto";
 import "flyteidl/admin/task.proto";
 import "flyteidl/admin/workflow.proto";
 import "flyteidl/admin/workflow_attributes.proto";
@@ -489,6 +490,37 @@ service AdminService {
     };
   }
 
+  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level
+  rpc UpdateProjectAttributes (flyteidl.admin.ProjectAttributesUpdateRequest) returns (flyteidl.admin.ProjectAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/project_attributes/{attributes.project}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the customized resource attributes associated with a project"
+    };
+  }
+
+  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/project_attributes/{project}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve the customized resource attributes associated with a project"
+    };
+  }
+
+  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc DeleteProjectAttributes (flyteidl.admin.ProjectAttributesDeleteRequest) returns (flyteidl.admin.ProjectAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_attributes/{project}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Delete the customized resource attributes associated with a project"
+    };
+  }
   // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
   rpc UpdateWorkflowAttributes (flyteidl.admin.WorkflowAttributesUpdateRequest) returns (flyteidl.admin.WorkflowAttributesUpdateResponse) {
     option (google.api.http) = {
