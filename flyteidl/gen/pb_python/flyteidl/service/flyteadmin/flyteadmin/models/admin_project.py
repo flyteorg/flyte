@@ -168,7 +168,7 @@ class AdminProject(object):
     def labels(self):
         """Gets the labels of this AdminProject.  # noqa: E501
 
-        Leverage Labels from flyteidel.admin.common.proto to tag projects with ownership information.  # noqa: E501
+        Leverage Labels from flyteidl.admin.common.proto to tag projects with ownership information.  # noqa: E501
 
         :return: The labels of this AdminProject.  # noqa: E501
         :rtype: AdminLabels
@@ -179,7 +179,7 @@ class AdminProject(object):
     def labels(self, labels):
         """Sets the labels of this AdminProject.
 
-        Leverage Labels from flyteidel.admin.common.proto to tag projects with ownership information.  # noqa: E501
+        Leverage Labels from flyteidl.admin.common.proto to tag projects with ownership information.  # noqa: E501
 
         :param labels: The labels of this AdminProject.  # noqa: E501
         :type: AdminLabels

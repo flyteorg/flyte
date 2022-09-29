@@ -1413,6 +1413,108 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionList"
+  /api/v1/project_attributes/{attributes.project}:
+    put:
+      tags:
+      - "AdminService"
+      summary: "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ at the project level"
+      description: "Update the customized resource attributes associated with a project"
+      operationId: "UpdateProjectAttributes"
+      parameters:
+      - name: "attributes.project"
+        in: "path"
+        description: "Unique project id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesProject"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectAttributesUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesUpdateResponse"
+  /api/v1/project_attributes/{project}:
+    get:
+      tags:
+      - "AdminService"
+      summary: "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project and domain."
+      description: "Retrieve the customized resource attributes associated with a\
+        \ project"
+      operationId: "GetProjectAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "resource_type"
+        in: "query"
+        description: "Which type of matchable attributes to return.\n+required.\n\n\
+          \ - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n\
+          \ - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster\
+          \ resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution\
+          \ queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster\
+          \ label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+          \ Configures default quality of service when undefined in an execution spec.\n\
+          \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
+          \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
+          \ customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT:\
+          \ Controls how to select an available cluster on which this execution should\
+          \ run."
+        required: false
+        type: "string"
+        default: "TASK_RESOURCE"
+        enum:
+        - "TASK_RESOURCE"
+        - "CLUSTER_RESOURCE"
+        - "EXECUTION_QUEUE"
+        - "EXECUTION_CLUSTER_LABEL"
+        - "QUALITY_OF_SERVICE_SPECIFICATION"
+        - "PLUGIN_OVERRIDE"
+        - "WORKFLOW_EXECUTION_CONFIG"
+        - "CLUSTER_ASSIGNMENT"
+        x-exportParamName: "ResourceType"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesGetResponse"
+    delete:
+      tags:
+      - "AdminService"
+      summary: "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`\
+        \ for a project and domain."
+      description: "Delete the customized resource attributes associated with a project"
+      operationId: "DeleteProjectAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectAttributesDeleteRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesDeleteResponse"
   /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:
     put:
       tags:
@@ -13726,7 +13828,7 @@ definitions:
       description:
         type: "string"
       labels:
-        description: "Leverage Labels from flyteidel.admin.common.proto to\ntag projects\
+        description: "Leverage Labels from flyteidl.admin.common.proto to\ntag projects\
           \ with ownership information."
         $ref: "#/definitions/adminLabels"
       state:
@@ -13746,6 +13848,289 @@ definitions:
       labels:
         values:
           key: "values"
+  adminProjectAttributes:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id for which this set of attributes will be applied."
+      matching_attributes:
+        $ref: "#/definitions/adminMatchingAttributes"
+    title: "Defines a set of custom matching attributes at the project level.\nFor\
+      \ more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    example:
+      project: "project"
+      matching_attributes:
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
+        workflow_execution_config:
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
+          max_parallelism: 0
+          annotations:
+            values:
+              key: "values"
+          interruptible: true
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  group_version: "group_version"
+                  key: "key"
+                  group: "group"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+            - mount_requirement: {}
+              group_version: "group_version"
+              key: "key"
+              group: "group"
+          labels:
+            values:
+              key: "values"
+        cluster_assignment:
+          toleration:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+          affinity:
+            selectors:
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+            - value:
+              - "value"
+              - "value"
+              key: "key"
+              operator: {}
+        cluster_resource_attributes:
+          attributes:
+            key: "attributes"
+        execution_queue_attributes:
+          tags:
+          - "tags"
+          - "tags"
+        task_resource_attributes:
+          defaults:
+            memory: "memory"
+            cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
+            storage: "storage"
+            gpu: "gpu"
+          limits:
+            memory: "memory"
+            cpu: "cpu"
+            ephemeral_storage: "ephemeral_storage"
+            storage: "storage"
+            gpu: "gpu"
+        execution_cluster_label:
+          value: "value"
+        plugin_overrides:
+          overrides:
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
+  adminProjectAttributesDeleteRequest:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        title: "Unique project id which this set of attributes references.\n+required"
+      resource_type:
+        title: "Which type of matchable attributes to delete.\n+required"
+        $ref: "#/definitions/adminMatchableResource"
+    title: "Request to delete a set matchable project level attribute override.\n\
+      For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+  adminProjectAttributesDeleteResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
+  adminProjectAttributesGetResponse:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminProjectAttributes"
+    title: "Response to get an individual project level attribute override.\nFor more\
+      \ info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    example:
+      attributes:
+        project: "project"
+        matching_attributes:
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
+          workflow_execution_config:
+            raw_output_data_config:
+              output_location_prefix: "output_location_prefix"
+            max_parallelism: 0
+            annotations:
+              values:
+                key: "values"
+            interruptible: true
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    group_version: "group_version"
+                    key: "key"
+                    group: "group"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+              - mount_requirement: {}
+                group_version: "group_version"
+                key: "key"
+                group: "group"
+            labels:
+              values:
+                key: "values"
+          cluster_assignment:
+            toleration:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+            affinity:
+              selectors:
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+              - value:
+                - "value"
+                - "value"
+                key: "key"
+                operator: {}
+          cluster_resource_attributes:
+            attributes:
+              key: "attributes"
+          execution_queue_attributes:
+            tags:
+            - "tags"
+            - "tags"
+          task_resource_attributes:
+            defaults:
+              memory: "memory"
+              cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
+              storage: "storage"
+              gpu: "gpu"
+            limits:
+              memory: "memory"
+              cpu: "cpu"
+              ephemeral_storage: "ephemeral_storage"
+              storage: "storage"
+              gpu: "gpu"
+          execution_cluster_label:
+            value: "value"
+          plugin_overrides:
+            overrides:
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+  adminProjectAttributesUpdateRequest:
+    type: "object"
+    properties:
+      attributes:
+        title: "+required"
+        $ref: "#/definitions/adminProjectAttributes"
+    title: "Sets custom attributes for a project\nFor more info on matchable attributes,\
+      \ see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+  adminProjectAttributesUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   adminProjectDomainAttributes:
     type: "object"
     properties:

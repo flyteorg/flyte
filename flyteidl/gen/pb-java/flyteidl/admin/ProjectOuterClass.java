@@ -858,7 +858,7 @@ public final class ProjectOuterClass {
 
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -867,7 +867,7 @@ public final class ProjectOuterClass {
     boolean hasLabels();
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -876,7 +876,7 @@ public final class ProjectOuterClass {
     flyteidl.admin.Common.Labels getLabels();
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -1315,7 +1315,7 @@ public final class ProjectOuterClass {
     private flyteidl.admin.Common.Labels labels_;
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -1326,7 +1326,7 @@ public final class ProjectOuterClass {
     }
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -1337,7 +1337,7 @@ public final class ProjectOuterClass {
     }
     /**
      * <pre>
-     * Leverage Labels from flyteidel.admin.common.proto to
+     * Leverage Labels from flyteidl.admin.common.proto to
      * tag projects with ownership information.
      * </pre>
      *
@@ -2301,7 +2301,7 @@ public final class ProjectOuterClass {
           flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> labelsBuilder_;
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2312,7 +2312,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2327,7 +2327,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2348,7 +2348,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2367,7 +2367,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2390,7 +2390,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2409,7 +2409,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2422,7 +2422,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
@@ -2438,7 +2438,7 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Leverage Labels from flyteidel.admin.common.proto to
+       * Leverage Labels from flyteidl.admin.common.proto to
        * tag projects with ownership information.
        * </pre>
        *
