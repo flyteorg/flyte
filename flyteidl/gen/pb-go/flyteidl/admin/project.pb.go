@@ -111,7 +111,7 @@ type Project struct {
 	Name        string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Domains     []*Domain `protobuf:"bytes,3,rep,name=domains,proto3" json:"domains,omitempty"`
 	Description string    `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	// Leverage Labels from flyteidel.admin.common.proto to
+	// Leverage Labels from flyteidl.admin.common.proto to
 	// tag projects with ownership information.
 	Labels               *Labels              `protobuf:"bytes,5,opt,name=labels,proto3" json:"labels,omitempty"`
 	State                Project_ProjectState `protobuf:"varint,6,opt,name=state,proto3,enum=flyteidl.admin.Project_ProjectState" json:"state,omitempty"`

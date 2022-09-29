@@ -29,7 +29,7 @@ message Project {
 
     string description      = 4;
 
-    // Leverage Labels from flyteidel.admin.common.proto to
+    // Leverage Labels from flyteidl.admin.common.proto to
     // tag projects with ownership information.
     Labels labels = 5;
 

@@ -302,6 +302,47 @@ func (_m *AdminServiceServer) CreateWorkflowEvent(_a0 context.Context, _a1 *admi
 	return r0, r1
 }
 
+type AdminServiceServer_DeleteProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_DeleteProjectAttributes) Return(_a0 *admin.ProjectAttributesDeleteResponse, _a1 error) *AdminServiceServer_DeleteProjectAttributes {
+	return &AdminServiceServer_DeleteProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnDeleteProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesDeleteRequest) *AdminServiceServer_DeleteProjectAttributes {
+	c_call := _m.On("DeleteProjectAttributes", _a0, _a1)
+	return &AdminServiceServer_DeleteProjectAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnDeleteProjectAttributesMatch(matchers ...interface{}) *AdminServiceServer_DeleteProjectAttributes {
+	c_call := _m.On("DeleteProjectAttributes", matchers...)
+	return &AdminServiceServer_DeleteProjectAttributes{Call: c_call}
+}
+
+// DeleteProjectAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) DeleteProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ProjectAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesDeleteRequest) *admin.ProjectAttributesDeleteResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesDeleteRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_DeleteProjectDomainAttributes struct {
 	*mock.Call
 }
@@ -663,6 +704,47 @@ func (_m *AdminServiceServer) GetNodeExecutionData(_a0 context.Context, _a1 *adm
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.NodeExecutionGetDataRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_GetProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetProjectAttributes) Return(_a0 *admin.ProjectAttributesGetResponse, _a1 error) *AdminServiceServer_GetProjectAttributes {
+	return &AdminServiceServer_GetProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesGetRequest) *AdminServiceServer_GetProjectAttributes {
+	c_call := _m.On("GetProjectAttributes", _a0, _a1)
+	return &AdminServiceServer_GetProjectAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetProjectAttributesMatch(matchers ...interface{}) *AdminServiceServer_GetProjectAttributes {
+	c_call := _m.On("GetProjectAttributes", matchers...)
+	return &AdminServiceServer_GetProjectAttributes{Call: c_call}
+}
+
+// GetProjectAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ProjectAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesGetRequest) *admin.ProjectAttributesGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesGetRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -1852,6 +1934,47 @@ func (_m *AdminServiceServer) UpdateProject(_a0 context.Context, _a1 *admin.Proj
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.Project) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_UpdateProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateProjectAttributes) Return(_a0 *admin.ProjectAttributesUpdateResponse, _a1 error) *AdminServiceServer_UpdateProjectAttributes {
+	return &AdminServiceServer_UpdateProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesUpdateRequest) *AdminServiceServer_UpdateProjectAttributes {
+	c_call := _m.On("UpdateProjectAttributes", _a0, _a1)
+	return &AdminServiceServer_UpdateProjectAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnUpdateProjectAttributesMatch(matchers ...interface{}) *AdminServiceServer_UpdateProjectAttributes {
+	c_call := _m.On("UpdateProjectAttributes", matchers...)
+	return &AdminServiceServer_UpdateProjectAttributes{Call: c_call}
+}
+
+// UpdateProjectAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateProjectAttributes(_a0 context.Context, _a1 *admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ProjectAttributesUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesUpdateRequest) *admin.ProjectAttributesUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesUpdateRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

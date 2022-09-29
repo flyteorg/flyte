@@ -2610,7 +2610,7 @@ Top-level namespace used to classify different entities like workflows and execu
    "name", ":ref:`ref_string`", "", "Display name."
    "domains", ":ref:`ref_flyteidl.admin.Domain`", "repeated", ""
    "description", ":ref:`ref_string`", "", ""
-   "labels", ":ref:`ref_flyteidl.admin.Labels`", "", "Leverage Labels from flyteidel.admin.common.proto to tag projects with ownership information."
+   "labels", ":ref:`ref_flyteidl.admin.Labels`", "", "Leverage Labels from flyteidl.admin.common.proto to tag projects with ownership information."
    "state", ":ref:`ref_flyteidl.admin.Project.ProjectState`", "", ""
 
 
@@ -2735,6 +2735,173 @@ The state of the project is used to control its visibility in the UI and validit
    "ACTIVE", "0", "By default, all projects are considered active."
    "ARCHIVED", "1", "Archived projects are no longer visible in the UI and no longer valid."
    "SYSTEM_GENERATED", "2", "System generated projects that aren't explicitly created or managed by a user."
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
+
+
+
+
+.. _ref_flyteidl/admin/project_attributes.proto:
+
+flyteidl/admin/project_attributes.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributes:
+
+ProjectAttributes
+------------------------------------------------------------------
+
+Defines a set of custom matching attributes at the project level.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectAttributes type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id for which this set of attributes will be applied."
+   "matching_attributes", ":ref:`ref_flyteidl.admin.MatchingAttributes`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesDeleteRequest:
+
+ProjectAttributesDeleteRequest
+------------------------------------------------------------------
+
+Request to delete a set matchable project level attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectAttributesDeleteRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to delete. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesDeleteResponse:
+
+ProjectAttributesDeleteResponse
+------------------------------------------------------------------
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesGetRequest:
+
+ProjectAttributesGetRequest
+------------------------------------------------------------------
+
+Request to get an individual project level attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectAttributesGetRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to return. +required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesGetResponse:
+
+ProjectAttributesGetResponse
+------------------------------------------------------------------
+
+Response to get an individual project level attribute override.
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectAttributesGetResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "attributes", ":ref:`ref_flyteidl.admin.ProjectAttributes`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesUpdateRequest:
+
+ProjectAttributesUpdateRequest
+------------------------------------------------------------------
+
+Sets custom attributes for a project
+For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+
+
+
+.. csv-table:: ProjectAttributesUpdateRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "attributes", ":ref:`ref_flyteidl.admin.ProjectAttributes`", "", "+required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.ProjectAttributesUpdateResponse:
+
+ProjectAttributesUpdateResponse
+------------------------------------------------------------------
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+
+..
+   end messages
 
 
 ..
