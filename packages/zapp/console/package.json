@@ -11,7 +11,7 @@
         "clean": "rm -rf dist",
         "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.dev.config.ts --mode=development",
         "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.prod.config.ts --mode=production --progress",
-        "start": "webpack serve --config webpack.dev.config.ts --hot",
+        "start": "webpack serve --config webpack.dev.config.ts",
         "start:prod": "NODE_ENV=production node -r dotenv/config index.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "format": "prettier --ignore-path .eslintignore --write \"**/*.+(js|jsx|ts|tsx|json)\"",

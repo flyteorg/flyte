@@ -41,6 +41,10 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
   mode: 'development',
   devtool,
   devServer: {
+    historyApiFallback: {
+      logger: console.log.bind(console),
+      disableDotRule: true,
+    },
     hot: true,
     open: [BASE_URL || '/'],
     static: {
@@ -50,7 +54,6 @@ export const clientConfig: webpack.Configuration = merge(common.default.clientCo
     compress: true,
     port: 3000,
     host: LOCAL_DEV_HOST,
-    historyApiFallback: true,
     server: {
       type: ADMIN_API_USE_SSL,
       options: {
