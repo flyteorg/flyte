@@ -112,7 +112,16 @@ Troubles With Inconsistent Names for Pods and Downstream Resources
 - Flyte uses the format ``executionid-node-id-attempt`` from the node to assign a name to a Kubernetes pod or downstream resource.
 - But if this is an invalid name for a Kubernetes pod, Flyte assigns a valid name of random characters instead.
 
+Troubles With ``FlyteRemote.sync``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+- Usually occurs when trying to sync execution using sync() and the elements or nodes exceed the max limit previously set.
+- The log displays ``Received message larger than max``
+- The log ends with the grpc message ``grpc_message:"Received message larger than max ( vs. 4194304)"``
+
+How To Fix?
+"""""""""""""""
+- In the ``config`` file of flyte-admin, increase the value of ``MaxMessageSizeBytes`` variable accordingly.
 
 
 I Still Need Help!
