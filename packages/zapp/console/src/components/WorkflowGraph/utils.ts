@@ -87,7 +87,12 @@ export const getNodeTypeFromCompiledNode = (node: CompiledNode): dTypes => {
   } else if (node.branchNode) {
     return dTypes.subworkflow;
   } else if (node.workflowNode) {
-    return dTypes.subworkflow;
+    /* Workflow prop can mean either launchplanReft or subworklow */
+    if (node.workflowNode.launchplanRef) {
+      return dTypes.task;
+    } else {
+      return dTypes.subworkflow;
+    }
   } else {
     return dTypes.task;
   }

@@ -200,13 +200,20 @@ export const transformerWorkflowToDag = (
       });
       buildDAG(dNode, node, dTypes.branch);
     } else if (node.workflowNode) {
-      const id = node.workflowNode.subWorkflowRef;
-      const subworkflow = getSubWorkflowFromId(id, workflow);
-      dNode = createDNode({
-        compiledNode: node,
-        parentDNode: root,
-      });
-      buildDAG(dNode, subworkflow, dTypes.subworkflow);
+      if (node.workflowNode.launchplanRef) {
+        dNode = createDNode({
+          compiledNode: node,
+          parentDNode: root,
+        });
+      } else {
+        const id = node.workflowNode.subWorkflowRef;
+        const subworkflow = getSubWorkflowFromId(id, workflow);
+        dNode = createDNode({
+          compiledNode: node,
+          parentDNode: root,
+        });
+        buildDAG(dNode, subworkflow, dTypes.subworkflow);
+      }
     } else if (node.taskNode) {
       const taskNode = node.taskNode as TaskNode;
       const taskType: CompiledTask = getTaskTypeFromCompiledNode(

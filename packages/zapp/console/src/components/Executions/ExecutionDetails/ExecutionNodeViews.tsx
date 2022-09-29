@@ -147,15 +147,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({ executio
     </NodeExecutionsRequestConfigContext.Provider>
   );
 
-  const renderTab = (tabType) => (
-    <WaitForQuery
-      errorComponent={DataError}
-      query={childGroupsQuery}
-      loadingComponent={TimelineLoading}
-    >
-      {() => <ExecutionTab tabType={tabType} />}
-    </WaitForQuery>
-  );
+  const renderTab = (tabType) => <ExecutionTab tabType={tabType} />;
 
   const TimelineLoading = () => {
     return (

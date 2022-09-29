@@ -273,7 +273,8 @@ function fetchChildNodeExecutionGroups(
   // or Task executions.
   if (
     workflowNodeMetadata &&
-    !isEqual(workflowNodeMetadata.executionId, nodeExecution.id.executionId)
+    !isEqual(workflowNodeMetadata.executionId, nodeExecution.id.executionId) &&
+    !isEqual(nodeExecution.metadata?.specNodeId, nodeExecution.scopedId)
   ) {
     return fetchGroupsForWorkflowExecutionNode(queryClient, nodeExecution, config);
   }
