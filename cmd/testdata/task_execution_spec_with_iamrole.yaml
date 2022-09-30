@@ -13,3 +13,4 @@ targetDomain: "development"
 targetProject: "flytesnacks"
 task: core.control_flow.merge_sort.merge
 version: v2
+clusterPool: gpu

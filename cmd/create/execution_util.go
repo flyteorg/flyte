@@ -6,13 +6,14 @@ import (
 	"io/ioutil"
 	"strings"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	cmdGet "github.com/flyteorg/flytectl/cmd/get"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
+
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	cmdGet "github.com/flyteorg/flytectl/cmd/get"
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
@@ -148,6 +149,10 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securi
 	if len(targetExecName) == 0 {
 		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
 	}
+	var clusterAssignment *admin.ClusterAssignment
+	if executionConfig.ClusterPool != "" {
+		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: executionConfig.ClusterPool}
+	}
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
 		Domain:  executionConfig.TargetDomain,
@@ -159,8 +164,9 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securi
 				Principal: "sdk",
 				Nesting:   0,
 			},
-			AuthRole:        authRole,
-			SecurityContext: securityContext,
+			AuthRole:          authRole,
+			SecurityContext:   securityContext,
+			ClusterAssignment: clusterAssignment,
 		},
 		Inputs: inputs,
 	}

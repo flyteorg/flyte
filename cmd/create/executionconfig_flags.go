@@ -59,6 +59,7 @@ func (cfg ExecutionConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&executionConfig.Recover, fmt.Sprintf("%v%v", prefix, "recover"), executionConfig.Recover, "execution id to be recreated from the last known failure point.")
 	cmdFlags.BoolVar(&executionConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), executionConfig.DryRun, "execute command without making any modifications.")
 	cmdFlags.StringVar(&executionConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), executionConfig.Version, "specify version of execution workflow/task.")
+	cmdFlags.StringVar(&executionConfig.ClusterPool, fmt.Sprintf("%v%v", prefix, "clusterPool"), executionConfig.ClusterPool, "specify which cluster pool to assign execution to.")
 	cmdFlags.StringVar(&executionConfig.Workflow, fmt.Sprintf("%v%v", prefix, "workflow"), executionConfig.Workflow, "")
 	cmdFlags.StringVar(&executionConfig.Task, fmt.Sprintf("%v%v", prefix, "task"), executionConfig.Task, "")
 	return cmdFlags
