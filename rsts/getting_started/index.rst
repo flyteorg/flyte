@@ -231,6 +231,14 @@ Unlike the previous ``pyflyte run`` invocation, passing the ``--remote`` flag wi
 
     * If you want to build an image with your Flyte project's code built-in, refer to the :doc:`Deploying Workflows Guide <cookbook:auto/deployment/deploying_workflows>`.
 
+Remove the Demo Flyte Cluster
+"""""""""""""""""""""""""""""""
+
+Teardown the Flyte demonstration environment on your local machine via:
+
+.. prompt:: bash $
+
+  flytectl demo teardown --verbose
 
 Inspect the Results
 ^^^^^^^^^^^^^^^^^^^
