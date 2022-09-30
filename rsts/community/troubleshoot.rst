@@ -115,9 +115,7 @@ Troubles With Inconsistent Names for Pods and Downstream Resources
 Troubles with handling large responses in ``FlyteRemote.sync`` 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Usually occurs when trying to sync execution using sync() and the elements or nodes exceed the max limit previously set.
-- The log displays ``Received message larger than max``
-- The log ends with the grpc message ``grpc_message:"Received message larger than max ( vs. 4194304)"``
+- ``Received message larger than max (xxx vs. 4194304)`` usually crops up when the message size is too large.
 
 How To Fix?
 """""""""""""""
