@@ -11,7 +11,6 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
@@ -352,11 +351,11 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 	return nil
 }
 
-// Create a new Datacatalog client for task execution caching
-func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration, useAdminAuth bool, defaultServiceConfig string, authOpt grpc.DialOption) (*CatalogClient, error) {
+// NewDataCatalog creates a new Datacatalog client for task execution caching
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration, useAdminAuth bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
-		opts = append(opts, authOpt)
+		opts = append(opts, authOpt...)
 	}
 
 	grpcOptions := []grpcRetry.CallOption{
@@ -385,12 +384,8 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
-	finalUnaryInterceptor := grpcMiddleware.ChainUnaryClient(
-		grpcPrometheus.UnaryClientInterceptor,
-		retryInterceptor,
-	)
-
-	opts = append(opts, grpc.WithUnaryInterceptor(finalUnaryInterceptor))
+	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor,
+		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return nil, err
