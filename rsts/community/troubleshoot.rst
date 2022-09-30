@@ -116,10 +116,7 @@ Troubles with handling large responses in ``FlyteRemote.sync``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``Received message larger than max (xxx vs. 4194304)`` usually crops up when the message size is too large.
-
-How To Fix?
-"""""""""""""""
-- In the ``config`` file of flyte-admin, increase the value of ``MaxMessageSizeBytes`` variable accordingly.
+- To fix this, edit the flyte-admin-base-config config map to increase ``maxMessageSizeBytes`` value.
 
 
 I Still Need Help!
