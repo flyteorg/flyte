@@ -171,6 +171,18 @@ File containing the client secret
   /etc/secrets/client_secret
   
 
+clientSecretEnvVar (string)
+--------------------------------------------------------------------------------
+
+Environment variable containing the client secret
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 scopes ([]string)
 --------------------------------------------------------------------------------
 
@@ -229,7 +241,21 @@ Config for Pkce authentication flow.
 .. code-block:: yaml
 
   refreshTime: 5m0s
-  timeout: 15s
+  timeout: 2m0s
+  
+
+deviceFlowConfig (`deviceflow.Config`_)
+--------------------------------------------------------------------------------
+
+Config for Device authentication flow.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  pollInterval: 5s
+  refreshTime: 5m0s
+  timeout: 10m0s
   
 
 command ([]string)
@@ -392,21 +418,64 @@ RawFragment (string)
   ""
   
 
+deviceflow.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+refreshTime (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+grace period from the token expiry after which it would refresh the token.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5m0s
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+amount of time the device flow should complete or else it will be cancelled.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10m0s
+  
+
+pollInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+amount of time the device flow would poll the token endpoint if auth server doesn't return a polling interval. Okta and google IDP do return an interval'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5s
+  
+
 pkce.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 timeout (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+Amount of time the browser session would be active for authentication from client app.
+
 **Default Value**: 
 
 .. code-block:: yaml
 
-  15s
+  2m0s
   
 
 refreshTime (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+grace period from the token expiry after which it would refresh the token.
 
 **Default Value**: 
 
@@ -693,11 +762,11 @@ catalogcache (`catalog.Config`_)
 .. code-block:: yaml
 
   reader:
-    maxItems: 1000
+    maxItems: 10000
     maxRetries: 3
     workers: 10
   writer:
-    maxItems: 1000
+    maxItems: 10000
     maxRetries: 3
     workers: 10
   
@@ -1355,7 +1424,7 @@ Catalog reader workqueue config. Make sure the index cache must be big enough to
 
 .. code-block:: yaml
 
-  maxItems: 1000
+  maxItems: 10000
   maxRetries: 3
   workers: 10
   
@@ -1369,7 +1438,7 @@ Catalog writer workqueue config. Make sure the index cache must be big enough to
 
 .. code-block:: yaml
 
-  maxItems: 1000
+  maxItems: 10000
   maxRetries: 3
   workers: 10
   
@@ -1410,7 +1479,7 @@ Maximum number of entries to keep in the index.
 
 .. code-block:: yaml
 
-  "1000"
+  "10000"
   
 
 config.Config
@@ -4366,13 +4435,13 @@ Config for Exponential BackOff implementation
 maxLogMessageLength (int)
 --------------------------------------------------------------------------------
 
-Max length of error message.
+Deprecated!!! Max length of error message.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "2048"
+  "0"
   
 
 config.BackOffConfig

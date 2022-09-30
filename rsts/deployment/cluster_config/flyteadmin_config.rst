@@ -269,7 +269,21 @@ Config for Pkce authentication flow.
 .. code-block:: yaml
 
   refreshTime: 5m0s
-  timeout: 15s
+  timeout: 2m0s
+  
+
+deviceFlowConfig (`deviceflow.Config`_)
+--------------------------------------------------------------------------------
+
+Config for Device authentication flow.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  pollInterval: 5s
+  refreshTime: 5m0s
+  timeout: 10m0s
   
 
 command ([]string)
@@ -432,21 +446,64 @@ RawFragment (string)
   ""
   
 
+deviceflow.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+refreshTime (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+grace period from the token expiry after which it would refresh the token.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5m0s
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+amount of time the device flow should complete or else it will be cancelled.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10m0s
+  
+
+pollInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+amount of time the device flow would poll the token endpoint if auth server doesn't return a polling interval. Okta and google IDP do return an interval'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  5s
+  
+
 pkce.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 timeout (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+Amount of time the browser session would be active for authentication from client app.
+
 **Default Value**: 
 
 .. code-block:: yaml
 
-  15s
+  2m0s
   
 
 refreshTime (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+grace period from the token expiry after which it would refresh the token.
 
 **Default Value**: 
 
@@ -595,7 +652,7 @@ Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
         - access_token
       flytepropeller:
         audience: null
-        client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2
+        client_secret: JDJhJDA2JGQ2UFFuMlFBRlUzY0w1VjhNRGtldXVrNjN4dWJxVXhOeGp0ZlB3LkZjOU1nVjZ2cG15T0l5
         grant_types:
         - refresh_token
         - client_credentials
@@ -684,7 +741,7 @@ Authorization Server config to run as a service. Use this when using an IdP that
       - access_token
     flytepropeller:
       audience: null
-      client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2
+      client_secret: JDJhJDA2JGQ2UFFuMlFBRlUzY0w1VjhNRGtldXVrNjN4dWJxVXhOeGp0ZlB3LkZjOU1nVjZ2cG15T0l5
       grant_types:
       - refresh_token
       - client_credentials
@@ -862,7 +919,7 @@ staticClients (map[string]*fosite.DefaultClient)
     - access_token
   flytepropeller:
     audience: null
-    client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2
+    client_secret: JDJhJDA2JGQ2UFFuMlFBRlUzY0w1VjhNRGtldXVrNjN4dWJxVXhOeGp0ZlB3LkZjOU1nVjZ2cG15T0l5
     grant_types:
     - refresh_token
     - client_credentials
