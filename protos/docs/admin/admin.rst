@@ -14,27 +14,6 @@ flyteidl/admin/cluster_assignment.proto
 
 
 
-.. _ref_flyteidl.admin.Affinity:
-
-Affinity
-------------------------------------------------------------------
-
-Defines a set of constraints used to select eligible objects based on labels they possess.
-
-
-
-.. csv-table:: Affinity type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "selectors", ":ref:`ref_flyteidl.admin.Selector`", "repeated", "Multiples selectors are 'and'-ed together to produce the list of matching, eligible objects."
-
-
-
-
-
-
-
 .. _ref_flyteidl.admin.ClusterAssignment:
 
 ClusterAssignment
@@ -48,52 +27,7 @@ Encapsulates specifications for routing an execution onto a specific cluster.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "affinity", ":ref:`ref_flyteidl.admin.Affinity`", "", ""
-   "toleration", ":ref:`ref_flyteidl.admin.Toleration`", "", ""
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.Selector:
-
-Selector
-------------------------------------------------------------------
-
-A Selector is a specification for identifying a set of objects with corresponding labels.
-
-
-
-.. csv-table:: Selector type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "key", ":ref:`ref_string`", "", "The label key."
-   "value", ":ref:`ref_string`", "repeated", "One or more values used to match labels. For equality (or inequality) requirements, values must contain a single element. For set-based requirements, values may contain one or more elements."
-   "operator", ":ref:`ref_flyteidl.admin.Selector.Operator`", "", ""
-
-
-
-
-
-
-
-.. _ref_flyteidl.admin.Toleration:
-
-Toleration
-------------------------------------------------------------------
-
-Defines a set of specific label selectors that the execution can tolerate on a cluster.
-
-
-
-.. csv-table:: Toleration type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "selectors", ":ref:`ref_flyteidl.admin.Selector`", "repeated", "A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS."
+   "cluster_pool_name", ":ref:`ref_string`", "", ""
 
 
 
@@ -102,25 +36,6 @@ Defines a set of specific label selectors that the execution can tolerate on a c
 
 ..
    end messages
-
-
-
-.. _ref_flyteidl.admin.Selector.Operator:
-
-Selector.Operator
-------------------------------------------------------------------
-
-Defines how a label with a corresponding key and value is selected or excluded.
-
-.. csv-table:: Enum Selector.Operator values
-   :header: "Name", "Number", "Description"
-   :widths: auto
-
-   "EQUALS", "0", ""
-   "NOT_EQUALS", "1", ""
-   "IN", "2", ""
-   "NOT_IN", "3", ""
-   "EXISTS", "4", "A label key with any value"
 
 
 ..

@@ -3026,6 +3026,20 @@
       "default": "RESERVATION_DISABLED",
       "description": "Indicates the status of a catalog reservation operation.\n\n - RESERVATION_DISABLED: Used to indicate that reservations are disabled\n - RESERVATION_ACQUIRED: Used to indicate that a reservation was successfully acquired or extended\n - RESERVATION_EXISTS: Used to indicate that an active reservation currently exists\n - RESERVATION_RELEASED: Used to indicate that the reservation has been successfully released\n - RESERVATION_FAILURE: Used to indicate that a reservation operation resulted in failure"
     },
+    "ComparisonExpressionOperator": {
+      "type": "string",
+      "enum": [
+        "EQ",
+        "NEQ",
+        "GT",
+        "GTE",
+        "LT",
+        "LTE"
+      ],
+      "default": "EQ",
+      "description": "- GT: Greater Than\n - LT: Less Than",
+      "title": "Binary Operator for each expression"
+    },
     "ConjunctionExpressionLogicalOperator": {
       "type": "string",
       "enum": [
@@ -3290,19 +3304,6 @@
       },
       "description": "Specifies metadata around an aborted workflow execution."
     },
-    "adminAffinity": {
-      "type": "object",
-      "properties": {
-        "selectors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/adminSelector"
-          },
-          "description": "Multiples selectors are 'and'-ed together to produce the list of matching, eligible objects."
-        }
-      },
-      "description": "Defines a set of constraints used to select eligible objects based on labels they possess."
-    },
     "adminAnnotations": {
       "type": "object",
       "properties": {
@@ -3347,11 +3348,8 @@
     "adminClusterAssignment": {
       "type": "object",
       "properties": {
-        "affinity": {
-          "$ref": "#/definitions/adminAffinity"
-        },
-        "toleration": {
-          "$ref": "#/definitions/adminToleration"
+        "cluster_pool_name": {
+          "type": "string"
         }
       },
       "description": "Encapsulates specifications for routing an execution onto a specific cluster."
@@ -4620,38 +4618,6 @@
       },
       "description": "Defines complete set of information required to trigger an execution on a schedule."
     },
-    "adminSelector": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "The label key."
-        },
-        "value": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "One or more values used to match labels.\nFor equality (or inequality) requirements, values must contain a single element.\nFor set-based requirements, values may contain one or more elements."
-        },
-        "operator": {
-          "$ref": "#/definitions/adminSelectorOperator"
-        }
-      },
-      "description": "A Selector is a specification for identifying a set of objects with corresponding labels."
-    },
-    "adminSelectorOperator": {
-      "type": "string",
-      "enum": [
-        "EQUALS",
-        "NOT_EQUALS",
-        "IN",
-        "NOT_IN",
-        "EXISTS"
-      ],
-      "default": "EQUALS",
-      "description": "Defines how a label with a corresponding key and value is selected or excluded."
-    },
     "adminSlackNotification": {
       "type": "object",
       "properties": {
@@ -4919,19 +4885,6 @@
         }
       },
       "description": "Represents a structure that encapsulates the user-configured specification of the task."
-    },
-    "adminToleration": {
-      "type": "object",
-      "properties": {
-        "selectors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/adminSelector"
-          },
-          "description": "A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS."
-        }
-      },
-      "description": "Defines a set of specific label selectors that the execution can tolerate on a cluster."
     },
     "adminUrlBlob": {
       "type": "object",
@@ -5380,7 +5333,7 @@
       "type": "object",
       "properties": {
         "operator": {
-          "$ref": "#/definitions/coreComparisonExpressionOperator"
+          "$ref": "#/definitions/ComparisonExpressionOperator"
         },
         "left_value": {
           "$ref": "#/definitions/coreOperand"
@@ -5390,20 +5343,6 @@
         }
       },
       "description": "Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.\nEach expression results in a boolean result."
-    },
-    "coreComparisonExpressionOperator": {
-      "type": "string",
-      "enum": [
-        "EQ",
-        "NEQ",
-        "GT",
-        "GTE",
-        "LT",
-        "LTE"
-      ],
-      "default": "EQ",
-      "description": "- GT: Greater Than\n - LT: Less Than",
-      "title": "Binary Operator for each expression"
     },
     "coreCompiledTask": {
       "type": "object",

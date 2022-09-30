@@ -6,45 +6,6 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 // Encapsulates specifications for routing an execution onto a specific cluster.
 message ClusterAssignment {
-  Affinity affinity = 1;
-
-  Toleration toleration = 2;
+  reserved 1, 2;
+  string cluster_pool_name = 3;
 }
-
-// Defines a set of constraints used to select eligible objects based on labels they possess.
-message Affinity {
-  // Multiples selectors are 'and'-ed together to produce the list of matching, eligible objects.
-  repeated Selector selectors = 1;
-}
-
-// Defines a set of specific label selectors that the execution can tolerate on a cluster.
-message Toleration {
-
-  // A toleration selector is similar to that of an affinity but the only valid operators are EQUALS AND EXISTS.
-  repeated Selector selectors = 1;
-}
-
-// A Selector is a specification for identifying a set of objects with corresponding labels.
-message Selector {
-
-  // The label key.
-  string key = 1;
-
-  // One or more values used to match labels.
-  // For equality (or inequality) requirements, values must contain a single element.
-  // For set-based requirements, values may contain one or more elements.
-  repeated string value = 2;
-
-  // Defines how a label with a corresponding key and value is selected or excluded.
-  enum Operator {
-    EQUALS = 0;
-    NOT_EQUALS = 1;
-    IN = 2;
-    NOT_IN = 3;
-    EXISTS = 4; // A label key with any value
-    
-    // K8s supports more operators, we can consider adding them if necessary
-  }
-  Operator operator = 3;
-}
-
