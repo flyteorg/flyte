@@ -16,27 +16,12 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcluster_5fassignment_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto;
 namespace flyteidl {
 namespace admin {
 class ClusterAssignmentDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ClusterAssignment> _instance;
 } _ClusterAssignment_default_instance_;
-class AffinityDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Affinity> _instance;
-} _Affinity_default_instance_;
-class TolerationDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Toleration> _instance;
-} _Toleration_default_instance_;
-class SelectorDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Selector> _instance;
-} _Selector_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 static void InitDefaultsClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
@@ -50,64 +35,15 @@ static void InitDefaultsClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignmen
   ::flyteidl::admin::ClusterAssignment::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto}, {
-      &scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,
-      &scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,}};
-
-static void InitDefaultsAffinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::flyteidl::admin::_Affinity_default_instance_;
-    new (ptr) ::flyteidl::admin::Affinity();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::flyteidl::admin::Affinity::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsAffinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto}, {
-      &scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,}};
-
-static void InitDefaultsToleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::flyteidl::admin::_Toleration_default_instance_;
-    new (ptr) ::flyteidl::admin::Toleration();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::flyteidl::admin::Toleration::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsToleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto}, {
-      &scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,}};
-
-static void InitDefaultsSelector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::flyteidl::admin::_Selector_default_instance_;
-    new (ptr) ::flyteidl::admin::Selector();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::flyteidl::admin::Selector::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSelector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto}, {}};
 
 void InitDefaults_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[4];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[1];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fcluster_5fassignment_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -116,68 +52,33 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fcluster_5fassign
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ClusterAssignment, affinity_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ClusterAssignment, toleration_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Affinity, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Affinity, selectors_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Toleration, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Toleration, selectors_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Selector, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Selector, key_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Selector, value_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Selector, operator__),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ClusterAssignment, cluster_pool_name_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::ClusterAssignment)},
-  { 7, -1, sizeof(::flyteidl::admin::Affinity)},
-  { 13, -1, sizeof(::flyteidl::admin::Toleration)},
-  { 19, -1, sizeof(::flyteidl::admin::Selector)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ClusterAssignment_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Affinity_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Toleration_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Selector_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = {
   {}, AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, "flyteidl/admin/cluster_assignment.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fadmin_2fcluster_5fassignment_2eproto::offsets,
-  file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 4, file_level_enum_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto,
+  file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 1, file_level_enum_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[] =
   "\n\'flyteidl/admin/cluster_assignment.prot"
-  "o\022\016flyteidl.admin\"o\n\021ClusterAssignment\022*"
-  "\n\010affinity\030\001 \001(\0132\030.flyteidl.admin.Affini"
-  "ty\022.\n\ntoleration\030\002 \001(\0132\032.flyteidl.admin."
-  "Toleration\"7\n\010Affinity\022+\n\tselectors\030\001 \003("
-  "\0132\030.flyteidl.admin.Selector\"9\n\nToleratio"
-  "n\022+\n\tselectors\030\001 \003(\0132\030.flyteidl.admin.Se"
-  "lector\"\243\001\n\010Selector\022\013\n\003key\030\001 \001(\t\022\r\n\005valu"
-  "e\030\002 \003(\t\0223\n\010operator\030\003 \001(\0162!.flyteidl.adm"
-  "in.Selector.Operator\"F\n\010Operator\022\n\n\006EQUA"
-  "LS\020\000\022\016\n\nNOT_EQUALS\020\001\022\006\n\002IN\020\002\022\n\n\006NOT_IN\020\003"
-  "\022\n\n\006EXISTS\020\004B7Z5github.com/flyteorg/flyt"
-  "eidl/gen/pb-go/flyteidl/adminb\006proto3"
+  "o\022\016flyteidl.admin\":\n\021ClusterAssignment\022\031"
+  "\n\021cluster_pool_name\030\003 \001(\tJ\004\010\001\020\002J\004\010\002\020\003B7Z"
+  "5github.com/flyteorg/flyteidl/gen/pb-go/"
+  "flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fcluster_5fassignment_2eproto,
-  "flyteidl/admin/cluster_assignment.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 517,
+  "flyteidl/admin/cluster_assignment.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 182,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
@@ -191,59 +92,17 @@ void AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = []() { AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto(); return true; }();
 namespace flyteidl {
 namespace admin {
-const ::google::protobuf::EnumDescriptor* Selector_Operator_descriptor() {
-  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto);
-  return file_level_enum_descriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[0];
-}
-bool Selector_Operator_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-      return true;
-    default:
-      return false;
-  }
-}
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const Selector_Operator Selector::EQUALS;
-const Selector_Operator Selector::NOT_EQUALS;
-const Selector_Operator Selector::IN;
-const Selector_Operator Selector::NOT_IN;
-const Selector_Operator Selector::EXISTS;
-const Selector_Operator Selector::Operator_MIN;
-const Selector_Operator Selector::Operator_MAX;
-const int Selector::Operator_ARRAYSIZE;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 // ===================================================================
 
 void ClusterAssignment::InitAsDefaultInstance() {
-  ::flyteidl::admin::_ClusterAssignment_default_instance_._instance.get_mutable()->affinity_ = const_cast< ::flyteidl::admin::Affinity*>(
-      ::flyteidl::admin::Affinity::internal_default_instance());
-  ::flyteidl::admin::_ClusterAssignment_default_instance_._instance.get_mutable()->toleration_ = const_cast< ::flyteidl::admin::Toleration*>(
-      ::flyteidl::admin::Toleration::internal_default_instance());
 }
 class ClusterAssignment::HasBitSetters {
  public:
-  static const ::flyteidl::admin::Affinity& affinity(const ClusterAssignment* msg);
-  static const ::flyteidl::admin::Toleration& toleration(const ClusterAssignment* msg);
 };
 
-const ::flyteidl::admin::Affinity&
-ClusterAssignment::HasBitSetters::affinity(const ClusterAssignment* msg) {
-  return *msg->affinity_;
-}
-const ::flyteidl::admin::Toleration&
-ClusterAssignment::HasBitSetters::toleration(const ClusterAssignment* msg) {
-  return *msg->toleration_;
-}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ClusterAssignment::kAffinityFieldNumber;
-const int ClusterAssignment::kTolerationFieldNumber;
+const int ClusterAssignment::kClusterPoolNameFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ClusterAssignment::ClusterAssignment()
@@ -255,15 +114,9 @@ ClusterAssignment::ClusterAssignment(const ClusterAssignment& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  if (from.has_affinity()) {
-    affinity_ = new ::flyteidl::admin::Affinity(*from.affinity_);
-  } else {
-    affinity_ = nullptr;
-  }
-  if (from.has_toleration()) {
-    toleration_ = new ::flyteidl::admin::Toleration(*from.toleration_);
-  } else {
-    toleration_ = nullptr;
+  cluster_pool_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.cluster_pool_name().size() > 0) {
+    cluster_pool_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.cluster_pool_name_);
   }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ClusterAssignment)
 }
@@ -271,9 +124,7 @@ ClusterAssignment::ClusterAssignment(const ClusterAssignment& from)
 void ClusterAssignment::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  ::memset(&affinity_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&toleration_) -
-      reinterpret_cast<char*>(&affinity_)) + sizeof(toleration_));
+  cluster_pool_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 ClusterAssignment::~ClusterAssignment() {
@@ -282,8 +133,7 @@ ClusterAssignment::~ClusterAssignment() {
 }
 
 void ClusterAssignment::SharedDtor() {
-  if (this != internal_default_instance()) delete affinity_;
-  if (this != internal_default_instance()) delete toleration_;
+  cluster_pool_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void ClusterAssignment::SetCachedSize(int size) const {
@@ -301,14 +151,7 @@ void ClusterAssignment::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == nullptr && affinity_ != nullptr) {
-    delete affinity_;
-  }
-  affinity_ = nullptr;
-  if (GetArenaNoVirtual() == nullptr && toleration_ != nullptr) {
-    delete toleration_;
-  }
-  toleration_ = nullptr;
+  cluster_pool_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -325,30 +168,20 @@ const char* ClusterAssignment::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.admin.Affinity affinity = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+      // string cluster_pool_name = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::admin::Affinity::_InternalParse;
-        object = msg->mutable_affinity();
-        if (size > end - ptr) goto len_delim_till_end;
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.ClusterAssignment.cluster_pool_name");
+        object = msg->mutable_cluster_pool_name();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
-        break;
-      }
-      // .flyteidl.admin.Toleration toleration = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::admin::Toleration::_InternalParse;
-        object = msg->mutable_toleration();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -366,6 +199,10 @@ const char* ClusterAssignment::_InternalParse(const char* begin, const char* end
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -381,22 +218,15 @@ bool ClusterAssignment::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.admin.Affinity affinity = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_affinity()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .flyteidl.admin.Toleration toleration = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_toleration()));
+      // string cluster_pool_name = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_cluster_pool_name()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->cluster_pool_name().data(), static_cast<int>(this->cluster_pool_name().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ClusterAssignment.cluster_pool_name"));
         } else {
           goto handle_unusual;
         }
@@ -430,16 +260,14 @@ void ClusterAssignment::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.Affinity affinity = 1;
-  if (this->has_affinity()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, HasBitSetters::affinity(this), output);
-  }
-
-  // .flyteidl.admin.Toleration toleration = 2;
-  if (this->has_toleration()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, HasBitSetters::toleration(this), output);
+  // string cluster_pool_name = 3;
+  if (this->cluster_pool_name().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->cluster_pool_name().data(), static_cast<int>(this->cluster_pool_name().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ClusterAssignment.cluster_pool_name");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->cluster_pool_name(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -455,18 +283,15 @@ void ClusterAssignment::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.Affinity affinity = 1;
-  if (this->has_affinity()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, HasBitSetters::affinity(this), target);
-  }
-
-  // .flyteidl.admin.Toleration toleration = 2;
-  if (this->has_toleration()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        2, HasBitSetters::toleration(this), target);
+  // string cluster_pool_name = 3;
+  if (this->cluster_pool_name().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->cluster_pool_name().data(), static_cast<int>(this->cluster_pool_name().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ClusterAssignment.cluster_pool_name");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->cluster_pool_name(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -490,18 +315,11 @@ size_t ClusterAssignment::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .flyteidl.admin.Affinity affinity = 1;
-  if (this->has_affinity()) {
+  // string cluster_pool_name = 3;
+  if (this->cluster_pool_name().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *affinity_);
-  }
-
-  // .flyteidl.admin.Toleration toleration = 2;
-  if (this->has_toleration()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *toleration_);
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->cluster_pool_name());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -531,11 +349,9 @@ void ClusterAssignment::MergeFrom(const ClusterAssignment& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_affinity()) {
-    mutable_affinity()->::flyteidl::admin::Affinity::MergeFrom(from.affinity());
-  }
-  if (from.has_toleration()) {
-    mutable_toleration()->::flyteidl::admin::Toleration::MergeFrom(from.toleration());
+  if (from.cluster_pool_name().size() > 0) {
+
+    cluster_pool_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.cluster_pool_name_);
   }
 }
 
@@ -564,984 +380,11 @@ void ClusterAssignment::Swap(ClusterAssignment* other) {
 void ClusterAssignment::InternalSwap(ClusterAssignment* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(affinity_, other->affinity_);
-  swap(toleration_, other->toleration_);
+  cluster_pool_name_.Swap(&other->cluster_pool_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
 }
 
 ::google::protobuf::Metadata ClusterAssignment::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto);
-  return ::file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void Affinity::InitAsDefaultInstance() {
-}
-class Affinity::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Affinity::kSelectorsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-Affinity::Affinity()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.admin.Affinity)
-}
-Affinity::Affinity(const Affinity& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      selectors_(from.selectors_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Affinity)
-}
-
-void Affinity::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-}
-
-Affinity::~Affinity() {
-  // @@protoc_insertion_point(destructor:flyteidl.admin.Affinity)
-  SharedDtor();
-}
-
-void Affinity::SharedDtor() {
-}
-
-void Affinity::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const Affinity& Affinity::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_Affinity_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void Affinity::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.admin.Affinity)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  selectors_.Clear();
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* Affinity::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<Affinity*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // repeated .flyteidl.admin.Selector selectors = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::flyteidl::admin::Selector::_InternalParse;
-          object = msg->add_selectors();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool Affinity::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.admin.Affinity)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .flyteidl.admin.Selector selectors = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_selectors()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:flyteidl.admin.Affinity)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.admin.Affinity)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void Affinity::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.admin.Affinity)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->selectors_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->selectors(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:flyteidl.admin.Affinity)
-}
-
-::google::protobuf::uint8* Affinity::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.Affinity)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->selectors_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->selectors(static_cast<int>(i)), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.Affinity)
-  return target;
-}
-
-size_t Affinity::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.Affinity)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->selectors_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->selectors(static_cast<int>(i)));
-    }
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void Affinity::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.Affinity)
-  GOOGLE_DCHECK_NE(&from, this);
-  const Affinity* source =
-      ::google::protobuf::DynamicCastToGenerated<Affinity>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.Affinity)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.Affinity)
-    MergeFrom(*source);
-  }
-}
-
-void Affinity::MergeFrom(const Affinity& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.Affinity)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  selectors_.MergeFrom(from.selectors_);
-}
-
-void Affinity::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.Affinity)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Affinity::CopyFrom(const Affinity& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.Affinity)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool Affinity::IsInitialized() const {
-  return true;
-}
-
-void Affinity::Swap(Affinity* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void Affinity::InternalSwap(Affinity* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&selectors_)->InternalSwap(CastToBase(&other->selectors_));
-}
-
-::google::protobuf::Metadata Affinity::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto);
-  return ::file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void Toleration::InitAsDefaultInstance() {
-}
-class Toleration::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Toleration::kSelectorsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-Toleration::Toleration()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.admin.Toleration)
-}
-Toleration::Toleration(const Toleration& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      selectors_(from.selectors_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Toleration)
-}
-
-void Toleration::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-}
-
-Toleration::~Toleration() {
-  // @@protoc_insertion_point(destructor:flyteidl.admin.Toleration)
-  SharedDtor();
-}
-
-void Toleration::SharedDtor() {
-}
-
-void Toleration::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const Toleration& Toleration::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_Toleration_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void Toleration::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.admin.Toleration)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  selectors_.Clear();
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* Toleration::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<Toleration*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // repeated .flyteidl.admin.Selector selectors = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::flyteidl::admin::Selector::_InternalParse;
-          object = msg->add_selectors();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool Toleration::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.admin.Toleration)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .flyteidl.admin.Selector selectors = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_selectors()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:flyteidl.admin.Toleration)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.admin.Toleration)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void Toleration::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.admin.Toleration)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->selectors_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->selectors(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:flyteidl.admin.Toleration)
-}
-
-::google::protobuf::uint8* Toleration::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.Toleration)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->selectors_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->selectors(static_cast<int>(i)), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.Toleration)
-  return target;
-}
-
-size_t Toleration::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.Toleration)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated .flyteidl.admin.Selector selectors = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->selectors_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->selectors(static_cast<int>(i)));
-    }
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void Toleration::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.Toleration)
-  GOOGLE_DCHECK_NE(&from, this);
-  const Toleration* source =
-      ::google::protobuf::DynamicCastToGenerated<Toleration>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.Toleration)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.Toleration)
-    MergeFrom(*source);
-  }
-}
-
-void Toleration::MergeFrom(const Toleration& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.Toleration)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  selectors_.MergeFrom(from.selectors_);
-}
-
-void Toleration::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.Toleration)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Toleration::CopyFrom(const Toleration& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.Toleration)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool Toleration::IsInitialized() const {
-  return true;
-}
-
-void Toleration::Swap(Toleration* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void Toleration::InternalSwap(Toleration* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&selectors_)->InternalSwap(CastToBase(&other->selectors_));
-}
-
-::google::protobuf::Metadata Toleration::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto);
-  return ::file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void Selector::InitAsDefaultInstance() {
-}
-class Selector::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Selector::kKeyFieldNumber;
-const int Selector::kValueFieldNumber;
-const int Selector::kOperatorFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-Selector::Selector()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.admin.Selector)
-}
-Selector::Selector(const Selector& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr),
-      value_(from.value_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.key().size() > 0) {
-    key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
-  }
-  operator__ = from.operator__;
-  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Selector)
-}
-
-void Selector::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  operator__ = 0;
-}
-
-Selector::~Selector() {
-  // @@protoc_insertion_point(destructor:flyteidl.admin.Selector)
-  SharedDtor();
-}
-
-void Selector::SharedDtor() {
-  key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void Selector::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const Selector& Selector::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_Selector_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void Selector::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.admin.Selector)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  value_.Clear();
-  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  operator__ = 0;
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* Selector::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<Selector*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string key = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Selector.key");
-        object = msg->mutable_key();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // repeated string value = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("flyteidl.admin.Selector.value");
-          object = msg->add_value();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
-        break;
-      }
-      // .flyteidl.admin.Selector.Operator operator = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
-        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_operator_(static_cast<::flyteidl::admin::Selector_Operator>(val));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool Selector::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.admin.Selector)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string key = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_key()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->key().data(), static_cast<int>(this->key().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Selector.key"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated string value = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_value()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->value(this->value_size() - 1).data(),
-            static_cast<int>(this->value(this->value_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Selector.value"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .flyteidl.admin.Selector.Operator operator = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-          int value = 0;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_operator_(static_cast< ::flyteidl::admin::Selector_Operator >(value));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:flyteidl.admin.Selector)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.admin.Selector)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void Selector::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.admin.Selector)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string key = 1;
-  if (this->key().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->key().data(), static_cast<int>(this->key().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Selector.key");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->key(), output);
-  }
-
-  // repeated string value = 2;
-  for (int i = 0, n = this->value_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->value(i).data(), static_cast<int>(this->value(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Selector.value");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      2, this->value(i), output);
-  }
-
-  // .flyteidl.admin.Selector.Operator operator = 3;
-  if (this->operator_() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      3, this->operator_(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:flyteidl.admin.Selector)
-}
-
-::google::protobuf::uint8* Selector::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.Selector)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string key = 1;
-  if (this->key().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->key().data(), static_cast<int>(this->key().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Selector.key");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->key(), target);
-  }
-
-  // repeated string value = 2;
-  for (int i = 0, n = this->value_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->value(i).data(), static_cast<int>(this->value(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Selector.value");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(2, this->value(i), target);
-  }
-
-  // .flyteidl.admin.Selector.Operator operator = 3;
-  if (this->operator_() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      3, this->operator_(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.Selector)
-  return target;
-}
-
-size_t Selector::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.Selector)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated string value = 2;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->value_size());
-  for (int i = 0, n = this->value_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->value(i));
-  }
-
-  // string key = 1;
-  if (this->key().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->key());
-  }
-
-  // .flyteidl.admin.Selector.Operator operator = 3;
-  if (this->operator_() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->operator_());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void Selector::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.Selector)
-  GOOGLE_DCHECK_NE(&from, this);
-  const Selector* source =
-      ::google::protobuf::DynamicCastToGenerated<Selector>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.Selector)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.Selector)
-    MergeFrom(*source);
-  }
-}
-
-void Selector::MergeFrom(const Selector& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.Selector)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  value_.MergeFrom(from.value_);
-  if (from.key().size() > 0) {
-
-    key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
-  }
-  if (from.operator_() != 0) {
-    set_operator_(from.operator_());
-  }
-}
-
-void Selector::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.Selector)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Selector::CopyFrom(const Selector& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.Selector)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool Selector::IsInitialized() const {
-  return true;
-}
-
-void Selector::Swap(Selector* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void Selector::InternalSwap(Selector* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  value_.InternalSwap(CastToBase(&other->value_));
-  key_.Swap(&other->key_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(operator__, other->operator__);
-}
-
-::google::protobuf::Metadata Selector::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto);
   return ::file_level_metadata_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[kIndexInFileMessages];
 }
@@ -1554,15 +397,6 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::ClusterAssignment* Arena::CreateMaybeMessage< ::flyteidl::admin::ClusterAssignment >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::ClusterAssignment >(arena);
-}
-template<> PROTOBUF_NOINLINE ::flyteidl::admin::Affinity* Arena::CreateMaybeMessage< ::flyteidl::admin::Affinity >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::admin::Affinity >(arena);
-}
-template<> PROTOBUF_NOINLINE ::flyteidl::admin::Toleration* Arena::CreateMaybeMessage< ::flyteidl::admin::Toleration >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::admin::Toleration >(arena);
-}
-template<> PROTOBUF_NOINLINE ::flyteidl::admin::Selector* Arena::CreateMaybeMessage< ::flyteidl::admin::Selector >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::admin::Selector >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

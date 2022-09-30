@@ -2711,6 +2711,18 @@ definitions:
     - "RESERVATION_RELEASED"
     - "RESERVATION_FAILURE"
     default: "RESERVATION_DISABLED"
+  ComparisonExpressionOperator:
+    type: "string"
+    title: "Binary Operator for each expression"
+    description: "- GT: Greater Than\n - LT: Less Than"
+    enum:
+    - "EQ"
+    - "NEQ"
+    - "GT"
+    - "GTE"
+    - "LT"
+    - "LTE"
+    default: "EQ"
   ConjunctionExpressionLogicalOperator:
     type: "string"
     title: "Nested conditions. They can be conjoined using AND / OR\nOrder of evaluation\
@@ -2980,29 +2992,6 @@ definitions:
     example:
       principal: "principal"
       cause: "cause"
-  adminAffinity:
-    type: "object"
-    properties:
-      selectors:
-        type: "array"
-        description: "Multiples selectors are 'and'-ed together to produce the list\
-          \ of matching, eligible objects."
-        items:
-          $ref: "#/definitions/adminSelector"
-    description: "Defines a set of constraints used to select eligible objects based\
-      \ on labels they possess."
-    example:
-      selectors:
-      - value:
-        - "value"
-        - "value"
-        key: "key"
-        operator: {}
-      - value:
-        - "value"
-        - "value"
-        key: "key"
-        operator: {}
   adminAnnotations:
     type: "object"
     properties:
@@ -3054,37 +3043,12 @@ definitions:
   adminClusterAssignment:
     type: "object"
     properties:
-      affinity:
-        $ref: "#/definitions/adminAffinity"
-      toleration:
-        $ref: "#/definitions/adminToleration"
+      cluster_pool_name:
+        type: "string"
     description: "Encapsulates specifications for routing an execution onto a specific\
       \ cluster."
     example:
-      toleration:
-        selectors:
-        - value:
-          - "value"
-          - "value"
-          key: "key"
-          operator: {}
-        - value:
-          - "value"
-          - "value"
-          key: "key"
-          operator: {}
-      affinity:
-        selectors:
-        - value:
-          - "value"
-          - "value"
-          key: "key"
-          operator: {}
-        - value:
-          - "value"
-          - "value"
-          key: "key"
-          operator: {}
+      cluster_pool_name: "cluster_pool_name"
   adminClusterResourceAttributes:
     type: "object"
     properties:
@@ -3269,30 +3233,7 @@ definitions:
         raw_output_data_config:
           output_location_prefix: "output_location_prefix"
         cluster_assignment:
-          toleration:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-          affinity:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
+          cluster_pool_name: "cluster_pool_name"
         notifications:
           notifications:
           - pager_duty:
@@ -3665,30 +3606,7 @@ definitions:
           raw_output_data_config:
             output_location_prefix: "output_location_prefix"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           notifications:
             notifications:
             - pager_duty:
@@ -3877,30 +3795,7 @@ definitions:
           raw_output_data_config:
             output_location_prefix: "output_location_prefix"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           notifications:
             notifications:
             - pager_duty:
@@ -4180,30 +4075,7 @@ definitions:
       raw_output_data_config:
         output_location_prefix: "output_location_prefix"
       cluster_assignment:
-        toleration:
-          selectors:
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-        affinity:
-          selectors:
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
+        cluster_pool_name: "cluster_pool_name"
       notifications:
         notifications:
         - pager_duty:
@@ -6726,30 +6598,7 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -6848,30 +6697,7 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -7003,30 +6829,7 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
-          toleration:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-          affinity:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
+          cluster_pool_name: "cluster_pool_name"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -7165,30 +6968,7 @@ definitions:
           values:
             key: "values"
       cluster_assignment:
-        toleration:
-          selectors:
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-        affinity:
-          selectors:
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
-          - value:
-            - "value"
-            - "value"
-            key: "key"
-            operator: {}
+        cluster_pool_name: "cluster_pool_name"
       cluster_resource_attributes:
         attributes:
           key: "attributes"
@@ -13920,30 +13700,7 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
-          toleration:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-          affinity:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
+          cluster_pool_name: "cluster_pool_name"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -14062,30 +13819,7 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -14207,30 +13941,7 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
-          toleration:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-          affinity:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
+          cluster_pool_name: "cluster_pool_name"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -14353,30 +14064,7 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -14515,40 +14203,6 @@ definitions:
       rate:
         unit: {}
         value: 0
-  adminSelector:
-    type: "object"
-    properties:
-      key:
-        type: "string"
-        description: "The label key."
-      value:
-        type: "array"
-        description: "One or more values used to match labels.\nFor equality (or inequality)\
-          \ requirements, values must contain a single element.\nFor set-based requirements,\
-          \ values may contain one or more elements."
-        items:
-          type: "string"
-      operator:
-        $ref: "#/definitions/adminSelectorOperator"
-    description: "A Selector is a specification for identifying a set of objects with\
-      \ corresponding labels."
-    example:
-      value:
-      - "value"
-      - "value"
-      key: "key"
-      operator: {}
-  adminSelectorOperator:
-    type: "string"
-    description: "Defines how a label with a corresponding key and value is selected\
-      \ or excluded."
-    enum:
-    - "EQUALS"
-    - "NOT_EQUALS"
-    - "IN"
-    - "NOT_IN"
-    - "EXISTS"
-    default: "EQUALS"
   adminSlackNotification:
     type: "object"
     properties:
@@ -16096,29 +15750,6 @@ definitions:
         $ref: "#/definitions/coreTaskTemplate"
     description: "Represents a structure that encapsulates the user-configured specification\
       \ of the task."
-  adminToleration:
-    type: "object"
-    properties:
-      selectors:
-        type: "array"
-        description: "A toleration selector is similar to that of an affinity but\
-          \ the only valid operators are EQUALS AND EXISTS."
-        items:
-          $ref: "#/definitions/adminSelector"
-    description: "Defines a set of specific label selectors that the execution can\
-      \ tolerate on a cluster."
-    example:
-      selectors:
-      - value:
-        - "value"
-        - "value"
-        key: "key"
-        operator: {}
-      - value:
-        - "value"
-        - "value"
-        key: "key"
-        operator: {}
   adminUrlBlob:
     type: "object"
     properties:
@@ -22254,30 +21885,7 @@ definitions:
             values:
               key: "values"
         cluster_assignment:
-          toleration:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-          affinity:
-            selectors:
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
-            - value:
-              - "value"
-              - "value"
-              key: "key"
-              operator: {}
+          cluster_pool_name: "cluster_pool_name"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -22403,30 +22011,7 @@ definitions:
               values:
                 key: "values"
           cluster_assignment:
-            toleration:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-            affinity:
-              selectors:
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
-              - value:
-                - "value"
-                - "value"
-                key: "key"
-                operator: {}
+            cluster_pool_name: "cluster_pool_name"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -41325,7 +40910,7 @@ definitions:
     type: "object"
     properties:
       operator:
-        $ref: "#/definitions/coreComparisonExpressionOperator"
+        $ref: "#/definitions/ComparisonExpressionOperator"
       left_value:
         $ref: "#/definitions/coreOperand"
       right_value:
@@ -41353,18 +40938,6 @@ definitions:
           integer: "integer"
         var: "var"
       operator: {}
-  coreComparisonExpressionOperator:
-    type: "string"
-    title: "Binary Operator for each expression"
-    description: "- GT: Greater Than\n - LT: Less Than"
-    enum:
-    - "EQ"
-    - "NEQ"
-    - "GT"
-    - "GTE"
-    - "LT"
-    - "LTE"
-    default: "EQ"
   coreCompiledTask:
     type: "object"
     properties:
