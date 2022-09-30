@@ -44,17 +44,19 @@ type Config struct {
 	DefaultServiceConfig string `json:"default-service-config" pflag:"\"\", Set the default service config for the catalog gRPC client"`
 }
 
-// Gets loaded config for Discovery
+// GetConfig gets loaded config for Discovery
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
 
-func NewCatalogClient(ctx context.Context, authOpt grpc.DialOption) (catalog.Client, error) {
+func NewCatalogClient(ctx context.Context, authOpt ...grpc.DialOption) (catalog.Client, error) {
 	catalogConfig := GetConfig()
 
 	switch catalogConfig.Type {
 	case DataCatalogType:
-		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure, catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig, authOpt)
+		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
+			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
+			authOpt...)
 	case NoOpDiscoveryType, "":
 		return NOOPCatalog{}, nil
 	}
