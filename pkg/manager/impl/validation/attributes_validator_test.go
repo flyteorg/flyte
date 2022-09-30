@@ -18,13 +18,11 @@ var attributesApplicationConfigProvider = testutils.GetApplicationConfigWithDefa
 func TestValidateMatchingAttributes(t *testing.T) {
 	testCases := []struct {
 		attributes                *admin.MatchingAttributes
-		identifier                string
 		expectedMatchableResource admin.MatchableResource
 		expectedErr               error
 	}{
 		{
 			nil,
-			"foo",
 			defaultMatchableResource,
 			errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing matching_attributes"),
 		},
@@ -38,7 +36,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_TASK_RESOURCE,
 			nil,
 		},
@@ -52,7 +49,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_CLUSTER_RESOURCE,
 			nil,
 		},
@@ -64,7 +60,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_EXECUTION_QUEUE,
 			nil,
 		},
@@ -81,7 +76,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_PLUGIN_OVERRIDE,
 			nil,
 		},
@@ -93,7 +87,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
 			nil,
 		},
@@ -101,24 +94,16 @@ func TestValidateMatchingAttributes(t *testing.T) {
 			&admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ClusterAssignment{
 					ClusterAssignment: &admin.ClusterAssignment{
-						Affinity: &admin.Affinity{
-							Selectors: []*admin.Selector{
-								{
-									Key:      "bar",
-									Operator: admin.Selector_EXISTS,
-								},
-							},
-						},
+						ClusterPoolName: "gpu",
 					},
 				},
 			},
-			"foo",
 			admin.MatchableResource_CLUSTER_ASSIGNMENT,
 			nil,
 		},
 	}
 	for _, tc := range testCases {
-		matchableResource, err := validateMatchingAttributes(tc.attributes, tc.identifier)
+		matchableResource, err := validateMatchingAttributes(tc.attributes, "foo")
 		assert.Equal(t, tc.expectedMatchableResource, matchableResource)
 		assert.EqualValues(t, tc.expectedErr, err)
 	}

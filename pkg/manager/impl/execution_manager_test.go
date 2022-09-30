@@ -277,17 +277,7 @@ func TestCreateExecution(t *testing.T) {
 
 	principal := "principal"
 	rawOutput := "raw_output"
-	clusterAssignment := admin.ClusterAssignment{
-		Affinity: &admin.Affinity{
-			Selectors: []*admin.Selector{
-				{
-					Key:      "foo",
-					Value:    []string{"bar"},
-					Operator: admin.Selector_NOT_EQUALS,
-				},
-			},
-		},
-	}
+	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
 			var spec admin.ExecutionSpec
@@ -4679,17 +4669,7 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 }
 
 func TestGetClusterAssignment(t *testing.T) {
-	clusterAssignment := admin.ClusterAssignment{
-		Affinity: &admin.Affinity{
-			Selectors: []*admin.Selector{
-				{
-					Key:      "foo",
-					Value:    []string{"bar"},
-					Operator: admin.Selector_EQUALS,
-				},
-			},
-		},
-	}
+	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
@@ -4720,16 +4700,7 @@ func TestGetClusterAssignment(t *testing.T) {
 		assert.True(t, proto.Equal(ca, &clusterAssignment))
 	})
 	t.Run("value from request", func(t *testing.T) {
-		reqClusterAssignment := admin.ClusterAssignment{
-			Affinity: &admin.Affinity{
-				Selectors: []*admin.Selector{
-					{
-						Key:      "baz",
-						Operator: admin.Selector_IN,
-					},
-				},
-			},
-		}
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
 		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.Project,
 			Domain:  workflowIdentifier.Domain,
