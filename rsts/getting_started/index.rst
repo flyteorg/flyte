@@ -164,7 +164,7 @@ Start a Flyte demonstration environment on your local machine via:
 
 .. prompt:: bash $
 
-  flytectl demo start
+  flytectl demo start --verbose
 
 .. div:: shadow p-3 mb-8 rounded
 

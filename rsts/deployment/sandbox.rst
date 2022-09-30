@@ -73,7 +73,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     brew install kubectl
 
-Recommended using ``flytectl sandbox start`` as described in :ref:`getting-started`
+Recommended using ``flytectl sandbox start --verbose`` as described in :ref:`getting-started`
 
 .. prompt:: bash $
 
