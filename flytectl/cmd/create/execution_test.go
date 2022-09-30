@@ -4,28 +4,39 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type TestStruct struct {
-	executionConfig *ExecutionConfig
-	args            []string
+type createSuite struct {
+	suite.Suite
+	testutils.TestStruct
+	originalExecConfig ExecutionConfig
 }
 
-// This function needs to be called after testutils.Steup()
-func createExecutionSetup(s *testutils.TestStruct) (t TestStruct) {
-	ctx := s.Ctx
-	t.executionConfig = &ExecutionConfig{}
+func (s *createSuite) SetupTest() {
+	s.TestStruct = setup()
+
 	// TODO: migrate to new command context from testutils
 	s.CmdCtx = cmdCore.NewCommandContext(s.MockClient, s.MockOutStream)
+	s.originalExecConfig = *executionConfig
+}
+
+func (s *createSuite) TearDownTest() {
+	orig := s.originalExecConfig
+	executionConfig = &orig
+	s.MockAdminClient.AssertExpectations(s.T())
+}
+
+func (s *createSuite) onGetTask() {
 	sortedListLiteralType := core.Variable{
 		Type: &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
@@ -60,7 +71,10 @@ func createExecutionSetup(s *testutils.TestStruct) (t TestStruct) {
 			},
 		},
 	}
-	s.MockAdminClient.OnGetTaskMatch(ctx, mock.Anything).Return(task1, nil)
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, mock.Anything).Return(task1, nil)
+}
+
+func (s *createSuite) onGetLaunchPlan() {
 	parameterMap := map[string]*core.Parameter{
 		"numbers": {
 			Var: &core.Variable{
@@ -132,20 +146,14 @@ func createExecutionSetup(s *testutils.TestStruct) (t TestStruct) {
 			Project:      config.GetConfig().Project,
 			Domain:       config.GetConfig().Domain,
 			Name:         "core.control_flow.merge_sort.merge_sort",
-			Version:      "v2",
+			Version:      "v3",
 		},
 	}
-	s.MockAdminClient.OnGetLaunchPlanMatch(ctx, objectGetRequest).Return(launchPlan1, nil)
-
-	return TestStruct{
-		executionConfig: executionConfig,
-		args:            []string{},
-	}
+	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(launchPlan1, nil).Once()
 }
 
-func TestCreateTaskExecutionFunc(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
+func (s *createSuite) Test_CreateTaskExecution() {
+	s.onGetTask()
 	executionCreateResponseTask := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
@@ -153,31 +161,73 @@ func TestCreateTaskExecutionFunc(t *testing.T) {
 			Name:    "ff513c0e44b5b4a35aa5",
 		},
 	}
+	expected := &admin.ExecutionCreateRequest{
+		Project: "dummyProject",
+		Domain:  "dummyDomain",
+		Spec: &admin.ExecutionSpec{
+			LaunchPlan: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "dummyProject",
+				Domain:       "dummyDomain",
+				Name:         "task1",
+				Version:      "v2",
+			},
+			Metadata: &admin.ExecutionMetadata{Mode: admin.ExecutionMetadata_MANUAL, Principal: "sdk", Nesting: 0},
+			AuthRole: &admin.AuthRole{
+				KubernetesServiceAccount: executionConfig.KubeServiceAcct,
+				AssumableIamRole:         "iamRoleARN",
+			},
+			SecurityContext: &core.SecurityContext{
+				RunAs: &core.Identity{
+					K8SServiceAccount: executionConfig.KubeServiceAcct,
+					IamRole:           "iamRoleARN",
+				},
+			},
+			ClusterAssignment: &admin.ClusterAssignment{ClusterPoolName: "gpu"},
+		},
+	}
+	s.MockAdminClient.
+		OnCreateExecutionMatch(s.Ctx, mock.Anything).
+		Run(func(args mock.Arguments) {
+			actual := args.Get(1).(*admin.ExecutionCreateRequest)
+			actual.Name = ""
+			actual.Inputs = nil
+			s.True(proto.Equal(expected, actual), actual.String())
+		}).
+		Return(executionCreateResponseTask, nil).
+		Once()
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec_with_iamrole.yaml"
 
-	ctx := s.Ctx
-	s.MockAdminClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(executionCreateResponseTask, nil)
-	ts.executionConfig.ExecFile = testDataFolder + "task_execution_spec_with_iamrole.yaml"
-	err := createExecutionCommand(ctx, ts.args, s.CmdCtx)
-	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
-	tearDownAndVerify(t, s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.NoError(err)
+	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
 }
 
-func TestCreateTaskExecutionFuncError(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
-	ctx := s.Ctx
-	s.MockAdminClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(nil, fmt.Errorf("error launching task"))
-	ts.executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
-	err := createExecutionCommand(ctx, ts.args, s.CmdCtx)
-	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("error launching task"), err)
-	s.MockAdminClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
+func (s *createSuite) Test_CreateTaskExecution_GetTaskError() {
+	expected := fmt.Errorf("error")
+	s.MockAdminClient.OnGetTaskMatch(s.Ctx, mock.Anything).Return(nil, expected).Once()
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.Equal(expected, err)
 }
 
-func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
+func (s *createSuite) Test_CreateTaskExecution_CreateExecutionError() {
+	s.onGetTask()
+	s.MockAdminClient.
+		OnCreateExecutionMatch(s.Ctx, mock.Anything).
+		Return(nil, fmt.Errorf("error launching task")).
+		Once()
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.EqualError(err, "error launching task")
+}
+
+func (s *createSuite) Test_CreateLaunchPlanExecution() {
 	executionCreateResponseLP := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
@@ -185,20 +235,27 @@ func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
 			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
+	s.onGetLaunchPlan()
+	s.MockAdminClient.OnCreateExecutionMatch(s.Ctx, mock.Anything).Return(executionCreateResponseLP, nil)
+	executionConfig.ExecFile = testDataFolder + "launchplan_execution_spec.yaml"
 
-	ctx := s.Ctx
-	s.MockAdminClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(executionCreateResponseLP, nil)
-	ts.executionConfig.ExecFile = testDataFolder + "launchplan_execution_spec.yaml"
-	err := createExecutionCommand(ctx, ts.args, s.CmdCtx)
-	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
-	tearDownAndVerify(t, s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.NoError(err)
+	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
 }
 
-func TestCreateRelaunchExecutionFunc(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
-	defer func() { ts.executionConfig.Relaunch = "" }()
+func (s *createSuite) Test_CreateLaunchPlan_GetLaunchPlanError() {
+	expected := fmt.Errorf("error")
+	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, mock.Anything).Return(nil, expected).Once()
+	executionConfig.ExecFile = testDataFolder + "launchplan_execution_spec.yaml"
+
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.Equal(expected, err)
+}
+
+func (s *createSuite) Test_CreateRelaunchExecution() {
 	relaunchExecResponse := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
@@ -206,8 +263,7 @@ func TestCreateRelaunchExecutionFunc(t *testing.T) {
 			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
-
-	ts.executionConfig.Relaunch = relaunchExecResponse.Id.Name
+	executionConfig.Relaunch = relaunchExecResponse.Id.Name
 	relaunchRequest := &admin.ExecutionRelaunchRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    executionConfig.Relaunch,
@@ -215,19 +271,15 @@ func TestCreateRelaunchExecutionFunc(t *testing.T) {
 			Domain:  config.GetConfig().Domain,
 		},
 	}
-	ctx := s.Ctx
-	s.MockAdminClient.OnRelaunchExecutionMatch(ctx, relaunchRequest).Return(relaunchExecResponse, nil)
-	err := createExecutionCommand(ctx, ts.args, s.CmdCtx)
-	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "RelaunchExecution", ctx, relaunchRequest)
-	tearDownAndVerify(t, s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(relaunchExecResponse, nil).Once()
+
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.NoError(err)
+	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
 }
 
-func TestCreateRecoverExecutionFunc(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
-	defer func() { ts.executionConfig.Recover = "" }()
-
+func (s *createSuite) Test_CreateRecoverExecution() {
 	originalExecutionName := "abc123"
 	recoverExecResponse := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -236,8 +288,7 @@ func TestCreateRecoverExecutionFunc(t *testing.T) {
 			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
-
-	ts.executionConfig.Recover = originalExecutionName
+	executionConfig.Recover = originalExecutionName
 	recoverRequest := &admin.ExecutionRecoverRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    originalExecutionName,
@@ -245,31 +296,39 @@ func TestCreateRecoverExecutionFunc(t *testing.T) {
 			Domain:  config.GetConfig().Domain,
 		},
 	}
+	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(recoverExecResponse, nil).Once()
 
-	ctx := s.Ctx
-	s.MockAdminClient.OnRecoverExecutionMatch(ctx, recoverRequest).Return(recoverExecResponse, nil)
-	err := createExecutionCommand(ctx, ts.args, s.CmdCtx)
-	assert.Nil(t, err)
-	s.MockAdminClient.AssertCalled(t, "RecoverExecution", ctx, recoverRequest)
-	tearDownAndVerify(t, s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
-	ts.executionConfig.Relaunch = ""
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+
+	s.NoError(err)
+	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
 }
 
-func TestCreateExecutionFuncInvalid(t *testing.T) {
-	s := setup()
-	ts := createExecutionSetup(&s)
-	executionConfig := ts.executionConfig
+func (s *createSuite) TestCreateExecutionFuncInvalid() {
 	executionConfig.Relaunch = ""
 	executionConfig.ExecFile = ""
-	err := createExecutionCommand(s.Ctx, ts.args, s.CmdCtx)
-	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("executionConfig, relaunch and recover can't be empty. Run the flytectl get task/launchplan to generate the config"), err)
+	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+	s.EqualError(err, "executionConfig, relaunch and recover can't be empty. Run the flytectl get task/launchplan to generate the config")
+
 	executionConfig.ExecFile = "Invalid-file"
-	err = createExecutionCommand(s.Ctx, ts.args, s.CmdCtx)
-	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("unable to read from %v yaml file", executionConfig.ExecFile), err)
+	err = createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+	s.EqualError(err, fmt.Sprintf("unable to read from %v yaml file", executionConfig.ExecFile))
+
 	executionConfig.ExecFile = testDataFolder + "invalid_execution_spec.yaml"
-	err = createExecutionCommand(s.Ctx, ts.args, s.CmdCtx)
-	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("either task or workflow name should be specified to launch an execution"), err)
+	err = createExecutionCommand(s.Ctx, nil, s.CmdCtx)
+	s.EqualError(err, "either task or workflow name should be specified to launch an execution")
+}
+
+func (s *createSuite) Test_CreateTaskExecution_DryRun() {
+	s.onGetTask()
+	executionConfig.DryRun = true
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec_with_iamrole.yaml"
+
+	err := createExecutionCommand(s.Ctx, []string{"target"}, s.CmdCtx)
+
+	s.NoError(err)
+}
+
+func TestCreateSuite(t *testing.T) {
+	suite.Run(t, &createSuite{originalExecConfig: *executionConfig})
 }

@@ -9,7 +9,7 @@ require (
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/flyteorg/flyteidl v1.1.15
+	github.com/flyteorg/flyteidl v1.1.19
 	github.com/flyteorg/flytestdlib v1.0.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0

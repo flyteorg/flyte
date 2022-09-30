@@ -225,6 +225,20 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_clusterPool", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("clusterPool", testValue)
+			if vString, err := cmdFlags.GetString("clusterPool"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.ClusterPool)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_workflow", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
