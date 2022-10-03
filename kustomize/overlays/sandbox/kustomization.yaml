@@ -25,7 +25,7 @@ resources:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v1.1.44 # FLYTEADMIN_TAG override the tag
+    newTag: v1.1.46 # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
