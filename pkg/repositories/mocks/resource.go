@@ -43,6 +43,14 @@ func (r *MockResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID)
 	return models.Resource{}, nil
 }
 
+func (r *MockResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.ResourceID) (
+	models.Resource, error) {
+	if r.GetFunction != nil {
+		return r.GetFunction(ctx, ID)
+	}
+	return models.Resource{}, nil
+}
+
 func (r *MockResourceRepo) ListAll(ctx context.Context, resourceType string) ([]models.Resource, error) {
 	if r.ListAllFunction != nil {
 		return r.ListAllFunction(ctx, resourceType)

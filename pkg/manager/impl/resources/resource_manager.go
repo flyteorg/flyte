@@ -3,6 +3,8 @@ package resources
 import (
 	"context"
 
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -148,6 +150,123 @@ func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 	return &admin.WorkflowAttributesDeleteResponse{}, nil
 }
 
+func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+	*admin.ProjectAttributesUpdateResponse, error) {
+
+	var resource admin.MatchableResource
+	var err error
+
+	if resource, err = validation.ValidateProjectAttributesUpdateRequest(ctx, m.db, request); err != nil {
+		return nil, err
+	}
+	model, err := transformers.ProjectAttributesToResourceModel(*request.Attributes, resource)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Attributes.GetMatchingAttributes().GetPluginOverrides() != nil {
+		return m.createOrMergeUpdateProjectAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
+	}
+
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.ProjectAttributesUpdateResponse{}, nil
+}
+
+func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+	*admin.ProjectAttributesGetResponse, error) {
+
+	if err := validation.ValidateProjectExists(ctx, m.db, request.Project); err != nil {
+		return nil, err
+	}
+
+	projectAttributesModel, err := m.db.ResourceRepo().GetProjectLevel(
+		ctx, repo_interface.ResourceID{Project: request.Project, Domain: "", ResourceType: request.ResourceType.String()})
+	if err != nil {
+		return nil, err
+	}
+
+	ma, err := transformers.FromResourceModelToMatchableAttributes(projectAttributesModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.ProjectAttributesGetResponse{
+		Attributes: &admin.ProjectAttributes{
+			Project:            request.Project,
+			MatchingAttributes: ma.Attributes,
+		},
+	}, nil
+}
+
+// GetProjectAttributes combines the call to the database to get the Project level settings with
+// Admin server level configuration.
+// Note this merge is only done for WorkflowExecutionConfig
+// This code should be removed pending implementation of a complete settings implementation.
+func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+	*admin.ProjectAttributesGetResponse, error) {
+
+	getResponse, err := m.GetProjectAttributesBase(ctx, request)
+	configLevelDefaults := m.config.GetTopLevelConfig().GetAsWorkflowExecutionConfig()
+	if err != nil {
+		ec, ok := err.(errors.FlyteAdminError)
+		if ok && ec.Code() == codes.NotFound {
+			// TODO: Will likely be removed after overarching settings project is done
+			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
+			return &admin.ProjectAttributesGetResponse{
+				Attributes: &admin.ProjectAttributes{
+					Project: request.Project,
+					MatchingAttributes: &admin.MatchingAttributes{
+						Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+							WorkflowExecutionConfig: &configLevelDefaults,
+						},
+					},
+				},
+			}, nil
+		}
+		return nil, err
+
+	}
+	// If found, then merge result with the default values for the platform
+	// TODO: Remove this logic once the overarching settings project is done. Those endpoints should take
+	//   default configuration into account.
+	responseAttributes := getResponse.Attributes.GetMatchingAttributes().GetWorkflowExecutionConfig()
+	if responseAttributes != nil {
+		logger.Warningf(ctx, "Merging response %s with defaults %s", responseAttributes, configLevelDefaults)
+		tmp := util.MergeIntoExecConfig(*responseAttributes, &configLevelDefaults)
+		responseAttributes = &tmp
+		return &admin.ProjectAttributesGetResponse{
+			Attributes: &admin.ProjectAttributes{
+				Project: request.Project,
+				MatchingAttributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+						WorkflowExecutionConfig: responseAttributes,
+					},
+				},
+			},
+		}, nil
+	}
+
+	return getResponse, nil
+}
+
+func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+	*admin.ProjectAttributesDeleteResponse, error) {
+
+	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project); err != nil {
+		return nil, err
+	}
+	if err := m.db.ResourceRepo().Delete(
+		ctx, repo_interface.ResourceID{Project: request.Project, ResourceType: request.ResourceType.String()}); err != nil {
+		return nil, err
+	}
+	logger.Infof(ctx, "Deleted project attributes for: %s-%s (%s)", request.Project, request.ResourceType.String())
+	return &admin.ProjectAttributesDeleteResponse{}, nil
+}
+
 func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.ProjectDomainAttributesUpdateResponse, error) {
@@ -171,8 +290,8 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 		}
 		return nil, err
 	}
-	updatedModel, err := transformers.MergeUpdateProjectDomainAttributes(
-		ctx, existing, resourceType, &resourceID, request.Attributes)
+	updatedModel, err := transformers.MergeUpdatePluginAttributes(
+		ctx, existing, resourceType, &resourceID, request.Attributes.MatchingAttributes)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +300,42 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 		return nil, err
 	}
 	return &admin.ProjectDomainAttributesUpdateResponse{}, nil
+}
+
+func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
+	ctx context.Context, request admin.ProjectAttributesUpdateRequest, model models.Resource,
+	resourceType admin.MatchableResource) (*admin.ProjectAttributesUpdateResponse, error) {
+
+	resourceID := repo_interface.ResourceID{
+		Project:      model.Project,
+		Domain:       model.Domain,
+		Workflow:     model.Workflow,
+		LaunchPlan:   model.LaunchPlan,
+		ResourceType: model.ResourceType,
+	}
+	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
+	if err != nil {
+		ec, ok := err.(errors.FlyteAdminError)
+		if ok && ec.Code() == codes.NotFound {
+			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			if err != nil {
+				return nil, err
+			}
+			return &admin.ProjectAttributesUpdateResponse{}, nil
+		}
+		return nil, err
+	}
+	updatedModel, err := transformers.MergeUpdatePluginAttributes(
+		ctx, existing, resourceType, &resourceID, request.Attributes.MatchingAttributes)
+	if err != nil {
+		return nil, err
+	}
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectAttributesUpdateResponse{}, nil
 }
 
 func (m *ResourceManager) UpdateProjectDomainAttributes(

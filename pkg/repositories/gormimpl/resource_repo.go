@@ -38,7 +38,10 @@ The data in the Resource repo maps to the following rules:
 **	Example: Domain="staging" Project="Lyft" Workflow="" LaunchPlan= "l1" is invalid.
 */
 func validateCreateOrUpdateResourceInput(project, domain, workflow, launchPlan, resourceType string) bool {
-	if domain == "" || resourceType == "" {
+	if resourceType == "" {
+		return false
+	}
+	if domain == "" && project == "" {
 		return false
 	}
 	if project == "" && (workflow != "" || launchPlan != "") {
@@ -82,6 +85,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 	return nil
 }
 
+// Get returns the most-specific attribute setting for the given ResourceType.
 func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
 	if !validateCreateOrUpdateResourceInput(ID.Project, ID.Domain, ID.Workflow, ID.LaunchPlan, ID.ResourceType) {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
@@ -89,10 +93,15 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 	var resources []models.Resource
 	timer := r.metrics.GetDuration.Start()
 
-	txWhereClause := "resource_type = ? AND domain = ? AND project IN (?) AND workflow IN (?) AND launch_plan IN (?)"
+	txWhereClause := "resource_type = ? AND domain IN (?) AND project IN (?) AND workflow IN (?) AND launch_plan IN (?)"
 	project := []string{""}
 	if ID.Project != "" {
 		project = append(project, ID.Project)
+	}
+
+	domain := []string{""}
+	if ID.Domain != "" {
+		domain = append(domain, ID.Domain)
 	}
 
 	workflow := []string{""}
@@ -105,7 +114,33 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 		launchPlan = append(launchPlan, ID.LaunchPlan)
 	}
 
-	tx := r.db.Where(txWhereClause, ID.ResourceType, ID.Domain, project, workflow, launchPlan)
+	tx := r.db.Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan)
+	tx.Order(priorityDescending).First(&resources)
+	timer.Stop()
+
+	if (tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound)) || len(resources) == 0 {
+		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
+			"Resource [%+v] not found", ID)
+	} else if tx.Error != nil {
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return resources[0], nil
+}
+
+// GetProjectLevel differs from Get in that it returns only the project-level attribute setting for the
+// given ResourceType if it exists. The reason this exists is because we want to return project level
+// attributes to Flyte Console, regardless of whether a more specific setting exists.
+func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
+	if ID.Project == "" {
+		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
+	}
+
+	var resources []models.Resource
+	timer := r.metrics.GetDuration.Start()
+
+	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = ''"
+
+	tx := r.db.Where(txWhereClause, ID.ResourceType, ID.Project)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 

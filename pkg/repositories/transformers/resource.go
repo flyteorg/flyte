@@ -112,8 +112,23 @@ func ProjectDomainAttributesToResourceModel(attributes admin.ProjectDomainAttrib
 	}, nil
 }
 
-func MergeUpdateProjectDomainAttributes(ctx context.Context, model models.Resource, resource admin.MatchableResource,
-	resourceID *repoInterfaces.ResourceID, attributes *admin.ProjectDomainAttributes) (models.Resource, error) {
+func ProjectAttributesToResourceModel(attributes admin.ProjectAttributes, resource admin.MatchableResource) (models.Resource, error) {
+	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+	if err != nil {
+		return models.Resource{}, err
+	}
+	return models.Resource{
+		Project:      attributes.Project,
+		ResourceType: resource.String(),
+		Priority:     models.ResourcePriorityProjectLevel,
+		Attributes:   attributeBytes,
+	}, nil
+}
+
+// MergeUpdatePluginAttributes only handles plugin overrides. Other attributes are just overridden when an
+// update happens.
+func MergeUpdatePluginAttributes(ctx context.Context, model models.Resource, resource admin.MatchableResource,
+	resourceID *repoInterfaces.ResourceID, matchingAttributes *admin.MatchingAttributes) (models.Resource, error) {
 	switch resource {
 	case admin.MatchableResource_PLUGIN_OVERRIDE:
 		var existingAttributes admin.MatchingAttributes
@@ -122,7 +137,7 @@ func MergeUpdateProjectDomainAttributes(ctx context.Context, model models.Resour
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
 				"Unable to unmarshal existing resource attributes for [%+v] with err: %v", resourceID, err)
 		}
-		updatedAttributes := mergeUpdatePluginOverrides(existingAttributes, attributes.GetMatchingAttributes())
+		updatedAttributes := mergeUpdatePluginOverrides(existingAttributes, matchingAttributes)
 		marshaledAttributes, err := proto.Marshal(updatedAttributes)
 		if err != nil {
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,

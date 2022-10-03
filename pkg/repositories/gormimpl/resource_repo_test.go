@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -14,6 +16,7 @@ import (
 )
 
 const resourceTestWorkflowName = "workflow"
+const resourceTypeStr = "resource-type"
 
 func TestCreateWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
@@ -86,11 +89,11 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	response["project"] = "project"
 	response["domain"] = "domain"
 	response["workflow"] = resourceTestWorkflowName
-	response["resource_type"] = "resource-type"
+	response["resource_type"] = resourceTypeStr
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = $2 AND project IN ($3,$4) AND workflow IN ($5,$6) AND launch_plan IN ($7) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6,$7) AND launch_plan IN ($8) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -100,7 +103,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	assert.Equal(t, "project", output.Project)
 	assert.Equal(t, "domain", output.Domain)
 	assert.Equal(t, "workflow", output.Workflow)
-	assert.Equal(t, "resource-type", output.ResourceType)
+	assert.Equal(t, resourceTypeStr, output.ResourceType)
 	assert.Equal(t, []byte("attrs"), output.Attributes)
 }
 
@@ -111,11 +114,11 @@ func TestProjectDomainAttributes(t *testing.T) {
 	response := make(map[string]interface{})
 	response[project] = project
 	response[domain] = domain
-	response["resource_type"] = "resource-type"
+	response["resource_type"] = resourceTypeStr
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = $2 AND project IN ($3,$4) AND workflow IN ($5) AND launch_plan IN ($6) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6) AND launch_plan IN ($7) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -127,6 +130,35 @@ func TestProjectDomainAttributes(t *testing.T) {
 	assert.Equal(t, "", output.Workflow)
 	assert.Equal(t, "resource-type", output.ResourceType)
 	assert.Equal(t, []byte("attrs"), output.Attributes)
+}
+
+func TestProjectLevelAttributes(t *testing.T) {
+	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	response := make(map[string]interface{})
+	response[project] = project
+	response[domain] = ""
+	response["resource_type"] = "resource-type"
+	response["attributes"] = []byte("attrs")
+
+	query := GlobalMock.NewMock()
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = '' AND project = $2 AND workflow = '' AND launch_plan = '' ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+		[]map[string]interface{}{
+			response,
+		})
+
+	output, err := resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{Project: "project", Domain: "", ResourceType: "resource"})
+	assert.Nil(t, err)
+	assert.Equal(t, project, output.Project)
+	assert.Equal(t, "", output.Domain)
+	assert.Equal(t, "", output.Workflow)
+	assert.Equal(t, "resource-type", output.ResourceType)
+	assert.Equal(t, []byte("attrs"), output.Attributes)
+
+	// Must have a project defined
+	_, err = resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{Project: "", Domain: "", ResourceType: "resource"})
+	assert.Error(t, err)
 }
 
 func TestGetRawWorkflowAttributes(t *testing.T) {
@@ -197,4 +229,19 @@ func TestListAll(t *testing.T) {
 	assert.Equal(t, "resource", output[0].ResourceType)
 	assert.Equal(t, []byte("attrs"), output[0].Attributes)
 	assert.True(t, fakeResponse.Triggered)
+}
+
+func TestGetError(t *testing.T) {
+	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	query := GlobalMock.NewMock()
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6,$7) AND launch_plan IN ($8) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithError(gorm.ErrRecordNotFound)
+
+	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", ResourceType: "resource"})
+	assert.Error(t, err)
+	assert.Equal(t, "", output.Project)
+	assert.Equal(t, "", output.Domain)
+	assert.Equal(t, "", output.Workflow)
 }
