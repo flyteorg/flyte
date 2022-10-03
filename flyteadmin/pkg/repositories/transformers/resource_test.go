@@ -86,15 +86,13 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 			ResourceType: "PLUGIN_OVERRIDE",
 			Attributes:   existingWorkflowAttributes,
 		}
-		mergeUpdatedModel, err := MergeUpdateProjectDomainAttributes(context.Background(), existingModel,
-			admin.MatchableResource_PLUGIN_OVERRIDE, &repoInterfaces.ResourceID{}, &admin.ProjectDomainAttributes{
-				Project: resourceProject,
-				Domain:  resourceDomain,
-				MatchingAttributes: testutils.GetPluginOverridesAttributes(map[string][]string{
-					"sidecar": {"plugin_c"},
-					"hive":    {"plugin_d"},
-				}),
-			})
+		mergeUpdatedModel, err := MergeUpdatePluginAttributes(context.Background(), existingModel,
+			admin.MatchableResource_PLUGIN_OVERRIDE, &repoInterfaces.ResourceID{},
+			testutils.GetPluginOverridesAttributes(map[string][]string{
+				"sidecar": {"plugin_c"},
+				"hive":    {"plugin_d"},
+			}),
+		)
 		assert.NoError(t, err)
 		var updatedAttributes admin.MatchingAttributes
 		err = proto.Unmarshal(mergeUpdatedModel.Attributes, &updatedAttributes)
@@ -124,8 +122,8 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 			Workflow:     resourceWorkflow,
 			ResourceType: "PLUGIN_OVERRIDE",
 		}
-		_, err := MergeUpdateProjectDomainAttributes(context.Background(), existingModel,
-			admin.MatchableResource_TASK_RESOURCE, &repoInterfaces.ResourceID{}, &admin.ProjectDomainAttributes{})
+		_, err := MergeUpdatePluginAttributes(context.Background(), existingModel,
+			admin.MatchableResource_TASK_RESOURCE, &repoInterfaces.ResourceID{}, &admin.MatchingAttributes{})
 		assert.Error(t, err, "unsupported resource type")
 	})
 }
@@ -251,4 +249,21 @@ func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
 	_, err := FromResourceModelToWorkflowAttributes(model)
 	assert.NotNil(t, err)
 	assert.Equal(t, codes.Internal, err.(errors.FlyteAdminError).Code())
+}
+
+func TestProjectAttributesToResourceModel(t *testing.T) {
+	pa := admin.ProjectAttributes{
+		Project:            resourceProject,
+		MatchingAttributes: matchingClusterResourceAttributes,
+	}
+	rm, err := ProjectAttributesToResourceModel(pa, admin.MatchableResource_CLUSTER_RESOURCE)
+
+	assert.NoError(t, err)
+	assert.EqualValues(t, models.Resource{
+		Project:      resourceProject,
+		Domain:       "",
+		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
+		Priority:     models.ResourcePriorityProjectLevel,
+		Attributes:   marshalledClusterResourceAttributes,
+	}, rm)
 }

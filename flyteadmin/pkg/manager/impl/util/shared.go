@@ -254,3 +254,42 @@ func GetMatchableResource(ctx context.Context, resourceManager interfaces.Resour
 	}
 	return matchableResource, nil
 }
+
+// MergeIntoExecConfig into workflowExecConfig (higher priority) from spec (lower priority) and return the
+// a new object with the merged changes.
+// After settings project is done, can move this function back to execution manager. Currently shared with resource.
+func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) admin.WorkflowExecutionConfig {
+	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
+		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
+	}
+
+	// Do a deep check on the spec in case the security context is set but to an empty object (which may be
+	// the case when coming from the UI)
+	if workflowExecConfig.GetSecurityContext() == nil && spec.GetSecurityContext() != nil {
+		if spec.GetSecurityContext().GetRunAs() != nil &&
+			(len(spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()) > 0 ||
+				len(spec.GetSecurityContext().GetRunAs().GetIamRole()) > 0) {
+			workflowExecConfig.SecurityContext = spec.GetSecurityContext()
+		}
+	}
+	// Launchplan spec has label, annotation and rawOutputDataConfig initialized with empty values.
+	// Hence we do a deep check in the following conditions before assignment
+	if (workflowExecConfig.GetRawOutputDataConfig() == nil ||
+		len(workflowExecConfig.GetRawOutputDataConfig().GetOutputLocationPrefix()) == 0) &&
+		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().OutputLocationPrefix) > 0) {
+		workflowExecConfig.RawOutputDataConfig = spec.GetRawOutputDataConfig()
+	}
+	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().Values) == 0) &&
+		(spec.GetLabels() != nil && len(spec.GetLabels().Values) > 0) {
+		workflowExecConfig.Labels = spec.GetLabels()
+	}
+	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().Values) == 0) &&
+		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().Values) > 0) {
+		workflowExecConfig.Annotations = spec.GetAnnotations()
+	}
+
+	if workflowExecConfig.GetInterruptible() == nil && spec.GetInterruptible() != nil {
+		workflowExecConfig.Interruptible = spec.GetInterruptible()
+	}
+	return workflowExecConfig
+}

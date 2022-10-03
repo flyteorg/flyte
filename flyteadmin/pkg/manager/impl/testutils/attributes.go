@@ -11,3 +11,18 @@ var ExecutionQueueAttributes = &admin.MatchingAttributes{
 		},
 	},
 }
+
+var WorkflowExecutionConfigSample = &admin.MatchingAttributes{
+	Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+		WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+			MaxParallelism: 5,
+			RawOutputDataConfig: &admin.RawOutputDataConfig{
+				OutputLocationPrefix: "s3://test-bucket",
+			},
+			Labels: &admin.Labels{
+				Values: map[string]string{"lab1": "val1"},
+			},
+			Annotations: nil,
+		},
+	},
+}

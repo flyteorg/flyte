@@ -51,7 +51,6 @@ import (
 	"github.com/benbjohnson/clock"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -434,59 +433,6 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 	return parentNodeExecutionID, sourceExecutionID, nil
 }
 
-// WorkflowExecutionConfigInterface is used as common interface for capturing the common behavior catering to the needs
-// of fetching the WorkflowExecutionConfig across LaunchPlanSpec, ExecutionCreateRequest
-// MatchableResource_WORKFLOW_EXECUTION_CONFIG and ApplicationConfig
-type WorkflowExecutionConfigInterface interface {
-	// GetMaxParallelism Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
-	GetMaxParallelism() int32
-	// GetRawOutputDataConfig Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
-	GetRawOutputDataConfig() *admin.RawOutputDataConfig
-	// GetSecurityContext Indicates security context permissions for executions triggered with this matchable attribute.
-	GetSecurityContext() *core.SecurityContext
-	// GetAnnotations Custom annotations to be applied to a triggered execution resource.
-	GetAnnotations() *admin.Annotations
-	// GetLabels Custom labels to be applied to a triggered execution resource.
-	GetLabels() *admin.Labels
-	// GetInterruptible indicates a workflow should be flagged as interruptible for a single execution. If omitted, the workflow's default is used.
-	GetInterruptible() *wrappers.BoolValue
-}
-
-// Merge into workflowExecConfig from spec and return true if any value has been changed
-func mergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec WorkflowExecutionConfigInterface) admin.WorkflowExecutionConfig {
-	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
-		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
-	}
-
-	if workflowExecConfig.GetSecurityContext() == nil && spec.GetSecurityContext() != nil {
-		if spec.GetSecurityContext().GetRunAs() != nil &&
-			(len(spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()) > 0 ||
-				len(spec.GetSecurityContext().GetRunAs().GetIamRole()) > 0) {
-			workflowExecConfig.SecurityContext = spec.GetSecurityContext()
-		}
-	}
-	// Launchplan spec has label, annotation and rawOutputDataConfig initialized with empty values.
-	// Hence we do a deep check in the following conditions before assignment
-	if (workflowExecConfig.GetRawOutputDataConfig() == nil ||
-		len(workflowExecConfig.GetRawOutputDataConfig().GetOutputLocationPrefix()) == 0) &&
-		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().OutputLocationPrefix) > 0) {
-		workflowExecConfig.RawOutputDataConfig = spec.GetRawOutputDataConfig()
-	}
-	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().Values) == 0) &&
-		(spec.GetLabels() != nil && len(spec.GetLabels().Values) > 0) {
-		workflowExecConfig.Labels = spec.GetLabels()
-	}
-	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().Values) == 0) &&
-		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().Values) > 0) {
-		workflowExecConfig.Annotations = spec.GetAnnotations()
-	}
-
-	if workflowExecConfig.GetInterruptible() == nil && spec.GetInterruptible() != nil {
-		workflowExecConfig.Interruptible = spec.GetInterruptible()
-	}
-	return workflowExecConfig
-}
-
 // Produces execution-time attributes for workflow execution.
 // Defaults to overridable execution values set in the execution create request, then looks at the launch plan values
 // (if any) before defaulting to values set in the matchable resource db and further if matchable resources don't
@@ -495,28 +441,47 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	launchPlan *admin.LaunchPlan) (*admin.WorkflowExecutionConfig, error) {
 
 	workflowExecConfig := admin.WorkflowExecutionConfig{}
-	// merge the request spec into workflowExecConfig
-	workflowExecConfig = mergeIntoExecConfig(workflowExecConfig, request.Spec)
+	// Merge the request spec into workflowExecConfig
+	workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, request.Spec)
 
 	var workflowName string
 	if launchPlan != nil && launchPlan.Spec != nil {
-		// merge the launch plan spec into workflowExecConfig
-		workflowExecConfig = mergeIntoExecConfig(workflowExecConfig, launchPlan.Spec)
+		// Merge the launch plan spec into workflowExecConfig
+		workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, launchPlan.Spec)
 		if launchPlan.Spec.WorkflowId != nil {
 			workflowName = launchPlan.Spec.WorkflowId.Name
 		}
 	}
 
+	// This will get the most specific Workflow Execution Config.
 	matchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
 		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain, workflowName)
 	if err != nil {
 		return nil, err
 	}
-
 	if matchableResource != nil && matchableResource.Attributes.GetWorkflowExecutionConfig() != nil {
 		// merge the matchable resource workflow execution config into workflowExecConfig
-		workflowExecConfig = mergeIntoExecConfig(workflowExecConfig,
+		workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig,
 			matchableResource.Attributes.GetWorkflowExecutionConfig())
+	}
+
+	// To match what the front-end will display to the user, we need to do the project level query too.
+	// This searches only for a direct match, and will not merge in system config level defaults like the
+	// GetProjectAttributes call does, since that's done below.
+	// The reason we need to do the project level query is for the case where some configs (say max parallelism)
+	// is set on the project level, but other items (say service account) is set on the project-domain level.
+	// In this case you want to use the project-domain service account, the project-level max parallelism, and
+	// system level defaults for the rest.
+	// See FLYTE-2322 for more background information.
+	projectMatchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, "", "")
+	if err != nil {
+		return nil, err
+	}
+	if projectMatchableResource != nil && projectMatchableResource.Attributes.GetWorkflowExecutionConfig() != nil {
+		// merge the matchable resource workflow execution config into workflowExecConfig
+		workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig,
+			projectMatchableResource.Attributes.GetWorkflowExecutionConfig())
 	}
 
 	// Backward compatibility changes to get security context from auth role.
@@ -530,8 +495,8 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 			len(resolvedSecurityCtx.GetRunAs().GetIamRole()) > 0) {
 		workflowExecConfig.SecurityContext = resolvedSecurityCtx
 	}
-	//  merge the application config into workflowExecConfig. If even the deprecated fields are not set
-	workflowExecConfig = mergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
+	// Merge the application config into workflowExecConfig. If even the deprecated fields are not set
+	workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
 	// Explicitly set the security context if its nil since downstream we expect this settings to be available
 	if workflowExecConfig.GetSecurityContext() == nil {
 		workflowExecConfig.SecurityContext = &core.SecurityContext{

@@ -6,11 +6,18 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-// Interface for managing project, domain and workflow -specific attributes.
+// ResourceInterface manages project, domain and workflow -specific attributes.
 type ResourceInterface interface {
 	ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
 		*admin.ListMatchableAttributesResponse, error)
 	GetResource(ctx context.Context, request ResourceRequest) (*ResourceResponse, error)
+
+	UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+		*admin.ProjectAttributesUpdateResponse, error)
+	GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+		*admin.ProjectAttributesGetResponse, error)
+	DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+		*admin.ProjectAttributesDeleteResponse, error)
 
 	UpdateProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 		*admin.ProjectDomainAttributesUpdateResponse, error)

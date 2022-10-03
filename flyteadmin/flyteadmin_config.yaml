@@ -6,7 +6,7 @@ server:
   httpPort: 8088
   grpcPort: 8089
   grpcServerReflection: true
-  kube-config: /Users/haythamabuelfutuh/kubeconfig/k3s/k3s.yaml
+  kube-config: /Users/ytong/.kube/config
   security:
     secure: false
     useAuth: false
@@ -66,7 +66,7 @@ database:
     port: 5432
     username: postgres
     host: localhost
-    dbname: postgres
+    dbname: flyteadmin
     options: "sslmode=disable"
 scheduler:
   eventScheduler:
@@ -122,7 +122,7 @@ storage:
     auth-type: accesskey
     secret-key: miniostorage
     disable-ssl: true
-    endpoint: "http://localhost:9000"
+    endpoint: "http://localhost:30084"
     region: my-region
   signedUrl:
     stowConfigOverride:

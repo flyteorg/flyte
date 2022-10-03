@@ -117,6 +117,63 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 	return response, nil
 }
 
+func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (
+	*admin.ProjectAttributesUpdateResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ProjectAttributesUpdateResponse
+	var err error
+	m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
+		response, err = m.ResourceManager.UpdateProjectAttributes(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+	}
+
+	return response, nil
+}
+
+func (m *AdminService) GetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
+	*admin.ProjectAttributesGetResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ProjectAttributesGetResponse
+	var err error
+	m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
+		response, err = m.ResourceManager.GetProjectAttributes(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+	}
+
+	return response, nil
+}
+
+func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (
+	*admin.ProjectAttributesDeleteResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ProjectAttributesDeleteResponse
+	var err error
+	m.Metrics.projectAttributesEndpointMetrics.delete.Time(func() {
+		response, err = m.ResourceManager.DeleteProjectAttributes(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.delete)
+	}
+
+	return response, nil
+}
+
 func (m *AdminService) ListMatchableAttributes(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
 	*admin.ListMatchableAttributesResponse, error) {
 	defer m.interceptPanic(ctx, request)

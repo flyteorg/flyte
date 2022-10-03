@@ -53,6 +53,21 @@ func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 		fmt.Sprintf("%s-%s", request.Attributes.Project, request.Attributes.Domain))
 }
 
+func ValidateProjectAttributesUpdateRequest(ctx context.Context,
+	db repositoryInterfaces.Repository,
+	request admin.ProjectAttributesUpdateRequest) (
+	admin.MatchableResource, error) {
+
+	if request.Attributes == nil {
+		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
+	}
+	if err := ValidateProjectForUpdate(ctx, db, request.Attributes.Project); err != nil {
+		return defaultMatchableResource, err
+	}
+
+	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Project)
+}
+
 func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {

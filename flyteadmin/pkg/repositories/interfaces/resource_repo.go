@@ -13,6 +13,9 @@ type ResourceRepoInterface interface {
 	Get(ctx context.Context, ID ResourceID) (models.Resource, error)
 	// Returns a matching Type model.
 	GetRaw(ctx context.Context, ID ResourceID) (models.Resource, error)
+	// GetProjectLevel returns the Project level resource entry, if any, even if there is a higher
+	// specificity resource.
+	GetProjectLevel(ctx context.Context, ID ResourceID) (models.Resource, error)
 	// Lists all resources
 	ListAll(ctx context.Context, resourceType string) ([]models.Resource, error)
 	// Deletes a matching Type model when it exists.
