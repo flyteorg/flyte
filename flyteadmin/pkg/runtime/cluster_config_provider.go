@@ -35,6 +35,15 @@ func (p *ClusterConfigurationProvider) GetClusterConfigs() []interfaces.ClusterC
 	return make([]interfaces.ClusterConfig, 0)
 }
 
+func (p *ClusterConfigurationProvider) GetDefaultExecutionLabel() string {
+	if clusterConfig != nil {
+		clusters := clusterConfig.GetConfig().(*interfaces.Clusters)
+		return clusters.DefaultExecutionLabel
+	}
+	logger.Debug(context.Background(), "Failed to find default execution label in config. Will use random cluster if no execution label matches.")
+	return ""
+}
+
 func NewClusterConfigurationProvider() interfaces.ClusterConfiguration {
 	clusterConfigProvider := ClusterConfigurationProvider{}
 	clusterNameMap := make(map[string]bool)

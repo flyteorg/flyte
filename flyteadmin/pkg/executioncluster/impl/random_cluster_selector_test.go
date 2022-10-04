@@ -23,14 +23,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testProject = "project"
-const testDomain = "domain"
-const testWorkflow = "name"
-
 const (
-	testCluster1 = "testcluster1"
-	testCluster2 = "testcluster2"
-	testCluster3 = "testcluster3"
+	testProject                    = "project"
+	testDomain                     = "domain"
+	testWorkflow                   = "name"
+	testCluster1                   = "testcluster1"
+	testCluster2                   = "testcluster2"
+	testCluster3                   = "testcluster3"
+	clusterConfig1                 = "clusters_config.yaml"
+	clusterConfig2                 = "clusters_config2.yaml"
+	clusterConfig2WithDefaultLabel = "clusters_config2_default_label.yaml"
 )
 
 func initTestConfig(fileName string) error {
@@ -47,7 +49,7 @@ func initTestConfig(fileName string) error {
 }
 
 func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface {
-	err := initTestConfig("clusters_config.yaml")
+	err := initTestConfig(clusterConfig1)
 	assert.NoError(t, err)
 
 	db := repo_mock.NewMockRepository()
@@ -102,6 +104,74 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 	targets := map[string]*executioncluster.ExecutionTarget{
 		testCluster1: {
 			ID: testCluster1,
+		},
+		testCluster2: {
+			ID:      testCluster2,
+			Enabled: true,
+		},
+		testCluster3: {
+			ID:      testCluster3,
+			Enabled: true,
+		},
+	}
+	listTargetsProvider.OnGetValidTargets().Return(validTargets)
+	listTargetsProvider.OnGetAllTargets().Return(targets)
+	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
+	assert.NoError(t, err)
+	return randomCluster
+}
+
+func getRandomClusterSelectorWithDefaultLabelForTest(t *testing.T, configFile string) interfaces2.ClusterInterface {
+	err := initTestConfig(configFile)
+	assert.NoError(t, err)
+
+	db := repo_mock.NewMockRepository()
+	db.ResourceRepo().(*repo_mock.MockResourceRepo).GetFunction = func(ctx context.Context, ID repo_interface.ResourceID) (resource models.Resource, e error) {
+		assert.Equal(t, "EXECUTION_CLUSTER_LABEL", ID.ResourceType)
+		if ID.Project == "" {
+			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.NotFound,
+				"Resource [%+v] not found", ID)
+		}
+		response := models.Resource{
+			Project:      ID.Project,
+			Domain:       ID.Domain,
+			Workflow:     ID.Workflow,
+			ResourceType: ID.ResourceType,
+			LaunchPlan:   ID.LaunchPlan,
+		}
+		if ID.Project == testProject && ID.Domain == testDomain {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
+					ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+						Value: "two",
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			response.Attributes = marshalledMatchingAttributes
+		}
+		return response, nil
+	}
+	configProvider := runtime.NewConfigurationProvider()
+	listTargetsProvider := mocks.ListTargetsInterface{}
+	validTargets := map[string]*executioncluster.ExecutionTarget{
+		testCluster1: {
+			ID:      testCluster1,
+			Enabled: true,
+		},
+		testCluster2: {
+			ID:      testCluster2,
+			Enabled: true,
+		},
+		testCluster3: {
+			ID:      testCluster3,
+			Enabled: true,
+		},
+	}
+	targets := map[string]*executioncluster.ExecutionTarget{
+		testCluster1: {
+			ID:      testCluster1,
+			Enabled: true,
 		},
 		testCluster2: {
 			ID:      testCluster2,
@@ -197,4 +267,43 @@ func TestRandomClusterSelectorGetAllValidTargets(t *testing.T) {
 	cluster := getRandomClusterSelectorForTest(t)
 	targets := cluster.GetValidTargets()
 	assert.Equal(t, 2, len(targets))
+}
+
+func TestRandomClusterSelectorGetTargetWithFallbackToDefault1(t *testing.T) {
+	cluster := getRandomClusterSelectorWithDefaultLabelForTest(t, clusterConfig2)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project:     testProject,
+		Domain:      "different",
+		Workflow:    testWorkflow,
+		ExecutionID: "e3",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, testCluster3, target.ID)
+	assert.True(t, target.Enabled)
+}
+
+func TestRandomClusterSelectorGetTargetWithFallbackToDefault2(t *testing.T) {
+	cluster := getRandomClusterSelectorWithDefaultLabelForTest(t, clusterConfig2)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project:     testProject,
+		Domain:      testDomain,
+		Workflow:    testWorkflow,
+		ExecutionID: "e3",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, testCluster2, target.ID)
+	assert.True(t, target.Enabled)
+}
+
+func TestRandomClusterSelectorGetTargetWithFallbackToDefault3(t *testing.T) {
+	cluster := getRandomClusterSelectorWithDefaultLabelForTest(t, clusterConfig2WithDefaultLabel)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project:     testProject,
+		Domain:      "different",
+		Workflow:    testWorkflow,
+		ExecutionID: "e3",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, testCluster1, target.ID)
+	assert.True(t, target.Enabled)
 }
