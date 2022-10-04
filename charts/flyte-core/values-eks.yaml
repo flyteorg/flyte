@@ -307,7 +307,7 @@ workflow_scheduler:
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-  enabled: false
+  enabled: true
   config:
     notifications:
       type: aws
@@ -318,7 +318,7 @@ workflow_notifications:
         queueName: flyte-notifications-queue
         accountId: "{{ .Values.userSettings.accountNumber }}"
       emailer:
-        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has {{ phase }}"
         sender: "flyte@example.com"
         body: |
          "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
