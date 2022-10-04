@@ -307,7 +307,7 @@ workflow_scheduler:
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-  enabled: true
+  enabled: false
   config:
     notifications:
       type: aws
