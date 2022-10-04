@@ -46,6 +46,38 @@ func (_m *ClusterConfiguration) GetClusterConfigs() []interfaces.ClusterConfig {
 	return r0
 }
 
+type ClusterConfiguration_GetDefaultExecutionLabel struct {
+	*mock.Call
+}
+
+func (_m ClusterConfiguration_GetDefaultExecutionLabel) Return(_a0 string) *ClusterConfiguration_GetDefaultExecutionLabel {
+	return &ClusterConfiguration_GetDefaultExecutionLabel{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ClusterConfiguration) OnGetDefaultExecutionLabel() *ClusterConfiguration_GetDefaultExecutionLabel {
+	c_call := _m.On("GetDefaultExecutionLabel")
+	return &ClusterConfiguration_GetDefaultExecutionLabel{Call: c_call}
+}
+
+func (_m *ClusterConfiguration) OnGetDefaultExecutionLabelMatch(matchers ...interface{}) *ClusterConfiguration_GetDefaultExecutionLabel {
+	c_call := _m.On("GetDefaultExecutionLabel", matchers...)
+	return &ClusterConfiguration_GetDefaultExecutionLabel{Call: c_call}
+}
+
+// GetDefaultExecutionLabel provides a mock function with given fields:
+func (_m *ClusterConfiguration) GetDefaultExecutionLabel() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ClusterConfiguration_GetLabelClusterMap struct {
 	*mock.Call
 }

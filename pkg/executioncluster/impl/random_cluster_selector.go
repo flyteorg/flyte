@@ -32,6 +32,7 @@ type RandomClusterSelector struct {
 	equalWeightedAllClusters random.WeightedRandomList
 	labelWeightedRandomMap   map[string]random.WeightedRandomList
 	resourceManager          managerInterfaces.ResourceInterface
+	defaultExecutionLabel    string
 }
 
 func getRandSource(seed string) (rand.Source, error) {
@@ -111,6 +112,7 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 			return nil, err
 		}
 	}
+
 	var weightedRandomList random.WeightedRandomList
 	if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
 		label := resource.Attributes.GetExecutionClusterLabel().Value
@@ -123,8 +125,17 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 	} else {
 		logger.Debugf(ctx, "No override found for the spec %v", spec)
 	}
-	// If there is no label associated (or) if the label is invalid, choose from all enabled clusters.
-	// Note that if there is a valid label with zero "Enabled" clusters, we still choose from all enabled ones.
+
+	if weightedRandomList == nil {
+		if s.defaultExecutionLabel != "" {
+			if _, ok := s.labelWeightedRandomMap[s.defaultExecutionLabel]; ok {
+				weightedRandomList = s.labelWeightedRandomMap[s.defaultExecutionLabel]
+			} else {
+				logger.Warnf(ctx, "No cluster mapping found for the default execution label %s", s.defaultExecutionLabel)
+			}
+		}
+	}
+
 	if weightedRandomList == nil {
 		weightedRandomList = s.equalWeightedAllClusters
 	}
@@ -148,6 +159,9 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, config runtime.Configuration,
 	db repositoryInterfaces.Repository) (interfaces.ClusterInterface, error) {
+
+	defaultExecutionLabel := config.ClusterConfiguration().GetDefaultExecutionLabel()
+
 	equalWeightedAllClusters, err := convertToRandomWeightedList(context.Background(), listTargets.GetValidTargets())
 	if err != nil {
 		return nil, err
@@ -161,5 +175,6 @@ func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, confi
 		resourceManager:          resources.NewResourceManager(db, config.ApplicationConfiguration()),
 		equalWeightedAllClusters: equalWeightedAllClusters,
 		ListTargetsInterface:     listTargets,
+		defaultExecutionLabel:    defaultExecutionLabel,
 	}, nil
 }

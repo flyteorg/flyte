@@ -42,8 +42,9 @@ func (auth Auth) GetToken() (string, error) {
 }
 
 type Clusters struct {
-	ClusterConfigs  []ClusterConfig            `json:"clusterConfigs"`
-	LabelClusterMap map[string][]ClusterEntity `json:"labelClusterMap"`
+	ClusterConfigs        []ClusterConfig            `json:"clusterConfigs"`
+	LabelClusterMap       map[string][]ClusterEntity `json:"labelClusterMap"`
+	DefaultExecutionLabel string                     `json:"defaultExecutionLabel"`
 }
 
 //go:generate mockery -name ClusterConfiguration -case=underscore -output=../mocks -case=underscore
@@ -56,4 +57,7 @@ type ClusterConfiguration interface {
 
 	// Returns label cluster map for routing
 	GetLabelClusterMap() map[string][]ClusterEntity
+
+	// Returns default execution label used as fallback if no execution cluster was explicitly defined.
+	GetDefaultExecutionLabel() string
 }
