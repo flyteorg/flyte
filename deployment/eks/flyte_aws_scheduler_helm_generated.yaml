@@ -846,7 +846,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "76b8ca5476cbbb2d029c2c19776657074c77ce14d12e4c9bd4611e97d78b158"
+        configChecksum: "2b5c85969f2bd85bb51a084f9fd72c20c3aca94be99e53cb4c4e9f78e77ebc5"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte

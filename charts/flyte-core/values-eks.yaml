@@ -318,7 +318,7 @@ workflow_notifications:
         queueName: flyte-notifications-queue
         accountId: "{{ .Values.userSettings.accountNumber }}"
       emailer:
-        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has {{ phase }}"
         sender: "flyte@example.com"
         body: |
          "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
