@@ -45,12 +45,16 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			tokenURL = metadata.TokenEndpoint
 		}
 
-		clientMetadata, err := authClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+		scopes := cfg.Scopes
+		if len(scopes) == 0 {
+			clientMetadata, err := authClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
+			if err != nil {
+				return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+			}
+			scopes = clientMetadata.Scopes
 		}
 
-		tokenProvider, err = NewClientCredentialsTokenSourceProvider(ctx, cfg, clientMetadata, tokenURL)
+		tokenProvider, err = NewClientCredentialsTokenSourceProvider(ctx, cfg, scopes, tokenURL)
 		if err != nil {
 			return nil, err
 		}
@@ -148,8 +152,7 @@ type ClientCredentialsTokenSourceProvider struct {
 	TokenRefreshWindow time.Duration
 }
 
-func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config,
-	clientMetadata *service.PublicClientAuthConfigResponse, tokenURL string) (TokenSourceProvider, error) {
+func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, scopes []string, tokenURL string) (TokenSourceProvider, error) {
 	var secret string
 	if len(cfg.ClientSecretEnvVar) > 0 {
 		secret = os.Getenv(cfg.ClientSecretEnvVar)
@@ -162,11 +165,6 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config,
 		secret = string(secretBytes)
 	}
 	secret = strings.TrimSpace(secret)
-
-	scopes := cfg.Scopes
-	if len(scopes) == 0 {
-		scopes = clientMetadata.Scopes
-	}
 	return ClientCredentialsTokenSourceProvider{
 		ccConfig: clientcredentials.Config{
 			ClientID:     cfg.ClientID,
