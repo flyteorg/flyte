@@ -25,6 +25,7 @@ func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
 }
 
 func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
+	optional := true
 	return corev1.EnvVar{
 		Name: strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
 		ValueFrom: &corev1.EnvVarSource{
@@ -32,13 +33,15 @@ func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 				LocalObjectReference: corev1.LocalObjectReference{
 					Name: secret.Group,
 				},
-				Key: secret.Key,
+				Key:      secret.Key,
+				Optional: &optional,
 			},
 		},
 	}
 }
 
 func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
+	optional := true
 	return corev1.Volume{
 		// we don't want to create different volume for the same secret group
 		Name: encoding.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.GroupVersion)),
@@ -51,6 +54,7 @@ func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
 						Path: strings.ToLower(secret.Key),
 					},
 				},
+				Optional: &optional,
 			},
 		},
 	}

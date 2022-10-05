@@ -11,6 +11,8 @@ import (
 )
 
 func TestK8sSecretInjector_Inject(t *testing.T) {
+	optional := true
+
 	inputPod := corev1.Pod{
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
@@ -36,6 +38,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: "grOUP",
 									},
+									Optional: &optional,
 								},
 							},
 						},
@@ -63,6 +66,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 									Path: "hello",
 								},
 							},
+							Optional: &optional,
 						},
 					},
 				},
@@ -110,6 +114,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 									Path: "world",
 								},
 							},
+							Optional: &optional,
 						},
 					},
 				},
@@ -147,6 +152,7 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName: "hello",
+							Optional:   &optional,
 						},
 					},
 				},
