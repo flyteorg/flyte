@@ -1,0 +1,40 @@
+%option noyywrap
+
+%{
+
+#include<stdio.h>
+#include<strings.h>
+
+int count=0;
+
+char longest[50];
+
+%}
+
+/*Rule Section*/
+
+%%
+
+[A-Za-z0-9]+ {if(yyleng>count){
+
+ count=yyleng;
+
+ strcpy(longest,yytext);
+
+ }
+
+ }
+
+%%
+
+int main()
+
+{
+
+ yylex();
+
+printf("Longest Word:%s\n",longest);
+
+return 0;
+
+}
