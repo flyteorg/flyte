@@ -53,6 +53,6 @@ spec:
           name: cluster-resource-templates
       - name: config
         configMap:
-          name: config
+          name: flyte-backend-config
       - name: state
         emptyDir: {}

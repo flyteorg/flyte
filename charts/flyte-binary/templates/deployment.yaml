@@ -24,7 +24,11 @@ spec:
         args:
         - start
         - --config
+        {{- if eq .Values.paths.externalFlyteConfig "" }}
         - /etc/flyte/flyte.yaml
+        {{- else }}
+        - {{ .Values.paths.externalFlyteConfig }}
+        {{- end }}
         resources:
           limits:
             cpu: 1
@@ -39,9 +43,11 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/cluster-resource-templates
           name: cluster-resource-templates
+        {{- if eq .Values.paths.externalFlyteConfig "" }}
         - mountPath: /etc/flyte/flyte.yaml
           subPath: flyte.yaml
           name: config
+        {{- end }}
         - mountPath: /var/run/flyte
           name: state
       serviceAccountName: flyte
@@ -49,8 +55,10 @@ spec:
       - name: cluster-resource-templates
         configMap:
           name: cluster-resource-templates
+      {{- if eq .Values.paths.externalFlyteConfig "" }}
       - name: config
         configMap:
-          name: config
+          name: flyte-backend-config
+      {{- end }}
       - name: state
         emptyDir: {}

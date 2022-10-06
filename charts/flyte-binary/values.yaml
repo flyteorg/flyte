@@ -8,5 +8,6 @@ storage:
 logger:
   level: 1
 
-configSource:
-  localPath: ""
+paths:
+  # Specify full path to Flyte binary config file here if being provided externally
+  externalFlyteConfig: ""
