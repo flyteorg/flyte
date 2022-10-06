@@ -1,0 +1,21 @@
+---
+# Source: flyte-binary/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "lev0-flyte-binary-test-connection"
+  labels:
+    helm.sh/chart: flyte-binary-0.1.0
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: lev0
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['lev0-flyte-binary:80']
+  restartPolicy: Never
