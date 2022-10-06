@@ -417,12 +417,6 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 }
 
 func TestComputePreviousCheckpointPath(t *testing.T) {
-	t.Run("attempt-0", func(t *testing.T) {
-		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nil, "n1", 0)
-		assert.NoError(t, err)
-		assert.Equal(t, storage.DataReference(""), c)
-	})
-
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
 	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
@@ -437,6 +431,10 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 	assert.NoError(t, err)
 	nCtx.OnDataStore().Return(ds)
 	nCtx.OnNodeExecutionMetadata().Return(nm)
+	reader := &nodeMocks.NodeStateReader{}
+	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
+	nCtx.OnNodeStateReader().Return(reader)
+
 	t.Run("attempt-0-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
 		assert.NoError(t, err)
@@ -444,6 +442,39 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 	})
 
 	t.Run("attempt-1-nCtx", func(t *testing.T) {
+		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 1)
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference("s3://sandbox/x/name-n1-0/_flytecheckpoints"), c)
+	})
+}
+
+func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
+	nCtx := &nodeMocks.NodeExecutionContext{}
+	nm := &nodeMocks.NodeExecutionMetadata{}
+	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	ds, err := storage.NewDataStore(
+		&storage.Config{
+			Type: storage.TypeMemory,
+		},
+		promutils.NewTestScope(),
+	)
+	assert.NoError(t, err)
+	nCtx.OnDataStore().Return(ds)
+	nCtx.OnNodeExecutionMetadata().Return(nm)
+	reader := &nodeMocks.NodeStateReader{}
+	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{
+		PreviousNodeExecutionCheckpointURI: storage.DataReference("s3://sandbox/x/prevname-n1-0/_flytecheckpoints"),
+	})
+	nCtx.OnNodeStateReader().Return(reader)
+
+	t.Run("recovery-attempt-0-nCtx", func(t *testing.T) {
+		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference("s3://sandbox/x/prevname-n1-0/_flytecheckpoints"), c)
+	})
+	t.Run("recovery-attempt-1-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 1)
 		assert.NoError(t, err)
 		assert.Equal(t, storage.DataReference("s3://sandbox/x/name-n1-0/_flytecheckpoints"), c)

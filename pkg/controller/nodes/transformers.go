@@ -225,6 +225,7 @@ func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n *nodeStateMa
 		t.SetPluginState(n.t.PluginState)
 		t.SetPluginStateVersion(n.t.PluginStateVersion)
 		t.SetBarrierClockTick(n.t.BarrierClockTick)
+		t.SetPreviousNodeExecutionCheckpointPath(n.t.PreviousNodeExecutionCheckpointURI)
 	}
 
 	// Update dynamic node status

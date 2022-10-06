@@ -511,6 +511,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		eventPhase      core.TaskExecution_Phase
 		skipStateUpdate bool
 		incrParallel    bool
+		checkpoint      bool
 	}
 	tests := []struct {
 		name string
@@ -535,6 +536,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseSuccess,
 				event:        true,
 				eventPhase:   core.TaskExecution_SUCCEEDED,
+				checkpoint:   true,
 			},
 		},
 		{
@@ -552,6 +554,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseRetryableFailure,
 				event:        true,
 				eventPhase:   core.TaskExecution_FAILED,
+				checkpoint:   true,
 			},
 		},
 		{
@@ -574,6 +577,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseRetryableFailure,
 				event:        true,
 				eventPhase:   core.TaskExecution_FAILED,
+				checkpoint:   true,
 			},
 		},
 		{
@@ -596,6 +600,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseFailed,
 				event:        true,
 				eventPhase:   core.TaskExecution_FAILED,
+				checkpoint:   true,
 			},
 		},
 		{
@@ -713,6 +718,14 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				} else {
 					assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
 					assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
+				}
+				if tt.want.checkpoint {
+					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
+						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)
+				} else {
+					assert.True(t, got.Info().GetInfo() == nil || got.Info().GetInfo().TaskNodeInfo == nil ||
+						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata == nil ||
+						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri) == 0)
 				}
 			}
 		})
