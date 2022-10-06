@@ -5,6 +5,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
@@ -13,12 +14,13 @@ import (
 // TODO eventually we could just convert this to be binary node state encoded into the node status
 
 type TaskNodeState struct {
-	PluginPhase        pluginCore.Phase
-	PluginPhaseVersion uint32
-	PluginState        []byte
-	PluginStateVersion uint32
-	BarrierClockTick   uint32
-	LastPhaseUpdatedAt time.Time
+	PluginPhase                        pluginCore.Phase
+	PluginPhaseVersion                 uint32
+	PluginState                        []byte
+	PluginStateVersion                 uint32
+	BarrierClockTick                   uint32
+	LastPhaseUpdatedAt                 time.Time
+	PreviousNodeExecutionCheckpointURI storage.DataReference
 }
 
 type BranchNodeState struct {

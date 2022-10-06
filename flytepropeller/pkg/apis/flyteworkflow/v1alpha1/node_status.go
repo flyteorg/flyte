@@ -711,12 +711,13 @@ func (in *CustomState) DeepCopy() *CustomState {
 
 type TaskNodeStatus struct {
 	MutableStruct
-	Phase              int       `json:"phase,omitempty"`
-	PhaseVersion       uint32    `json:"phaseVersion,omitempty"`
-	PluginState        []byte    `json:"pState,omitempty"`
-	PluginStateVersion uint32    `json:"psv,omitempty"`
-	BarrierClockTick   uint32    `json:"tick,omitempty"`
-	LastPhaseUpdatedAt time.Time `json:"updAt,omitempty"`
+	Phase                               int           `json:"phase,omitempty"`
+	PhaseVersion                        uint32        `json:"phaseVersion,omitempty"`
+	PluginState                         []byte        `json:"pState,omitempty"`
+	PluginStateVersion                  uint32        `json:"psv,omitempty"`
+	BarrierClockTick                    uint32        `json:"tick,omitempty"`
+	LastPhaseUpdatedAt                  time.Time     `json:"updAt,omitempty"`
+	PreviousNodeExecutionCheckpointPath DataReference `json:"checkpointPath,omitempty"`
 }
 
 func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
@@ -725,6 +726,11 @@ func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
 
 func (in *TaskNodeStatus) SetBarrierClockTick(tick uint32) {
 	in.BarrierClockTick = tick
+	in.SetDirty()
+}
+
+func (in *TaskNodeStatus) SetPreviousNodeExecutionCheckpointPath(path DataReference) {
+	in.PreviousNodeExecutionCheckpointPath = path
 	in.SetDirty()
 }
 
@@ -766,6 +772,10 @@ func (in TaskNodeStatus) GetPhase() int {
 
 func (in TaskNodeStatus) GetLastPhaseUpdatedAt() time.Time {
 	return in.LastPhaseUpdatedAt
+}
+
+func (in TaskNodeStatus) GetPreviousNodeExecutionCheckpointPath() DataReference {
+	return in.PreviousNodeExecutionCheckpointPath
 }
 
 func (in TaskNodeStatus) GetPhaseVersion() uint32 {

@@ -41,12 +41,13 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 	tn := n.nodeStatus.GetTaskNodeStatus()
 	if tn != nil {
 		return handler.TaskNodeState{
-			PluginPhase:        pluginCore.Phase(tn.GetPhase()),
-			PluginPhaseVersion: tn.GetPhaseVersion(),
-			PluginStateVersion: tn.GetPluginStateVersion(),
-			PluginState:        tn.GetPluginState(),
-			BarrierClockTick:   tn.GetBarrierClockTick(),
-			LastPhaseUpdatedAt: tn.GetLastPhaseUpdatedAt(),
+			PluginPhase:                        pluginCore.Phase(tn.GetPhase()),
+			PluginPhaseVersion:                 tn.GetPhaseVersion(),
+			PluginStateVersion:                 tn.GetPluginStateVersion(),
+			PluginState:                        tn.GetPluginState(),
+			BarrierClockTick:                   tn.GetBarrierClockTick(),
+			LastPhaseUpdatedAt:                 tn.GetLastPhaseUpdatedAt(),
+			PreviousNodeExecutionCheckpointURI: tn.GetPreviousNodeExecutionCheckpointPath(),
 		}
 	}
 	return handler.TaskNodeState{}

@@ -117,11 +117,25 @@ func (p *pluginRequestedTransition) ObservedTransitionAndState(trns pluginCore.T
 	p.pluginStateVersion = pluginStateVersion
 }
 
-func (p *pluginRequestedTransition) ObservedExecutionError(executionError *io.ExecutionError) {
+func (p *pluginRequestedTransition) ObservedExecutionError(executionError *io.ExecutionError, taskMetadata *event.TaskNodeMetadata) {
 	if executionError.IsRecoverable {
 		p.pInfo = pluginCore.PhaseInfoFailed(pluginCore.PhaseRetryableFailure, executionError.ExecutionError, p.pInfo.Info())
 	} else {
 		p.pInfo = pluginCore.PhaseInfoFailed(pluginCore.PhasePermanentFailure, executionError.ExecutionError, p.pInfo.Info())
+	}
+
+	if taskMetadata != nil {
+		p.execInfo.TaskNodeInfo = &handler.TaskNodeInfo{
+			TaskNodeMetadata: taskMetadata,
+		}
+	}
+}
+
+func (p *pluginRequestedTransition) ObservedFailure(taskMetadata *event.TaskNodeMetadata) {
+	if taskMetadata != nil {
+		p.execInfo.TaskNodeInfo = &handler.TaskNodeInfo{
+			TaskNodeMetadata: taskMetadata,
+		}
 	}
 }
 
@@ -159,10 +173,10 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 		return handler.DoTransition(p.ttype, handler.PhaseInfoSuccess(&p.execInfo)), nil
 	case pluginCore.PhaseRetryableFailure:
 		logger.Debugf(ctx, "Transitioning to RetryableFailure")
-		return handler.DoTransition(p.ttype, handler.PhaseInfoRetryableFailureErr(p.pInfo.Err(), nil)), nil
+		return handler.DoTransition(p.ttype, handler.PhaseInfoRetryableFailureErr(p.pInfo.Err(), &p.execInfo)), nil
 	case pluginCore.PhasePermanentFailure:
 		logger.Debugf(ctx, "Transitioning to Failure")
-		return handler.DoTransition(p.ttype, handler.PhaseInfoFailureErr(p.pInfo.Err(), nil)), nil
+		return handler.DoTransition(p.ttype, handler.PhaseInfoFailureErr(p.pInfo.Err(), &p.execInfo)), nil
 	case pluginCore.PhaseUndefined:
 		return handler.UnknownTransition, fmt.Errorf("error converting plugin phase, received [Undefined]")
 	}
@@ -429,7 +443,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 						pluginTrns.pInfo.Phase().String(), p.GetID(), pluginTrns.pInfo.Version(), t.cfg.MaxPluginPhaseVersions),
 				},
 				IsRecoverable: false,
-			})
+			}, nil)
 			return pluginTrns, nil
 		}
 	}
@@ -448,7 +462,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}
 	}
 
-	if pluginTrns.pInfo.Phase() == pluginCore.PhaseSuccess {
+	switch pluginTrns.pInfo.Phase() {
+	case pluginCore.PhaseSuccess:
 		// -------------------------------------
 		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes
 		// This code only exists to support Dynamic tasks. Eventually dynamic tasks will use closure nodes to execute
@@ -480,8 +495,12 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		if err != nil {
 			return nil, err
 		}
+
 		if ee != nil {
-			pluginTrns.ObservedExecutionError(ee)
+			pluginTrns.ObservedExecutionError(ee,
+				&event.TaskNodeMetadata{
+					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
+				})
 		} else {
 			var deckURI *storage.DataReference
 			if tCtx.ow.GetReader() != nil {
@@ -496,10 +515,18 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			}
 			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
 				&event.TaskNodeMetadata{
-					CacheStatus: cacheStatus.GetCacheStatus(),
-					CatalogKey:  cacheStatus.GetMetadata(),
+					CacheStatus:   cacheStatus.GetCacheStatus(),
+					CatalogKey:    cacheStatus.GetMetadata(),
+					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		}
+	case pluginCore.PhaseRetryableFailure:
+		fallthrough
+	case pluginCore.PhasePermanentFailure:
+		pluginTrns.ObservedFailure(
+			&event.TaskNodeMetadata{
+				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
+			})
 	}
 
 	return pluginTrns, nil
@@ -710,12 +737,13 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 
 	// STEP 6: Persist the plugin state
 	err = nCtx.NodeStateWriter().PutTaskNodeState(handler.TaskNodeState{
-		PluginState:        pluginTrns.pluginState,
-		PluginStateVersion: pluginTrns.pluginStateVersion,
-		PluginPhase:        pluginTrns.pInfo.Phase(),
-		PluginPhaseVersion: pluginTrns.pInfo.Version(),
-		BarrierClockTick:   barrierTick,
-		LastPhaseUpdatedAt: time.Now(),
+		PluginState:                        pluginTrns.pluginState,
+		PluginStateVersion:                 pluginTrns.pluginStateVersion,
+		PluginPhase:                        pluginTrns.pInfo.Phase(),
+		PluginPhaseVersion:                 pluginTrns.pInfo.Version(),
+		BarrierClockTick:                   barrierTick,
+		LastPhaseUpdatedAt:                 time.Now(),
+		PreviousNodeExecutionCheckpointURI: ts.PreviousNodeExecutionCheckpointURI,
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to store TaskNode state, err :%s", err.Error())
