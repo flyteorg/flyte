@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
@@ -135,12 +137,41 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		assert.Nil(t, dialOption)
 		assert.NotNil(t, err)
 	})
+	t.Run("legal-no-external-calls", func(t *testing.T) {
+		mockAuthClient := new(mocks.AuthMetadataServiceClient)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
+		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get public client config"))
+		var adminCfg Config
+		err := copier.Copy(&adminCfg, adminServiceConfig)
+		assert.NoError(t, err)
+		adminCfg.TokenURL = "http://localhost:1000/api/v1/token"
+		adminCfg.Scopes = []string{"all"}
+		adminCfg.AuthorizationHeader = "authorization"
+		dialOption, err := getAuthenticationDialOption(ctx, &adminCfg, nil, mockAuthClient)
+		assert.Nil(t, dialOption)
+		assert.NotNil(t, err)
+	})
 	t.Run("error during oauth2Metatdata", func(t *testing.T) {
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
 		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		dialOption, err := getAuthenticationDialOption(ctx, adminServiceConfig, nil, mockAuthClient)
 		assert.Nil(t, dialOption)
 		assert.NotNil(t, err)
+	})
+	t.Run("error during public client config", func(t *testing.T) {
+		mockAuthClient := new(mocks.AuthMetadataServiceClient)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
+		failedPublicClientConfigLookup := errors.New("expected err")
+		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, failedPublicClientConfigLookup)
+		var adminCfg Config
+		err := copier.Copy(&adminCfg, adminServiceConfig)
+		assert.NoError(t, err)
+		adminCfg.TokenURL = "http://localhost:1000/api/v1/token"
+		adminCfg.Scopes = []string{"all"}
+		tokenProvider := ClientCredentialsTokenSourceProvider{}
+		dialOption, err := getAuthenticationDialOption(ctx, &adminCfg, tokenProvider, mockAuthClient)
+		assert.Nil(t, dialOption)
+		assert.EqualError(t, err, "failed to fetch client metadata. Error: expected err")
 	})
 	t.Run("error during flyte client", func(t *testing.T) {
 		metatdata := &service.OAuth2MetadataResponse{

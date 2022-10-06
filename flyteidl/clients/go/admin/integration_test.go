@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package admin
@@ -31,7 +32,7 @@ func TestLiveAdminClient(t *testing.T) {
 		ClientSecretLocation:             "/Users/username/.ssh/admin/propeller_secret",
 		DeprecatedAuthorizationServerURL: "https://lyft.okta.com/oauth2/ausc5wmjw96cRKvTd1t7",
 		Scopes:                           []string{"svc"},
-		DeprecatedAuthorizationHeader:    "Flyte-Authorization",
+		AuthorizationHeader:              "Flyte-Authorization",
 	})
 
 	resp, err := client.ListProjects(ctx, &admin.ProjectListRequest{})

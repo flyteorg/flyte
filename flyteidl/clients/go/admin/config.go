@@ -64,8 +64,7 @@ type Config struct {
 	// See the implementation of the 'grpcAuthorizationHeader' option in Flyte Admin for more information. But
 	// basically we want to be able to use a different string to pass the token from this client to the the Admin service
 	// because things might be running in a service mesh (like Envoy) that already uses the default 'authorization' header
-	// Deprecated: It will automatically be discovered through an anonymously accessible auth metadata service.
-	DeprecatedAuthorizationHeader string `json:"authorizationHeader" pflag:",Custom metadata header to pass JWT"`
+	AuthorizationHeader string `json:"authorizationHeader" pflag:",Custom metadata header to pass JWT"`
 
 	PkceConfig pkce.Config `json:"pkceConfig" pflag:",Config for Pkce authentication flow."`
 
