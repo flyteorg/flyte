@@ -13,7 +13,7 @@ metadata:
 data:
   flyte.yaml: | 
     propeller:
-      rawoutput-prefix: "s3://my-s3-bucket/test/"
+      rawoutput-prefix: "s3://my-s3-bucket/data/"
       create-flyteworkflow-crd: true
     webhook:
       certDir: /var/run/flyte/certs
@@ -67,17 +67,17 @@ data:
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
       # Logging configuration
+      # Escape Helm templating because admin will template these later
       logs:
         kubernetes-enabled: true
         kubernetes-template-uri:
-            "http://localhost:30080/kubernetes-dashboard/#/log///pod?namespace="
+            "http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
       k8s-array:
         logs:
           config:
             kubernetes-enabled: true
-            kubernetes-template-uri:
-                "http://localhost:30080/kubernetes-dashboard/#/log///pod?namespace="
-    
+            kubernetes-template-uri: 
+                "http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
     
     cluster_resources:
       refreshInterval: 5m
@@ -110,3 +110,34 @@ data:
       endpoint: localhost:8081
       insecure: true
       type: datacatalog
+---
+# Source: flyte-binary/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-resource-templates
+  labels: 
+    helm.sh/chart: flyte-binary-0.1.0
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: lev0
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  namespace.yaml: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+  project_resource_quota.yaml: |-
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }}
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }}
+        limits.memory: {{ projectQuotaMemory }}
