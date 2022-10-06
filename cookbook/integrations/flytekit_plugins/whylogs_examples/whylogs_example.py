@@ -41,9 +41,9 @@ def get_reference_data() -> pd.DataFrame:
 
 
 # %%
-# To some extent, we wanted to show kinds of drift in our example
-# So in order to reproduce some of what real-life data behaves
-# We will take an arbitrary subset of the reference dataset
+# To some extent, we wanted to show kinds of drift in our example,
+# so in order to reproduce some of what real-life data behaves
+# we will take an arbitrary subset of the reference dataset
 @task
 def get_target_data() -> pd.DataFrame:
     diabetes = load_diabetes()
@@ -54,9 +54,9 @@ def get_target_data() -> pd.DataFrame:
 
 # %%
 # Now we will define a task that can take in any pandas DataFrame
-# and return a `:class:DatasetProfileView, which is our data profile.
+# and return a ``DatasetProfileView``, which is our data profile.
 # With it, users can either visualize and check overall statistics
-# Or even run a constraint suite on top of it.
+# or even run a constraint suite on top of it.
 @task
 def create_profile_view(df: pd.DataFrame) -> DatasetProfileView:
     result = why.log(df)
@@ -65,7 +65,7 @@ def create_profile_view(df: pd.DataFrame) -> DatasetProfileView:
 
 # %%
 # And we will also define a constraints report task
-# That will run some checks in our existing profile.
+# that will run some checks in our existing profile.
 @task
 def constraints_report(profile_view: DatasetProfileView) -> bool:
     builder = ConstraintsBuilder(dataset_profile_view=profile_view)
@@ -84,7 +84,7 @@ def constraints_report(profile_view: DatasetProfileView) -> bool:
 
 # %%
 # This is a representation of a prediction task. Since we are looking
-# To take some of the complexity away from our demonstrations,
+# to take some of the complexity away from our demonstrations,
 # our model prediction here will be represented by generating a bunch of
 # random numbers with numpy. This task will take place if we pass our
 # constraints suite.
