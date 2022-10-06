@@ -197,6 +197,9 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 				StartedAt: occurredAtProto,
 				Phase:     core.NodeExecution_RUNNING,
 				UpdatedAt: occurredAtProto,
+				TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
+					TaskNodeMetadata: &admin.TaskNodeMetadata{},
+				},
 			}
 			expectedClosureBytes, _ := proto.Marshal(&expectedClosure)
 			actualClosure := admin.NodeExecutionClosure{}
@@ -541,6 +544,11 @@ func TestGetNodeExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedClosure := admin.NodeExecutionClosure{
 		Phase: core.NodeExecution_SUCCEEDED,
+		TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
+			TaskNodeMetadata: &admin.TaskNodeMetadata{
+				CheckpointUri: "last checkpoint uri",
+			},
+		},
 	}
 	expectedMetadata := admin.NodeExecutionMetaData{
 		SpecNodeId: "spec_node_id",

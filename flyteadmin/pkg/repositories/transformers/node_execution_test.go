@@ -328,6 +328,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 								},
 							},
 						},
+						CheckpointUri: "last checkpoint uri",
 					},
 				},
 			},
@@ -351,8 +352,9 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 			UpdatedAt: occurredAtProto,
 			TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
 				TaskNodeMetadata: &admin.TaskNodeMetadata{
-					CacheStatus: request.Event.GetTaskNodeMetadata().CacheStatus,
-					CatalogKey:  request.Event.GetTaskNodeMetadata().CatalogKey,
+					CacheStatus:   request.Event.GetTaskNodeMetadata().CacheStatus,
+					CatalogKey:    request.Event.GetTaskNodeMetadata().CatalogKey,
+					CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
 				},
 			},
 		}

@@ -211,16 +211,19 @@ func UpdateNodeExecutionModel(
 	}
 
 	// Update TaskNodeMetadata, which includes caching information today.
-	if request.Event.GetTaskNodeMetadata() != nil && request.Event.GetTaskNodeMetadata().CatalogKey != nil {
-		st := request.Event.GetTaskNodeMetadata().GetCacheStatus().String()
+	if request.Event.GetTaskNodeMetadata() != nil {
 		targetMetadata := &admin.NodeExecutionClosure_TaskNodeMetadata{
 			TaskNodeMetadata: &admin.TaskNodeMetadata{
-				CacheStatus: request.Event.GetTaskNodeMetadata().GetCacheStatus(),
-				CatalogKey:  request.Event.GetTaskNodeMetadata().GetCatalogKey(),
+				CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
 			},
 		}
+		if request.Event.GetTaskNodeMetadata().CatalogKey != nil {
+			st := request.Event.GetTaskNodeMetadata().GetCacheStatus().String()
+			targetMetadata.TaskNodeMetadata.CacheStatus = request.Event.GetTaskNodeMetadata().GetCacheStatus()
+			targetMetadata.TaskNodeMetadata.CatalogKey = request.Event.GetTaskNodeMetadata().GetCatalogKey()
+			nodeExecutionModel.CacheStatus = &st
+		}
 		nodeExecutionClosure.TargetMetadata = targetMetadata
-		nodeExecutionModel.CacheStatus = &st
 	}
 
 	marshaledClosure, err := proto.Marshal(&nodeExecutionClosure)
