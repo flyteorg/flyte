@@ -1,0 +1,12 @@
+image:
+  fqn: "localhost:30000/flyte"
+
+storage:
+  metadataContainer: my-s3-bucket
+  userDataContainer: my-s3-bucket
+
+logger:
+  level: 1
+
+configSource:
+  localPath: ""

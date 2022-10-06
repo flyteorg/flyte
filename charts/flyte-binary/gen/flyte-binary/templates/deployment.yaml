@@ -1,0 +1,58 @@
+---
+# Source: flyte-binary/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyte
+  name: flyte-backend
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: flyte
+  template:
+    metadata:
+      labels:
+        app: flyte
+    spec:
+      hostNetwork: true
+      containers:
+      - name: flyte
+        image: "localhost:30000/flyte"
+        imagePullPolicy: Always
+        args:
+        - start
+        - --config
+        - /etc/flyte/flyte.yaml
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+        ports:
+        - containerPort: 8088
+          name: http
+        - containerPort: 8089
+          name: grpc
+        - containerPort: 9443
+          name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/cluster-resource-templates
+          name: cluster-resource-templates
+        - mountPath: /etc/flyte/flyte.yaml
+          subPath: flyte.yaml
+          name: config
+        - mountPath: /var/run/flyte
+          name: state
+      serviceAccountName: flyte
+      volumes:
+      - name: cluster-resource-templates
+        configMap:
+          name: cluster-resource-templates
+      - name: config
+        configMap:
+          name: config
+      - name: state
+        emptyDir: {}

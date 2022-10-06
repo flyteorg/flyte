@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-backend-config
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
+data:
+  flyte.yaml: | {{ tpl (.Files.Get "flyte_config.yaml") $ | nindent 4 }}
