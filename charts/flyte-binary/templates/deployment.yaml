@@ -20,7 +20,7 @@ spec:
       containers:
       - name: flyte
         image: "{{ .Values.image.fqn }}"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         args:
         - start
         - --config

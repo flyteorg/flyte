@@ -35,7 +35,7 @@ storage:
   cache:
     max_size_mbs: 10
     target_gc_percent: 100
-  container: "my-s3-bucket"
+  container: "{{ .Values.storage.metadataContainer }}"
 logger:
   show-source: true
   level: 4
