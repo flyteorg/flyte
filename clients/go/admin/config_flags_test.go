@@ -330,7 +330,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("authorizationHeader", testValue)
 			if vString, err := cmdFlags.GetString("authorizationHeader"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DeprecatedAuthorizationHeader)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthorizationHeader)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -231,5 +232,55 @@ func Test_newAuthInterceptor(t *testing.T) {
 		err = interceptor(ctx, "POST", nil, nil, nil, unauthenticated)
 		assert.Error(t, err)
 		assert.Falsef(t, f.IsInitialized(), "PerRPCCredentialFuture should not be initialized")
+	})
+}
+
+func TestMaterializeCredentials(t *testing.T) {
+	port := rand.IntnRange(10000, 60000)
+	t.Run("No public client config or oauth2 metadata endpoint lookup", func(t *testing.T) {
+		m := &mocks2.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get public client config"))
+		s := newAuthMetadataServer(t, port, m)
+		ctx := context.Background()
+		assert.NoError(t, s.Start(ctx))
+		defer s.Close()
+
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		assert.NoError(t, err)
+
+		f := NewPerRPCCredentialsFuture()
+		err = MaterializeCredentials(ctx, &Config{
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: true,
+			AuthType:              AuthTypeClientSecret,
+			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
+			Scopes:                []string{"all"},
+			AuthorizationHeader:   "authorization",
+		}, &mocks.TokenCache{}, f)
+		assert.NoError(t, err)
+	})
+	t.Run("Failed to fetch client metadata", func(t *testing.T) {
+		m := &mocks2.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
+		failedPublicClientConfigLookup := errors.New("expected err")
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, failedPublicClientConfigLookup)
+		s := newAuthMetadataServer(t, port, m)
+		ctx := context.Background()
+		assert.NoError(t, s.Start(ctx))
+		defer s.Close()
+
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		assert.NoError(t, err)
+
+		f := NewPerRPCCredentialsFuture()
+		err = MaterializeCredentials(ctx, &Config{
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: true,
+			AuthType:              AuthTypeClientSecret,
+			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
+			Scopes:                []string{"all"},
+		}, &mocks.TokenCache{}, f)
+		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
 	})
 }
