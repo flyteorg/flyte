@@ -123,7 +123,7 @@ metadata:
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 data:
-  namespace.yaml: |-
+  namespace.yaml: |
     apiVersion: v1
     kind: Namespace
     metadata:
@@ -131,7 +131,7 @@ data:
     spec:
       finalizers:
       - kubernetes
-  project_resource_quota.yaml: |-
+  project_resource_quota.yaml: |
     apiVersion: v1
     kind: ResourceQuota
     metadata:
