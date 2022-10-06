@@ -113,10 +113,14 @@ Troubles With Inconsistent Names for Pods and Downstream Resources
 - But if this is an invalid name for a Kubernetes pod, Flyte assigns a valid name of random characters instead.
 
 Troubles with handling large responses in ``FlyteRemote.sync`` 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``Received message larger than max (xxx vs. 4194304)`` usually crops up when the message size is too large.
 - To fix this, edit the flyte-admin-base-config config map to increase ``maxMessageSizeBytes`` value.
+
+This is how you can edit the flyte-admin-base-config config map 
+
+- Edit the ``flyte-admin-base-config`` config map using the command ``kubectl edit cm flyte-admin-base-config -n flyte`` to increase the ``maxMessageSizeBytes`` value. Refer to the :ref:`flyte: <troubleshoot>` in case you've queries about the command's usage.
 
 
 I Still Need Help!
