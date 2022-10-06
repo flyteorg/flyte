@@ -86,9 +86,13 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourcePr
 		return nil, errors.New("can't create authenticated channel without a TokenSourceProvider")
 	}
 
-	clientMetadata, err := authClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+	authorizationMetadataKey := cfg.AuthorizationHeader
+	if len(authorizationMetadataKey) == 0 {
+		clientMetadata, err := authClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+		}
+		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
 	}
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
@@ -96,7 +100,7 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourcePr
 		return nil, err
 	}
 
-	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, clientMetadata.AuthorizationMetadataKey)
+	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
 	return grpc.WithPerRPCCredentials(wrappedTokenSource), nil
 }
 
