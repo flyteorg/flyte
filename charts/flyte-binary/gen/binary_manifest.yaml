@@ -1,4 +1,16 @@
 ---
+# Source: flyte-binary/templates/namespace.yaml
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: flyte
+  labels: 
+    helm.sh/chart: flyte-binary-0.1.0
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: binary-tst-deploy
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-binary/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -272,7 +284,7 @@ spec:
       hostNetwork: true
       containers:
       - name: flyte
-        image: "localhost:30000/flyte"
+        image: "flyte"
         imagePullPolicy: IfNotPresent
         args:
         - start
