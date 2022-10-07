@@ -3183,9 +3183,9 @@ config for a workflow node
 .. code-block:: yaml
 
   default-deadlines:
-    node-active-deadline: 48h0m0s
-    node-execution-deadline: 48h0m0s
-    workflow-active-deadline: 72h0m0s
+    node-active-deadline: 0h0m0s
+    node-execution-deadline: 0h0m0s
+    workflow-active-deadline: 0h0m0s
   interruptible-failure-threshold: 1
   max-node-retries-system-failures: 3
   
@@ -3606,9 +3606,9 @@ Default value for timeouts
 
 .. code-block:: yaml
 
-  node-active-deadline: 48h0m0s
-  node-execution-deadline: 48h0m0s
-  workflow-active-deadline: 72h0m0s
+  node-active-deadline: 0h0m0s
+  node-execution-deadline: 0h0m0s
+  workflow-active-deadline: 0h0m0s
   
 
 max-node-retries-system-failures (int64)
