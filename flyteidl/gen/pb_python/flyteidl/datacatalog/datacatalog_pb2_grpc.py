@@ -58,6 +58,11 @@ class DataCatalogStub(object):
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
                 )
+        self.DeleteArtifact = channel.unary_unary(
+                '/datacatalog.DataCatalog/DeleteArtifact',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
+                )
         self.GetOrExtendReservation = channel.unary_unary(
                 '/datacatalog.DataCatalog/GetOrExtendReservation',
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.SerializeToString,
@@ -135,6 +140,13 @@ class DataCatalogServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteArtifact(self, request, context):
+        """Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetOrExtendReservation(self, request, context):
         """Attempts to get or extend a reservation for the corresponding artifact. If one already exists
         (ie. another entity owns the reservation) then that reservation is retrieved.
@@ -202,6 +214,11 @@ def add_DataCatalogServicer_to_server(servicer, server):
                     servicer.UpdateArtifact,
                     request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.FromString,
                     response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.SerializeToString,
+            ),
+            'DeleteArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteArtifact,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.SerializeToString,
             ),
             'GetOrExtendReservation': grpc.unary_unary_rpc_method_handler(
                     servicer.GetOrExtendReservation,
@@ -360,6 +377,23 @@ class DataCatalog(object):
         return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/UpdateArtifact',
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/DeleteArtifact',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

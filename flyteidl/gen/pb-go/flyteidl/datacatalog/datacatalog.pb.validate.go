@@ -1305,6 +1305,160 @@ var _ interface {
 	ErrorName() string
 } = UpdateArtifactResponseValidationError{}
 
+// Validate checks the field values on DeleteArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DeleteArtifactRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeleteArtifactRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.QueryHandle.(type) {
+
+	case *DeleteArtifactRequest_ArtifactId:
+		// no validation rules for ArtifactId
+
+	case *DeleteArtifactRequest_TagName:
+		// no validation rules for TagName
+
+	}
+
+	return nil
+}
+
+// DeleteArtifactRequestValidationError is the validation error returned by
+// DeleteArtifactRequest.Validate if the designated constraints aren't met.
+type DeleteArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteArtifactRequestValidationError) ErrorName() string {
+	return "DeleteArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteArtifactRequestValidationError{}
+
+// Validate checks the field values on DeleteArtifactResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DeleteArtifactResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// DeleteArtifactResponseValidationError is the validation error returned by
+// DeleteArtifactResponse.Validate if the designated constraints aren't met.
+type DeleteArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteArtifactResponseValidationError) ErrorName() string {
+	return "DeleteArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteArtifactResponseValidationError{}
+
 // Validate checks the field values on ReservationID with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.

@@ -261,6 +261,43 @@ Dataset properties we can filter by
 
 
 
+.. _ref_datacatalog.DeleteArtifactRequest:
+
+DeleteArtifactRequest
+------------------------------------------------------------------
+
+Request message for deleting an Artifact and its associated ArtifactData.
+
+
+
+.. csv-table:: DeleteArtifactRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "dataset", ":ref:`ref_datacatalog.DatasetID`", "", "ID of dataset the artifact is associated with"
+   "artifact_id", ":ref:`ref_string`", "", ""
+   "tag_name", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+
+.. _ref_datacatalog.DeleteArtifactResponse:
+
+DeleteArtifactResponse
+------------------------------------------------------------------
+
+Response message for deleting an Artifact.
+
+
+
+
+
+
+
+
 .. _ref_datacatalog.FilterExpression:
 
 FilterExpression
@@ -915,6 +952,7 @@ Artifacts are associated with a Dataset, and can be tagged for retrieval.
    "ListArtifacts", ":ref:`ref_datacatalog.ListArtifactsRequest`", ":ref:`ref_datacatalog.ListArtifactsResponse`", "Return a paginated list of artifacts"
    "ListDatasets", ":ref:`ref_datacatalog.ListDatasetsRequest`", ":ref:`ref_datacatalog.ListDatasetsResponse`", "Return a paginated list of datasets"
    "UpdateArtifact", ":ref:`ref_datacatalog.UpdateArtifactRequest`", ":ref:`ref_datacatalog.UpdateArtifactResponse`", "Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage."
+   "DeleteArtifact", ":ref:`ref_datacatalog.DeleteArtifactRequest`", ":ref:`ref_datacatalog.DeleteArtifactResponse`", "Deletes an existing artifact, removing the stored artifact data from the underlying blob storage."
    "GetOrExtendReservation", ":ref:`ref_datacatalog.GetOrExtendReservationRequest`", ":ref:`ref_datacatalog.GetOrExtendReservationResponse`", "Attempts to get or extend a reservation for the corresponding artifact. If one already exists (ie. another entity owns the reservation) then that reservation is retrieved. Once you acquire a reservation, you need to periodically extend the reservation with an identical call. If the reservation is not extended before the defined expiration, it may be acquired by another task. Note: We may have multiple concurrent tasks with the same signature and the same input that try to populate the same artifact at the same time. Thus with reservation, only one task can run at a time, until the reservation expires. Note: If task A does not extend the reservation in time and the reservation expires, another task B may take over the reservation, resulting in two tasks A and B running in parallel. So a third task C may get the Artifact from A or B, whichever writes last."
    "ReleaseReservation", ":ref:`ref_datacatalog.ReleaseReservationRequest`", ":ref:`ref_datacatalog.ReleaseReservationResponse`", "Release the reservation when the task holding the spot fails so that the other tasks can grab the spot."
 
