@@ -120,7 +120,7 @@ Troubles with handling large responses in ``FlyteRemote.sync``
 
 This is how you can edit the flyte-admin-base-config config map 
 
-- Edit the ``flyte-admin-base-config`` config map using the command ``kubectl edit cm flyte-admin-base-config -n flyte`` to increase the ``maxMessageSizeBytes`` value. Refer to the :ref:`flyte: <troubleshoot>` in case you've queries about the command's usage.
+- To fix this, edit the ``flyte-admin-base-config`` config map using the command ``kubectl edit cm flyte-admin-base-config -n flyte`` to increase the ``maxMessageSizeBytes`` value.
 
 
 I Still Need Help!
