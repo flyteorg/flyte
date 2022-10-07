@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flytectl/cmd/config"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -191,4 +192,23 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 		executionConfig.KubeServiceAcct = ""
 	})
+}
+
+func Test_resolveOverrides(t *testing.T) {
+	executionConfig.KubeServiceAcct = "k8s-acct"
+	executionConfig.IamRoleARN = "iam-role"
+	executionConfig.TargetProject = "t-proj"
+	executionConfig.TargetDomain = "t-domain"
+	executionConfig.Version = "v1"
+	executionConfig.ClusterPool = "gpu"
+	cfg := &ExecutionConfig{}
+
+	resolveOverrides(cfg, "p1", "d1")
+
+	assert.Equal(t, "k8s-acct", cfg.KubeServiceAcct)
+	assert.Equal(t, "iam-role", cfg.IamRoleARN)
+	assert.Equal(t, "t-proj", cfg.TargetProject)
+	assert.Equal(t, "t-domain", cfg.TargetDomain)
+	assert.Equal(t, "v1", cfg.Version)
+	assert.Equal(t, "gpu", cfg.ClusterPool)
 }
