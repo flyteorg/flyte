@@ -160,6 +160,54 @@ func (_m *DataCatalogClient) CreateDataset(ctx context.Context, in *datacatalog.
 	return r0, r1
 }
 
+type DataCatalogClient_DeleteArtifact struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_DeleteArtifact) Return(_a0 *datacatalog.DeleteArtifactResponse, _a1 error) *DataCatalogClient_DeleteArtifact {
+	return &DataCatalogClient_DeleteArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnDeleteArtifact(ctx context.Context, in *datacatalog.DeleteArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_DeleteArtifact {
+	c_call := _m.On("DeleteArtifact", ctx, in, opts)
+	return &DataCatalogClient_DeleteArtifact{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnDeleteArtifactMatch(matchers ...interface{}) *DataCatalogClient_DeleteArtifact {
+	c_call := _m.On("DeleteArtifact", matchers...)
+	return &DataCatalogClient_DeleteArtifact{Call: c_call}
+}
+
+// DeleteArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) DeleteArtifact(ctx context.Context, in *datacatalog.DeleteArtifactRequest, opts ...grpc.CallOption) (*datacatalog.DeleteArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.DeleteArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DeleteArtifactRequest, ...grpc.CallOption) *datacatalog.DeleteArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.DeleteArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DeleteArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataCatalogClient_GetArtifact struct {
 	*mock.Call
 }

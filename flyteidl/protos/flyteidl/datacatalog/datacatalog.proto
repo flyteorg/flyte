@@ -40,6 +40,9 @@ service DataCatalog {
     // Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
     rpc UpdateArtifact (UpdateArtifactRequest) returns (UpdateArtifactResponse);
 
+    // Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+    rpc DeleteArtifact (DeleteArtifactRequest) returns (DeleteArtifactResponse);
+
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
     // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -197,6 +200,27 @@ message UpdateArtifactRequest {
 message UpdateArtifactResponse {
     // The unique ID of the artifact updated
     string artifact_id = 1;
+}
+
+/*
+ * Request message for deleting an Artifact and its associated ArtifactData.
+ */
+message DeleteArtifactRequest {
+    // ID of dataset the artifact is associated with
+    DatasetID dataset = 1;
+
+    // Either ID of artifact or name of tag of existing artifact
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+}
+
+/*
+ * Response message for deleting an Artifact.
+ */
+message DeleteArtifactResponse {
+
 }
 
 /*
