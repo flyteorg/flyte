@@ -256,7 +256,7 @@ kind: Deployment
 metadata:
   labels:
     app: flyte
-  name: flyte-backend
+  name: flytebinary
 spec:
   replicas: 1
   strategy:
