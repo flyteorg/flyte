@@ -77,7 +77,9 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: flyte-role
-  namespace: {{ .Release.Namespace }}
 subjects:
   - kind: ServiceAccount
     name: flyte
+    # Have to add a namespace explicitly here so that the generated manifest has it
+    # since kubectl apply --namespace won't update it.
+    namespace: {{ .Release.Namespace }}
