@@ -241,10 +241,11 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: flyte-role
-  namespace: flyte
 subjects:
   - kind: ServiceAccount
     name: flyte
+    # Have to add a namespace explicitly here otherwise 
+    namespace: flyte
 ---
 # Source: flyte-binary/templates/service.yaml
 apiVersion: v1
