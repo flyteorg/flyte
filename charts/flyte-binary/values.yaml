@@ -1,5 +1,5 @@
 image:
-  fqn: "localhost:30000/flyte"
+  fqn: "flyte"
 
 storage:
   metadataContainer: my-s3-bucket
