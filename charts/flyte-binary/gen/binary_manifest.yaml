@@ -35,7 +35,6 @@ data:
       create-flyteworkflow-crd: true
     webhook:
       certDir: /var/run/flyte/certs
-      serviceName: flyte-pod-webhook
       localCert: true
     tasks:
       task-plugins:
@@ -128,6 +127,9 @@ data:
       endpoint: localhost:8081
       insecure: true
       type: datacatalog
+    
+    namespace_mapping:
+      template: "{{ project }}-{{ domain }}-tst"
 ---
 # Source: flyte-binary/templates/configmap.yaml
 apiVersion: v1
@@ -244,7 +246,8 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flyte
-    # Have to add a namespace explicitly here otherwise 
+    # Have to add a namespace explicitly here so that the generated manifest has it
+    # since kubectl apply --namespace won't update it.
     namespace: flyte
 ---
 # Source: flyte-binary/templates/service.yaml
@@ -258,6 +261,16 @@ spec:
       port: 8088
     - name: grpc
       port: 8089
+  selector:
+    app: flyte
+---
+# Source: flyte-binary/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook
+spec:
+  ports:
     - name: webhook
       port: 443
       targetPort: 9443
@@ -296,6 +309,15 @@ spec:
           limits:
             cpu: 1
             memory: 1Gi
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         ports:
         - containerPort: 8088
           name: http

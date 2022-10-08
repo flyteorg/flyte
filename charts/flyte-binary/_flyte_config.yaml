@@ -3,7 +3,6 @@ propeller:
   create-flyteworkflow-crd: true
 webhook:
   certDir: /var/run/flyte/certs
-  serviceName: flyte-pod-webhook
   localCert: true
 tasks:
   task-plugins:
@@ -96,3 +95,6 @@ catalog-cache:
   endpoint: localhost:8081
   insecure: true
   type: datacatalog
+
+namespace_mapping:
+  template: {{`"{{ project }}-{{ domain }}-tst"`}}
