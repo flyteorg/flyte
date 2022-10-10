@@ -84,7 +84,7 @@ producer-consumer order creates a workflow.
 Flyte was designed to manage the complexity that arises in Data and ML teams and ensure they keep up their high velocity of delivering business impacting features. One way it achieves this is by separating
 the control-plane from the user-plane. Thus, every organization can offer Flyte as a service to their end-users where the service is managed by folks who are more infrastructure-focused, while the users use the intuitive interface of Flytekit.
 
-## ⁉️  Why Flyte
+## ⁉️  Why Flyte?
 
 - Kubernetes-native workflow automation platform
 - Ergonomic SDKs in Python, Java, and Scala
