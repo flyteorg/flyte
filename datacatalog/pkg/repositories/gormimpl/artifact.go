@@ -182,7 +182,7 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 }
 
 // Delete deletes the given artifact and its associated ArtifactData from the database.
-func (h *artifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error {
+func (h *artifactRepo) Delete(ctx context.Context, artifact models.Artifact) error {
 	timer := h.repoMetrics.DeleteDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -197,14 +197,24 @@ func (h *artifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error
 		return err
 	}
 
-	// delete artifact data from database
-	if err := tx.Where(&models.ArtifactData{ArtifactKey: key}).Delete(&models.ArtifactData{}).Error; err != nil {
+	// delete all data related to artifact from database
+	if err := tx.Where(&models.ArtifactData{ArtifactKey: artifact.ArtifactKey}).Delete(&models.ArtifactData{}).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	if err := tx.Where(&models.Tag{ArtifactID: artifact.ArtifactID, DatasetUUID: artifact.DatasetUUID}).Delete(&models.Tag{}).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	if err := tx.Where(&models.Partition{ArtifactID: artifact.ArtifactID, DatasetUUID: artifact.DatasetUUID}).Delete(&models.Partition{}).Error; err != nil {
 		tx.Rollback()
 		return h.errorTransformer.ToDataCatalogError(err)
 	}
 
 	// delete actual artifact from database
-	if res := tx.Where(&models.Artifact{ArtifactKey: key}).Delete(&models.Artifact{}); res.Error != nil {
+	if res := tx.Delete(&artifact); res.Error != nil {
 		tx.Rollback()
 		return h.errorTransformer.ToDataCatalogError(res.Error)
 	} else if res.RowsAffected == 0 {
@@ -212,12 +222,12 @@ func (h *artifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error
 		tx.Rollback()
 		return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
 			Dataset: &datacatalog.DatasetID{
-				Project: key.DatasetProject,
-				Domain:  key.DatasetDomain,
-				Name:    key.DatasetName,
-				Version: key.DatasetVersion,
+				Project: artifact.DatasetProject,
+				Domain:  artifact.DatasetDomain,
+				Name:    artifact.DatasetName,
+				Version: artifact.DatasetVersion,
 			},
-			Id: key.ArtifactID,
+			Id: artifact.ArtifactID,
 		})
 	}
 

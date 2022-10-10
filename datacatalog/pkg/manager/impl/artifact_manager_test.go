@@ -1027,12 +1027,12 @@ func TestDeleteArtifact(t *testing.T) {
 
 		dcRepo.MockArtifactRepo.On("Delete",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(key models.ArtifactKey) bool {
-				return key.ArtifactID == expectedArtifact.Id &&
-					key.DatasetProject == expectedArtifact.Dataset.Project &&
-					key.DatasetDomain == expectedArtifact.Dataset.Domain &&
-					key.DatasetName == expectedArtifact.Dataset.Name &&
-					key.DatasetVersion == expectedArtifact.Dataset.Version
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				return artifact.ArtifactID == expectedArtifact.Id &&
+					artifact.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifact.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifact.DatasetName == expectedArtifact.Dataset.Name &&
+					artifact.DatasetVersion == expectedArtifact.Dataset.Version
 			})).Return(nil)
 
 		request := &datacatalog.DeleteArtifactRequest{
@@ -1064,12 +1064,12 @@ func TestDeleteArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Delete",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(key models.ArtifactKey) bool {
-				return key.ArtifactID == expectedArtifact.Id &&
-					key.DatasetProject == expectedArtifact.Dataset.Project &&
-					key.DatasetDomain == expectedArtifact.Dataset.Domain &&
-					key.DatasetName == expectedArtifact.Dataset.Name &&
-					key.DatasetVersion == expectedArtifact.Dataset.Version
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				return artifact.ArtifactID == expectedArtifact.Id &&
+					artifact.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifact.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifact.DatasetName == expectedArtifact.Dataset.Name &&
+					artifact.DatasetVersion == expectedArtifact.Dataset.Version
 			})).Return(nil)
 
 		dcRepo.MockTagRepo.On("Get", mock.Anything,

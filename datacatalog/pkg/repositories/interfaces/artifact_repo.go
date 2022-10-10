@@ -13,5 +13,5 @@ type ArtifactRepo interface {
 	Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error)
 	List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error)
 	Update(ctx context.Context, artifact models.Artifact) error
-	Delete(ctx context.Context, key models.ArtifactKey) error
+	Delete(ctx context.Context, artifact models.Artifact) error
 }

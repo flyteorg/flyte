@@ -55,8 +55,8 @@ func (_m ArtifactRepo_Delete) Return(_a0 error) *ArtifactRepo_Delete {
 	return &ArtifactRepo_Delete{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ArtifactRepo) OnDelete(ctx context.Context, key models.ArtifactKey) *ArtifactRepo_Delete {
-	c_call := _m.On("Delete", ctx, key)
+func (_m *ArtifactRepo) OnDelete(ctx context.Context, artifact models.Artifact) *ArtifactRepo_Delete {
+	c_call := _m.On("Delete", ctx, artifact)
 	return &ArtifactRepo_Delete{Call: c_call}
 }
 
@@ -65,13 +65,13 @@ func (_m *ArtifactRepo) OnDeleteMatch(matchers ...interface{}) *ArtifactRepo_Del
 	return &ArtifactRepo_Delete{Call: c_call}
 }
 
-// Delete provides a mock function with given fields: ctx, key
-func (_m *ArtifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error {
-	ret := _m.Called(ctx, key)
+// Delete provides a mock function with given fields: ctx, artifact
+func (_m *ArtifactRepo) Delete(ctx context.Context, artifact models.Artifact) error {
+	ret := _m.Called(ctx, artifact)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.ArtifactKey) error); ok {
-		r0 = rf(ctx, key)
+	if rf, ok := ret.Get(0).(func(context.Context, models.Artifact) error); ok {
+		r0 = rf(ctx, artifact)
 	} else {
 		r0 = ret.Error(0)
 	}

@@ -444,7 +444,7 @@ func (m *artifactManager) DeleteArtifact(ctx context.Context, request *datacatal
 	}
 
 	// delete artifact from DB, also removed associated artifact data entries
-	err = m.repo.ArtifactRepo().Delete(ctx, artifactModel.ArtifactKey)
+	err = m.repo.ArtifactRepo().Delete(ctx, artifactModel)
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
 			logger.Warnf(ctx, "Artifact does not exist key: %+v, err %v", artifactModel.ArtifactID, err)

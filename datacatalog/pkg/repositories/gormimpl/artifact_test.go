@@ -590,29 +590,41 @@ func TestDeleteArtifact(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
-	artifactDeleted := false
-	GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE "artifacts"."artifact_id" = $1`).
-		WithRowsNum(1).
-		WithCallback(func(s string, values []driver.NamedValue) {
-			artifactDeleted = true
-		})
 	artifactDataDeleted := false
 	GlobalMock.NewMock().
-		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1`).
+		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
 		WithRowsNum(1).
 		WithCallback(func(s string, values []driver.NamedValue) {
 			artifactDataDeleted = true
 		})
-
-	deleteInput := models.ArtifactKey{
-		ArtifactID: artifact.ArtifactID,
-	}
+	tagsDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			tagsDeleted = true
+		})
+	partitionsDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			partitionsDeleted = true
+		})
+	artifactDeleted := false
+	GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDeleted = true
+		})
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Delete(ctx, deleteInput)
+	err := artifactRepo.Delete(ctx, artifact)
 	assert.NoError(t, err)
-	assert.True(t, artifactDeleted)
 	assert.True(t, artifactDataDeleted)
+	assert.True(t, tagsDeleted)
+	assert.True(t, partitionsDeleted)
+	assert.True(t, artifactDeleted)
 }
 
 func TestDeleteArtifactDoesNotExist(t *testing.T) {
@@ -622,65 +634,48 @@ func TestDeleteArtifactDoesNotExist(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
-	artifactDeleted := false
-	GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE "artifacts"."artifact_id" = $1`).
-		WithRowsNum(0).
-		WithCallback(func(s string, values []driver.NamedValue) {
-			artifactDeleted = true
-		})
 	artifactDataDeleted := false
 	GlobalMock.NewMock().
-		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1`).
+		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
 		WithRowsNum(0).
 		WithCallback(func(s string, values []driver.NamedValue) {
 			artifactDataDeleted = true
 		})
-
-	deleteInput := models.ArtifactKey{
-		ArtifactID: artifact.ArtifactID,
-	}
+	tagsDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+		WithRowsNum(0).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			tagsDeleted = true
+		})
+	partitionsDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+		WithRowsNum(0).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			partitionsDeleted = true
+		})
+	artifactDeleted := false
+	GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
+		WithRowsNum(0).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDeleted = true
+		})
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Delete(ctx, deleteInput)
+	err := artifactRepo.Delete(ctx, artifact)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
 	assert.Equal(t, dcErr.Code(), codes.NotFound)
-	assert.True(t, artifactDeleted)
 	assert.True(t, artifactDataDeleted)
+	assert.True(t, tagsDeleted)
+	assert.True(t, partitionsDeleted)
+	assert.True(t, artifactDeleted)
 }
 
 func TestDeleteArtifactError(t *testing.T) {
 	artifact := getTestArtifact()
-
-	t.Run("ArtifactDelete", func(t *testing.T) {
-		ctx := context.Background()
-
-		GlobalMock := mocket.Catcher.Reset()
-		GlobalMock.Logging = true
-
-		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE "artifacts"."artifact_id" = $1`).
-			WithExecException()
-		artifactDataDeleted := false
-		GlobalMock.NewMock().
-			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1`).
-			WithRowsNum(0).
-			WithCallback(func(s string, values []driver.NamedValue) {
-				artifactDataDeleted = true
-			})
-
-		deleteInput := models.ArtifactKey{
-			ArtifactID: artifact.ArtifactID,
-		}
-
-		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-		err := artifactRepo.Delete(ctx, deleteInput)
-		assert.Error(t, err)
-		dcErr, ok := err.(apiErrors.DataCatalogError)
-		assert.True(t, ok)
-		assert.Equal(t, dcErr.Code(), codes.Internal)
-		assert.True(t, artifactDataDeleted)
-	})
 
 	t.Run("ArtifactDataDelete", func(t *testing.T) {
 		ctx := context.Background()
@@ -688,26 +683,162 @@ func TestDeleteArtifactError(t *testing.T) {
 		GlobalMock := mocket.Catcher.Reset()
 		GlobalMock.Logging = true
 
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
+			WithExecException()
+		tagsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				tagsDeleted = true
+			})
+		partitionsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				partitionsDeleted = true
+			})
 		artifactDeleted := false
-		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE "artifacts"."artifact_id" = $1`).
+		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
 			WithRowsNum(1).
 			WithCallback(func(s string, values []driver.NamedValue) {
 				artifactDeleted = true
 			})
-		GlobalMock.NewMock().
-			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1`).
-			WithExecException()
-
-		deleteInput := models.ArtifactKey{
-			ArtifactID: artifact.ArtifactID,
-		}
 
 		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-		err := artifactRepo.Delete(ctx, deleteInput)
+		err := artifactRepo.Delete(ctx, artifact)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
 		assert.True(t, ok)
 		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.False(t, tagsDeleted)
+		assert.False(t, partitionsDeleted)
 		assert.False(t, artifactDeleted)
+	})
+
+	t.Run("TagsDelete", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		artifactDataDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDataDeleted = true
+			})
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+			WithExecException()
+		partitionsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				partitionsDeleted = true
+			})
+		artifactDeleted := false
+		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
+			WithRowsNum(1).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDeleted = true
+			})
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Delete(ctx, artifact)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.True(t, artifactDataDeleted)
+		assert.False(t, partitionsDeleted)
+		assert.False(t, artifactDeleted)
+	})
+
+	t.Run("PartitionsDelete", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		artifactDataDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDataDeleted = true
+			})
+		tagsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				tagsDeleted = true
+			})
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+			WithRowsNum(0).
+			WithExecException()
+		artifactDeleted := false
+		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
+			WithRowsNum(1).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDeleted = true
+			})
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Delete(ctx, artifact)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.True(t, artifactDataDeleted)
+		assert.True(t, tagsDeleted)
+		assert.False(t, artifactDeleted)
+	})
+
+	t.Run("ArtifactDelete", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		artifactDataDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."dataset_project" = $1 AND "artifact_data"."dataset_name" = $2 AND "artifact_data"."dataset_domain" = $3 AND "artifact_data"."dataset_version" = $4 AND "artifact_data"."artifact_id" = $5`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDataDeleted = true
+			})
+		tagsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "tags" WHERE "tags"."artifact_id" = $1 AND "tags"."dataset_uuid" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				tagsDeleted = true
+			})
+		partitionsDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "partitions" WHERE "partitions"."dataset_uuid" = $1 AND "partitions"."artifact_id" = $2`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				partitionsDeleted = true
+			})
+		GlobalMock.NewMock().WithQuery(`DELETE FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))`).
+			WithExecException()
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Delete(ctx, artifact)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.True(t, artifactDataDeleted)
+		assert.True(t, tagsDeleted)
+		assert.True(t, partitionsDeleted)
 	})
 }
