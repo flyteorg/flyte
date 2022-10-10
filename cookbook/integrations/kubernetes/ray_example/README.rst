@@ -51,3 +51,20 @@ Create a Ray Cluster Managed by Flyte and Run a Ray Job on This Cluster
         futures = [f.remote(i) for i in range(5)]
         return ray.get(futures)
 
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: https://blog.flyte.org/ray-and-flyte
+       :type: url
+       :text: Blog Post
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    An article detailing Ray and Flyte integration.
+
+.. toctree::
+    :maxdepth: -1
+    :caption: Contents
+    :hidden:
+
+    Blog Post <https://blog.flyte.org/ray-and-flyte>

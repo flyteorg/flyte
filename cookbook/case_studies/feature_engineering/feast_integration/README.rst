@@ -58,3 +58,21 @@ Takeaways
 #. Source data is from SQL-like data sources
 #. Procreated feature transforms
 #. Serve features to production using Feast
+
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: https://blog.flyte.org/bring-ml-close-to-data-using-feast-and-flyte
+       :type: url
+       :text: Blog Post
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    An article detailing Feast and Flyte integration.
+
+.. toctree::
+    :maxdepth: -1
+    :caption: Contents
+    :hidden:
+
+    Blog Post <https://blog.flyte.org/bring-ml-close-to-data-using-feast-and-flyte>

@@ -104,3 +104,21 @@ To use the Great Expectations Flyte plugin, run the following command:
 
 .. note::
     Make sure to run workflows from the "flytekit_plugins" directory.
+
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: https://blog.flyte.org/data-quality-enforcement-using-great-expectations-and-flyte
+       :type: url
+       :text: Blog Post
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    An article detailing Great Expectations and Flyte integration.
+
+.. toctree::
+    :maxdepth: -1
+    :caption: Contents
+    :hidden:
+
+    Blog Post <https://blog.flyte.org/data-quality-enforcement-using-great-expectations-and-flyte>

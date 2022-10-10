@@ -205,3 +205,22 @@ if __name__ == "__main__":
 #
 # Dynamic tasks have overhead for large fan-out tasks because they store metadata for the entire workflow. In contrast, map tasks are efficient for these large fan-out tasks since they don’t store the metadata, as a consequence of which overhead is less apparent.
 #
+
+# %%
+# .. panels::
+#     :header: text-center
+#     :column: col-lg-12 p-2
+#
+#     .. link-button:: https://blog.flyte.org/dynamic-workflows-in-flyte
+#        :type: url
+#        :text: Blog Post
+#        :classes: btn-block stretched-link
+#     ^^^^^^^^^^^^
+#     An article on how to use Dynamic Workflows in Flyte.
+#
+# .. toctree::
+#     :maxdepth: -1
+#     :caption: Contents
+#     :hidden:
+#
+#     Blog Post <https://blog.flyte.org/dynamic-workflows-in-flyte>
