@@ -24,7 +24,7 @@ file="/var/run/docker.pid"
 if [ -f "$file" ] ; then
     rm "$file"
 fi
-dockerd  &> /var/log/dockerd.log &
+dockerd &> /var/log/dockerd.log &
 DOCKERD_PID=$!
 timeout "$FLYTE_TIMEOUT" sh -c "until docker info &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for dockerd to start"; exit 1 )
 echo "Done."
@@ -34,7 +34,8 @@ echo "Starting k3s cluster..."
 KUBERNETES_API_PORT=${KUBERNETES_API_PORT:-6443}
 k3s server --docker --no-deploy=traefik --no-deploy=servicelb --no-deploy=local-storage --no-deploy=metrics-server --https-listen-port=${KUBERNETES_API_PORT} &> /var/log/k3s.log &
 K3S_PID=$!
-timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
+timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl get node $HOSTNAME &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
+k3s kubectl wait node $HOSTNAME --for condition=Ready --timeout ${FLYTE_TIMEOUT}s &> /dev/null || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to be ready"; exit 1 )
 echo "Done."
 
 # Deploy flyte
