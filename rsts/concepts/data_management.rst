@@ -166,7 +166,7 @@ Between Tasks
 Bringing in Your Own Datastores for Raw Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Flytekit has a pluggable data persistence layer as explained in :std:ref:`extend_data_persistence_layer`. This is driven by PROTOCOL.
+Flytekit has a pluggable data persistence layer as explained in :std:ref:`extend data persistence layer <data.extend>`. This is driven by PROTOCOL.
 For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
 But for Metadata, the data should be accessible to Flyte control plane.
 
