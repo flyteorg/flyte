@@ -18,6 +18,7 @@ func TestGenerateClientConfig(t *testing.T) {
 		ClientId:    "dummyClient",
 		RedirectUri: "dummyRedirectUri",
 		Scopes:      []string{"dummyScopes"},
+		Audience:    "dummyAudience",
 	}
 	oauthMetaDataResp := &service.OAuth2MetadataResponse{
 		Issuer:                        "dummyIssuer",
@@ -36,4 +37,5 @@ func TestGenerateClientConfig(t *testing.T) {
 	assert.Equal(t, "dummyTokenEndpoint", oauthConfig.Endpoint.TokenURL)
 	assert.Equal(t, "dummyAuthEndPoint", oauthConfig.Endpoint.AuthURL)
 	assert.Equal(t, "dummyDeviceEndpoint", oauthConfig.DeviceEndpoint)
+	assert.Equal(t, "dummyAudience", oauthConfig.Audience)
 }

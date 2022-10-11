@@ -181,6 +181,7 @@ FlyteClientResponse encapsulates public information that flyte clients (CLIs... 
    "scopes", ":ref:`ref_string`", "repeated", "scopes to request when initiating OAuth2 authorization requests."
    "authorization_metadata_key", ":ref:`ref_string`", "", "Authorization Header to use when passing Access Tokens to the server. If not provided, the client should use the default http `Authorization` header."
    "service_http_endpoint", ":ref:`ref_string`", "", "ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used to configure the gRPC connection can be used for the http one respecting the insecure flag to choose between SSL or no SSL connections."
+   "audience", ":ref:`ref_string`", "", "audience to use when initiating OAuth2 authorization requests."
 
 
 

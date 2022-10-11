@@ -63,6 +63,8 @@ message PublicClientAuthConfigResponse {
     // to configure the gRPC connection can be used for the http one respecting the insecure flag to choose between
     // SSL or no SSL connections.
     string service_http_endpoint = 5;
+    // audience to use when initiating OAuth2 authorization requests.
+    string audience = 6;
 }
 
 // The following defines an RPC service that is also served over HTTP via grpc-gateway.

@@ -3573,6 +3573,24 @@ public final class Auth {
      */
     com.google.protobuf.ByteString
         getServiceHttpEndpointBytes();
+
+    /**
+     * <pre>
+     * audience to use when initiating OAuth2 authorization requests.
+     * </pre>
+     *
+     * <code>string audience = 6;</code>
+     */
+    java.lang.String getAudience();
+    /**
+     * <pre>
+     * audience to use when initiating OAuth2 authorization requests.
+     * </pre>
+     *
+     * <code>string audience = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getAudienceBytes();
   }
   /**
    * <pre>
@@ -3596,6 +3614,7 @@ public final class Auth {
       scopes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       authorizationMetadataKey_ = "";
       serviceHttpEndpoint_ = "";
+      audience_ = "";
     }
 
     @java.lang.Override
@@ -3653,6 +3672,12 @@ public final class Auth {
               java.lang.String s = input.readStringRequireUtf8();
 
               serviceHttpEndpoint_ = s;
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              audience_ = s;
               break;
             }
             default: {
@@ -3910,6 +3935,48 @@ public final class Auth {
       }
     }
 
+    public static final int AUDIENCE_FIELD_NUMBER = 6;
+    private volatile java.lang.Object audience_;
+    /**
+     * <pre>
+     * audience to use when initiating OAuth2 authorization requests.
+     * </pre>
+     *
+     * <code>string audience = 6;</code>
+     */
+    public java.lang.String getAudience() {
+      java.lang.Object ref = audience_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        audience_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * audience to use when initiating OAuth2 authorization requests.
+     * </pre>
+     *
+     * <code>string audience = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAudienceBytes() {
+      java.lang.Object ref = audience_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        audience_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3938,6 +4005,9 @@ public final class Auth {
       }
       if (!getServiceHttpEndpointBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, serviceHttpEndpoint_);
+      }
+      if (!getAudienceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, audience_);
       }
       unknownFields.writeTo(output);
     }
@@ -3968,6 +4038,9 @@ public final class Auth {
       if (!getServiceHttpEndpointBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, serviceHttpEndpoint_);
       }
+      if (!getAudienceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, audience_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3993,6 +4066,8 @@ public final class Auth {
           .equals(other.getAuthorizationMetadataKey())) return false;
       if (!getServiceHttpEndpoint()
           .equals(other.getServiceHttpEndpoint())) return false;
+      if (!getAudience()
+          .equals(other.getAudience())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4016,6 +4091,8 @@ public final class Auth {
       hash = (53 * hash) + getAuthorizationMetadataKey().hashCode();
       hash = (37 * hash) + SERVICE_HTTP_ENDPOINT_FIELD_NUMBER;
       hash = (53 * hash) + getServiceHttpEndpoint().hashCode();
+      hash = (37 * hash) + AUDIENCE_FIELD_NUMBER;
+      hash = (53 * hash) + getAudience().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4163,6 +4240,8 @@ public final class Auth {
 
         serviceHttpEndpoint_ = "";
 
+        audience_ = "";
+
         return this;
       }
 
@@ -4200,6 +4279,7 @@ public final class Auth {
         result.scopes_ = scopes_;
         result.authorizationMetadataKey_ = authorizationMetadataKey_;
         result.serviceHttpEndpoint_ = serviceHttpEndpoint_;
+        result.audience_ = audience_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4273,6 +4353,10 @@ public final class Auth {
         }
         if (!other.getServiceHttpEndpoint().isEmpty()) {
           serviceHttpEndpoint_ = other.serviceHttpEndpoint_;
+          onChanged();
+        }
+        if (!other.getAudience().isEmpty()) {
+          audience_ = other.audience_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -4805,6 +4889,95 @@ public final class Auth {
         onChanged();
         return this;
       }
+
+      private java.lang.Object audience_ = "";
+      /**
+       * <pre>
+       * audience to use when initiating OAuth2 authorization requests.
+       * </pre>
+       *
+       * <code>string audience = 6;</code>
+       */
+      public java.lang.String getAudience() {
+        java.lang.Object ref = audience_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          audience_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * audience to use when initiating OAuth2 authorization requests.
+       * </pre>
+       *
+       * <code>string audience = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAudienceBytes() {
+        java.lang.Object ref = audience_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          audience_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * audience to use when initiating OAuth2 authorization requests.
+       * </pre>
+       *
+       * <code>string audience = 6;</code>
+       */
+      public Builder setAudience(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        audience_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * audience to use when initiating OAuth2 authorization requests.
+       * </pre>
+       *
+       * <code>string audience = 6;</code>
+       */
+      public Builder clearAudience() {
+        
+        audience_ = getDefaultInstance().getAudience();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * audience to use when initiating OAuth2 authorization requests.
+       * </pre>
+       *
+       * <code>string audience = 6;</code>
+       */
+      public Builder setAudienceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        audience_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4899,26 +5072,26 @@ public final class Auth {
       "ks_uri\030\007 \001(\t\022(\n code_challenge_methods_s" +
       "upported\030\010 \003(\t\022\035\n\025grant_types_supported\030" +
       "\t \003(\t\022%\n\035device_authorization_endpoint\030\n" +
-      " \001(\t\"\037\n\035PublicClientAuthConfigRequest\"\234\001" +
+      " \001(\t\"\037\n\035PublicClientAuthConfigRequest\"\256\001" +
       "\n\036PublicClientAuthConfigResponse\022\021\n\tclie" +
       "nt_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sco" +
       "pes\030\003 \003(\t\022\"\n\032authorization_metadata_key\030" +
-      "\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t2\374\003\n" +
-      "\023AuthMetadataService\022\365\001\n\021GetOAuth2Metada" +
-      "ta\022\'.flyteidl.service.OAuth2MetadataRequ" +
-      "est\032(.flyteidl.service.OAuth2MetadataRes" +
-      "ponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oauth-autho" +
-      "rization-server\222AZ\032XRetrieves OAuth2 aut" +
-      "horization server metadata. This endpoin" +
-      "t is anonymously accessible.\022\354\001\n\025GetPubl" +
-      "icClientConfig\022/.flyteidl.service.Public" +
-      "ClientAuthConfigRequest\0320.flyteidl.servi" +
-      "ce.PublicClientAuthConfigResponse\"p\202\323\344\223\002" +
-      "\031\022\027/config/v1/flyte_client\222AN\032LRetrieves" +
-      " public flyte client info. This endpoint" +
-      " is anonymously accessible.B9Z7github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/s" +
-      "erviceb\006proto3"
+      "\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t\022\020\n\010" +
+      "audience\030\006 \001(\t2\374\003\n\023AuthMetadataService\022\365" +
+      "\001\n\021GetOAuth2Metadata\022\'.flyteidl.service." +
+      "OAuth2MetadataRequest\032(.flyteidl.service" +
+      ".OAuth2MetadataResponse\"\214\001\202\323\344\223\002)\022\'/.well" +
+      "-known/oauth-authorization-server\222AZ\032XRe" +
+      "trieves OAuth2 authorization server meta" +
+      "data. This endpoint is anonymously acces" +
+      "sible.\022\354\001\n\025GetPublicClientConfig\022/.flyte" +
+      "idl.service.PublicClientAuthConfigReques" +
+      "t\0320.flyteidl.service.PublicClientAuthCon" +
+      "figResponse\"p\202\323\344\223\002\031\022\027/config/v1/flyte_cl" +
+      "ient\222AN\032LRetrieves public flyte client i" +
+      "nfo. This endpoint is anonymously access" +
+      "ible.B9Z7github.com/flyteorg/flyteidl/ge" +
+      "n/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4957,7 +5130,7 @@ public final class Auth {
     internal_static_flyteidl_service_PublicClientAuthConfigResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_PublicClientAuthConfigResponse_descriptor,
-        new java.lang.String[] { "ClientId", "RedirectUri", "Scopes", "AuthorizationMetadataKey", "ServiceHttpEndpoint", });
+        new java.lang.String[] { "ClientId", "RedirectUri", "Scopes", "AuthorizationMetadataKey", "ServiceHttpEndpoint", "Audience", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
