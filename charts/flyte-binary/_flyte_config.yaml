@@ -94,6 +94,5 @@ catalog-cache:
   endpoint: localhost:8081
   insecure: true
   type: datacatalog
-
 namespace_mapping:
   template: {{`"{{ project }}-{{ domain }}"`}}
