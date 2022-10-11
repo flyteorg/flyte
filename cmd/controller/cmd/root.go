@@ -131,6 +131,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
 		},
+		MetricsBindAddress: "0",
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, cfg, options)

@@ -110,8 +110,9 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 			return executors.NewFallbackClientBuilder(webhookScope).Build(cache, config, options)
 		},
-		CertDir: cfg.CertDir,
-		Port:    cfg.ListenPort,
+		CertDir:            cfg.CertDir,
+		Port:               cfg.ListenPort,
+		MetricsBindAddress: "0",
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, options)
