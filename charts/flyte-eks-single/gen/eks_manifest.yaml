@@ -17,6 +17,15 @@ kind: ServiceAccount
 metadata:
   name: flyte
 ---
+# Source: flyte-eks-single/charts/flyte/templates/admin_secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-db-pass
+type: Opaque
+stringData:
+  pass.txt: "awesomesauce"
+---
 # Source: flyte-eks-single/charts/flyte/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -31,7 +40,7 @@ metadata:
 data:
   flyte.yaml: | 
     propeller:
-      rawoutput-prefix: "s3://my-s3-bucket/data/"
+      rawoutput-prefix: "s3://flyte-single-binary-test/userdata/data/"
       create-flyteworkflow-crd: true
     webhook:
       certDir: /var/run/flyte/certs
@@ -45,31 +54,25 @@ data:
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-    flyteadmin:
-      runScheduler: false
     database:
       postgres:
         port: 30001
         username: postgres
-        host: 127.0.0.1
+        host: trinity1.cmp0wwpbez1r.us-east-2.rds.amazonaws.com
         dbname: flyteadmin
         options: "sslmode=disable"
+        passwordPath: /etc/db/pass.txt
     storage:
-      type: minio
+      type: s3
       connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: "http://localhost:30002"
-        region: my-region
+        region: us-east-2
       cache:
         max_size_mbs: 10
         target_gc_percent: 100
-      container: "my-s3-bucket"
+      container: "flyte-single-binary-test"
     logger:
       show-source: true
-      level: 4
+      level: 1
     admin:
       endpoint: localhost:8089
       insecure: true
@@ -80,9 +83,6 @@ data:
         default-env-vars:
           - AWS_METADATA_SERVICE_TIMEOUT: 5
           - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-          - FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
-          - FLYTE_AWS_ACCESS_KEY_ID: minio
-          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
       # Logging configuration
       # Escape Helm templating because admin will template these later
       logs:
@@ -129,7 +129,7 @@ data:
       type: datacatalog
     
     namespace_mapping:
-      template: "{{ project }}-{{ domain }}-tst"
+      template: "{{ project }}-{{ domain }}"
 ---
 # Source: flyte-eks-single/charts/flyte/templates/configmap.yaml
 apiVersion: v1
@@ -299,7 +299,7 @@ spec:
       hostNetwork: true
       containers:
       - name: flyte
-        image: "flyte"
+        image: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
         imagePullPolicy: IfNotPresent
         args:
         - start
@@ -333,6 +333,8 @@ spec:
           name: config
         - mountPath: /var/run/flyte
           name: state
+        - mountPath: /etc/db
+          name: db-pass
       serviceAccountName: flyte
       volumes:
       - name: cluster-resource-templates
@@ -343,3 +345,6 @@ spec:
           name: flyte-backend-config
       - name: state
         emptyDir: {}
+      - name: db-pass
+        secret:
+          secretName: flyte-db-pass

@@ -1,15 +1,15 @@
-flyte-binary:
 
+flyte:
   image:
-    fqn: "flyte"
+    fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
 
   storage:
-    metadataContainer: my-s3-bucket
-    userDataContainer: my-s3-bucket
+    metadataContainer: flyte-single-binary-test
+    userDataContainer: flyte-single-binary-test/userdata
+    type: s3
+    region: us-east-2
 
-  logger:
-    level: 1
-
-  paths:
-    # Specify full path to Flyte binary config file here if being provided externally
-    externalFlyteConfig: ""
+  database:
+    username: postgres
+    host: trinity1.cmp0wwpbez1r.us-east-2.rds.amazonaws.com
+    password: awesomesauce

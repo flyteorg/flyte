@@ -13,31 +13,30 @@ tasks:
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
-flyteadmin:
-  runScheduler: false
 database:
   postgres:
-    port: 30001
-    username: postgres
-    host: 127.0.0.1
-    dbname: flyteadmin
+    port: {{ .Values.database.port }}
+    username: {{ .Values.database.username }}
+    host: {{ .Values.database.host }}
+    dbname: {{ .Values.database.dbname }}
     options: "sslmode=disable"
+    {{- if .Values.database.password }}
+    {{- include "flyte-binary.database.secretpathconfig" . | nindent 4 }}
+    {{- end }}
 storage:
-  type: minio
+  type: {{ .Values.storage.type }}
   connection:
-    access-key: minio
-    auth-type: accesskey
-    secret-key: miniostorage
-    disable-ssl: true
-    endpoint: "http://localhost:30002"
-    region: my-region
+    region: {{ .Values.storage.region }}
+{{- if eq .Values.storage.type "minio" }}
+{{ include "flyte-binary.minioExtraConnectionSettings" . | indent 4 }}
+{{- end }}
   cache:
     max_size_mbs: 10
     target_gc_percent: 100
   container: "{{ .Values.storage.metadataContainer }}"
 logger:
   show-source: true
-  level: 4
+  level: {{ .Values.logger.level }}
 admin:
   endpoint: localhost:8089
   insecure: true
@@ -48,9 +47,9 @@ plugins:
     default-env-vars:
       - AWS_METADATA_SERVICE_TIMEOUT: 5
       - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-      - FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
-      - FLYTE_AWS_ACCESS_KEY_ID: minio
-      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+{{- if eq .Values.storage.type "minio" }}
+{{ include "flyte-binary.minioExtraEnvVars" . | indent 6 }}
+{{- end }}
   # Logging configuration
   # Escape Helm templating because admin will template these later
   logs:
@@ -97,4 +96,4 @@ catalog-cache:
   type: datacatalog
 
 namespace_mapping:
-  template: {{`"{{ project }}-{{ domain }}-tst"`}}
+  template: {{`"{{ project }}-{{ domain }}"`}}
