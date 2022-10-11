@@ -244,8 +244,7 @@ used to manage Flyte entities such as tasks, workflows, and executions.
 
    - The default execution view shows the list of tasks executing in sequential order.
    - The right-hand panel shows metadata about the task execution, including logs, inputs, outputs, and task metadata.
-   - The *Graph* view shows the execution graph of the workflow, providing visual information about the topology
-     of the graph and the state of each node as the workflow progresses.
+   - The *Graph* view shows the execution graph of the workflow, providing visual information about the topology of the graph and the state of each node as the workflow progresses.
    - On completion, you can inspect the outputs of each task, and ultimately, the overarching workflow.
 
 Recap
