@@ -1,0 +1,15 @@
+flyte-binary:
+
+  image:
+    fqn: "flyte"
+
+  storage:
+    metadataContainer: my-s3-bucket
+    userDataContainer: my-s3-bucket
+
+  logger:
+    level: 1
+
+  paths:
+    # Specify full path to Flyte binary config file here if being provided externally
+    externalFlyteConfig: ""
