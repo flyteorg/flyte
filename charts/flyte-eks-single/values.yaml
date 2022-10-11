@@ -10,6 +10,7 @@ flyte:
     region: us-east-2
 
   database:
+    port: 5432
     username: postgres
     host: trinity1.cmp0wwpbez1r.us-east-2.rds.amazonaws.com
     password: awesomesauce
