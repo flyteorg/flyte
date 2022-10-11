@@ -139,6 +139,10 @@
         "service_http_endpoint": {
           "type": "string",
           "description": "ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used\nto configure the gRPC connection can be used for the http one respecting the insecure flag to choose between\nSSL or no SSL connections."
+        },
+        "audience": {
+          "type": "string",
+          "description": "audience to use when initiating OAuth2 authorization requests."
         }
       },
       "description": "FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users."

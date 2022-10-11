@@ -12,6 +12,8 @@ import (
 type Config struct {
 	*oauth2.Config
 	DeviceEndpoint string
+	// Audience value to be passed when requesting access token using device flow.This needs to be passed in the first request of the device flow currently and is configured in admin public client config.Required when auth server hasn't been configured with default audience"`
+	Audience string
 }
 
 // BuildConfigFromMetadataService builds OAuth2 config from information retrieved through the anonymous auth metadata service.
@@ -37,6 +39,7 @@ func BuildConfigFromMetadataService(ctx context.Context, authMetadataClient serv
 			},
 		},
 		DeviceEndpoint: oauthMetaResp.DeviceAuthorizationEndpoint,
+		Audience:       clientResp.Audience,
 	}
 
 	return clientConf, nil
