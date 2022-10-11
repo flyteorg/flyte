@@ -156,8 +156,7 @@ To start a local demo cluster, install :std:ref:`flytectl`, which is the command
 
   .. prompt:: bash $
 
-    curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin # You can change path from /usr/local/bin to any file system path
-    export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
+    curl -L https://raw.githubusercontent.com/flyteorg/flytectl/HEAD/install.sh | bash
 
 
 Start a Flyte demonstration environment on your local machine via:
