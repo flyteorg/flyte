@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -46,9 +47,18 @@ func TestFetchFromAuthFlow(t *testing.T) {
 			body, err := io.ReadAll(r.Body)
 			assert.Nil(t, err)
 			isDeviceReq := strings.Contains(string(body), scope)
-			isTokReq := strings.Contains(string(body), deviceCode) && strings.Contains(string(body), grantType) && strings.Contains(string(body), cliendID)
+			isTokReq := strings.Contains(string(body), deviceCode) && strings.Contains(string(body), grantType) && strings.Contains(string(body), clientID)
 
 			if isDeviceReq {
+				for _, urlParm := range strings.Split(string(body), "&") {
+					paramKeyValue := strings.Split(urlParm, "=")
+					switch paramKeyValue[0] {
+					case audience:
+						assert.Equal(t, "abcd", paramKeyValue[1])
+					case clientID:
+						assert.Equal(t, clientID, paramKeyValue[1])
+					}
+				}
 				dar := DeviceAuthorizationResponse{
 					DeviceCode:              "e1db31fe-3b23-4fce-b759-82bf8ea323d6",
 					UserCode:                "RPBQZNRX",
@@ -62,6 +72,17 @@ func TestFetchFromAuthFlow(t *testing.T) {
 				assert.Nil(t, err)
 				return
 			} else if isTokReq {
+				for _, urlParm := range strings.Split(string(body), "&") {
+					paramKeyValue := strings.Split(urlParm, "=")
+					switch paramKeyValue[0] {
+					case grantType:
+						assert.Equal(t, url.QueryEscape(grantTypeValue), paramKeyValue[1])
+					case deviceCode:
+						assert.Equal(t, "e1db31fe-3b23-4fce-b759-82bf8ea323d6", paramKeyValue[1])
+					case clientID:
+						assert.Equal(t, clientID, paramKeyValue[1])
+					}
+				}
 				dar := DeviceAccessTokenResponse{
 					Token: oauth2.Token{
 						AccessToken: "access_token",
@@ -81,7 +102,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{
-					ClientID:    cliendID,
+					ClientID:    clientID,
 					RedirectURL: "http://localhost:8089/redirect",
 					Scopes:      []string{"code", "all"},
 					Endpoint: oauth2.Endpoint{
@@ -89,6 +110,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 					},
 				},
 				DeviceEndpoint: fakeServer.URL,
+				Audience:       "abcd",
 			},
 			TokenCache: tokenCache,
 		}, Config{
