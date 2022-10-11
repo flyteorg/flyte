@@ -1,36 +1,37 @@
 ---
-# Source: flyte-binary/templates/namespace.yaml
+# Source: flyte-eks-single/charts/flyte/templates/namespace.yaml
 kind: Namespace
 apiVersion: v1
 metadata:
   name: flyte
   labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: binary-tst-deploy
+    helm.sh/chart: flyte-0.1.0
+    app.kubernetes.io/name: flyte
+    app.kubernetes.io/instance: binary-tst-eks
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyte-binary/templates/serviceaccount.yaml
+# Source: flyte-eks-single/charts/flyte/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flyte
 ---
-# Source: flyte-binary/templates/configmap.yaml
+# Source: flyte-eks-single/charts/flyte/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-backend-config
   labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: binary-tst-deploy
+    helm.sh/chart: flyte-0.1.0
+    app.kubernetes.io/name: flyte
+    app.kubernetes.io/instance: binary-tst-eks
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 data:
   flyte.yaml: | 
     propeller:
+    # UPDATE
       rawoutput-prefix: "s3://my-s3-bucket/data/"
       create-flyteworkflow-crd: true
     webhook:
@@ -47,34 +48,40 @@ data:
           - container_array: K8S-ARRAY
     database:
       postgres:
+        # UPDATE
         port: 30001
+        # UPDATE
         username: postgres
+        # UPDATE
         host: 127.0.0.1
         dbname: flyteadmin
         options: "sslmode=disable"
     storage:
+      # UPDATE
       type: minio
       connection:
-        region: my-region
         access-key: minio
         auth-type: accesskey
         secret-key: miniostorage
         disable-ssl: true
         endpoint: "http://localhost:30002"
+        region: my-region
       cache:
         max_size_mbs: 10
         target_gc_percent: 100
       container: "my-s3-bucket"
     logger:
       show-source: true
-      level: 1
+      level: 4
     admin:
+      # UPDATE
       endpoint: localhost:8089
       insecure: true
     plugins:
       # All k8s plugins default configuration
       k8s:
         inject-finalizer: true
+        # UPDATE
         default-env-vars:
           - AWS_METADATA_SERVICE_TIMEOUT: 5
           - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
@@ -83,6 +90,7 @@ data:
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
       # Logging configuration
       # Escape Helm templating because admin will template these later
+      # UPDATE
       logs:
         kubernetes-enabled: true
         kubernetes-template-uri:
@@ -129,15 +137,15 @@ data:
     namespace_mapping:
       template: "{{ project }}-{{ domain }}"
 ---
-# Source: flyte-binary/templates/configmap.yaml
+# Source: flyte-eks-single/charts/flyte/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cluster-resource-templates
   labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: binary-tst-deploy
+    helm.sh/chart: flyte-0.1.0
+    app.kubernetes.io/name: flyte
+    app.kubernetes.io/instance: binary-tst-eks
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 data:
@@ -160,7 +168,7 @@ data:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
 ---
-# Source: flyte-binary/templates/rbac.yaml
+# Source: flyte-eks-single/charts/flyte/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -232,7 +240,7 @@ rules:
       - patch
       - update
 ---
-# Source: flyte-binary/templates/rbac.yaml
+# Source: flyte-eks-single/charts/flyte/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -248,7 +256,7 @@ subjects:
     # since kubectl apply --namespace won't update it.
     namespace: flyte
 ---
-# Source: flyte-binary/templates/service.yaml
+# Source: flyte-eks-single/charts/flyte/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -262,7 +270,7 @@ spec:
   selector:
     app: flyte
 ---
-# Source: flyte-binary/templates/service.yaml
+# Source: flyte-eks-single/charts/flyte/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -275,7 +283,7 @@ spec:
   selector:
     app: flyte
 ---
-# Source: flyte-binary/templates/deployment.yaml
+# Source: flyte-eks-single/charts/flyte/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:

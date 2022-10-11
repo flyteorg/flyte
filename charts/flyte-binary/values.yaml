@@ -4,6 +4,15 @@ image:
 storage:
   metadataContainer: my-s3-bucket
   userDataContainer: my-s3-bucket
+  type: minio
+  region: my-region
+
+database:
+  port: 30001
+  username: postgres
+  host: 127.0.0.1
+  dbname: flyteadmin
+  password: ""
 
 logger:
   level: 1

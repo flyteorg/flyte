@@ -60,3 +60,54 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Extra Minio connection settings
+*/}}
+{{- define "flyte-binary.minioExtraConnectionSettings" -}}
+access-key: minio
+auth-type: accesskey
+secret-key: miniostorage
+disable-ssl: true
+endpoint: "http://localhost:30002"
+{{- end }}
+
+{{/*
+Extra Minio env vars for propeller
+*/}}
+{{- define "flyte-binary.minioExtraEnvVars" -}}
+- FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
+- FLYTE_AWS_ACCESS_KEY_ID: minio
+- FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+{{- end }}
+
+{{/*
+For creating a K8s secret for the database password
+*/}}
+{{- define "flyte-binary.database.secret" -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-db-pass
+type: Opaque
+stringData:
+  pass.txt: "{{ .Values.database.password }}"
+{{- end }}
+
+{{- define "flyte-binary.database.secretvol" -}}
+- name: db-pass
+  secret:
+    secretName: flyte-db-pass
+{{- end }}
+
+{{- define "flyte-binary.database.secretvolmount" -}}
+- mountPath: /etc/db
+  name: db-pass
+{{- end }}
+
+{{- define "flyte-binary.database.secretpathconfig" -}}
+passwordPath: /etc/db/pass.txt
+{{- end }}
+
+
+
