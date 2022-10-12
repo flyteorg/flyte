@@ -16,7 +16,9 @@ spec:
       labels:
         app: flyte
     spec:
+      {{- if .Values.networking.host }}
       hostNetwork: true
+      {{- end }}
       containers:
       - name: flyte
         image: "{{ .Values.image.fqn }}"

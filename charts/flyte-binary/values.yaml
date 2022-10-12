@@ -1,3 +1,6 @@
+networking:
+  host: true
+
 image:
   fqn: "flyte"
 

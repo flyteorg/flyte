@@ -1,5 +1,8 @@
 
 flyte:
+  networking:
+    host: false
+
   image:
     fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
 
