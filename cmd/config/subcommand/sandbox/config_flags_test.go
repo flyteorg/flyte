@@ -209,4 +209,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_dev", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("dev", testValue)
+			if vBool, err := cmdFlags.GetBool("dev"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Dev)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

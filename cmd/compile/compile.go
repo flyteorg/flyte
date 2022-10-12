@@ -29,8 +29,8 @@ func compileTasks(tasks []*core.TaskTemplate) ([]*core.CompiledTask, error) {
 }
 
 /*
- Utility to compile a packaged workflow locally.
- compilation is done locally so no flyte cluster is required.
+Utility to compile a packaged workflow locally.
+compilation is done locally so no flyte cluster is required.
 */
 func compileFromPackage(packagePath string) error {
 	args := []string{packagePath}

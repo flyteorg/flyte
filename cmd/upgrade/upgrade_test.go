@@ -44,7 +44,6 @@ func TestUpgradeCommand(t *testing.T) {
 	assert.Equal(t, cmdNouns[0].Long, upgradeCmdLong)
 }
 
-//
 func TestUpgrade(t *testing.T) {
 	_ = util.WriteIntoFile([]byte("data"), tempExt)
 	stdlibversion.Version = version

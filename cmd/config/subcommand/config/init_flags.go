@@ -7,7 +7,7 @@ var (
 	}
 )
 
-//Configs
+// Configs
 type Config struct {
 	Host     string `json:"host" pflag:",Endpoint of flyte admin"`
 	Insecure bool   `json:"insecure" pflag:",Enable insecure mode"`

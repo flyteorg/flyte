@@ -20,6 +20,11 @@ Starts the demo cluster without any source code:
 
  flytectl demo start
 
+Runs a dev cluster, which only has minio and postgres pod.
+::
+
+ flytectl demo start --dev
+
 Mounts your source code repository inside the demo cluster:
 ::
 
@@ -45,7 +50,7 @@ Runs a specific version of Flyte. Flytectl demo only supports Flyte version avai
 .. note::
 	  Flytectl demo is only supported for Flyte versions >= v1.0.0
 
-Runs the latest pre release of  Flyte.
+Runs the latest pre release of Flyte.
 ::
 
  flytectl demo start --pre
