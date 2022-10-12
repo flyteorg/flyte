@@ -27,9 +27,9 @@ storage:
   type: {{ .Values.storage.type }}
   connection:
     region: {{ .Values.storage.region }}
-{{- if eq .Values.storage.type "minio" }}
-{{ include "flyte-binary.minioExtraConnectionSettings" . | indent 4 }}
-{{- end }}
+    {{- if eq .Values.storage.type "minio" }}
+    {{- include "flyte-binary.minioExtraConnectionSettings" . | nindent 4 }}
+    {{- end }}
   cache:
     max_size_mbs: 10
     target_gc_percent: 100
@@ -47,9 +47,9 @@ plugins:
     default-env-vars:
       - AWS_METADATA_SERVICE_TIMEOUT: 5
       - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-{{- if eq .Values.storage.type "minio" }}
-{{ include "flyte-binary.minioExtraEnvVars" . | indent 6 }}
-{{- end }}
+      {{- if eq .Values.storage.type "minio" }}
+      {{- include "flyte-binary.minioExtraEnvVars" . | nindent 6 }}
+      {{- end }}
   # Logging configuration
   # Escape Helm templating because admin will template these later
   logs:
