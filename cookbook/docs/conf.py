@@ -443,7 +443,6 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
     "modin": ("https://modin.readthedocs.io/en/stable/", None),
-    "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
     "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
@@ -453,13 +452,16 @@ intersphinx_mapping = {
     # "flytekit": ("/Users/ytong/go/src/github.com/lyft/flytekit/docs/build/html", None),
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
     "flytectl": ("https://docs.flyte.org/projects/flytectl/en/latest/", None),
-    "pytorch": ("https://pytorch.org/docs/stable/", None),
+    "torch": ("https://pytorch.org/docs/stable/", None),
     "greatexpectations": ("https://legacy.docs.greatexpectations.io/en/latest", None),
     "tensorflow": (
         "https://www.tensorflow.org/api_docs/python",
         "https://github.com/GPflow/tensorflow-intersphinx/raw/master/tf2_py_objects.inv",
     ),
-    "whylogs": ("https://whylogs.readthedocs.io/", None),
+    "whylogs": ("https://whylogs.readthedocs.io/en/latest/", None),
+    "horovod": ("https://horovod.readthedocs.io/en/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
+    "feast": ("https://rtd.feast.dev/en/latest", None),
 }
 
 # Sphinx-tabs config

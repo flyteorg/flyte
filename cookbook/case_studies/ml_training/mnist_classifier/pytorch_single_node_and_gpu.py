@@ -62,9 +62,9 @@ def wandb_setup():
 # Creating the Network
 # ====================
 #
-# We use a simple PyTorch model with :py:class:`pytorch:torch.nn.Conv2d` and :py:class:`pytorch:torch.nn.Linear` layers.
-# Let's also use :py:func:`pytorch:torch.nn.functional.relu`, :py:func:`pytorch:torch.nn.functional.max_pool2d`, and
-# :py:func:`pytorch:torch.nn.functional.relu` to define the forward pass.
+# We use a simple PyTorch model with :py:class:`torch:torch.nn.Conv2d` and :py:class:`torch:torch.nn.Linear` layers.
+# Let's also use :py:func:`torch:torch.nn.functional.relu`, :py:func:`torch:torch.nn.functional.max_pool2d`, and
+# :py:func:`torch:torch.nn.functional.relu` to define the forward pass.
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -257,7 +257,7 @@ class Hyperparameters(object):
 # Training and Evaluating
 # =======================
 #
-# The output model using :py:func:`pytorch:torch.save` saves the `state_dict` as described
+# The output model using :py:func:`torch:torch.save` saves the `state_dict` as described
 # `in pytorch docs <https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-and-loading-models>`_.
 # A common convention is to have the ``.pt`` extension for the model file.
 #
