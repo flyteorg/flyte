@@ -44,7 +44,7 @@ var DefaultProjectConfig = &ConfigProject{
 	Labels:      map[string]string{},
 }
 
-//GetProjectSpec return project spec from a file/flags
+// GetProjectSpec return project spec from a file/flags
 func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
 	projectSpec := admin.Project{}
 	if len(c.File) > 0 {
@@ -71,7 +71,7 @@ func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
 	return &projectSpec, nil
 }
 
-//MapToAdminState return project spec from a file/flags
+// MapToAdminState return project spec from a file/flags
 func (c *ConfigProject) MapToAdminState() (admin.Project_ProjectState, error) {
 	if c.ActivateProject {
 		c.Activate = c.ActivateProject

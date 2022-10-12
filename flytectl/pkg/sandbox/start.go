@@ -193,10 +193,14 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 	if err := docker.PullDockerImage(ctx, cli, sandboxImage, sandboxConfig.ImagePullPolicy, sandboxConfig.ImagePullOptions); err != nil {
 		return nil, err
 	}
+	sandboxEnv := sandboxConfig.Env
+	if sandboxConfig.Dev {
+		sandboxEnv = append(sandboxEnv, "FLYTE_DEV=True")
+	}
 
 	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
 	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
-		sandboxImage, sandboxConfig.Env)
+		sandboxImage, sandboxEnv)
 
 	if err != nil {
 		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
@@ -281,6 +285,9 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 	primePod := true
 	sandboxImagePrefix := "sha"
 	exposedPorts, portBindings, err := docker.GetDemoPorts()
+	if sandboxConfig.Dev {
+		exposedPorts, portBindings, err = docker.GetDevPorts()
+	}
 	if err != nil {
 		return err
 	}
