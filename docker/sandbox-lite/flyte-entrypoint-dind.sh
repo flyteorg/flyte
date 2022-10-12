@@ -64,13 +64,21 @@ timeout "$FLYTE_TIMEOUT" sh -c "until k3s kubectl rollout status deployment post
 k3s kubectl wait --for=condition=available deployment/minio deployment/postgres -n flyte --timeout=5m || ( echo >&2 "Timed out while waiting for the Flyte deployment to start"; exit 1 )
 # Create directory to store certificate
 mkdir -p /tmp/k8s-webhook-server/serving-certs
-flyte start --config /flyteorg/share/flyte.yaml &
-FLYTE_PID=$!
 
 # With flytectl sandbox --source flag, we mount the root volume to user source dir that will create helm & k8s cache specific directory.
 # In Linux, These file belongs to root user that is different then current user
 # In this case during fast serialization, Pyflyte will through error because of permission denied
 rm -rf /root/.cache /root/.kube /root/.config
 
-# Monitor running processes. Exit when the first process exits.
-monitor ${DOCKERD_PID} ${K3S_PID} ${FLYTE_PID}
+if [[ $FLYTE_DEV = "True" ]]
+then
+  # Namespaces must be manually created since cluster resource manager is disabled by default
+  k3s kubectl create ns flytesnacks-development
+  # Monitor running processes. Exit when the first process exits.
+  monitor ${DOCKERD_PID} ${K3S_PID}
+else
+  flyte start --config /flyteorg/share/flyte.yaml &
+  FLYTE_PID=$!
+  # Monitor running processes. Exit when the first process exits.
+  monitor ${DOCKERD_PID} ${K3S_PID} ${FLYTE_PID}
+fi
