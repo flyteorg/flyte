@@ -13,6 +13,10 @@ const (
   endpoint: {{.Host}}
   authType: Pkce
   insecure: {{.Insecure}}
+{{- if .Console}}
+console:
+  endpoint: {{.Console}}
+{{- end}}
 logger:
   show-source: true
   level: 0`
@@ -21,6 +25,7 @@ logger:
 type ConfigTemplateSpec struct {
 	Host     string
 	Insecure bool
+	Console  string
 }
 
 var (

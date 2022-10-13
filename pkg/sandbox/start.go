@@ -168,6 +168,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 	templateValues := configutil.ConfigTemplateSpec{
 		Host:     "localhost:30081",
 		Insecure: true,
+		Console:  fmt.Sprintf("http://localhost:%d", consolePort),
 	}
 	if err := configutil.SetupConfig(configutil.FlytectlConfig, configutil.GetTemplate(), templateValues); err != nil {
 		return nil, err

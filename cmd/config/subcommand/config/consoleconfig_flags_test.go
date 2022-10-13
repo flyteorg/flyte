@@ -14,22 +14,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dereferencableKindsConfig = map[reflect.Kind]struct{}{
+var dereferencableKindsConsoleConfig = map[reflect.Kind]struct{}{
 	reflect.Array: {}, reflect.Chan: {}, reflect.Map: {}, reflect.Ptr: {}, reflect.Slice: {},
 }
 
 // Checks if t is a kind that can be dereferenced to get its underlying type.
-func canGetElementConfig(t reflect.Kind) bool {
-	_, exists := dereferencableKindsConfig[t]
+func canGetElementConsoleConfig(t reflect.Kind) bool {
+	_, exists := dereferencableKindsConsoleConfig[t]
 	return exists
 }
 
 // This decoder hook tests types for json unmarshaling capability. If implemented, it uses json unmarshal to build the
 // object. Otherwise, it'll just pass on the original data.
-func jsonUnmarshalerHookConfig(_, to reflect.Type, data interface{}) (interface{}, error) {
+func jsonUnmarshalerHookConsoleConfig(_, to reflect.Type, data interface{}) (interface{}, error) {
 	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
 	if to.Implements(unmarshalerType) || reflect.PtrTo(to).Implements(unmarshalerType) ||
-		(canGetElementConfig(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
+		(canGetElementConsoleConfig(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
 
 		raw, err := json.Marshal(data)
 		if err != nil {
@@ -50,7 +50,7 @@ func jsonUnmarshalerHookConfig(_, to reflect.Type, data interface{}) (interface{
 	return data, nil
 }
 
-func decode_Config(input, result interface{}) error {
+func decode_ConsoleConfig(input, result interface{}) error {
 	config := &mapstructure.DecoderConfig{
 		TagName:          "json",
 		WeaklyTypedInput: true,
@@ -58,7 +58,7 @@ func decode_Config(input, result interface{}) error {
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
-			jsonUnmarshalerHookConfig,
+			jsonUnmarshalerHookConsoleConfig,
 		),
 	}
 
@@ -70,7 +70,7 @@ func decode_Config(input, result interface{}) error {
 	return decoder.Decode(input)
 }
 
-func join_Config(arr interface{}, sep string) string {
+func join_ConsoleConfig(arr interface{}, sep string) string {
 	listValue := reflect.ValueOf(arr)
 	strs := make([]string, 0, listValue.Len())
 	for i := 0; i < listValue.Len(); i++ {
@@ -80,61 +80,33 @@ func join_Config(arr interface{}, sep string) string {
 	return strings.Join(strs, sep)
 }
 
-func testDecodeJson_Config(t *testing.T, val, result interface{}) {
-	assert.NoError(t, decode_Config(val, result))
+func testDecodeJson_ConsoleConfig(t *testing.T, val, result interface{}) {
+	assert.NoError(t, decode_ConsoleConfig(val, result))
 }
 
-func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
-	assert.NoError(t, decode_Config(vStringSlice, result))
+func testDecodeRaw_ConsoleConfig(t *testing.T, vStringSlice, result interface{}) {
+	assert.NoError(t, decode_ConsoleConfig(vStringSlice, result))
 }
 
-func TestConfig_GetPFlagSet(t *testing.T) {
-	val := Config{}
+func TestConsoleConfig_GetPFlagSet(t *testing.T) {
+	val := ConsoleConfig{}
 	cmdFlags := val.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 }
 
-func TestConfig_SetFlags(t *testing.T) {
-	actual := Config{}
+func TestConsoleConfig_SetFlags(t *testing.T) {
+	actual := ConsoleConfig{}
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
-	t.Run("Test_console", func(t *testing.T) {
+	t.Run("Test_endpoint", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("console", testValue)
-			if vString, err := cmdFlags.GetString("console"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Console)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_host", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("host", testValue)
-			if vString, err := cmdFlags.GetString("host"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Host)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_insecure", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("insecure", testValue)
-			if vBool, err := cmdFlags.GetBool("insecure"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Insecure)
+			cmdFlags.Set("endpoint", testValue)
+			if vString, err := cmdFlags.GetString("endpoint"); err == nil {
+				testDecodeJson_ConsoleConfig(t, fmt.Sprintf("%v", vString), &actual.Endpoint)
 
 			} else {
 				assert.FailNow(t, err.Error())

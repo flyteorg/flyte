@@ -50,6 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
+	cmdFlags.StringVar(&DefaultConfig.Console, fmt.Sprintf("%v%v", prefix, "console"), DefaultConfig.Console, "Endpoint of console,  if different than flyte admin")
 	cmdFlags.StringVar(&DefaultConfig.Host, fmt.Sprintf("%v%v", prefix, "host"), DefaultConfig.Host, "Endpoint of flyte admin")
 	cmdFlags.BoolVar(&DefaultConfig.Insecure, fmt.Sprintf("%v%v", prefix, "insecure"), DefaultConfig.Insecure, "Enable insecure mode")
 	return cmdFlags
