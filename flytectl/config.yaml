@@ -3,6 +3,8 @@ admin:
   endpoint: dns:///localhost:30081
   insecure: true
   authType: Pkce
+console:
+  endpoint: http://localhost:30080
 logger:
   show-source: true
   level: 0

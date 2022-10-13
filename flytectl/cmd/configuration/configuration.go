@@ -34,7 +34,6 @@ Flyte Sandbox is a fully standalone minimal environment for running Flyte.
 Read more about the Sandbox deployment :ref:` + "`here <deploy-sandbox-local>`" + `.
 
 Generate remote cluster config: 
-	
 ::
 
  flytectl config init --host=flyte.myexample.com
@@ -43,10 +42,14 @@ By default, the connection is secure.
 Read more about remote deployment :ref:` + "`here <Deployment>`" + `.
 
 Generate remote cluster config with insecure connection:
-
 ::
 
  flytectl config init --host=flyte.myexample.com --insecure 
+
+ Generate remote cluster config with separate console endpoint:
+ ::
+
+  flytectl config init --host=flyte.myexample.com --console=console.myexample.com
 
 Generate Flytectl config with a storage provider:
 ::
@@ -90,10 +93,17 @@ func initFlytectlConfig(reader io.Reader) error {
 	if len(initConfig.DefaultConfig.Host) > 0 {
 		trimHost := trimEndpoint(initConfig.DefaultConfig.Host)
 		if !validateEndpointName(trimHost) {
-			return errors.New("Please use a valid endpoint")
+			return fmt.Errorf("%s invalid, please use a valid admin endpoint", trimHost)
 		}
 		templateValues.Host = fmt.Sprintf("dns:///%s", trimHost)
 		templateValues.Insecure = initConfig.DefaultConfig.Insecure
+	}
+	if len(initConfig.DefaultConfig.Console) > 0 {
+		trimConsole := trimEndpoint(initConfig.DefaultConfig.Console)
+		if !validateEndpointName(trimConsole) {
+			return fmt.Errorf("%s invalid, please use a valid console endpoint", trimConsole)
+		}
+		templateValues.Console = initConfig.DefaultConfig.Console
 	}
 	var _err error
 	if _, err := os.Stat(configutil.ConfigFile); os.IsNotExist(err) {
