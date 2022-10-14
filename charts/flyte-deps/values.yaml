@@ -87,18 +87,13 @@ minio:
   affinity: {}
 
 redoc:
-  # --- enable or disable Minio deployment installation
+  # --- enable or disable redoc deployment installation
   enabled: false
-  # -- Replicas count for Minio deployment
   replicaCount: 1
   image:
-    # -- Docker image for Minio deployment
     repository: docker.io/redocly/redoc
-    # -- Docker image tag
     tag: latest
-    # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Minio deployment
   resources:
     # -- Requests are the minimum set of resources needed for this pod
     requests:
@@ -108,16 +103,11 @@ redoc:
     limits:
       cpu: 200m
       memory: 512Mi
-  # -- Service settings for Minio
   service:
     type: ClusterIP
-  # -- Annotations for Minio pods
   podAnnotations: {}
-  # -- nodeSelector for Minio deployment
   nodeSelector: {}
-  # -- tolerations for Minio deployment
   tolerations: []
-  # -- affinity for Minio deployment
   affinity: {}
 
 #
