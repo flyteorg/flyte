@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	stdConfig "github.com/flyteorg/flytestdlib/config"
 
 	"github.com/coreos/go-oidc"
@@ -289,4 +290,21 @@ func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 	handler(w, req)
 	assert.Equal(t, http.StatusSeeOther, w.Code)
 	assert.Equal(t, "http://www.google.com/.well-known/openid-configuration", w.Header()["Location"][0])
+}
+
+func TestUserInfoForwardResponseHander(t *testing.T) {
+	ctx := context.Background()
+	handler := GetUserInfoForwardResponseHandler()
+	w := httptest.NewRecorder()
+	resp := service.UserInfoResponse{
+		Subject: "user-id",
+	}
+	assert.NoError(t, handler(ctx, w, &resp))
+	assert.Contains(t, w.Result().Header, "X-User-Subject")
+	assert.Equal(t, w.Result().Header["X-User-Subject"], []string{"user-id"})
+
+	w = httptest.NewRecorder()
+	unrelatedResp := service.OAuth2MetadataResponse{}
+	assert.NoError(t, handler(ctx, w, &unrelatedResp))
+	assert.NotContains(t, w.Result().Header, "X-User-Subject")
 }

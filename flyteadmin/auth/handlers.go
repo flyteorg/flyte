@@ -8,22 +8,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-
-	"golang.org/x/oauth2"
-
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"google.golang.org/grpc/peer"
-
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
-
 	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/runtime/protoiface"
 )
 
 const (
@@ -33,6 +30,7 @@ const (
 )
 
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
+type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
 
 type AuthenticatedClientMeta struct {
 	ClientIds     []string
@@ -441,5 +439,15 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 		if redirectURL := queryParams.Get(RedirectURLParameter); redirectURL != "" {
 			http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 		}
+	}
+}
+
+func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
+	return func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error {
+		info, ok := m.(*service.UserInfoResponse)
+		if ok {
+			w.Header().Set("X-User-Subject", info.Subject)
+		}
+		return nil
 	}
 }
