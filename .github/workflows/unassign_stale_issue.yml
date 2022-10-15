@@ -1,0 +1,19 @@
+# Automatically unassign stale issue
+#------------------------------------------------------------
+
+name: Unassign-stale
+on:
+  issues:
+    types: [ labeled ]
+jobs:
+  one:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'stale'
+    steps:
+      - name: unassign-stale
+        run: |
+          echo "Unassigning issue ${{ github.event.issue.number }}"
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"assignees": []}' \
+              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees
+          echo "Unassigned"
