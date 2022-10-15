@@ -1,0 +1,24 @@
+# Labels all issues with no activity for 14 days as "stale"
+# Runs everday at 00:00
+#-------------------------------------------------------------
+
+name: Check stale
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/stale@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          include-only-assigned: true
+          days-before-issue-stale: 14
+          days-before-close: -1
+          stale-issue-label: "stale"
+          stale-issue-message: "This issue is stale because it has been open for 14 days with no activity."
