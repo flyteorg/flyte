@@ -1,6 +1,12 @@
-<!-- If your PR fixes an open issue, use `Closes #999` to link your PR with the issue. #999 stands for the issue number you are fixing -->
+<!--
+Thank you for sending the PR! 
+Please fill the applicable details below
+Happy contributing!
+-->
 
 ## Fixes Issue
+
+<!-- If your PR fixes an open issue, use `Closes #999` to link your PR with the issue. #999 stands for the issue number you are fixing -->
 
 <!-- Remove this section if not applicable -->
 
