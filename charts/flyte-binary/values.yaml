@@ -2,7 +2,7 @@ networking:
   host: true
 
 image:
-  fqn: "flyte"
+  fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
 
 storage:
   metadataContainer: my-s3-bucket
@@ -11,7 +11,7 @@ storage:
   region: my-region
 
 database:
-  port: 30001
+  port: 5432
   username: postgres
   host: 127.0.0.1
   dbname: flyteadmin
@@ -23,3 +23,5 @@ logger:
 paths:
   # Specify full path to Flyte binary config file here if being provided externally
   externalFlyteConfig: ""
+
+# Need to add an aws section for IAM role annotation
