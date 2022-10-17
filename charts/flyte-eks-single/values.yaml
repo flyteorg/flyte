@@ -3,9 +3,6 @@ flyte:
   networking:
     host: false
 
-  image:
-    fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
-
   storage:
     metadataContainer: flyte-single-binary-test
     userDataContainer: flyte-single-binary-test/userdata
@@ -13,7 +10,6 @@ flyte:
     region: us-east-2
 
   database:
-    port: 5432
     username: postgres
     host: trinity1.cmp0wwpbez1r.us-east-2.rds.amazonaws.com
     password: awesomesauce
