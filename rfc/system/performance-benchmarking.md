@@ -1,4 +1,11 @@
-# executive summary (TODO)
+# Performance Metrics and Benchmarking
+
+**Authors:**
+
+- @hamersaw
+
+## 1 Executive Summary
+
 from a high level - performance improvements are an iterative process - these things are a science, not an art
     without proper benchmarking there is no way to determine what needs to be improved, or if an improvement actually helped
     users can report:
@@ -9,21 +16,22 @@ from a high level - performance improvements are an iterative process - these th
 
 From a high-level, performance improvements are an iterative process which may be better explained as a science than an art. They require constant monitoring in diverse workloads and environments. The goal of this work is to expose objective metrics which simplify the understanding of Flyte performance. On top of these metrics we must design
 
-# motivation
+## 2 Motivation
+
 Performance evaluation is paramount to understanding and improving platform efficiency. However, thoughtless, or otherwise ill-suited metrics / benchmarks can hinder progress which risks unintuitive production behavior (ex. Flyte is much slower than advertised) and wasted development cycles mitigating bottlenecks that are unimportant or non-existant. Therefore, this process needs to be well designed, ensuring metrics and results are objective, specific, and reproducible. Within the Flyte ecosystem, exposing such a collection of information is motivated under two scopes, specifically (1) providing users with objective, actionable metrics to assess and explain Flyte performance and (2) identify infratructure-level bottlenecks to reduce Flyte-imposed overhead on workflow executions.
 
 To address to former motivation, users are frequently interested in performance evalutions of Flyte. This often includes direct questions like "What is the overhead of Flyte for each workflow?" and "What is Flyte doing to impose this overhead?". These are very fair questions and are important in understanding the viability of Flyte within their ecosystem. However, currently these answers are not straight-forward. They require a significant amount of esoteric knowledge into the Flyte platform. Metrics often relate to very in-depth Flyte architectural and algorithmic design, and exposed through prometheus are poor indicators of single workflow performance. Other solutions require parsing logs, etc - which is far from user-friendly. We must simplify this process.
 
 The later motivation, namely identifying system bottlenecks, is important to explain the overhead imposed by Flyte; and in doing so, to prioritize and quantify the returns on work mitigating these inefficiencies. Generally, our intuition is that Flyte is I/O bound, where things like event reporting, state persistence, and external API calls are responsible for the lions share of overhead during workflow evaluations. However, it is impossible to quantify the most significant issues without objective evaluation. Additionally, when we propose a change, or develop a new feature, we need a rigerous benchmarking framework to definitively say approach "A" is faster than approach "B" and quantify the tradeoffs thereof.
 
-# proposed implementation (TODO)
-## metrics
+## 3 Proposed Implementation
+
+### Metric Definitions
 Providing actionable metrics within Flyte is challenging given the inherit disjoint between workflow execution performance and infrastructure performance. This may be easiest explained when framed in a single task execution. All Flyte infrastucture is still operating in the background during the specified execution, so any work done during a task execution (ex. periodically checking state, use eventing to report task updates, etc) does not contribute the Flyte-imposed overhead on the execution of that task. This means that analysis over infrastructure-level metrics in regards to overall workfow evaluation performance may tell a story, but it can not tell the whole story.
 
 For this reason, we believe Flyte metrics should be naturally partitioned into workflow execution and infrastructure-level scopes. Workflow execution refers to user perceived performance, for example how long did it take for the workflow to execute? how long for each node? This should also quantify the overhead imposed by Flyte, k8s, and other operating frameworks. Basically, this level of analysis focuses on comparing what percentage of workflow and node execution time is spent in user-code and what is spent on infrastructure management. Alternatively, infrstructure-level metrics help explain what Flyte is doing that imposes the overhead. This may inlcude the cost of event reporting from FlytePropeller to FlyteAdmin, the latency of etcd updates to persist state in the FlyteWorkflow CRD, etc. As previously mentioned, these metric scopes are correlated. For example, reducing the latency of etcd updates will improve workflow execution performance, but the direct effects are less understood and will certainly vary by workflow definition -- reducing the cost of event reporting by half will not reduce workflow execution duration by half, nor will it reduce the Flyte overhead incurred during event reporting by half (because some events are sent during active node / task executions).
             
-#### workflow execution metrics
-The workflow execution scope is meant to capture user-perceived performance
+**Workflow Execution Metrics:** The workflow execution scope is meant to capture user-perceived performance
     this is easily summarizable by displaying what percentage of workflow execution duration contributes to user-code execution, Flyte management, and external systems.
     in theory, this sounds simple enough, but the complexities of Flyte can make this challenging in certain scenarios.
 
@@ -68,7 +76,7 @@ how are we going to collect this information?
     aggregate this on FlytePropeller side?
         currently that's how we do acceptance / queued / etc time
 
-#### infrastructure metrics
+**Infrastructure Metrics:**
 uses prometheus ...
     very cumbersome to track an individual workflow
         and the use of quantiles result in some degree of inaccuracy
@@ -105,7 +113,7 @@ uses prometheus ...
 to begin this integration is only necessary in FlytePropeller 
     but if it is very successful and it is advantageous -> perhaps FlyteAdmin / DataCatalog
 
-## performance benchmarking
+### Reproducible Performance Benchmarking
 we have defined an objective set of metrics to ...
     we need to define an experiment setup ensuring:
         (1) accurate performance measurements
@@ -140,24 +148,32 @@ we have defined an objective set of metrics to ...
     - propeller roundes / streaks
     - etc
 
-# metrics and dashboard
+## 4 Metrics & Dashboards
+
 literally, this entire thing is designing metrics.
 
 depends on the level of transparency users prefer
     could potentially include overhead estimates in the UI
     could provide links to the open-telemetry traces in the UI
 
-# drawbacks
+## 5 Drawbacks
+
 - metric values are often relative to a specific environment - we can't cover every single case
     - but this is still a good bit of improvement over the current state
 
-# alternative approaches
+## 6 Alternatives
+
 prometheus metrics
     focus on aggregate metrics (ex. 99th quantile, etc) - not very queryable at the workflow level
 flytepropeller fold_logs.py script
     parses logs to compute traces - not very accurate / accessible
 
-# unresolved questions
+## 7 Potential Impact and Dependencies
+
+TODO
+
+## 8 Unresolved questions
+
 - what is the most efficient avenue for provisioning infrastructure?
     - does it make sense to ad-hoc startup / teardown clusters?
     - should we use single binary?
@@ -168,4 +184,4 @@ flytepropeller fold_logs.py script
     - none of the infrastructure components have been resource bound (ie. CPU, RAM)
         - but FlytePropeller is heavily cached ...
 
-# conclusion
+## 9 Conclusion
