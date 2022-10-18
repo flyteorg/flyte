@@ -31,42 +31,16 @@ Providing actionable metrics within Flyte is challenging given the inherit disjo
 
 For this reason, we believe Flyte metrics should be naturally partitioned into workflow execution and infrastructure-level scopes. Workflow execution refers to user perceived performance, for example how long did it take for the workflow to execute? how long for each node? This should also quantify the overhead imposed by Flyte, k8s, and other operating frameworks. Basically, this level of analysis focuses on comparing what percentage of workflow and node execution time is spent in user-code and what is spent on infrastructure management. Alternatively, infrstructure-level metrics help explain what Flyte is doing that imposes the overhead. This may inlcude the cost of event reporting from FlytePropeller to FlyteAdmin, the latency of etcd updates to persist state in the FlyteWorkflow CRD, etc. As previously mentioned, these metric scopes are correlated. For example, reducing the latency of etcd updates will improve workflow execution performance, but the direct effects are less understood and will certainly vary by workflow definition -- reducing the cost of event reporting by half will not reduce workflow execution duration by half, nor will it reduce the Flyte overhead incurred during event reporting by half (because some events are sent during active node / task executions).
             
-**Workflow Execution Metrics:** The workflow execution scope is meant to capture user-perceived performance
-    this is easily summarizable by displaying what percentage of workflow execution duration contributes to user-code execution, Flyte management, and external systems.
-    in theory, this sounds simple enough, but the complexities of Flyte can make this challenging in certain scenarios.
-
-The metrics related to the workflow execution scope are meant to capture user-perceived performance. This is summarizable by breaking down workflow execution durations into user-code execution, Flyte management, and external system overhead. In theory, this explanation sounds very simple, but the complexities of Flyte can make this challenging in certain scenarios.
-
-perhaps it is most important to begin by defining what we mean by overhead
-    within any node execution Flyte requires some pre-processing and post-processing for execution
-        these operations may include wrangling input data from multiple upstream nodes, updating node phases both in etcd and using FlyteAdmin eventing, etc
-    additionally, k8s (or other external frameworks) require various housekeeping operations to ensure job execution
-        in k8s Pod scheduling / creation, pulling images, starting containers, etc
-    basically, all nodes within Flyte only spend a portion of that time actually executing user code, the rest may be attributed to overhead in some respect
+**Workflow Execution Metrics:** The metrics related to the workflow execution scope are meant to capture user-perceived performance. This is summarizable by breaking down workflow execution durations into user-code execution, Flyte management, and external system overhead. In theory, this explanation sounds very simple, but the complexities of Flyte can make this challenging in certain scenarios.
 
     we have provided a graphic to help explain the different components here - TODO explain
         TODO - describe graphic
 
 Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte requires different pre-processing and post-processing operations to ensure cohesion with other nodes. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
-how do we define overhead at the workflow level?
-    node-level overhead can be calculated via above ... TODO
+The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencys have succeeded. This is depicted in TODO. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead? This is highlighted at TODO.
 
-    but, there is additional cost - all upstream nodes are completed and Flyte has not yet begun processing the node
-        in this scenario overhead should be attributed based on the notification system (subqueue), etc - if k8s notified on change, it's on Flyte, otherwise it's on k8s
-
-    to further complicate this
-    flyte often evaluates tasks in parallel - effectively ammortizing any overhead
-        for example, if from some time T1 to T2, task A is incurring front-end overhead (ex. copying inputs from upstream nodes) but task B is actively executing - is this overhead?
-        we think yes - just because the overhead is ammortized does not mean it is not effecting workflow execution - it could delay downstream tasks
-
-The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencys have succeeded. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead?
-
-we propose to define overhead of a workflow as an aggregate of overhead at each individual node
-    so in our example above the overal runtime, flyte overhead, and external system overhead is aggregated at the node level
-        and percentages of overhead are calculated from those values - may be unintiutive, but seems the most accurate
-
-We propose to define workflow overhead as an aggregate of the overhead at each individual node. ... TODO
+In consideration of these complexities we propose to define workflow overhead as an aggregate of the overhead at each individual node. So in our example, the workflow overhead would be computed by adding the execution runtime, Flyte management overhead, and external system overhead components of each individual node and computing the overal workflow overhead as ratios of these summed values. This seems to be the most honest and accurate portrayal.
 
 
 how are we going to collect this information?
