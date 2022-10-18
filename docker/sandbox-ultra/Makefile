@@ -26,7 +26,7 @@ $(foreach name,$(IMAGES),$(eval $(call IMAGE_RULE,$(name))))
 
 images/tar/flyte:
 	mkdir -p $(dir $@)
-	docker build -t flyte ../../ -f ../../Dockerfile --build-arg="FLYTE_VERSION=$(VERSION)"
+	docker build -t flyte ../../ -f ../../Dockerfile
 	docker save --output $@.tar flyte:latest
 
 .PHONY: images

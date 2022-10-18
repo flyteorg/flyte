@@ -19,6 +19,10 @@ on:
         description: "Repository Name"
         required: false
         type: string
+      args:
+        description: "Docker build Args"
+        required: false
+        type: string
       push:
         description: "Push to registry"
         required: false
@@ -44,14 +48,13 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ inputs.repository }}
           tags: |
-            dind
             ${{ inputs.version }}
-            type=sha,format=long, prefix=dind-
+            type=sha,format=long
       - name: Prepare Sandbox images for single binary
-        if: ${{ inputs.repository == 'flyte-single-binary' }}
+        if: ${{ inputs.repository == 'flyte-sandbox-ultra' }}
         run: |
           make -C docker/sandbox-lite bootstrap
-          VERSION=${{ steps.set_version.outputs.version }} make -C docker/sandbox-lite images
+          VERSION=${{ inputs.version }} make -C docker/sandbox-lite images
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -71,7 +74,7 @@ jobs:
           platforms: linux/arm64, linux/amd64
           push: ${{ inputs.push }}
           tags: ${{ steps.dind-names.outputs.tags }}
-          build-args: "FLYTE_VERSION=${{ inputs.version }}"
+          build-args: ${{ inputs.args }}
           file: ${{ inputs.dockerfile }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

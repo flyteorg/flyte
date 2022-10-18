@@ -5,7 +5,7 @@ FROM ghcr.io/flyteorg/flyteconsole-release:$FLYTE_VERSION AS flyteconsole
 
 FROM golang:1.19.1-bullseye AS flytebuilder
 
-ARG FLYTE_VERSION="latest"
+ARG FLYTE_VERSION="master"
 
 WORKDIR /flyteorg/build
 RUN git clone --depth=1 https://github.com/flyteorg/flyte.git . -b $FLYTE_VERSION

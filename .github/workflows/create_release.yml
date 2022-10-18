@@ -79,12 +79,13 @@ jobs:
   trigger-sandbox-publish:
     name: Sandbox build
     needs: [bump-version]
-    uses: ./buildx_build.yaml
+    uses: ./.github/workflows/buildx_build.yaml
     with:
       context: .
       dockerfile: docker/sandbox/Dockerfile
       repository: flyte-sandbox
       version: ${{ needs.bump-version.outputs.version }}
+      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
       push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -93,12 +94,13 @@ jobs:
   trigger-single-binary-build:
     name: Single Binary build
     needs: [publish-flyte-component-image]
-    uses: ./buildx_build.yaml
+    uses: ./.github/workflows/buildx_build.yaml
     with:
       context: .
       dockerfile:  Dockerfile
       repository: flyte-single-binary
       version: ${{ needs.bump-version.outputs.version }}
+      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
       push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -106,12 +108,27 @@ jobs:
 
   trigger-sandbox-lite-build:
     name: Sandbox lite build
+    uses: ./.github/workflows/buildx_build.yaml
+    with:
+      context: .
+      dockerfile:  docker/sandbox-lite/Dockerfile
+      repository: flyte-sandbox-lite
+      version: latest
+      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
+      push: false
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  trigger-sandbox-ultra-build:
+    name: Sandbox ultra build
     needs: [trigger-single-binary-build]
-    uses: ./buildx_build.yaml
+    uses: ./.github/workflows/buildx_build.yaml
     with:
       context: docker/sandbox-lite
-      dockerfile:  docker/sandbox-lite/images/dockerfiles/k3s/Dockerfile
-      repository: flyte-sandbox-lite
+      dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
+      repository: flyte-sandbox-ultra
+      args: ""
       version: ${{ needs.bump-version.outputs.version }}
       push: true
     secrets:
