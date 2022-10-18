@@ -122,8 +122,9 @@ Flyte maintainers are available on Zoom for you to ask anything, weekly on Wedne
 Flyte Documentation Style Guide
 -------------------------------
 
+*********
 Overview
-^^^^^^^^
+*********
 
 This guide is an overview of style guidelines for the documentation. 
 
@@ -134,30 +135,31 @@ Documentation formatting standards
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Usage of upper camel case
 _________________________
+
 - When you refer specifically to interacting with an API object, use `UpperCamelCase <https://en.wikipedia.org/wiki/Camel_case>`_, also known as Pascal case. You may see different capitalization, such as "Flytectl", in the `API Reference <https://docs.flyte.org/en/latest/reference/index.html>`_. 
 
 - When referring to any of the libraries in the Flyte ecosystem, prefer un-capitalized inline code markup format instead of capitalized plain-text format.
 
-**Example:**
+    Example:
 
-.. code-block:: text
+    .. code-block:: text
 
-    “`flytekit` is an SDK for Flyte” is preferred over “Flytekit is an SDK for Flyte”.
+        “`flytekit` is an SDK for Flyte” is preferred over “Flytekit is an SDK for Flyte”.
 
 - When you are referring to an API object in general, `use sentence-style capitalization <https://docs.microsoft.com/en-us/style-guide/text-formatting/using-type/use-sentence-style-capitalization>`_.
 
-**Example:**
+    Example:
 
-.. code-block:: text
+    .. code-block:: text
 
-    Flyte UI is a web-based user interface for Flyte. 
+        Flyte UI is a web-based user interface for Flyte. 
 
 - Don't split an API object name into separate words. For example, use “Flytectl”, not “Flyte ctl”.
 
 - The following examples focus on capitalization. For more information about formatting API object names, review the related guidance on `Code Styling <https://docs.google.com/document/d/1rhEZqd3Ae8Y9HUxg7yF6LarHrfIHKnPyeke8aMSPgis/edit#heading=h.ei4vpl6rqhz3>`_.
 
-Terminology casing convention:
-``````````````````````````````
+Terminology casing convention
+`````````````````````````````
 A list of specific terms and words to be used consistently across the documentation.
 
 * flytectl
@@ -170,14 +172,13 @@ A list of specific terms and words to be used consistently across the documentat
 * FlyteConsole
 * FlytePropeller
 * workflow
-* LaunchPlan
--We use ‘launch plan’ when we mention it generally, e.g., ‘we use launch plan to execute workflow,’ AND ‘we use LaunchPlan A to execute workflow B’).
+* LaunchPlan- We use `launch plan` when we mention it generally, e.g., `we use launch plan to execute workflow,` AND `we use LaunchPlan A to execute workflow B`).
 
 Use angle brackets for placeholders
 ___________________________________
 Tell the reader what a placeholder represents.
 
-**Example:**
+Example:
 
 .. code-block:: text
 
@@ -195,17 +196,18 @@ In rst, use double asterisks to show text as **bold**, or strong.
 **RST syntax:**
 **Place content here**.
 
-**Examples:**
+Examples:
 
 .. code-block:: text
 
-    - Select Graph in FlyteConsole to see a diagram of the workflow.
-    - Executions are instances of workflows, nodes or tasks. You can schedule or request an execution. 
+    - Select **Graph** in FlyteConsole to see a diagram of the workflow.
+    - **Executions** are instances of workflows, nodes or tasks. You can schedule or request an execution. 
 
 International standards for punctuation inside quotes
 _____________________________________________________
 Use punctuation inside the quotes while writing sentences using quotes.
-**Example:** 
+
+Example:
 
 .. code-block:: text
 
@@ -213,9 +215,11 @@ Use punctuation inside the quotes while writing sentences using quotes.
     
 Starting a sentence with a component tool or component name
 ___________________________________________________________
+
 * While starting a sentence with a tool or component name, prefer to use the right article before it.
 * Use a general descriptor for a component name.
-**Examples:**
+
+Examples:
 
 .. code-block:: text
 
@@ -229,14 +233,14 @@ Use code style for String and Integer field
 ___________________________________________
 For string or integer values, use style (single backticks for rst and double backticks for markdown).
 
-**Examples:**
+Examples:
 
 .. code-block:: text
 
-    - Set the value of the field to True.
+    - Set the value of the field to ``True``.
 
 Code Styling
-^^^^^^^^^^^^
+------------
 Use code style for
 
 * Filenames 
@@ -249,41 +253,34 @@ Use code style for
 * API objects
 * Anything that’s related to code!
 
-**Examples:**
+Examples:
 
-.. code-block:: text
-
-    - Commands: flytectl --help,flyte sandbox start,`flytectl exec`
-    - Filename: Open example.py in your favorite editor.
-    - Directory: The docs for this repo are present in /cookbook/docs folder
-    - Path: The myflyteapp directory comes with a sample workflow, which can be found under flyte/workflows/example.py.
-    - Inline code: Use flytectl get objectName, `create launchplan my_launchplan`
-    - Set value of `flytectl flag` to < >.
-    - `flytectl- apiserver …`
-    - The @task decorator actually turns the decorated function into an instance of the PythonFunctionTask object.
+    - Commands: ``flytectl --help``, ``flyte sandbox start``, ``flytectl exec``
+    - Filename: Open ``example.py`` in your favorite editor.
+    - Directory: The docs for this repo are present in ``/cookbook/docs`` folder
+    - Path: The ``myflyteapp`` directory comes with a sample workflow, which can be found under ``flyte/workflows/example.py``.
+    - Inline code: Use ``flytectl get objectName``, ``create launchplan my_launchplan``
+    - Set value of ``flytectl flag`` to < >.
+    - ``flytectl- apiserver …``
+    - The ``@task`` decorator actually turns the decorated function into an instance of the ``PythonFunctionTask`` object.
 * Include a title for the code example.
 * Use backtick (**`<inline code here>`**) for code style.
-* Enclose code samples with triple backticks. (```).
 * Use **..code-block::** a multi-line code block for fenced code blocks.
 
-**Example for code block:**
+Example for code block:
 
 .. code-block:: text
 
-    ```bash
-       Make html
-    ```
-
-    ..code-block:: python
+    .. code-block:: python
       :caption: this .py
        :name: this-py
        print 'Explicit is better than implicit.'
 
 * Use meaningful variable names that match the context.
 
-Python: Snake case
-Go: camelCase
-HTML: camelCase 
+    Python: Snake case
+    Go: camelCase
+    HTML: camelCase 
 
 * Remove trailing spaces in the code.
 * Begin with Upper case for inline comments (wherever applicable).
@@ -296,7 +293,7 @@ Flytectl
 --------
 * In Go, error strings shouldn’t be capitalized or end with a punctuation or newline - else it results in a lint error.
 * For list items in Go script, no period at the end of the sentence.
-* For ‘println’ statements in Go, no period or exclamation mark at the end of the sentence.
+* For println statements in Go, no period or exclamation mark at the end of the sentence.
 
 Common phrases for introducing code samples
 -------------------------------------------
@@ -315,7 +312,7 @@ Code Snippet formatting
 -----------------------
 While adding the code snippets, include the command prompt syntax.
 
-**Example:**
+Example:
 
 .. code-block:: text
 
@@ -325,7 +322,7 @@ Separate commands from output
 -----------------------------
 
 
-**Example:**
+Example:
 First, let's import the libraries we use in this example.
 
 .. code-block:: python
@@ -336,9 +333,9 @@ First, let's import the libraries we use in this example.
     from flytekit import Resources, kwtypes, workflow
     from flytekitplugins.papermill import NotebookTask
 
-**Out:**
+Out:
 
-.. code-block:: text
+.. code-block:: bash
 
     Output of multiplier(my_input=3.0):9.0
     Output of multiplier(my_input=0.5):1.0
@@ -351,7 +348,7 @@ Versioning
 * Avoid ambiguous comments on older/earlier versions.
 * Mention alternative versions only if relevant. 
 
-**Example:**
+Example:
 
 .. code-block:: text
 
@@ -364,12 +361,14 @@ Use literalinclude to include a source file instead of copying and pasting its c
 You can also use literalinclude to insert files other than Python or README files.
 To show certain configurations/preferences/settings to the user (instead of expecting the user to move back and forth between files), use literalinclude. This will specify the contents of the configuration file. Refer to the Sphinx docs to learn more.
 
-**Example:**
+Example:
 
-.. literalinclude:: ../../../../../integrations/kubernetes/k8s_spark/Dockerfile
-    :linenos:
-    :emphasize-lines: 26-38
-    :language: docker
+.. code-block:: text
+
+    .. literalinclude:: ../../../../../integrations/kubernetes/k8s_spark/Dockerfile
+        :linenos:
+        :emphasize-lines: 26-38
+        :language: docker
 
 Short codes
 -----------
@@ -387,15 +386,16 @@ Note
 ----
 
 * Use **‘Note’** when you want to highlight a piece of information that may be  helpful to know.
-* You can also use a **‘Note’** in a list. Refer `Common short code issues <https://docs.google.com/document/d/1rhEZqd3Ae8Y9HUxg7yF6LarHrfIHKnPyeke8aMSPgis/edit#heading=h.ezfwdgke7u3>`_.
+* You can also use a **‘Note’** in a list. Refer to `common short code issues <https://docs.google.com/document/d/1rhEZqd3Ae8Y9HUxg7yF6LarHrfIHKnPyeke8aMSPgis/edit#heading=h.ezfwdgke7u3>`__.
 
 
 **Syntax**
 
 ..note::
-We recommend using an OSX or a Linux machine, as we have not tested this on windows. If you happen to test it, please let us know.
 
-**Example:**
+    We recommend using an OSX or a Linux machine, as we have not tested this on windows. If you happen to test it, please let us know.
+
+Example:
 
 
 .. note::
@@ -405,7 +405,7 @@ We recommend using an OSX or a Linux machine, as we have not tested this on wind
 Caution
 -------
 
-* Do not use it. Use `‘Warning’<https://docs.google.com/document/d/1rhEZqd3Ae8Y9HUxg7yF6LarHrfIHKnPyeke8aMSPgis/edit#heading=h.gvinpnji63wc>`_ instead.
+* Do not use it. Use `Warning <https://docs.google.com/document/d/1rhEZqd3Ae8Y9HUxg7yF6LarHrfIHKnPyeke8aMSPgis/edit#heading=h.gvinpnji63wc>`__ instead.
 
 Tip
 ----
@@ -415,9 +415,11 @@ Tip
 
 **Syntax:**
 
-..tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-cluster-config-monitoring`.
+..tip::
 
-**Example:**
+    Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-cluster-config-monitoring`.
+
+Example:
 
 .. tip:: 
 
@@ -433,11 +435,13 @@ Warning
 **Syntax:**
 
 ..warning::
-Don't use sandbox deployment for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
 
-**Example:**
+    Don't use sandbox deployment for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
+
+Example:
 
 .. warning::
+
     Don't use sandbox deployment for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
     
 Common shortcode issues
