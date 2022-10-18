@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: proxy
+    labels:
+        app: proxy
+spec:
+    selector:
+        matchLabels:
+            app: proxy
+    template:
+        metadata:
+            labels:
+                app: proxy
+        spec:
+            containers:
+                - name: proxy
+                  image: envoyproxy/envoy
+                  imagePullPolicy: Never
+                  args:
+                      - envoy
+                      - -c /etc/envoy/config.yaml
+                  ports:
+                      - name: admin
+                        containerPort: 9901
+                      - name: http
+                        containerPort: 8000
+                  volumeMounts:
+                      - name: config-volume
+                        mountPath: /etc/envoy
+            volumes:
+                - name: config-volume
+                  configMap:
+                      name: proxy-config

@@ -1,0 +1,6 @@
+namespace: registry
+
+resources:
+- deployment.yaml
+- namespace.yaml
+- service.yaml

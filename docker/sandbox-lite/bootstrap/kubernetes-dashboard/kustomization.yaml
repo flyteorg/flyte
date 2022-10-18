@@ -1,0 +1,6 @@
+resources:
+  # TODO (jeev): Figure out how to rev this automatically
+- https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/alternative.yaml
+- clusterrolebinding.yaml
+patchesStrategicMerge:
+- deployment.yaml

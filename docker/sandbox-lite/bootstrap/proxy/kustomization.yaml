@@ -1,0 +1,11 @@
+namespace: proxy
+
+resources:
+- deployment.yaml
+- namespace.yaml
+- service.yaml
+
+configMapGenerator:
+- name: proxy-config
+  files:
+  - config.yaml

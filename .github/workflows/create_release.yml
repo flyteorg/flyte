@@ -76,6 +76,48 @@ jobs:
           docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:latest
           docker push ghcr.io/flyteorg/${{ matrix.component }}-release:latest
 
+  trigger-sandbox-publish:
+    name: Sandbox build
+    needs: [bump-version]
+    uses: ./buildx_build.yaml
+    with:
+      context: .
+      dockerfile: docker/sandbox/Dockerfile
+      repository: flyte-sandbox
+      version: ${{ needs.bump-version.outputs.version }}
+      push: true
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  trigger-single-binary-build:
+    name: Single Binary build
+    needs: [publish-flyte-component-image]
+    uses: ./buildx_build.yaml
+    with:
+      context: .
+      dockerfile:  Dockerfile
+      repository: flyte-single-binary
+      version: ${{ needs.bump-version.outputs.version }}
+      push: true
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  trigger-sandbox-lite-build:
+    name: Sandbox lite build
+    needs: [trigger-single-binary-build]
+    uses: ./buildx_build.yaml
+    with:
+      context: docker/sandbox-lite
+      dockerfile:  docker/sandbox-lite/images/dockerfiles/k3s/Dockerfile
+      repository: flyte-sandbox-lite
+      version: ${{ needs.bump-version.outputs.version }}
+      push: true
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
   helm-release:
     name: Flyte helm release
     runs-on: ubuntu-latest

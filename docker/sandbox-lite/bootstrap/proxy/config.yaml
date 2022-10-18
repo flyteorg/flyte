@@ -1,0 +1,143 @@
+admin:
+    access_log_path: /dev/stdout
+    address:
+        socket_address:
+            address: 127.0.0.1
+            port_value: 9901
+
+static_resources:
+    listeners:
+        - address:
+              socket_address:
+                  address: 0.0.0.0
+                  port_value: 8000
+          filter_chains:
+              - filters:
+                    - name: envoy.filters.network.http_connection_manager
+                      typed_config:
+                          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                          stat_prefix: ingress_http
+                          codec_type: AUTO
+                          route_config:
+                              name: local_route
+                              virtual_hosts:
+                                  - name: backend
+                                    domains:
+                                        - "*"
+                                    routes:
+                                        - match:
+                                              path: "/"
+                                          redirect:
+                                              path_redirect: "/console/"
+                                        - match:
+                                              prefix: "/console"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/__webpack_hmr"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/api"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/healthcheck"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/v1"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/login"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/me"
+                                          route:
+                                              cluster: flyte
+                                        - match:
+                                              prefix: "/flyteidl.service.AdminService"
+                                          route:
+                                              cluster: flyte_grpc
+                                        - match:
+                                              prefix: "/flyteidl.service.DataProxyService"
+                                          route:
+                                              cluster: flyte_grpc
+                                        - match:
+                                              path: "/minio"
+                                          redirect:
+                                              path_redirect: "/minio/"
+                                        - match:
+                                              prefix: "/minio/"
+                                          route:
+                                              cluster: minio
+                                              prefix_rewrite: /
+                                        - match:
+                                              path: "/kubernetes-dashboard"
+                                          redirect:
+                                              path_redirect: "/kubernetes-dashboard/"
+                                        - match:
+                                              prefix: "/kubernetes-dashboard/"
+                                          route:
+                                              cluster: kubernetes-dashboard
+                                              prefix_rewrite: /
+                          http_filters:
+                              - name: envoy.filters.http.router
+                                typed_config:
+                                  "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+    clusters:
+        - name: flyte
+          connect_timeout: 0.25s
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+              cluster_name: flyte
+              endpoints:
+                  - lb_endpoints:
+                        - endpoint:
+                              address:
+                                  socket_address:
+                                      address: flyte.flyte
+                                      port_value: 8088
+        - name: flyte_grpc
+          connect_timeout: 0.25s
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          http2_protocol_options: {}
+          load_assignment:
+              cluster_name: flyte_grpc
+              endpoints:
+                  - lb_endpoints:
+                        - endpoint:
+                              address:
+                                  socket_address:
+                                      address: flyte.flyte
+                                      port_value: 8089
+        - name: minio
+          connect_timeout: 0.25s
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+              cluster_name: minio
+              endpoints:
+                  - lb_endpoints:
+                        - endpoint:
+                              address:
+                                  socket_address:
+                                      address: minio.minio
+                                      port_value: 9001
+        - name: kubernetes-dashboard
+          connect_timeout: 0.25s
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+              cluster_name: kubernetes-dashboard
+              endpoints:
+                  - lb_endpoints:
+                        - endpoint:
+                              address:
+                                  socket_address:
+                                      address: kubernetes-dashboard.kubernetes-dashboard
+                                      port_value: 80
