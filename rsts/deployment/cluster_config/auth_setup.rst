@@ -144,7 +144,7 @@ Apply Configuration
 
    .. prompt:: bash
 
-      kubectl edit configmap -n flyte flyte-admin-config
+      kubectl edit configmap -n flyte flyte-admin-base-config
 
    Follow the inline comments to make the necessary changes:
 
