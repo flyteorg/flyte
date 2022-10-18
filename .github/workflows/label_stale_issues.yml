@@ -14,11 +14,11 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/stale@v5
+      - uses: actions/stale@v6
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           include-only-assigned: true
-          days-before-issue-stale: 14
+          days-before-issue-stale: 30
           days-before-close: -1
           stale-issue-label: "stale"
-          stale-issue-message: "This issue is stale because it has been open for 14 days with no activity."
+          stale-issue-message: "This issue is marked stale because it has been open for 30 days with no activity."
