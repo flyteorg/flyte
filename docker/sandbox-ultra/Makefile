@@ -32,9 +32,9 @@ $(foreach name,$(IMAGES),$(eval $(call IMAGE_RULE,$(name))))
 images/tar/flyte:
 	mkdir -p $(dir $@)
 	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/amd64
-	docker save --output $(dir $@)/amd64/flyte.tar flyte:latest
+	docker save --output $(dir $@)amd64/flyte.tar flyte:latest
 	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/arm64
-	docker save --output $(dir $@)/arm64/flyte.tar flyte:latest
+	docker save --output $(dir $@)arm64/flyte.tar flyte:latest
 
 .PHONY: images
 images: $(foreach name,flyte $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))
