@@ -67,7 +67,7 @@ CLASSES_COLUMNS = OrderedDict({"class": int})
 # Let us declare a task that accepts a CSV file with the previously defined
 # columns and converts it to a typed schema.
 # An example CSV file is available at
-# `https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv<https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv>`
+# `here <https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv>`__
 @task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def split_traintest_dataset(
     dataset: FlyteFile[typing.TypeVar("csv")], seed: int, test_split_ratio: float
