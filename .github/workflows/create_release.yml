@@ -23,7 +23,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
-          CUSTOM_TAG: ${{ github.event.inputs.version }}
+          CUSTOM_TAG: ${{ inputs.version }}
           RELEASE_BRANCHES: master
 
   publish-flyte-component-image:
@@ -70,22 +70,22 @@ jobs:
       - name: Tag Image to release version
         run: |
           docker pull ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}
-          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
-          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
+          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:${{ inputs.version }}
+          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:${{ inputs.version }}
 
           docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:latest
           docker push ghcr.io/flyteorg/${{ matrix.component }}-release:latest
 
   trigger-sandbox-publish:
     name: Sandbox build
-    needs: [bump-version]
+    needs: [publish-flyte-component-image]
     uses: ./.github/workflows/buildx_build.yaml
     with:
       context: .
       dockerfile: docker/sandbox/Dockerfile
       repository: flyte-sandbox
-      version: ${{ needs.bump-version.outputs.version }}
-      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
+      version: ${{ inputs.version }}
+      args: "FLYTE_VERSION=${{ inputs.version }}"
       push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -99,8 +99,8 @@ jobs:
       context: .
       dockerfile:  Dockerfile
       repository: flyte-single-binary
-      version: ${{ needs.bump-version.outputs.version }}
-      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
+      version: ${{ inputs.version }}
+      args: "FLYTE_VERSION=${{ inputs.version }}"
       push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -108,14 +108,15 @@ jobs:
 
   trigger-sandbox-lite-build:
     name: Sandbox lite build
+    needs: [publish-flyte-component-image]
     uses: ./.github/workflows/buildx_build.yaml
     with:
       context: .
       dockerfile:  docker/sandbox-lite/Dockerfile
       repository: flyte-sandbox-lite
-      version: latest
-      args: "FLYTE_VERSION=${{ needs.bump-version.outputs.version }}"
-      push: false
+      version: ${{ inputs.version }}
+      args: "FLYTE_VERSION=${{ inputs.version }}"
+      push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
       FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
@@ -125,11 +126,11 @@ jobs:
     needs: [trigger-single-binary-build]
     uses: ./.github/workflows/buildx_build.yaml
     with:
-      context: docker/sandbox-lite
+      context: docker/sandbox-ultra
       dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
       repository: flyte-sandbox-ultra
-      args: ""
-      version: ${{ needs.bump-version.outputs.version }}
+      args: "FLYTE_VERSION=${{ inputs.version }}"
+      version: ${{ inputs.version }}
       push: true
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -154,7 +155,7 @@ jobs:
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
       - name: Preprare Flyte Helm Release
         env:
-          VERSION: ${{ needs.bump-version.outputs.version }}
+          VERSION: ${{ inputs.version }}
           REPOSITORY: "https://flyteorg.github.io/flyte"
         run: |
           make prepare_artifacts
@@ -176,7 +177,7 @@ jobs:
 
       - name: Preprare Flyte Release
         env:
-          VERSION: ${{ needs.bump-version.outputs.version }}
+          VERSION: ${{ inputs.version }}
         run: |
           make prepare_artifacts
           git stash
@@ -185,6 +186,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
+          args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ inputs.version }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}

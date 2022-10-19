@@ -26,7 +26,7 @@ jobs:
     name: Sandbox lite ultra
     uses: ./.github/workflows/buildx_build.yaml
     with:
-      context: docker/sandbox-lite
+      context: docker/sandbox-ultra
       dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
       repository: flyte-sandbox-ultra
       version: latest
