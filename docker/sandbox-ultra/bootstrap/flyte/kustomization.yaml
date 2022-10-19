@@ -1,0 +1,13 @@
+namespace: flyte
+
+resources:
+- deployment.yaml
+- namespace.yaml
+- rbac.yaml
+- service.yaml
+
+configMapGenerator:
+- name: cluster-resource-templates
+  files:
+  - cluster-resource-templates/namespace.yaml
+  - cluster-resource-templates/project_resource_quota.yaml
