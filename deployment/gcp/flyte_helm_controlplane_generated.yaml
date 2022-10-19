@@ -313,6 +313,10 @@ data:
   namespace_config.yaml: | 
     namespace_mapping:
       template: '{{ domain }}'
+  clusters.yaml: |
+    clusters:
+      clusterConfigs: []
+      labelClusterMap: {}
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -739,7 +743,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2a1e5e5cff9966c9658d2b665fc4787ef644d6eb43b0954a3eb59df94c0c678"
+        configChecksum: "dc18f5d54e0770c574e6b0693724047e22063030259104eebb554398d63209f"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -763,6 +767,8 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
+          - mountPath: /var/run/credentials
+            name: flyte-admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -774,6 +780,9 @@ spec:
         - configMap:
             name: flyte-clusterresourcesync-config
           name: config-volume
+        - name: flyte-admin-secrets
+          secret:
+            secretName: flyte-admin-secrets
 ---
 # Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1

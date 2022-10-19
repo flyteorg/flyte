@@ -337,6 +337,10 @@ data:
       name: staging
     - id: production
       name: production
+  clusters.yaml: |
+    clusters:
+      clusterConfigs: []
+      labelClusterMap: {}
 ---
 # Source: flyte-core/templates/console/configmap.yaml
 apiVersion: v1
@@ -1018,7 +1022,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "96ecbccfd19ea2e8268104eae476320f13d53bfa83ddae7ac29d072b3fbc238"
+        configChecksum: "55ce597c10b17ef6e891f0c9242b17aafb3d7b4e4e414d0a5078d71ad9c804f"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -1042,6 +1046,8 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
+          - mountPath: /var/run/credentials
+            name: flyte-admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -1053,6 +1059,9 @@ spec:
         - configMap:
             name: flyte-clusterresourcesync-config
           name: config-volume
+        - name: flyte-admin-secrets
+          secret:
+            secretName: flyte-admin-secrets
 ---
 # Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1
