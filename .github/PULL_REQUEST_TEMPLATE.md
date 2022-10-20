@@ -37,6 +37,6 @@ Happy contributing!
 
 <!-- Add all the screenshots which support your changes -->
 
-## Note to Reviewers
+## Note to reviewers
 
 <!-- Add notes to reviewers if applicable -->
