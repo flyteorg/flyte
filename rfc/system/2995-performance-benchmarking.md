@@ -6,7 +6,7 @@
 
 ## 1 Executive Summary
 
-In designing a performance benchmarking framework for Flyte it is important to clearly define the goal. A naive suggestion may to "make workflows execute faster", but that could be easier to attain by horizontally or vertically scaling k8s clusters in most scenarios rather than improve Flyte performance. We argue that directing effort at making workflow executions faster is the wrong approach. Rather, the primary focus should be to reduce the overhead that Flyte imposes on workflow evaluations. In purusing this goal, we then achieve better efficiency and faster workflow evaluations.
+In designing a performance benchmarking framework for Flyte it is important to clearly define the goal. A naive suggestion may be to "make workflows execute faster", but that could be easier to attain by horizontally or vertically scaling k8s clusters in most scenarios rather than improve Flyte performance. We argue that directing effort at making workflow executions faster is the wrong approach. Rather, the primary focus should be to reduce the overhead that Flyte imposes on workflow evaluations. In purusing this goal, we then achieve better efficiency and faster workflow evaluations.
 
 To these ends, we first attempt to quantify this overhead by presenting an approach for a lower-bound estimation of node and workflow level overhead. We then dive into infrastructure scopped metrics to identify what exactly within Flyte incurs the overhead by proposing integration of a distributing tracing solution to provide a fine-grained time-series breakdown of workflow evaluations. With these robust metrics, we design an experimental setup which provides diversity in k8s / Flyte environments and faciitates benchmarking problematic Flyte workflows. This process, and the specific components thereof, are intended to be easily understandable, objective, and reproducible to ensure utility for both dynamic performance analysis in production environments and static benchmarking of feature proposals.
 
@@ -34,18 +34,18 @@ we have provided a graphic to help explain the different components here - TODO 
 
 Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte requires different pre-processing and post-processing operations to ensure cohesion with other nodes. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
-The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencys have succeeded. This is depicted in TODO. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead? This is highlighted at TODO.
-
-In consideration of these complexities we propose to define workflow overhead as an aggregate of the overhead at each individual node. So in our example, the workflow overhead would be computed by adding the execution runtime, Flyte management overhead, and external system overhead components of each individual node and computing the overal workflow overhead as ratios of these summed values. This seems to be the most honest and accurate portrayal.
-
-TODO - and there are many corner cases - max parallelsim is not a bad thing
-
 TODO - will need to be implemented on a per-node basis 
     out example for executing k8s pods is relativley simple
     what about the overhead of dynamic tasks with launch a pod to compile a Flyte DAG and then execute the DAG?
     what about launchplans which start a separate FlyteWorkflow
 
     the best we can do has to be good enough - but disclaimers that this represents an estimate
+
+The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencys have succeeded. This is depicted in TODO. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead? This is highlighted at TODO.
+
+In consideration of these complexities we propose to define workflow overhead as an aggregate of the overhead at each individual node. So in our example, the workflow overhead would be computed by adding the execution runtime, Flyte management overhead, and external system overhead components of each individual node and computing the overal workflow overhead as ratios of these summed values. This seems to be the most honest and accurate portrayal.
+
+TODO - and there are many corner cases - max parallelsim is not a bad thing
 
 Collecting and correctly reporting this information encompasses it's own challenges. Fortunately, Flyte already incorporates a robust eventing system used to report workflow, node, and task execution information which is then incorporated into the UI. The plan is to compute / collect this information within FlytePropeller and include it in event messages. This additional information includes scheduling overhead, k8s pod metadata (ex. pod durations, container durations, etc), etc. FlyteAdmin will then aggregate the metric timestamps to provide a cohesive view of workflow and node overhead. Specifically, we extend the FlyteIDL event protos and FlyteAdmin models as such... TODO
 
@@ -55,7 +55,7 @@ TODO - layout FlyteIDL and FlyteAdmin model updates
 
 Currently, FlytePropeller emits a collection of metrics using a prometheus exporter. These may be scoped using labels to partition by workflow ID, node ID, etc. However, this solution still lacks the time-series granularity to precisely disassemble workflow evaluations. For example, we can know that there were 10 events sent and what the distribution of event latencies are, but will not know if the p99 event latency was the first event sent or the last. This is important in debugging system performance. 
 
-We propose to integrate a distributed tracing solution, like [opentelemetry](TODO), to track and monitor workflow evaluations within FlytePropeller. These systems work by emitting traces for operations performed on a specific entity. This fits well with FlytePropeller, where each trace is responsible for an individual workflow. Additionally, the heirarchical nature of trace spans make following FlytePropeller rounds, streaks, and the breadth-first traversal of nodes visualizable and easy to dissect. Within each node evaluation we can inspect admin event reporting, etcd updates, and blobstore operations. An example trace is depicted below:
+We propose to integrate a distributed tracing solution to track and monitor workflow evaluations within FlytePropeller. These systems work by emitting traces for operations performed on a specific entity. This fits well with FlytePropeller, where each trace is responsible for an individual workflow. Additionally, the heirarchical nature of trace spans make following FlytePropeller rounds, streaks, and the breadth-first traversal of nodes visualizable and easy to dissect. Within each node evaluation we can inspect admin event reporting, etcd updates, and blobstore operations. An example trace is depicted below:
 
     TODO - graphic of trace
         workflow-evaluation
@@ -94,7 +94,7 @@ We specifically separate infrastructure provisionsing because the goal is to sup
 
 Flyte is a microservice architecture, where the framework is partitioned into many individually scalable parts (ex. FlyteConsole, FlyteAdmin, FlytePropeller, etc). Currently deployment is partitioned into two separate scopes, namely single binary and full deployment. The single binary approach compiles all of the Flyte components into, you may have guessed it, a single binary. This is advantageous for quickly deploying Flyte, easing PoC deployments and development / testing iterations. In the scope of benchmarking we need to determine whether this can accurately represent a production-grade environment. If it can, this greatly simplifies the deployment process. If not, we will need to fallback to a full deployment which involves managing multiple Flyte components where complexities are increased with each additional modified component.
 
-Fortunately the base Flyte repository contains helm charts for each release. These include both single binary (for the demo cluster) as well as cloud specific default deployments (ex. EKS, GKE, etc). It should be relatively easy to leverage these charts, with some minor modifications (ex. component images for updates, configuration updates) to help drive automated Flyte deployments.
+Fortunately the base [Flyte repository](https://github.com/flyteorg/flyte) contains [helm charts](https://github.com/flyteorg/flyte/tree/master/charts) for each release. These include both single binary (for the demo cluster) as well as cloud specific default deployments (ex. EKS, GKE, etc). It should be relatively easy to leverage these charts, with some minor modifications (ex. component images for updates, configuration updates) to help drive automated Flyte deployments.
 
 **Execute Workflow Portfolio:** We need to be precise about the workflows we use to benchmark Flyte, with the goal to succinctly highlight known bottlenecks. Admittedly, this requires some esoteric knowledge and as performance bottlenecks are mitigating this will likely be an iterative process. While our initial goal is to define 10 - 15 workflows, which span functionality but are easily understandable, it is likely this process may evolve to break into multiple workflow portfolios. For example, one collection which tests Ray or Spark task performance specifically, etc. To begin, below we outline a few ideas:
 
@@ -107,102 +107,100 @@ Fortunately the base Flyte repository contains helm charts for each release. The
 
 The process run a single workflow at a time to ensure accurate benchmark metrics. The goal of this work is not to load-test a deployment, but it could be easily adapted in the future. Fortunately, Flyte tooling already includes `flytectl` which can be leveraged to first ensure the workflows are registered in the deployment and then start and monitor each execution to ensure they are serially executed.
 
-**Aggregate Benchmark Results**
-in previous sections we outlined addition of a robust collection of objective metrics to track both workflow execution and infrastructure level scopes
-    in this stage we focus on harnessing these metrics to provide insight into performance 
+**Aggregate Benchmark Results** To analyze and compare benchmarking results we need to aggregate performance metrics in a concise document. This process involves querying for workflow / node overheads and gathering summary statistics. These operations should be able to use existing tooling and just rely on parsing and formatting results. Intially this output will be a textual "benchmarking results" document with breakdowns for each indvidual workflow, an example of YAML format is below:
 
-aggregating performance metrics for each benchmark to easily compare approaches and identify bottlenecks.
-    this process involves querying for workflow / node overheads for each workflow and gathering summary statistics
-    
-    initially the output will be a textual "benchmarking results" document with breakdowns of each individual metric
-
-    workflow 1: 5m34s with 37s (X%) Flyte overhead and 30s (Y%) k8s overhead
-        node 1 : 1m2s with 5s (X%) Flyte overhead and 4s (Y%) k8s overhead
+    flyte.benchmark.chained-cache:
+      duration: 1m53s
+      flyteOverhead: 14%
+      nodes:
+      - n1:
+        duration: 1m2s
+        flyteOverhead: 6%
+      - n2:
         ...
-                    count       avg. latency
-                                p50     p90     p95
-    events:
-        workflow:   5           21ms    ...
-        node:       21          8ms
-        task:       18          4m
-    etcd updates    5           51ms
-    blobstore
-        writes:     20          98ms
-        reads:      40          18ms
-    propeller
-        rounds      4           ...
-        streaks     20          ...
-
-goal is to easily compare results from different runs - 
-    these provide an overal summary - if we want to break into specifics then look at traces for the workflow
-    ... TODO
-
-maybe the format will change but a text dump to start
-    this could be formatted as yaml, json, etc which would then be auto-comperable 
-    for example, a script which output the same format, but with delta changes between values for the two executions:
-
-        workflow 1: +1m4s with ...
-            node 1 : -4s with ..
+      events:
+        workflow:
+          count: 5
+          latency:
+            p50: 21ms
+            p90: 30ms
+            p99: 35ms
+        node:
+          count: 18
+          latency:
             ...
-                        count       avg. latency
-                                    p50     p90     p95
-        events:
-            workflow:   +1          -1ms    ...
-            node:       -3          +1ms
+        task:
+          ...
+      blobstore
+        writes:
+          count: 20
+          latency:
+            p50: 98ms
+            ...
+        reads:
+          count: 40
+          latency:
+            p50: 23ms
+            ...
+      propeller:
+        rounds:
+          ...
+        streaks:
+          ...
+
+This format is common in our domain, but we could conceivably support JSON, etc in the future. Additionally, it allows script-driven comparrisons between evaluations when it is useful to quanitfy the advantages of one approach over another. For example, it would be relatively simple to provide a script with mimics the YAML hierarchy with delta values such as below:
+
+    flyte.benchmark.chained-cache:
+      duration: -10s
+      flyteOverhead: -2.4%
+      nodes:
+      - n1:
+        duration: -2s
+        flyteOverhead: -0.1%
+      - n2:
         ...
-
-
+      events:
+        workflow:
+          count: +0
+          latency:
+            p50: +0.1ms
+            p90: +0.2ms
+            p99: -0.1ms
+        node:
+          count: -2
+          latency:
+            ...
 
 ## 4 Metrics & Dashboards
 
-literally, this entire thing is designing metrics.
+Like literally, this entire thing is designing metrics ... see "$everything_else"
 
-depends on the level of transparency users prefer
-    could potentially include overhead estimates in the UI
-    could provide links to the open-telemetry traces in the UI
+Creating a separate dashboard specifically for performance benchmarks would be useful but is far too involved to offset the costs. However, integration of specific metric components into FlyteConsole would be both possible and helpful. For example, displaying the overhead estimate for each workflow / node in the UI and, if distributed tracing is enabled, linking to the tracing agent from the workflow view makes in-depth performance analysis available to end users.
 
 ## 5 Drawbacks
 
-- metric values are often relative to a specific environment - we can't cover every single case
-    - but this is still a good bit of improvement over the current state
+The considerations for this proposal are rooted in esoteric knowledge of the Flyte infrastructure to ensure robust and flexible design. This means we can support diversity in environments and workflow definitions. That being said, the main concern is going down the wrong path. Metric reporting often bloats code-bases, where function logic is often prefixed and postfixed by some boilerplate context setting. If this solution prooves to be unuseful, removing this should be relatively easy, but remains a non-negligible cost.
 
 ## 6 Alternatives
 
-prometheus metrics
-    very cumbersome to track an individual workflow
-        and the use of quantiles result in some degree of inaccuracy
-    ill-suited for performance benchmarking
+Currently, Flyte emits a collection of metrics through prometheus. This is very powerful in defining SLOs and macro tracking a Flyte deployment, but it is very cumbersome to analyze performance of an individual workflow. This is because prometheus metrics (1) are meant to have bounded label values, so using workflow id results in massive memory utilization and (2) values are reported in quantiles, so individual values are lost and a time-series based analysis is impossible. For these reasons, using existing prometheus metrics to inform performance benchmarking will result in inaccurate and unprecise results.
 
-    focus on aggregate metrics (ex. 99th quantile, etc) - not very queryable at the workflow level
-
-
-flytepropeller fold_logs.py script
-    parses logs to compute traces - not very accurate / accessible
+The [FlytePropeller repository](https://github.com/flyteorg/flytepropeller) contains a script called [fold_logs.py](https://github.com/flyteorg/flytepropeller/blob/master/script/fold-logs.py). This script parses FlytePropeller logs and outputs a hierarchical time-series breakdown of Flytes management of an individual workflow. This output is probably very close to the distributed trace we expect to produce. However, this is based on parsing log messages which ensures that the results will be inaccurate and it is difficult to quantify operations unless specific "start X" and "stop X" logs are recorded. An example output of this script is provided below:
 
     TODO - include script output
 
 ## 7 Potential Impact and Dependencies
 
-TODO
-
-we will have actual metrics into Flyte bottlenecks rather to inform performance mitigations.
-
-including a distributed tracing solution is going to require additional complexity in Flyte setup
-    similar to prometheus support - this is not going to be necessary to run, rather can be turned on / off at will
-        if users are interested in an in-depth analysis of Flyte performance for a particular workflow it is useful, but may have issues at scale so an always on deployment in a production environment is likely in-advisable
+Including a distributed tracing solution is going to require additional complexity in Flyte setup. Similar to the existing support for prometheus, this is not going to be requried for a Flyte deployment. Rather, it can be turned on / of on demand. Issues in collecting long-running traces at scale are a concern, so at least to begin, integrating always on fine-grainded performance analysis in a production environment is likely in-advisable
 
 ## 8 Unresolved questions
 
-- what is the most efficient avenue for provisioning infrastructure and deploying Flyte?
-    - does it make sense to ad-hoc startup / teardown clusters?
-    - should we use single binary?
+- What is the most efficient solution for provisioning infrastructure and deploying Flyte? The proposed solution to use terraform and helm seems like a logical approach, but there may be unforeseen issues.
 
-- is tracing the best solution for breaking down performance on a per-workflow basis?
-    - how difficult is the integration / collection framework setup?
-    - what is the level of queryability?
+- Is distributed tracing the best solution for breaking down performance on a per-workflow basis? Specifically, our concerns are the difficulty of integration / collection framework setup and the levels of queryability.
 
-- do we need to capture cpu, memory, network i/o, etc?
-    - none of the infrastructure components have been resource bound (ie. CPU, RAM)
-        - but FlytePropeller is heavily cached ...
+- Do we need to capture CPU, memory, network I/O, etc? Currently, there is no indication that Flyte components are resource bound. This is especially true when comparing to the workloads they orchestrate. However, as this framework progresses it may be important to track this utilization to better inform deployments.
 
 ## 9 Conclusion
+
+TODO
