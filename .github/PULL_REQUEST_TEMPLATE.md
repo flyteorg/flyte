@@ -23,7 +23,7 @@ Happy contributing!
 [ ] - Not correct; marked as **not** done
 -->
 
-## Check List (Check all the applicable boxes) <!-- Follow the above conventions to check the box -->
+## Check all the applicable boxes <!-- Follow the above conventions to check the box -->
 
 - [ ] My code follows the code style of this project.
 - [ ] My change requires changes to the documentation.
