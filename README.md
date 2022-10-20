@@ -164,6 +164,9 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
   - [Flytekit plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
   - Arbitrary Flytekit-less containers tasks ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
 - Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
+  - Versioned data, code, and models
+  - Automatically tracked executions
+  - Declarative pipelines
 - **Multi-cloud support** (AWS, GCP, and others)
 - No single point of failure, and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
