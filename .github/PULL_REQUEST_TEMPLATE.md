@@ -12,7 +12,7 @@ Happy contributing!
 
 <!-- Example: Closes #31 -->
 
-## Changes proposed (Describe Changes)
+## Describe your changes
 
 <!-- List all the proposed changes in your PR -->
 
