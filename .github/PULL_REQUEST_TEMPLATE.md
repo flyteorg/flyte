@@ -31,7 +31,7 @@ Happy contributing!
 - [ ] All new and existing tests passed.
 - [ ] This PR does not contain plagiarized content.
 - [ ] The title of my pull request is a short description of the requested changes.
-- [ ] All commits are Signed-off.
+- [ ] All commits are signed-off.
 
 ## Screenshots
 
