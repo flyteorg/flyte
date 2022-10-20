@@ -25,11 +25,8 @@ Happy contributing!
 
 ## Check all the applicable boxes <!-- Follow the above conventions to check the box -->
 
-
 - [ ] I updated the documentation accordingly.
 - [ ] All new and existing tests passed.
-
-
 - [ ] All commits are signed-off.
 
 ## Screenshots
