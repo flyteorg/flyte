@@ -30,7 +30,7 @@ For this reason, we believe Flyte metrics should be naturally partitioned into r
             
 **Runtime Metrics:** These metrics breakdown the time spent within workflow executions into user-code and various overhead estimates. In theory, this explanation sounds very simple, but the complexities of Flyte can make this challenging in many scenarios.
 
-![node-overhead](https://drive.google.com/file/d/1DneXD8gLZ1J6-8ECr2tMBS-gLi1XPCMF/view?usp=sharing)
+![node-overhead](https://drive.google.com/uc?export=view&id=1hbZsB272N0iXCT0LswtA5OozYFVxJgrs)
 
 Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte performs a variety or orchestration operations to ensure cohesion within the framework. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
