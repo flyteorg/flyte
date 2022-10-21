@@ -1,33 +1,21 @@
----
-# Source: flyte-binary/templates/namespace.yaml
-kind: Namespace
 apiVersion: v1
+kind: Namespace
 metadata:
-  name: flyte
-  labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
+  labels:
     app.kubernetes.io/instance: flytedemo
-    app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-0.1.0
+  name: flyte
 ---
-# Source: flyte-binary/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flyte
+  namespace: flyte
 ---
-# Source: flyte-binary/templates/configmap.yaml
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cluster-resource-templates
-  labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: flytedemo
-    app.kubernetes.io/version: "1.16.0"
-    app.kubernetes.io/managed-by: Helm
 data:
   namespace.yaml: |
     apiVersion: v1
@@ -47,80 +35,88 @@ data:
       hard:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: flytedemo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-0.1.0
+  name: cluster-resource-templates
+  namespace: flyte
 ---
-# Source: flyte-binary/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: flyte-role
 rules:
 - apiGroups:
-      - ""
+  - ""
   resources:
-      - namespaces
-      - resourcequotas
-      - secrets
+  - namespaces
+  - resourcequotas
+  - secrets
   verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
+  - create
+  - get
+  - list
+  - patch
+  - update
 - apiGroups:
-      - ""
+  - ""
   resources:
-      - pods
+  - pods
   verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
-      - ""
+  - ""
   resources:
-      - events
+  - events
   verbs:
-      - create
-      - delete
-      - patch
-      - update
+  - create
+  - delete
+  - patch
+  - update
 - apiGroups:
-      - flyte.lyft.com
+  - flyte.lyft.com
   resources:
-      - flyteworkflows
+  - flyteworkflows
   verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - post
-      - update
-      - watch
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - post
+  - update
+  - watch
 - apiGroups:
-      - apiextensions.k8s.io
+  - apiextensions.k8s.io
   resources:
-      - customresourcedefinitions
+  - customresourcedefinitions
   verbs:
-      - create
-      - get
-      - list
+  - create
+  - get
+  - list
 - apiGroups:
-      - admissionregistration.k8s.io
+  - admissionregistration.k8s.io
   resources:
-      - mutatingwebhookconfigurations
+  - mutatingwebhookconfigurations
   verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
+  - create
+  - get
+  - list
+  - patch
+  - update
 ---
-# Source: flyte-binary/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -130,71 +126,61 @@ roleRef:
   kind: ClusterRole
   name: flyte-role
 subjects:
-  - kind: ServiceAccount
-    name: flyte
-    # Have to add a namespace explicitly here so that the generated manifest has it
-    # since kubectl apply --namespace won't update it.
-    namespace: flyte
+- kind: ServiceAccount
+  name: flyte
+  namespace: flyte
 ---
-# Source: flyte-binary/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: flyte
+  namespace: flyte
 spec:
   ports:
-    - name: http
-      port: 8088
-    - name: grpc
-      port: 8089
+  - name: http
+    port: 8088
+  - name: grpc
+    port: 8089
   selector:
     app: flyte
 ---
-# Source: flyte-binary/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: flyte-pod-webhook
+  namespace: flyte
 spec:
   ports:
-    - name: webhook
-      port: 443
-      targetPort: 9443
+  - name: webhook
+    port: 443
+    targetPort: 9443
   selector:
     app: flyte
 ---
-# Source: flyte-binary/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: flyte
   name: flytebinary
+  namespace: flyte
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: flyte
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: flyte
     spec:
-      hostNetwork: true
       containers:
-      - name: flyte
-        image: "flyte"
-        imagePullPolicy: IfNotPresent
-        args:
+      - args:
         - start
         - --config
         - /etc/flyte/flyte.yaml
-        resources:
-          limits:
-            cpu: 1
-            memory: 1Gi
         env:
         - name: POD_NAME
           valueFrom:
@@ -204,6 +190,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        image: flyte
+        imagePullPolicy: IfNotPresent
+        name: flyte
         ports:
         - containerPort: 8088
           name: http
@@ -211,6 +200,10 @@ spec:
           name: grpc
         - containerPort: 9443
           name: webhook
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
         volumeMounts:
         - mountPath: /etc/flyte/cluster-resource-templates
           name: cluster-resource-templates
@@ -218,14 +211,15 @@ spec:
           name: config
         - mountPath: /var/run/flyte
           name: state
+      hostNetwork: true
       serviceAccountName: flyte
       volumes:
-      - name: cluster-resource-templates
-        configMap:
+      - configMap:
           name: cluster-resource-templates
+        name: cluster-resource-templates
       - hostPath:
           path: /srv/flyte/flyte.yaml
           type: File
         name: config
-      - name: state
-        emptyDir: {}
+      - emptyDir: {}
+        name: state

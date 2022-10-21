@@ -26,11 +26,7 @@ spec:
         args:
         - start
         - --config
-        {{- if eq .Values.paths.externalFlyteConfig "" }}
         - /etc/flyte/flyte.yaml
-        {{- else }}
-        - {{ .Values.paths.externalFlyteConfig }}
-        {{- end }}
         resources:
           limits:
             cpu: 1
@@ -58,6 +54,9 @@ spec:
         - mountPath: /etc/flyte/flyte.yaml
           subPath: flyte.yaml
           name: config
+        {{- else }}
+        - mountPath: /etc/flyte/flyte.yaml
+          name: config
         {{- end }}
         - mountPath: /var/run/flyte
           name: state
@@ -73,6 +72,11 @@ spec:
       - name: config
         configMap:
           name: flyte-backend-config
+      {{- else }}
+      - hostPath:
+          path: {{ .Values.paths.externalFlyteConfig }}
+          type: File
+        name: config
       {{- end }}
       - name: state
         emptyDir: {}
