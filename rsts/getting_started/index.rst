@@ -156,8 +156,7 @@ To start a local demo cluster, install :std:ref:`flytectl`, which is the command
 
   .. prompt:: bash $
 
-    curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin # You can change path from /usr/local/bin to any file system path
-    export PATH=$(pwd)/bin:$PATH # Only required if user used different path then /usr/local/bin
+    curl -L https://raw.githubusercontent.com/flyteorg/flytectl/HEAD/install.sh | bash
 
 
 Start a Flyte demonstration environment on your local machine via:
@@ -245,8 +244,7 @@ used to manage Flyte entities such as tasks, workflows, and executions.
 
    - The default execution view shows the list of tasks executing in sequential order.
    - The right-hand panel shows metadata about the task execution, including logs, inputs, outputs, and task metadata.
-   - The *Graph* view shows the execution graph of the workflow, providing visual information about the topology
-     of the graph and the state of each node as the workflow progresses.
+   - The *Graph* view shows the execution graph of the workflow, providing visual information about the topology of the graph and the state of each node as the workflow progresses.
    - On completion, you can inspect the outputs of each task, and ultimately, the overarching workflow.
 
 Recap
