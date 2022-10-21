@@ -32,7 +32,7 @@ For this reason, we believe Flyte metrics should be naturally partitioned into w
 
 we have provided a graphic to help explain the different components here - TODO provide graphic
 
-Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte requires different pre-processing and post-processing operations to ensure cohesion with other nodes. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
+Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte requires different pre-processing and post-processing operations to ensure cohesion within the framework. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
 TODO - will need to be implemented on a per-node basis 
     out example for executing k8s pods is relativley simple
@@ -41,11 +41,13 @@ TODO - will need to be implemented on a per-node basis
 
     the best we can do has to be good enough - but disclaimers that this represents an estimate
 
-The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencys have succeeded. This is depicted in TODO. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead? This is highlighted at TODO.
+The goal of this scope is to provide a simple, easily understandable value to quickly understand the efficiency of a workflow execution. For this we need to aggregate information to compute an overall workflow-level overhead. The aforementioned node-level overhead computation is a great start, but it is only a component. There are additional considerations, perhaps the most significant is the time between when Flyte processes a node after all of it's upstream node dependencies have completed. In this situation, Flyte processes each workflow both every N seconds and when notified that a node has changed. If the later has high latency it could take seconds for Flyte to process a schedulable node after all of it's upstream node dependencies have succeeded. This is depicted in TODO. An additional complexity is the inherit parallelization of workflow executions. If for some time range T1 to T2, task A is actively executing user-code but task B is incurring overhead does this contribute to the overall workflow overhead? This is highlighted at TODO.
+
+TODO - this has explained, in some depth, the process of quanitfying Flyte overhead to reinforce how difficult this is. And yet, there are scenarios where the computation of overhead are not well defined. For example, max parallelism is not a bad thing...
+    for these reason - need to reiterate that this value is an estimate
 
 In consideration of these complexities we propose to define workflow overhead as an aggregate of the overhead at each individual node. So in our example, the workflow overhead would be computed by adding the execution runtime, Flyte management overhead, and external system overhead components of each individual node and computing the overal workflow overhead as ratios of these summed values. This seems to be the most honest and accurate portrayal.
 
-TODO - and there are many corner cases - max parallelsim is not a bad thing
 
 Collecting and correctly reporting this information encompasses it's own challenges. Fortunately, Flyte already incorporates a robust eventing system used to report workflow, node, and task execution information which is then incorporated into the UI. The plan is to compute / collect this information within FlytePropeller and include it in event messages. This additional information includes scheduling overhead, k8s pod metadata (ex. pod durations, container durations, etc), etc. FlyteAdmin will then aggregate the metric timestamps to provide a cohesive view of workflow and node overhead. Specifically, we extend the FlyteIDL event protos and FlyteAdmin models as such... TODO
 
@@ -79,10 +81,10 @@ To begin, this integration is only necessary within FlytePropeller. However, if 
 
 We have defined a diverse collection of objective metrics which cover both the workflow execution and infrastructure scopes. These serve as a platform to easily analyze infrastructure level performance and relate the impact on workflow executions. Now we need to define an experimental setup that ensures accurate performance measurements, coverage over a diverse portfolio, and the ability to yield reproducible results. We propose to partition this work into four distinct stages:
 
-1. **Provision Benchmarking Infrastructure:** TODO
-2. **Deploy Flyte Components:** TODO
-3. **Execute Workflow Portfolio:** TODO
-4. **Aggregate Benchmark Results:** TODO
+1. Provision Benchmarking Infrastructure
+2. Deploy Flyte Components
+3. Execute Workflow Portfolio
+4. Aggregate Benchmark Results
 
 We envision this process will be highly script-driven, standing on the shoulders of existing tooling. We can break each individual stage into a script (or multiple scripts) so that extensions (or reductions) in the breadth of analysis can use a mix-and-match solution. For example, executing benchmarks on existing clusters / Flyte deployments or evaluating additional workload-specific workflow portfolios like spark or ray tasks benchmarks. Initially, this process will be manually driven, but as the approach matures scripting ensures the ability to transition to automated github actions, etc.
 
@@ -187,7 +189,42 @@ Currently, Flyte emits a collection of metrics through prometheus. This is very 
 
 The [FlytePropeller repository](https://github.com/flyteorg/flytepropeller) contains a script called [fold_logs.py](https://github.com/flyteorg/flytepropeller/blob/master/script/fold-logs.py). This script parses FlytePropeller logs and outputs a hierarchical time-series breakdown of Flytes management of an individual workflow. This output is probably very close to the distributed trace we expect to produce. However, this is based on parsing log messages which ensures that the results will be inaccurate and it is difficult to quantify operations unless specific "start X" and "stop X" logs are recorded. An example output of this script is provided below:
 
-    TODO - include script output
+    hamersaw@ragnarok:~/development/flytepropeller$ ./script/fold-logs.py ~/flyte.log fd5d4ee88f9dc4436a76
+    Timestamp   Line    Duration    Heirarchical Log Layout
+    ----------------------------------------------------------------------------------------------------
+    18:08:38    282     14.0s       1 Workflow
+    18:08:38    283     0.0s            1.1 Processing
+    18:08:38    284     0.0s                1.1.1 StreakRound(Ready)
+    18:08:38    289     0.0s                1.1.2 StreakRound(Running)
+    18:08:38    292     0.0s                    1.1.2.1 UpdateNodePhase(start-node,NotYetStarted,Succeeded)
+    18:08:38    298     0.0s                1.1.3 StreakRound(Running)
+    18:08:38    299     0.0s                    1.1.3.1 UpdateNodePhase(n0,NotYetStarted,Queued)
+    18:08:38    304     0.0s                1.1.4 StreakRound(Running)
+    18:08:38    319     0.0s                    1.1.4.1 UpdateNodePhase(n0,Queued,Running)
+    18:08:38    323     0.0s                1.1.5 StreakRound(Running)
+    18:08:38    332     0.0s                1.1.6 StreakRound(Running)
+    18:08:38    342     0.0s            1.2 Processing
+    18:08:38    343     0.0s                1.2.1 StreakRound(Running)
+    18:08:39    352     0.0s            1.3 Processing
+    18:08:39    353     0.0s                1.3.1 StreakRound(Running)
+    18:08:39    361     0.0s                1.3.2 StreakRound(Running)
+    18:08:39    371     0.0s            1.4 Processing
+    18:08:39    372     0.0s                1.4.1 StreakRound(Running)
+    18:08:40    382     0.0s            1.5 Processing
+    18:08:40    383     0.0s                1.5.1 StreakRound(Running)
+    18:08:50    397     0.0s            1.6 Processing
+    18:08:50    398     0.0s                1.6.1 StreakRound(Running)
+    18:08:52    407     0.0s            1.7 Processing
+    18:08:52    408     0.0s                1.7.1 StreakRound(Running)
+    18:08:52    415     0.0s                    1.7.1.1 UpdateNodePhase(n0,Running,Succeeding)
+    18:08:52    419     0.0s                1.7.2 StreakRound(Running)
+    18:08:52    426     0.0s                1.7.3 StreakRound(Running)
+    18:08:52    428     0.0s                    1.7.3.1 UpdateNodePhase(end-node,NotYetStarted,Queued)
+    18:08:52    433     0.0s                1.7.4 StreakRound(Running)
+    18:08:52    436     0.0s                    1.7.4.1 UpdateNodePhase(end-node,Queued,Succeeded)
+    18:08:52    442     0.0s                1.7.5 StreakRound(Running)
+    18:08:52    445     0.0s                1.7.6 StreakRound(Succeeding)
+    18:08:52    453     0.0s            1.8 Processing
 
 ## 7 Potential Impact and Dependencies
 
