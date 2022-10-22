@@ -1,0 +1,876 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubernetes-dashboard
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proxy
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: registry
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-key-holder
+  - kubernetes-dashboard-certs
+  - kubernetes-dashboard-csrf
+  resources:
+  - secrets
+  verbs:
+  - get
+  - update
+  - delete
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubernetes-dashboard-settings
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - dashboard-metrics-scraper
+  resources:
+  - services
+  verbs:
+  - proxy
+- apiGroups:
+  - ""
+  resourceNames:
+  - heapster
+  - 'http:heapster:'
+  - 'https:heapster:'
+  - dashboard-metrics-scraper
+  - http:dashboard-metrics-scraper
+  resources:
+  - services/proxy
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - resourcequotas
+  - secrets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - post
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - get
+  - list
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+rules:
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kubernetes-dashboard
+subjects:
+- kind: ServiceAccount
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-role
+subjects:
+- kind: ServiceAccount
+  name: flyte
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubernetes-dashboard
+subjects:
+- kind: ServiceAccount
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+---
+apiVersion: v1
+data:
+  namespace.yaml: |-
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+  project_resource_quota.yaml: |-
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }}
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }}
+        limits.memory: {{ projectQuotaMemory }}
+kind: ConfigMap
+metadata:
+  name: cluster-resource-templates-f7gkhfk7g8
+  namespace: flyte
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-settings
+  namespace: kubernetes-dashboard
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    admin:
+        access_log_path: /dev/stdout
+        address:
+            socket_address:
+                address: 127.0.0.1
+                port_value: 9901
+
+    static_resources:
+        listeners:
+            - address:
+                  socket_address:
+                      address: 0.0.0.0
+                      port_value: 8000
+              filter_chains:
+                  - filters:
+                        - name: envoy.filters.network.http_connection_manager
+                          typed_config:
+                              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                              stat_prefix: ingress_http
+                              codec_type: AUTO
+                              route_config:
+                                  name: local_route
+                                  virtual_hosts:
+                                      - name: backend
+                                        domains:
+                                            - "*"
+                                        routes:
+                                            - match:
+                                                  path: "/"
+                                              redirect:
+                                                  path_redirect: "/console/"
+                                            - match:
+                                                  prefix: "/console"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/__webpack_hmr"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/api"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/healthcheck"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/v1"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/login"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/me"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/flyteidl.service.AdminService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.service.DataProxyService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  path: "/minio"
+                                              redirect:
+                                                  path_redirect: "/minio/"
+                                            - match:
+                                                  prefix: "/minio/"
+                                              route:
+                                                  cluster: minio
+                                                  prefix_rewrite: /
+                                            - match:
+                                                  path: "/kubernetes-dashboard"
+                                              redirect:
+                                                  path_redirect: "/kubernetes-dashboard/"
+                                            - match:
+                                                  prefix: "/kubernetes-dashboard/"
+                                              route:
+                                                  cluster: kubernetes-dashboard
+                                                  prefix_rewrite: /
+                              http_filters:
+                                  - name: envoy.filters.http.router
+                                    typed_config:
+                                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+        clusters:
+            - name: flyte
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: flyte
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte.flyte
+                                          port_value: 8088
+            - name: flyte_grpc
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: flyte_grpc
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte.flyte
+                                          port_value: 8089
+            - name: minio
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: minio
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: minio.minio
+                                          port_value: 9001
+            - name: kubernetes-dashboard
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: kubernetes-dashboard
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: kubernetes-dashboard.kubernetes-dashboard
+                                          port_value: 80
+kind: ConfigMap
+metadata:
+  name: proxy-config-kt754998b7
+  namespace: proxy
+---
+apiVersion: v1
+data:
+  csrf: ""
+kind: Secret
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-csrf
+  namespace: kubernetes-dashboard
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-key-holder
+  namespace: kubernetes-dashboard
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 8088
+  - name: grpc
+    port: 8089
+  selector:
+    app: flyte
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    targetPort: 9443
+  selector:
+    app: flyte
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: dashboard-metrics-scraper
+  name: dashboard-metrics-scraper
+  namespace: kubernetes-dashboard
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    k8s-app: dashboard-metrics-scraper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  ports:
+  - port: 80
+    targetPort: 9090
+  selector:
+    k8s-app: kubernetes-dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  ports:
+  - name: api
+    port: 9000
+  - name: console
+    port: 9001
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-external
+  namespace: minio
+spec:
+  ports:
+  - name: api
+    nodePort: 30002
+    port: 9000
+  selector:
+    app: minio
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: postgres
+spec:
+  ports:
+  - name: postgres
+    nodePort: 30001
+    port: 5432
+  selector:
+    app: postgres
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy
+  namespace: proxy
+spec:
+  ports:
+  - name: http
+    nodePort: 30080
+    port: 8000
+  selector:
+    app: proxy
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: registry
+spec:
+  ports:
+  - name: registry
+    nodePort: 30000
+    port: 5000
+  selector:
+    app: registry
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyte
+  name: flyte
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyte
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flyte
+    spec:
+      containers:
+      - args:
+        - start
+        - --config
+        - /etc/flyte/flyte.yaml
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: flyte
+        imagePullPolicy: Never
+        name: flyte
+        ports:
+        - containerPort: 8088
+          name: http
+        - containerPort: 8089
+          name: grpc
+        - containerPort: 9443
+          name: webhook
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /etc/flyte/cluster-resource-templates
+          name: cluster-resource-templates
+        - mountPath: /etc/flyte/flyte.yaml
+          name: config
+        - mountPath: /var/run/flyte
+          name: state
+      hostNetwork: true
+      serviceAccountName: flyte
+      volumes:
+      - configMap:
+          name: cluster-resource-templates-f7gkhfk7g8
+        name: cluster-resource-templates
+      - hostPath:
+          path: /srv/flyte/flyte.yaml
+          type: File
+        name: config
+      - emptyDir: {}
+        name: state
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: dashboard-metrics-scraper
+  name: dashboard-metrics-scraper
+  namespace: kubernetes-dashboard
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: dashboard-metrics-scraper
+  template:
+    metadata:
+      labels:
+        k8s-app: dashboard-metrics-scraper
+    spec:
+      containers:
+      - image: kubernetesui/metrics-scraper:v1.0.8
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        name: dashboard-metrics-scraper
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: kubernetes-dashboard
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      volumes:
+      - emptyDir: {}
+        name: tmp-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: kubernetes-dashboard
+  template:
+    metadata:
+      labels:
+        k8s-app: kubernetes-dashboard
+    spec:
+      containers:
+      - args:
+        - --namespace=kubernetes-dashboard
+        - --enable-insecure-login
+        - --enable-skip-login
+        - --disable-settings-authorizer
+        image: kubernetesui/dashboard
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        name: kubernetes-dashboard
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 2001
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: kubernetes-dashboard
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      volumes:
+      - emptyDir: {}
+        name: tmp-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - env:
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: http://localhost:30080/minio
+        - name: MINIO_DEFAULT_BUCKETS
+          value: my-s3-bucket
+        - name: MINIO_ROOT_USER
+          value: minio
+        - name: MINIO_ROOT_PASSWORD
+          value: miniostorage
+        image: bitnami/minio
+        imagePullPolicy: Never
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        volumeMounts:
+        - mountPath: /data
+          name: minio-storage
+      volumes:
+      - hostPath:
+          path: /srv/flyte/s3
+          type: DirectoryOrCreate
+        name: minio-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        image: postgres
+        imagePullPolicy: Never
+        name: postgres
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+      volumes:
+      - hostPath:
+          path: /srv/flyte/db
+          type: DirectoryOrCreate
+        name: postgres-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: proxy
+  name: proxy
+  namespace: proxy
+spec:
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+      - args:
+        - envoy
+        - -c /etc/envoy/config.yaml
+        image: envoyproxy/envoy
+        imagePullPolicy: Never
+        name: proxy
+        ports:
+        - containerPort: 9901
+          name: admin
+        - containerPort: 8000
+          name: http
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: config-volume
+      volumes:
+      - configMap:
+          name: proxy-config-kt754998b7
+        name: config-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: registry
+  name: registry
+  namespace: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+      - image: registry
+        imagePullPolicy: Never
+        name: registry
+        ports:
+        - containerPort: 5000
