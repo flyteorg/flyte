@@ -12,6 +12,7 @@ IMAGES := \
 	bitnami/minio:2022-debian-11 \
 	postgres:14-alpine \
 	envoyproxy/envoy:v1.23-latest \
+	rancher/pause:3.1 \
 	registry:2
 
 define IMAGE_RULE
