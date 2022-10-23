@@ -32,3 +32,4 @@ dist
 *.db
 flyte
 vendor/
+docker/sandbox-ultra/images/tar
