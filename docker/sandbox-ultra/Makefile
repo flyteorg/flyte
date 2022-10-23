@@ -33,9 +33,9 @@ $(foreach name,$(IMAGES),$(eval $(call IMAGE_RULE,$(name))))
 images/tar/flyte:
 	mkdir -p $(dir $@)amd64
 	mkdir -p $(dir $@)arm64
-	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/amd64
+	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/amd64 --build-arg ARCH=linux/amd64
 	docker save --output $(dir $@)amd64/flyte.tar flyte:latest
-	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/arm64
+	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/arm64 --build-arg ARCH=linux/arm64
 	docker save --output $(dir $@)arm64/flyte.tar flyte:latest
 
 .PHONY: images
