@@ -1,0 +1,39 @@
+scratch
+
+
+
+
+
+now you've used the basic thing.
+time to deploy
+
+
+steps:
+0. Local sandbox experience. This is what you've been using all along. Here are some details about it.
+
+1. Deploy to Cloud.
+Just installing Flyte in the most standalone way possible.
+1.1 Discussion on dependencies.
+    See notes on how to deploy sandboxed version of cloud in appendix.
+1.2 Deploy to EKS. Deploy to GKE
+  - Instructions on how to use Helm to install Flyte.
+  - List out specific dependencies for each cloud provider.
+
+1.3 Deploy to Cloud as sandbox
+
+1.4 Test
+Test by port-forward and register. Should get basic things like registration, secrets, schedules.
+Run a workflow. Set up config file (use portforwarded)
+
+2. Enable more complicated things - DNS/Ingress
+
+3. Enable more complicated things - Auth
+
+4. Production Strategies
+  - Multi cluster
+  - Events
+  - How to upgrade.
+  - Propeller performance tweaks
+
+5. Contribute and be part of the community.
+

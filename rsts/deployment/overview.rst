@@ -19,7 +19,7 @@ Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart 
 .. warning:: 
    Opta is no longer actively in development. You can `migrate to terraform <https://docs.opta.dev/features/terraform/#migrate-from-opta-to-terraform>`__ to generate Terraform code from the Opta file. Briefly put, the steps would be as follows.
    
-   1. Run ``opta appply`` on your Opta configuration files to migrate from Opta to Terraform and ensure that Terraform provisions your infrastructure. 
+   1. Run ``opta apply`` on your Opta configuration files to migrate from Opta to Terraform and ensure that Terraform provisions your infrastructure. 
    2. To migrate from existing infrastructure state,
 
       1. Run ``opta generate-terraform --backend remote -c env.yaml`` for environment variable.
