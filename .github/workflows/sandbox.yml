@@ -16,7 +16,7 @@ jobs:
       dockerfile: docker/sandbox/Dockerfile
       repository: flyte-sandbox
       version: latest
-      args: ""
+      args: "latest"
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -30,7 +30,7 @@ jobs:
       dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
       repository: flyte-sandbox-ultra
       version: latest
-      args: ""
+      args: "latest"
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -44,7 +44,7 @@ jobs:
       dockerfile:  docker/sandbox-lite/Dockerfile
       repository: flyte-sandbox-lite
       version: latest
-      args: ""
+      args: "latest"
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -58,7 +58,7 @@ jobs:
       dockerfile:  Dockerfile
       repository: flyte-single-binary
       version: latest
-      args: ""
+      args: "latest"
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
