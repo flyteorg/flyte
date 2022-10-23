@@ -8,6 +8,8 @@ FROM golang:1.19.1-bullseye AS flytebuilder
 ARG FLYTE_VERSION="master"
 
 WORKDIR /flyteorg/build
+RUN echo $BUILDARCH
+RUN uname -a
 RUN git clone --depth=1 https://github.com/flyteorg/flyte.git ./flyte -b $FLYTE_VERSION
 WORKDIR /flyteorg/build/flyte
 RUN go mod download
