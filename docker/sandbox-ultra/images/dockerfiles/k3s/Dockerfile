@@ -1,8 +1,10 @@
 FROM rancher/k3s:v1.24.4-k3s1
 
+ARG ARCH="linux/amd64"
+
 COPY bootstrap/output.yaml /var/lib/rancher/k3s/server/manifests/
-COPY images/tar/$BUILDARCH/* /var/lib/rancher/k3s/agent/imagestmp/
-RUN mv /var/lib/rancher/k3s/agent/imagestmp/$BUILDARCH /var/lib/rancher/k3s/agent/images
+COPY images/tar/$ARCH/* /var/lib/rancher/k3s/agent/imagestmp/
+RUN mv /var/lib/rancher/k3s/agent/imagestmp/$ARCH /var/lib/rancher/k3s/agent/images
 COPY images/dockerfiles/k3s/bin /bin/
 
 COPY flyte.yaml /opt/flyte/defaults.flyte.yaml

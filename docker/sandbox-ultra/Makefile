@@ -31,15 +31,21 @@ endef
 $(foreach name,$(IMAGES),$(eval $(call IMAGE_RULE,$(name))))
 
 images/tar/flyte:
-	mkdir -p $(dir $@)amd64
-	mkdir -p $(dir $@)arm64
-	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/amd64
-	docker save --output $(dir $@)amd64/flyte.tar flyte:latest
-	docker build  -t flyte ../../ -f ../../Dockerfile  --platform linux/arm64
-	docker save --output $(dir $@)arm64/flyte.tar flyte:latest
+	mkdir -p $(dir $@)
+	docker build -t flyte images/dockerfiles/flyte
+	docker save --output $@.tar flyte:latest
+
+images/tar/flyte-ci:
+	mkdir -p $(dir $@)
+	cp /tmp/flyte-amd64.tar $$(dir $$@)/amd64/flyte.tar
+	cp /tmp/flyte-arm64.tar $$(dir $$@)/arm64/flyte.tar
 
 .PHONY: images
 images: $(foreach name,flyte $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))
+
+.PHONY: images-ci
+images-ci: $(foreach name,flyte-ci $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))
+
 
 .PHONY: bootstrap
 bootstrap:

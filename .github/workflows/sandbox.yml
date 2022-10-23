@@ -10,13 +10,13 @@ on:
 jobs:
   trigger-sandbox-build:
     name: Sandbox build
-    uses: ./.github/workflows/buildx_build.yaml
+    uses: ./.github/workflows/buildx_build_dind.yaml
     with:
       context: .
       dockerfile: docker/sandbox/Dockerfile
       repository: flyte-sandbox
       version: latest
-      args: "latest"
+      args: ""
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -24,13 +24,14 @@ jobs:
 
   trigger-sandbox-ultra-build:
     name: Sandbox lite ultra
+    needs: [trigger-single-binary-build]
     uses: ./.github/workflows/buildx_build.yaml
     with:
       context: docker/sandbox-ultra
       dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
       repository: flyte-sandbox-ultra
       version: latest
-      args: "latest"
+      args: ""
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -38,13 +39,13 @@ jobs:
 
   trigger-sandbox-lite-build:
     name: Sandbox lite build
-    uses: ./.github/workflows/buildx_build.yaml
+    uses: ./.github/workflows/buildx_build_dind.yaml
     with:
       context: .
       dockerfile:  docker/sandbox-lite/Dockerfile
       repository: flyte-sandbox-lite
       version: latest
-      args: "latest"
+      args: ""
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
@@ -58,7 +59,7 @@ jobs:
       dockerfile:  Dockerfile
       repository: flyte-single-binary
       version: latest
-      args: "latest"
+      args: ""
       push: false
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
