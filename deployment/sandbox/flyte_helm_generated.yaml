@@ -608,9 +608,9 @@ data:
       prof-port: 10254
       queue:
         batch-size: -1
-        batching-interval: 2s
+        batching-interval: 1s
         queue:
-          base-delay: 5s
+          base-delay: 0s
           capacity: 1000
           max-delay: 120s
           rate: 100
@@ -7116,7 +7116,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "66eed8cb193fe41d8892fa81877986b3526748a09a463a47029b68702804815"
+        configChecksum: "d8c26bb3ec234e9ba3b836493fd43b72bd17ef23772fc46705f5f9842a6abe3"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7190,7 +7190,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.43
       annotations:
-        configChecksum: "66eed8cb193fe41d8892fa81877986b3526748a09a463a47029b68702804815"
+        configChecksum: "d8c26bb3ec234e9ba3b836493fd43b72bd17ef23772fc46705f5f9842a6abe3"
     spec:
       securityContext:
         fsGroup: 65534
@@ -7507,22 +7507,6 @@ spec:
             cpu: 10m
             memory: 128Mi
 ---
-# Source: flyte/charts/contour/templates/contour/ingressclass.yaml
-apiVersion: networking.k8s.io/v1
-kind: IngressClass
-metadata:
-  name: contour
-  annotations:
-    ingressclass.kubernetes.io/is-default-class: "true"
-  labels:
-    app.kubernetes.io/name: contour
-    helm.sh/chart: contour-7.10.1
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: contour
-spec:
-  controller: projectcontour.io/flyte/flyte-contour-contour
----
 # Source: flyte/charts/flyte/templates/common/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -7825,6 +7809,22 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+---
+# Source: flyte/charts/contour/templates/contour/ingressclass.yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: contour
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-7.10.1
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
+spec:
+  controller: projectcontour.io/flyte/flyte-contour-contour
 ---
 # Source: flyte/charts/contour/templates/certgen/serviceaccount.yaml
 apiVersion: v1

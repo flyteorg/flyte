@@ -499,13 +499,13 @@ flyte:
           retry-period: 2s
         queue:
           type: batch
-          batching-interval: 2s
+          batching-interval: 1s
           batch-size: -1
           queue:
             type: maxof
             rate: 100
             capacity: 1000
-            base-delay: 5s
+            base-delay: 0s
             max-delay: 120s
           sub-queue:
             type: bucket

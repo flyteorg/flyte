@@ -125,9 +125,9 @@ data:
       prof-port: 10254
       queue:
         batch-size: -1
-        batching-interval: 2s
+        batching-interval: 1s
         queue:
-          base-delay: 5s
+          base-delay: 0s
           capacity: 1000
           max-delay: 120s
           rate: 100
@@ -434,7 +434,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "8aa8eecb484663e36cdcd3b2a253d557c507f1271d6d7a83fd8cf681d63cd86"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -515,7 +515,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.43
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "8aa8eecb484663e36cdcd3b2a253d557c507f1271d6d7a83fd8cf681d63cd86"
     spec:
       securityContext:
         fsGroup: 65534
