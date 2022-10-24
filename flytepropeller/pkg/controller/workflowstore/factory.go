@@ -20,8 +20,13 @@ func NewWorkflowStore(ctx context.Context, cfg *Config, lister v1alpha1.FlyteWor
 		workflowStore = NewInMemoryWorkflowStore()
 	case PolicyPassThrough:
 		workflowStore = NewPassthroughWorkflowStore(ctx, scope, workflows, lister)
+	case PolicyTrackTerminated:
+		workflowStore = NewPassthroughWorkflowStore(ctx, scope, workflows, lister)
+		workflowStore, err = NewTerminatedTrackingStore(ctx, scope, workflowStore)
 	case PolicyResourceVersionCache:
-		workflowStore, err = NewResourceVersionCachingStore(ctx, scope, NewPassthroughWorkflowStore(ctx, scope, workflows, lister))
+		workflowStore = NewPassthroughWorkflowStore(ctx, scope, workflows, lister)
+		workflowStore, err = NewTerminatedTrackingStore(ctx, scope, workflowStore)
+		workflowStore = NewResourceVersionCachingStore(ctx, scope, workflowStore)
 	}
 
 	if err != nil {
