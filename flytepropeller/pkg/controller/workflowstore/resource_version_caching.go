@@ -7,11 +7,8 @@ import (
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
-	"github.com/flyteorg/flytestdlib/fastcheck"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // TODO - optimization maybe? we can move this to predicate check, before we add it to the queue?
@@ -33,7 +30,6 @@ type resourceVersionCaching struct {
 	w                               FlyteWorkflow
 	metrics                         *resourceVersionMetrics
 	lastUpdatedResourceVersionCache sync.Map
-	terminatedFilter                fastcheck.Filter
 }
 
 func (r *resourceVersionCaching) updateRevisionCache(ctx context.Context, namespace, name, resourceVersion string, isTerminated bool) {
@@ -58,13 +54,6 @@ func (r *resourceVersionCaching) isResourceVersionSameAsPrevious(ctx context.Con
 }
 
 func (r *resourceVersionCaching) Get(ctx context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error) {
-	// Check if the resource version key has already been stored in a terminal phase. Processing
-	// terminated FlyteWorkflows can occur when workflow updates are reported after a workflow
-	// has already completed.
-	if r.terminatedFilter.Contains(ctx, []byte(resourceVersionKey(namespace, name))) {
-		return nil, ErrWorkflowTerminated
-	}
-
 	w, err := r.w.Get(ctx, namespace, name)
 	if err != nil {
 		return nil, err
@@ -98,10 +87,6 @@ func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1a
 		} else {
 			r.metrics.workflowRedundantUpdatesCount.Inc(ctx)
 		}
-
-		if newWF.GetExecutionStatus().IsTerminated() {
-			r.terminatedFilter.Add(ctx, []byte(resourceVersionKey(workflow.Namespace, workflow.Name)))
-		}
 	}
 
 	return newWF, nil
@@ -109,14 +94,6 @@ func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1a
 
 func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
 	newWF *v1alpha1.FlyteWorkflow, err error) {
-	// If the workflow has any managed fields setting the array to one empty ManagedField clears them in the CRD.
-	// FlyteWorkflow CRDs are only managed by a single FlytePropeller instance and therefore the managed fields paradigm
-	// does not add useful functionality. Clearing them reduces CRD size, improving etcd I/O performance.
-	if len(workflow.ObjectMeta.ManagedFields) > 0 {
-		workflow.ObjectMeta.ManagedFields = workflow.ObjectMeta.ManagedFields[:1]
-		workflow.ObjectMeta.ManagedFields[0] = metav1.ManagedFieldsEntry{}
-	}
-
 	newWF, err = r.w.Update(ctx, workflow, priorityClass)
 	if err != nil {
 		return nil, err
@@ -130,21 +107,12 @@ func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.
 		} else {
 			r.metrics.workflowRedundantUpdatesCount.Inc(ctx)
 		}
-
-		if newWF.GetExecutionStatus().IsTerminated() {
-			r.terminatedFilter.Add(ctx, []byte(resourceVersionKey(workflow.Namespace, workflow.Name)))
-		}
 	}
 
 	return newWF, nil
 }
 
-func NewResourceVersionCachingStore(_ context.Context, scope promutils.Scope, workflowStore FlyteWorkflow) (FlyteWorkflow, error) {
-	filter, err := fastcheck.NewLRUCacheFilter(1000, scope.NewSubScope("terminated_filter"))
-	if err != nil {
-		return nil, err
-	}
-
+func NewResourceVersionCachingStore(_ context.Context, scope promutils.Scope, workflowStore FlyteWorkflow) FlyteWorkflow {
 	return &resourceVersionCaching{
 		w: workflowStore,
 		metrics: &resourceVersionMetrics{
@@ -153,6 +121,5 @@ func NewResourceVersionCachingStore(_ context.Context, scope promutils.Scope, wo
 			workflowRedundantUpdatesCount: labeled.NewCounter("wf_redundant", "Workflow Update called but ectd. detected no actual update to the workflow.", scope, labeled.EmitUnlabeledMetric),
 		},
 		lastUpdatedResourceVersionCache: sync.Map{},
-		terminatedFilter:                filter,
-	}, nil
+	}
 }
