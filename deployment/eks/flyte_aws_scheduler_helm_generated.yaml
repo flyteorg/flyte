@@ -459,13 +459,13 @@ data:
         batching-interval: 1s
         queue:
           base-delay: 0s
-          capacity: 1000
+          capacity: 10000
           max-delay: 120s
-          rate: 100
+          rate: 1000
           type: maxof
         sub-queue:
-          capacity: 1000
-          rate: 100
+          capacity: 10000
+          rate: 1000
           type: bucket
         type: batch
       rawoutput-prefix: s3://<BUCKET_NAME>/
@@ -1225,7 +1225,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0d340874c28e1e862f4d22f9bdc9a8a2f1257f5f5aaca63f3fb70a85b290d06"
+        configChecksum: "267b6c0001d2d24470784c2a4c64215167fd9d033d5e81d1e5664d0ad4dcd97"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1307,7 +1307,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.43
       annotations:
-        configChecksum: "0d340874c28e1e862f4d22f9bdc9a8a2f1257f5f5aaca63f3fb70a85b290d06"
+        configChecksum: "267b6c0001d2d24470784c2a4c64215167fd9d033d5e81d1e5664d0ad4dcd97"
     spec:
       securityContext:
         fsGroup: 65534

@@ -235,8 +235,8 @@ configmap:
       queue:
         sub-queue:
           type: bucket
-          rate: 100
-          capacity: 1000
+          rate: 1000
+          capacity: 10000
 
   # -- Resource manager configuration
   resource_manager:
