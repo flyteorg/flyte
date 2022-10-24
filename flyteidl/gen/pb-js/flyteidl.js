@@ -36926,6 +36926,384 @@ export const flyteidl = $root.flyteidl = (() => {
             return WorkflowClosure;
         })();
 
+        admin.WorkflowErrorExistsDifferentStructure = (function() {
+
+            /**
+             * Properties of a WorkflowErrorExistsDifferentStructure.
+             * @memberof flyteidl.admin
+             * @interface IWorkflowErrorExistsDifferentStructure
+             * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsDifferentStructure id
+             */
+
+            /**
+             * Constructs a new WorkflowErrorExistsDifferentStructure.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a WorkflowErrorExistsDifferentStructure.
+             * @implements IWorkflowErrorExistsDifferentStructure
+             * @constructor
+             * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
+             */
+            function WorkflowErrorExistsDifferentStructure(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * WorkflowErrorExistsDifferentStructure id.
+             * @member {flyteidl.core.IIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+             * @instance
+             */
+            WorkflowErrorExistsDifferentStructure.prototype.id = null;
+
+            /**
+             * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+             * @static
+             * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
+             * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure instance
+             */
+            WorkflowErrorExistsDifferentStructure.create = function create(properties) {
+                return new WorkflowErrorExistsDifferentStructure(properties);
+            };
+
+            /**
+             * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+             * @static
+             * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure} message WorkflowErrorExistsDifferentStructure message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            WorkflowErrorExistsDifferentStructure.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            WorkflowErrorExistsDifferentStructure.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a WorkflowErrorExistsDifferentStructure message.
+             * @function verify
+             * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            WorkflowErrorExistsDifferentStructure.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.Identifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                return null;
+            };
+
+            return WorkflowErrorExistsDifferentStructure;
+        })();
+
+        admin.WorkflowErrorExistsIdenticalStructure = (function() {
+
+            /**
+             * Properties of a WorkflowErrorExistsIdenticalStructure.
+             * @memberof flyteidl.admin
+             * @interface IWorkflowErrorExistsIdenticalStructure
+             * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsIdenticalStructure id
+             */
+
+            /**
+             * Constructs a new WorkflowErrorExistsIdenticalStructure.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a WorkflowErrorExistsIdenticalStructure.
+             * @implements IWorkflowErrorExistsIdenticalStructure
+             * @constructor
+             * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
+             */
+            function WorkflowErrorExistsIdenticalStructure(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * WorkflowErrorExistsIdenticalStructure id.
+             * @member {flyteidl.core.IIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+             * @instance
+             */
+            WorkflowErrorExistsIdenticalStructure.prototype.id = null;
+
+            /**
+             * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+             * @static
+             * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
+             * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure instance
+             */
+            WorkflowErrorExistsIdenticalStructure.create = function create(properties) {
+                return new WorkflowErrorExistsIdenticalStructure(properties);
+            };
+
+            /**
+             * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+             * @static
+             * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure} message WorkflowErrorExistsIdenticalStructure message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            WorkflowErrorExistsIdenticalStructure.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            WorkflowErrorExistsIdenticalStructure.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a WorkflowErrorExistsIdenticalStructure message.
+             * @function verify
+             * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            WorkflowErrorExistsIdenticalStructure.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.Identifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                return null;
+            };
+
+            return WorkflowErrorExistsIdenticalStructure;
+        })();
+
+        admin.CreateWorkflowFailureReason = (function() {
+
+            /**
+             * Properties of a CreateWorkflowFailureReason.
+             * @memberof flyteidl.admin
+             * @interface ICreateWorkflowFailureReason
+             * @property {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null} [existsDifferentStructure] CreateWorkflowFailureReason existsDifferentStructure
+             * @property {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null} [existsIdenticalStructure] CreateWorkflowFailureReason existsIdenticalStructure
+             */
+
+            /**
+             * Constructs a new CreateWorkflowFailureReason.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a CreateWorkflowFailureReason.
+             * @implements ICreateWorkflowFailureReason
+             * @constructor
+             * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
+             */
+            function CreateWorkflowFailureReason(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * CreateWorkflowFailureReason existsDifferentStructure.
+             * @member {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null|undefined} existsDifferentStructure
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @instance
+             */
+            CreateWorkflowFailureReason.prototype.existsDifferentStructure = null;
+
+            /**
+             * CreateWorkflowFailureReason existsIdenticalStructure.
+             * @member {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null|undefined} existsIdenticalStructure
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @instance
+             */
+            CreateWorkflowFailureReason.prototype.existsIdenticalStructure = null;
+
+            // OneOf field names bound to virtual getters and setters
+            let $oneOfFields;
+
+            /**
+             * CreateWorkflowFailureReason reason.
+             * @member {"existsDifferentStructure"|"existsIdenticalStructure"|undefined} reason
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @instance
+             */
+            Object.defineProperty(CreateWorkflowFailureReason.prototype, "reason", {
+                get: $util.oneOfGetter($oneOfFields = ["existsDifferentStructure", "existsIdenticalStructure"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            /**
+             * Creates a new CreateWorkflowFailureReason instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @static
+             * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
+             * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason instance
+             */
+            CreateWorkflowFailureReason.create = function create(properties) {
+                return new CreateWorkflowFailureReason(properties);
+            };
+
+            /**
+             * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @static
+             * @param {flyteidl.admin.ICreateWorkflowFailureReason} message CreateWorkflowFailureReason message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            CreateWorkflowFailureReason.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure"))
+                    $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.encode(message.existsDifferentStructure, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure"))
+                    $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.encode(message.existsIdenticalStructure, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            CreateWorkflowFailureReason.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.CreateWorkflowFailureReason();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.existsDifferentStructure = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.existsIdenticalStructure = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a CreateWorkflowFailureReason message.
+             * @function verify
+             * @memberof flyteidl.admin.CreateWorkflowFailureReason
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            CreateWorkflowFailureReason.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                let properties = {};
+                if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure")) {
+                    properties.reason = 1;
+                    {
+                        let error = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify(message.existsDifferentStructure);
+                        if (error)
+                            return "existsDifferentStructure." + error;
+                    }
+                }
+                if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure")) {
+                    if (properties.reason === 1)
+                        return "reason: multiple values";
+                    properties.reason = 1;
+                    {
+                        let error = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify(message.existsIdenticalStructure);
+                        if (error)
+                            return "existsIdenticalStructure." + error;
+                    }
+                }
+                return null;
+            };
+
+            return CreateWorkflowFailureReason;
+        })();
+
         admin.WorkflowAttributes = (function() {
 
             /**

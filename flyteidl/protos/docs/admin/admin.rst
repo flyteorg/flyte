@@ -3566,6 +3566,28 @@ flyteidl/admin/workflow.proto
 
 
 
+.. _ref_flyteidl.admin.CreateWorkflowFailureReason:
+
+CreateWorkflowFailureReason
+------------------------------------------------------------------
+
+When a CreateWorkflowRequest failes due to matching id
+
+
+
+.. csv-table:: CreateWorkflowFailureReason type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "exists_different_structure", ":ref:`ref_flyteidl.admin.WorkflowErrorExistsDifferentStructure`", "", ""
+   "exists_identical_structure", ":ref:`ref_flyteidl.admin.WorkflowErrorExistsIdenticalStructure`", "", ""
+
+
+
+
+
+
+
 .. _ref_flyteidl.admin.Workflow:
 
 Workflow
@@ -3642,6 +3664,48 @@ WorkflowCreateResponse
 
 Purposefully empty, may be populated in the future.
 
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowErrorExistsDifferentStructure:
+
+WorkflowErrorExistsDifferentStructure
+------------------------------------------------------------------
+
+The workflow id is already used and the structure is different
+
+
+
+.. csv-table:: WorkflowErrorExistsDifferentStructure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.WorkflowErrorExistsIdenticalStructure:
+
+WorkflowErrorExistsIdenticalStructure
+------------------------------------------------------------------
+
+The workflow id is already used with an identical sctructure
+
+
+
+.. csv-table:: WorkflowErrorExistsIdenticalStructure type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", ""
 
 
 

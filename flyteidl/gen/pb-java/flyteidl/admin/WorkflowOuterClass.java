@@ -5555,6 +5555,2156 @@ public final class WorkflowOuterClass {
 
   }
 
+  public interface WorkflowErrorExistsDifferentStructureOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getId();
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder();
+  }
+  /**
+   * <pre>
+   * The workflow id is already used and the structure is different
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.WorkflowErrorExistsDifferentStructure}
+   */
+  public  static final class WorkflowErrorExistsDifferentStructure extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+      WorkflowErrorExistsDifferentStructureOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WorkflowErrorExistsDifferentStructure.newBuilder() to construct.
+    private WorkflowErrorExistsDifferentStructure(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WorkflowErrorExistsDifferentStructure() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkflowErrorExistsDifferentStructure(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (id_ != null) {
+                subBuilder = id_.toBuilder();
+              }
+              id_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(id_);
+                id_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.class, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.Identifier id_;
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public boolean hasId() {
+      return id_ != null;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+      return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+      return getId();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (id_ != null) {
+        output.writeMessage(1, getId());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (id_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getId());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure other = (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) obj;
+
+      if (hasId() != other.hasId()) return false;
+      if (hasId()) {
+        if (!getId()
+            .equals(other.getId())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * The workflow id is already used and the structure is different
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.WorkflowErrorExistsDifferentStructure}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.class, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = null;
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getDefaultInstanceForType() {
+        return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure build() {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure buildPartial() {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure result = new flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure(this);
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) {
+          return mergeFrom((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure other) {
+        if (other == flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public boolean hasId() {
+        return idBuilder_ != null || id_ != null;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+        if (idBuilder_ == null) {
+          return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder mergeId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (id_ != null) {
+            id_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = null;
+          onChanged();
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getIdBuilder() {
+        
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getId(),
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+    private static final flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure();
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WorkflowErrorExistsDifferentStructure>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowErrorExistsDifferentStructure>() {
+      @java.lang.Override
+      public WorkflowErrorExistsDifferentStructure parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkflowErrorExistsDifferentStructure(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorkflowErrorExistsDifferentStructure> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkflowErrorExistsDifferentStructure> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface WorkflowErrorExistsIdenticalStructureOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getId();
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder();
+  }
+  /**
+   * <pre>
+   * The workflow id is already used with an identical sctructure
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.WorkflowErrorExistsIdenticalStructure}
+   */
+  public  static final class WorkflowErrorExistsIdenticalStructure extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+      WorkflowErrorExistsIdenticalStructureOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WorkflowErrorExistsIdenticalStructure.newBuilder() to construct.
+    private WorkflowErrorExistsIdenticalStructure(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WorkflowErrorExistsIdenticalStructure() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkflowErrorExistsIdenticalStructure(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (id_ != null) {
+                subBuilder = id_.toBuilder();
+              }
+              id_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(id_);
+                id_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.class, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.Identifier id_;
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public boolean hasId() {
+      return id_ != null;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+      return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+      return getId();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (id_ != null) {
+        output.writeMessage(1, getId());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (id_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getId());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure other = (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) obj;
+
+      if (hasId() != other.hasId()) return false;
+      if (hasId()) {
+        if (!getId()
+            .equals(other.getId())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * The workflow id is already used with an identical sctructure
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.WorkflowErrorExistsIdenticalStructure}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.class, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = null;
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getDefaultInstanceForType() {
+        return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure build() {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure buildPartial() {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure result = new flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure(this);
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) {
+          return mergeFrom((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure other) {
+        if (other == flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public boolean hasId() {
+        return idBuilder_ != null || id_ != null;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+        if (idBuilder_ == null) {
+          return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder mergeId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (id_ != null) {
+            id_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = null;
+          onChanged();
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getIdBuilder() {
+        
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getId(),
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+    private static final flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure();
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WorkflowErrorExistsIdenticalStructure>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowErrorExistsIdenticalStructure>() {
+      @java.lang.Override
+      public WorkflowErrorExistsIdenticalStructure parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkflowErrorExistsIdenticalStructure(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorkflowErrorExistsIdenticalStructure> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkflowErrorExistsIdenticalStructure> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface CreateWorkflowFailureReasonOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.CreateWorkflowFailureReason)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    boolean hasExistsDifferentStructure();
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getExistsDifferentStructure();
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder getExistsDifferentStructureOrBuilder();
+
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    boolean hasExistsIdenticalStructure();
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getExistsIdenticalStructure();
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder getExistsIdenticalStructureOrBuilder();
+
+    public flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.ReasonCase getReasonCase();
+  }
+  /**
+   * <pre>
+   * When a CreateWorkflowRequest failes due to matching id
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.CreateWorkflowFailureReason}
+   */
+  public  static final class CreateWorkflowFailureReason extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.CreateWorkflowFailureReason)
+      CreateWorkflowFailureReasonOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CreateWorkflowFailureReason.newBuilder() to construct.
+    private CreateWorkflowFailureReason(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CreateWorkflowFailureReason() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CreateWorkflowFailureReason(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder subBuilder = null;
+              if (reasonCase_ == 1) {
+                subBuilder = ((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_).toBuilder();
+              }
+              reason_ =
+                  input.readMessage(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_);
+                reason_ = subBuilder.buildPartial();
+              }
+              reasonCase_ = 1;
+              break;
+            }
+            case 18: {
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder subBuilder = null;
+              if (reasonCase_ == 2) {
+                subBuilder = ((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_).toBuilder();
+              }
+              reason_ =
+                  input.readMessage(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_);
+                reason_ = subBuilder.buildPartial();
+              }
+              reasonCase_ = 2;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_CreateWorkflowFailureReason_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.class, flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.Builder.class);
+    }
+
+    private int reasonCase_ = 0;
+    private java.lang.Object reason_;
+    public enum ReasonCase
+        implements com.google.protobuf.Internal.EnumLite {
+      EXISTS_DIFFERENT_STRUCTURE(1),
+      EXISTS_IDENTICAL_STRUCTURE(2),
+      REASON_NOT_SET(0);
+      private final int value;
+      private ReasonCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static ReasonCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static ReasonCase forNumber(int value) {
+        switch (value) {
+          case 1: return EXISTS_DIFFERENT_STRUCTURE;
+          case 2: return EXISTS_IDENTICAL_STRUCTURE;
+          case 0: return REASON_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public ReasonCase
+    getReasonCase() {
+      return ReasonCase.forNumber(
+          reasonCase_);
+    }
+
+    public static final int EXISTS_DIFFERENT_STRUCTURE_FIELD_NUMBER = 1;
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    public boolean hasExistsDifferentStructure() {
+      return reasonCase_ == 1;
+    }
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getExistsDifferentStructure() {
+      if (reasonCase_ == 1) {
+         return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_;
+      }
+      return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+     */
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder getExistsDifferentStructureOrBuilder() {
+      if (reasonCase_ == 1) {
+         return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_;
+      }
+      return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+    }
+
+    public static final int EXISTS_IDENTICAL_STRUCTURE_FIELD_NUMBER = 2;
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    public boolean hasExistsIdenticalStructure() {
+      return reasonCase_ == 2;
+    }
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getExistsIdenticalStructure() {
+      if (reasonCase_ == 2) {
+         return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_;
+      }
+      return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+     */
+    public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder getExistsIdenticalStructureOrBuilder() {
+      if (reasonCase_ == 2) {
+         return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_;
+      }
+      return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (reasonCase_ == 1) {
+        output.writeMessage(1, (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_);
+      }
+      if (reasonCase_ == 2) {
+        output.writeMessage(2, (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (reasonCase_ == 1) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_);
+      }
+      if (reasonCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason other = (flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason) obj;
+
+      if (!getReasonCase().equals(other.getReasonCase())) return false;
+      switch (reasonCase_) {
+        case 1:
+          if (!getExistsDifferentStructure()
+              .equals(other.getExistsDifferentStructure())) return false;
+          break;
+        case 2:
+          if (!getExistsIdenticalStructure()
+              .equals(other.getExistsIdenticalStructure())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      switch (reasonCase_) {
+        case 1:
+          hash = (37 * hash) + EXISTS_DIFFERENT_STRUCTURE_FIELD_NUMBER;
+          hash = (53 * hash) + getExistsDifferentStructure().hashCode();
+          break;
+        case 2:
+          hash = (37 * hash) + EXISTS_IDENTICAL_STRUCTURE_FIELD_NUMBER;
+          hash = (53 * hash) + getExistsIdenticalStructure().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * When a CreateWorkflowRequest failes due to matching id
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.CreateWorkflowFailureReason}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.CreateWorkflowFailureReason)
+        flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReasonOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_CreateWorkflowFailureReason_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.class, flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        reasonCase_ = 0;
+        reason_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.WorkflowOuterClass.internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason getDefaultInstanceForType() {
+        return flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason build() {
+        flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason buildPartial() {
+        flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason result = new flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason(this);
+        if (reasonCase_ == 1) {
+          if (existsDifferentStructureBuilder_ == null) {
+            result.reason_ = reason_;
+          } else {
+            result.reason_ = existsDifferentStructureBuilder_.build();
+          }
+        }
+        if (reasonCase_ == 2) {
+          if (existsIdenticalStructureBuilder_ == null) {
+            result.reason_ = reason_;
+          } else {
+            result.reason_ = existsIdenticalStructureBuilder_.build();
+          }
+        }
+        result.reasonCase_ = reasonCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason) {
+          return mergeFrom((flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason other) {
+        if (other == flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason.getDefaultInstance()) return this;
+        switch (other.getReasonCase()) {
+          case EXISTS_DIFFERENT_STRUCTURE: {
+            mergeExistsDifferentStructure(other.getExistsDifferentStructure());
+            break;
+          }
+          case EXISTS_IDENTICAL_STRUCTURE: {
+            mergeExistsIdenticalStructure(other.getExistsIdenticalStructure());
+            break;
+          }
+          case REASON_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int reasonCase_ = 0;
+      private java.lang.Object reason_;
+      public ReasonCase
+          getReasonCase() {
+        return ReasonCase.forNumber(
+            reasonCase_);
+      }
+
+      public Builder clearReason() {
+        reasonCase_ = 0;
+        reason_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder> existsDifferentStructureBuilder_;
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public boolean hasExistsDifferentStructure() {
+        return reasonCase_ == 1;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure getExistsDifferentStructure() {
+        if (existsDifferentStructureBuilder_ == null) {
+          if (reasonCase_ == 1) {
+            return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_;
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+        } else {
+          if (reasonCase_ == 1) {
+            return existsDifferentStructureBuilder_.getMessage();
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public Builder setExistsDifferentStructure(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure value) {
+        if (existsDifferentStructureBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reason_ = value;
+          onChanged();
+        } else {
+          existsDifferentStructureBuilder_.setMessage(value);
+        }
+        reasonCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public Builder setExistsDifferentStructure(
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder builderForValue) {
+        if (existsDifferentStructureBuilder_ == null) {
+          reason_ = builderForValue.build();
+          onChanged();
+        } else {
+          existsDifferentStructureBuilder_.setMessage(builderForValue.build());
+        }
+        reasonCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public Builder mergeExistsDifferentStructure(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure value) {
+        if (existsDifferentStructureBuilder_ == null) {
+          if (reasonCase_ == 1 &&
+              reason_ != flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance()) {
+            reason_ = flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.newBuilder((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            reason_ = value;
+          }
+          onChanged();
+        } else {
+          if (reasonCase_ == 1) {
+            existsDifferentStructureBuilder_.mergeFrom(value);
+          }
+          existsDifferentStructureBuilder_.setMessage(value);
+        }
+        reasonCase_ = 1;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public Builder clearExistsDifferentStructure() {
+        if (existsDifferentStructureBuilder_ == null) {
+          if (reasonCase_ == 1) {
+            reasonCase_ = 0;
+            reason_ = null;
+            onChanged();
+          }
+        } else {
+          if (reasonCase_ == 1) {
+            reasonCase_ = 0;
+            reason_ = null;
+          }
+          existsDifferentStructureBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder getExistsDifferentStructureBuilder() {
+        return getExistsDifferentStructureFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder getExistsDifferentStructureOrBuilder() {
+        if ((reasonCase_ == 1) && (existsDifferentStructureBuilder_ != null)) {
+          return existsDifferentStructureBuilder_.getMessageOrBuilder();
+        } else {
+          if (reasonCase_ == 1) {
+            return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_;
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder> 
+          getExistsDifferentStructureFieldBuilder() {
+        if (existsDifferentStructureBuilder_ == null) {
+          if (!(reasonCase_ == 1)) {
+            reason_ = flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.getDefaultInstance();
+          }
+          existsDifferentStructureBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructureOrBuilder>(
+                  (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsDifferentStructure) reason_,
+                  getParentForChildren(),
+                  isClean());
+          reason_ = null;
+        }
+        reasonCase_ = 1;
+        onChanged();;
+        return existsDifferentStructureBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder> existsIdenticalStructureBuilder_;
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public boolean hasExistsIdenticalStructure() {
+        return reasonCase_ == 2;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure getExistsIdenticalStructure() {
+        if (existsIdenticalStructureBuilder_ == null) {
+          if (reasonCase_ == 2) {
+            return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_;
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+        } else {
+          if (reasonCase_ == 2) {
+            return existsIdenticalStructureBuilder_.getMessage();
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public Builder setExistsIdenticalStructure(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure value) {
+        if (existsIdenticalStructureBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reason_ = value;
+          onChanged();
+        } else {
+          existsIdenticalStructureBuilder_.setMessage(value);
+        }
+        reasonCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public Builder setExistsIdenticalStructure(
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder builderForValue) {
+        if (existsIdenticalStructureBuilder_ == null) {
+          reason_ = builderForValue.build();
+          onChanged();
+        } else {
+          existsIdenticalStructureBuilder_.setMessage(builderForValue.build());
+        }
+        reasonCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public Builder mergeExistsIdenticalStructure(flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure value) {
+        if (existsIdenticalStructureBuilder_ == null) {
+          if (reasonCase_ == 2 &&
+              reason_ != flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance()) {
+            reason_ = flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.newBuilder((flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            reason_ = value;
+          }
+          onChanged();
+        } else {
+          if (reasonCase_ == 2) {
+            existsIdenticalStructureBuilder_.mergeFrom(value);
+          }
+          existsIdenticalStructureBuilder_.setMessage(value);
+        }
+        reasonCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public Builder clearExistsIdenticalStructure() {
+        if (existsIdenticalStructureBuilder_ == null) {
+          if (reasonCase_ == 2) {
+            reasonCase_ = 0;
+            reason_ = null;
+            onChanged();
+          }
+        } else {
+          if (reasonCase_ == 2) {
+            reasonCase_ = 0;
+            reason_ = null;
+          }
+          existsIdenticalStructureBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder getExistsIdenticalStructureBuilder() {
+        return getExistsIdenticalStructureFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      public flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder getExistsIdenticalStructureOrBuilder() {
+        if ((reasonCase_ == 2) && (existsIdenticalStructureBuilder_ != null)) {
+          return existsIdenticalStructureBuilder_.getMessageOrBuilder();
+        } else {
+          if (reasonCase_ == 2) {
+            return (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_;
+          }
+          return flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder> 
+          getExistsIdenticalStructureFieldBuilder() {
+        if (existsIdenticalStructureBuilder_ == null) {
+          if (!(reasonCase_ == 2)) {
+            reason_ = flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.getDefaultInstance();
+          }
+          existsIdenticalStructureBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure.Builder, flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructureOrBuilder>(
+                  (flyteidl.admin.WorkflowOuterClass.WorkflowErrorExistsIdenticalStructure) reason_,
+                  getParentForChildren(),
+                  isClean());
+          reason_ = null;
+        }
+        reasonCase_ = 2;
+        onChanged();;
+        return existsIdenticalStructureBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.CreateWorkflowFailureReason)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.CreateWorkflowFailureReason)
+    private static final flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason();
+    }
+
+    public static flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CreateWorkflowFailureReason>
+        PARSER = new com.google.protobuf.AbstractParser<CreateWorkflowFailureReason>() {
+      @java.lang.Override
+      public CreateWorkflowFailureReason parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CreateWorkflowFailureReason(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CreateWorkflowFailureReason> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CreateWorkflowFailureReason> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.WorkflowOuterClass.CreateWorkflowFailureReason getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_WorkflowCreateRequest_descriptor;
   private static final 
@@ -5585,6 +7735,21 @@ public final class WorkflowOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_WorkflowClosure_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_CreateWorkflowFailureReason_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -5612,9 +7777,18 @@ public final class WorkflowOuterClass {
       "mplate\"\204\001\n\017WorkflowClosure\022A\n\021compiled_w" +
       "orkflow\030\001 \001(\0132&.flyteidl.core.CompiledWo" +
       "rkflowClosure\022.\n\ncreated_at\030\002 \001(\0132\032.goog" +
-      "le.protobuf.TimestampB7Z5github.com/flyt" +
-      "eorg/flyteidl/gen/pb-go/flyteidl/adminb\006" +
-      "proto3"
+      "le.protobuf.Timestamp\"N\n%WorkflowErrorEx" +
+      "istsDifferentStructure\022%\n\002id\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\"N\n%WorkflowErrorEx" +
+      "istsIdenticalStructure\022%\n\002id\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\"\341\001\n\033CreateWorkflow" +
+      "FailureReason\022[\n\032exists_different_struct" +
+      "ure\030\001 \001(\01325.flyteidl.admin.WorkflowError" +
+      "ExistsDifferentStructureH\000\022[\n\032exists_ide" +
+      "ntical_structure\030\002 \001(\01325.flyteidl.admin." +
+      "WorkflowErrorExistsIdenticalStructureH\000B" +
+      "\010\n\006reasonB7Z5github.com/flyteorg/flyteid" +
+      "l/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5668,6 +7842,24 @@ public final class WorkflowOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowClosure_descriptor,
         new java.lang.String[] { "CompiledWorkflow", "CreatedAt", });
+    internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_WorkflowErrorExistsDifferentStructure_descriptor,
+        new java.lang.String[] { "Id", });
+    internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_WorkflowErrorExistsIdenticalStructure_descriptor,
+        new java.lang.String[] { "Id", });
+    internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_flyteidl_admin_CreateWorkflowFailureReason_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_CreateWorkflowFailureReason_descriptor,
+        new java.lang.String[] { "ExistsDifferentStructure", "ExistsIdenticalStructure", "Reason", });
     flyteidl.core.Compiler.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Workflow.getDescriptor();

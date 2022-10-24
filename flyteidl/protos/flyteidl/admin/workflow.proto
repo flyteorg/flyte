@@ -65,3 +65,21 @@ message WorkflowClosure {
     // Time at which the workflow was created.
     google.protobuf.Timestamp created_at           = 2;
 }
+
+// The workflow id is already used and the structure is different
+message WorkflowErrorExistsDifferentStructure {
+    core.Identifier id = 1;
+}
+
+// The workflow id is already used with an identical sctructure
+message WorkflowErrorExistsIdenticalStructure {
+    core.Identifier id = 1;
+}
+
+// When a CreateWorkflowRequest failes due to matching id
+message CreateWorkflowFailureReason {
+    oneof reason {
+        WorkflowErrorExistsDifferentStructure exists_different_structure = 1;
+        WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;
+    }
+}
