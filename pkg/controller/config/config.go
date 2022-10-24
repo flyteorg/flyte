@@ -90,11 +90,6 @@ var (
 			RetryPeriod:   config.Duration{Duration: time.Second * 2},
 		},
 		NodeConfig: NodeConfig{
-			DefaultDeadlines: DefaultDeadlines{
-				DefaultNodeExecutionDeadline:  config.Duration{Duration: time.Hour * 48},
-				DefaultNodeActiveDeadline:     config.Duration{Duration: time.Hour * 48},
-				DefaultWorkflowActiveDeadline: config.Duration{Duration: time.Hour * 72},
-			},
 			MaxNodeRetriesOnSystemFailures: 3,
 			InterruptibleFailureThreshold:  1,
 		},
