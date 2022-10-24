@@ -79,7 +79,7 @@ jobs:
   trigger-sandbox-publish:
     name: Sandbox build
     needs: [publish-flyte-component-image]
-    uses: ./.github/workflows/buildx_build.yaml
+    uses: ./.github/workflows/buildx_build_dind.yaml
     with:
       context: .
       dockerfile: docker/sandbox/Dockerfile
@@ -109,7 +109,7 @@ jobs:
   trigger-sandbox-lite-build:
     name: Sandbox lite build
     needs: [publish-flyte-component-image]
-    uses: ./.github/workflows/buildx_build.yaml
+    uses: ./.github/workflows/buildx_build_dind.yaml
     with:
       context: .
       dockerfile:  docker/sandbox-lite/Dockerfile

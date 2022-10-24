@@ -3,7 +3,6 @@
 set -o errexit
 set -o nounset
 
-
 LOGFILE="/var/log/k3d-entrypoints_$(date "+%y%m%d%H%M%S").log"
 
 touch "$LOGFILE"
