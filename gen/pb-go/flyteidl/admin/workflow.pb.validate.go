@@ -530,3 +530,255 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WorkflowClosureValidationError{}
+
+// Validate checks the field values on WorkflowErrorExistsDifferentStructure
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *WorkflowErrorExistsDifferentStructure) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowErrorExistsDifferentStructureValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// WorkflowErrorExistsDifferentStructureValidationError is the validation error
+// returned by WorkflowErrorExistsDifferentStructure.Validate if the
+// designated constraints aren't met.
+type WorkflowErrorExistsDifferentStructureValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowErrorExistsDifferentStructureValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowErrorExistsDifferentStructureValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowErrorExistsDifferentStructureValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowErrorExistsDifferentStructureValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowErrorExistsDifferentStructureValidationError) ErrorName() string {
+	return "WorkflowErrorExistsDifferentStructureValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowErrorExistsDifferentStructureValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowErrorExistsDifferentStructure.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowErrorExistsDifferentStructureValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowErrorExistsDifferentStructureValidationError{}
+
+// Validate checks the field values on WorkflowErrorExistsIdenticalStructure
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *WorkflowErrorExistsIdenticalStructure) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowErrorExistsIdenticalStructureValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// WorkflowErrorExistsIdenticalStructureValidationError is the validation error
+// returned by WorkflowErrorExistsIdenticalStructure.Validate if the
+// designated constraints aren't met.
+type WorkflowErrorExistsIdenticalStructureValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowErrorExistsIdenticalStructureValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowErrorExistsIdenticalStructureValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowErrorExistsIdenticalStructureValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowErrorExistsIdenticalStructureValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowErrorExistsIdenticalStructureValidationError) ErrorName() string {
+	return "WorkflowErrorExistsIdenticalStructureValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowErrorExistsIdenticalStructureValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowErrorExistsIdenticalStructure.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowErrorExistsIdenticalStructureValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowErrorExistsIdenticalStructureValidationError{}
+
+// Validate checks the field values on CreateWorkflowFailureReason with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateWorkflowFailureReason) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Reason.(type) {
+
+	case *CreateWorkflowFailureReason_ExistsDifferentStructure:
+
+		if v, ok := interface{}(m.GetExistsDifferentStructure()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateWorkflowFailureReasonValidationError{
+					field:  "ExistsDifferentStructure",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CreateWorkflowFailureReason_ExistsIdenticalStructure:
+
+		if v, ok := interface{}(m.GetExistsIdenticalStructure()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateWorkflowFailureReasonValidationError{
+					field:  "ExistsIdenticalStructure",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CreateWorkflowFailureReasonValidationError is the validation error returned
+// by CreateWorkflowFailureReason.Validate if the designated constraints
+// aren't met.
+type CreateWorkflowFailureReasonValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateWorkflowFailureReasonValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateWorkflowFailureReasonValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateWorkflowFailureReasonValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateWorkflowFailureReasonValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateWorkflowFailureReasonValidationError) ErrorName() string {
+	return "CreateWorkflowFailureReasonValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateWorkflowFailureReasonValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateWorkflowFailureReason.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateWorkflowFailureReasonValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateWorkflowFailureReasonValidationError{}

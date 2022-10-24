@@ -15505,6 +15505,171 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a WorkflowErrorExistsDifferentStructure. */
+        interface IWorkflowErrorExistsDifferentStructure {
+
+            /** WorkflowErrorExistsDifferentStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents a WorkflowErrorExistsDifferentStructure. */
+        class WorkflowErrorExistsDifferentStructure implements IWorkflowErrorExistsDifferentStructure {
+
+            /**
+             * Constructs a new WorkflowErrorExistsDifferentStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure);
+
+            /** WorkflowErrorExistsDifferentStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowErrorExistsDifferentStructure instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
+
+            /**
+             * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
+             * @param message WorkflowErrorExistsDifferentStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowErrorExistsDifferentStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowErrorExistsDifferentStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
+
+            /**
+             * Verifies a WorkflowErrorExistsDifferentStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowErrorExistsIdenticalStructure. */
+        interface IWorkflowErrorExistsIdenticalStructure {
+
+            /** WorkflowErrorExistsIdenticalStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents a WorkflowErrorExistsIdenticalStructure. */
+        class WorkflowErrorExistsIdenticalStructure implements IWorkflowErrorExistsIdenticalStructure {
+
+            /**
+             * Constructs a new WorkflowErrorExistsIdenticalStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure);
+
+            /** WorkflowErrorExistsIdenticalStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowErrorExistsIdenticalStructure instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
+
+            /**
+             * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
+             * @param message WorkflowErrorExistsIdenticalStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowErrorExistsIdenticalStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
+
+            /**
+             * Verifies a WorkflowErrorExistsIdenticalStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateWorkflowFailureReason. */
+        interface ICreateWorkflowFailureReason {
+
+            /** CreateWorkflowFailureReason existsDifferentStructure */
+            existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
+
+            /** CreateWorkflowFailureReason existsIdenticalStructure */
+            existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
+        }
+
+        /** Represents a CreateWorkflowFailureReason. */
+        class CreateWorkflowFailureReason implements ICreateWorkflowFailureReason {
+
+            /**
+             * Constructs a new CreateWorkflowFailureReason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ICreateWorkflowFailureReason);
+
+            /** CreateWorkflowFailureReason existsDifferentStructure. */
+            public existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
+
+            /** CreateWorkflowFailureReason existsIdenticalStructure. */
+            public existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
+
+            /** CreateWorkflowFailureReason reason. */
+            public reason?: ("existsDifferentStructure"|"existsIdenticalStructure");
+
+            /**
+             * Creates a new CreateWorkflowFailureReason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateWorkflowFailureReason instance
+             */
+            public static create(properties?: flyteidl.admin.ICreateWorkflowFailureReason): flyteidl.admin.CreateWorkflowFailureReason;
+
+            /**
+             * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
+             * @param message CreateWorkflowFailureReason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ICreateWorkflowFailureReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateWorkflowFailureReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.CreateWorkflowFailureReason;
+
+            /**
+             * Verifies a CreateWorkflowFailureReason message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a WorkflowAttributes. */
         interface IWorkflowAttributes {
 

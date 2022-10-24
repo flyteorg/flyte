@@ -3233,7 +3233,6 @@ Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
     Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
         .setNanos((int) ((millis % 1000) * 1000000)).build();
 
-
 Example 5: Compute Timestamp from Java `Instant.now()`.
 
     Instant now = Instant.now();
@@ -3241,7 +3240,6 @@ Example 5: Compute Timestamp from Java `Instant.now()`.
     Timestamp timestamp =
         Timestamp.newBuilder().setSeconds(now.getEpochSecond())
             .setNanos(now.getNano()).build();
-
 
 Example 6: Compute Timestamp from current time in Python.
 
