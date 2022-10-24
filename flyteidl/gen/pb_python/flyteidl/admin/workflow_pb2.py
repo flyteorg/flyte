@@ -24,7 +24,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1d\x66lyteidl/admin/workflow.proto\x12\x0e\x66lyteidl.admin\x1a\x1c\x66lyteidl/core/compiler.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"j\n\x15WorkflowCreateRequest\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12*\n\x04spec\x18\x02 \x01(\x0b\x32\x1c.flyteidl.admin.WorkflowSpec\"\x18\n\x16WorkflowCreateResponse\"c\n\x08Workflow\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x30\n\x07\x63losure\x18\x02 \x01(\x0b\x32\x1f.flyteidl.admin.WorkflowClosure\"J\n\x0cWorkflowList\x12+\n\tworkflows\x18\x01 \x03(\x0b\x32\x18.flyteidl.admin.Workflow\x12\r\n\x05token\x18\x02 \x01(\t\"y\n\x0cWorkflowSpec\x12\x31\n\x08template\x18\x01 \x01(\x0b\x32\x1f.flyteidl.core.WorkflowTemplate\x12\x36\n\rsub_workflows\x18\x02 \x03(\x0b\x32\x1f.flyteidl.core.WorkflowTemplate\"\x84\x01\n\x0fWorkflowClosure\x12\x41\n\x11\x63ompiled_workflow\x18\x01 \x01(\x0b\x32&.flyteidl.core.CompiledWorkflowClosure\x12.\n\ncreated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1d\x66lyteidl/admin/workflow.proto\x12\x0e\x66lyteidl.admin\x1a\x1c\x66lyteidl/core/compiler.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"j\n\x15WorkflowCreateRequest\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12*\n\x04spec\x18\x02 \x01(\x0b\x32\x1c.flyteidl.admin.WorkflowSpec\"\x18\n\x16WorkflowCreateResponse\"c\n\x08Workflow\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x30\n\x07\x63losure\x18\x02 \x01(\x0b\x32\x1f.flyteidl.admin.WorkflowClosure\"J\n\x0cWorkflowList\x12+\n\tworkflows\x18\x01 \x03(\x0b\x32\x18.flyteidl.admin.Workflow\x12\r\n\x05token\x18\x02 \x01(\t\"y\n\x0cWorkflowSpec\x12\x31\n\x08template\x18\x01 \x01(\x0b\x32\x1f.flyteidl.core.WorkflowTemplate\x12\x36\n\rsub_workflows\x18\x02 \x03(\x0b\x32\x1f.flyteidl.core.WorkflowTemplate\"\x84\x01\n\x0fWorkflowClosure\x12\x41\n\x11\x63ompiled_workflow\x18\x01 \x01(\x0b\x32&.flyteidl.core.CompiledWorkflowClosure\x12.\n\ncreated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"N\n%WorkflowErrorExistsDifferentStructure\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\"N\n%WorkflowErrorExistsIdenticalStructure\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\"\xe1\x01\n\x1b\x43reateWorkflowFailureReason\x12[\n\x1a\x65xists_different_structure\x18\x01 \x01(\x0b\x32\x35.flyteidl.admin.WorkflowErrorExistsDifferentStructureH\x00\x12[\n\x1a\x65xists_identical_structure\x18\x02 \x01(\x0b\x32\x35.flyteidl.admin.WorkflowErrorExistsIdenticalStructureH\x00\x42\x08\n\x06reasonB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_compiler__pb2.DESCRIPTOR,flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,flyteidl_dot_core_dot_workflow__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -244,6 +244,109 @@ _WORKFLOWCLOSURE = _descriptor.Descriptor(
   serialized_end=741,
 )
 
+
+_WORKFLOWERROREXISTSDIFFERENTSTRUCTURE = _descriptor.Descriptor(
+  name='WorkflowErrorExistsDifferentStructure',
+  full_name='flyteidl.admin.WorkflowErrorExistsDifferentStructure',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='flyteidl.admin.WorkflowErrorExistsDifferentStructure.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=743,
+  serialized_end=821,
+)
+
+
+_WORKFLOWERROREXISTSIDENTICALSTRUCTURE = _descriptor.Descriptor(
+  name='WorkflowErrorExistsIdenticalStructure',
+  full_name='flyteidl.admin.WorkflowErrorExistsIdenticalStructure',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='flyteidl.admin.WorkflowErrorExistsIdenticalStructure.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=823,
+  serialized_end=901,
+)
+
+
+_CREATEWORKFLOWFAILUREREASON = _descriptor.Descriptor(
+  name='CreateWorkflowFailureReason',
+  full_name='flyteidl.admin.CreateWorkflowFailureReason',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='exists_different_structure', full_name='flyteidl.admin.CreateWorkflowFailureReason.exists_different_structure', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='exists_identical_structure', full_name='flyteidl.admin.CreateWorkflowFailureReason.exists_identical_structure', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='reason', full_name='flyteidl.admin.CreateWorkflowFailureReason.reason',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=904,
+  serialized_end=1129,
+)
+
 _WORKFLOWCREATEREQUEST.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._IDENTIFIER
 _WORKFLOWCREATEREQUEST.fields_by_name['spec'].message_type = _WORKFLOWSPEC
 _WORKFLOW.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._IDENTIFIER
@@ -253,12 +356,25 @@ _WORKFLOWSPEC.fields_by_name['template'].message_type = flyteidl_dot_core_dot_wo
 _WORKFLOWSPEC.fields_by_name['sub_workflows'].message_type = flyteidl_dot_core_dot_workflow__pb2._WORKFLOWTEMPLATE
 _WORKFLOWCLOSURE.fields_by_name['compiled_workflow'].message_type = flyteidl_dot_core_dot_compiler__pb2._COMPILEDWORKFLOWCLOSURE
 _WORKFLOWCLOSURE.fields_by_name['created_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_WORKFLOWERROREXISTSDIFFERENTSTRUCTURE.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._IDENTIFIER
+_WORKFLOWERROREXISTSIDENTICALSTRUCTURE.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._IDENTIFIER
+_CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_different_structure'].message_type = _WORKFLOWERROREXISTSDIFFERENTSTRUCTURE
+_CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_identical_structure'].message_type = _WORKFLOWERROREXISTSIDENTICALSTRUCTURE
+_CREATEWORKFLOWFAILUREREASON.oneofs_by_name['reason'].fields.append(
+  _CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_different_structure'])
+_CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_different_structure'].containing_oneof = _CREATEWORKFLOWFAILUREREASON.oneofs_by_name['reason']
+_CREATEWORKFLOWFAILUREREASON.oneofs_by_name['reason'].fields.append(
+  _CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_identical_structure'])
+_CREATEWORKFLOWFAILUREREASON.fields_by_name['exists_identical_structure'].containing_oneof = _CREATEWORKFLOWFAILUREREASON.oneofs_by_name['reason']
 DESCRIPTOR.message_types_by_name['WorkflowCreateRequest'] = _WORKFLOWCREATEREQUEST
 DESCRIPTOR.message_types_by_name['WorkflowCreateResponse'] = _WORKFLOWCREATERESPONSE
 DESCRIPTOR.message_types_by_name['Workflow'] = _WORKFLOW
 DESCRIPTOR.message_types_by_name['WorkflowList'] = _WORKFLOWLIST
 DESCRIPTOR.message_types_by_name['WorkflowSpec'] = _WORKFLOWSPEC
 DESCRIPTOR.message_types_by_name['WorkflowClosure'] = _WORKFLOWCLOSURE
+DESCRIPTOR.message_types_by_name['WorkflowErrorExistsDifferentStructure'] = _WORKFLOWERROREXISTSDIFFERENTSTRUCTURE
+DESCRIPTOR.message_types_by_name['WorkflowErrorExistsIdenticalStructure'] = _WORKFLOWERROREXISTSIDENTICALSTRUCTURE
+DESCRIPTOR.message_types_by_name['CreateWorkflowFailureReason'] = _CREATEWORKFLOWFAILUREREASON
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 WorkflowCreateRequest = _reflection.GeneratedProtocolMessageType('WorkflowCreateRequest', (_message.Message,), dict(
@@ -302,6 +418,27 @@ WorkflowClosure = _reflection.GeneratedProtocolMessageType('WorkflowClosure', (_
   # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowClosure)
   ))
 _sym_db.RegisterMessage(WorkflowClosure)
+
+WorkflowErrorExistsDifferentStructure = _reflection.GeneratedProtocolMessageType('WorkflowErrorExistsDifferentStructure', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWERROREXISTSDIFFERENTSTRUCTURE,
+  __module__ = 'flyteidl.admin.workflow_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+  ))
+_sym_db.RegisterMessage(WorkflowErrorExistsDifferentStructure)
+
+WorkflowErrorExistsIdenticalStructure = _reflection.GeneratedProtocolMessageType('WorkflowErrorExistsIdenticalStructure', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWERROREXISTSIDENTICALSTRUCTURE,
+  __module__ = 'flyteidl.admin.workflow_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+  ))
+_sym_db.RegisterMessage(WorkflowErrorExistsIdenticalStructure)
+
+CreateWorkflowFailureReason = _reflection.GeneratedProtocolMessageType('CreateWorkflowFailureReason', (_message.Message,), dict(
+  DESCRIPTOR = _CREATEWORKFLOWFAILUREREASON,
+  __module__ = 'flyteidl.admin.workflow_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.CreateWorkflowFailureReason)
+  ))
+_sym_db.RegisterMessage(CreateWorkflowFailureReason)
 
 
 DESCRIPTOR._options = None

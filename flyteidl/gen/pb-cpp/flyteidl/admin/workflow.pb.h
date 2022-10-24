@@ -45,7 +45,7 @@ struct TableStruct_flyteidl_2fadmin_2fworkflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[6]
+  static const ::google::protobuf::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -54,6 +54,9 @@ struct TableStruct_flyteidl_2fadmin_2fworkflow_2eproto {
 void AddDescriptors_flyteidl_2fadmin_2fworkflow_2eproto();
 namespace flyteidl {
 namespace admin {
+class CreateWorkflowFailureReason;
+class CreateWorkflowFailureReasonDefaultTypeInternal;
+extern CreateWorkflowFailureReasonDefaultTypeInternal _CreateWorkflowFailureReason_default_instance_;
 class Workflow;
 class WorkflowDefaultTypeInternal;
 extern WorkflowDefaultTypeInternal _Workflow_default_instance_;
@@ -66,6 +69,12 @@ extern WorkflowCreateRequestDefaultTypeInternal _WorkflowCreateRequest_default_i
 class WorkflowCreateResponse;
 class WorkflowCreateResponseDefaultTypeInternal;
 extern WorkflowCreateResponseDefaultTypeInternal _WorkflowCreateResponse_default_instance_;
+class WorkflowErrorExistsDifferentStructure;
+class WorkflowErrorExistsDifferentStructureDefaultTypeInternal;
+extern WorkflowErrorExistsDifferentStructureDefaultTypeInternal _WorkflowErrorExistsDifferentStructure_default_instance_;
+class WorkflowErrorExistsIdenticalStructure;
+class WorkflowErrorExistsIdenticalStructureDefaultTypeInternal;
+extern WorkflowErrorExistsIdenticalStructureDefaultTypeInternal _WorkflowErrorExistsIdenticalStructure_default_instance_;
 class WorkflowList;
 class WorkflowListDefaultTypeInternal;
 extern WorkflowListDefaultTypeInternal _WorkflowList_default_instance_;
@@ -76,10 +85,13 @@ extern WorkflowSpecDefaultTypeInternal _WorkflowSpec_default_instance_;
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::admin::CreateWorkflowFailureReason* Arena::CreateMaybeMessage<::flyteidl::admin::CreateWorkflowFailureReason>(Arena*);
 template<> ::flyteidl::admin::Workflow* Arena::CreateMaybeMessage<::flyteidl::admin::Workflow>(Arena*);
 template<> ::flyteidl::admin::WorkflowClosure* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowClosure>(Arena*);
 template<> ::flyteidl::admin::WorkflowCreateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowCreateRequest>(Arena*);
 template<> ::flyteidl::admin::WorkflowCreateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowCreateResponse>(Arena*);
+template<> ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowErrorExistsDifferentStructure>(Arena*);
+template<> ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowErrorExistsIdenticalStructure>(Arena*);
 template<> ::flyteidl::admin::WorkflowList* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowList>(Arena*);
 template<> ::flyteidl::admin::WorkflowSpec* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowSpec>(Arena*);
 }  // namespace protobuf
@@ -828,6 +840,379 @@ class WorkflowClosure final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
 };
+// -------------------------------------------------------------------
+
+class WorkflowErrorExistsDifferentStructure final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowErrorExistsDifferentStructure) */ {
+ public:
+  WorkflowErrorExistsDifferentStructure();
+  virtual ~WorkflowErrorExistsDifferentStructure();
+
+  WorkflowErrorExistsDifferentStructure(const WorkflowErrorExistsDifferentStructure& from);
+
+  inline WorkflowErrorExistsDifferentStructure& operator=(const WorkflowErrorExistsDifferentStructure& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WorkflowErrorExistsDifferentStructure(WorkflowErrorExistsDifferentStructure&& from) noexcept
+    : WorkflowErrorExistsDifferentStructure() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowErrorExistsDifferentStructure& operator=(WorkflowErrorExistsDifferentStructure&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WorkflowErrorExistsDifferentStructure& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WorkflowErrorExistsDifferentStructure* internal_default_instance() {
+    return reinterpret_cast<const WorkflowErrorExistsDifferentStructure*>(
+               &_WorkflowErrorExistsDifferentStructure_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(WorkflowErrorExistsDifferentStructure* other);
+  friend void swap(WorkflowErrorExistsDifferentStructure& a, WorkflowErrorExistsDifferentStructure& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowErrorExistsDifferentStructure* New() const final {
+    return CreateMaybeMessage<WorkflowErrorExistsDifferentStructure>(nullptr);
+  }
+
+  WorkflowErrorExistsDifferentStructure* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowErrorExistsDifferentStructure>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WorkflowErrorExistsDifferentStructure& from);
+  void MergeFrom(const WorkflowErrorExistsDifferentStructure& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowErrorExistsDifferentStructure* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.Identifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::core::Identifier& id() const;
+  ::flyteidl::core::Identifier* release_id();
+  ::flyteidl::core::Identifier* mutable_id();
+  void set_allocated_id(::flyteidl::core::Identifier* id);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsDifferentStructure)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::Identifier* id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WorkflowErrorExistsIdenticalStructure final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowErrorExistsIdenticalStructure) */ {
+ public:
+  WorkflowErrorExistsIdenticalStructure();
+  virtual ~WorkflowErrorExistsIdenticalStructure();
+
+  WorkflowErrorExistsIdenticalStructure(const WorkflowErrorExistsIdenticalStructure& from);
+
+  inline WorkflowErrorExistsIdenticalStructure& operator=(const WorkflowErrorExistsIdenticalStructure& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WorkflowErrorExistsIdenticalStructure(WorkflowErrorExistsIdenticalStructure&& from) noexcept
+    : WorkflowErrorExistsIdenticalStructure() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowErrorExistsIdenticalStructure& operator=(WorkflowErrorExistsIdenticalStructure&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WorkflowErrorExistsIdenticalStructure& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WorkflowErrorExistsIdenticalStructure* internal_default_instance() {
+    return reinterpret_cast<const WorkflowErrorExistsIdenticalStructure*>(
+               &_WorkflowErrorExistsIdenticalStructure_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(WorkflowErrorExistsIdenticalStructure* other);
+  friend void swap(WorkflowErrorExistsIdenticalStructure& a, WorkflowErrorExistsIdenticalStructure& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowErrorExistsIdenticalStructure* New() const final {
+    return CreateMaybeMessage<WorkflowErrorExistsIdenticalStructure>(nullptr);
+  }
+
+  WorkflowErrorExistsIdenticalStructure* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowErrorExistsIdenticalStructure>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WorkflowErrorExistsIdenticalStructure& from);
+  void MergeFrom(const WorkflowErrorExistsIdenticalStructure& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowErrorExistsIdenticalStructure* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.Identifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::core::Identifier& id() const;
+  ::flyteidl::core::Identifier* release_id();
+  ::flyteidl::core::Identifier* mutable_id();
+  void set_allocated_id(::flyteidl::core::Identifier* id);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowErrorExistsIdenticalStructure)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::Identifier* id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CreateWorkflowFailureReason final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.CreateWorkflowFailureReason) */ {
+ public:
+  CreateWorkflowFailureReason();
+  virtual ~CreateWorkflowFailureReason();
+
+  CreateWorkflowFailureReason(const CreateWorkflowFailureReason& from);
+
+  inline CreateWorkflowFailureReason& operator=(const CreateWorkflowFailureReason& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CreateWorkflowFailureReason(CreateWorkflowFailureReason&& from) noexcept
+    : CreateWorkflowFailureReason() {
+    *this = ::std::move(from);
+  }
+
+  inline CreateWorkflowFailureReason& operator=(CreateWorkflowFailureReason&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CreateWorkflowFailureReason& default_instance();
+
+  enum ReasonCase {
+    kExistsDifferentStructure = 1,
+    kExistsIdenticalStructure = 2,
+    REASON_NOT_SET = 0,
+  };
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CreateWorkflowFailureReason* internal_default_instance() {
+    return reinterpret_cast<const CreateWorkflowFailureReason*>(
+               &_CreateWorkflowFailureReason_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(CreateWorkflowFailureReason* other);
+  friend void swap(CreateWorkflowFailureReason& a, CreateWorkflowFailureReason& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CreateWorkflowFailureReason* New() const final {
+    return CreateMaybeMessage<CreateWorkflowFailureReason>(nullptr);
+  }
+
+  CreateWorkflowFailureReason* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CreateWorkflowFailureReason>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CreateWorkflowFailureReason& from);
+  void MergeFrom(const CreateWorkflowFailureReason& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CreateWorkflowFailureReason* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;
+  bool has_exists_different_structure() const;
+  void clear_exists_different_structure();
+  static const int kExistsDifferentStructureFieldNumber = 1;
+  const ::flyteidl::admin::WorkflowErrorExistsDifferentStructure& exists_different_structure() const;
+  ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* release_exists_different_structure();
+  ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* mutable_exists_different_structure();
+  void set_allocated_exists_different_structure(::flyteidl::admin::WorkflowErrorExistsDifferentStructure* exists_different_structure);
+
+  // .flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;
+  bool has_exists_identical_structure() const;
+  void clear_exists_identical_structure();
+  static const int kExistsIdenticalStructureFieldNumber = 2;
+  const ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure& exists_identical_structure() const;
+  ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* release_exists_identical_structure();
+  ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* mutable_exists_identical_structure();
+  void set_allocated_exists_identical_structure(::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* exists_identical_structure);
+
+  void clear_reason();
+  ReasonCase reason_case() const;
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.CreateWorkflowFailureReason)
+ private:
+  class HasBitSetters;
+  void set_has_exists_different_structure();
+  void set_has_exists_identical_structure();
+
+  inline bool has_reason() const;
+  inline void clear_has_reason();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  union ReasonUnion {
+    ReasonUnion() {}
+    ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* exists_different_structure_;
+    ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* exists_identical_structure_;
+  } reason_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
+};
 // ===================================================================
 
 
@@ -1297,9 +1682,208 @@ inline void WorkflowClosure::set_allocated_created_at(::google::protobuf::Timest
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowClosure.created_at)
 }
 
+// -------------------------------------------------------------------
+
+// WorkflowErrorExistsDifferentStructure
+
+// .flyteidl.core.Identifier id = 1;
+inline bool WorkflowErrorExistsDifferentStructure::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& WorkflowErrorExistsDifferentStructure::id() const {
+  const ::flyteidl::core::Identifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowErrorExistsDifferentStructure.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* WorkflowErrorExistsDifferentStructure::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowErrorExistsDifferentStructure.id)
+  
+  ::flyteidl::core::Identifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Identifier* WorkflowErrorExistsDifferentStructure::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowErrorExistsDifferentStructure.id)
+  return id_;
+}
+inline void WorkflowErrorExistsDifferentStructure::set_allocated_id(::flyteidl::core::Identifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowErrorExistsDifferentStructure.id)
+}
+
+// -------------------------------------------------------------------
+
+// WorkflowErrorExistsIdenticalStructure
+
+// .flyteidl.core.Identifier id = 1;
+inline bool WorkflowErrorExistsIdenticalStructure::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& WorkflowErrorExistsIdenticalStructure::id() const {
+  const ::flyteidl::core::Identifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowErrorExistsIdenticalStructure.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* WorkflowErrorExistsIdenticalStructure::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowErrorExistsIdenticalStructure.id)
+  
+  ::flyteidl::core::Identifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Identifier* WorkflowErrorExistsIdenticalStructure::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowErrorExistsIdenticalStructure.id)
+  return id_;
+}
+inline void WorkflowErrorExistsIdenticalStructure::set_allocated_id(::flyteidl::core::Identifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowErrorExistsIdenticalStructure.id)
+}
+
+// -------------------------------------------------------------------
+
+// CreateWorkflowFailureReason
+
+// .flyteidl.admin.WorkflowErrorExistsDifferentStructure exists_different_structure = 1;
+inline bool CreateWorkflowFailureReason::has_exists_different_structure() const {
+  return reason_case() == kExistsDifferentStructure;
+}
+inline void CreateWorkflowFailureReason::set_has_exists_different_structure() {
+  _oneof_case_[0] = kExistsDifferentStructure;
+}
+inline void CreateWorkflowFailureReason::clear_exists_different_structure() {
+  if (has_exists_different_structure()) {
+    delete reason_.exists_different_structure_;
+    clear_has_reason();
+  }
+}
+inline ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* CreateWorkflowFailureReason::release_exists_different_structure() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.CreateWorkflowFailureReason.exists_different_structure)
+  if (has_exists_different_structure()) {
+    clear_has_reason();
+      ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* temp = reason_.exists_different_structure_;
+    reason_.exists_different_structure_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::WorkflowErrorExistsDifferentStructure& CreateWorkflowFailureReason::exists_different_structure() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.CreateWorkflowFailureReason.exists_different_structure)
+  return has_exists_different_structure()
+      ? *reason_.exists_different_structure_
+      : *reinterpret_cast< ::flyteidl::admin::WorkflowErrorExistsDifferentStructure*>(&::flyteidl::admin::_WorkflowErrorExistsDifferentStructure_default_instance_);
+}
+inline ::flyteidl::admin::WorkflowErrorExistsDifferentStructure* CreateWorkflowFailureReason::mutable_exists_different_structure() {
+  if (!has_exists_different_structure()) {
+    clear_reason();
+    set_has_exists_different_structure();
+    reason_.exists_different_structure_ = CreateMaybeMessage< ::flyteidl::admin::WorkflowErrorExistsDifferentStructure >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.CreateWorkflowFailureReason.exists_different_structure)
+  return reason_.exists_different_structure_;
+}
+
+// .flyteidl.admin.WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;
+inline bool CreateWorkflowFailureReason::has_exists_identical_structure() const {
+  return reason_case() == kExistsIdenticalStructure;
+}
+inline void CreateWorkflowFailureReason::set_has_exists_identical_structure() {
+  _oneof_case_[0] = kExistsIdenticalStructure;
+}
+inline void CreateWorkflowFailureReason::clear_exists_identical_structure() {
+  if (has_exists_identical_structure()) {
+    delete reason_.exists_identical_structure_;
+    clear_has_reason();
+  }
+}
+inline ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* CreateWorkflowFailureReason::release_exists_identical_structure() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.CreateWorkflowFailureReason.exists_identical_structure)
+  if (has_exists_identical_structure()) {
+    clear_has_reason();
+      ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* temp = reason_.exists_identical_structure_;
+    reason_.exists_identical_structure_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure& CreateWorkflowFailureReason::exists_identical_structure() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.CreateWorkflowFailureReason.exists_identical_structure)
+  return has_exists_identical_structure()
+      ? *reason_.exists_identical_structure_
+      : *reinterpret_cast< ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure*>(&::flyteidl::admin::_WorkflowErrorExistsIdenticalStructure_default_instance_);
+}
+inline ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure* CreateWorkflowFailureReason::mutable_exists_identical_structure() {
+  if (!has_exists_identical_structure()) {
+    clear_reason();
+    set_has_exists_identical_structure();
+    reason_.exists_identical_structure_ = CreateMaybeMessage< ::flyteidl::admin::WorkflowErrorExistsIdenticalStructure >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.CreateWorkflowFailureReason.exists_identical_structure)
+  return reason_.exists_identical_structure_;
+}
+
+inline bool CreateWorkflowFailureReason::has_reason() const {
+  return reason_case() != REASON_NOT_SET;
+}
+inline void CreateWorkflowFailureReason::clear_has_reason() {
+  _oneof_case_[0] = REASON_NOT_SET;
+}
+inline CreateWorkflowFailureReason::ReasonCase CreateWorkflowFailureReason::reason_case() const {
+  return CreateWorkflowFailureReason::ReasonCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
