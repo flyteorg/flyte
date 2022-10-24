@@ -158,7 +158,13 @@ func ServeHTTPHealthCheck(ctx context.Context, cfg *config.Config) error {
 	})
 
 	logger.Infof(ctx, "Serving DataCatalog http on port %v", cfg.GetHTTPHostAddress())
-	return http.ListenAndServe(cfg.GetHTTPHostAddress(), mux)
+
+	server := &http.Server{
+		Addr:              cfg.GetHTTPHostAddress(),
+		Handler:           mux,
+		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
+	}
+	return server.ListenAndServe()
 }
 
 // Create and start the gRPC server and http healthcheck endpoint
