@@ -29,4 +29,10 @@ data:
   namespace_config.yaml: | {{ toYaml . | nindent 4 }}
   {{- end }}
 
+  {{- with .Values.configmap.clusters }}
+  clusters.yaml: |
+    clusters:
+      {{- tpl (toYaml .) $ | nindent 6 }}
+  {{- end }}
+
   {{- end }}
