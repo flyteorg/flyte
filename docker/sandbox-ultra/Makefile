@@ -17,13 +17,13 @@ IMAGES := \
 
 define IMAGE_RULE
 images/tar/$(subst /,-,$(word 1,$(subst :, ,$(1)))):
-	mkdir -p $$(dir $$@)/arm64
+	mkdir -p $$(dir $$@)arm64
 	docker pull --platform linux/arm64 $(1)
 	docker tag $(1) $(word 1,$(subst :, ,$(1))):latest
 	docker save --output $$(dir $$@)arm64/$(subst /,-,$(word 1,$(subst :, ,$(1)))).tar $(word 1,$(subst :, ,$(1))):latest
 
-	mkdir -p $$(dir $$@)/amd64
-	docker pull --platform linux/amd64 $(1)
+	mkdir -p $$(dir $$@)amd64
+	docker pull --platform linux/amd64,linux/arm64 $(1)
 	docker tag $(1) $(word 1,$(subst :, ,$(1))):latest
 	docker save --output $$(dir $$@)amd64/$(subst /,-,$(word 1,$(subst :, ,$(1)))).tar $(word 1,$(subst :, ,$(1))):latest
 endef
