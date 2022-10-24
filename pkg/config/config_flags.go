@@ -54,5 +54,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpcServerReflection"), defaultConfig.GrpcServerReflection, "Enable GRPC Server Reflection")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "httpPort"), defaultConfig.HTTPPort, "On which http port to serve Catalog")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "secure"), defaultConfig.Secure, "Whether to run Catalog in secure mode or not")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "readHeaderTimeoutSeconds"), defaultConfig.ReadHeaderTimeoutSeconds, "The amount of time allowed to read request headers.")
 	return cmdFlags
 }

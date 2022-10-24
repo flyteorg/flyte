@@ -11,13 +11,22 @@ const SectionKey = "application"
 //go:generate pflags Config
 
 type Config struct {
-	GrpcPort             int  `json:"grpcPort" pflag:",On which grpc port to serve Catalog"`
-	GrpcServerReflection bool `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
-	HTTPPort             int  `json:"httpPort" pflag:",On which http port to serve Catalog"`
-	Secure               bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
+	GrpcPort                 int  `json:"grpcPort" pflag:",On which grpc port to serve Catalog"`
+	GrpcServerReflection     bool `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
+	HTTPPort                 int  `json:"httpPort" pflag:",On which http port to serve Catalog"`
+	Secure                   bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
+	ReadHeaderTimeoutSeconds int  `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
 }
 
-var defaultConfig = &Config{GrpcPort: 8081, HTTPPort: 8080, GrpcServerReflection: true}
+var defaultConfig = &Config{
+	GrpcPort:             8081,
+	HTTPPort:             8080,
+	GrpcServerReflection: true,
+	// Set the HTTP timeout to avoid security vulnerabilities with expired, inactive connections:
+	// https://deepsource.io/directory/analyzers/go/issues/GO-S2114
+	// just shy of requestTimeoutUpperBound
+	ReadHeaderTimeoutSeconds: 32,
+}
 var applicationConfig = config.MustRegisterSection(SectionKey, defaultConfig)
 
 func GetConfig() *Config {

@@ -63,7 +63,10 @@ func (h *DBHandle) CreateDB(dbName string) error {
 		result = h.db.Exec(createDBStatement)
 
 		if result.Error != nil {
-			return result.Error
+			if !isPgErrorWithCode(result.Error, pqDbAlreadyExistsCode) {
+				return result.Error
+			}
+			logger.Infof(context.TODO(), "Not creating database %s, already exists", dbName)
 		}
 	}
 

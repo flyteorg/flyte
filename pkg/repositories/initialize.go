@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"reflect"
 
 	errors2 "github.com/flyteorg/datacatalog/pkg/repositories/errors"
@@ -17,6 +18,7 @@ var migrateScope = migrationsScope.NewSubScope("migrate")
 // all postgres servers come by default with a db name named postgres
 const defaultDB = "postgres"
 const pqInvalidDBCode = "3D000"
+const pqDbAlreadyExistsCode = "42P04"
 
 // Migrate This command will run all the migrations for the database
 func Migrate(ctx context.Context) error {
@@ -74,4 +76,15 @@ func Migrate(ctx context.Context) error {
 	}
 	logger.Infof(ctx, "Ran DB migration successfully.")
 	return nil
+}
+
+func isPgErrorWithCode(err error, code string) bool {
+	pgErr := &pgconn.PgError{}
+	if !errors.As(err, &pgErr) {
+		// err chain does not contain a pgconn.PgError
+		return false
+	}
+
+	// pgconn.PgError found in chain and set to code specified
+	return pgErr.Code == code
 }

@@ -3,8 +3,6 @@ package gormimpl
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
 	"testing"
 	"time"
 
@@ -145,7 +143,7 @@ func getReservationRepo(t *testing.T) interfaces.ReservationRepo {
 
 	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}))
 	if err != nil {
-		t.Fatal(fmt.Sprintf("Failed to open mock db with err %v", err))
+		t.Fatalf("Failed to open mock db with err %v", err)
 	}
 
 	return NewReservationRepo(db, errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
