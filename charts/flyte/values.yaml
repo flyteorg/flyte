@@ -503,14 +503,14 @@ flyte:
           batch-size: -1
           queue:
             type: maxof
-            rate: 100
-            capacity: 1000
+            rate: 1000
+            capacity: 10000
             base-delay: 0s
             max-delay: 120s
           sub-queue:
             type: bucket
-            rate: 10
-            capacity: 100
+            rate: 1000
+            capacity: 10000
       webhook:
         certDir: /etc/webhook/certs
         serviceName: flyte-pod-webhook
