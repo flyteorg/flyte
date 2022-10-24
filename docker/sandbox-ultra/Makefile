@@ -36,9 +36,10 @@ images/tar/flyte:
 	docker save --output $@.tar flyte:latest
 
 images/tar/flyte-ci:
-	mkdir -p $(dir $@)
-	cp /tmp/flyte-amd64.tar $$(dir $$@)/amd64/flyte.tar
-	cp /tmp/flyte-arm64.tar $$(dir $$@)/arm64/flyte.tar
+	mkdir -p $(dir $@)amd64
+	mkdir -p $(dir $@)arm64
+	cp /tmp/flyte-amd64.tar $(dir $@)amd64/flyte.tar
+	cp /tmp/flyte-arm64.tar $(dir $@)arm64/flyte.tar
 
 .PHONY: images
 images: $(foreach name,flyte $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))
