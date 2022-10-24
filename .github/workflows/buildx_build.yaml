@@ -99,7 +99,7 @@ jobs:
           DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: ${{ inputs.context }}
-          platforms: linux/arm64
+          platforms: linux/amd64
           push: ${{ inputs.push }}
           tags: ${{ steps.dind-names.outputs.tags }}
           load: true
