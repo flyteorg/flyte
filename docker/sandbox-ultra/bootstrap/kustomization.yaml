@@ -1,6 +1,0 @@
-bases:
-- kubernetes-dashboard
-- minio
-- postgres
-- proxy
-- registry

@@ -24,12 +24,9 @@ __pycache__/
 /docker/sandbox-lite/storage/charts
 /docker/sandbox-lite/storage/Chart.lock
 **/*.bak-
-bin/-
-bin/
 .python-version
 dist/
 dist
 *.db
-flyte
 vendor/
-docker/sandbox-ultra/images/tar
+/docker/sandbox-ultra/images/tar
