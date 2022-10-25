@@ -1,6 +1,0 @@
-namespace: minio
-
-resources:
-- deployment.yaml
-- namespace.yaml
-- service.yaml

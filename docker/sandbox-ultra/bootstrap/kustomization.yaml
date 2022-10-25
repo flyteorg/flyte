@@ -1,7 +1,0 @@
-bases:
-- flyte
-- kubernetes-dashboard
-- minio
-- postgres
-- proxy
-- registry

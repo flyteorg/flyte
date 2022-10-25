@@ -1,6 +1,5 @@
 FROM rancher/k3s:v1.24.4-k3s1
 
-
 ARG TARGETARCH
 
 COPY bootstrap/output.yaml /var/lib/rancher/k3s/server/manifests/
