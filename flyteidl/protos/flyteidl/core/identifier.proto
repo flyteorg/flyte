@@ -63,3 +63,12 @@ message TaskExecutionIdentifier {
 
     uint32 retry_attempt     = 3;
 }
+
+// Encapsulation of fields the uniquely identify a signal.
+message SignalIdentifier {
+    // Unique identifier for a signal.
+    string signal_id = 1;
+
+    // Identifies the Flyte workflow execution this signal belongs to.
+    WorkflowExecutionIdentifier execution_id = 2;
+}

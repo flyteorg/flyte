@@ -947,6 +947,28 @@ Encapsulation of fields that identify a Flyte node execution entity.
 
 
 
+.. _ref_flyteidl.core.SignalIdentifier:
+
+SignalIdentifier
+------------------------------------------------------------------
+
+Encapsulation of fields the uniquely identify a signal.
+
+
+
+.. csv-table:: SignalIdentifier type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signal_id", ":ref:`ref_string`", "", "Unique identifier for a signal."
+   "execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifies the Flyte workflow execution this signal belongs to."
+
+
+
+
+
+
+
 .. _ref_flyteidl.core.TaskExecutionIdentifier:
 
 TaskExecutionIdentifier
@@ -2824,6 +2846,28 @@ Links a variable to an alias.
 
 
 
+.. _ref_flyteidl.core.ApproveCondition:
+
+ApproveCondition
+------------------------------------------------------------------
+
+ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean
+signal with the provided signal_id.
+
+
+
+.. csv-table:: ApproveCondition type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signal_id", ":ref:`ref_string`", "", "A unique identifier for the requested boolean signal."
+
+
+
+
+
+
+
 .. _ref_flyteidl.core.BranchNode:
 
 BranchNode
@@ -2839,6 +2883,29 @@ runtime based on a series of conditions that get evaluated on various parameters
    :widths: auto
 
    "if_else", ":ref:`ref_flyteidl.core.IfElseBlock`", "", "+required"
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.GateNode:
+
+GateNode
+------------------------------------------------------------------
+
+GateNode refers to the condition that is required for the gate to successfully complete.
+
+
+
+.. csv-table:: GateNode type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "approve", ":ref:`ref_flyteidl.core.ApproveCondition`", "", "ApproveCondition represents a dependency on an external approval provided by a boolean signal."
+   "signal", ":ref:`ref_flyteidl.core.SignalCondition`", "", "SignalCondition represents a dependency on an signal."
+   "sleep", ":ref:`ref_flyteidl.core.SleepCondition`", "", "SleepCondition represents a dependency on waiting for the specified duration."
 
 
 
@@ -2915,6 +2982,7 @@ node.
    "task_node", ":ref:`ref_flyteidl.core.TaskNode`", "", "Information about the Task to execute in this node."
    "workflow_node", ":ref:`ref_flyteidl.core.WorkflowNode`", "", "Information about the Workflow to execute in this mode."
    "branch_node", ":ref:`ref_flyteidl.core.BranchNode`", "", "Information about the branch node to evaluate in this node."
+   "gate_node", ":ref:`ref_flyteidl.core.GateNode`", "", "Information about the condition to evaluate in this node."
 
 
 
@@ -2939,6 +3007,50 @@ Defines extra information about the Node.
    "timeout", ":ref:`ref_google.protobuf.Duration`", "", "The overall timeout of a task."
    "retries", ":ref:`ref_flyteidl.core.RetryStrategy`", "", "Number of retries per task."
    "interruptible", ":ref:`ref_bool`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.SignalCondition:
+
+SignalCondition
+------------------------------------------------------------------
+
+SignalCondition represents a dependency on an signal.
+
+
+
+.. csv-table:: SignalCondition type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signal_id", ":ref:`ref_string`", "", "A unique identifier for the requested signal."
+   "type", ":ref:`ref_flyteidl.core.LiteralType`", "", "A type denoting the required value type for this signal."
+   "output_variable_name", ":ref:`ref_string`", "", "The variable name for the signal value in this nodes outputs."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.SleepCondition:
+
+SleepCondition
+------------------------------------------------------------------
+
+SleepCondition represents a dependency on waiting for the specified duration.
+
+
+
+.. csv-table:: SleepCondition type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "duration", ":ref:`ref_google.protobuf.Duration`", "", "The overall duration for this sleep."
 
 
 

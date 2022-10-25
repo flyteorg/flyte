@@ -5153,6 +5153,16 @@
       },
       "description": "Links a variable to an alias."
     },
+    "coreApproveCondition": {
+      "type": "object",
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "description": "A unique identifier for the requested boolean signal."
+        }
+      },
+      "description": "ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean\nsignal with the provided signal_id."
+    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -5567,6 +5577,24 @@
       },
       "description": "Represents the error message from the execution."
     },
+    "coreGateNode": {
+      "type": "object",
+      "properties": {
+        "approve": {
+          "$ref": "#/definitions/coreApproveCondition",
+          "description": "ApproveCondition represents a dependency on an external approval provided by a boolean signal."
+        },
+        "signal": {
+          "$ref": "#/definitions/coreSignalCondition",
+          "description": "SignalCondition represents a dependency on an signal."
+        },
+        "sleep": {
+          "$ref": "#/definitions/coreSleepCondition",
+          "description": "SleepCondition represents a dependency on waiting for the specified duration."
+        }
+      },
+      "description": "GateNode refers to the condition that is required for the gate to successfully complete."
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -5849,6 +5877,10 @@
         "branch_node": {
           "$ref": "#/definitions/coreBranchNode",
           "description": "Information about the branch node to evaluate in this node."
+        },
+        "gate_node": {
+          "$ref": "#/definitions/coreGateNode",
+          "description": "Information about the condition to evaluate in this node."
         }
       },
       "description": "A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch\nnode."
@@ -6214,6 +6246,24 @@
       },
       "description": "SecurityContext holds security attributes that apply to tasks."
     },
+    "coreSignalCondition": {
+      "type": "object",
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "description": "A unique identifier for the requested signal."
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "A type denoting the required value type for this signal."
+        },
+        "output_variable_name": {
+          "type": "string",
+          "description": "The variable name for the signal value in this nodes outputs."
+        }
+      },
+      "description": "SignalCondition represents a dependency on an signal."
+    },
     "coreSimpleType": {
       "type": "string",
       "enum": [
@@ -6230,6 +6280,16 @@
       ],
       "default": "NONE",
       "description": "Define a set of simple types."
+    },
+    "coreSleepCondition": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "description": "The overall duration for this sleep."
+        }
+      },
+      "description": "SleepCondition represents a dependency on waiting for the specified duration."
     },
     "coreSql": {
       "type": "object",

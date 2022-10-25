@@ -29,6 +29,7 @@ type Clientset struct {
 	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
 	dataProxyServiceClient    service.DataProxyServiceClient
+	signalServiceClient       service.SignalServiceClient
 }
 
 // AdminClient retrieves the AdminServiceClient
@@ -52,6 +53,10 @@ func (c Clientset) IdentityClient() service.IdentityServiceClient {
 
 func (c Clientset) DataProxyClient() service.DataProxyServiceClient {
 	return c.dataProxyServiceClient
+}
+
+func (c Clientset) SignalServiceClient() service.SignalServiceClient {
+	return c.signalServiceClient
 }
 
 func NewAdminClient(ctx context.Context, conn *grpc.ClientConn) service.AdminServiceClient {
@@ -186,6 +191,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
+	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
 
 	return &cs, nil
 }
