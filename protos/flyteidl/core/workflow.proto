@@ -68,6 +68,45 @@ message WorkflowNode {
     }
 }
 
+// ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean
+// signal with the provided signal_id.
+message ApproveCondition {
+    // A unique identifier for the requested boolean signal.
+    string signal_id = 1;
+}
+
+// SignalCondition represents a dependency on an signal.
+message SignalCondition {
+    // A unique identifier for the requested signal.
+    string signal_id = 1;
+
+    // A type denoting the required value type for this signal.
+    LiteralType type = 2;
+
+    // The variable name for the signal value in this nodes outputs.
+    string output_variable_name = 3;
+}
+
+// SleepCondition represents a dependency on waiting for the specified duration.
+message SleepCondition {
+    // The overall duration for this sleep.
+    google.protobuf.Duration duration = 1;
+}
+
+// GateNode refers to the condition that is required for the gate to successfully complete.
+message GateNode {
+    oneof condition {
+        // ApproveCondition represents a dependency on an external approval provided by a boolean signal.
+        ApproveCondition approve = 1;
+
+        // SignalCondition represents a dependency on an signal.
+        SignalCondition signal = 2;
+
+        // SleepCondition represents a dependency on waiting for the specified duration.
+        SleepCondition sleep = 3;
+    }
+}
+
 // Defines extra information about the Node.
 message NodeMetadata {
     // A friendly name for the Node
@@ -129,6 +168,9 @@ message Node {
 
         // Information about the branch node to evaluate in this node.
         BranchNode branch_node = 8;
+
+        // Information about the condition to evaluate in this node.
+        GateNode gate_node = 9;
     }
 }
 

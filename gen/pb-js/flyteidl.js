@@ -1082,6 +1082,135 @@ export const flyteidl = $root.flyteidl = (() => {
             return TaskExecutionIdentifier;
         })();
 
+        core.SignalIdentifier = (function() {
+
+            /**
+             * Properties of a SignalIdentifier.
+             * @memberof flyteidl.core
+             * @interface ISignalIdentifier
+             * @property {string|null} [signalId] SignalIdentifier signalId
+             * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [executionId] SignalIdentifier executionId
+             */
+
+            /**
+             * Constructs a new SignalIdentifier.
+             * @memberof flyteidl.core
+             * @classdesc Represents a SignalIdentifier.
+             * @implements ISignalIdentifier
+             * @constructor
+             * @param {flyteidl.core.ISignalIdentifier=} [properties] Properties to set
+             */
+            function SignalIdentifier(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalIdentifier signalId.
+             * @member {string} signalId
+             * @memberof flyteidl.core.SignalIdentifier
+             * @instance
+             */
+            SignalIdentifier.prototype.signalId = "";
+
+            /**
+             * SignalIdentifier executionId.
+             * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} executionId
+             * @memberof flyteidl.core.SignalIdentifier
+             * @instance
+             */
+            SignalIdentifier.prototype.executionId = null;
+
+            /**
+             * Creates a new SignalIdentifier instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.SignalIdentifier
+             * @static
+             * @param {flyteidl.core.ISignalIdentifier=} [properties] Properties to set
+             * @returns {flyteidl.core.SignalIdentifier} SignalIdentifier instance
+             */
+            SignalIdentifier.create = function create(properties) {
+                return new SignalIdentifier(properties);
+            };
+
+            /**
+             * Encodes the specified SignalIdentifier message. Does not implicitly {@link flyteidl.core.SignalIdentifier.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.SignalIdentifier
+             * @static
+             * @param {flyteidl.core.ISignalIdentifier} message SignalIdentifier message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalIdentifier.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.signalId);
+                if (message.executionId != null && message.hasOwnProperty("executionId"))
+                    $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.executionId, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalIdentifier message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.SignalIdentifier
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.SignalIdentifier} SignalIdentifier
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalIdentifier.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SignalIdentifier();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.signalId = reader.string();
+                        break;
+                    case 2:
+                        message.executionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalIdentifier message.
+             * @function verify
+             * @memberof flyteidl.core.SignalIdentifier
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalIdentifier.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    if (!$util.isString(message.signalId))
+                        return "signalId: string expected";
+                if (message.executionId != null && message.hasOwnProperty("executionId")) {
+                    let error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.executionId);
+                    if (error)
+                        return "executionId." + error;
+                }
+                return null;
+            };
+
+            return SignalIdentifier;
+        })();
+
         core.ConnectionSet = (function() {
 
             /**
@@ -2514,6 +2643,552 @@ export const flyteidl = $root.flyteidl = (() => {
             return WorkflowNode;
         })();
 
+        core.ApproveCondition = (function() {
+
+            /**
+             * Properties of an ApproveCondition.
+             * @memberof flyteidl.core
+             * @interface IApproveCondition
+             * @property {string|null} [signalId] ApproveCondition signalId
+             */
+
+            /**
+             * Constructs a new ApproveCondition.
+             * @memberof flyteidl.core
+             * @classdesc Represents an ApproveCondition.
+             * @implements IApproveCondition
+             * @constructor
+             * @param {flyteidl.core.IApproveCondition=} [properties] Properties to set
+             */
+            function ApproveCondition(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ApproveCondition signalId.
+             * @member {string} signalId
+             * @memberof flyteidl.core.ApproveCondition
+             * @instance
+             */
+            ApproveCondition.prototype.signalId = "";
+
+            /**
+             * Creates a new ApproveCondition instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.ApproveCondition
+             * @static
+             * @param {flyteidl.core.IApproveCondition=} [properties] Properties to set
+             * @returns {flyteidl.core.ApproveCondition} ApproveCondition instance
+             */
+            ApproveCondition.create = function create(properties) {
+                return new ApproveCondition(properties);
+            };
+
+            /**
+             * Encodes the specified ApproveCondition message. Does not implicitly {@link flyteidl.core.ApproveCondition.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.ApproveCondition
+             * @static
+             * @param {flyteidl.core.IApproveCondition} message ApproveCondition message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ApproveCondition.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.signalId);
+                return writer;
+            };
+
+            /**
+             * Decodes an ApproveCondition message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.ApproveCondition
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.ApproveCondition} ApproveCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ApproveCondition.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ApproveCondition();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.signalId = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an ApproveCondition message.
+             * @function verify
+             * @memberof flyteidl.core.ApproveCondition
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ApproveCondition.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    if (!$util.isString(message.signalId))
+                        return "signalId: string expected";
+                return null;
+            };
+
+            return ApproveCondition;
+        })();
+
+        core.SignalCondition = (function() {
+
+            /**
+             * Properties of a SignalCondition.
+             * @memberof flyteidl.core
+             * @interface ISignalCondition
+             * @property {string|null} [signalId] SignalCondition signalId
+             * @property {flyteidl.core.ILiteralType|null} [type] SignalCondition type
+             * @property {string|null} [outputVariableName] SignalCondition outputVariableName
+             */
+
+            /**
+             * Constructs a new SignalCondition.
+             * @memberof flyteidl.core
+             * @classdesc Represents a SignalCondition.
+             * @implements ISignalCondition
+             * @constructor
+             * @param {flyteidl.core.ISignalCondition=} [properties] Properties to set
+             */
+            function SignalCondition(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalCondition signalId.
+             * @member {string} signalId
+             * @memberof flyteidl.core.SignalCondition
+             * @instance
+             */
+            SignalCondition.prototype.signalId = "";
+
+            /**
+             * SignalCondition type.
+             * @member {flyteidl.core.ILiteralType|null|undefined} type
+             * @memberof flyteidl.core.SignalCondition
+             * @instance
+             */
+            SignalCondition.prototype.type = null;
+
+            /**
+             * SignalCondition outputVariableName.
+             * @member {string} outputVariableName
+             * @memberof flyteidl.core.SignalCondition
+             * @instance
+             */
+            SignalCondition.prototype.outputVariableName = "";
+
+            /**
+             * Creates a new SignalCondition instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.SignalCondition
+             * @static
+             * @param {flyteidl.core.ISignalCondition=} [properties] Properties to set
+             * @returns {flyteidl.core.SignalCondition} SignalCondition instance
+             */
+            SignalCondition.create = function create(properties) {
+                return new SignalCondition(properties);
+            };
+
+            /**
+             * Encodes the specified SignalCondition message. Does not implicitly {@link flyteidl.core.SignalCondition.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.SignalCondition
+             * @static
+             * @param {flyteidl.core.ISignalCondition} message SignalCondition message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalCondition.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.signalId);
+                if (message.type != null && message.hasOwnProperty("type"))
+                    $root.flyteidl.core.LiteralType.encode(message.type, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.outputVariableName != null && message.hasOwnProperty("outputVariableName"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputVariableName);
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalCondition message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.SignalCondition
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.SignalCondition} SignalCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalCondition.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SignalCondition();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.signalId = reader.string();
+                        break;
+                    case 2:
+                        message.type = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.outputVariableName = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalCondition message.
+             * @function verify
+             * @memberof flyteidl.core.SignalCondition
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalCondition.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signalId != null && message.hasOwnProperty("signalId"))
+                    if (!$util.isString(message.signalId))
+                        return "signalId: string expected";
+                if (message.type != null && message.hasOwnProperty("type")) {
+                    let error = $root.flyteidl.core.LiteralType.verify(message.type);
+                    if (error)
+                        return "type." + error;
+                }
+                if (message.outputVariableName != null && message.hasOwnProperty("outputVariableName"))
+                    if (!$util.isString(message.outputVariableName))
+                        return "outputVariableName: string expected";
+                return null;
+            };
+
+            return SignalCondition;
+        })();
+
+        core.SleepCondition = (function() {
+
+            /**
+             * Properties of a SleepCondition.
+             * @memberof flyteidl.core
+             * @interface ISleepCondition
+             * @property {google.protobuf.IDuration|null} [duration] SleepCondition duration
+             */
+
+            /**
+             * Constructs a new SleepCondition.
+             * @memberof flyteidl.core
+             * @classdesc Represents a SleepCondition.
+             * @implements ISleepCondition
+             * @constructor
+             * @param {flyteidl.core.ISleepCondition=} [properties] Properties to set
+             */
+            function SleepCondition(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SleepCondition duration.
+             * @member {google.protobuf.IDuration|null|undefined} duration
+             * @memberof flyteidl.core.SleepCondition
+             * @instance
+             */
+            SleepCondition.prototype.duration = null;
+
+            /**
+             * Creates a new SleepCondition instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.SleepCondition
+             * @static
+             * @param {flyteidl.core.ISleepCondition=} [properties] Properties to set
+             * @returns {flyteidl.core.SleepCondition} SleepCondition instance
+             */
+            SleepCondition.create = function create(properties) {
+                return new SleepCondition(properties);
+            };
+
+            /**
+             * Encodes the specified SleepCondition message. Does not implicitly {@link flyteidl.core.SleepCondition.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.SleepCondition
+             * @static
+             * @param {flyteidl.core.ISleepCondition} message SleepCondition message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SleepCondition.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.duration != null && message.hasOwnProperty("duration"))
+                    $root.google.protobuf.Duration.encode(message.duration, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SleepCondition message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.SleepCondition
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.SleepCondition} SleepCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SleepCondition.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SleepCondition();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.duration = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SleepCondition message.
+             * @function verify
+             * @memberof flyteidl.core.SleepCondition
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SleepCondition.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.duration != null && message.hasOwnProperty("duration")) {
+                    let error = $root.google.protobuf.Duration.verify(message.duration);
+                    if (error)
+                        return "duration." + error;
+                }
+                return null;
+            };
+
+            return SleepCondition;
+        })();
+
+        core.GateNode = (function() {
+
+            /**
+             * Properties of a GateNode.
+             * @memberof flyteidl.core
+             * @interface IGateNode
+             * @property {flyteidl.core.IApproveCondition|null} [approve] GateNode approve
+             * @property {flyteidl.core.ISignalCondition|null} [signal] GateNode signal
+             * @property {flyteidl.core.ISleepCondition|null} [sleep] GateNode sleep
+             */
+
+            /**
+             * Constructs a new GateNode.
+             * @memberof flyteidl.core
+             * @classdesc Represents a GateNode.
+             * @implements IGateNode
+             * @constructor
+             * @param {flyteidl.core.IGateNode=} [properties] Properties to set
+             */
+            function GateNode(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * GateNode approve.
+             * @member {flyteidl.core.IApproveCondition|null|undefined} approve
+             * @memberof flyteidl.core.GateNode
+             * @instance
+             */
+            GateNode.prototype.approve = null;
+
+            /**
+             * GateNode signal.
+             * @member {flyteidl.core.ISignalCondition|null|undefined} signal
+             * @memberof flyteidl.core.GateNode
+             * @instance
+             */
+            GateNode.prototype.signal = null;
+
+            /**
+             * GateNode sleep.
+             * @member {flyteidl.core.ISleepCondition|null|undefined} sleep
+             * @memberof flyteidl.core.GateNode
+             * @instance
+             */
+            GateNode.prototype.sleep = null;
+
+            // OneOf field names bound to virtual getters and setters
+            let $oneOfFields;
+
+            /**
+             * GateNode condition.
+             * @member {"approve"|"signal"|"sleep"|undefined} condition
+             * @memberof flyteidl.core.GateNode
+             * @instance
+             */
+            Object.defineProperty(GateNode.prototype, "condition", {
+                get: $util.oneOfGetter($oneOfFields = ["approve", "signal", "sleep"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            /**
+             * Creates a new GateNode instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.GateNode
+             * @static
+             * @param {flyteidl.core.IGateNode=} [properties] Properties to set
+             * @returns {flyteidl.core.GateNode} GateNode instance
+             */
+            GateNode.create = function create(properties) {
+                return new GateNode(properties);
+            };
+
+            /**
+             * Encodes the specified GateNode message. Does not implicitly {@link flyteidl.core.GateNode.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.GateNode
+             * @static
+             * @param {flyteidl.core.IGateNode} message GateNode message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GateNode.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.approve != null && message.hasOwnProperty("approve"))
+                    $root.flyteidl.core.ApproveCondition.encode(message.approve, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.signal != null && message.hasOwnProperty("signal"))
+                    $root.flyteidl.core.SignalCondition.encode(message.signal, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.sleep != null && message.hasOwnProperty("sleep"))
+                    $root.flyteidl.core.SleepCondition.encode(message.sleep, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a GateNode message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.GateNode
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.GateNode} GateNode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GateNode.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.GateNode();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.approve = $root.flyteidl.core.ApproveCondition.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.signal = $root.flyteidl.core.SignalCondition.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.sleep = $root.flyteidl.core.SleepCondition.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a GateNode message.
+             * @function verify
+             * @memberof flyteidl.core.GateNode
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            GateNode.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                let properties = {};
+                if (message.approve != null && message.hasOwnProperty("approve")) {
+                    properties.condition = 1;
+                    {
+                        let error = $root.flyteidl.core.ApproveCondition.verify(message.approve);
+                        if (error)
+                            return "approve." + error;
+                    }
+                }
+                if (message.signal != null && message.hasOwnProperty("signal")) {
+                    if (properties.condition === 1)
+                        return "condition: multiple values";
+                    properties.condition = 1;
+                    {
+                        let error = $root.flyteidl.core.SignalCondition.verify(message.signal);
+                        if (error)
+                            return "signal." + error;
+                    }
+                }
+                if (message.sleep != null && message.hasOwnProperty("sleep")) {
+                    if (properties.condition === 1)
+                        return "condition: multiple values";
+                    properties.condition = 1;
+                    {
+                        let error = $root.flyteidl.core.SleepCondition.verify(message.sleep);
+                        if (error)
+                            return "sleep." + error;
+                    }
+                }
+                return null;
+            };
+
+            return GateNode;
+        })();
+
         core.NodeMetadata = (function() {
 
             /**
@@ -2837,6 +3512,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ITaskNode|null} [taskNode] Node taskNode
              * @property {flyteidl.core.IWorkflowNode|null} [workflowNode] Node workflowNode
              * @property {flyteidl.core.IBranchNode|null} [branchNode] Node branchNode
+             * @property {flyteidl.core.IGateNode|null} [gateNode] Node gateNode
              */
 
             /**
@@ -2921,17 +3597,25 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             Node.prototype.branchNode = null;
 
+            /**
+             * Node gateNode.
+             * @member {flyteidl.core.IGateNode|null|undefined} gateNode
+             * @memberof flyteidl.core.Node
+             * @instance
+             */
+            Node.prototype.gateNode = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
             /**
              * Node target.
-             * @member {"taskNode"|"workflowNode"|"branchNode"|undefined} target
+             * @member {"taskNode"|"workflowNode"|"branchNode"|"gateNode"|undefined} target
              * @memberof flyteidl.core.Node
              * @instance
              */
             Object.defineProperty(Node.prototype, "target", {
-                get: $util.oneOfGetter($oneOfFields = ["taskNode", "workflowNode", "branchNode"]),
+                get: $util.oneOfGetter($oneOfFields = ["taskNode", "workflowNode", "branchNode", "gateNode"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -2978,6 +3662,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.WorkflowNode.encode(message.workflowNode, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 if (message.branchNode != null && message.hasOwnProperty("branchNode"))
                     $root.flyteidl.core.BranchNode.encode(message.branchNode, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                if (message.gateNode != null && message.hasOwnProperty("gateNode"))
+                    $root.flyteidl.core.GateNode.encode(message.gateNode, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 return writer;
             };
 
@@ -3028,6 +3714,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 8:
                         message.branchNode = $root.flyteidl.core.BranchNode.decode(reader, reader.uint32());
+                        break;
+                    case 9:
+                        message.gateNode = $root.flyteidl.core.GateNode.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -3108,6 +3797,16 @@ export const flyteidl = $root.flyteidl = (() => {
                         let error = $root.flyteidl.core.BranchNode.verify(message.branchNode);
                         if (error)
                             return "branchNode." + error;
+                    }
+                }
+                if (message.gateNode != null && message.hasOwnProperty("gateNode")) {
+                    if (properties.target === 1)
+                        return "target: multiple values";
+                    properties.target = 1;
+                    {
+                        let error = $root.flyteidl.core.GateNode.verify(message.gateNode);
+                        if (error)
+                            return "gateNode." + error;
                     }
                 }
                 return null;
@@ -33808,6 +34507,830 @@ export const flyteidl = $root.flyteidl = (() => {
             return ProjectDomainAttributesDeleteResponse;
         })();
 
+        admin.SignalGetOrCreateRequest = (function() {
+
+            /**
+             * Properties of a SignalGetOrCreateRequest.
+             * @memberof flyteidl.admin
+             * @interface ISignalGetOrCreateRequest
+             * @property {flyteidl.core.ISignalIdentifier|null} [id] SignalGetOrCreateRequest id
+             * @property {flyteidl.core.ILiteralType|null} [type] SignalGetOrCreateRequest type
+             */
+
+            /**
+             * Constructs a new SignalGetOrCreateRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SignalGetOrCreateRequest.
+             * @implements ISignalGetOrCreateRequest
+             * @constructor
+             * @param {flyteidl.admin.ISignalGetOrCreateRequest=} [properties] Properties to set
+             */
+            function SignalGetOrCreateRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalGetOrCreateRequest id.
+             * @member {flyteidl.core.ISignalIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @instance
+             */
+            SignalGetOrCreateRequest.prototype.id = null;
+
+            /**
+             * SignalGetOrCreateRequest type.
+             * @member {flyteidl.core.ILiteralType|null|undefined} type
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @instance
+             */
+            SignalGetOrCreateRequest.prototype.type = null;
+
+            /**
+             * Creates a new SignalGetOrCreateRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @static
+             * @param {flyteidl.admin.ISignalGetOrCreateRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.SignalGetOrCreateRequest} SignalGetOrCreateRequest instance
+             */
+            SignalGetOrCreateRequest.create = function create(properties) {
+                return new SignalGetOrCreateRequest(properties);
+            };
+
+            /**
+             * Encodes the specified SignalGetOrCreateRequest message. Does not implicitly {@link flyteidl.admin.SignalGetOrCreateRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @static
+             * @param {flyteidl.admin.ISignalGetOrCreateRequest} message SignalGetOrCreateRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalGetOrCreateRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.SignalIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.type != null && message.hasOwnProperty("type"))
+                    $root.flyteidl.core.LiteralType.encode(message.type, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalGetOrCreateRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SignalGetOrCreateRequest} SignalGetOrCreateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalGetOrCreateRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SignalGetOrCreateRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.SignalIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.type = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalGetOrCreateRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.SignalGetOrCreateRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalGetOrCreateRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.SignalIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.type != null && message.hasOwnProperty("type")) {
+                    let error = $root.flyteidl.core.LiteralType.verify(message.type);
+                    if (error)
+                        return "type." + error;
+                }
+                return null;
+            };
+
+            return SignalGetOrCreateRequest;
+        })();
+
+        admin.SignalListRequest = (function() {
+
+            /**
+             * Properties of a SignalListRequest.
+             * @memberof flyteidl.admin
+             * @interface ISignalListRequest
+             * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowExecutionId] SignalListRequest workflowExecutionId
+             * @property {number|null} [limit] SignalListRequest limit
+             * @property {string|null} [token] SignalListRequest token
+             * @property {string|null} [filters] SignalListRequest filters
+             * @property {flyteidl.admin.ISort|null} [sortBy] SignalListRequest sortBy
+             */
+
+            /**
+             * Constructs a new SignalListRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SignalListRequest.
+             * @implements ISignalListRequest
+             * @constructor
+             * @param {flyteidl.admin.ISignalListRequest=} [properties] Properties to set
+             */
+            function SignalListRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalListRequest workflowExecutionId.
+             * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowExecutionId
+             * @memberof flyteidl.admin.SignalListRequest
+             * @instance
+             */
+            SignalListRequest.prototype.workflowExecutionId = null;
+
+            /**
+             * SignalListRequest limit.
+             * @member {number} limit
+             * @memberof flyteidl.admin.SignalListRequest
+             * @instance
+             */
+            SignalListRequest.prototype.limit = 0;
+
+            /**
+             * SignalListRequest token.
+             * @member {string} token
+             * @memberof flyteidl.admin.SignalListRequest
+             * @instance
+             */
+            SignalListRequest.prototype.token = "";
+
+            /**
+             * SignalListRequest filters.
+             * @member {string} filters
+             * @memberof flyteidl.admin.SignalListRequest
+             * @instance
+             */
+            SignalListRequest.prototype.filters = "";
+
+            /**
+             * SignalListRequest sortBy.
+             * @member {flyteidl.admin.ISort|null|undefined} sortBy
+             * @memberof flyteidl.admin.SignalListRequest
+             * @instance
+             */
+            SignalListRequest.prototype.sortBy = null;
+
+            /**
+             * Creates a new SignalListRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SignalListRequest
+             * @static
+             * @param {flyteidl.admin.ISignalListRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.SignalListRequest} SignalListRequest instance
+             */
+            SignalListRequest.create = function create(properties) {
+                return new SignalListRequest(properties);
+            };
+
+            /**
+             * Encodes the specified SignalListRequest message. Does not implicitly {@link flyteidl.admin.SignalListRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SignalListRequest
+             * @static
+             * @param {flyteidl.admin.ISignalListRequest} message SignalListRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalListRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId"))
+                    $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowExecutionId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.limit);
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.token);
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.filters);
+                if (message.sortBy != null && message.hasOwnProperty("sortBy"))
+                    $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalListRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SignalListRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SignalListRequest} SignalListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalListRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SignalListRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.workflowExecutionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.limit = reader.uint32();
+                        break;
+                    case 3:
+                        message.token = reader.string();
+                        break;
+                    case 4:
+                        message.filters = reader.string();
+                        break;
+                    case 5:
+                        message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalListRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.SignalListRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalListRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId")) {
+                    let error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowExecutionId);
+                    if (error)
+                        return "workflowExecutionId." + error;
+                }
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    if (!$util.isInteger(message.limit))
+                        return "limit: integer expected";
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    if (!$util.isString(message.filters))
+                        return "filters: string expected";
+                if (message.sortBy != null && message.hasOwnProperty("sortBy")) {
+                    let error = $root.flyteidl.admin.Sort.verify(message.sortBy);
+                    if (error)
+                        return "sortBy." + error;
+                }
+                return null;
+            };
+
+            return SignalListRequest;
+        })();
+
+        admin.SignalList = (function() {
+
+            /**
+             * Properties of a SignalList.
+             * @memberof flyteidl.admin
+             * @interface ISignalList
+             * @property {Array.<flyteidl.admin.ISignal>|null} [signals] SignalList signals
+             * @property {string|null} [token] SignalList token
+             */
+
+            /**
+             * Constructs a new SignalList.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SignalList.
+             * @implements ISignalList
+             * @constructor
+             * @param {flyteidl.admin.ISignalList=} [properties] Properties to set
+             */
+            function SignalList(properties) {
+                this.signals = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalList signals.
+             * @member {Array.<flyteidl.admin.ISignal>} signals
+             * @memberof flyteidl.admin.SignalList
+             * @instance
+             */
+            SignalList.prototype.signals = $util.emptyArray;
+
+            /**
+             * SignalList token.
+             * @member {string} token
+             * @memberof flyteidl.admin.SignalList
+             * @instance
+             */
+            SignalList.prototype.token = "";
+
+            /**
+             * Creates a new SignalList instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SignalList
+             * @static
+             * @param {flyteidl.admin.ISignalList=} [properties] Properties to set
+             * @returns {flyteidl.admin.SignalList} SignalList instance
+             */
+            SignalList.create = function create(properties) {
+                return new SignalList(properties);
+            };
+
+            /**
+             * Encodes the specified SignalList message. Does not implicitly {@link flyteidl.admin.SignalList.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SignalList
+             * @static
+             * @param {flyteidl.admin.ISignalList} message SignalList message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalList.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.signals != null && message.signals.length)
+                    for (let i = 0; i < message.signals.length; ++i)
+                        $root.flyteidl.admin.Signal.encode(message.signals[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalList message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SignalList
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SignalList} SignalList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalList.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SignalList();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        if (!(message.signals && message.signals.length))
+                            message.signals = [];
+                        message.signals.push($root.flyteidl.admin.Signal.decode(reader, reader.uint32()));
+                        break;
+                    case 2:
+                        message.token = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalList message.
+             * @function verify
+             * @memberof flyteidl.admin.SignalList
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalList.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.signals != null && message.hasOwnProperty("signals")) {
+                    if (!Array.isArray(message.signals))
+                        return "signals: array expected";
+                    for (let i = 0; i < message.signals.length; ++i) {
+                        let error = $root.flyteidl.admin.Signal.verify(message.signals[i]);
+                        if (error)
+                            return "signals." + error;
+                    }
+                }
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
+                return null;
+            };
+
+            return SignalList;
+        })();
+
+        admin.SignalSetRequest = (function() {
+
+            /**
+             * Properties of a SignalSetRequest.
+             * @memberof flyteidl.admin
+             * @interface ISignalSetRequest
+             * @property {flyteidl.core.ISignalIdentifier|null} [id] SignalSetRequest id
+             * @property {flyteidl.core.ILiteral|null} [value] SignalSetRequest value
+             */
+
+            /**
+             * Constructs a new SignalSetRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SignalSetRequest.
+             * @implements ISignalSetRequest
+             * @constructor
+             * @param {flyteidl.admin.ISignalSetRequest=} [properties] Properties to set
+             */
+            function SignalSetRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SignalSetRequest id.
+             * @member {flyteidl.core.ISignalIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @instance
+             */
+            SignalSetRequest.prototype.id = null;
+
+            /**
+             * SignalSetRequest value.
+             * @member {flyteidl.core.ILiteral|null|undefined} value
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @instance
+             */
+            SignalSetRequest.prototype.value = null;
+
+            /**
+             * Creates a new SignalSetRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @static
+             * @param {flyteidl.admin.ISignalSetRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.SignalSetRequest} SignalSetRequest instance
+             */
+            SignalSetRequest.create = function create(properties) {
+                return new SignalSetRequest(properties);
+            };
+
+            /**
+             * Encodes the specified SignalSetRequest message. Does not implicitly {@link flyteidl.admin.SignalSetRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @static
+             * @param {flyteidl.admin.ISignalSetRequest} message SignalSetRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalSetRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.SignalIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    $root.flyteidl.core.Literal.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalSetRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SignalSetRequest} SignalSetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalSetRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SignalSetRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.SignalIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.value = $root.flyteidl.core.Literal.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalSetRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.SignalSetRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalSetRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.SignalIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.value != null && message.hasOwnProperty("value")) {
+                    let error = $root.flyteidl.core.Literal.verify(message.value);
+                    if (error)
+                        return "value." + error;
+                }
+                return null;
+            };
+
+            return SignalSetRequest;
+        })();
+
+        admin.SignalSetResponse = (function() {
+
+            /**
+             * Properties of a SignalSetResponse.
+             * @memberof flyteidl.admin
+             * @interface ISignalSetResponse
+             */
+
+            /**
+             * Constructs a new SignalSetResponse.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SignalSetResponse.
+             * @implements ISignalSetResponse
+             * @constructor
+             * @param {flyteidl.admin.ISignalSetResponse=} [properties] Properties to set
+             */
+            function SignalSetResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new SignalSetResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SignalSetResponse
+             * @static
+             * @param {flyteidl.admin.ISignalSetResponse=} [properties] Properties to set
+             * @returns {flyteidl.admin.SignalSetResponse} SignalSetResponse instance
+             */
+            SignalSetResponse.create = function create(properties) {
+                return new SignalSetResponse(properties);
+            };
+
+            /**
+             * Encodes the specified SignalSetResponse message. Does not implicitly {@link flyteidl.admin.SignalSetResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SignalSetResponse
+             * @static
+             * @param {flyteidl.admin.ISignalSetResponse} message SignalSetResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SignalSetResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a SignalSetResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SignalSetResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SignalSetResponse} SignalSetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SignalSetResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SignalSetResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SignalSetResponse message.
+             * @function verify
+             * @memberof flyteidl.admin.SignalSetResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SignalSetResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            return SignalSetResponse;
+        })();
+
+        admin.Signal = (function() {
+
+            /**
+             * Properties of a Signal.
+             * @memberof flyteidl.admin
+             * @interface ISignal
+             * @property {flyteidl.core.ISignalIdentifier|null} [id] Signal id
+             * @property {flyteidl.core.ILiteralType|null} [type] Signal type
+             * @property {flyteidl.core.ILiteral|null} [value] Signal value
+             */
+
+            /**
+             * Constructs a new Signal.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a Signal.
+             * @implements ISignal
+             * @constructor
+             * @param {flyteidl.admin.ISignal=} [properties] Properties to set
+             */
+            function Signal(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Signal id.
+             * @member {flyteidl.core.ISignalIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.Signal
+             * @instance
+             */
+            Signal.prototype.id = null;
+
+            /**
+             * Signal type.
+             * @member {flyteidl.core.ILiteralType|null|undefined} type
+             * @memberof flyteidl.admin.Signal
+             * @instance
+             */
+            Signal.prototype.type = null;
+
+            /**
+             * Signal value.
+             * @member {flyteidl.core.ILiteral|null|undefined} value
+             * @memberof flyteidl.admin.Signal
+             * @instance
+             */
+            Signal.prototype.value = null;
+
+            /**
+             * Creates a new Signal instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.Signal
+             * @static
+             * @param {flyteidl.admin.ISignal=} [properties] Properties to set
+             * @returns {flyteidl.admin.Signal} Signal instance
+             */
+            Signal.create = function create(properties) {
+                return new Signal(properties);
+            };
+
+            /**
+             * Encodes the specified Signal message. Does not implicitly {@link flyteidl.admin.Signal.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.Signal
+             * @static
+             * @param {flyteidl.admin.ISignal} message Signal message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Signal.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.SignalIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.type != null && message.hasOwnProperty("type"))
+                    $root.flyteidl.core.LiteralType.encode(message.type, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.value != null && message.hasOwnProperty("value"))
+                    $root.flyteidl.core.Literal.encode(message.value, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a Signal message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.Signal
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.Signal} Signal
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Signal.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Signal();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.SignalIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.type = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.value = $root.flyteidl.core.Literal.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a Signal message.
+             * @function verify
+             * @memberof flyteidl.admin.Signal
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Signal.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.SignalIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.type != null && message.hasOwnProperty("type")) {
+                    let error = $root.flyteidl.core.LiteralType.verify(message.type);
+                    if (error)
+                        return "type." + error;
+                }
+                if (message.value != null && message.hasOwnProperty("value")) {
+                    let error = $root.flyteidl.core.Literal.verify(message.value);
+                    if (error)
+                        return "value." + error;
+                }
+                return null;
+            };
+
+            return Signal;
+        })();
+
         admin.TaskCreateRequest = (function() {
 
             /**
@@ -41767,6 +43290,140 @@ export const flyteidl = $root.flyteidl = (() => {
              */
 
             return IdentityService;
+        })();
+
+        service.SignalService = (function() {
+
+            /**
+             * Constructs a new SignalService service.
+             * @memberof flyteidl.service
+             * @classdesc Represents a SignalService
+             * @extends $protobuf.rpc.Service
+             * @constructor
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             */
+            function SignalService(rpcImpl, requestDelimited, responseDelimited) {
+                $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+            }
+
+            (SignalService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = SignalService;
+
+            /**
+             * Creates new SignalService service using the specified rpc implementation.
+             * @function create
+             * @memberof flyteidl.service.SignalService
+             * @static
+             * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+             * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+             * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+             * @returns {SignalService} RPC service. Useful where requests and/or responses are streamed.
+             */
+            SignalService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                return new this(rpcImpl, requestDelimited, responseDelimited);
+            };
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#getOrCreateSignal}.
+             * @memberof flyteidl.service.SignalService
+             * @typedef GetOrCreateSignalCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.Signal} [response] Signal
+             */
+
+            /**
+             * Calls GetOrCreateSignal.
+             * @function getOrCreateSignal
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalGetOrCreateRequest} request SignalGetOrCreateRequest message or plain object
+             * @param {flyteidl.service.SignalService.GetOrCreateSignalCallback} callback Node-style callback called with the error, if any, and Signal
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(SignalService.prototype.getOrCreateSignal = function getOrCreateSignal(request, callback) {
+                return this.rpcCall(getOrCreateSignal, $root.flyteidl.admin.SignalGetOrCreateRequest, $root.flyteidl.admin.Signal, request, callback);
+            }, "name", { value: "GetOrCreateSignal" });
+
+            /**
+             * Calls GetOrCreateSignal.
+             * @function getOrCreateSignal
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalGetOrCreateRequest} request SignalGetOrCreateRequest message or plain object
+             * @returns {Promise<flyteidl.admin.Signal>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#listSignals}.
+             * @memberof flyteidl.service.SignalService
+             * @typedef ListSignalsCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.SignalList} [response] SignalList
+             */
+
+            /**
+             * Calls ListSignals.
+             * @function listSignals
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalListRequest} request SignalListRequest message or plain object
+             * @param {flyteidl.service.SignalService.ListSignalsCallback} callback Node-style callback called with the error, if any, and SignalList
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(SignalService.prototype.listSignals = function listSignals(request, callback) {
+                return this.rpcCall(listSignals, $root.flyteidl.admin.SignalListRequest, $root.flyteidl.admin.SignalList, request, callback);
+            }, "name", { value: "ListSignals" });
+
+            /**
+             * Calls ListSignals.
+             * @function listSignals
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalListRequest} request SignalListRequest message or plain object
+             * @returns {Promise<flyteidl.admin.SignalList>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#setSignal}.
+             * @memberof flyteidl.service.SignalService
+             * @typedef SetSignalCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.SignalSetResponse} [response] SignalSetResponse
+             */
+
+            /**
+             * Calls SetSignal.
+             * @function setSignal
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalSetRequest} request SignalSetRequest message or plain object
+             * @param {flyteidl.service.SignalService.SetSignalCallback} callback Node-style callback called with the error, if any, and SignalSetResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(SignalService.prototype.setSignal = function setSignal(request, callback) {
+                return this.rpcCall(setSignal, $root.flyteidl.admin.SignalSetRequest, $root.flyteidl.admin.SignalSetResponse, request, callback);
+            }, "name", { value: "SetSignal" });
+
+            /**
+             * Calls SetSignal.
+             * @function setSignal
+             * @memberof flyteidl.service.SignalService
+             * @instance
+             * @param {flyteidl.admin.ISignalSetRequest} request SignalSetRequest message or plain object
+             * @returns {Promise<flyteidl.admin.SignalSetResponse>} Promise
+             * @variation 2
+             */
+
+            return SignalService;
         })();
 
         return service;

@@ -3975,6 +3975,853 @@ public final class IdentifierOuterClass {
 
   }
 
+  public interface SignalIdentifierOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.SignalIdentifier)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Unique identifier for a signal.
+     * </pre>
+     *
+     * <code>string signal_id = 1;</code>
+     */
+    java.lang.String getSignalId();
+    /**
+     * <pre>
+     * Unique identifier for a signal.
+     * </pre>
+     *
+     * <code>string signal_id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSignalIdBytes();
+
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    boolean hasExecutionId();
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getExecutionId();
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getExecutionIdOrBuilder();
+  }
+  /**
+   * <pre>
+   * Encapsulation of fields the uniquely identify a signal.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.SignalIdentifier}
+   */
+  public  static final class SignalIdentifier extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.SignalIdentifier)
+      SignalIdentifierOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use SignalIdentifier.newBuilder() to construct.
+    private SignalIdentifier(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private SignalIdentifier() {
+      signalId_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SignalIdentifier(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              signalId_ = s;
+              break;
+            }
+            case 18: {
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
+              if (executionId_ != null) {
+                subBuilder = executionId_.toBuilder();
+              }
+              executionId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(executionId_);
+                executionId_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.IdentifierOuterClass.internal_static_flyteidl_core_SignalIdentifier_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.IdentifierOuterClass.internal_static_flyteidl_core_SignalIdentifier_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.IdentifierOuterClass.SignalIdentifier.class, flyteidl.core.IdentifierOuterClass.SignalIdentifier.Builder.class);
+    }
+
+    public static final int SIGNAL_ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object signalId_;
+    /**
+     * <pre>
+     * Unique identifier for a signal.
+     * </pre>
+     *
+     * <code>string signal_id = 1;</code>
+     */
+    public java.lang.String getSignalId() {
+      java.lang.Object ref = signalId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        signalId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Unique identifier for a signal.
+     * </pre>
+     *
+     * <code>string signal_id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSignalIdBytes() {
+      java.lang.Object ref = signalId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        signalId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXECUTION_ID_FIELD_NUMBER = 2;
+    private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier executionId_;
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    public boolean hasExecutionId() {
+      return executionId_ != null;
+    }
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getExecutionId() {
+      return executionId_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : executionId_;
+    }
+    /**
+     * <pre>
+     * Identifies the Flyte workflow execution this signal belongs to.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getExecutionIdOrBuilder() {
+      return getExecutionId();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getSignalIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, signalId_);
+      }
+      if (executionId_ != null) {
+        output.writeMessage(2, getExecutionId());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getSignalIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, signalId_);
+      }
+      if (executionId_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getExecutionId());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.IdentifierOuterClass.SignalIdentifier)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.IdentifierOuterClass.SignalIdentifier other = (flyteidl.core.IdentifierOuterClass.SignalIdentifier) obj;
+
+      if (!getSignalId()
+          .equals(other.getSignalId())) return false;
+      if (hasExecutionId() != other.hasExecutionId()) return false;
+      if (hasExecutionId()) {
+        if (!getExecutionId()
+            .equals(other.getExecutionId())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SIGNAL_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getSignalId().hashCode();
+      if (hasExecutionId()) {
+        hash = (37 * hash) + EXECUTION_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getExecutionId().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.IdentifierOuterClass.SignalIdentifier prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Encapsulation of fields the uniquely identify a signal.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.SignalIdentifier}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.SignalIdentifier)
+        flyteidl.core.IdentifierOuterClass.SignalIdentifierOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.IdentifierOuterClass.internal_static_flyteidl_core_SignalIdentifier_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.IdentifierOuterClass.internal_static_flyteidl_core_SignalIdentifier_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.IdentifierOuterClass.SignalIdentifier.class, flyteidl.core.IdentifierOuterClass.SignalIdentifier.Builder.class);
+      }
+
+      // Construct using flyteidl.core.IdentifierOuterClass.SignalIdentifier.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        signalId_ = "";
+
+        if (executionIdBuilder_ == null) {
+          executionId_ = null;
+        } else {
+          executionId_ = null;
+          executionIdBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.IdentifierOuterClass.internal_static_flyteidl_core_SignalIdentifier_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.IdentifierOuterClass.SignalIdentifier getDefaultInstanceForType() {
+        return flyteidl.core.IdentifierOuterClass.SignalIdentifier.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.IdentifierOuterClass.SignalIdentifier build() {
+        flyteidl.core.IdentifierOuterClass.SignalIdentifier result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.IdentifierOuterClass.SignalIdentifier buildPartial() {
+        flyteidl.core.IdentifierOuterClass.SignalIdentifier result = new flyteidl.core.IdentifierOuterClass.SignalIdentifier(this);
+        result.signalId_ = signalId_;
+        if (executionIdBuilder_ == null) {
+          result.executionId_ = executionId_;
+        } else {
+          result.executionId_ = executionIdBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.IdentifierOuterClass.SignalIdentifier) {
+          return mergeFrom((flyteidl.core.IdentifierOuterClass.SignalIdentifier)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.IdentifierOuterClass.SignalIdentifier other) {
+        if (other == flyteidl.core.IdentifierOuterClass.SignalIdentifier.getDefaultInstance()) return this;
+        if (!other.getSignalId().isEmpty()) {
+          signalId_ = other.signalId_;
+          onChanged();
+        }
+        if (other.hasExecutionId()) {
+          mergeExecutionId(other.getExecutionId());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.IdentifierOuterClass.SignalIdentifier parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.IdentifierOuterClass.SignalIdentifier) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object signalId_ = "";
+      /**
+       * <pre>
+       * Unique identifier for a signal.
+       * </pre>
+       *
+       * <code>string signal_id = 1;</code>
+       */
+      public java.lang.String getSignalId() {
+        java.lang.Object ref = signalId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          signalId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Unique identifier for a signal.
+       * </pre>
+       *
+       * <code>string signal_id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSignalIdBytes() {
+        java.lang.Object ref = signalId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          signalId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Unique identifier for a signal.
+       * </pre>
+       *
+       * <code>string signal_id = 1;</code>
+       */
+      public Builder setSignalId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        signalId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Unique identifier for a signal.
+       * </pre>
+       *
+       * <code>string signal_id = 1;</code>
+       */
+      public Builder clearSignalId() {
+        
+        signalId_ = getDefaultInstance().getSignalId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Unique identifier for a signal.
+       * </pre>
+       *
+       * <code>string signal_id = 1;</code>
+       */
+      public Builder setSignalIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        signalId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier executionId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> executionIdBuilder_;
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public boolean hasExecutionId() {
+        return executionIdBuilder_ != null || executionId_ != null;
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getExecutionId() {
+        if (executionIdBuilder_ == null) {
+          return executionId_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : executionId_;
+        } else {
+          return executionIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public Builder setExecutionId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (executionIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          executionId_ = value;
+          onChanged();
+        } else {
+          executionIdBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public Builder setExecutionId(
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder builderForValue) {
+        if (executionIdBuilder_ == null) {
+          executionId_ = builderForValue.build();
+          onChanged();
+        } else {
+          executionIdBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public Builder mergeExecutionId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (executionIdBuilder_ == null) {
+          if (executionId_ != null) {
+            executionId_ =
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.newBuilder(executionId_).mergeFrom(value).buildPartial();
+          } else {
+            executionId_ = value;
+          }
+          onChanged();
+        } else {
+          executionIdBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public Builder clearExecutionId() {
+        if (executionIdBuilder_ == null) {
+          executionId_ = null;
+          onChanged();
+        } else {
+          executionId_ = null;
+          executionIdBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder getExecutionIdBuilder() {
+        
+        onChanged();
+        return getExecutionIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getExecutionIdOrBuilder() {
+        if (executionIdBuilder_ != null) {
+          return executionIdBuilder_.getMessageOrBuilder();
+        } else {
+          return executionId_ == null ?
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : executionId_;
+        }
+      }
+      /**
+       * <pre>
+       * Identifies the Flyte workflow execution this signal belongs to.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> 
+          getExecutionIdFieldBuilder() {
+        if (executionIdBuilder_ == null) {
+          executionIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder>(
+                  getExecutionId(),
+                  getParentForChildren(),
+                  isClean());
+          executionId_ = null;
+        }
+        return executionIdBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.SignalIdentifier)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.SignalIdentifier)
+    private static final flyteidl.core.IdentifierOuterClass.SignalIdentifier DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.IdentifierOuterClass.SignalIdentifier();
+    }
+
+    public static flyteidl.core.IdentifierOuterClass.SignalIdentifier getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<SignalIdentifier>
+        PARSER = new com.google.protobuf.AbstractParser<SignalIdentifier>() {
+      @java.lang.Override
+      public SignalIdentifier parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SignalIdentifier(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SignalIdentifier> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SignalIdentifier> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.IdentifierOuterClass.SignalIdentifier getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Identifier_descriptor;
   private static final 
@@ -3995,6 +4842,11 @@ public final class IdentifierOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TaskExecutionIdentifier_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_SignalIdentifier_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_SignalIdentifier_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4017,10 +4869,13 @@ public final class IdentifierOuterClass {
       "sk_id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A" +
       "\n\021node_execution_id\030\002 \001(\0132&.flyteidl.cor" +
       "e.NodeExecutionIdentifier\022\025\n\rretry_attem" +
-      "pt\030\003 \001(\r*U\n\014ResourceType\022\017\n\013UNSPECIFIED\020" +
-      "\000\022\010\n\004TASK\020\001\022\014\n\010WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN" +
-      "\020\003\022\013\n\007DATASET\020\004B6Z4github.com/flyteorg/f" +
-      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "pt\030\003 \001(\r\"g\n\020SignalIdentifier\022\021\n\tsignal_i" +
+      "d\030\001 \001(\t\022@\n\014execution_id\030\002 \001(\0132*.flyteidl" +
+      ".core.WorkflowExecutionIdentifier*U\n\014Res" +
+      "ourceType\022\017\n\013UNSPECIFIED\020\000\022\010\n\004TASK\020\001\022\014\n\010" +
+      "WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN\020\003\022\013\n\007DATASET\020\004" +
+      "B6Z4github.com/flyteorg/flyteidl/gen/pb-" +
+      "go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4058,6 +4913,12 @@ public final class IdentifierOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskExecutionIdentifier_descriptor,
         new java.lang.String[] { "TaskId", "NodeExecutionId", "RetryAttempt", });
+    internal_static_flyteidl_core_SignalIdentifier_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_flyteidl_core_SignalIdentifier_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_SignalIdentifier_descriptor,
+        new java.lang.String[] { "SignalId", "ExecutionId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

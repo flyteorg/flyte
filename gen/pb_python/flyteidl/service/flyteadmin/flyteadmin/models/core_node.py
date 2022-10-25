@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.core_alias import CoreAlias  # noqa: F401,E501
 from flyteadmin.models.core_binding import CoreBinding  # noqa: F401,E501
 from flyteadmin.models.core_branch_node import CoreBranchNode  # noqa: F401,E501
+from flyteadmin.models.core_gate_node import CoreGateNode  # noqa: F401,E501
 from flyteadmin.models.core_node_metadata import CoreNodeMetadata  # noqa: F401,E501
 from flyteadmin.models.core_task_node import CoreTaskNode  # noqa: F401,E501
 from flyteadmin.models.core_workflow_node import CoreWorkflowNode  # noqa: F401,E501
@@ -45,7 +46,8 @@ class CoreNode(object):
         'output_aliases': 'list[CoreAlias]',
         'task_node': 'CoreTaskNode',
         'workflow_node': 'CoreWorkflowNode',
-        'branch_node': 'CoreBranchNode'
+        'branch_node': 'CoreBranchNode',
+        'gate_node': 'CoreGateNode'
     }
 
     attribute_map = {
@@ -56,10 +58,11 @@ class CoreNode(object):
         'output_aliases': 'output_aliases',
         'task_node': 'task_node',
         'workflow_node': 'workflow_node',
-        'branch_node': 'branch_node'
+        'branch_node': 'branch_node',
+        'gate_node': 'gate_node'
     }
 
-    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None):  # noqa: E501
+    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None, gate_node=None):  # noqa: E501
         """CoreNode - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -70,6 +73,7 @@ class CoreNode(object):
         self._task_node = None
         self._workflow_node = None
         self._branch_node = None
+        self._gate_node = None
         self.discriminator = None
 
         if id is not None:
@@ -88,6 +92,8 @@ class CoreNode(object):
             self.workflow_node = workflow_node
         if branch_node is not None:
             self.branch_node = branch_node
+        if gate_node is not None:
+            self.gate_node = gate_node
 
     @property
     def id(self):
@@ -272,6 +278,29 @@ class CoreNode(object):
         """
 
         self._branch_node = branch_node
+
+    @property
+    def gate_node(self):
+        """Gets the gate_node of this CoreNode.  # noqa: E501
+
+        Information about the condition to evaluate in this node.  # noqa: E501
+
+        :return: The gate_node of this CoreNode.  # noqa: E501
+        :rtype: CoreGateNode
+        """
+        return self._gate_node
+
+    @gate_node.setter
+    def gate_node(self, gate_node):
+        """Sets the gate_node of this CoreNode.
+
+        Information about the condition to evaluate in this node.  # noqa: E501
+
+        :param gate_node: The gate_node of this CoreNode.  # noqa: E501
+        :type: CoreGateNode
+        """
+
+        self._gate_node = gate_node
 
     def to_dict(self):
         """Returns the model properties as a dict"""

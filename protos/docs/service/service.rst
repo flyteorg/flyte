@@ -435,3 +435,45 @@ IdentityService defines an RPC Service that interacts with user/app identities.
    end services
 
 
+
+
+.. _ref_flyteidl/service/signal.proto:
+
+flyteidl/service/signal.proto
+==================================================================
+
+
+
+
+..
+   end messages
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+
+.. _ref_flyteidl.service.SignalService:
+
+SignalService
+------------------------------------------------------------------
+
+SignalService defines an RPC Service that may create, update, and retrieve signal(s).
+
+.. csv-table:: SignalService service methods
+   :header: "Method Name", "Request Type", "Response Type", "Description"
+   :widths: auto
+
+   "GetOrCreateSignal", ":ref:`ref_flyteidl.admin.SignalGetOrCreateRequest`", ":ref:`ref_flyteidl.admin.Signal`", "Fetches or creates a :ref:`ref_flyteidl.admin.Signal`."
+   "ListSignals", ":ref:`ref_flyteidl.admin.SignalListRequest`", ":ref:`ref_flyteidl.admin.SignalList`", "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions."
+   "SetSignal", ":ref:`ref_flyteidl.admin.SignalSetRequest`", ":ref:`ref_flyteidl.admin.SignalSetResponse`", "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition"
+
+..
+   end services
+
+

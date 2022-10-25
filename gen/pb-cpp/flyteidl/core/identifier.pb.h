@@ -42,7 +42,7 @@ struct TableStruct_flyteidl_2fcore_2fidentifier_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[4]
+  static const ::google::protobuf::internal::ParseTable schema[5]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -57,6 +57,9 @@ extern IdentifierDefaultTypeInternal _Identifier_default_instance_;
 class NodeExecutionIdentifier;
 class NodeExecutionIdentifierDefaultTypeInternal;
 extern NodeExecutionIdentifierDefaultTypeInternal _NodeExecutionIdentifier_default_instance_;
+class SignalIdentifier;
+class SignalIdentifierDefaultTypeInternal;
+extern SignalIdentifierDefaultTypeInternal _SignalIdentifier_default_instance_;
 class TaskExecutionIdentifier;
 class TaskExecutionIdentifierDefaultTypeInternal;
 extern TaskExecutionIdentifierDefaultTypeInternal _TaskExecutionIdentifier_default_instance_;
@@ -69,6 +72,7 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::Identifier* Arena::CreateMaybeMessage<::flyteidl::core::Identifier>(Arena*);
 template<> ::flyteidl::core::NodeExecutionIdentifier* Arena::CreateMaybeMessage<::flyteidl::core::NodeExecutionIdentifier>(Arena*);
+template<> ::flyteidl::core::SignalIdentifier* Arena::CreateMaybeMessage<::flyteidl::core::SignalIdentifier>(Arena*);
 template<> ::flyteidl::core::TaskExecutionIdentifier* Arena::CreateMaybeMessage<::flyteidl::core::TaskExecutionIdentifier>(Arena*);
 template<> ::flyteidl::core::WorkflowExecutionIdentifier* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(Arena*);
 }  // namespace protobuf
@@ -681,6 +685,136 @@ class TaskExecutionIdentifier final :
   ::flyteidl::core::Identifier* task_id_;
   ::flyteidl::core::NodeExecutionIdentifier* node_execution_id_;
   ::google::protobuf::uint32 retry_attempt_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fidentifier_2eproto;
+};
+// -------------------------------------------------------------------
+
+class SignalIdentifier final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.SignalIdentifier) */ {
+ public:
+  SignalIdentifier();
+  virtual ~SignalIdentifier();
+
+  SignalIdentifier(const SignalIdentifier& from);
+
+  inline SignalIdentifier& operator=(const SignalIdentifier& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  SignalIdentifier(SignalIdentifier&& from) noexcept
+    : SignalIdentifier() {
+    *this = ::std::move(from);
+  }
+
+  inline SignalIdentifier& operator=(SignalIdentifier&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const SignalIdentifier& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SignalIdentifier* internal_default_instance() {
+    return reinterpret_cast<const SignalIdentifier*>(
+               &_SignalIdentifier_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(SignalIdentifier* other);
+  friend void swap(SignalIdentifier& a, SignalIdentifier& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SignalIdentifier* New() const final {
+    return CreateMaybeMessage<SignalIdentifier>(nullptr);
+  }
+
+  SignalIdentifier* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<SignalIdentifier>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const SignalIdentifier& from);
+  void MergeFrom(const SignalIdentifier& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SignalIdentifier* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string signal_id = 1;
+  void clear_signal_id();
+  static const int kSignalIdFieldNumber = 1;
+  const ::std::string& signal_id() const;
+  void set_signal_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_signal_id(::std::string&& value);
+  #endif
+  void set_signal_id(const char* value);
+  void set_signal_id(const char* value, size_t size);
+  ::std::string* mutable_signal_id();
+  ::std::string* release_signal_id();
+  void set_allocated_signal_id(::std::string* signal_id);
+
+  // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;
+  bool has_execution_id() const;
+  void clear_execution_id();
+  static const int kExecutionIdFieldNumber = 2;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& execution_id() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_execution_id();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_execution_id();
+  void set_allocated_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* execution_id);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.SignalIdentifier)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr signal_id_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* execution_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fidentifier_2eproto;
 };
@@ -1312,9 +1446,119 @@ inline void TaskExecutionIdentifier::set_retry_attempt(::google::protobuf::uint3
   // @@protoc_insertion_point(field_set:flyteidl.core.TaskExecutionIdentifier.retry_attempt)
 }
 
+// -------------------------------------------------------------------
+
+// SignalIdentifier
+
+// string signal_id = 1;
+inline void SignalIdentifier::clear_signal_id() {
+  signal_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& SignalIdentifier::signal_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.SignalIdentifier.signal_id)
+  return signal_id_.GetNoArena();
+}
+inline void SignalIdentifier::set_signal_id(const ::std::string& value) {
+  
+  signal_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.SignalIdentifier.signal_id)
+}
+#if LANG_CXX11
+inline void SignalIdentifier::set_signal_id(::std::string&& value) {
+  
+  signal_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.SignalIdentifier.signal_id)
+}
+#endif
+inline void SignalIdentifier::set_signal_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  signal_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.SignalIdentifier.signal_id)
+}
+inline void SignalIdentifier::set_signal_id(const char* value, size_t size) {
+  
+  signal_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.SignalIdentifier.signal_id)
+}
+inline ::std::string* SignalIdentifier::mutable_signal_id() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.SignalIdentifier.signal_id)
+  return signal_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* SignalIdentifier::release_signal_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.SignalIdentifier.signal_id)
+  
+  return signal_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void SignalIdentifier::set_allocated_signal_id(::std::string* signal_id) {
+  if (signal_id != nullptr) {
+    
+  } else {
+    
+  }
+  signal_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), signal_id);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.SignalIdentifier.signal_id)
+}
+
+// .flyteidl.core.WorkflowExecutionIdentifier execution_id = 2;
+inline bool SignalIdentifier::has_execution_id() const {
+  return this != internal_default_instance() && execution_id_ != nullptr;
+}
+inline void SignalIdentifier::clear_execution_id() {
+  if (GetArenaNoVirtual() == nullptr && execution_id_ != nullptr) {
+    delete execution_id_;
+  }
+  execution_id_ = nullptr;
+}
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& SignalIdentifier::execution_id() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = execution_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.SignalIdentifier.execution_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* SignalIdentifier::release_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.SignalIdentifier.execution_id)
+  
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = execution_id_;
+  execution_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* SignalIdentifier::mutable_execution_id() {
+  
+  if (execution_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    execution_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.SignalIdentifier.execution_id)
+  return execution_id_;
+}
+inline void SignalIdentifier::set_allocated_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete execution_id_;
+  }
+  if (execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, execution_id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  execution_id_ = execution_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.SignalIdentifier.execution_id)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
