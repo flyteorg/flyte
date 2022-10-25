@@ -13,6 +13,7 @@ IMAGES := \
 	postgres:14-alpine \
 	envoyproxy/envoy:v1.23-latest \
 	rancher/pause:3.1 \
+	kubernetesui/metrics-scraper:v1.0.8 \
 	registry:2
 
 define IMAGE_RULE
@@ -43,6 +44,10 @@ images/tar/flyte-ci:
 
 .PHONY: images
 images: $(foreach name,flyte $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))
+
+.PHONY: osxbuildflyte
+osxbuildflyte:
+	echo hello
 
 .PHONY: images-ci
 images-ci: $(foreach name,flyte-ci $(IMAGES),images/tar/$(subst /,-,$(word 1,$(subst :, ,$(name)))))

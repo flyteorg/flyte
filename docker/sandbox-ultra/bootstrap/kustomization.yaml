@@ -1,4 +1,5 @@
 bases:
+- flyte
 - kubernetes-dashboard
 - minio
 - postgres
