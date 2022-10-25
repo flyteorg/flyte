@@ -58,7 +58,6 @@ jobs:
       - name: Prepare Sandbox images for single binary
         if: ${{ inputs.repository == 'flyte-sandbox-ultra' }}
         run: |
-          make -C docker/sandbox-ultra bootstrap
           if [ ${{ inputs.version }} = "latest" ]; then
             make -C docker/sandbox-ultra images-ci
           else
