@@ -1662,15 +1662,15 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@flyteorg/flyteidl@1.1.22":
-  version "1.1.22"
-  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-1.1.22.tgz#001595186e506afc25dee29a6e52d946d16ddbd0"
-  integrity sha512-Gpnmu1S2ZWfehYCi+cqOlKdVtZ21WVjxgqPV2sSm255/6KOebaen257j0VoQol/oi2p8pHqPOCN8THq1rtcLDg==
-
 "@flyteorg/flyteidl@1.1.4":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-1.1.4.tgz#7a02d80e22c623817b6061f1f5e88ec243041cf1"
   integrity sha512-CmO/H3vbjluV/G4J9TFnSo3HiefOQ8f46BbpordSlVA2CANWQZaNc6Csz7JTGdotyZ2DdUXJkBcPRiA/r9H3lQ==
+
+"@flyteorg/flyteidl@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-1.2.0.tgz#3f1a3f020800c9bc99c7ef10d42da74aad186d91"
+  integrity sha512-AzN4vG91hvYFAZV0T0LzDNWSFKyJkjZaLr9oTjYHPpSSvBut3RAJAqbomJD8fcF1w6TMm9HT+vI8bwSBYMMXUQ==
 
 "@gar/promisify@^1.0.1", "@gar/promisify@^1.1.3":
   version "1.1.3"
