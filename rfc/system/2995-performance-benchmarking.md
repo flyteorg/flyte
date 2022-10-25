@@ -30,39 +30,26 @@ For this reason, we believe Flyte metrics should be naturally partitioned into r
             
 **Runtime Metrics:** These metrics breakdown the time spent within workflow executions into user-code and various overhead estimates. In theory, this explanation sounds very simple, but the complexities of Flyte can make this challenging in many scenarios.
 
-![node-overhead](https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd)
-
-<img 
-    style="display: block; 
-           margin-left: auto;
-           margin-right: auto;
-           width: 60%;"
-    src="https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd" 
-    alt="node-overhead">
-</img>
+We have provided a small image below to help describe the myriad scenarios within this definition. The image depicts the timeline-view of node runtimes for a workflow where `node-0` is a dynamic task which sparks two additonal nodes, namely `node-0-0` and `node-0-1`; and `node-1` and `node-2` have no dependencies on `node-0` but `node-2` is dependent on `node-1`. Within each node, runtime is broken down by red boxes denoting Flyte overhead, yellow boxes denoting k8s overhead, green boxes denoting user-code execution, and blue boxes denoting subnode execution. These runtimes, and the exposed overheads, are entirely artifical and some have been inflated, others shrunk, compared to real-world expectations for the purposes of easing this definition. 
 
 <p align="center" width="100%">
     <img width="60%" src="https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd" alt="node-runtime"> 
 </p>
 
-Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte performs a variety or orchestration operations to ensure cohesion within the framework. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
+Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte performs a variety or orchestration operations to ensure cohesion within the framework. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. As outlined in the node runtime image these are typically pre and post processing operations on node executions. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. This overhead anchors user-code runtimes and shown in the image. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
-It is important to highlight that this overhead differs signficantly between node types. For example, executing a `python-task` creates a k8s Pod and then periodically tracks it's status. The overhead here is clear, all pre-processing and post-processing operations. However, this becomes more difficult if the Pod fails after some time. Flyte will create a new retry attempt, but does the original Pod execution count as overhead? This complexity increases when analyzing dynamic tasks, which use a k8s Pod to dynamically compile a Flyte DAG and then proceed to execute that DAG, or launchplans, which start an entirely separate workflow. Given the extreme complexity, we must reiterate that this overhead is provided only as an estimate and will likely reflect a lower-bound.
+It is important to highlight that this overhead differs signficantly between node types. For example, executing a `python-task` creates a k8s Pod and then periodically tracks it's status. The overhead here is clear, for example `node-1` or `node-2` have overhead for all pre-processing and post-processing operations. However, this becomes more difficult if the Pod fails after some time. Flyte will create a new retry attempt, but does the original Pod execution count as overhead? This complexity increases when analyzing dynamic tasks, which use a k8s Pod to dynamically compile a Flyte DAG and then proceed to execute that DAG as depicted in the blue box on `node-0` where it's children `node-0-0` and `node-0-1` are executing, or launchplans, which start an entirely separate workflow. Given the extreme complexity, we must reiterate that this overhead is provided only as an estimate and will likely reflect a lower-bound.
 
-Since each node type requires a unique overhead computation it makes sense to define this on each [NodeHandler](TODO) individually. This will likely require additional metadata with the [NodeStatus]() for each type, for example temporary timestamps that may or may not be persisted to FlyteAdmin through eventing.
-
-TODO - layout NodeHandler changes
+Since each node type requires a unique overhead computation it makes sense to define this on each [NodeHandler](https://github.com/flyteorg/flytepropeller/blob/26ad85757c57cda41bf23a2b054d49eccaa8145d/pkg/controller/nodes/handler/iface.go#L10) individually. This will likely require additional metadata with the [NodeState](https://github.com/flyteorg/flytepropeller/blob/master/pkg/controller/nodes/handler/state.go) for each type, for example temporary timestamps that may or may not be persisted to FlyteAdmin through eventing. Overhead estimates may be computed and reported as part of processing terminal phases.
 
 Given overhead estimates for each node, we can aggregate this information to compute an overall workflow overhead estimate. Again, this computation is not well defined, naively we could aggregate all node overhead estimates, but that omits the time Flyte orchestration spends between executing a node after all of it's upstream dependencies have completed. We outline some of the scenarios where this delta can be large below:
 
-- High Latency k8s Watch: FlytePropeller opens a watch on k8s Pods, which means that everytime a Pod status updates FlytePropeller is informed. This enables Flyte to immedately detect and process Pod completions rather than waiting peridically. If this watch API has a large latency it could be seconds before Fltye is able to schedule downstream nodes.
-- Max Parallelism: Fltye workflows can restrict the number of concurrent node executions. This is useful as a defense mechanism, but does mean that a scheduleable node is held back. In the case it is unclear wether this should count as Flyte overhead or not.
+- High Latency k8s Watch: FlytePropeller opens a watch on k8s Pods, which means that everytime a Pod status updates FlytePropeller is informed. This enables Flyte to immedately detect and process Pod completions rather than waiting peridically. If this watch API has a large latency it could be seconds before Flyte is able to schedule downstream nodes. This is highlighted in the execution of `node-2` after `node-1` completes, there is about half a second where neither node is executing which should be attributed to Flyte overhead.
+- Max Parallelism: Flyte workflows can restrict the number of concurrent node executions. This is useful as a defense mechanism, but does mean that a scheduleable node is held back. In the case it is unclear wether this should count as Flyte overhead or not.
 
 In consideration of these complexities we propose to define the workflow overhead estimate as an aggregate of the overhead estimate and scheduling latency at each individual node. This seems to be the most honest and accurate portrayal.
 
-Collecting and correctly reporting this information encompasses it's own challenges. Fortunately, Flyte already incorporates a robust eventing system used to report workflow, node, and task execution information which is then incorporated into the UI. The plan is to compute / collect this information within FlytePropeller and include it in event messages. Specifically, we extend the FlyteIDL event protos and FlyteAdmin models as such... TODO
-
-TODO - layout FlyteIDL and FlyteAdmin model updates
+Collecting and correctly reporting this information encompasses it's own challenges. Fortunately, Flyte already incorporates a robust eventing system used to report workflow, node, and task execution information which is then incorporated into the UI. The plan is to compute / collect this information within FlytePropeller and include it in event messages. Specifically, we propose to extend the existing [FlyteIDL event protos](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/event/event.proto) with an `overhead estimation` value which can then be set on the FlyteAdmin [NodeExecution](https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/models/node_execution.go#L16) and [Execution (workflow)](https://github.com/flyteorg/flyteadmin/blob/c80bd7c1a608cfd76f316b6cd4a0ceb9a707592a/pkg/repositories/models/execution.go#L20) models. This is the less intrusive change, alternatively we could report individual timestamps and store them in the models to compute overhead on the FlyteAdmin side. This would additionally improve the precision of Flyte runtime tracking in the UI. The correct approach should be debated.
 
 **Orchestration Metrics:** These metrics provide insight into what Flyte is doing to incur overhead. As previously mentioned, these values do not directly correlate with workflow runtimes because Flyte performs orchestration operations during node / task executions.
 
@@ -242,6 +229,8 @@ The [FlytePropeller repository](https://github.com/flyteorg/flytepropeller) cont
 Including a telemetry library is going to require additional complexity in Flyte setup. Similar to the existing support for prometheus, this is not going to be requried for a Flyte deployment. Rather, it can be turned on / of on demand. Issues in collecting long-running traces at scale are a concern, so at least to begin, integrating always on fine-grainded performance analysis in a production environment is likely in-advisable
 
 ## 8 Unresolved questions
+
+- Do we compute overhead on the FlytePropeller or FlyteAdmin side? If FlytePropeller means we compute overhead on terminal phases and report a single `overhead-estimate` value in the event. Alternatively, FlyteAdmin requires additional complexity for storing a collection of timestamps and logic to compute overhead thereof.
 
 - What is the most efficient solution for provisioning infrastructure and deploying Flyte? The proposed solution to use terraform and helm seems like a logical approach, but there may be unforeseen issues.
 
