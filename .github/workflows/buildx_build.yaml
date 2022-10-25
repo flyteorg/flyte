@@ -71,7 +71,7 @@ jobs:
         with:
           driver-opts: network=host
       - name: Login to GitHub Container Registry
-        if: false
+        if: ${{ inputs.push }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -84,9 +84,8 @@ jobs:
         with:
           context: ${{ inputs.context }}
           platforms: linux/arm64
-          push: ${{ inputs.push }}
+          push: false
           tags: ${{ steps.dind-names.outputs.tags }}
-          load: true
           build-args: ${{ inputs.args }}
           outputs: type=docker,dest=/tmp/flyte-arm64.tar
           file: ${{ inputs.dockerfile }}
@@ -99,14 +98,18 @@ jobs:
         with:
           context: ${{ inputs.context }}
           platforms: linux/amd64
-          push: ${{ inputs.push }}
+          push: false
           tags: ${{ steps.dind-names.outputs.tags }}
-          load: true
           build-args: ${{ inputs.args }}
           outputs: type=docker,dest=/tmp/flyte-amd64.tar
           file: ${{ inputs.dockerfile }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Publish Multi Arch images
+        if: ${{ inputs.push }}
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ inputs.repository }}:${{ inputs.version }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ inputs.repository }}:sha-$(git rev-parse HEAD)
       - name: Upload Artifact GitHub Action
         if: ${{ inputs.repository == 'flyte-single-binary' }}
         uses: actions/upload-artifact@v2
