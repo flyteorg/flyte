@@ -6,14 +6,13 @@ K8s Operator
 
 This guide gives an overview of setting up the K8s Operator backend plugin in your Flyte deployment.
 
-1. Add Flyte chart repo to Helm:
+1. Add Flyte chart repo to Helm.
 
 .. code-block::
 
  helm repo add flyteorg https://flyteorg.github.io/flyte
 
-
-2. Setup the cluster.
+2. Set up the cluster.
 
 .. tabbed:: Sandbox
 
@@ -513,8 +512,7 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
 
 .. code-block:: bash
 
-  helm upgrade flyte flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml -n flyte
-
+  helm upgrade flyte-core flyteorg/flyte-core -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml -n flyte
 
 6. Register the plugin example:
 

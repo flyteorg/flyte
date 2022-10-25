@@ -3,8 +3,8 @@ module github.com/flyteorg/flyte
 go 1.18
 
 require (
-	github.com/flyteorg/datacatalog v1.0.1
-	github.com/flyteorg/flyteadmin v1.1.50
+	github.com/flyteorg/datacatalog v1.0.2
+	github.com/flyteorg/flyteadmin v1.1.51
 	github.com/flyteorg/flytepropeller v1.1.43
 	github.com/flyteorg/flytestdlib v1.0.7
 	github.com/golang/glog v1.0.0
