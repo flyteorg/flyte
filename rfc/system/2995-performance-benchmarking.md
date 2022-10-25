@@ -30,14 +30,14 @@ For this reason, we believe Flyte metrics should be naturally partitioned into r
             
 **Runtime Metrics:** These metrics breakdown the time spent within workflow executions into user-code and various overhead estimates. In theory, this explanation sounds very simple, but the complexities of Flyte can make this challenging in many scenarios.
 
-![node-overhead](https://drive.google.com/uc?export=view&id=1hbZsB272N0iXCT0LswtA5OozYFVxJgrs)
+![node-overhead](https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd)
 
 <img 
-    style="display: block;
+    style="display: block; 
            margin-left: auto;
            margin-right: auto;
            width: 60%;"
-    src="https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd"
+    src="https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd" 
     alt="node-overhead">
 </img>
 
