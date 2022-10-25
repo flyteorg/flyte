@@ -58,7 +58,7 @@ We propose to integrate a telemetry library within FlytePropeller to emit distri
 An example of using telemetry to define a FlyteWorkflow trace is depicted below. This is presented at a high level, depecting blue boxes for propeller rounds, green boxes for evaluation streaks, yellow boxes for etcd updates on state persistence, and red boxes for eventings, phase updates, blobstore read / writes, etc. This is not meant as an exact replica of the visualization, rather to provide deeper understanding of what is possible. For example, we can see when propeller evaluated a workflow, and within that evaluation how much time was spent performing various operations. This is very important when dissecting performance on a per-workflow basis. 
 
 <p align="center" width="100%">
-    <img width="60%" src="https://drive.google.com/uc?export=view&id=1vsnPe8PBB-X0Aqglji18-T2uPACZtAew" alt="workflow-trace"> 
+    <img width="60%" src="https://drive.google.com/uc?export=view&id=1Jlk71Y0JVv2b1vcbCzI2jbPHjgY4o4bo" alt="workflow-trace"> 
 </p>
 
 This will involve an additional dependency in FlytePropeller and likely some boilerplate code in FlyteIDL to abstract initialization (if this will be used in other repositories). Many telemetry libraries require simple context decorating to define each span. This can either be manaully implemented for fine-grained control or automatically included in each exported function. It is likely the former solution (ie. manually defining) will ensure more well-defined insight into performance without unecessarily bloating metrics.
