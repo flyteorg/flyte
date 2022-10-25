@@ -53,23 +53,13 @@ Collecting and correctly reporting this information encompasses it's own challen
 
 **Orchestration Metrics:** These metrics provide insight into what Flyte is doing to incur overhead. As previously mentioned, these values do not directly correlate with workflow runtimes because Flyte performs orchestration operations during node / task executions.
 
-We propose to integrate a telemetry library within FlytePropeller to emit distributed traces of orchestration operations for each workflow execution. Telemetry traces involve defining a hierarchical collection of spans, where each span relates to single operation with a starting and ending timestamp. Spans typically relate to function invocations, network calls, database reads / writes, etc. This paradigm fits very well with how FlytePropeller orchestrates workflow executions. For example, it uses a queuing system to periodically check various workflow state in _rounds_. Within each round it executes multiple _streaks_ which can include a single change followed by state persistence. Each _streak_ may involve blobstore reads / writes, k8s Pod operations, etc. An example of using telemetry to define a FlyteWorkflow trace is depicted below:
+We propose to integrate a telemetry library within FlytePropeller to emit distributed traces of orchestration operations for each workflow execution. Telemetry traces involve defining a hierarchical collection of spans, where each span relates to single operation with a starting and ending timestamp. Spans typically relate to function invocations, network calls, database reads / writes, etc. This paradigm fits very well with how FlytePropeller orchestrates workflow executions. For example, it uses a queuing system to periodically check various workflow state in _rounds_. Within each round it executes multiple _streaks_ which can include a single change followed by state persistence. Each _streak_ may involve blobstore reads / writes, k8s Pod operations, etc.
 
-    TODO - graphic of trace
-        workflow-evaluation
-            streak-round
-                processing node N
-                    NodeEvent
-                        TaskEvent
-                WorkflowEvent
-                updating CRD in etcd
-            streak-round
-                processing node N
-                    blobstore copy
-            streak-round
-                processing node N
-                    NodeEvent
-            ...
+An example of using telemetry to define a FlyteWorkflow trace is depicted below. This is presented at a high level, depecting blue boxes for propeller rounds, green boxes for evaluation streaks, yellow boxes for etcd updates on state persistence, and red boxes for eventings, phase updates, blobstore read / writes, etc. This is not meant as an exact replica of the visualization, rather to provide deeper understanding of what is possible. For example, we can see when propeller evaluated a workflow, and within that evaluation how much time was spent performing various operations. This is very important when dissecting performance on a per-workflow basis. 
+
+<p align="center" width="100%">
+    <img width="60%" src="https://drive.google.com/uc?export=view&id=1vsnPe8PBB-X0Aqglji18-T2uPACZtAew" alt="workflow-trace"> 
+</p>
 
 This will involve an additional dependency in FlytePropeller and likely some boilerplate code in FlyteIDL to abstract initialization (if this will be used in other repositories). Many telemetry libraries require simple context decorating to define each span. This can either be manaully implemented for fine-grained control or automatically included in each exported function. It is likely the former solution (ie. manually defining) will ensure more well-defined insight into performance without unecessarily bloating metrics.
 
