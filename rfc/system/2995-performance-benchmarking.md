@@ -41,6 +41,10 @@ For this reason, we believe Flyte metrics should be naturally partitioned into r
     alt="node-overhead">
 </img>
 
+<p align="center" width="100%">
+    <img width="60%" src=""https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd" alt="node-runtime"> 
+</p>
+
 Perhaps, the best place to start is by defining what we mean by overhead. Within any node execution Flyte performs a variety or orchestration operations to ensure cohesion within the framework. These may inlcude wrangling input data from multiple upstream nodes, using events and etcd writes to update node phases, etc. Additionally, k8s (and other external systems) require various housekeeping operations to ensure job execution. For example, creating / scheduling Pods and metadata maintenance thereof, pulling container images, managing container runtimes, and so on. Basically, all nodes within Flyte spend a portion of their execution time executing user node, the rest, in some respect, may be attributed to overhead.
 
 It is important to highlight that this overhead differs signficantly between node types. For example, executing a `python-task` creates a k8s Pod and then periodically tracks it's status. The overhead here is clear, all pre-processing and post-processing operations. However, this becomes more difficult if the Pod fails after some time. Flyte will create a new retry attempt, but does the original Pod execution count as overhead? This complexity increases when analyzing dynamic tasks, which use a k8s Pod to dynamically compile a Flyte DAG and then proceed to execute that DAG, or launchplans, which start an entirely separate workflow. Given the extreme complexity, we must reiterate that this overhead is provided only as an estimate and will likely reflect a lower-bound.
