@@ -3114,6 +3114,169 @@ Represents a frequency at which to run a schedule.
 
 
 
+.. _ref_flyteidl/admin/signal.proto:
+
+flyteidl/admin/signal.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.Signal:
+
+Signal
+------------------------------------------------------------------
+
+Signal encapsulates a unique identifier, associated metadata, and a value for a single Flyte
+signal. Signals may exist either without a set value (representing a signal request) or with a
+populated value (indicating the signal has been given).
+
+
+
+.. csv-table:: Signal type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.SignalIdentifier`", "", "A unique identifier for the requested signal."
+   "type", ":ref:`ref_flyteidl.core.LiteralType`", "", "A type denoting the required value type for this signal."
+   "value", ":ref:`ref_flyteidl.core.Literal`", "", "The value of the signal. This is only available if the signal has been "set" and must match the defined the type."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SignalGetOrCreateRequest:
+
+SignalGetOrCreateRequest
+------------------------------------------------------------------
+
+SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+See :ref:`ref_flyteidl.admin.Signal` for more details
+
+
+
+.. csv-table:: SignalGetOrCreateRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.SignalIdentifier`", "", "A unique identifier for the requested signal."
+   "type", ":ref:`ref_flyteidl.core.LiteralType`", "", "A type denoting the required value type for this signal."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SignalList:
+
+SignalList
+------------------------------------------------------------------
+
+SignalList represents collection of signals along with the token of the last result.
+See :ref:`ref_flyteidl.admin.Signal` for more details
+
+
+
+.. csv-table:: SignalList type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signals", ":ref:`ref_flyteidl.admin.Signal`", "repeated", "A list of signals matching the input filters."
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SignalListRequest:
+
+SignalListRequest
+------------------------------------------------------------------
+
+SignalListRequest represents a request structure to retrieve a collection of signals.
+See :ref:`ref_flyteidl.admin.Signal` for more details
+
+
+
+.. csv-table:: SignalListRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Indicates the workflow execution to filter by. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional"
+   "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. +optional"
+   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SignalSetRequest:
+
+SignalSetRequest
+------------------------------------------------------------------
+
+SignalSetRequest represents a request structure to set the value on a signal. Setting a signal
+effetively satisfies the signal condition within a Flyte workflow.
+See :ref:`ref_flyteidl.admin.Signal` for more details
+
+
+
+.. csv-table:: SignalSetRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.SignalIdentifier`", "", "A unique identifier for the requested signal."
+   "value", ":ref:`ref_flyteidl.core.Literal`", "", "The value of this signal, must match the defining signal type."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SignalSetResponse:
+
+SignalSetResponse
+------------------------------------------------------------------
+
+SignalSetResponse represents a response structure if signal setting succeeds.
+
+Purposefully empty, may be populated in the future.
+
+
+
+
+
+
+
+..
+   end messages
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
+
+
+
+
 .. _ref_flyteidl/admin/task.proto:
 
 flyteidl/admin/task.proto

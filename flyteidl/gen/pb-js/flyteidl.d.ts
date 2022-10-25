@@ -469,6 +469,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a SignalIdentifier. */
+        interface ISignalIdentifier {
+
+            /** SignalIdentifier signalId */
+            signalId?: (string|null);
+
+            /** SignalIdentifier executionId */
+            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+        }
+
+        /** Represents a SignalIdentifier. */
+        class SignalIdentifier implements ISignalIdentifier {
+
+            /**
+             * Constructs a new SignalIdentifier.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISignalIdentifier);
+
+            /** SignalIdentifier signalId. */
+            public signalId: string;
+
+            /** SignalIdentifier executionId. */
+            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /**
+             * Creates a new SignalIdentifier instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalIdentifier instance
+             */
+            public static create(properties?: flyteidl.core.ISignalIdentifier): flyteidl.core.SignalIdentifier;
+
+            /**
+             * Encodes the specified SignalIdentifier message. Does not implicitly {@link flyteidl.core.SignalIdentifier.verify|verify} messages.
+             * @param message SignalIdentifier message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISignalIdentifier, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalIdentifier message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalIdentifier
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SignalIdentifier;
+
+            /**
+             * Verifies a SignalIdentifier message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ConnectionSet. */
         interface IConnectionSet {
 
@@ -1061,6 +1119,241 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ApproveCondition. */
+        interface IApproveCondition {
+
+            /** ApproveCondition signalId */
+            signalId?: (string|null);
+        }
+
+        /** Represents an ApproveCondition. */
+        class ApproveCondition implements IApproveCondition {
+
+            /**
+             * Constructs a new ApproveCondition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IApproveCondition);
+
+            /** ApproveCondition signalId. */
+            public signalId: string;
+
+            /**
+             * Creates a new ApproveCondition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ApproveCondition instance
+             */
+            public static create(properties?: flyteidl.core.IApproveCondition): flyteidl.core.ApproveCondition;
+
+            /**
+             * Encodes the specified ApproveCondition message. Does not implicitly {@link flyteidl.core.ApproveCondition.verify|verify} messages.
+             * @param message ApproveCondition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IApproveCondition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ApproveCondition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ApproveCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ApproveCondition;
+
+            /**
+             * Verifies an ApproveCondition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SignalCondition. */
+        interface ISignalCondition {
+
+            /** SignalCondition signalId */
+            signalId?: (string|null);
+
+            /** SignalCondition type */
+            type?: (flyteidl.core.ILiteralType|null);
+
+            /** SignalCondition outputVariableName */
+            outputVariableName?: (string|null);
+        }
+
+        /** Represents a SignalCondition. */
+        class SignalCondition implements ISignalCondition {
+
+            /**
+             * Constructs a new SignalCondition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISignalCondition);
+
+            /** SignalCondition signalId. */
+            public signalId: string;
+
+            /** SignalCondition type. */
+            public type?: (flyteidl.core.ILiteralType|null);
+
+            /** SignalCondition outputVariableName. */
+            public outputVariableName: string;
+
+            /**
+             * Creates a new SignalCondition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalCondition instance
+             */
+            public static create(properties?: flyteidl.core.ISignalCondition): flyteidl.core.SignalCondition;
+
+            /**
+             * Encodes the specified SignalCondition message. Does not implicitly {@link flyteidl.core.SignalCondition.verify|verify} messages.
+             * @param message SignalCondition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISignalCondition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalCondition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SignalCondition;
+
+            /**
+             * Verifies a SignalCondition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SleepCondition. */
+        interface ISleepCondition {
+
+            /** SleepCondition duration */
+            duration?: (google.protobuf.IDuration|null);
+        }
+
+        /** Represents a SleepCondition. */
+        class SleepCondition implements ISleepCondition {
+
+            /**
+             * Constructs a new SleepCondition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISleepCondition);
+
+            /** SleepCondition duration. */
+            public duration?: (google.protobuf.IDuration|null);
+
+            /**
+             * Creates a new SleepCondition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SleepCondition instance
+             */
+            public static create(properties?: flyteidl.core.ISleepCondition): flyteidl.core.SleepCondition;
+
+            /**
+             * Encodes the specified SleepCondition message. Does not implicitly {@link flyteidl.core.SleepCondition.verify|verify} messages.
+             * @param message SleepCondition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISleepCondition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SleepCondition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SleepCondition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SleepCondition;
+
+            /**
+             * Verifies a SleepCondition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GateNode. */
+        interface IGateNode {
+
+            /** GateNode approve */
+            approve?: (flyteidl.core.IApproveCondition|null);
+
+            /** GateNode signal */
+            signal?: (flyteidl.core.ISignalCondition|null);
+
+            /** GateNode sleep */
+            sleep?: (flyteidl.core.ISleepCondition|null);
+        }
+
+        /** Represents a GateNode. */
+        class GateNode implements IGateNode {
+
+            /**
+             * Constructs a new GateNode.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IGateNode);
+
+            /** GateNode approve. */
+            public approve?: (flyteidl.core.IApproveCondition|null);
+
+            /** GateNode signal. */
+            public signal?: (flyteidl.core.ISignalCondition|null);
+
+            /** GateNode sleep. */
+            public sleep?: (flyteidl.core.ISleepCondition|null);
+
+            /** GateNode condition. */
+            public condition?: ("approve"|"signal"|"sleep");
+
+            /**
+             * Creates a new GateNode instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GateNode instance
+             */
+            public static create(properties?: flyteidl.core.IGateNode): flyteidl.core.GateNode;
+
+            /**
+             * Encodes the specified GateNode message. Does not implicitly {@link flyteidl.core.GateNode.verify|verify} messages.
+             * @param message GateNode message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IGateNode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GateNode message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GateNode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.GateNode;
+
+            /**
+             * Verifies a GateNode message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a NodeMetadata. */
         interface INodeMetadata {
 
@@ -1218,6 +1511,9 @@ export namespace flyteidl {
 
             /** Node branchNode */
             branchNode?: (flyteidl.core.IBranchNode|null);
+
+            /** Node gateNode */
+            gateNode?: (flyteidl.core.IGateNode|null);
         }
 
         /** Represents a Node. */
@@ -1253,8 +1549,11 @@ export namespace flyteidl {
             /** Node branchNode. */
             public branchNode?: (flyteidl.core.IBranchNode|null);
 
+            /** Node gateNode. */
+            public gateNode?: (flyteidl.core.IGateNode|null);
+
             /** Node target. */
-            public target?: ("taskNode"|"workflowNode"|"branchNode");
+            public target?: ("taskNode"|"workflowNode"|"branchNode"|"gateNode");
 
             /**
              * Creates a new Node instance using the specified properties.
@@ -14166,6 +14465,366 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a SignalGetOrCreateRequest. */
+        interface ISignalGetOrCreateRequest {
+
+            /** SignalGetOrCreateRequest id */
+            id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** SignalGetOrCreateRequest type */
+            type?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents a SignalGetOrCreateRequest. */
+        class SignalGetOrCreateRequest implements ISignalGetOrCreateRequest {
+
+            /**
+             * Constructs a new SignalGetOrCreateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignalGetOrCreateRequest);
+
+            /** SignalGetOrCreateRequest id. */
+            public id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** SignalGetOrCreateRequest type. */
+            public type?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new SignalGetOrCreateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalGetOrCreateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.ISignalGetOrCreateRequest): flyteidl.admin.SignalGetOrCreateRequest;
+
+            /**
+             * Encodes the specified SignalGetOrCreateRequest message. Does not implicitly {@link flyteidl.admin.SignalGetOrCreateRequest.verify|verify} messages.
+             * @param message SignalGetOrCreateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignalGetOrCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalGetOrCreateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalGetOrCreateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SignalGetOrCreateRequest;
+
+            /**
+             * Verifies a SignalGetOrCreateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SignalListRequest. */
+        interface ISignalListRequest {
+
+            /** SignalListRequest workflowExecutionId */
+            workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** SignalListRequest limit */
+            limit?: (number|null);
+
+            /** SignalListRequest token */
+            token?: (string|null);
+
+            /** SignalListRequest filters */
+            filters?: (string|null);
+
+            /** SignalListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+        }
+
+        /** Represents a SignalListRequest. */
+        class SignalListRequest implements ISignalListRequest {
+
+            /**
+             * Constructs a new SignalListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignalListRequest);
+
+            /** SignalListRequest workflowExecutionId. */
+            public workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** SignalListRequest limit. */
+            public limit: number;
+
+            /** SignalListRequest token. */
+            public token: string;
+
+            /** SignalListRequest filters. */
+            public filters: string;
+
+            /** SignalListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /**
+             * Creates a new SignalListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.ISignalListRequest): flyteidl.admin.SignalListRequest;
+
+            /**
+             * Encodes the specified SignalListRequest message. Does not implicitly {@link flyteidl.admin.SignalListRequest.verify|verify} messages.
+             * @param message SignalListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignalListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SignalListRequest;
+
+            /**
+             * Verifies a SignalListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SignalList. */
+        interface ISignalList {
+
+            /** SignalList signals */
+            signals?: (flyteidl.admin.ISignal[]|null);
+
+            /** SignalList token */
+            token?: (string|null);
+        }
+
+        /** Represents a SignalList. */
+        class SignalList implements ISignalList {
+
+            /**
+             * Constructs a new SignalList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignalList);
+
+            /** SignalList signals. */
+            public signals: flyteidl.admin.ISignal[];
+
+            /** SignalList token. */
+            public token: string;
+
+            /**
+             * Creates a new SignalList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalList instance
+             */
+            public static create(properties?: flyteidl.admin.ISignalList): flyteidl.admin.SignalList;
+
+            /**
+             * Encodes the specified SignalList message. Does not implicitly {@link flyteidl.admin.SignalList.verify|verify} messages.
+             * @param message SignalList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignalList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SignalList;
+
+            /**
+             * Verifies a SignalList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SignalSetRequest. */
+        interface ISignalSetRequest {
+
+            /** SignalSetRequest id */
+            id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** SignalSetRequest value */
+            value?: (flyteidl.core.ILiteral|null);
+        }
+
+        /** Represents a SignalSetRequest. */
+        class SignalSetRequest implements ISignalSetRequest {
+
+            /**
+             * Constructs a new SignalSetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignalSetRequest);
+
+            /** SignalSetRequest id. */
+            public id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** SignalSetRequest value. */
+            public value?: (flyteidl.core.ILiteral|null);
+
+            /**
+             * Creates a new SignalSetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalSetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.ISignalSetRequest): flyteidl.admin.SignalSetRequest;
+
+            /**
+             * Encodes the specified SignalSetRequest message. Does not implicitly {@link flyteidl.admin.SignalSetRequest.verify|verify} messages.
+             * @param message SignalSetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignalSetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalSetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalSetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SignalSetRequest;
+
+            /**
+             * Verifies a SignalSetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SignalSetResponse. */
+        interface ISignalSetResponse {
+        }
+
+        /** Represents a SignalSetResponse. */
+        class SignalSetResponse implements ISignalSetResponse {
+
+            /**
+             * Constructs a new SignalSetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignalSetResponse);
+
+            /**
+             * Creates a new SignalSetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SignalSetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.ISignalSetResponse): flyteidl.admin.SignalSetResponse;
+
+            /**
+             * Encodes the specified SignalSetResponse message. Does not implicitly {@link flyteidl.admin.SignalSetResponse.verify|verify} messages.
+             * @param message SignalSetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignalSetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SignalSetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SignalSetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SignalSetResponse;
+
+            /**
+             * Verifies a SignalSetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Signal. */
+        interface ISignal {
+
+            /** Signal id */
+            id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** Signal type */
+            type?: (flyteidl.core.ILiteralType|null);
+
+            /** Signal value */
+            value?: (flyteidl.core.ILiteral|null);
+        }
+
+        /** Represents a Signal. */
+        class Signal implements ISignal {
+
+            /**
+             * Constructs a new Signal.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISignal);
+
+            /** Signal id. */
+            public id?: (flyteidl.core.ISignalIdentifier|null);
+
+            /** Signal type. */
+            public type?: (flyteidl.core.ILiteralType|null);
+
+            /** Signal value. */
+            public value?: (flyteidl.core.ILiteral|null);
+
+            /**
+             * Creates a new Signal instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Signal instance
+             */
+            public static create(properties?: flyteidl.admin.ISignal): flyteidl.admin.Signal;
+
+            /**
+             * Encodes the specified Signal message. Does not implicitly {@link flyteidl.admin.Signal.verify|verify} messages.
+             * @param message Signal message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISignal, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Signal message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Signal
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Signal;
+
+            /**
+             * Verifies a Signal message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskCreateRequest. */
         interface ITaskCreateRequest {
 
@@ -17999,6 +18658,93 @@ export namespace flyteidl {
              * @param [response] UserInfoResponse
              */
             type UserInfoCallback = (error: (Error|null), response?: flyteidl.service.UserInfoResponse) => void;
+        }
+
+        /** Represents a SignalService */
+        class SignalService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new SignalService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new SignalService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): SignalService;
+
+            /**
+             * Calls GetOrCreateSignal.
+             * @param request SignalGetOrCreateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Signal
+             */
+            public getOrCreateSignal(request: flyteidl.admin.ISignalGetOrCreateRequest, callback: flyteidl.service.SignalService.GetOrCreateSignalCallback): void;
+
+            /**
+             * Calls GetOrCreateSignal.
+             * @param request SignalGetOrCreateRequest message or plain object
+             * @returns Promise
+             */
+            public getOrCreateSignal(request: flyteidl.admin.ISignalGetOrCreateRequest): Promise<flyteidl.admin.Signal>;
+
+            /**
+             * Calls ListSignals.
+             * @param request SignalListRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and SignalList
+             */
+            public listSignals(request: flyteidl.admin.ISignalListRequest, callback: flyteidl.service.SignalService.ListSignalsCallback): void;
+
+            /**
+             * Calls ListSignals.
+             * @param request SignalListRequest message or plain object
+             * @returns Promise
+             */
+            public listSignals(request: flyteidl.admin.ISignalListRequest): Promise<flyteidl.admin.SignalList>;
+
+            /**
+             * Calls SetSignal.
+             * @param request SignalSetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and SignalSetResponse
+             */
+            public setSignal(request: flyteidl.admin.ISignalSetRequest, callback: flyteidl.service.SignalService.SetSignalCallback): void;
+
+            /**
+             * Calls SetSignal.
+             * @param request SignalSetRequest message or plain object
+             * @returns Promise
+             */
+            public setSignal(request: flyteidl.admin.ISignalSetRequest): Promise<flyteidl.admin.SignalSetResponse>;
+        }
+
+        namespace SignalService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#getOrCreateSignal}.
+             * @param error Error, if any
+             * @param [response] Signal
+             */
+            type GetOrCreateSignalCallback = (error: (Error|null), response?: flyteidl.admin.Signal) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#listSignals}.
+             * @param error Error, if any
+             * @param [response] SignalList
+             */
+            type ListSignalsCallback = (error: (Error|null), response?: flyteidl.admin.SignalList) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.SignalService#setSignal}.
+             * @param error Error, if any
+             * @param [response] SignalSetResponse
+             */
+            type SetSignalCallback = (error: (Error|null), response?: flyteidl.admin.SignalSetResponse) => void;
         }
     }
 }

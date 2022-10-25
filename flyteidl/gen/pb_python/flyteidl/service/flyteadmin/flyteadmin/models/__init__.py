@@ -139,6 +139,7 @@ from flyteadmin.models.conjunction_expression_logical_operator import Conjunctio
 from flyteadmin.models.connection_set_id_list import ConnectionSetIdList
 from flyteadmin.models.container_architecture import ContainerArchitecture
 from flyteadmin.models.core_alias import CoreAlias
+from flyteadmin.models.core_approve_condition import CoreApproveCondition
 from flyteadmin.models.core_binary import CoreBinary
 from flyteadmin.models.core_binding import CoreBinding
 from flyteadmin.models.core_binding_data import CoreBindingData
@@ -164,6 +165,7 @@ from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
 from flyteadmin.models.core_enum_type import CoreEnumType
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
+from flyteadmin.models.core_gate_node import CoreGateNode
 from flyteadmin.models.core_io_strategy import CoreIOStrategy
 from flyteadmin.models.core_identifier import CoreIdentifier
 from flyteadmin.models.core_identity import CoreIdentity
@@ -198,7 +200,9 @@ from flyteadmin.models.core_scalar import CoreScalar
 from flyteadmin.models.core_schema_type import CoreSchemaType
 from flyteadmin.models.core_secret import CoreSecret
 from flyteadmin.models.core_security_context import CoreSecurityContext
+from flyteadmin.models.core_signal_condition import CoreSignalCondition
 from flyteadmin.models.core_simple_type import CoreSimpleType
+from flyteadmin.models.core_sleep_condition import CoreSleepCondition
 from flyteadmin.models.core_sql import CoreSql
 from flyteadmin.models.core_structured_dataset import CoreStructuredDataset
 from flyteadmin.models.core_structured_dataset_metadata import CoreStructuredDatasetMetadata
