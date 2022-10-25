@@ -1,0 +1,103 @@
+# This is a sample configuration file.
+# Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
+# Look in the artifacts directory in the flyte repo for what's actually run
+# https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
+propeller:
+  rawoutput-prefix: "s3://my-s3-bucket/test/"
+  create-flyteworkflow-crd: true
+webhook:
+  certDir: /var/run/flyte/certs
+  localCert: true
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - K8S-ARRAY
+    default-for-task-types:
+      - container: container
+      - container_array: K8S-ARRAY
+flyteadmin:
+  runScheduler: false
+database:
+  postgres:
+    port: 30001
+    username: postgres
+    host: 127.0.0.1
+    dbname: flyteadmin
+    options: "sslmode=disable"
+storage:
+  type: minio
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    secret-key: miniostorage
+    disable-ssl: true
+    endpoint: "http://localhost:30002"
+    region: my-region
+  cache:
+    max_size_mbs: 10
+    target_gc_percent: 100
+  container: "my-s3-bucket"
+logger:
+  show-source: true
+  level: 4
+admin:
+  endpoint: localhost:8089
+  insecure: true
+plugins:
+  # All k8s plugins default configuration
+  k8s:
+    inject-finalizer: true
+    default-env-vars:
+      - AWS_METADATA_SERVICE_TIMEOUT: 5
+      - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
+      - FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+  # Logging configuration
+  logs:
+    kubernetes-enabled: true
+    kubernetes-template-uri:
+        "http://localhost:30080/kubernetes-dashboard/#/log/{{
+        .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
+  k8s-array:
+    logs:
+      config:
+        kubernetes-enabled: true
+        kubernetes-template-uri:
+            "http://localhost:30080/kubernetes-dashboard/#/log/{{
+            .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
+
+
+cluster_resources:
+  refreshInterval: 5m
+  templatePath: "/etc/flyte/cluster-resource-templates"
+  # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+  standaloneDeployment: false
+  customData:
+  - production:
+    - projectQuotaCpu:
+        value: "5"
+    - projectQuotaMemory:
+        value: "4000Mi"
+  - staging:
+    - projectQuotaCpu:
+        value: "2"
+    - projectQuotaMemory:
+        value: "3000Mi"
+  - development:
+    - projectQuotaCpu:
+        value: "4"
+    - projectQuotaMemory:
+        value: "3000Mi"
+  refresh: 5m
+task_resources:
+  defaults:
+    cpu: 500m
+    memory: 500Mi
+    storage: 500Mi
+catalog-cache:
+  endpoint: localhost:8081
+  insecure: true
+  type: datacatalog
