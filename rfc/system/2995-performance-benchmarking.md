@@ -33,11 +33,11 @@ For this reason, we believe Flyte metrics should be naturally partitioned into r
 ![node-overhead](https://drive.google.com/uc?export=view&id=1hbZsB272N0iXCT0LswtA5OozYFVxJgrs)
 
 <img 
-    style="display: block; 
+    style="display: block;
            margin-left: auto;
            margin-right: auto;
            width: 60%;"
-    src="https://drive.google.com/uc?export=view&id=1hbZsB272N0iXCT0LswtA5OozYFVxJgrs" 
+    src="https://drive.google.com/uc?export=view&id=1Dl_xgoVBl1wXZjiUhTMBT8s0iIghgyPd"
     alt="node-overhead">
 </img>
 
