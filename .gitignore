@@ -29,4 +29,4 @@ dist/
 dist
 *.db
 vendor/
-/docker/sandbox-ultra/images/tar
+/docker/sandbox-bundled/images/tar

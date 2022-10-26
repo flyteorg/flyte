@@ -12,7 +12,7 @@ RUN git clone --depth=1 https://github.com/flyteorg/flyte.git ./flyte -b $FLYTE_
 WORKDIR /flyteorg/build/flyte
 RUN go mod download
 COPY --from=flyteconsole /app/dist cmd/single/dist
-RUN --mount=type=cache,target=/root/.cache/go-build \
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -tags console -v -o dist/flyte cmd/main.go
 
 

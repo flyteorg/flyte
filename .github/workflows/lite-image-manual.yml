@@ -30,11 +30,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-lite
           tags: |
             ${{ steps.set_version.outputs.flyte_version }}
-            type=sha,format=long
-      - name: Prepare Sandbox images
-        run: |
-          make -C docker/sandbox-lite bootstrap
-          make -C docker/sandbox-lite images
+            type=sha,format=long, prefix=dind-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -56,12 +52,13 @@ jobs:
       - name: Build and push DIND Image
         uses: docker/build-push-action@v2
         with:
-          context: docker/sandbox-lite
+          context: .
           platforms: linux/arm64, linux/amd64
           push: true
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
-          file: docker/sandbox-lite/images/dockerfiles/k3s/Dockerfile
+          build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
+          file: docker/sandbox-lite/Dockerfile
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
       - # Temp fix

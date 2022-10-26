@@ -6,62 +6,282 @@ on:
       - docker/**
       - charts/**
       - .github/workflows/sandbox.yml
+  release:
+    types: [published]
 
 jobs:
   trigger-sandbox-build:
-    name: Sandbox build
-    uses: ./.github/workflows/buildx_build_dind.yaml
-    with:
-      context: .
-      dockerfile: docker/sandbox/Dockerfile
-      repository: flyte-sandbox
-      version: latest
-      args: ""
-      push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
-
-  trigger-sandbox-ultra-build:
-    name: Sandbox lite ultra
-    needs: [trigger-single-binary-build]
-    uses: ./.github/workflows/buildx_build.yaml
-    with:
-      context: docker/sandbox-ultra
-      dockerfile:  docker/sandbox-ultra/images/dockerfiles/k3s/Dockerfile
-      repository: flyte-sandbox-ultra
-      version: latest
-      args: ""
-      push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Set flyte version to release
+        id: set_version
+        run: |
+          if [ ${{ github.event_name}} = "release" ]; then
+            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
+          else
+            echo ::set-output name=flyte_version::latest
+          fi
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox
+          tags: |
+            dind
+            ${{ steps.set_version.outputs.flyte_version }}
+            type=sha,format=long, prefix=dind-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Build and push DIND Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          target: dind
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
+          file: docker/sandbox/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   trigger-sandbox-lite-build:
-    name: Sandbox lite build
-    uses: ./.github/workflows/buildx_build_dind.yaml
-    with:
-      context: .
-      dockerfile:  docker/sandbox-lite/Dockerfile
-      repository: flyte-sandbox-lite
-      version: latest
-      args: ""
-      push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Setup Golang caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            /root/.cache/go-build
+            /root/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
+      - name: Set flyte version to release
+        id: set_version
+        run: |
+          if [ ${{ github.event_name}} = "release" ]; then
+            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
+          else
+            echo ::set-output name=flyte_version::latest
+          fi
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-lite
+          tags: |
+            ${{ steps.set_version.outputs.flyte_version }}
+            type=sha,format=long
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Build and push DIND Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          target: dind
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
+          file: docker/sandbox-lite/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
 
   trigger-single-binary-build:
-    name: Single Binary build
-    uses: ./.github/workflows/buildx_build.yaml
-    with:
-      context: .
-      dockerfile:  Dockerfile
-      repository: flyte-single-binary
-      version: latest
-      args: ""
-      push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Setup Golang caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            /root/.cache/go-build
+            /root/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
+      - name: Set flyte version to release
+        id: set_version
+        run: |
+          if [ ${{ github.event_name}} = "release" ]; then
+            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
+          else
+            echo ::set-output name=flyte_version::latest
+          fi
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-binary
+          tags: |
+            ${{ inputs.version }}
+            type=sha,format=long,
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Export ARM64 Image
+        uses: docker/build-push-action@v3
+        if: ${{ github.event_name != 'release' }}
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          context: .
+          platforms: linux/arm64
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: ""
+          file: Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/flyte-arm64.tar
+      - name: Export AMD64 Image
+        uses: docker/build-push-action@v3
+        if: ${{ github.event_name != 'release' }}
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          context: .
+          platforms: linux/amd64
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: ""
+          file: Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/flyte-amd64.tar
+      - name: Build and push Image
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/build-push-action@v3
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: ""
+          file: Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: ${{ github.event_name == 'release' }}
+      - name: Upload Artifact GitHub Action
+        if: ${{ github.event_name != 'release' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: single-binary-image
+          path: /tmp/flyte-*.tar
 
+
+  trigger-sandbox-bundled-build:
+    runs-on: ubuntu-latest
+    needs: [trigger-single-binary-build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Set flyte version to release
+        id: set_version
+        run: |
+          if [ ${{ github.event_name}} = "release" ]; then
+            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
+            echo ::set-output name=build_args::$(echo FLYTE_VERSION=${{ github.event.release.tag_name }})
+          else
+            echo ::set-output name=flyte_version::latest
+            echo ::set-output name=build_args::"FLYTE_VERSION=''"
+          fi
+      - uses: actions/download-artifact@v3
+        if: ${{ github.event_name != 'release' }}
+        with:
+          name: single-binary-image
+          path: /tmp/
+      - name: Prepare DIND Image Names
+        id: dind-names
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-bundled
+          tags: |
+            ${{ inputs.version }}
+            type=sha,format=long,
+      - name: Prepare Sandbox images for single binary
+        run: |
+          if [ ${{ steps.set_version.outputs.flyte_version }} = "latest" ]; then
+            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images-ci
+          else
+            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images
+          fi
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: network=host
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Build and push Image
+        uses: docker/build-push-action@v3
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          context: docker/sandbox-bundled
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ steps.dind-names.outputs.tags }}
+          build-args: ${{ steps.set_version.outputs.build_args }}
+          file: docker/sandbox-bundled/images/dockerfiles/k3s/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: ${{ github.event_name == 'release' }}
