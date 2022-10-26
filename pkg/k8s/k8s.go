@@ -17,6 +17,7 @@ type K8s interface {
 
 //go:generate mockery -name=ContextOps -case=underscore
 type ContextOps interface {
+	CheckConfig() error
 	CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error
 	RemoveContext(ctxName string) error
 }
@@ -56,9 +57,15 @@ func GetK8sClient(cfg, master string) (K8s, error) {
 	return Client, nil
 }
 
+// CheckConfig checks if the kubeConfig pointed to by configAccess exists
+func (k *ContextManager) CheckConfig() error {
+	_, err := k.configAccess.GetStartingConfig()
+	return err
+}
+
 // CopyKubeContext copies context srcCtxName part of srcConfigAccess to targetCtxName part of targetConfigAccess.
 func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error {
-	_, err := k.configAccess.GetStartingConfig()
+	err := k.CheckConfig()
 	if err != nil {
 		return err
 	}
