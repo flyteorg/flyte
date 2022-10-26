@@ -13,6 +13,38 @@ type ContextOps struct {
 	mock.Mock
 }
 
+type ContextOps_CheckConfig struct {
+	*mock.Call
+}
+
+func (_m ContextOps_CheckConfig) Return(_a0 error) *ContextOps_CheckConfig {
+	return &ContextOps_CheckConfig{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ContextOps) OnCheckConfig() *ContextOps_CheckConfig {
+	c_call := _m.On("CheckConfig")
+	return &ContextOps_CheckConfig{Call: c_call}
+}
+
+func (_m *ContextOps) OnCheckConfigMatch(matchers ...interface{}) *ContextOps_CheckConfig {
+	c_call := _m.On("CheckConfig", matchers...)
+	return &ContextOps_CheckConfig{Call: c_call}
+}
+
+// CheckConfig provides a mock function with given fields:
+func (_m *ContextOps) CheckConfig() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type ContextOps_CopyContext struct {
 	*mock.Call
 }

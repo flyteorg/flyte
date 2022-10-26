@@ -140,12 +140,11 @@ func MountVolume(file, destination string) (*mount.Mount, error) {
 	return nil, nil
 }
 
-func UpdateLocalKubeContext(dockerCtx string, contextName string) error {
+func UpdateLocalKubeContext(k8sCtxMgr k8s.ContextOps, dockerCtx string, contextName string) error {
 	srcConfigAccess := &clientcmd.PathOptions{
 		GlobalFile:   docker.Kubeconfig,
 		LoadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 	}
-	k8sCtxMgr := k8s.NewK8sContextManager()
 	return k8sCtxMgr.CopyContext(srcConfigAccess, dockerCtx, contextName)
 }
 
@@ -240,6 +239,12 @@ func primeFlytekitPod(ctx context.Context, podService corev1.PodInterface) {
 }
 
 func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config, primePod bool, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) error {
+	k8sCtxMgr := k8s.NewK8sContextManager()
+	err := k8sCtxMgr.CheckConfig()
+	if err != nil {
+		return err
+	}
+
 	cli, err := docker.GetDockerClient()
 	if err != nil {
 		return err
@@ -267,7 +272,7 @@ func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdC
 		if err != nil {
 			return err
 		}
-		if err = UpdateLocalKubeContext(sandboxDockerContext, sandboxContextName); err != nil {
+		if err = UpdateLocalKubeContext(k8sCtxMgr, sandboxDockerContext, sandboxContextName); err != nil {
 			return err
 		}
 

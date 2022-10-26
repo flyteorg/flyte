@@ -310,6 +310,7 @@ func TestStartFunc(t *testing.T) {
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		k8s.ContextMgr = mockK8sContextMgr
 		ghutil.Client = githubMock
+		mockK8sContextMgr.OnCheckConfig().Return(nil)
 		mockK8sContextMgr.OnCopyContextMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		err = StartSandboxCluster(context.Background(), []string{}, config)
 		assert.Nil(t, err)
