@@ -69,6 +69,8 @@ be granted an access_token valid to be used with admin and other backend service
         :alt: Service Authentication Swimlane
 
         sequenceDiagram
+        %%{config: { 'fontFamily': 'Menlo', 'fontSize': 10, 'fontWeight': 100} }%%
+            autonumber
             Propeller->>+External Authorization Server: /token?client_creds&scope=https://admin/
             External Authorization Server->>-Propeller: access_token
             Propeller->>+Admin: /list_projects?token=access_token
