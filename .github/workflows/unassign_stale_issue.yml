@@ -13,7 +13,8 @@ jobs:
       - name: unassign-stale
         run: |
           echo "Unassigning issue ${{ github.event.issue.number }}"
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d '{"assignees": []}' \
+          curl -X DELETE \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"assignees": ["${{ github.event.issue.assignee }}"]}' \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees
           echo "Unassigned"
