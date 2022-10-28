@@ -2,7 +2,7 @@
 # Runs everday at 00:00
 #-------------------------------------------------------------
 
-name: Check stale
+name: Check stale issues
 
 on:
   schedule:
