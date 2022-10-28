@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/golang/protobuf/proto"
 
+	flyteErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
@@ -177,12 +178,11 @@ func TestCreateWorkflow_ExistingWorkflow(t *testing.T) {
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "workflow with different structure already exists with id "+
-		"resource_type:WORKFLOW project:\"project\" domain:\"domain\" name:\"name\" version:\"version\" ")
+	assert.EqualError(t, err, "workflow with different structure already exists")
 	assert.Nil(t, response)
 }
 
-func TestCreateWorkflow_ExistingWorkflow_NotIdentical(t *testing.T) {
+func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
 	mockStorageClient := commonMocks.GetMockStorageClient()
 
 	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
@@ -196,8 +196,9 @@ func TestCreateWorkflow_ExistingWorkflow_NotIdentical(t *testing.T) {
 
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "workflow with different structure already exists with id "+
-		"resource_type:WORKFLOW project:\"project\" domain:\"domain\" name:\"name\" version:\"version\" ")
+	assert.EqualError(t, err, "workflow with different structure already exists")
+	flyteErr := err.(flyteErrors.FlyteAdminError)
+	assert.Equal(t, codes.InvalidArgument, flyteErr.Code())
 	assert.Nil(t, response)
 }
 

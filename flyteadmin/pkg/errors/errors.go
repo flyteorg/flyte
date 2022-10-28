@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,10 +17,9 @@ type FlyteAdminError interface {
 	Error() string
 	Code() codes.Code
 	GRPCStatus() *status.Status
-	WithDetails(details *admin.EventFailureReason) (FlyteAdminError, error)
+	WithDetails(details proto.Message) (FlyteAdminError, error)
 	String() string
 }
-
 type flyteAdminErrorImpl struct {
 	status *status.Status
 }
@@ -43,7 +43,7 @@ func (e *flyteAdminErrorImpl) String() string {
 // enclose the error in the format that grpc server expect from golang:
 //
 //	https://github.com/grpc/grpc-go/blob/master/status/status.go#L133
-func (e *flyteAdminErrorImpl) WithDetails(details *admin.EventFailureReason) (FlyteAdminError, error) {
+func (e *flyteAdminErrorImpl) WithDetails(details proto.Message) (FlyteAdminError, error) {
 	s, err := e.status.WithDetails(details)
 	if err != nil {
 		return nil, err
@@ -104,6 +104,38 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)
+	}
+	return statusErr
+}
+
+func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest) FlyteAdminError {
+	errorMsg := "workflow with different structure already exists"
+	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateWorkflowFailureReason{
+		Reason: &admin.CreateWorkflowFailureReason_ExistsDifferentStructure{
+			ExistsDifferentStructure: &admin.WorkflowErrorExistsDifferentStructure{
+				Id: request.Id,
+			},
+		},
+	})
+	if transformationErr != nil {
+		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+	}
+	return statusErr
+}
+
+func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admin.WorkflowCreateRequest) FlyteAdminError {
+	errorMsg := "workflow with identical structure already exists"
+	statusErr, transformationErr := NewFlyteAdminError(codes.AlreadyExists, errorMsg).WithDetails(&admin.CreateWorkflowFailureReason{
+		Reason: &admin.CreateWorkflowFailureReason_ExistsIdenticalStructure{
+			ExistsIdenticalStructure: &admin.WorkflowErrorExistsIdenticalStructure{
+				Id: request.Id,
+			},
+		},
+	})
+	if transformationErr != nil {
+		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
 	}
 	return statusErr
 }
