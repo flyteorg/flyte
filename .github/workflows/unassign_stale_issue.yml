@@ -1,7 +1,7 @@
 # Automatically unassign stale issue
 #------------------------------------------------------------
 
-name: Unassign-stale
+name: Unassign stale issues
 on:
   issues:
     types: [ labeled ]
