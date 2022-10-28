@@ -1,13 +1,14 @@
 .. _deployment-cluster-config-auth-appendix:
 
+######################################
 Understanding Authentication in Detail
----------------------------------------
+######################################
 
 .. _auth-openid-appendix:
 
-##############
+**************
 OpenID Connect
-##############
+**************
 
 Flyte supports OpenID Connect. A defacto standard for user authentication. After configuring OpenID Connect, users
 accessing flyte console or flytectl (or other 3rd party apps) will be prompted to authenticate using the configured
@@ -39,9 +40,9 @@ provider.
 
 .. _auth-oauth2-appendix:
 
-######
+******
 OAuth2
-######
+******
 
 Flyte supports OAuth2 to control access to 3rd party and native apps. FlyteAdmin comes with a built in Authorization
 Server that can perform 3-legged and 2-legged OAuth2 flows. It also supports delegating these responsibilities to an
