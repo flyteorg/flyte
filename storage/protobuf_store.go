@@ -92,7 +92,11 @@ func newProtoMetrics(scope promutils.Scope) *protoMetrics {
 	}
 }
 
-func NewDefaultProtobufStore(store RawStore, metrics *protoMetrics) DefaultProtobufStore {
+func NewDefaultProtobufStore(store RawStore, scope promutils.Scope) DefaultProtobufStore {
+	return NewDefaultProtobufStoreWithMetrics(store, newProtoMetrics(scope))
+}
+
+func NewDefaultProtobufStoreWithMetrics(store RawStore, metrics *protoMetrics) DefaultProtobufStore {
 	return DefaultProtobufStore{
 		RawStore: store,
 		metrics:  metrics,

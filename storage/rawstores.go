@@ -106,7 +106,7 @@ func (ds *DataStore) RefreshConfig(cfg *Config) error {
 	}
 
 	rawStore = newCachedRawStore(cfg, rawStore, ds.metrics.cacheMetrics)
-	protoStore := NewDefaultProtobufStore(rawStore, ds.metrics.protoMetrics)
+	protoStore := NewDefaultProtobufStoreWithMetrics(rawStore, ds.metrics.protoMetrics)
 	newDS := NewCompositeDataStore(NewURLPathConstructor(), protoStore)
 	newDS.metrics = ds.metrics
 	*ds = *newDS
