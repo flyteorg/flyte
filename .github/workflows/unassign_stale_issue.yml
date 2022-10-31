@@ -5,6 +5,8 @@ name: Unassign stale issues
 on:
   issues:
     types: [ labeled ]
+env:
+  assignees: "[\"${{ join(github.event.issue.assignees.*.login, '\", \"') }}\"]"
 jobs:
   one:
     runs-on: ubuntu-latest
@@ -15,6 +17,6 @@ jobs:
           echo "Unassigning issue ${{ github.event.issue.number }}"
           curl -X DELETE \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d '{"assignees": ["${{ github.event.issue.assignee }}"]}' \
+              -d '{"assignees": ${{ env.assignees }} }' \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees
           echo "Unassigned"
