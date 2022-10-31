@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/telemetryutils"
 
 	"github.com/flyteorg/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
@@ -38,12 +39,6 @@ import (
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	//"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/sdk/resource"
-	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 )
 
 const defaultNamespace = "all"
@@ -113,51 +108,6 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		limitNamespace = propellerCfg.LimitNamespace
 	}
 
-	// TODO - add opentelemetry exporter
-	/*f, err := os.Create("traces.txt")
-	if err != nil {
-		return err
-	}
-
-	telemetryExporter, err := stdouttrace.New(
-		stdouttrace.WithWriter(f),
-		stdouttrace.WithPrettyPrint(), // Use human-readable output.
-		//stdouttrace.WithoutTimestamps(), // Do not print timestamps for the demo.
-	)
-	if err != nil {
-		return err
-	}*/
-
-	telemetryExporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))
-	if err != nil {
-		return err
-	}
-
-	telemetryResource, _ := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("flytepropeller"), // TODO get these values from flytestdlib
-			semconv.ServiceVersionKey.String("v0.1.0"),
-			attribute.String("environment", "demo"),
-		),
-	)
-
-	tracerProvider := trace.NewTracerProvider(
-		trace.WithBatcher(telemetryExporter),
-		trace.WithResource(telemetryResource),
-	)
-
-	defer func() error {
-		if err := tracerProvider.Shutdown(context.Background()); err != nil {
-			logger.Fatalf(ctx, "failed to shutdown opentelemtry trace provider with err '%v'", err)
-			return err
-		}
-		return nil
-	}()
-
-	otel.SetTracerProvider(tracerProvider)
-
 	options := manager.Options{
 		Namespace:  limitNamespace,
 		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
@@ -205,6 +155,23 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
+
+		tracerProvider, err := telemetryutils.NewTracerProvider("flyte", telemetryutils.GetConfig())
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create telemetry tracer provider. %v", err)
+			return err
+		}
+
+		if tracerProvider != nil {
+			otel.SetTracerProvider(tracerProvider)
+			defer func() error {
+				if err := tracerProvider.Shutdown(context.Background()); err != nil {
+					logger.Fatalf(ctx, "failed to shutdown opentelemtry trace provider with err '%v'", err)
+					return err
+				}
+				return nil
+			}()
+		}
 
 		if !cfg.Admin.Disabled {
 			g.Go(func() error {
