@@ -89,6 +89,38 @@ func (_m *ComposedProtobufStore) CreateSignedURL(ctx context.Context, reference 
 	return r0, r1
 }
 
+type ComposedProtobufStore_Delete struct {
+	*mock.Call
+}
+
+func (_m ComposedProtobufStore_Delete) Return(_a0 error) *ComposedProtobufStore_Delete {
+	return &ComposedProtobufStore_Delete{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ComposedProtobufStore) OnDelete(ctx context.Context, reference storage.DataReference) *ComposedProtobufStore_Delete {
+	c := _m.On("Delete", ctx, reference)
+	return &ComposedProtobufStore_Delete{Call: c}
+}
+
+func (_m *ComposedProtobufStore) OnDeleteMatch(matchers ...interface{}) *ComposedProtobufStore_Delete {
+	c := _m.On("Delete", matchers...)
+	return &ComposedProtobufStore_Delete{Call: c}
+}
+
+// Delete provides a mock function with given fields: ctx, reference
+func (_m *ComposedProtobufStore) Delete(ctx context.Context, reference storage.DataReference) error {
+	ret := _m.Called(ctx, reference)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, storage.DataReference) error); ok {
+		r0 = rf(ctx, reference)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type ComposedProtobufStore_GetBaseContainerFQN struct {
 	*mock.Call
 }
