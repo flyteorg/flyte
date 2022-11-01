@@ -263,7 +263,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 		OutputURI: outputFile,
 	}
 
-	deckFile := v1alpha1.GetDeckFile(nCtx.NodeStatus().GetOutputDir())
+	deckFile := storage.DataReference(recovered.Closure.GetDeckUri())
 	metadata, err := nCtx.DataStore().Head(ctx, deckFile)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to check the existence of deck file. Error: %v", err)
