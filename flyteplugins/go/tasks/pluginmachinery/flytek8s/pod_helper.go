@@ -26,8 +26,8 @@ const SIGKILL = 137
 const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 
-// ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
-func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
+// ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
+func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
 	// Determine node selector terms to add to node affinity
 	var nodeSelectorRequirement v1.NodeSelectorRequirement
 	if interruptible {
@@ -42,24 +42,31 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 		nodeSelectorRequirement = *config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement
 	}
 
-	if podSpec.Affinity == nil {
-		podSpec.Affinity = &v1.Affinity{}
+	if affinity.NodeAffinity == nil {
+		affinity.NodeAffinity = &v1.NodeAffinity{}
 	}
-	if podSpec.Affinity.NodeAffinity == nil {
-		podSpec.Affinity.NodeAffinity = &v1.NodeAffinity{}
+	if affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
+		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
 	}
-	if podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
-		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
-	}
-	if len(podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
-		nodeSelectorTerms := podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+	if len(affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
+		nodeSelectorTerms := affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
 		for i := range nodeSelectorTerms {
 			nst := &nodeSelectorTerms[i]
 			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
 		}
 	} else {
-		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
+		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
 	}
+
+}
+
+// ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
+func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
 // UpdatePod updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options

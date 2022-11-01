@@ -90,6 +90,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	for _, envVar := range envVars {
 		sparkEnvVars[envVar.Name] = envVar.Value
 	}
+
 	sparkEnvVars["FLYTE_MAX_ATTEMPTS"] = strconv.Itoa(int(taskCtx.TaskExecutionMetadata().GetMaxAttempts()))
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
@@ -99,24 +100,34 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 	driverSpec := sparkOp.DriverSpec{
 		SparkPodSpec: sparkOp.SparkPodSpec{
+			Affinity:         config.GetK8sPluginConfig().DefaultAffinity,
 			Annotations:      annotations,
 			Labels:           labels,
 			EnvVars:          sparkEnvVars,
 			Image:            &container.Image,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
+			Tolerations:      config.GetK8sPluginConfig().DefaultTolerations,
+			SchedulerName:    &config.GetK8sPluginConfig().SchedulerName,
+			NodeSelector:     config.GetK8sPluginConfig().DefaultNodeSelector,
+			HostNetwork:      config.GetK8sPluginConfig().EnableHostNetworkingPod,
 		},
 		ServiceAccount: &serviceAccountName,
 	}
 
 	executorSpec := sparkOp.ExecutorSpec{
 		SparkPodSpec: sparkOp.SparkPodSpec{
+			Affinity:         config.GetK8sPluginConfig().DefaultAffinity.DeepCopy(),
 			Annotations:      annotations,
 			Labels:           labels,
 			Image:            &container.Image,
 			EnvVars:          sparkEnvVars,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
+			Tolerations:      config.GetK8sPluginConfig().DefaultTolerations,
+			SchedulerName:    &config.GetK8sPluginConfig().SchedulerName,
+			NodeSelector:     config.GetK8sPluginConfig().DefaultNodeSelector,
+			HostNetwork:      config.GetK8sPluginConfig().EnableHostNetworkingPod,
 		},
 	}
 
@@ -225,11 +236,16 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		j.Spec.MainClass = &sparkJob.MainClass
 	}
 
-	// Add Tolerations/NodeSelector to only Executor pods.
+	// Add Interruptible Tolerations/NodeSelector to only Executor pods.
+	// The Interruptible NodeSelector takes precedence over the DefaultNodeSelector
 	if taskCtx.TaskExecutionMetadata().IsInterruptible() {
-		j.Spec.Executor.Tolerations = config.GetK8sPluginConfig().InterruptibleTolerations
+		j.Spec.Executor.Tolerations = append(j.Spec.Executor.Tolerations, config.GetK8sPluginConfig().InterruptibleTolerations...)
 		j.Spec.Executor.NodeSelector = config.GetK8sPluginConfig().InterruptibleNodeSelector
 	}
+
+	// Add interruptible/non-interruptible node selector requirements to executor pod
+	flytek8s.ApplyInterruptibleNodeSelectorRequirement(taskCtx.TaskExecutionMetadata().IsInterruptible(), j.Spec.Executor.Affinity)
+
 	return j, nil
 }
 
