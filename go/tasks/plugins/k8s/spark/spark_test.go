@@ -3,6 +3,7 @@ package spark
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"testing"
 
@@ -353,7 +354,67 @@ func TestBuildResourceSpark(t *testing.T) {
 	dnsOptVal1 := "1"
 	dnsOptVal2 := "1"
 	dnsOptVal3 := "3"
+
+	// Set scheduler
+	schedulerName := "custom-scheduler"
+
+	// Node selectors
+	defaultNodeSelector := map[string]string{
+		"x/default": "true",
+	}
+	interruptibleNodeSelector := map[string]string{
+		"x/interruptible": "true",
+	}
+
+	defaultPodHostNetwork := true
+
+	// Default env vars passed explicitly and default env vars derived from environment
+	defaultEnvVars := make(map[string]string)
+	defaultEnvVars["foo"] = "bar"
+
+	defaultEnvVarsFromEnv := make(map[string]string)
+	targetKeyFromEnv := "TEST_VAR_FROM_ENV_KEY"
+	targetValueFromEnv := "TEST_VAR_FROM_ENV_VALUE"
+	os.Setenv(targetKeyFromEnv, targetValueFromEnv)
+	defer os.Unsetenv(targetKeyFromEnv)
+	defaultEnvVarsFromEnv["fooEnv"] = targetKeyFromEnv
+
+	// Default affinity/anti-affinity
+	defaultAffinity := &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "x/default",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"true"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// interruptible/non-interruptible nodeselector requirement
+	interruptibleNodeSelectorRequirement := &corev1.NodeSelectorRequirement{
+		Key:      "x/interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"true"},
+	}
+
+	nonInterruptibleNodeSelectorRequirement := &corev1.NodeSelectorRequirement{
+		Key:      "x/non-interruptible",
+		Operator: corev1.NodeSelectorOpIn,
+		Values:   []string{"true"},
+	}
+
+	// NonInterruptibleNodeSelectorRequirement
+
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultAffinity: defaultAffinity,
 		DefaultPodSecurityContext: &corev1.PodSecurityContext{
 			RunAsUser: &runAsUser,
 		},
@@ -378,9 +439,16 @@ func TestBuildResourceSpark(t *testing.T) {
 			},
 			Searches: []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"},
 		},
-		InterruptibleNodeSelector: map[string]string{
-			"x/interruptible": "true",
+		DefaultTolerations: []corev1.Toleration{
+			{
+				Key:      "x/flyte",
+				Value:    "default",
+				Operator: "Equal",
+				Effect:   "NoSchedule",
+			},
 		},
+		DefaultNodeSelector:       defaultNodeSelector,
+		InterruptibleNodeSelector: interruptibleNodeSelector,
 		InterruptibleTolerations: []corev1.Toleration{
 			{
 				Key:      "x/flyte",
@@ -388,7 +456,14 @@ func TestBuildResourceSpark(t *testing.T) {
 				Operator: "Equal",
 				Effect:   "NoSchedule",
 			},
-		}}),
+		},
+		InterruptibleNodeSelectorRequirement:    interruptibleNodeSelectorRequirement,
+		NonInterruptibleNodeSelectorRequirement: nonInterruptibleNodeSelectorRequirement,
+		SchedulerName:                           schedulerName,
+		EnableHostNetworkingPod:                 &defaultPodHostNetwork,
+		DefaultEnvVars:                          defaultEnvVars,
+		DefaultEnvVarsFromEnv:                   defaultEnvVarsFromEnv,
+	}),
 	)
 	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true))
 	assert.Nil(t, err)
@@ -438,19 +513,40 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
 	assert.Equal(t, dummySparkConf["spark.batchScheduler"], *sparkApp.Spec.BatchScheduler)
+	assert.Equal(t, schedulerName, *sparkApp.Spec.Executor.SchedulerName)
+	assert.Equal(t, schedulerName, *sparkApp.Spec.Driver.SchedulerName)
+	assert.Equal(t, defaultPodHostNetwork, *sparkApp.Spec.Executor.HostNetwork)
+	assert.Equal(t, defaultPodHostNetwork, *sparkApp.Spec.Driver.HostNetwork)
 
-	// Validate Interruptible Toleration and NodeSelector set for Executor but not Driver.
-	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))
-	assert.Equal(t, 0, len(sparkApp.Spec.Driver.NodeSelector))
+	// Validate
+	// * Interruptible Toleration and NodeSelector set for Executor but not Driver.
+	// * Validate Default NodeSelector set for Driver but overwritten with Interruptible NodeSelector for Executor.
+	// * Default Tolerations set for both Driver and Executor.
+	// * Interruptible/Non-Interruptible NodeSelectorRequirements set for Executor Affinity but not Driver Affinity.
+	assert.Equal(t, 1, len(sparkApp.Spec.Driver.Tolerations))
+	assert.Equal(t, 1, len(sparkApp.Spec.Driver.NodeSelector))
+	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
+	tolDriverDefault := sparkApp.Spec.Driver.Tolerations[0]
+	assert.Equal(t, tolDriverDefault.Key, "x/flyte")
+	assert.Equal(t, tolDriverDefault.Value, "default")
+	assert.Equal(t, tolDriverDefault.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tolDriverDefault.Effect, corev1.TaintEffect("NoSchedule"))
 
-	assert.Equal(t, 1, len(sparkApp.Spec.Executor.Tolerations))
+	assert.Equal(t, 2, len(sparkApp.Spec.Executor.Tolerations))
 	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
+	assert.Equal(t, interruptibleNodeSelector, sparkApp.Spec.Executor.NodeSelector)
 
-	tol := sparkApp.Spec.Executor.Tolerations[0]
-	assert.Equal(t, tol.Key, "x/flyte")
-	assert.Equal(t, tol.Value, "interruptible")
-	assert.Equal(t, tol.Operator, corev1.TolerationOperator("Equal"))
-	assert.Equal(t, tol.Effect, corev1.TaintEffect("NoSchedule"))
+	tolExecDefault := sparkApp.Spec.Executor.Tolerations[0]
+	assert.Equal(t, tolExecDefault.Key, "x/flyte")
+	assert.Equal(t, tolExecDefault.Value, "default")
+	assert.Equal(t, tolExecDefault.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tolExecDefault.Effect, corev1.TaintEffect("NoSchedule"))
+
+	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[1]
+	assert.Equal(t, tolExecInterrupt.Key, "x/flyte")
+	assert.Equal(t, tolExecInterrupt.Value, "interruptible")
+	assert.Equal(t, tolExecInterrupt.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tolExecInterrupt.Effect, corev1.TaintEffect("NoSchedule"))
 	assert.Equal(t, "true", sparkApp.Spec.Executor.NodeSelector["x/interruptible"])
 
 	for confKey, confVal := range dummySparkConf {
@@ -485,6 +581,22 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.flyteorg.feature3.enabled"], sparkApp.Spec.SparkConf["spark.flyteorg.feature3.enabled"])
 
 	assert.Equal(t, len(sparkApp.Spec.Driver.EnvVars["FLYTE_MAX_ATTEMPTS"]), 1)
+	assert.Equal(t, sparkApp.Spec.Driver.EnvVars["foo"], defaultEnvVars["foo"])
+	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["foo"], defaultEnvVars["foo"])
+	assert.Equal(t, sparkApp.Spec.Driver.EnvVars["fooEnv"], targetValueFromEnv)
+	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["fooEnv"], targetValueFromEnv)
+	assert.Equal(t, sparkApp.Spec.Driver.Affinity, defaultAffinity)
+
+	assert.Equal(
+		t,
+		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+	)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
+		*interruptibleNodeSelectorRequirement,
+	)
 
 	// Case 2: Driver/Executor request cores set.
 	dummyConfWithRequest := make(map[string]string)
@@ -514,10 +626,30 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.True(t, ok)
 
 	// Validate Interruptible Toleration and NodeSelector not set  for both Driver and Executors.
-	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))
-	assert.Equal(t, 0, len(sparkApp.Spec.Driver.NodeSelector))
-	assert.Equal(t, 0, len(sparkApp.Spec.Executor.Tolerations))
-	assert.Equal(t, 0, len(sparkApp.Spec.Executor.NodeSelector))
+	// Validate that the default Toleration and NodeSelector are set for both Driver and Executors.
+	assert.Equal(t, 1, len(sparkApp.Spec.Driver.Tolerations))
+	assert.Equal(t, 1, len(sparkApp.Spec.Driver.NodeSelector))
+	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
+	assert.Equal(t, 1, len(sparkApp.Spec.Executor.Tolerations))
+	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
+	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Executor.NodeSelector)
+	assert.Equal(t, sparkApp.Spec.Executor.Tolerations[0].Key, "x/flyte")
+	assert.Equal(t, sparkApp.Spec.Executor.Tolerations[0].Value, "default")
+	assert.Equal(t, sparkApp.Spec.Driver.Tolerations[0].Key, "x/flyte")
+	assert.Equal(t, sparkApp.Spec.Driver.Tolerations[0].Value, "default")
+
+	// Validate correct affinity and nodeselector requirements are set for both Driver and Executors.
+	assert.Equal(t, sparkApp.Spec.Driver.Affinity, defaultAffinity)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+	)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
+		*nonInterruptibleNodeSelectorRequirement,
+	)
 
 	// Case 4: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
