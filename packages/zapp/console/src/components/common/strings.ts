@@ -24,6 +24,7 @@ const str = {
   valueKeyRequired: "Value's key is required",
   valueValueInvalid: "Value's value is invalid",
   valueMustBeObject: 'Value must be an object',
+  gateNodeInput: 'Node input',
   type: 'Type',
 };
 

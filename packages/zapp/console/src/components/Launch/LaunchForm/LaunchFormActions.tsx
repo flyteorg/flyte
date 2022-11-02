@@ -1,10 +1,11 @@
 import { Button, DialogActions, FormHelperText } from '@material-ui/core';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import * as React from 'react';
+import { useEffect } from 'react';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';
-import { formStrings } from './constants';
-import { LaunchState } from './launchMachine';
+import t from './strings';
+import { LaunchState, TaskResumeContext } from './launchMachine';
 import { useStyles } from './styles';
 import { BaseInterpretedLaunchState, BaseLaunchService } from './types';
 
@@ -13,6 +14,7 @@ export interface LaunchFormActionsProps {
   service: BaseLaunchService;
   onClose(): void;
   isError: boolean;
+  submitTitle: string;
 }
 /** Renders the Submit/Cancel buttons for a LaunchForm */
 export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
@@ -20,6 +22,7 @@ export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
   service,
   onClose,
   isError,
+  submitTitle,
 }) => {
   const styles = useStyles();
   const submissionInFlight = state.matches(LaunchState.SUBMITTING);
@@ -40,13 +43,18 @@ export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
     onClose();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const subscription = service.subscribe((newState) => {
       // On transition to final success state, read the resulting execution
       // id and navigate to the Execution Details page.
       // if (state.matches({ submit: 'succeeded' })) {
       if (newState.matches(LaunchState.SUBMIT_SUCCEEDED)) {
-        history.push(Routes.ExecutionDetails.makeUrl(newState.context.resultExecutionId));
+        if (newState.context.resultExecutionId) {
+          history.push(Routes.ExecutionDetails.makeUrl(newState.context.resultExecutionId));
+        }
+        if ((newState.context as TaskResumeContext).compiledNode) {
+          onCancel();
+        }
       }
     });
 
@@ -66,7 +74,7 @@ export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
           onClick={onCancel}
           variant="outlined"
         >
-          {formStrings.cancel}
+          {t('cancel')}
         </Button>
         <Button
           color="primary"
@@ -76,7 +84,7 @@ export const LaunchFormActions: React.FC<LaunchFormActionsProps> = ({
           type="submit"
           variant="contained"
         >
-          {formStrings.submit}
+          {submitTitle}
           {submissionInFlight && <ButtonCircularProgress />}
         </Button>
       </DialogActions>

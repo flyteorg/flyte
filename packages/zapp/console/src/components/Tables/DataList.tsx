@@ -2,8 +2,9 @@ import { ListProps, Typography } from '@material-ui/core';
 import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
-import { tablePlaceholderColor } from 'components/Theme/constants';
+import { useExecutionTableStyles } from 'components/Executions/Tables/styles';
 import * as React from 'react';
+import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   AutoSizer,
   CellMeasurer,
@@ -26,11 +27,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     // set minHeight to avoid AutoResizer setting height to 0
     minHeight: theme.spacing(minListContainerHeight),
-  },
-  noRowsContent: {
-    color: tablePlaceholderColor,
-    margin: `${theme.spacing(5)}px auto`,
-    textAlign: 'center',
   },
 }));
 
@@ -83,17 +79,18 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
   } = props;
 
   const styles = useStyles();
+  const tableStyles = useExecutionTableStyles();
   const theme = useTheme<Theme>();
-  const lengthRef = React.useRef<number>(0);
-  const listRef = React.useRef<List>(null);
+  const lengthRef = useRef<number>(0);
+  const listRef = useRef<List>(null);
   /** We want the cache to persist across renders, which useState will do.
    * But we also don't want to be needlessly creating new caches that are
    * thrown away immediately. So we're using a creation function which useState
    * will call to create the initial value.
    */
-  const [cellCache, setCellCache] = React.useState(createCellMeasurerCache);
+  const [cellCache, setCellCache] = useState(createCellMeasurerCache);
 
-  const recomputeRow = React.useMemo(
+  const recomputeRow = useMemo(
     () => (rowIndex: number) => {
       cellCache.clear(rowIndex, 0);
       if (listRef.current !== null) {
@@ -102,7 +99,7 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
     },
     [cellCache, listRef],
   );
-  React.useImperativeHandle(
+  useImperativeHandle(
     ref,
     () => ({
       recomputeRowHeights: recomputeRow,
@@ -110,7 +107,7 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
     [recomputeRow],
   );
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (lengthRef.current >= 0 && items.length > lengthRef.current) {
       recomputeRow(lengthRef.current);
     }
@@ -133,7 +130,7 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
   const rowCount = showLoadMore ? items.length + 1 : items.length;
 
   const noRowsRenderer = () => (
-    <div className={styles.noRowsContent}>
+    <div className={tableStyles.noRowsContent}>
       {typeof NoRowsContent === 'string' ? (
         <Typography variant="h6">{NoRowsContent}</Typography>
       ) : (
@@ -194,7 +191,7 @@ const DataListImplComponent: React.RefForwardingComponent<DataListRef, DataListI
     </>
   );
 };
-const DataListImpl = React.forwardRef(DataListImplComponent);
+const DataListImpl = forwardRef(DataListImplComponent);
 
 /** The default version of DataList doesn't require a width/height and will expand to
  * fill its parent container (this can have odd behavior when using flex or the parent
@@ -223,6 +220,6 @@ const DataListComponent: React.RefForwardingComponent<DataListRef, DataListProps
     </div>
   );
 };
-const DataList = React.forwardRef(DataListComponent);
+const DataList = forwardRef(DataListComponent);
 
 export { DataList, DataListImpl };

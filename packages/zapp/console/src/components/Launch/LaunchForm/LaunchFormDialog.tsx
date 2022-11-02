@@ -6,12 +6,16 @@ import {
   TaskInitialLaunchParameters,
   WorkflowInitialLaunchParameters,
 } from 'components/Launch/LaunchForm/types';
+import { CompiledNode } from 'models/Node/types';
+import { ResumeForm } from './ResumeForm';
 
 interface LaunchFormDialogProps {
-  id: ResourceIdentifier;
-  initialParameters: TaskInitialLaunchParameters | WorkflowInitialLaunchParameters;
+  id?: ResourceIdentifier;
+  initialParameters?: TaskInitialLaunchParameters | WorkflowInitialLaunchParameters;
   showLaunchForm: boolean;
   setShowLaunchForm: React.Dispatch<React.SetStateAction<boolean>>;
+  compiledNode?: CompiledNode;
+  nodeId?: string;
 }
 
 function getLaunchProps(id: ResourceIdentifier) {
@@ -23,9 +27,14 @@ function getLaunchProps(id: ResourceIdentifier) {
   throw new Error('Unknown Resource Type');
 }
 
-export const LaunchFormDialog = (props: LaunchFormDialogProps): JSX.Element => {
-  const { id, initialParameters, showLaunchForm, setShowLaunchForm } = props;
-
+export const LaunchFormDialog = ({
+  id,
+  initialParameters,
+  showLaunchForm,
+  setShowLaunchForm,
+  compiledNode,
+  nodeId,
+}: LaunchFormDialogProps): JSX.Element => {
   const onCancelLaunch = () => setShowLaunchForm(false);
 
   // prevent child onclick event in the dialog triggers parent onclick event
@@ -41,11 +50,20 @@ export const LaunchFormDialog = (props: LaunchFormDialogProps): JSX.Element => {
       open={showLaunchForm}
       onClick={dialogOnClick}
     >
-      <LaunchForm
-        initialParameters={initialParameters}
-        onClose={onCancelLaunch}
-        {...getLaunchProps(id)}
-      />
+      {id ? (
+        <LaunchForm
+          initialParameters={initialParameters}
+          onClose={onCancelLaunch}
+          {...getLaunchProps(id)}
+        />
+      ) : compiledNode && nodeId ? (
+        <ResumeForm
+          initialParameters={initialParameters}
+          nodeId={nodeId}
+          onClose={onCancelLaunch}
+          compiledNode={compiledNode}
+        />
+      ) : null}
     </Dialog>
   );
 };

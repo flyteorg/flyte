@@ -1,18 +1,6 @@
 import { BlobDimensionality, SimpleType } from 'models/Common/types';
 import { BlobValue, InputType, AuthRoleTypes, AuthRoleMeta } from './types';
 
-export const formStrings = {
-  cancel: 'Cancel',
-  inputs: 'Inputs',
-  role: 'Role',
-  submit: 'Launch',
-  taskVersion: 'Task Version',
-  title: 'Create New Execution',
-  workflowVersion: 'Workflow Version',
-  launchPlan: 'Launch Plan',
-  interruptible: 'Interruptible',
-};
-
 export const AuthRoleStrings: { [k in AuthRoleTypes]: AuthRoleMeta } = {
   [AuthRoleTypes.k8]: {
     helperText: 'example: default-service-account',
@@ -70,20 +58,6 @@ export const defaultBlobValue: BlobValue = {
 
 export const launchInputDebouncDelay = 500;
 
-export const requiredInputSuffix = '*';
-export const cannotLaunchWorkflowString = 'Workflow cannot be launched';
-export const cannotLaunchTaskString = 'Task cannot be launched';
-export const inputsDescription =
-  'Enter input values below. Items marked with an asterisk(*) are required.';
-export const workflowNoInputsString = 'This workflow does not accept any inputs.';
-export const taskNoInputsString = 'This task does not accept any inputs.';
-export const workflowUnsupportedRequiredInputsString = `This Workflow version contains one or more required inputs which are not supported by Flyte Console and do not have default values specified in the Workflow definition or the selected Launch Plan.\n\nYou can launch this Workflow version with the Flyte CLI or by selecting a Launch Plan which provides values for the unsupported inputs.\n\nThe required inputs are :`;
-export const taskUnsupportedRequiredInputsString = `This Task version contains one or more required inputs which are not supported by Flyte Console.\n\nYou can launch this Task version with the Flyte CLI instead.\n\nThe required inputs are :`;
-export const blobUriHelperText = '(required) location of the data';
-export const blobFormatHelperText = '(optional) csv, parquet, etc...';
-export const correctInputErrors = 'Some inputs have errors. Please correct them before submitting.';
-export const noneInputTypeDescription = 'The value of none type is empty';
-
 export const qualityOfServiceTier = {
   UNDEFINED: 0,
   HIGH: 1,
@@ -97,3 +71,5 @@ export const qualityOfServiceTierLabels = {
   [qualityOfServiceTier.MEDIUM]: 'Medium',
   [qualityOfServiceTier.LOW]: 'Low',
 };
+
+export const workflowNoInputsString = 'This workflow does not accept any inputs.';

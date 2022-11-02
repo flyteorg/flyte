@@ -2,10 +2,15 @@ import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
 import { ConvertFlyteDagToReactFlows } from 'components/flytegraph/ReactFlow/transformDAGToReactFlowV2';
 import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
+import { useNodeExecutionContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
+import { NodeExecutionPhase } from 'models/Execution/enums';
+import { isNodeGateNode } from 'components/Executions/utils';
+import { dNode } from 'models/Graph/types';
 import { RFWrapperProps, RFGraphTypes, ConvertDagProps } from './types';
 import { getRFBackground } from './utils';
 import { ReactFlowWrapper } from './ReactFlowWrapper';
 import { Legend } from './NodeStatusLegend';
+import { PausedTasksComponent } from './PausedTasksComponent';
 
 const nodeExecutionStatusChanged = (previous, nodeExecutionsById) => {
   for (const exe in nodeExecutionsById) {
@@ -44,16 +49,20 @@ const graphNodeCountChanged = (previous, data) => {
   }
 };
 
-const ReactFlowGraphComponent = (props) => {
-  const {
-    data,
-    onNodeSelectionChanged,
-    onPhaseSelectionChanged,
-    selectedPhase,
-    isDetailsTabClosed,
-    dynamicWorkflows,
-  } = props;
+const ReactFlowGraphComponent = ({
+  data,
+  onNodeSelectionChanged,
+  onPhaseSelectionChanged,
+  selectedPhase,
+  isDetailsTabClosed,
+  dynamicWorkflows,
+  initialNodes,
+}) => {
   const nodeExecutionsById = useContext(NodeExecutionsByIdContext);
+  const { compiledWorkflowClosure } = useNodeExecutionContext();
+
+  const [pausedNodes, setPausedNodes] = useState<dNode[]>([]);
+
   const [state, setState] = useState({
     data,
     dynamicWorkflows,
@@ -141,6 +150,30 @@ const ReactFlowGraphComponent = (props) => {
 
   const backgroundStyle = getRFBackground().nested;
 
+  useEffect(() => {
+    const updatedPausedNodes: dNode[] = initialNodes.filter((node) => {
+      const nodeExecution = nodeExecutionsById[node.id];
+      if (nodeExecution) {
+        const phase = nodeExecution?.closure.phase;
+        const isGateNode = isNodeGateNode(
+          compiledWorkflowClosure?.primary.template.nodes ?? [],
+          nodeExecution.id,
+        );
+        return isGateNode && phase === NodeExecutionPhase.RUNNING;
+      }
+      return false;
+    });
+    const nodesWithExecutions = updatedPausedNodes.map((node) => {
+      const execution = nodeExecutionsById[node.scopedId];
+      return {
+        ...node,
+        startedAt: execution?.closure.startedAt,
+        execution,
+      };
+    });
+    setPausedNodes(nodesWithExecutions);
+  }, [initialNodes]);
+
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     flex: `1 1 100%`,
@@ -160,6 +193,9 @@ const ReactFlowGraphComponent = (props) => {
     };
     return (
       <div style={containerStyle}>
+        {pausedNodes && pausedNodes.length > 0 && (
+          <PausedTasksComponent pausedNodes={pausedNodes} />
+        )}
         <Legend />
         <ReactFlowWrapper {...ReactFlowProps} />
       </div>

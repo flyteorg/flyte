@@ -8,6 +8,7 @@ export const integerInputName = 'simpleInteger';
 export const binaryInputName = 'simpleBinary';
 export const errorInputName = 'simpleError';
 export const mapInputName = 'simpleMap';
+export const signalInputName = 'Signal Input';
 
 export const iamRoleString = 'arn:aws:iam::12345678:role/defaultrole';
 export const k8sServiceAccountString = 'default-service-account';

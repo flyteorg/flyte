@@ -9,18 +9,12 @@ export const workflowExecutionsTableColumnWidths = {
 
 export const nodeExecutionsTableColumnWidths = {
   duration: 100,
-  logs: 100,
+  logs: 138,
   type: 144,
   nodeId: 144,
   name: 380,
   phase: 150,
   startedAt: 200,
-};
-
-export const titleStrings = {
-  childGroupFetchFailed: 'Failed to fetch children. Click to retry.',
-  expandRow: 'Expand row',
-  groupName: 'Group name',
 };
 
 export const workflowVersionsTableColumnWidths = {

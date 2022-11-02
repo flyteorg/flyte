@@ -15,6 +15,7 @@ const str = {
   succeeded: 'Succeeded',
   succeeding: 'Succeeding',
   timedOut: 'Timed Out',
+  paused: 'Paused',
   unknown: 'Unknown',
   cacheDisabledMessage: 'Caching was disabled for this execution.',
   cacheHitMessage: 'Output for this execution was read from cache.',

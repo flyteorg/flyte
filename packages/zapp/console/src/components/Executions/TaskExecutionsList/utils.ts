@@ -1,6 +1,6 @@
 import { ExternalResource, LogsByPhase, TaskExecution } from 'models/Execution/types';
 import { leftPaddedNumber } from 'common/formatters';
-import { Core, Event } from 'flyteidl';
+import { Event } from 'flyteidl';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 
 /** Generates a unique name for a task execution, suitable for display in a
@@ -91,27 +91,6 @@ export const getTaskRetryAtemptsForIndex = (
   });
   return filtered;
 };
-
-export function getTaskIndex(
-  taskExecution: TaskExecution,
-  selectedLog: Core.ITaskLog,
-): number | null {
-  const externalResources = taskExecution.closure.metadata?.externalResources ?? [];
-  for (const item of externalResources) {
-    const logs = item.logs ?? [];
-    for (const log of logs) {
-      if (log.uri) {
-        if (log.name === selectedLog.name && log.uri === selectedLog.uri) {
-          return item.index ?? 0;
-        }
-      } else if (log.name === selectedLog.name) {
-        return item.index ?? 0;
-      }
-    }
-  }
-
-  return null;
-}
 
 export function getTaskLogName(taskName: string, taskLogName: string): string {
   const lastDotIndex = taskName.lastIndexOf('.');

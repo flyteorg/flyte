@@ -21,14 +21,8 @@ import { Task } from 'models/Task/types';
 import { createMockTaskClosure } from 'models/__mocks__/taskData';
 import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
-import {
-  AuthRoleStrings,
-  cannotLaunchTaskString,
-  formStrings,
-  inputsDescription,
-  requiredInputSuffix,
-  taskNoInputsString,
-} from '../constants';
+import { AuthRoleStrings } from '../constants';
+import t from '../strings';
 import { LaunchForm } from '../LaunchForm';
 import { AuthRoleTypes, LaunchFormProps, TaskInitialLaunchParameters } from '../types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
@@ -185,7 +179,7 @@ describe('LaunchForm: Task', () => {
       const submitButton = await waitFor(() => getSubmitButton(container));
       await waitFor(() => expect(submitButton).toBeEnabled());
 
-      expect(getByText(taskNoInputsString)).toBeInTheDocument();
+      expect(getByText(t('taskNoInputsString'))).toBeInTheDocument();
     });
 
     it('should not render inputs header/description', async () => {
@@ -193,8 +187,8 @@ describe('LaunchForm: Task', () => {
       const submitButton = await waitFor(() => getSubmitButton(container));
       await waitFor(() => expect(submitButton).toBeEnabled());
 
-      expect(queryByText(formStrings.inputs)).toBeNull();
-      expect(queryByText(inputsDescription)).toBeNull();
+      expect(queryByText(t('inputs'))).toBeNull();
+      expect(queryByText(t('inputsDescription'))).toBeNull();
     });
   });
 
@@ -215,13 +209,13 @@ describe('LaunchForm: Task', () => {
     it('should not show task selector until options have loaded', async () => {
       mockListTasks.mockReturnValue(pendingPromise());
       const { getByText, queryByText } = renderForm();
-      await waitFor(() => getByText(formStrings.title));
-      expect(queryByText(formStrings.taskVersion)).not.toBeInTheDocument();
+      await waitFor(() => getByText(t('title')));
+      expect(queryByText(t('taskVersion'))).not.toBeInTheDocument();
     });
 
     it('should select the most recent task version by default', async () => {
       const { getByLabelText } = renderForm();
-      const versionEl = await waitFor(() => getByLabelText(formStrings.taskVersion));
+      const versionEl = await waitFor(() => getByLabelText(t('taskVersion')));
       expect(versionEl).toHaveValue(mockTaskVersions[0].id.version);
     });
 
@@ -282,7 +276,7 @@ describe('LaunchForm: Task', () => {
 
     it('should update inputs when selecting a new task version', async () => {
       const { queryByLabelText, getByTitle } = renderForm();
-      const taskVersionDiv = await waitFor(() => getByTitle(formStrings.taskVersion));
+      const taskVersionDiv = await waitFor(() => getByTitle(t('taskVersion')));
 
       // Delete the string input so that its corresponding input will
       // disappear after the new launch plan is loaded.
@@ -294,7 +288,7 @@ describe('LaunchForm: Task', () => {
       const items = await waitFor(() => getAllByRole(taskVersionDiv, 'menuitem'));
       fireEvent.click(items[1]);
 
-      await waitFor(() => getByTitle(formStrings.inputs));
+      await waitFor(() => getByTitle(t('inputs')));
       expect(
         queryByLabelText(stringInputName, {
           // Don't use exact match because the label will be decorated with type info
@@ -314,12 +308,12 @@ describe('LaunchForm: Task', () => {
       fireEvent.change(integerInput, { target: { value: '10' } });
 
       // Click the expander for the task version, select the second item
-      const taskVersionDiv = getByTitle(formStrings.taskVersion);
+      const taskVersionDiv = getByTitle(t('taskVersion'));
       const expander = getByRole(taskVersionDiv, 'button');
       fireEvent.click(expander);
       const items = await waitFor(() => getAllByRole(taskVersionDiv, 'menuitem'));
       fireEvent.click(items[1]);
-      await waitFor(() => getByTitle(formStrings.inputs));
+      await waitFor(() => getByTitle(t('inputs')));
 
       expect(
         getByLabelText(integerInputName, {
@@ -333,14 +327,14 @@ describe('LaunchForm: Task', () => {
       mockCreateWorkflowExecution.mockRejectedValue(new Error(errorString));
 
       const { container, getByText, getByTitle, queryByText } = renderForm();
-      await waitFor(() => getByTitle(formStrings.inputs));
+      await waitFor(() => getByTitle(t('inputs')));
       await fillInputs(container);
 
       fireEvent.click(getSubmitButton(container));
       await waitFor(() => expect(getByText(errorString)).toBeInTheDocument());
 
       // Click the expander for the launch plan, select the second item
-      const taskVersionDiv = getByTitle(formStrings.taskVersion);
+      const taskVersionDiv = getByTitle(t('taskVersion'));
       const expander = getByRole(taskVersionDiv, 'button');
       fireEvent.click(expander);
       const items = await waitFor(() => getAllByRole(taskVersionDiv, 'menuitem'));
@@ -399,7 +393,7 @@ describe('LaunchForm: Task', () => {
     describe('Input Values', () => {
       it('should decorate all inputs with required labels', async () => {
         const { getByTitle, queryAllByText } = renderForm();
-        await waitFor(() => getByTitle(formStrings.inputs));
+        await waitFor(() => getByTitle(t('inputs')));
         Object.keys(variables).forEach((name) => {
           const elements = queryAllByText(name, {
             exact: false,
@@ -417,9 +411,7 @@ describe('LaunchForm: Task', () => {
         };
         const { getByLabelText } = renderForm({ initialParameters });
         await waitFor(() =>
-          expect(getByLabelText(formStrings.taskVersion)).toHaveValue(
-            mockTaskVersions[2].id.version,
-          ),
+          expect(getByLabelText(t('taskVersion'))).toHaveValue(mockTaskVersions[2].id.version),
         );
       });
 
@@ -430,7 +422,7 @@ describe('LaunchForm: Task', () => {
         const { getByTitle } = renderForm({ initialParameters });
 
         // Click the expander for the workflow, select the second item
-        const versionDiv = await waitFor(() => getByTitle(formStrings.taskVersion));
+        const versionDiv = await waitFor(() => getByTitle(t('taskVersion')));
         const expander = getByRole(versionDiv, 'button');
         fireEvent.click(expander);
         const items = await waitFor(() => getAllByRole(versionDiv, 'menuitem'));
@@ -458,9 +450,7 @@ describe('LaunchForm: Task', () => {
         };
         const { getByLabelText } = renderForm({ initialParameters });
         await waitFor(() =>
-          expect(getByLabelText(formStrings.taskVersion)).toHaveValue(
-            mockTaskVersions[0].id.version,
-          ),
+          expect(getByLabelText(t('taskVersion'))).toHaveValue(mockTaskVersions[0].id.version),
         );
       });
 
@@ -491,7 +481,7 @@ describe('LaunchForm: Task', () => {
         };
         const { getByLabelText } = renderForm({ initialParameters });
         await waitFor(() =>
-          expect(getByLabelText(formStrings.taskVersion)).toHaveValue(missingTask.id.version),
+          expect(getByLabelText(t('taskVersion'))).toHaveValue(missingTask.id.version),
         );
       });
 
@@ -499,7 +489,7 @@ describe('LaunchForm: Task', () => {
         const { getByLabelText } = renderForm();
 
         // Focus the workflow version input
-        const workflowInput = await waitFor(() => getByLabelText(formStrings.taskVersion));
+        const workflowInput = await waitFor(() => getByLabelText(t('taskVersion')));
         fireEvent.focus(workflowInput);
 
         const expectedValue = mockTaskVersions[0].id.version;
@@ -516,7 +506,7 @@ describe('LaunchForm: Task', () => {
         const inputString = mockTaskVersions[1].id.version.substring(0, 4);
         const { getByLabelText } = renderForm({ initialParameters });
 
-        const versionInput = await waitFor(() => getByLabelText(formStrings.taskVersion));
+        const versionInput = await waitFor(() => getByLabelText(t('taskVersion')));
         mockListTasks.mockClear();
 
         fireEvent.change(versionInput, {
@@ -539,7 +529,7 @@ describe('LaunchForm: Task', () => {
 
       it('should render error message', async () => {
         const { getByText } = renderForm();
-        const errorElement = await waitFor(() => getByText(cannotLaunchTaskString));
+        const errorElement = await waitFor(() => getByText(t('cannotLaunchTaskString')));
         expect(errorElement).toBeInTheDocument();
       });
 
@@ -552,13 +542,13 @@ describe('LaunchForm: Task', () => {
       it('should print input labels without decoration', async () => {
         const { getByText } = renderForm();
         const inputElement = await waitFor(() => getByText(binaryInputName, { exact: false }));
-        expect(inputElement.textContent).not.toContain(requiredInputSuffix);
+        expect(inputElement.textContent).not.toContain(t('requiredInputSuffix'));
       });
 
       it('should disable submission', async () => {
         const { getByRole } = renderForm();
 
-        const submitButton = await waitFor(() => getByRole('button', { name: formStrings.submit }));
+        const submitButton = await waitFor(() => getByRole('button', { name: t('submit') }));
 
         expect(submitButton).toBeDisabled();
       });
@@ -575,7 +565,7 @@ describe('LaunchForm: Task', () => {
         });
 
         await waitFor(() => getByLabelText(binaryInputName, { exact: false }));
-        expect(queryByText(cannotLaunchTaskString)).toBeNull();
+        expect(queryByText(t('cannotLaunchTaskString'))).toBeNull();
       });
     });
 
@@ -583,7 +573,7 @@ describe('LaunchForm: Task', () => {
       it('should render checkbox', async () => {
         const { getByLabelText } = renderForm();
         const inputElement = await waitFor(() =>
-          getByLabelText(formStrings.interruptible, { exact: false }),
+          getByLabelText(t('interruptible'), { exact: false }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();
@@ -600,7 +590,7 @@ describe('LaunchForm: Task', () => {
         });
 
         const inputElement = await waitFor(() =>
-          getByLabelText(formStrings.interruptible, { exact: false }),
+          getByLabelText(t('interruptible'), { exact: false }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).toBeChecked();
@@ -610,7 +600,7 @@ describe('LaunchForm: Task', () => {
         const { getByLabelText } = renderForm();
 
         let inputElement = await waitFor(() =>
-          getByLabelText(`${formStrings.interruptible} (no override)`, { exact: true }),
+          getByLabelText(`${t('interruptible')} (no override)`, { exact: true }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();
@@ -618,7 +608,7 @@ describe('LaunchForm: Task', () => {
 
         fireEvent.click(inputElement);
         inputElement = await waitFor(() =>
-          getByLabelText(`${formStrings.interruptible} (enabled)`, { exact: true }),
+          getByLabelText(`${t('interruptible')} (enabled)`, { exact: true }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).toBeChecked();
@@ -626,7 +616,7 @@ describe('LaunchForm: Task', () => {
 
         fireEvent.click(inputElement);
         inputElement = await waitFor(() =>
-          getByLabelText(`${formStrings.interruptible} (disabled)`, { exact: true }),
+          getByLabelText(`${t('interruptible')} (disabled)`, { exact: true }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();
@@ -634,7 +624,7 @@ describe('LaunchForm: Task', () => {
 
         fireEvent.click(inputElement);
         inputElement = await waitFor(() =>
-          getByLabelText(`${formStrings.interruptible} (no override)`, { exact: true }),
+          getByLabelText(`${t('interruptible')} (no override)`, { exact: true }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();
@@ -645,7 +635,7 @@ describe('LaunchForm: Task', () => {
         const { container, getByLabelText } = renderForm();
 
         const inputElement = await waitFor(() =>
-          getByLabelText(formStrings.interruptible, { exact: false }),
+          getByLabelText(t('interruptible'), { exact: false }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();
@@ -670,7 +660,7 @@ describe('LaunchForm: Task', () => {
         const { container, getByLabelText } = renderForm({ initialParameters });
 
         const inputElement = await waitFor(() =>
-          getByLabelText(formStrings.interruptible, { exact: false }),
+          getByLabelText(t('interruptible'), { exact: false }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).toBeChecked();
@@ -695,7 +685,7 @@ describe('LaunchForm: Task', () => {
         const { container, getByLabelText } = renderForm({ initialParameters });
 
         const inputElement = await waitFor(() =>
-          getByLabelText(formStrings.interruptible, { exact: false }),
+          getByLabelText(t('interruptible'), { exact: false }),
         );
         expect(inputElement).toBeInTheDocument();
         expect(inputElement).not.toBeChecked();

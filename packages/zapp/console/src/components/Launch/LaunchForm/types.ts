@@ -17,6 +17,8 @@ import {
   TaskLaunchContext,
   TaskLaunchEvent,
   TaskLaunchTypestate,
+  TaskResumeContext,
+  TaskResumeTypestate,
   WorkflowLaunchContext,
   WorkflowLaunchEvent,
   WorkflowLaunchTypestate,
@@ -141,6 +143,12 @@ export interface LaunchTaskFormState {
   state: State<TaskLaunchContext, TaskLaunchEvent, any, TaskLaunchTypestate>;
   service: Interpreter<TaskLaunchContext, any, TaskLaunchEvent, TaskLaunchTypestate>;
   taskSourceSelectorState: TaskSourceSelectorState;
+}
+
+export interface ResumeFormState {
+  formInputsRef: React.RefObject<LaunchFormInputsRef>;
+  state: State<TaskResumeContext, BaseLaunchEvent, any, TaskResumeTypestate>;
+  service: Interpreter<TaskResumeContext, any, BaseLaunchEvent, TaskResumeTypestate>;
 }
 
 export enum InputType {

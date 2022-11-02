@@ -1,7 +1,7 @@
 import { Accordion, AccordionDetails, AccordionSummary, DialogContent } from '@material-ui/core';
 import { getCacheKey } from 'components/Cache/utils';
 import * as React from 'react';
-import { formStrings } from './constants';
+import t from './strings';
 import { LaunchFormActions } from './LaunchFormActions';
 import { LaunchFormHeader } from './LaunchFormHeader';
 import { LaunchFormInputs } from './LaunchFormInputs';
@@ -70,13 +70,13 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
 
   return (
     <>
-      <LaunchFormHeader title={state.context.sourceId?.name} />
+      <LaunchFormHeader title={state.context.sourceId?.name} formTitle={t('title')} />
       <DialogContent dividers={true} className={styles.inputsSection}>
         {showWorkflowSelector ? (
-          <section title={formStrings.workflowVersion} className={styles.formControl}>
+          <section title={t('workflowVersion')} className={styles.formControl}>
             <SearchableSelector
               id="launch-workflow-selector"
-              label={formStrings.workflowVersion}
+              label={t('workflowVersion')}
               onSelectionChanged={onSelectWorkflowVersion}
               options={workflowSelectorOptions}
               fetchSearchResults={fetchSearchResults}
@@ -85,10 +85,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
           </section>
         ) : null}
         {showLaunchPlanSelector ? (
-          <section title={formStrings.launchPlan} className={styles.formControl}>
+          <section title={t('launchPlan')} className={styles.formControl}>
             <SearchableSelector
               id="launch-lp-selector"
-              label={formStrings.launchPlan}
+              label={t('launchPlan')}
               onSelectionChanged={onSelectLaunchPlan}
               options={launchPlanSelectorOptions}
               selectedItem={selectedLaunchPlan}
@@ -132,6 +132,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = (props) => 
         service={baseService}
         onClose={props.onClose}
         isError={isError}
+        submitTitle={t('submit')}
       />
     </>
   );

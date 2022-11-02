@@ -4,7 +4,7 @@ import * as React from 'react';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { requiredInputSuffix } from './constants';
+import t from './strings';
 import { InputProps, InputType, InputTypeDefinition, InputValue } from './types';
 import { formatType, toMappedTypeValue } from './utils';
 import { getHelperForInput } from './inputHelpers/getHelperForInput';
@@ -73,7 +73,7 @@ const MapSingleInputItem = (props: MapInputItemProps) => {
   return (
     <div className={classes.controls}>
       <TextField
-        label={`string${requiredInputSuffix}`}
+        label={`string${t('requiredInputSuffix')}`}
         onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
           setKey(value);
           setError(!!value && !isValid(value));
@@ -86,7 +86,7 @@ const MapSingleInputItem = (props: MapInputItemProps) => {
         className={classes.keyControl}
       />
       <TextField
-        label={subtype ? `${formatType(subtype)}${requiredInputSuffix}` : ''}
+        label={subtype ? `${formatType(subtype)}${t('requiredInputSuffix')}` : ''}
         onChange={({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
           setTouched(true);
           setValue(value);

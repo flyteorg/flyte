@@ -191,6 +191,11 @@ interface RelaunchParams {
   name?: string;
 }
 
+interface ResumeSignalParams {
+  id: Core.SignalIdentifier;
+  value: Core.ILiteral;
+}
+
 /** Submits a request to relaunch a WorkflowExecution by id */
 export const relaunchWorkflowExecution = ({ id, name }: RelaunchParams, config?: RequestConfig) =>
   postAdminEntity<Admin.IExecutionRelaunchRequest, Admin.ExecutionCreateResponse>(
@@ -199,6 +204,18 @@ export const relaunchWorkflowExecution = ({ id, name }: RelaunchParams, config?:
       path: endpointPrefixes.relaunchExecution,
       requestMessageType: Admin.ExecutionRelaunchRequest,
       responseMessageType: Admin.ExecutionCreateResponse,
+    },
+    config,
+  );
+
+/** Submits a request to resume a signal node */
+export const resumeSignalNode = ({ id, value }: ResumeSignalParams, config?: RequestConfig) =>
+  postAdminEntity<Admin.ISignalSetRequest, Admin.SignalSetResponse>(
+    {
+      data: { id, value },
+      path: endpointPrefixes.setSignal,
+      requestMessageType: Admin.SignalSetRequest,
+      responseMessageType: Admin.SignalSetResponse,
     },
     config,
   );

@@ -11,6 +11,7 @@ import {
   ReactFlowCustomMaxNested,
   ReactFlowStaticNested,
   ReactFlowStaticNode,
+  ReactFlowGateNode,
 } from './customNodeComponents';
 import { getPositionedNodes, ReactFlowIdHash } from './utils';
 
@@ -27,6 +28,7 @@ const CustomNodeTypes = {
   FlyteNode_nestedMaxDepth: ReactFlowCustomMaxNested,
   FlyteNode_staticNode: ReactFlowStaticNode,
   FlyteNode_staticNestedNode: ReactFlowStaticNested,
+  FlyteNode_gateNode: ReactFlowGateNode,
 };
 
 export const ReactFlowWrapper: React.FC<RFWrapperProps> = ({

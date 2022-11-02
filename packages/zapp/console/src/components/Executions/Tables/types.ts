@@ -1,5 +1,6 @@
 import { PaginatedFetchableData } from 'components/hooks/types';
 import { Execution, NodeExecution, NodeExecutionIdentifier } from 'models/Execution/types';
+import { dNode } from 'models/Graph/types';
 import { Workflow } from 'models/Workflow/types';
 
 export interface WorkflowExecutionsTableState {
@@ -20,7 +21,7 @@ export interface ColumnDefinition<CellRendererData> {
 
 export interface NodeExecutionCellRendererData {
   execution: NodeExecution;
-  state: NodeExecutionsTableState;
+  node: dNode;
 }
 export type NodeExecutionColumnDefinition = ColumnDefinition<NodeExecutionCellRendererData>;
 

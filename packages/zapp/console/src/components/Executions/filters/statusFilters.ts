@@ -1,3 +1,7 @@
+import {
+  nodeExecutionPhaseConstants,
+  workflowExecutionPhaseConstants,
+} from 'components/Executions/constants';
 import { NodeExecutionPhase, WorkflowExecutionPhase } from 'models/Execution/enums';
 import { FilterMap } from './types';
 
@@ -15,32 +19,32 @@ export const workflowExecutionStatusFilters: FilterMap<WorkflowExecutionStatusFi
   queued: {
     label: 'Scheduled',
     value: 'queued',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.QUEUED],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.QUEUED].value,
   },
   running: {
     label: 'In Progress',
     value: 'running',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.RUNNING],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.RUNNING].value,
   },
   succeeded: {
     label: 'Successful',
     value: 'succeeded',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.SUCCEEDED],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.SUCCEEDED].value,
   },
   failed: {
     label: 'Failed',
     value: 'failed',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.FAILED],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.FAILED].value,
   },
   aborted: {
     label: 'Aborted',
     value: 'aborted',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.ABORTED],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.ABORTED].value,
   },
   unknown: {
     label: 'Unknown',
     value: 'unknown',
-    data: WorkflowExecutionPhase[WorkflowExecutionPhase.UNDEFINED],
+    data: workflowExecutionPhaseConstants[WorkflowExecutionPhase.UNDEFINED].value,
   },
 };
 
@@ -52,6 +56,7 @@ export type NodeExecutionStatusFilterKey =
   | 'aborted'
   | 'skipped'
   | 'timedOut'
+  | 'paused'
   | 'unknown';
 
 /** A set of WorkflowExecution status/phase filters to be consumed by a MultiFilterState.
@@ -60,41 +65,46 @@ export const nodeExecutionStatusFilters: FilterMap<NodeExecutionStatusFilterKey,
   queued: {
     label: 'Scheduled',
     value: 'queued',
-    data: NodeExecutionPhase[NodeExecutionPhase.QUEUED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.QUEUED].value,
   },
   running: {
     label: 'In Progress',
     value: 'running',
-    data: NodeExecutionPhase[NodeExecutionPhase.RUNNING],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.RUNNING].value,
   },
   succeeded: {
     label: 'Successful',
     value: 'succeeded',
-    data: NodeExecutionPhase[NodeExecutionPhase.SUCCEEDED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.SUCCEEDED].value,
   },
   failed: {
     label: 'Failed',
     value: 'failed',
-    data: NodeExecutionPhase[NodeExecutionPhase.FAILED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.FAILED].value,
   },
   aborted: {
     label: 'Aborted',
     value: 'aborted',
-    data: NodeExecutionPhase[NodeExecutionPhase.ABORTED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.ABORTED].value,
   },
   timedOut: {
     label: 'Timed Out',
     value: 'timedOut',
-    data: NodeExecutionPhase[NodeExecutionPhase.TIMED_OUT],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.TIMED_OUT].value,
   },
   skipped: {
     label: 'Skipped',
     value: 'skipped',
-    data: NodeExecutionPhase[NodeExecutionPhase.SKIPPED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.SKIPPED].value,
+  },
+  paused: {
+    label: 'Paused',
+    value: 'paused',
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.PAUSED].value,
   },
   unknown: {
     label: 'Unknown',
     value: 'unknown',
-    data: NodeExecutionPhase[NodeExecutionPhase.UNDEFINED],
+    data: nodeExecutionPhaseConstants[NodeExecutionPhase.UNDEFINED].value,
   },
 };

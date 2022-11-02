@@ -281,32 +281,6 @@ function fetchChildNodeExecutionGroups(
   return fetchGroupsForTaskExecutionNode(queryClient, nodeExecution, config);
 }
 
-/** Fetches and groups `NodeExecution`s which are direct children of the given
- * `NodeExecution`.
- */
-export function useChildNodeExecutionGroupsQuery(
-  nodeExecution: NodeExecution,
-  config: RequestConfig,
-): QueryObserverResult<NodeExecutionGroup[], Error> {
-  const queryClient = useQueryClient();
-  // Use cached data if the parent node execution is terminal and all children
-  // in all groups are terminal
-  const shouldEnableFn = (groups: NodeExecutionGroup[]) => {
-    if (!nodeExecutionIsTerminal(nodeExecution)) {
-      return true;
-    }
-    return groups.some((group) => group.nodeExecutions.some((ne) => !nodeExecutionIsTerminal(ne)));
-  };
-
-  return useConditionalQuery<NodeExecutionGroup[]>(
-    {
-      queryKey: [QueryType.NodeExecutionChildList, nodeExecution.id, config],
-      queryFn: () => fetchChildNodeExecutionGroups(queryClient, nodeExecution, config),
-    },
-    shouldEnableFn,
-  );
-}
-
 /**
  * Query returns all children (not only direct childs) for a list of `nodeExecutions`
  */
@@ -377,7 +351,16 @@ export function useAllTreeNodeExecutionGroupsQuery(
     }
   };
 
-  const key = `${nodeExecutions?.[0]?.scopedId}-${nodeExecutions?.[0]?.closure?.phase}`;
+  const n = nodeExecutions.length - 1;
+  let key = '';
+  if (n >= 0) {
+    const keyP1 = `${nodeExecutions[0]?.scopedId}-${nodeExecutions[0].closure.phase}-${nodeExecutions[0].closure?.startedAt?.nanos}`;
+    key = keyP1;
+    if (n >= 1) {
+      const keyP2 = `${nodeExecutions[n]?.scopedId}-${nodeExecutions[n].closure.phase}-${nodeExecutions[n].closure?.startedAt?.nanos}`;
+      key = keyP1 + '-' + keyP2;
+    }
+  }
 
   return useConditionalQuery<NodeExecution[]>(
     {

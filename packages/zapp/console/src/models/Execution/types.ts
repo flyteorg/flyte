@@ -1,12 +1,7 @@
 import { Admin, Core, Event, Protobuf, Service } from 'flyteidl';
 import { Identifier, LiteralMap, LiteralMapBlob, TaskLog, UrlBlob } from 'models/Common/types';
 import { CompiledWorkflow } from 'models/Workflow/types';
-import {
-  ExecutionMode,
-  NodeExecutionPhase,
-  TaskExecutionPhase,
-  WorkflowExecutionPhase,
-} from './enums';
+import { ExecutionMode, TaskExecutionPhase, WorkflowExecutionPhase } from './enums';
 
 export type WorkflowExecutionIdentifier = RequiredNonNullable<Core.IWorkflowExecutionIdentifier>;
 export type ExecutionError = RequiredNonNullable<Core.IExecutionError>;
@@ -104,7 +99,7 @@ export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
   duration?: Protobuf.Duration;
   error?: ExecutionError;
   outputUri: string;
-  phase: NodeExecutionPhase;
+  phase: Core.NodeExecution.Phase;
   startedAt?: Protobuf.ITimestamp;
   taskNodeMetadata?: TaskNodeMetadata;
   workflowNodeMetadata?: WorkflowNodeMetadata;

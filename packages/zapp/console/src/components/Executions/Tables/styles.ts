@@ -3,8 +3,6 @@ import { headerGridHeight } from 'components/Tables/constants';
 import {
   headerFontFamily,
   listhoverColor,
-  nestedListColor,
-  smallFontSize,
   tableHeaderColor,
   tablePlaceholderColor,
 } from 'components/Theme/constants';
@@ -20,23 +18,8 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
   borderBottom: {
     borderBottom: `1px solid ${theme.palette.divider}`,
   },
-  borderTop: {
-    borderTop: `1px solid ${theme.palette.divider}`,
-  },
-  childrenContainer: {
-    backgroundColor: nestedListColor,
-    minHeight: theme.spacing(7),
-  },
-  childGroupLabel: {
-    borderWidth: '2px',
-    padding: `${theme.spacing(2)}px 0`,
-  },
   errorContainer: {
     padding: `0 ${theme.spacing(8)}px ${theme.spacing(2)}px`,
-    '$childrenContainer &': {
-      paddingTop: theme.spacing(2),
-      paddingLeft: theme.spacing(2),
-    },
   },
   expander: {
     alignItems: 'center',
@@ -56,11 +39,6 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
   headerColumnVersion: {
     width: theme.spacing(4),
   },
-  headerColumnName: {
-    fontSize: smallFontSize,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
   headerRow: {
     alignItems: 'center',
     borderBottom: `4px solid ${theme.palette.divider}`,
@@ -70,17 +48,6 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
     fontFamily: headerFontFamily,
     flexDirection: 'row',
     height: theme.spacing(headerGridHeight),
-  },
-  logLink: {
-    '&:not(:first-child)': {
-      borderLeft: `1px solid ${theme.palette.divider}`,
-      marginLeft: theme.spacing(1),
-      paddingLeft: theme.spacing(1),
-    },
-  },
-  logLinksContainer: {
-    display: 'flex',
-    flexDirection: 'row',
   },
   noRowsContent: {
     color: tablePlaceholderColor,
@@ -101,7 +68,6 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
   clickableRow: {
     cursor: 'pointer',
   },
-  rowContent: {},
   rowColumns: {
     alignItems: 'center',
     display: 'flex',

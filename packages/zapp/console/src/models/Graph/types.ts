@@ -26,6 +26,7 @@ export enum dTypes {
   nestedMaxDepth,
   staticNode,
   staticNestedNode,
+  gateNode,
 }
 
 /**

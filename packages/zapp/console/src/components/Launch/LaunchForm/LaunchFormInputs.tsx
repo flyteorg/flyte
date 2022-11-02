@@ -2,7 +2,7 @@ import { Typography } from '@material-ui/core';
 import * as React from 'react';
 import { BlobInput } from './BlobInput';
 import { CollectionInput } from './CollectionInput';
-import { formStrings, inputsDescription } from './constants';
+import t from './strings';
 import { LaunchState } from './launchMachine';
 import { MapInput } from './MapInput';
 import { NoInputsNeeded } from './NoInputsNeeded';
@@ -80,8 +80,8 @@ const RenderFormInputs: React.FC<{
   ) : (
     <>
       <header className={styles.sectionHeader}>
-        <Typography variant="h6">{formStrings.inputs}</Typography>
-        <Typography variant="body2">{inputsDescription}</Typography>
+        <Typography variant="h6">{t('inputs')}</Typography>
+        <Typography variant="body2">{t('inputsDescription')}</Typography>
       </header>
       {inputs.map((input) => (
         <div key={input.label} className={styles.formControl}>
@@ -104,7 +104,7 @@ export const LaunchFormInputsImpl: React.RefForwardingComponent<
   }));
 
   return isEnterInputsState(state) ? (
-    <section title={formStrings.inputs}>
+    <section title={t('inputs')}>
       {state.matches(LaunchState.UNSUPPORTED_INPUTS) ? (
         <UnsupportedRequiredInputsError inputs={unsupportedRequiredInputs} variant={variant} />
       ) : (

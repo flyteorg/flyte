@@ -79,8 +79,12 @@ export const ExecutionFilters: React.FC<ExecutionFiltersProps> = ({
   filters = filters.map((filter) => {
     const onChangeFunc = filter.onChange;
     filter.onChange = (value) => {
-      if (clearCharts) clearCharts();
-      if (onChangeFunc) onChangeFunc(value);
+      if (clearCharts) {
+        clearCharts();
+      }
+      if (onChangeFunc) {
+        onChangeFunc(value);
+      }
     };
     return filter;
   });

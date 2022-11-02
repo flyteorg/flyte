@@ -1,7 +1,7 @@
 import { DialogContent } from '@material-ui/core';
 import { getCacheKey } from 'components/Cache/utils';
 import * as React from 'react';
-import { formStrings } from './constants';
+import t from './strings';
 import { LaunchFormActions } from './LaunchFormActions';
 import { LaunchFormHeader } from './LaunchFormHeader';
 import { LaunchFormInputs } from './LaunchFormInputs';
@@ -49,13 +49,13 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
 
   return (
     <>
-      <LaunchFormHeader title={state.context.sourceId?.name} />
+      <LaunchFormHeader title={state.context.sourceId?.name} formTitle={t('title')} />
       <DialogContent dividers={true} className={styles.inputsSection}>
         {showTaskSelector ? (
-          <section title={formStrings.taskVersion} className={styles.formControl}>
+          <section title={t('taskVersion')} className={styles.formControl}>
             <SearchableSelector
               id="launch-task-selector"
-              label={formStrings.taskVersion}
+              label={t('taskVersion')}
               onSelectionChanged={onSelectTaskVersion}
               options={taskSelectorOptions}
               fetchSearchResults={fetchSearchResults}
@@ -87,6 +87,7 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = (props) => {
         service={baseService}
         onClose={props.onClose}
         isError={isError}
+        submitTitle={t('submit')}
       />
     </>
   );

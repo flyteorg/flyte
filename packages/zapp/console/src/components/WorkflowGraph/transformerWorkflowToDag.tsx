@@ -68,8 +68,8 @@ export const transformerWorkflowToDag = (
     let scopedId = '';
     if (isStartOrEndNode(compiledNode) && parentDNode && !isStartOrEndNode(parentDNode)) {
       scopedId = `${parentDNode.scopedId}-${compiledNode.id}`;
-    } else if (parentDNode && parentDNode.type != dTypes.start) {
-      if (parentDNode.type == dTypes.branch || parentDNode.type == dTypes.subworkflow) {
+    } else if (parentDNode && parentDNode.type !== dTypes.start) {
+      if (parentDNode.type === dTypes.branch || parentDNode.type === dTypes.subworkflow) {
         scopedId = `${parentDNode.scopedId}-0-${compiledNode.id}`;
       } else {
         scopedId = `${parentDNode.scopedId}-${compiledNode.id}`;
@@ -88,6 +88,7 @@ export const transformerWorkflowToDag = (
       name: getDisplayName(compiledNode),
       nodes: [],
       edges: [],
+      gateNode: compiledNode.gateNode,
     } as dNode;
 
     staticExecutionIdsMap[output.scopedId] = compiledNode;

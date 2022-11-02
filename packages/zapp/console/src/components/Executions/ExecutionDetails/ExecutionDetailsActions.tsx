@@ -10,9 +10,11 @@ import { literalsToLiteralValueMap } from 'components/Launch/LaunchForm/utils';
 import { TaskInitialLaunchParameters } from 'components/Launch/LaunchForm/types';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import Close from '@material-ui/icons/Close';
+import { useEffect, useState } from 'react';
 import { NodeExecutionDetails } from '../types';
 import t from './strings';
 import { ExecutionNodeDeck } from './ExecutionNodeDeck';
+import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -57,26 +59,34 @@ const useStyles = makeStyles((theme: Theme) => {
 });
 
 interface ExecutionDetailsActionsProps {
-  details: NodeExecutionDetails;
+  details?: NodeExecutionDetails;
   nodeExecutionId: NodeExecutionIdentifier;
-  phase?: NodeExecutionPhase;
+  phase: NodeExecutionPhase;
 }
 
-export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JSX.Element => {
-  const { details, nodeExecutionId, phase } = props;
+export const ExecutionDetailsActions = ({
+  details,
+  nodeExecutionId,
+  phase,
+}: ExecutionDetailsActionsProps): JSX.Element => {
   const styles = useStyles();
 
-  const [showLaunchForm, setShowLaunchForm] = React.useState<boolean>(false);
+  const [showLaunchForm, setShowLaunchForm] = useState<boolean>(false);
+  const [showResumeForm, setShowResumeForm] = useState<boolean>(false);
 
-  const [initialParameters, setInitialParameters] = React.useState<
+  const [initialParameters, setInitialParameters] = useState<
     TaskInitialLaunchParameters | undefined
   >(undefined);
 
   const executionData = useNodeExecutionData(nodeExecutionId);
   const execution = useNodeExecution(nodeExecutionId);
-  const id = details.taskTemplate?.id;
+  const { compiledWorkflowClosure } = useNodeExecutionContext();
+  const id = details?.taskTemplate?.id;
+  const compiledNode = (compiledWorkflowClosure?.primary.template.nodes ?? []).find(
+    (node) => node.id === nodeExecutionId.nodeId,
+  );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!id) {
       return;
     }
@@ -99,13 +109,14 @@ export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JS
   const [showDeck, setShowDeck] = React.useState(false);
   const onCloseDeck = () => setShowDeck(false);
 
-  if (!id || !initialParameters) {
-    return <></>;
-  }
-
   const rerunOnClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     setShowLaunchForm(true);
+  };
+
+  const onResumeClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setShowResumeForm(true);
   };
 
   return (
@@ -121,17 +132,35 @@ export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JS
             {t('flyteDeck')}
           </Button>
         )}
-        <Button variant="outlined" color="primary" onClick={rerunOnClick}>
-          {t('rerun')}
-        </Button>
+        {id && initialParameters && details && (
+          <Button variant="outlined" color="primary" onClick={rerunOnClick}>
+            {t('rerun')}
+          </Button>
+        )}
+        {phase === NodeExecutionPhase.PAUSED && (
+          <Button variant="outlined" color="primary" onClick={onResumeClick}>
+            {t('resume')}
+          </Button>
+        )}
       </div>
-      <LaunchFormDialog
-        id={id as ResourceIdentifier}
-        initialParameters={initialParameters}
-        showLaunchForm={showLaunchForm}
-        setShowLaunchForm={setShowLaunchForm}
-      />
-      {execution?.value?.closure?.deckUri ? (
+      {id && initialParameters && (
+        <LaunchFormDialog
+          id={id as ResourceIdentifier}
+          initialParameters={initialParameters}
+          showLaunchForm={showLaunchForm}
+          setShowLaunchForm={setShowLaunchForm}
+        />
+      )}
+      {compiledNode && (
+        <LaunchFormDialog
+          compiledNode={compiledNode}
+          initialParameters={initialParameters}
+          nodeId={nodeExecutionId.nodeId}
+          showLaunchForm={showResumeForm}
+          setShowLaunchForm={setShowResumeForm}
+        />
+      )}
+      {execution?.value?.closure?.deckUri && (
         <Dialog PaperProps={{ className: styles.dialog }} maxWidth={false} open={showDeck}>
           <div className={styles.dialogTitle}>
             <h2 className={styles.deckTitle}>{t('flyteDeck')}</h2>
@@ -141,7 +170,7 @@ export const ExecutionDetailsActions = (props: ExecutionDetailsActionsProps): JS
           </div>
           <ExecutionNodeDeck deckUri={execution.value.closure.deckUri} />
         </Dialog>
-      ) : null}
+      )}
     </>
   );
 };

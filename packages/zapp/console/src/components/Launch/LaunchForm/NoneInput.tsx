@@ -1,6 +1,6 @@
 import { TextField } from '@material-ui/core';
 import * as React from 'react';
-import { noneInputTypeDescription } from './constants';
+import t from './strings';
 import { InputProps } from './types';
 import { getLaunchInputId } from './utils';
 
@@ -15,7 +15,7 @@ export const NoneInput: React.FC<InputProps> = (props) => {
       variant="outlined"
       disabled={true}
       helperText={description}
-      value={noneInputTypeDescription}
+      value={t('noneInputTypeDescription')}
     />
   );
 };

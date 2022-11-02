@@ -46,7 +46,7 @@ For help with installing dependencies look into
     ```
 2. Now, export the following env variables:
 
-    ` export ADMIN_API_URL=http://localhost:30080 export DISABLE_AUTH=1 `
+    `export ADMIN_API_URL=http://localhost:30080 export DISABLE_AUTH=1`
 
     > You can persist these environment variables either in the current shell or in a `.env` file at the root
     > of the repository. A `.env` file will persist the settings across multiple terminal

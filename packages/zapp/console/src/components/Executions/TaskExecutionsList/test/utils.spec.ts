@@ -1,4 +1,4 @@
-import { getTaskLogName, getTaskIndex } from 'components/Executions/TaskExecutionsList/utils';
+import { getTaskLogName } from 'components/Executions/TaskExecutionsList/utils';
 import { Event } from 'flyteidl';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import { obj } from 'test/utils';
@@ -98,19 +98,6 @@ describe('getTaskRetryAttemptsForIndex', () => {
       index,
     );
     expect(result).toHaveLength(0);
-  });
-});
-
-describe('getTaskIndex', () => {
-  it('should return index if selected log has a match in externalResources list', () => {
-    const index = 3;
-    const log = getMockMapTaskLogItem(TaskExecutionPhase.SUCCEEDED, true, index, 1).logs?.[0];
-
-    // TS check
-    if (log) {
-      const result1 = getTaskIndex(MockMapTaskExecution, log);
-      expect(result1).toStrictEqual(index);
-    }
   });
 });
 

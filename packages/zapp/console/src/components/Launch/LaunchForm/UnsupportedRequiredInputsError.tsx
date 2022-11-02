@@ -3,13 +3,7 @@ import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import { NonIdealState } from 'components/common/NonIdealState';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
-import {
-  cannotLaunchTaskString,
-  cannotLaunchWorkflowString,
-  requiredInputSuffix,
-  taskUnsupportedRequiredInputsString,
-  workflowUnsupportedRequiredInputsString,
-} from './constants';
+import t from './strings';
 import { ParsedInput } from './types';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function formatLabel(label: string) {
-  return label.endsWith(requiredInputSuffix) ? label.substring(0, label.length - 1) : label;
+  return label.endsWith(t('requiredInputSuffix')) ? label.substring(0, label.length - 1) : label;
 }
 
 export interface UnsupportedRequiredInputsErrorProps {
@@ -41,8 +35,8 @@ export const UnsupportedRequiredInputsError: React.FC<UnsupportedRequiredInputsE
   const commonStyles = useCommonStyles();
   const [titleString, errorString] =
     variant === 'workflow'
-      ? [cannotLaunchWorkflowString, workflowUnsupportedRequiredInputsString]
-      : [cannotLaunchTaskString, taskUnsupportedRequiredInputsString];
+      ? [t('cannotLaunchWorkflowString'), t('workflowUnsupportedRequiredInputsString')]
+      : [t('cannotLaunchTaskString'), t('taskUnsupportedRequiredInputsString')];
   return (
     <NonIdealState
       className={styles.errorContainer}

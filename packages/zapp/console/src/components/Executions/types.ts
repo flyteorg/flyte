@@ -7,8 +7,10 @@ import {
 import { TaskTemplate } from 'models/Task/types';
 
 export interface ExecutionPhaseConstants {
-  badgeColor: string;
   text: string;
+  value: string;
+  badgeColor: string;
+  nodeColor: string;
   textColor: string;
 }
 
@@ -16,6 +18,7 @@ export enum NodeExecutionDisplayType {
   MapTask = 'Map Task',
   BatchHiveTask = 'Hive Batch Task',
   BranchNode = 'Branch Node',
+  GateNode = 'Gate Node',
   DynamicTask = 'Dynamic Task',
   HiveTask = 'Hive Task',
   PythonTask = 'Python Task',

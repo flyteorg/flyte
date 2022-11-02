@@ -8,11 +8,14 @@ import { Execution, NodeExecution, TaskExecution } from 'models/Execution/types'
 import { createMockNodeExecutions } from 'models/Execution/__mocks__/mockNodeExecutionsData';
 import { createMockTaskExecutionsListResponse } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import { createMockWorkflowExecutionsListResponse } from 'models/Execution/__mocks__/mockWorkflowExecutionsData';
+import { mockNodes, mockNodesWithGateNode } from 'models/Node/__mocks__/mockNodeData';
 import { long, waitFor } from 'test/utils';
 import {
   getNodeExecutionTimingMS,
+  getNodeFrontendPhase,
   getTaskExecutionTimingMS,
   getWorkflowExecutionTimingMS,
+  isNodeGateNode,
 } from '../utils';
 
 const getMockWorkflowExecution = () => createMockWorkflowExecutionsListResponse(1).executions[0];
@@ -161,5 +164,55 @@ describe('getTaskExecutionTimingMS', () => {
     const secondResult = getTaskExecutionTimingMS(execution);
     expect(secondResult).not.toBeNull();
     expect(firstResult!.duration).toBeLessThan(secondResult!.duration);
+  });
+});
+
+describe('isNodeGateNode', () => {
+  const executionId = { project: 'project', domain: 'domain', name: 'name' };
+
+  it('should return true if nodeId is in the list and has a gateNode field', () => {
+    expect(isNodeGateNode(mockNodesWithGateNode, { nodeId: 'GateNode', executionId })).toBeTruthy();
+  });
+
+  it('should return false if nodeId is in the list, but a gateNode field is missing', () => {
+    expect(isNodeGateNode(mockNodes, { nodeId: 'BasicNode', executionId })).toBeFalsy();
+  });
+
+  it('should return false if nodeId is not in the list, but has a gateNode field', () => {
+    expect(isNodeGateNode(mockNodes, { nodeId: 'GateNode', executionId })).toBeFalsy();
+  });
+
+  it('should return false if nodeId is a gateNode, but the list is empty', () => {
+    expect(isNodeGateNode([], { nodeId: 'GateNode', executionId })).toBeFalsy();
+  });
+
+  it('should return false if nodeId is not a gateNode and the list is empty', () => {
+    expect(isNodeGateNode([], { nodeId: 'BasicNode', executionId })).toBeFalsy();
+  });
+});
+
+describe('getNodeFrontendPhase', () => {
+  it('should return PAUSED if node is a gateNode in the RUNNING phase', () => {
+    expect(getNodeFrontendPhase(NodeExecutionPhase.RUNNING, true)).toEqual(
+      NodeExecutionPhase.PAUSED,
+    );
+  });
+
+  it('should return phase if node is a gateNode not in the RUNNING phase', () => {
+    expect(getNodeFrontendPhase(NodeExecutionPhase.FAILED, true)).toEqual(
+      NodeExecutionPhase.FAILED,
+    );
+  });
+
+  it('should return RUNNING if node is not a gateNode in the RUNNING phase', () => {
+    expect(getNodeFrontendPhase(NodeExecutionPhase.RUNNING, false)).toEqual(
+      NodeExecutionPhase.RUNNING,
+    );
+  });
+
+  it('should return phase if node is not a gateNode not in the RUNNING phase', () => {
+    expect(getNodeFrontendPhase(NodeExecutionPhase.SUCCEEDED, false)).toEqual(
+      NodeExecutionPhase.SUCCEEDED,
+    );
   });
 });

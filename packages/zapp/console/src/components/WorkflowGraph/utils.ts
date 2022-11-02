@@ -93,6 +93,8 @@ export const getNodeTypeFromCompiledNode = (node: CompiledNode): dTypes => {
     } else {
       return dTypes.subworkflow;
     }
+  } else if (node.gateNode) {
+    return dTypes.gateNode;
   } else {
     return dTypes.task;
   }
@@ -131,7 +133,7 @@ export const getNodeNameFromDag = (dagData: dNode, nodeId: string) => {
   return getNodeTemplateName(node);
 };
 
-export const getNodeTemplateName = (node: dNode) => {
+export const getNodeTemplateName = (node: dNode): string | undefined => {
   const value = node?.value;
   if (value?.workflowNode) {
     const { launchplanRef, subWorkflowRef } = node.value.workflowNode;
@@ -143,7 +145,7 @@ export const getNodeTemplateName = (node: dNode) => {
     return value.taskNode.referenceId.name;
   }
 
-  return '';
+  return undefined;
 };
 
 export const transformWorkflowToKeyedDag = (workflow: Workflow) => {

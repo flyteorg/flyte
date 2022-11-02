@@ -3,7 +3,8 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
-import { taskNoInputsString, workflowNoInputsString } from './constants';
+import { workflowNoInputsString } from './constants';
+import t from './strings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -26,7 +27,7 @@ export const NoInputsNeeded: React.FC<NoInputsProps> = ({ variant }) => {
       className={classnames(commonStyles.hintText, useStyles().root)}
       variant="body2"
     >
-      {variant === 'workflow' ? workflowNoInputsString : taskNoInputsString}
+      {variant === 'workflow' ? workflowNoInputsString : t('taskNoInputsString')}
     </Typography>
   );
 };

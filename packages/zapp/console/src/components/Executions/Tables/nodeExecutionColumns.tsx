@@ -2,75 +2,29 @@ import { Tooltip, Typography } from '@material-ui/core';
 import { formatDateLocalTimezone, formatDateUTC, millisecondsToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
-import { isEqual } from 'lodash';
-import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { CompiledNode } from 'models/Node/types';
+import { NodeExecutionPhase } from 'models/Execution/enums';
+import { getNodeTemplateName } from 'components/WorkflowGraph/utils';
 import { useNodeExecutionContext } from '../contextProvider/NodeExecutionDetails';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
-import { getNodeExecutionTimingMS } from '../utils';
+import { getNodeExecutionTimingMS, getNodeFrontendPhase, isNodeGateNode } from '../utils';
 import { NodeExecutionActions } from './NodeExecutionActions';
-import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import { NodeExecutionCellRendererData, NodeExecutionColumnDefinition } from './types';
-
-const ExecutionName: React.FC<NodeExecutionCellRendererData> = ({ execution, state }) => {
-  const detailsContext = useNodeExecutionContext();
-  const [displayName, setDisplayName] = useState<string | undefined>();
-
-  useEffect(() => {
-    let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then((res) => {
-      if (isCurrent) {
-        setDisplayName(res.displayName);
-      }
-    });
-    return () => {
-      isCurrent = false;
-    };
-  });
-
-  const commonStyles = useCommonStyles();
-  const styles = useColumnStyles();
-  const { selectedExecution, setSelectedExecution } = state;
-
-  const isSelected = state.selectedExecution != null && isEqual(execution.id, selectedExecution);
-
-  const name = displayName ?? execution.id.nodeId;
-  const truncatedName = name?.split('.').pop() || name;
-
-  const readableName = isSelected ? (
-    <Typography variant="body1" className={styles.selectedExecutionName}>
-      {truncatedName}
-    </Typography>
-  ) : (
-    <SelectNodeExecutionLink
-      className={commonStyles.primaryLink}
-      execution={execution}
-      linkText={truncatedName || ''}
-      setSelectedExecution={setSelectedExecution}
-    />
-  );
-
-  return (
-    <>
-      {readableName}
-      <Typography variant="subtitle1" color="textSecondary">
-        {displayName}
-      </Typography>
-    </>
-  );
-};
+import t from '../strings';
+import { NodeExecutionName } from '../ExecutionDetails/Timeline/NodeExecutionName';
 
 const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
   const commonStyles = useCommonStyles();
-  const detailsContext = useNodeExecutionContext();
+  const { getNodeExecutionDetails } = useNodeExecutionContext();
   const [displayId, setDisplayId] = useState<string | undefined>();
 
   useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then((res) => {
+    getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
         setDisplayId(res.displayId);
       }
@@ -89,12 +43,12 @@ const DisplayId: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
 };
 
 const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => {
-  const detailsContext = useNodeExecutionContext();
+  const { getNodeExecutionDetails } = useNodeExecutionContext();
   const [type, setType] = useState<string | undefined>();
 
   useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(execution).then((res) => {
+    getNodeExecutionDetails(execution).then((res) => {
       if (isCurrent) {
         setType(res.displayType);
       }
@@ -109,39 +63,51 @@ const DisplayType: React.FC<NodeExecutionCellRendererData> = ({ execution }) => 
 
 export function generateColumns(
   styles: ReturnType<typeof useColumnStyles>,
+  nodes: CompiledNode[],
 ): NodeExecutionColumnDefinition[] {
   return [
     {
-      cellRenderer: (props) => <ExecutionName {...props} />,
+      cellRenderer: ({ node }) => (
+        <NodeExecutionName
+          name={node.name}
+          templateName={getNodeTemplateName(node)}
+          execution={node.execution}
+        />
+      ),
       className: styles.columnName,
       key: 'name',
-      label: 'task name',
+      label: t('nameLabel'),
     },
     {
       cellRenderer: (props) => <DisplayId {...props} />,
       className: styles.columnNodeId,
       key: 'nodeId',
-      label: 'node id',
+      label: t('nodeIdLabel'),
     },
     {
       cellRenderer: (props) => <DisplayType {...props} />,
       className: styles.columnType,
       key: 'type',
-      label: 'type',
+      label: t('typeLabel'),
     },
     {
-      cellRenderer: ({ execution }) => (
-        <>
-          <ExecutionStatusBadge
-            phase={execution.closure?.phase ?? NodeExecutionPhase.UNDEFINED}
-            type="node"
-          />
-          <NodeExecutionCacheStatus execution={execution} variant="iconOnly" />
-        </>
-      ),
+      cellRenderer: ({ execution }) => {
+        const isGateNode = isNodeGateNode(nodes, execution.id);
+        const phase = getNodeFrontendPhase(
+          execution.closure?.phase ?? NodeExecutionPhase.UNDEFINED,
+          isGateNode,
+        );
+
+        return (
+          <>
+            <ExecutionStatusBadge phase={phase} type="node" />
+            <NodeExecutionCacheStatus execution={execution} variant="iconOnly" />
+          </>
+        );
+      },
       className: styles.columnStatus,
       key: 'phase',
-      label: 'status',
+      label: t('phaseLabel'),
     },
     {
       cellRenderer: ({ execution: { closure } }) => {
@@ -161,7 +127,7 @@ export function generateColumns(
       },
       className: styles.columnStartedAt,
       key: 'startedAt',
-      label: 'start time',
+      label: t('startedAtLabel'),
     },
     {
       cellRenderer: ({ execution }) => {
@@ -180,18 +146,19 @@ export function generateColumns(
       label: () => (
         <>
           <Typography component="div" variant="overline">
-            duration
+            {t('durationLabel')}
           </Typography>
           <Typography component="div" variant="subtitle1" color="textSecondary">
-            Queued Time
+            {t('queuedTimeLabel')}
           </Typography>
         </>
       ),
     },
     {
-      cellRenderer: ({ execution, state }) => (
-        <NodeExecutionActions execution={execution} state={state} />
-      ),
+      cellRenderer: ({ execution }) =>
+        execution.closure.phase === NodeExecutionPhase.UNDEFINED ? null : (
+          <NodeExecutionActions execution={execution} />
+        ),
       className: styles.columnLogs,
       key: 'actions',
       label: '',

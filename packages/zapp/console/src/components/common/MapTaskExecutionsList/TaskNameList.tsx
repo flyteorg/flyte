@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { Core } from 'flyteidl';
-import { getTaskIndex, getTaskLogName } from 'components/Executions/TaskExecutionsList/utils';
+import { getTaskLogName } from 'components/Executions/TaskExecutionsList/utils';
 import { MapTaskExecution, TaskExecution } from 'models/Execution/types';
 import { noLogsFoundString } from 'components/Executions/constants';
-import { CacheStatus } from 'components/Executions/NodeExecutionCacheStatus';
+import { CacheStatus } from 'components/Executions/CacheStatus';
 import { useCommonStyles } from '../styles';
 
 interface StyleProps {

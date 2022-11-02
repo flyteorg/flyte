@@ -34,6 +34,9 @@ export const useStyles = makeStyles((theme: Theme) => ({
     color: interactiveTextColor,
     justifyContent: 'flex-end',
   },
+  viewNodeInputs: {
+    color: interactiveTextColor,
+  },
   noBorder: {
     '&:before': {
       height: 0,

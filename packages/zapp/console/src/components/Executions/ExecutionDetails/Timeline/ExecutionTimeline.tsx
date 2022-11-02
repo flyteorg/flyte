@@ -1,23 +1,18 @@
 import * as React from 'react';
 import { makeStyles, Typography } from '@material-ui/core';
-
-import { useNodeExecutionContext } from 'components/Executions/contextProvider/NodeExecutionDetails';
-import { transformerWorkflowToDag } from 'components/WorkflowGraph/transformerWorkflowToDag';
 import { isEndNode, isStartNode, isExpanded } from 'components/WorkflowGraph/utils';
 import { tableHeaderColor } from 'components/Theme/constants';
 import { timestampToDate } from 'common/utils';
 import { dNode } from 'models/Graph/types';
-import { makeNodeExecutionDynamicWorkflowQuery } from 'components/Workflow/workflowQueries';
-import { useQuery } from 'react-query';
 import { createRef, useContext, useEffect, useRef, useState } from 'react';
 import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
-import { checkForDynamicExecutions } from 'components/common/utils';
 import { convertToPlainNodes } from './helpers';
 import { ChartHeader } from './ChartHeader';
 import { useScaleContext } from './scaleContext';
 import { TaskNames } from './TaskNames';
 import { getChartDurationData } from './TimelineChart/chartData';
 import { TimelineChart } from './TimelineChart';
+import t from '../strings';
 
 interface StyleProps {
   chartWidth: number;
@@ -72,45 +67,29 @@ const INTERVAL_LENGTH = 110;
 
 interface ExProps {
   chartTimezone: string;
+  initialNodes: dNode[];
 }
 
-export const ExecutionTimeline: React.FC<ExProps> = ({ chartTimezone }) => {
+export const ExecutionTimeline: React.FC<ExProps> = ({ chartTimezone, initialNodes }) => {
   const [chartWidth, setChartWidth] = useState(0);
   const [labelInterval, setLabelInterval] = useState(INTERVAL_LENGTH);
   const durationsRef = useRef<HTMLDivElement>(null);
   const durationsLabelsRef = useRef<HTMLDivElement>(null);
   const taskNamesRef = createRef<HTMLDivElement>();
 
-  const [originalNodes, setOriginalNodes] = useState<dNode[]>([]);
+  const [originalNodes, setOriginalNodes] = useState<dNode[]>(initialNodes);
   const [showNodes, setShowNodes] = useState<dNode[]>([]);
   const [startedAt, setStartedAt] = useState<Date>(new Date());
-
-  const { compiledWorkflowClosure } = useNodeExecutionContext();
-  const { chartInterval: chartTimeInterval } = useScaleContext();
-  const { staticExecutionIdsMap } = compiledWorkflowClosure
-    ? transformerWorkflowToDag(compiledWorkflowClosure)
-    : [];
-
   const nodeExecutionsById = useContext(NodeExecutionsByIdContext);
-
-  const dynamicParents = checkForDynamicExecutions(nodeExecutionsById, staticExecutionIdsMap);
-
-  const { data: dynamicWorkflows } = useQuery(
-    makeNodeExecutionDynamicWorkflowQuery(dynamicParents),
-  );
+  const { chartInterval: chartTimeInterval } = useScaleContext();
 
   useEffect(() => {
-    const nodes: dNode[] = compiledWorkflowClosure
-      ? transformerWorkflowToDag(compiledWorkflowClosure, dynamicWorkflows).dag.nodes
-      : [];
-    // we remove start/end node info in the root dNode list during first assignment
-    const initializeNodes = convertToPlainNodes(nodes);
-    setOriginalNodes(initializeNodes);
-  }, [dynamicWorkflows, compiledWorkflowClosure]);
+    setOriginalNodes(initialNodes);
+  }, [initialNodes]);
 
   useEffect(() => {
-    const initializeNodes = convertToPlainNodes(originalNodes);
-    const updatedShownNodesMap = initializeNodes.map((node) => {
+    const plainNodes = convertToPlainNodes(originalNodes);
+    const updatedShownNodesMap = plainNodes.map((node) => {
       const execution = nodeExecutionsById[node.scopedId];
       return {
         ...node,
@@ -191,7 +170,7 @@ export const ExecutionTimeline: React.FC<ExProps> = ({ chartTimezone }) => {
   return (
     <>
       <div className={styles.taskNames}>
-        <Typography className={styles.taskNamesHeader}>Task Name</Typography>
+        <Typography className={styles.taskNamesHeader}>{t('taskNameColumnHeader')}</Typography>
         <TaskNames
           nodes={showNodes}
           ref={taskNamesRef}

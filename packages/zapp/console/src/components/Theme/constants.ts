@@ -55,6 +55,18 @@ export const statusColors = {
   SKIPPED: COLOR_SPECTRUM.sunset20.color,
   UNKNOWN: COLOR_SPECTRUM.gray20.color,
   WARNING: COLOR_SPECTRUM.yellow40.color,
+  PAUSED: COLOR_SPECTRUM.amber30.color,
+};
+
+export const graphStatusColors = {
+  FAILED: '#e90000',
+  FAILING: '#f2a4ad',
+  SUCCEEDED: '#37b789',
+  ABORTED: '#be25d7',
+  RUNNING: '#2892f4',
+  QUEUED: '#dfd71b',
+  PAUSED: '#f5a684',
+  UNDEFINED: '#4a2839',
 };
 
 export type TaskColorMap = Record<TaskType, string>;

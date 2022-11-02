@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Protobuf } from 'flyteidl';
 import { useStyles } from './styles';
 import { LaunchInterruptibleInputRef } from './types';
-import { formStrings } from './constants';
+import t from './strings';
 
 export const useInterruptibleStyles = makeStyles((theme: Theme) => ({
   labelIndeterminate: {
@@ -71,17 +71,18 @@ export const LaunchInterruptibleInputImpl: React.ForwardRefRenderFunction<
   const styles = useStyles();
   const interruptibleStyles = useInterruptibleStyles();
 
+  // TODO: to cover all text variants in localization conditional
   const getInterruptibleLabel = () => {
     if (indeterminate) {
       return (
-        <Typography
-          className={interruptibleStyles.labelIndeterminate}
-        >{`${formStrings.interruptible} (no override)`}</Typography>
+        <Typography className={interruptibleStyles.labelIndeterminate}>{`${t(
+          'interruptible',
+        )} (no override)`}</Typography>
       );
     } else if (interruptible) {
-      return <Typography>{`${formStrings.interruptible} (enabled)`}</Typography>;
+      return <Typography>{`${t('interruptible')} (enabled)`}</Typography>;
     }
-    return <Typography>{`${formStrings.interruptible} (disabled)`}</Typography>;
+    return <Typography>{`${t('interruptible')} (disabled)`}</Typography>;
   };
 
   return (
@@ -93,7 +94,7 @@ export const LaunchInterruptibleInputImpl: React.ForwardRefRenderFunction<
           forced on or off. If no value was selected, the workflow's default will be used.
         </Typography>
       </header>
-      <section title={formStrings.interruptible}>
+      <section title={t('interruptible')}>
         <FormControlLabel
           control={
             <Checkbox

@@ -236,6 +236,11 @@ export const buildGraphMapping = (props): ReactFlowGraphMapping => {
   const parse = (props: ParseProps) => {
     const { contextNode, contextParent, rootParentNode, nodeDataProps } = props;
     let context: ReactFlowGraph | null = null;
+    if (!contextNode) {
+      debug('\t graph parse: contextNode is ', contextNode);
+      return;
+    }
+
     contextNode.nodes
       .filter((n) => !!n)
       .map((node: dNode) => {

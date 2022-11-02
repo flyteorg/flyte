@@ -10,7 +10,7 @@ import {
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { BlobDimensionality } from 'models/Common/types';
 import * as React from 'react';
-import { blobFormatHelperText, blobUriHelperText } from './constants';
+import t from './strings';
 import { InputProps } from './types';
 import { getLaunchInputId, isBlobValue } from './utils';
 
@@ -84,7 +84,7 @@ export const BlobInput: React.FC<InputProps> = (props) => {
       <div className={styles.inputContainer}>
         <TextField
           id={getLaunchInputId(`${name}-uri`)}
-          helperText={blobUriHelperText}
+          helperText={t('blobUriHelperText')}
           fullWidth={true}
           label="uri"
           onChange={handleUriChange}
@@ -95,7 +95,7 @@ export const BlobInput: React.FC<InputProps> = (props) => {
           <TextField
             className={styles.formatInput}
             id={getLaunchInputId(`${name}-format`)}
-            helperText={blobFormatHelperText}
+            helperText={t('blobFormatHelperText')}
             label="format"
             onChange={handleFormatChange}
             value={blobValue.format}

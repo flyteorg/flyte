@@ -70,6 +70,19 @@ const getNodeDetails = (node: dNode, tasks: CompiledTask[]): NodeExecutionInfo =
     };
   }
 
+  if (node.value.gateNode) {
+    const templateName = node.name;
+    const task = tasks.find((t) => t.template.id.name === templateName);
+    const taskType = getTaskDisplayType(task?.template.type);
+    return {
+      scopedId: node.scopedId,
+      displayId: node.value.id ?? node.id,
+      displayName: 'gateNode',
+      displayType: taskType,
+      taskTemplate: task?.template,
+    };
+  }
+
   return UNKNOWN_DETAILS;
 };
 

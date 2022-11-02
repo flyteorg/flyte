@@ -8,7 +8,7 @@ import { WorkflowExecutionIdentifier } from 'models/Execution/types';
 import { taskSortFields } from 'models/Task/constants';
 import { Task } from 'models/Task/types';
 import { RefObject, useEffect, useMemo, useRef } from 'react';
-import { correctInputErrors } from './constants';
+import t from './strings';
 import { getInputsForTask } from './getInputs';
 import {
   LaunchState,
@@ -100,7 +100,7 @@ async function validate(
   }
 
   if (!roleInputRef.current.validate()) {
-    throw new Error(correctInputErrors);
+    throw new Error(t('correctInputErrors'));
   }
   return baseValidate(formInputsRef);
 }

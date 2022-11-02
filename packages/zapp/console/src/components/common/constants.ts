@@ -1,4 +1,5 @@
 import { env } from 'common/env';
+import { graphStatusColors } from 'components/Theme/constants';
 import { InterpreterOptions } from 'xstate';
 
 export const detailsPanelWidth = 432;
@@ -16,5 +17,5 @@ export const defaultStateMachineConfig: Partial<InterpreterOptions> = {
 export const barChartColors = {
   default: '#e5e5e5',
   success: '#78dfb1',
-  failure: '#f2a4ad',
+  failure: graphStatusColors.FAILING,
 };

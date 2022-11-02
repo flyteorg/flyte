@@ -2,7 +2,7 @@ import { sortedObjectEntries } from 'common/utils';
 import { LaunchPlan } from 'models/Launch/types';
 import { Task } from 'models/Task/types';
 import { Workflow } from 'models/Workflow/types';
-import { requiredInputSuffix } from './constants';
+import t from './strings';
 import { LiteralValueMap, ParsedInput } from './types';
 import {
   createInputCacheKey,
@@ -36,7 +36,7 @@ export function getInputsForWorkflow(
 
     const typeDefinition = getInputDefintionForLiteralType(parameter.var.type);
     const typeLabel = formatLabelWithType(name, typeDefinition);
-    const label = required ? `${typeLabel}${requiredInputSuffix}` : typeLabel;
+    const label = required ? `${typeLabel}${t('requiredInputSuffix')}` : typeLabel;
     const inputKey = createInputCacheKey(name, typeDefinition);
     const defaultVaue = parameter.default != null ? parameter.default : undefined;
     const initialValue = initialValues.has(inputKey) ? initialValues.get(inputKey) : defaultVaue;
@@ -81,7 +81,7 @@ export function getInputsForTask(
     const [name, { description = emptyDescription, type }] = value;
     const typeDefinition = getInputDefintionForLiteralType(type);
     const typeLabel = formatLabelWithType(name, typeDefinition);
-    const label = `${typeLabel}${requiredInputSuffix}`;
+    const label = `${typeLabel}${t('requiredInputSuffix')}`;
     const inputKey = createInputCacheKey(name, typeDefinition);
     const initialValue = initialValues.has(inputKey) ? initialValues.get(inputKey) : undefined;
 

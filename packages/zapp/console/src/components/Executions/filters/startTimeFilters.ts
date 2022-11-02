@@ -2,8 +2,8 @@ import * as moment from 'moment';
 import { FilterOperationName } from 'models/AdminEntity/types';
 import { FilterMap } from './types';
 
-const workflowExecutionStartTimeKey = 'execution_created_at';
-const nodeExecutionStartTimeKey = 'node_execution_created_at';
+const workflowExecutionStartTimeKey = 'created_at';
+const nodeExecutionStartTimeKey = 'created_at';
 
 export type StartTimeFilterKey =
   | 'all'

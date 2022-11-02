@@ -1,114 +1,83 @@
-import { CircularProgress, IconButton } from '@material-ui/core';
-import { Admin } from 'flyteidl';
-import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import classnames from 'classnames';
-import { useTheme } from 'components/Theme/useTheme';
-import { isEqual } from 'lodash';
 import { NodeExecution } from 'models/Execution/types';
+import { dNode } from 'models/Graph/types';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { NodeExecutionsRequestConfigContext } from '../contexts';
-import { useChildNodeExecutionGroupsQuery } from '../nodeExecutionQueries';
-import { titleStrings } from './constants';
-import { NodeExecutionsTableContext } from './contexts';
-import { ExpandableExecutionError } from './ExpandableExecutionError';
-import { NodeExecutionChildren } from './NodeExecutionChildren';
-import { RowExpander } from './RowExpander';
+import { useContext } from 'react';
+import { isExpanded } from 'components/WorkflowGraph/utils';
+import { isEqual } from 'lodash';
+import { useTheme } from 'components/Theme/useTheme';
+import { makeStyles } from '@material-ui/core';
 import { selectedClassName, useExecutionTableStyles } from './styles';
+import { NodeExecutionColumnDefinition } from './types';
+import { DetailsPanelContext } from '../ExecutionDetails/DetailsPanelContext';
+import { RowExpander } from './RowExpander';
 import { calculateNodeExecutionRowLeftSpacing } from './utils';
 
+const useStyles = makeStyles(() => ({
+  namesContainerExpander: {
+    display: 'flex',
+    marginTop: 'auto',
+    marginBottom: 'auto',
+  },
+  leaf: {
+    width: 30,
+  },
+}));
+
 interface NodeExecutionRowProps {
-  abortMetadata?: Admin.IAbortMetadata;
-  index: number;
-  execution: NodeExecution;
+  columns: NodeExecutionColumnDefinition[];
+  nodeExecution: NodeExecution;
   level?: number;
   style?: React.CSSProperties;
+  node: dNode;
+  onToggle: (id: string, scopeId: string, level: number) => void;
 }
-
-const ChildFetchErrorIcon: React.FC<{
-  query: ReturnType<typeof useChildNodeExecutionGroupsQuery>;
-}> = ({ query }) => {
-  return query.isFetching ? (
-    <CircularProgress size={24} />
-  ) : (
-    <IconButton
-      disableRipple={true}
-      disableTouchRipple={true}
-      size="small"
-      title={titleStrings.childGroupFetchFailed}
-      onClick={(e: React.MouseEvent<HTMLElement>) => {
-        // prevent the parent row body onClick event trigger
-        e.stopPropagation();
-        query.refetch();
-      }}
-    >
-      <ErrorOutline />
-    </IconButton>
-  );
-};
 
 /** Renders a NodeExecution as a row inside a `NodeExecutionsTable` */
 export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
-  abortMetadata,
-  execution: nodeExecution,
-  index,
-  level = 0,
+  columns,
+  nodeExecution,
+  node,
   style,
+  onToggle,
 }) => {
+  const styles = useStyles();
   const theme = useTheme();
-  const { columns, state } = React.useContext(NodeExecutionsTableContext);
-  const requestConfig = React.useContext(NodeExecutionsRequestConfigContext);
+  const tableStyles = useExecutionTableStyles();
+  const { selectedExecution, setSelectedExecution } = useContext(DetailsPanelContext);
 
-  const [expanded, setExpanded] = React.useState(false);
-  const toggleExpanded = () => {
-    setExpanded(!expanded);
-  };
+  const nodeLevel = node?.level ?? 0;
+  const expanded = isExpanded(node);
 
   // For the first level, we want the borders to span the entire table,
   // so we'll use padding to space the content. For nested rows, we want the
   // border to start where the content does, so we'll use margin.
-  const spacingProp = level === 0 ? 'paddingLeft' : 'marginLeft';
+  const spacingProp = nodeLevel === 0 ? 'paddingLeft' : 'marginLeft';
   const rowContentStyle = {
-    [spacingProp]: `${calculateNodeExecutionRowLeftSpacing(level, theme.spacing)}px`,
+    [spacingProp]: `${calculateNodeExecutionRowLeftSpacing(nodeLevel, theme.spacing)}px`,
   };
 
-  const childGroupsQuery = useChildNodeExecutionGroupsQuery(nodeExecution, requestConfig);
-  const { data: childGroups = [] } = childGroupsQuery;
+  const selected = selectedExecution ? isEqual(selectedExecution, nodeExecution) : false;
 
-  const isExpandable = childGroups.length > 0;
-  const tableStyles = useExecutionTableStyles();
-
-  const selected = state.selectedExecution
-    ? isEqual(state.selectedExecution, nodeExecution)
-    : false;
-  const { error } = nodeExecution.closure;
-
-  const expanderContent = childGroupsQuery.error ? (
-    <ChildFetchErrorIcon query={childGroupsQuery} />
-  ) : isExpandable ? (
-    <RowExpander expanded={expanded} onClick={toggleExpanded} />
-  ) : null;
-
-  const errorContent = error ? (
-    <ExpandableExecutionError error={error} abortMetadata={abortMetadata} />
-  ) : null;
-
-  const extraContent = expanded ? (
-    <div
-      className={classnames(tableStyles.childrenContainer, {
-        [tableStyles.borderBottom]: level === 0,
-      })}
-    >
-      <NodeExecutionChildren
-        abortMetadata={abortMetadata}
-        childGroups={childGroups}
-        level={level + 1}
-      />
+  const expanderContent = (
+    <div className={styles.namesContainerExpander}>
+      {node.nodes?.length ? (
+        <RowExpander
+          expanded={expanded}
+          onClick={() => onToggle(node.id, node.scopedId, nodeLevel)}
+        />
+      ) : (
+        <div className={styles.leaf} />
+      )}
     </div>
-  ) : null;
+  );
 
   // open the side panel for selected execution's detail
   // use null in case if there is no execution provided - when it is null, will close side panel
-  const onClickRow = () => state.setSelectedExecution(nodeExecution?.id ?? null);
+  const onClickRow = () =>
+    nodeExecution.closure.phase !== NodeExecutionPhase.UNDEFINED &&
+    setSelectedExecution(nodeExecution?.id ?? null);
 
   return (
     <div
@@ -119,13 +88,7 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
       style={style}
       onClick={onClickRow}
     >
-      <div
-        className={classnames(tableStyles.rowContent, {
-          [tableStyles.borderBottom]: level === 0 || (level > 0 && expanded),
-          [tableStyles.borderTop]: level > 0 && index > 0,
-        })}
-        style={rowContentStyle}
-      >
+      <div className={tableStyles.borderBottom} style={rowContentStyle}>
         <div className={tableStyles.rowColumns}>
           <div className={classnames(tableStyles.rowColumn, tableStyles.expander)}>
             {expanderContent}
@@ -133,15 +96,13 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
           {columns.map(({ className, key: columnKey, cellRenderer }) => (
             <div key={columnKey} className={classnames(tableStyles.rowColumn, className)}>
               {cellRenderer({
-                state,
+                node,
                 execution: nodeExecution,
               })}
             </div>
           ))}
         </div>
-        {errorContent}
       </div>
-      {extraContent}
     </div>
   );
 };

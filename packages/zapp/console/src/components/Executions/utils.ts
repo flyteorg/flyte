@@ -15,6 +15,7 @@ import {
   BaseExecutionClosure,
   Execution,
   NodeExecution,
+  NodeExecutionIdentifier,
   TaskExecution,
 } from 'models/Execution/types';
 import { CompiledNode } from 'models/Node/types';
@@ -162,4 +163,21 @@ export function getTaskExecutionTimingMS(execution: TaskExecution) {
 export function isExecutionArchived(execution: Execution): boolean {
   const state = execution.closure.stateChangeDetails?.state ?? null;
   return !!state && state === ExecutionState.EXECUTION_ARCHIVED;
+}
+
+/** Returns true if current node (by nodeId) has 'gateNode' field in the list of nodes on compiledWorkflowClosure */
+export function isNodeGateNode(
+  nodes: CompiledNode[],
+  executionId: NodeExecutionIdentifier,
+): boolean {
+  const node = nodes.find((n) => n.id === executionId.nodeId);
+  return !!node?.gateNode;
+}
+
+/** Transforms phase to Paused for gate nodes in the running state, otherwise returns the phase unchanged */
+export function getNodeFrontendPhase(
+  phase: NodeExecutionPhase,
+  isGateNode: boolean,
+): NodeExecutionPhase {
+  return isGateNode && phase === NodeExecutionPhase.RUNNING ? NodeExecutionPhase.PAUSED : phase;
 }

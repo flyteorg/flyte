@@ -42,6 +42,7 @@ import { ExpandableMonospaceText } from '../../common/ExpandableMonospaceText';
 import { fetchWorkflowExecution } from '../useWorkflowExecution';
 import { NodeExecutionTabs } from './NodeExecutionTabs';
 import { ExecutionDetailsActions } from './ExecutionDetailsActions';
+import { getNodeFrontendPhase, isNodeGateNode } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => {
   const paddingVertical = `${theme.spacing(2)}px`;
@@ -94,6 +95,11 @@ const useStyles = makeStyles((theme: Theme) => {
       marginTop: theme.spacing(2),
       paddingTop: theme.spacing(2),
     },
+    actionsContainer: {
+      borderTop: `1px solid ${theme.palette.divider}`,
+      marginTop: theme.spacing(2),
+      paddingTop: theme.spacing(2),
+    },
     nodeTypeContent: {
       minWidth: theme.spacing(9),
     },
@@ -135,7 +141,7 @@ const tabIds = {
 
 interface NodeExecutionDetailsProps {
   nodeExecutionId: NodeExecutionIdentifier;
-  phase?: TaskExecutionPhase;
+  taskPhase: TaskExecutionPhase;
   onClose?: () => void;
 }
 
@@ -228,18 +234,34 @@ const WorkflowTabs: React.FC<{
  */
 export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProps> = ({
   nodeExecutionId,
-  phase,
+  taskPhase,
   onClose,
 }) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
   const queryClient = useQueryClient();
-  const detailsContext = useNodeExecutionContext();
+  const { getNodeExecutionDetails, compiledWorkflowClosure } = useNodeExecutionContext();
+  const isGateNode = isNodeGateNode(
+    compiledWorkflowClosure?.primary.template.nodes ?? [],
+    nodeExecutionId,
+  );
+
+  const nodeExecutionQuery = useQuery<NodeExecution, Error>({
+    ...makeNodeExecutionQuery(nodeExecutionId),
+    // The selected NodeExecution has been fetched at this point, we don't want to
+    // issue an additional fetch.
+    staleTime: Infinity,
+  });
+
+  const nodeExecution = nodeExecutionQuery.data;
 
   const [isReasonsVisible, setReasonsVisible] = useState<boolean>(false);
   const [dag, setDag] = useState<any>(null);
   const [details, setDetails] = useState<NodeExecutionDetails | undefined>();
   const [selectedTaskExecution, setSelectedTaskExecution] = useState<MapTaskExecution | null>(null);
+  const [nodePhase, setNodePhase] = useState<NodeExecutionPhase>(
+    nodeExecution?.closure.phase ?? NodeExecutionPhase.UNDEFINED,
+  );
 
   const isMounted = useRef(false);
   useEffect(() => {
@@ -249,16 +271,9 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     };
   }, []);
 
-  const nodeExecutionQuery = useQuery<NodeExecution, Error>({
-    ...makeNodeExecutionQuery(nodeExecutionId),
-    // The selected NodeExecution has been fetched at this point, we don't want to
-    // issue an additional fetch.
-    staleTime: Infinity,
-  });
-
   useEffect(() => {
     let isCurrent = true;
-    detailsContext.getNodeExecutionDetails(nodeExecution).then((res) => {
+    getNodeExecutionDetails(nodeExecution).then((res) => {
       if (isCurrent) {
         setDetails(res);
       }
@@ -271,13 +286,12 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
 
   useEffect(() => {
     setReasonsVisible(false);
+    setNodePhase(nodeExecution?.closure.phase ?? NodeExecutionPhase.UNDEFINED);
   }, [nodeExecutionId]);
 
   useEffect(() => {
     setSelectedTaskExecution(null);
-  }, [nodeExecutionId, phase]);
-
-  const nodeExecution = nodeExecutionQuery.data;
+  }, [nodeExecutionId, taskPhase]);
 
   const getWorkflowDag = async () => {
     const workflowExecution = await fetchWorkflowExecution(
@@ -331,12 +345,13 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     );
   }, [nodeExecutionId, selectedTaskExecution]);
 
-  const isRunningPhase = useMemo(() => {
-    return (
-      nodeExecution?.closure.phase === NodeExecutionPhase.QUEUED ||
-      nodeExecution?.closure.phase === NodeExecutionPhase.RUNNING
-    );
-  }, [nodeExecution]);
+  const frontendPhase = useMemo(() => getNodeFrontendPhase(nodePhase, isGateNode), [nodePhase]);
+
+  const isRunningPhase = useMemo(
+    () =>
+      frontendPhase === NodeExecutionPhase.QUEUED || frontendPhase === NodeExecutionPhase.RUNNING,
+    [nodePhase],
+  );
 
   const handleReasonsVisibility = () => {
     setReasonsVisible(!isReasonsVisible);
@@ -345,7 +360,7 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
   const statusContent = nodeExecution ? (
     <div className={styles.statusContainer}>
       <div className={styles.statusHeaderContainer}>
-        <ExecutionStatusBadge phase={nodeExecution.closure.phase} type="node" />
+        <ExecutionStatusBadge phase={frontendPhase} type="node" />
         {isRunningPhase && (
           <InfoIcon className={styles.reasonsIcon} onClick={handleReasonsVisibility} />
         )}
@@ -374,13 +389,14 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     <NodeExecutionTabs
       nodeExecution={nodeExecution}
       selectedTaskExecution={selectedTaskExecution}
-      phase={phase}
+      phase={taskPhase}
       taskTemplate={details?.taskTemplate}
       onTaskSelected={setSelectedTaskExecution}
     />
   ) : null;
 
-  const displayName = details?.displayName ?? <Skeleton />;
+  const emptyName = isGateNode ? <></> : <Skeleton />;
+  const displayName = details?.displayName ?? emptyName;
 
   return (
     <section className={styles.container}>
@@ -396,13 +412,11 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
           </Typography>
           {statusContent}
           {!dag && detailsContent}
-          {details && (
-            <ExecutionDetailsActions
-              details={details}
-              nodeExecutionId={nodeExecutionId}
-              phase={nodeExecution?.closure.phase}
-            />
-          )}
+          <ExecutionDetailsActions
+            details={details}
+            nodeExecutionId={nodeExecutionId}
+            phase={frontendPhase}
+          />
         </div>
       </header>
       {dag ? <WorkflowTabs nodeId={nodeExecutionId.nodeId} dagData={dag} /> : tabsContent}

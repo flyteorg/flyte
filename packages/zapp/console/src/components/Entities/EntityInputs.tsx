@@ -16,6 +16,7 @@ import { FilterOperationName } from 'models/AdminEntity/types';
 import { ResourceIdentifier } from 'models/Common/types';
 import { LaunchPlanClosure, LaunchPlanSpec } from 'models/Launch/types';
 import * as React from 'react';
+import { useMemo } from 'react';
 import t from './strings';
 import { transformLiterals } from '../Literals/helpers';
 
@@ -104,8 +105,8 @@ export const EntityInputs: React.FC<{
     ? launchPlanState.value[0].spec
     : ({} as LaunchPlanSpec);
 
-  const expectedInputs = React.useMemo<Input[]>(() => {
-    const results = [] as Input[];
+  const expectedInputs = useMemo<Input[]>(() => {
+    const results: Input[] = [];
     Object.keys(closure?.expectedInputs?.parameters ?? {}).forEach((name) => {
       const parameter = closure?.expectedInputs.parameters[name];
       if (parameter?.var?.type) {
@@ -121,24 +122,10 @@ export const EntityInputs: React.FC<{
     return results;
   }, [closure]);
 
-  const fixedInputs = React.useMemo<Input[]>(() => {
+  const fixedInputs = useMemo<Input[]>(() => {
     const inputsMap = transformLiterals(spec?.fixedInputs?.literals ?? {});
     return Object.keys(inputsMap).map((name) => ({ name, defaultValue: inputsMap[name] }));
   }, [spec]);
-
-  const configs = React.useMemo(
-    () => [
-      { name: t('configType'), value: 'single (csv)' },
-      {
-        name: t('configUrl'),
-        value:
-          'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv',
-      },
-      { name: t('configSeed'), value: '7' },
-      { name: t('configTestSplitRatio'), value: '0.33' },
-    ],
-    [],
-  );
 
   return (
     <>
@@ -232,22 +219,6 @@ export const EntityInputs: React.FC<{
           )}
         </div>
       </div>
-      {/* <div className={styles.rowContainer}>
-        <div className={styles.firstColumnContainer}>
-          <Typography className={styles.header} variant="h4">
-            {t('configuration')}
-          </Typography>
-          <ul className={styles.configs}>
-            {configs.map(({ name, value }) => (
-              <li className={styles.config} key={name}>
-                <span className={styles.configName}><Typography variant="body">{name}:</Typography></span>
-                <span className={styles.configValue}><Typography variant="body">{value}</Typography></span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className={styles.secondColumnContainer}></div>
-      </div> */}
     </>
   );
 };

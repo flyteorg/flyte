@@ -1,468 +1,181 @@
-import {
-  fireEvent,
-  getAllByRole,
-  getAllByText,
-  getByText,
-  getByTitle,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
-import { cacheStatusMessages } from 'components/Executions/constants';
+import { render, waitFor } from '@testing-library/react';
 import { NodeExecutionDetailsContextProvider } from 'components/Executions/contextProvider/NodeExecutionDetails';
-import { UNKNOWN_DETAILS } from 'components/Executions/contextProvider/NodeExecutionDetails/types';
-import {
-  ExecutionContext,
-  ExecutionContextData,
-  NodeExecutionsRequestConfigContext,
-} from 'components/Executions/contexts';
-import { makeNodeExecutionListQuery } from 'components/Executions/nodeExecutionQueries';
-import { NodeExecutionDisplayType } from 'components/Executions/types';
-import { nodeExecutionIsTerminal } from 'components/Executions/utils';
-import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
-import { cloneDeep } from 'lodash';
+import { NodeExecutionsByIdContext } from 'components/Executions/contexts';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
-import { dynamicExternalSubWorkflow } from 'mocks/data/fixtures/dynamicExternalSubworkflow';
-import {
-  dynamicPythonNodeExecutionWorkflow,
-  dynamicPythonTaskWorkflow,
-} from 'mocks/data/fixtures/dynamicPythonWorkflow';
-import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
+import { noExecutionsFoundString } from 'common/constants';
 import { mockWorkflowId } from 'mocks/data/fixtures/types';
 import { insertFixture } from 'mocks/data/insertFixture';
-import { notFoundError } from 'mocks/errors';
 import { mockServer } from 'mocks/server';
-import { FilterOperationName, RequestConfig } from 'models/AdminEntity/types';
-import { nodeExecutionQueryParams } from 'models/Execution/constants';
-import { CatalogCacheStatus, NodeExecutionPhase } from 'models/Execution/enums';
-import { Execution, NodeExecution, TaskNodeMetadata } from 'models/Execution/types';
-import { ResourceType } from 'models/Common/types';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
-import { makeIdentifier } from 'test/modelUtils';
-import {
-  createTestQueryClient,
-  disableQueryLogger,
-  enableQueryLogger,
-  findNearestAncestorByRole,
-} from 'test/utils';
-import * as moduleApi from 'components/Executions/contextProvider/NodeExecutionDetails/getTaskThroughExecution';
-import { titleStrings } from '../constants';
+import { dateToTimestamp } from 'common/utils';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { createTestQueryClient } from 'test/utils';
+import { dNode } from 'models/Graph/types';
+import { useNodeExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../NodeExecutionsTable';
 
 jest.mock('components/Workflow/workflowQueries');
 const { fetchWorkflow } = require('components/Workflow/workflowQueries');
 
-describe('NodeExecutionsTable', () => {
-  let workflowExecution: Execution;
+jest.mock('components/Executions/filters/useExecutionFiltersState');
+const mockUseNodeExecutionFiltersState = useNodeExecutionFiltersState as jest.Mock<any>;
+mockUseNodeExecutionFiltersState.mockReturnValue({ filters: [], appliedFilters: [] });
+
+jest.mock('components/Executions/Tables/NodeExecutionRow', () => ({
+  NodeExecutionRow: jest.fn(({ nodeExecution }) => (
+    <div data-testid="node-execution-row">
+      <div data-testid="node-execution-col-id">{nodeExecution?.id?.nodeId}</div>
+      <div data-testid="node-execution-col-phase">{nodeExecution?.closure?.phase}</div>
+    </div>
+  )),
+}));
+
+const mockNodes = (n: number): dNode[] => {
+  const nodes: dNode[] = [];
+  for (let i = 1; i <= n; i++) {
+    nodes.push({
+      id: `node${i}`,
+      scopedId: `n${i}`,
+      type: 4,
+      name: `Node ${i}`,
+      nodes: [],
+      edges: [],
+    });
+  }
+  return nodes;
+};
+
+const mockExecutionsById = (n: number, phases: NodeExecutionPhase[]) => {
+  const nodeExecutionsById = {};
+
+  for (let i = 1; i <= n; i++) {
+    nodeExecutionsById[`n${i}`] = {
+      closure: {
+        createdAt: dateToTimestamp(new Date()),
+        outputUri: '',
+        phase: phases[i - 1],
+      },
+      id: {
+        executionId: { domain: 'domain', name: 'name', project: 'project' },
+        nodeId: `node${i}`,
+      },
+      inputUri: '',
+      scopedId: `n${i}`,
+    };
+  }
+  return nodeExecutionsById;
+};
+
+describe('NodeExecutionsTableExecutions > Tables > NodeExecutionsTable', () => {
   let queryClient: QueryClient;
-  let executionContext: ExecutionContextData;
-  let requestConfig: RequestConfig;
+  let fixture: ReturnType<typeof basicPythonWorkflow.generate>;
+  const initialNodes = mockNodes(2);
 
   beforeEach(() => {
-    requestConfig = {};
     queryClient = createTestQueryClient();
+    fixture = basicPythonWorkflow.generate();
+    insertFixture(mockServer, fixture);
+    fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
   });
 
-  const shouldUpdateFn = (nodeExecutions: NodeExecution[]) =>
-    nodeExecutions.some((ne) => !nodeExecutionIsTerminal(ne));
-
-  const selectNode = async (container: HTMLElement, truncatedName: string, nodeId: string) => {
-    const nodeNameAnchor = await waitFor(() => getByText(container, truncatedName));
-    fireEvent.click(nodeNameAnchor);
-    // Wait for Details Panel to render and then for the nodeId header
-    const detailsPanel = await waitFor(() => screen.getByTestId('details-panel'));
-    await waitFor(() => getByText(detailsPanel, nodeId));
-    return detailsPanel;
-  };
-
-  const expandParentNode = async (rowContainer: HTMLElement) => {
-    const expander = await waitFor(() => getByTitle(rowContainer, titleStrings.expandRow));
-    fireEvent.click(expander);
-    return await waitFor(() => getAllByRole(rowContainer, 'list'));
-  };
-
-  const TestTable = () => {
-    const query = useConditionalQuery(
-      {
-        ...makeNodeExecutionListQuery(useQueryClient(), workflowExecution.id, requestConfig),
-        // During tests, we only want to wait for the next tick to refresh
-        refetchInterval: 1,
-      },
-      shouldUpdateFn,
-    );
-    return query.data ? <NodeExecutionsTable nodeExecutions={query.data} /> : null;
-  };
-
-  const renderTable = () =>
+  const renderTable = ({ nodeExecutionsById, initialNodes, filteredNodes }) =>
     render(
       <QueryClientProvider client={queryClient}>
-        <NodeExecutionsRequestConfigContext.Provider value={requestConfig}>
-          <ExecutionContext.Provider value={executionContext}>
-            <NodeExecutionDetailsContextProvider workflowId={mockWorkflowId}>
-              <TestTable />
-            </NodeExecutionDetailsContextProvider>
-          </ExecutionContext.Provider>
-        </NodeExecutionsRequestConfigContext.Provider>
+        <NodeExecutionDetailsContextProvider workflowId={mockWorkflowId}>
+          <NodeExecutionsByIdContext.Provider value={nodeExecutionsById}>
+            <NodeExecutionsTable initialNodes={initialNodes} filteredNodes={filteredNodes} />
+          </NodeExecutionsByIdContext.Provider>
+        </NodeExecutionDetailsContextProvider>
       </QueryClientProvider>,
     );
 
-  describe('when rendering the DetailsPanel', () => {
-    let nodeExecution: NodeExecution;
-    let fixture: ReturnType<typeof basicPythonWorkflow.generate>;
-    beforeEach(() => {
-      fixture = basicPythonWorkflow.generate();
-      workflowExecution = fixture.workflowExecutions.top.data;
-      insertFixture(mockServer, fixture);
-      fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-
-      executionContext = {
-        execution: workflowExecution,
-      };
-      nodeExecution = fixture.workflowExecutions.top.nodeExecutions.pythonNode.data;
+  it('renders empty content when there are no nodes', async () => {
+    const { queryByText, queryByTestId } = renderTable({
+      initialNodes: [],
+      nodeExecutionsById: {},
+      filteredNodes: [],
     });
 
-    const updateNodeExecutions = (executions: NodeExecution[]) => {
-      executions.forEach(mockServer.insertNodeExecution);
-      mockServer.insertNodeExecutionList(fixture.workflowExecutions.top.data.id, executions);
-    };
+    await waitFor(() => queryByText(noExecutionsFoundString));
 
-    it('should render updated state if selected nodeExecution object changes', async () => {
-      nodeExecution.closure.phase = NodeExecutionPhase.RUNNING;
-      updateNodeExecutions([nodeExecution]);
-      const truncatedName = fixture.tasks.python.id.name.split('.').pop() || '';
-      // Render table, click first node
-      const { container } = renderTable();
-      const detailsPanel = await selectNode(container, truncatedName, nodeExecution.id.nodeId);
-      expect(getByText(detailsPanel, 'Running')).toBeInTheDocument();
-
-      const updatedExecution = cloneDeep(nodeExecution);
-      updatedExecution.closure.phase = NodeExecutionPhase.FAILED;
-      updateNodeExecutions([updatedExecution]);
-      await waitFor(() => expect(getByText(detailsPanel, 'Failed')));
-    });
-
-    describe('with nested children', () => {
-      let fixture: ReturnType<typeof dynamicPythonNodeExecutionWorkflow.generate>;
-      beforeEach(() => {
-        fixture = dynamicPythonNodeExecutionWorkflow.generate();
-        workflowExecution = fixture.workflowExecutions.top.data;
-        insertFixture(mockServer, fixture);
-        fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-        executionContext = { execution: workflowExecution };
-      });
-
-      it('should correctly render details for nested executions', async () => {
-        const childNodeExecution =
-          fixture.workflowExecutions.top.nodeExecutions.dynamicNode.nodeExecutions.firstChild.data;
-        const { container } = renderTable();
-        const dynamicTaskNameEl = await waitFor(() =>
-          getByText(container, fixture.tasks.dynamic.id.name),
-        );
-        const dynamicRowEl = findNearestAncestorByRole(dynamicTaskNameEl, 'listitem');
-        const parentNodeEl = await expandParentNode(dynamicRowEl);
-        const truncatedName = fixture.tasks.python.id.name.split('.').pop() || '';
-        await selectNode(parentNodeEl[0], truncatedName, childNodeExecution.id.nodeId);
-
-        // Wait for Details Panel to render and then for the nodeId header
-        const detailsPanel = await waitFor(() => screen.getByTestId('details-panel'));
-        await waitFor(() => expect(getByText(detailsPanel, childNodeExecution.id.nodeId)));
-        expect(getByText(detailsPanel, fixture.tasks.python.id.name)).toBeInTheDocument();
-      });
-    });
+    expect(queryByText(noExecutionsFoundString)).toBeInTheDocument();
+    expect(queryByTestId('node-execution-row')).not.toBeInTheDocument();
   });
 
-  describe('for basic executions', () => {
-    let fixture: ReturnType<typeof basicPythonWorkflow.generate>;
+  it('renders NodeExecutionRows with initialNodes when no filteredNodes were provided', async () => {
+    const phases = [NodeExecutionPhase.FAILED, NodeExecutionPhase.SUCCEEDED];
+    const nodeExecutionsById = mockExecutionsById(2, phases);
 
-    beforeEach(() => {
-      fixture = basicPythonWorkflow.generate();
-      workflowExecution = fixture.workflowExecutions.top.data;
-      insertFixture(mockServer, fixture);
-      fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-
-      executionContext = {
-        execution: workflowExecution,
-      };
+    const { queryAllByTestId } = renderTable({
+      initialNodes,
+      nodeExecutionsById,
+      filteredNodes: undefined,
     });
 
-    const updateNodeExecutions = (executions: NodeExecution[]) => {
-      executions.forEach(mockServer.insertNodeExecution);
-      mockServer.insertNodeExecutionList(fixture.workflowExecutions.top.data.id, executions);
-    };
+    await waitFor(() => queryAllByTestId('node-execution-row'));
 
-    it('renders task name for task nodes', async () => {
-      const { getByText } = renderTable();
-      await waitFor(() => expect(getByText(fixture.tasks.python.id.name)).toBeInTheDocument());
-    });
-
-    it('renders NodeExecutions with no associated spec information as Unknown', async () => {
-      const workflowExecution = fixture.workflowExecutions.top.data;
-      // For a NodeExecution which has no node in the associated workflow spec and
-      // no task executions, we don't have a way to identify its type.
-      // We'll change the python NodeExecution to reference a node id which doesn't exist
-      // in the spec and remove its TaskExecutions.
-      const nodeExecution = fixture.workflowExecutions.top.nodeExecutions.pythonNode.data;
-      nodeExecution.id.nodeId = 'unknownNode';
-      nodeExecution.metadata = {};
-      mockServer.insertNodeExecution(nodeExecution);
-      mockServer.insertNodeExecutionList(workflowExecution.id, [nodeExecution]);
-      mockServer.insertTaskExecutionList(nodeExecution.id, []);
-
-      const { container } = renderTable();
-      const pythonNodeNameEl = await waitFor(() =>
-        getAllByText(container, nodeExecution.id.nodeId),
-      );
-      const rowEl = findNearestAncestorByRole(pythonNodeNameEl?.[0], 'listitem');
-      await waitFor(() => expect(getByText(rowEl, NodeExecutionDisplayType.Unknown)));
-    });
-
-    describe('for task nodes with cache status', () => {
-      let taskNodeMetadata: TaskNodeMetadata;
-      let cachedNodeExecution: NodeExecution;
-      beforeEach(() => {
-        const { nodeExecutions } = fixture.workflowExecutions.top;
-        const { taskExecutions } = nodeExecutions.pythonNode;
-        cachedNodeExecution = nodeExecutions.pythonNode.data;
-        taskNodeMetadata = {
-          cacheStatus: CatalogCacheStatus.CACHE_MISS,
-          catalogKey: {
-            datasetId: makeIdentifier({
-              resourceType: ResourceType.DATASET,
-            }),
-            sourceTaskExecution: {
-              ...taskExecutions.firstAttempt.data.id,
-            },
-          },
-        };
-        cachedNodeExecution.closure.taskNodeMetadata = taskNodeMetadata;
-      });
-
-      [
-        CatalogCacheStatus.CACHE_HIT,
-        CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
-        CatalogCacheStatus.CACHE_POPULATED,
-        CatalogCacheStatus.CACHE_PUT_FAILURE,
-        CatalogCacheStatus.CACHE_MISS,
-        CatalogCacheStatus.CACHE_DISABLED,
-      ].forEach((cacheStatusValue) =>
-        it(`renders correct icon for ${CatalogCacheStatus[cacheStatusValue]}`, async () => {
-          taskNodeMetadata.cacheStatus = cacheStatusValue;
-          updateNodeExecutions([cachedNodeExecution]);
-          const { getByTitle } = renderTable();
-
-          await waitFor(() =>
-            expect(getByTitle(cacheStatusMessages[cacheStatusValue])).toBeDefined(),
-          );
-        }),
-      );
-    });
+    expect(queryAllByTestId('node-execution-row')).toHaveLength(initialNodes.length);
+    const ids = queryAllByTestId('node-execution-col-id');
+    expect(ids).toHaveLength(initialNodes.length);
+    const renderedPhases = queryAllByTestId('node-execution-col-phase');
+    expect(renderedPhases).toHaveLength(initialNodes.length);
+    for (const i in initialNodes) {
+      expect(ids[i]).toHaveTextContent(initialNodes[i].id);
+      expect(renderedPhases[i]).toHaveTextContent(phases[i].toString());
+    }
   });
 
-  describe('for nodes with children', () => {
-    describe('with isParentNode flag', () => {
-      let fixture: ReturnType<typeof dynamicPythonNodeExecutionWorkflow.generate>;
-      beforeEach(() => {
-        fixture = dynamicPythonNodeExecutionWorkflow.generate();
-        workflowExecution = fixture.workflowExecutions.top.data;
-        insertFixture(mockServer, fixture);
-        fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-        executionContext = { execution: workflowExecution };
-      });
+  it('renders NodeExecutionRows with initialNodes even when filterNodes were provided, if appliedFilters is empty', async () => {
+    const phases = [NodeExecutionPhase.FAILED, NodeExecutionPhase.SUCCEEDED];
+    const nodeExecutionsById = mockExecutionsById(2, phases);
+    const filteredNodes = mockNodes(1);
 
-      it('correctly renders children', async () => {
-        const { container } = renderTable();
-        const dynamicTaskNameEl = await waitFor(() =>
-          getByText(container, fixture.tasks.dynamic.id.name),
-        );
-        const dynamicRowEl = findNearestAncestorByRole(dynamicTaskNameEl, 'listitem');
-        const childContainerList = await expandParentNode(dynamicRowEl);
-        await waitFor(() => expect(getByText(childContainerList[0], fixture.tasks.python.id.name)));
-      });
-
-      it('correctly renders groups', async () => {
-        const { nodeExecutions } = fixture.workflowExecutions.top;
-        // We returned two task execution attempts, each with children
-        const { container } = renderTable();
-        const nodeNameEl = await waitFor(() =>
-          getByText(container, nodeExecutions.dynamicNode.data.id.nodeId),
-        );
-        const rowEl = findNearestAncestorByRole(nodeNameEl, 'listitem');
-        const childGroups = await expandParentNode(rowEl);
-        expect(childGroups).toHaveLength(2);
-      });
-
-      describe('with initial failure to fetch children', () => {
-        // Disable react-query logger output to avoid a console.error
-        // when the request fails.
-        beforeEach(() => {
-          disableQueryLogger();
-        });
-        afterEach(() => {
-          enableQueryLogger();
-        });
-        it('renders error icon with retry', async () => {
-          const {
-            data: { id: workflowExecutionId },
-            nodeExecutions,
-          } = fixture.workflowExecutions.top;
-          const parentNodeExecution = nodeExecutions.dynamicNode.data;
-          // Simulate an error when attempting to list children of first NE.
-          mockServer.insertNodeExecutionList(
-            workflowExecutionId,
-            notFoundError(parentNodeExecution.id.nodeId),
-            {
-              [nodeExecutionQueryParams.parentNodeId]: parentNodeExecution.id.nodeId,
-            },
-          );
-
-          const { container, getByTitle } = renderTable();
-          // We expect to find an error icon in place of the child expander
-          const errorIconButton = await waitFor(() =>
-            getByTitle(titleStrings.childGroupFetchFailed),
-          );
-          // restore proper handler for node execution children
-          insertFixture(mockServer, fixture);
-          // click error icon
-          await fireEvent.click(errorIconButton);
-
-          // wait for expander and open it to verify children loaded correctly
-          const nodeNameEl = await waitFor(() =>
-            getByText(container, nodeExecutions.dynamicNode.data.id.nodeId),
-          );
-          const rowEl = findNearestAncestorByRole(nodeNameEl, 'listitem');
-          const childGroups = await expandParentNode(rowEl);
-          expect(childGroups.length).toBeGreaterThan(0);
-        });
-      });
+    const { queryAllByTestId } = renderTable({
+      initialNodes,
+      nodeExecutionsById,
+      filteredNodes,
     });
 
-    describe('without isParentNode flag, using taskNodeMetadata', () => {
-      let fixture: ReturnType<typeof dynamicPythonTaskWorkflow.generate>;
-      beforeEach(() => {
-        fixture = dynamicPythonTaskWorkflow.generate();
-        workflowExecution = fixture.workflowExecutions.top.data;
-        fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-        executionContext = {
-          execution: workflowExecution,
-        };
-      });
+    await waitFor(() => queryAllByTestId('node-execution-row'));
 
-      it('correctly renders children', async () => {
-        // The dynamic task node should have a single child node
-        // which runs the basic python task. Expand it and then
-        // look for the python task name to verify it was rendered.
-        const { container } = renderTable();
-        const dynamicTaskNameEl = await waitFor(() =>
-          getByText(container, fixture.tasks.dynamic.id.name),
-        );
-        const dynamicRowEl = findNearestAncestorByRole(dynamicTaskNameEl, 'listitem');
-        const childContainerList = await expandParentNode(dynamicRowEl);
-        await waitFor(() => expect(getByText(childContainerList[0], fixture.tasks.python.id.name)));
-      });
-
-      it('correctly renders groups', async () => {
-        // We returned two task execution attempts, each with children
-        const { container } = renderTable();
-        const nodeNameEl = await waitFor(() =>
-          getByText(
-            container,
-            fixture.workflowExecutions.top.nodeExecutions.dynamicNode.data.id.nodeId,
-          ),
-        );
-        const rowEl = findNearestAncestorByRole(nodeNameEl, 'listitem');
-        const childGroups = await expandParentNode(rowEl);
-        expect(childGroups).toHaveLength(2);
-      });
-    });
-
-    describe('without isParentNode flag, using workflowNodeMetadata', () => {
-      let fixture: ReturnType<typeof dynamicExternalSubWorkflow.generate>;
-      let mockGetTaskThroughExecution: any;
-
-      beforeEach(() => {
-        fixture = dynamicExternalSubWorkflow.generate();
-        insertFixture(mockServer, fixture);
-        fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-        workflowExecution = fixture.workflowExecutions.top.data;
-        executionContext = {
-          execution: workflowExecution,
-        };
-
-        mockGetTaskThroughExecution = jest.spyOn(moduleApi, 'getTaskThroughExecution');
-        mockGetTaskThroughExecution.mockImplementation(() => {
-          return Promise.resolve({
-            ...UNKNOWN_DETAILS,
-            displayName: fixture.workflows.sub.id.name,
-          });
-        });
-      });
-
-      afterEach(() => {
-        mockGetTaskThroughExecution.mockReset();
-      });
-
-      it('correctly renders children', async () => {
-        const { container } = renderTable();
-        const dynamicTaskNameEl = await waitFor(() =>
-          getByText(container, fixture.tasks.generateSubWorkflow.id.name),
-        );
-        const dynamicRowEl = findNearestAncestorByRole(dynamicTaskNameEl, 'listitem');
-        const childContainerList = await expandParentNode(dynamicRowEl);
-        await waitFor(() =>
-          expect(getByText(childContainerList[0], fixture.workflows.sub.id.name)),
-        );
-      });
-
-      it('correctly renders groups', async () => {
-        const parentNodeId =
-          fixture.workflowExecutions.top.nodeExecutions.dynamicWorkflowGenerator.data.metadata
-            ?.specNodeId || 'not found';
-        // We returned a single WF execution child, so there should only
-        // be one child group
-        const { container } = renderTable();
-        const nodeNameEl = await waitFor(() => getByText(container, parentNodeId));
-        const rowEl = findNearestAncestorByRole(nodeNameEl, 'listitem');
-        const childGroups = await expandParentNode(rowEl);
-        expect(childGroups).toHaveLength(1);
-      });
-    });
+    expect(queryAllByTestId('node-execution-row')).toHaveLength(initialNodes.length);
+    const ids = queryAllByTestId('node-execution-col-id');
+    expect(ids).toHaveLength(initialNodes.length);
+    const renderedPhases = queryAllByTestId('node-execution-col-phase');
+    expect(renderedPhases).toHaveLength(initialNodes.length);
+    for (const i in initialNodes) {
+      expect(ids[i]).toHaveTextContent(initialNodes[i].id);
+      expect(renderedPhases[i]).toHaveTextContent(phases[i].toString());
+    }
   });
 
-  describe('with a request filter', () => {
-    let fixture: ReturnType<typeof oneFailedTaskWorkflow.generate>;
-
-    beforeEach(() => {
-      fixture = oneFailedTaskWorkflow.generate();
-      workflowExecution = fixture.workflowExecutions.top.data;
-      insertFixture(mockServer, fixture);
-      fetchWorkflow.mockImplementation(() => Promise.resolve(fixture.workflows.top));
-      // Adding a request filter to only show failed NodeExecutions
-      requestConfig = {
-        filter: [
-          {
-            key: 'phase',
-            operation: FilterOperationName.EQ,
-            value: NodeExecutionPhase[NodeExecutionPhase.FAILED],
-          },
-        ],
-      };
-      const nodeExecutions = fixture.workflowExecutions.top.nodeExecutions;
-      mockServer.insertNodeExecutionList(workflowExecution.id, [nodeExecutions.failedNode.data], {
-        filters: 'eq(phase,FAILED)',
-      });
-      executionContext = {
-        execution: workflowExecution,
-      };
+  it('renders NodeExecutionRows with filterNodes if appliedFilters is not empty', async () => {
+    mockUseNodeExecutionFiltersState.mockReturnValueOnce({
+      filters: [],
+      appliedFilters: [{ key: 'phase', operation: 'value_in', value: ['FAILED', 'SUCCEEDED'] }],
     });
 
-    it('requests child node executions using configuration from context', async () => {
-      const { getByText, queryByText } = renderTable();
-      const { nodeExecutions } = fixture.workflowExecutions.top;
+    const phases = [NodeExecutionPhase.FAILED, NodeExecutionPhase.SUCCEEDED];
+    const nodeExecutionsById = mockExecutionsById(2, phases);
+    const filteredNodes = mockNodes(1);
 
-      await waitFor(() => expect(getByText(nodeExecutions.failedNode.data.id.nodeId)));
-
-      expect(queryByText(nodeExecutions.pythonNode.data.id.nodeId)).toBeNull();
+    const { queryAllByTestId } = renderTable({
+      initialNodes,
+      nodeExecutionsById,
+      filteredNodes,
     });
+
+    await waitFor(() => queryAllByTestId('node-execution-row'));
+
+    expect(queryAllByTestId('node-execution-row')).toHaveLength(filteredNodes.length);
+    const ids = queryAllByTestId('node-execution-col-id');
+    expect(ids).toHaveLength(filteredNodes.length);
+    const renderedPhases = queryAllByTestId('node-execution-col-phase');
+    expect(renderedPhases).toHaveLength(filteredNodes.length);
+    for (const i in filteredNodes) {
+      expect(ids[i]).toHaveTextContent(filteredNodes[i].id);
+      expect(renderedPhases[i]).toHaveTextContent(phases[i].toString());
+    }
   });
 });

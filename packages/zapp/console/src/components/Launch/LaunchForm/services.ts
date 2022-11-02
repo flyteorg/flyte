@@ -1,5 +1,5 @@
 import { RefObject } from 'react';
-import { correctInputErrors } from './constants';
+import t from './strings';
 import { LaunchFormInputsRef } from './types';
 
 export async function validate(formInputsRef: RefObject<LaunchFormInputsRef>): Promise<boolean> {
@@ -8,7 +8,7 @@ export async function validate(formInputsRef: RefObject<LaunchFormInputsRef>): P
   }
 
   if (!formInputsRef.current.validate()) {
-    throw new Error(correctInputErrors);
+    throw new Error(t('correctInputErrors'));
   }
   return true;
 }

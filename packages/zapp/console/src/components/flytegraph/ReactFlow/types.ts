@@ -1,5 +1,5 @@
-import { CatalogCacheStatus } from 'models/Execution/enums';
-import { NodeExecutionsById } from 'models/Execution/types';
+import { CatalogCacheStatus, NodeExecutionPhase, TaskExecutionPhase } from 'models/Execution/enums';
+import { LogsByPhase } from 'models/Execution/types';
 import { dNode, dTypes } from 'models/Graph/types';
 import { HandleProps } from 'react-flow-renderer';
 
@@ -65,16 +65,24 @@ export interface DagToReactFlowProps extends ConvertDagProps {
   parents: any;
 }
 
-export interface RFCustomData {
-  nodeExecutionStatus: NodeExecutionsById;
+interface RFCustomData {
+  nodeExecutionStatus: NodeExecutionPhase;
   text: string;
   handles: [];
   nodeType: dTypes;
   scopedId: string;
   dag: any;
-  taskType?: dTypes;
-  cacheStatus?: CatalogCacheStatus;
-  onNodeSelectionChanged?: any;
-  onAddNestedView: any;
-  onRemoveNestedView: any;
+  taskType: dTypes;
+  cacheStatus: CatalogCacheStatus;
+  nodeLogsByPhase: LogsByPhase;
+  selectedPhase: TaskExecutionPhase;
+  currentNestedView: string[];
+  onNodeSelectionChanged: (n: boolean) => void;
+  onPhaseSelectionChanged: (p?: TaskExecutionPhase) => void;
+  onAddNestedView: () => void;
+  onRemoveNestedView: (scopedId: string, index: number) => void;
+}
+
+export interface RFNode {
+  data: RFCustomData;
 }
