@@ -26,6 +26,7 @@ static const char* DataCatalog_method_names[] = {
   "/datacatalog.DataCatalog/AddTag",
   "/datacatalog.DataCatalog/ListArtifacts",
   "/datacatalog.DataCatalog/ListDatasets",
+  "/datacatalog.DataCatalog/UpdateArtifact",
   "/datacatalog.DataCatalog/GetOrExtendReservation",
   "/datacatalog.DataCatalog/ReleaseReservation",
 };
@@ -44,8 +45,9 @@ DataCatalog::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channe
   , rpcmethod_AddTag_(DataCatalog_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListArtifacts_(DataCatalog_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListDatasets_(DataCatalog_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetOrExtendReservation_(DataCatalog_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ReleaseReservation_(DataCatalog_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateArtifact_(DataCatalog_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetOrExtendReservation_(DataCatalog_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ReleaseReservation_(DataCatalog_method_names[9], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status DataCatalog::Stub::CreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest& request, ::datacatalog::CreateDatasetResponse* response) {
@@ -244,6 +246,34 @@ void DataCatalog::Stub::experimental_async::ListDatasets(::grpc::ClientContext* 
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::datacatalog::ListDatasetsResponse>::Create(channel_.get(), cq, rpcmethod_ListDatasets_, context, request, false);
 }
 
+::grpc::Status DataCatalog::Stub::UpdateArtifact(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest& request, ::datacatalog::UpdateArtifactResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateArtifact_, context, request, response);
+}
+
+void DataCatalog::Stub::experimental_async::UpdateArtifact(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest* request, ::datacatalog::UpdateArtifactResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateArtifact_, context, request, response, std::move(f));
+}
+
+void DataCatalog::Stub::experimental_async::UpdateArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::UpdateArtifactResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateArtifact_, context, request, response, std::move(f));
+}
+
+void DataCatalog::Stub::experimental_async::UpdateArtifact(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest* request, ::datacatalog::UpdateArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateArtifact_, context, request, response, reactor);
+}
+
+void DataCatalog::Stub::experimental_async::UpdateArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::UpdateArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateArtifact_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::datacatalog::UpdateArtifactResponse>* DataCatalog::Stub::AsyncUpdateArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::datacatalog::UpdateArtifactResponse>::Create(channel_.get(), cq, rpcmethod_UpdateArtifact_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::datacatalog::UpdateArtifactResponse>* DataCatalog::Stub::PrepareAsyncUpdateArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::datacatalog::UpdateArtifactResponse>::Create(channel_.get(), cq, rpcmethod_UpdateArtifact_, context, request, false);
+}
+
 ::grpc::Status DataCatalog::Stub::GetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::datacatalog::GetOrExtendReservationResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetOrExtendReservation_, context, request, response);
 }
@@ -339,10 +369,15 @@ DataCatalog::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       DataCatalog_method_names[7],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< DataCatalog::Service, ::datacatalog::UpdateArtifactRequest, ::datacatalog::UpdateArtifactResponse>(
+          std::mem_fn(&DataCatalog::Service::UpdateArtifact), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      DataCatalog_method_names[8],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< DataCatalog::Service, ::datacatalog::GetOrExtendReservationRequest, ::datacatalog::GetOrExtendReservationResponse>(
           std::mem_fn(&DataCatalog::Service::GetOrExtendReservation), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      DataCatalog_method_names[8],
+      DataCatalog_method_names[9],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< DataCatalog::Service, ::datacatalog::ReleaseReservationRequest, ::datacatalog::ReleaseReservationResponse>(
           std::mem_fn(&DataCatalog::Service::ReleaseReservation), this)));
@@ -394,6 +429,13 @@ DataCatalog::Service::~Service() {
 }
 
 ::grpc::Status DataCatalog::Service::ListDatasets(::grpc::ServerContext* context, const ::datacatalog::ListDatasetsRequest* request, ::datacatalog::ListDatasetsResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status DataCatalog::Service::UpdateArtifact(::grpc::ServerContext* context, const ::datacatalog::UpdateArtifactRequest* request, ::datacatalog::UpdateArtifactResponse* response) {
   (void) context;
   (void) request;
   (void) response;

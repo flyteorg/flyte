@@ -4740,6 +4740,17 @@ public final class LaunchPlanOuterClass {
      * <code>.google.protobuf.BoolValue interruptible = 19;</code>
      */
     com.google.protobuf.BoolValueOrBuilder getInterruptibleOrBuilder();
+
+    /**
+     * <pre>
+     * Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+     * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+     * data once execution finishes successfully.
+     * </pre>
+     *
+     * <code>bool overwrite_cache = 20;</code>
+     */
+    boolean getOverwriteCache();
   }
   /**
    * <pre>
@@ -4950,6 +4961,11 @@ public final class LaunchPlanOuterClass {
                 interruptible_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 160: {
+
+              overwriteCache_ = input.readBool();
               break;
             }
             default: {
@@ -5440,6 +5456,21 @@ public final class LaunchPlanOuterClass {
       return getInterruptible();
     }
 
+    public static final int OVERWRITE_CACHE_FIELD_NUMBER = 20;
+    private boolean overwriteCache_;
+    /**
+     * <pre>
+     * Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+     * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+     * data once execution finishes successfully.
+     * </pre>
+     *
+     * <code>bool overwrite_cache = 20;</code>
+     */
+    public boolean getOverwriteCache() {
+      return overwriteCache_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5495,6 +5526,9 @@ public final class LaunchPlanOuterClass {
       }
       if (interruptible_ != null) {
         output.writeMessage(19, getInterruptible());
+      }
+      if (overwriteCache_ != false) {
+        output.writeBool(20, overwriteCache_);
       }
       unknownFields.writeTo(output);
     }
@@ -5559,6 +5593,10 @@ public final class LaunchPlanOuterClass {
       if (interruptible_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(19, getInterruptible());
+      }
+      if (overwriteCache_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(20, overwriteCache_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5639,6 +5677,8 @@ public final class LaunchPlanOuterClass {
         if (!getInterruptible()
             .equals(other.getInterruptible())) return false;
       }
+      if (getOverwriteCache()
+          != other.getOverwriteCache()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5702,6 +5742,9 @@ public final class LaunchPlanOuterClass {
         hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
         hash = (53 * hash) + getInterruptible().hashCode();
       }
+      hash = (37 * hash) + OVERWRITE_CACHE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getOverwriteCache());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5915,6 +5958,8 @@ public final class LaunchPlanOuterClass {
           interruptible_ = null;
           interruptibleBuilder_ = null;
         }
+        overwriteCache_ = false;
+
         return this;
       }
 
@@ -6003,6 +6048,7 @@ public final class LaunchPlanOuterClass {
         } else {
           result.interruptible_ = interruptibleBuilder_.build();
         }
+        result.overwriteCache_ = overwriteCache_;
         onBuilt();
         return result;
       }
@@ -6093,6 +6139,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasInterruptible()) {
           mergeInterruptible(other.getInterruptible());
+        }
+        if (other.getOverwriteCache() != false) {
+          setOverwriteCache(other.getOverwriteCache());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -8099,6 +8148,50 @@ public final class LaunchPlanOuterClass {
           interruptible_ = null;
         }
         return interruptibleBuilder_;
+      }
+
+      private boolean overwriteCache_ ;
+      /**
+       * <pre>
+       * Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+       * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+       * data once execution finishes successfully.
+       * </pre>
+       *
+       * <code>bool overwrite_cache = 20;</code>
+       */
+      public boolean getOverwriteCache() {
+        return overwriteCache_;
+      }
+      /**
+       * <pre>
+       * Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+       * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+       * data once execution finishes successfully.
+       * </pre>
+       *
+       * <code>bool overwrite_cache = 20;</code>
+       */
+      public Builder setOverwriteCache(boolean value) {
+        
+        overwriteCache_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+       * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+       * data once execution finishes successfully.
+       * </pre>
+       *
+       * <code>bool overwrite_cache = 20;</code>
+       */
+      public Builder clearOverwriteCache() {
+        
+        overwriteCache_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14229,7 +14322,7 @@ public final class LaunchPlanOuterClass {
       "0\n\014launch_plans\030\001 \003(\0132\032.flyteidl.admin.L" +
       "aunchPlan\022\r\n\005token\030\002 \001(\t\"J\n\004Auth\022\032\n\022assu" +
       "mable_iam_role\030\001 \001(\t\022\"\n\032kubernetes_servi" +
-      "ce_account\030\002 \001(\t:\002\030\001\"\260\005\n\016LaunchPlanSpec\022" +
+      "ce_account\030\002 \001(\t:\002\030\001\"\311\005\n\016LaunchPlanSpec\022" +
       ".\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core.Ide" +
       "ntifier\022;\n\017entity_metadata\030\002 \001(\0132\".flyte" +
       "idl.admin.LaunchPlanMetadata\0223\n\016default_" +
@@ -14246,29 +14339,29 @@ public final class LaunchPlanOuterClass {
       "ervice\022C\n\026raw_output_data_config\030\021 \001(\0132#" +
       ".flyteidl.admin.RawOutputDataConfig\022\027\n\017m" +
       "ax_parallelism\030\022 \001(\005\0221\n\rinterruptible\030\023 " +
-      "\001(\0132\032.google.protobuf.BoolValue\"\217\002\n\021Laun" +
-      "chPlanClosure\022.\n\005state\030\001 \001(\0162\037.flyteidl." +
-      "admin.LaunchPlanState\0224\n\017expected_inputs" +
-      "\030\002 \001(\0132\033.flyteidl.core.ParameterMap\0224\n\020e" +
-      "xpected_outputs\030\003 \001(\0132\032.flyteidl.core.Va" +
-      "riableMap\022.\n\ncreated_at\030\004 \001(\0132\032.google.p" +
-      "rotobuf.Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032." +
-      "google.protobuf.Timestamp\"u\n\022LaunchPlanM" +
-      "etadata\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.adm" +
-      "in.Schedule\0223\n\rnotifications\030\002 \003(\0132\034.fly" +
-      "teidl.admin.Notification\"p\n\027LaunchPlanUp" +
-      "dateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core." +
-      "Identifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.adm" +
-      "in.LaunchPlanState\"\032\n\030LaunchPlanUpdateRe" +
-      "sponse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030" +
-      "\001 \001(\0132%.flyteidl.admin.NamedEntityIdenti" +
-      "fier\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007" +
-      "project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003" +
-      " \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.f" +
-      "lyteidl.admin.Sort*+\n\017LaunchPlanState\022\014\n" +
-      "\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B7Z5github.com/fl" +
-      "yteorg/flyteidl/gen/pb-go/flyteidl/admin" +
-      "b\006proto3"
+      "\001(\0132\032.google.protobuf.BoolValue\022\027\n\017overw" +
+      "rite_cache\030\024 \001(\010\"\217\002\n\021LaunchPlanClosure\022." +
+      "\n\005state\030\001 \001(\0162\037.flyteidl.admin.LaunchPla" +
+      "nState\0224\n\017expected_inputs\030\002 \001(\0132\033.flytei" +
+      "dl.core.ParameterMap\0224\n\020expected_outputs" +
+      "\030\003 \001(\0132\032.flyteidl.core.VariableMap\022.\n\ncr" +
+      "eated_at\030\004 \001(\0132\032.google.protobuf.Timesta" +
+      "mp\022.\n\nupdated_at\030\005 \001(\0132\032.google.protobuf" +
+      ".Timestamp\"u\n\022LaunchPlanMetadata\022*\n\010sche" +
+      "dule\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\r" +
+      "notifications\030\002 \003(\0132\034.flyteidl.admin.Not" +
+      "ification\"p\n\027LaunchPlanUpdateRequest\022%\n\002" +
+      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022.\n\005s" +
+      "tate\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanSt" +
+      "ate\"\032\n\030LaunchPlanUpdateResponse\"L\n\027Activ" +
+      "eLaunchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteid" +
+      "l.admin.NamedEntityIdentifier\"\203\001\n\033Active" +
+      "LaunchPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016" +
+      "\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004" +
+      " \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.S" +
+      "ort*+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006" +
+      "ACTIVE\020\001B7Z5github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14326,7 +14419,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new

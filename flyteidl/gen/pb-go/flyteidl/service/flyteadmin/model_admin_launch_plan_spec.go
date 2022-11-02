@@ -34,4 +34,6 @@ type AdminLaunchPlanSpec struct {
 	MaxParallelism int32 `json:"max_parallelism,omitempty"`
 	// Allows for the interruptible flag of a workflow to be overwritten for a single execution. Omitting this field uses the workflow's value as a default. As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper around the bool field.
 	Interruptible bool `json:"interruptible,omitempty"`
+	// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution. If enabled, all calculations are performed even if cached results would be available, overwriting the stored data once execution finishes successfully.
+	OverwriteCache bool `json:"overwrite_cache,omitempty"`
 }

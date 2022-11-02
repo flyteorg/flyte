@@ -790,6 +790,51 @@ Tag properties we can filter by
 
 
 
+
+.. _ref_datacatalog.UpdateArtifactRequest:
+
+UpdateArtifactRequest
+------------------------------------------------------------------
+
+Request message for updating an Artifact and overwriting its associated ArtifactData.
+
+
+
+.. csv-table:: UpdateArtifactRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "dataset", ":ref:`ref_datacatalog.DatasetID`", "", "ID of dataset the artifact is associated with"
+   "artifact_id", ":ref:`ref_string`", "", ""
+   "tag_name", ":ref:`ref_string`", "", ""
+   "data", ":ref:`ref_datacatalog.ArtifactData`", "repeated", "List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing ArtifactData entries will be removed from the underlying blob storage and database."
+
+
+
+
+
+
+
+.. _ref_datacatalog.UpdateArtifactResponse:
+
+UpdateArtifactResponse
+------------------------------------------------------------------
+
+Response message for updating an Artifact.
+
+
+
+.. csv-table:: UpdateArtifactResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "artifact_id", ":ref:`ref_string`", "", "The unique ID of the artifact updated"
+
+
+
+
+
+
 ..
    end messages
 
@@ -869,6 +914,7 @@ Artifacts are associated with a Dataset, and can be tagged for retrieval.
    "AddTag", ":ref:`ref_datacatalog.AddTagRequest`", ":ref:`ref_datacatalog.AddTagResponse`", "Associate a tag with an artifact. Tags are unique within a Dataset."
    "ListArtifacts", ":ref:`ref_datacatalog.ListArtifactsRequest`", ":ref:`ref_datacatalog.ListArtifactsResponse`", "Return a paginated list of artifacts"
    "ListDatasets", ":ref:`ref_datacatalog.ListDatasetsRequest`", ":ref:`ref_datacatalog.ListDatasetsResponse`", "Return a paginated list of datasets"
+   "UpdateArtifact", ":ref:`ref_datacatalog.UpdateArtifactRequest`", ":ref:`ref_datacatalog.UpdateArtifactResponse`", "Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage."
    "GetOrExtendReservation", ":ref:`ref_datacatalog.GetOrExtendReservationRequest`", ":ref:`ref_datacatalog.GetOrExtendReservationResponse`", "Attempts to get or extend a reservation for the corresponding artifact. If one already exists (ie. another entity owns the reservation) then that reservation is retrieved. Once you acquire a reservation, you need to periodically extend the reservation with an identical call. If the reservation is not extended before the defined expiration, it may be acquired by another task. Note: We may have multiple concurrent tasks with the same signature and the same input that try to populate the same artifact at the same time. Thus with reservation, only one task can run at a time, until the reservation expires. Note: If task A does not extend the reservation in time and the reservation expires, another task B may take over the reservation, resulting in two tasks A and B running in parallel. So a third task C may get the Artifact from A or B, whichever writes last."
    "ReleaseReservation", ":ref:`ref_datacatalog.ReleaseReservationRequest`", ":ref:`ref_datacatalog.ReleaseReservationResponse`", "Release the reservation when the task holding the spot fails so that the other tasks can grab the spot."
 

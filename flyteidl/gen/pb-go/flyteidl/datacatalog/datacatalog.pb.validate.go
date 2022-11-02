@@ -1134,6 +1134,177 @@ var _ interface {
 	ErrorName() string
 } = ListDatasetsResponseValidationError{}
 
+// Validate checks the field values on UpdateArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateArtifactRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateArtifactRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetData() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateArtifactRequestValidationError{
+					field:  fmt.Sprintf("Data[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	switch m.QueryHandle.(type) {
+
+	case *UpdateArtifactRequest_ArtifactId:
+		// no validation rules for ArtifactId
+
+	case *UpdateArtifactRequest_TagName:
+		// no validation rules for TagName
+
+	}
+
+	return nil
+}
+
+// UpdateArtifactRequestValidationError is the validation error returned by
+// UpdateArtifactRequest.Validate if the designated constraints aren't met.
+type UpdateArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArtifactRequestValidationError) ErrorName() string {
+	return "UpdateArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArtifactRequestValidationError{}
+
+// Validate checks the field values on UpdateArtifactResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateArtifactResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ArtifactId
+
+	return nil
+}
+
+// UpdateArtifactResponseValidationError is the validation error returned by
+// UpdateArtifactResponse.Validate if the designated constraints aren't met.
+type UpdateArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateArtifactResponseValidationError) ErrorName() string {
+	return "UpdateArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateArtifactResponseValidationError{}
+
 // Validate checks the field values on ReservationID with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.

@@ -489,6 +489,12 @@ class ExecutionRelaunchRequest final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_id();
   void set_allocated_id(::flyteidl::core::WorkflowExecutionIdentifier* id);
 
+  // bool overwrite_cache = 4;
+  void clear_overwrite_cache();
+  static const int kOverwriteCacheFieldNumber = 4;
+  bool overwrite_cache() const;
+  void set_overwrite_cache(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionRelaunchRequest)
  private:
   class HasBitSetters;
@@ -496,6 +502,7 @@ class ExecutionRelaunchRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::flyteidl::core::WorkflowExecutionIdentifier* id_;
+  bool overwrite_cache_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
 };
@@ -2354,6 +2361,12 @@ class ExecutionSpec final :
   ::google::protobuf::int32 max_parallelism() const;
   void set_max_parallelism(::google::protobuf::int32 value);
 
+  // bool overwrite_cache = 22;
+  void clear_overwrite_cache();
+  static const int kOverwriteCacheFieldNumber = 22;
+  bool overwrite_cache() const;
+  void set_overwrite_cache(bool value);
+
   // .flyteidl.admin.NotificationList notifications = 5;
   bool has_notifications() const;
   void clear_notifications();
@@ -2396,6 +2409,7 @@ class ExecutionSpec final :
   ::flyteidl::admin::ClusterAssignment* cluster_assignment_;
   ::google::protobuf::BoolValue* interruptible_;
   ::google::protobuf::int32 max_parallelism_;
+  bool overwrite_cache_;
   union NotificationOverridesUnion {
     NotificationOverridesUnion() {}
     ::flyteidl::admin::NotificationList* notifications_;
@@ -3631,6 +3645,20 @@ inline void ExecutionRelaunchRequest::set_allocated_name(::std::string* name) {
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionRelaunchRequest.name)
+}
+
+// bool overwrite_cache = 4;
+inline void ExecutionRelaunchRequest::clear_overwrite_cache() {
+  overwrite_cache_ = false;
+}
+inline bool ExecutionRelaunchRequest::overwrite_cache() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionRelaunchRequest.overwrite_cache)
+  return overwrite_cache_;
+}
+inline void ExecutionRelaunchRequest::set_overwrite_cache(bool value) {
+  
+  overwrite_cache_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionRelaunchRequest.overwrite_cache)
 }
 
 // -------------------------------------------------------------------
@@ -5943,6 +5971,20 @@ inline void ExecutionSpec::set_allocated_interruptible(::google::protobuf::BoolV
   }
   interruptible_ = interruptible;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.interruptible)
+}
+
+// bool overwrite_cache = 22;
+inline void ExecutionSpec::clear_overwrite_cache() {
+  overwrite_cache_ = false;
+}
+inline bool ExecutionSpec::overwrite_cache() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.overwrite_cache)
+  return overwrite_cache_;
+}
+inline void ExecutionSpec::set_overwrite_cache(bool value) {
+  
+  overwrite_cache_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionSpec.overwrite_cache)
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {
