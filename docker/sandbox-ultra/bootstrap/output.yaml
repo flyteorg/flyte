@@ -755,6 +755,13 @@ spec:
       labels:
         app: minio
     spec:
+      initContainers:
+        - image: busybox:1.35.0
+          name: minio-init
+          command: ['sh', '-c', 'chmod go=u /data']
+          volumeMounts:
+          - mountPath: /data
+            name: minio-storage
       containers:
       - env:
         - name: MINIO_BROWSER_REDIRECT_URL

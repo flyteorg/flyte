@@ -14,6 +14,7 @@ IMAGES := \
 	envoyproxy/envoy:v1.23-latest \
 	rancher/pause:3.1 \
 	kubernetesui/metrics-scraper:v1.0.8 \
+	busybox:1.35.0 \
 	registry:2
 
 define IMAGE_RULE
