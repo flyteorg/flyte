@@ -104,12 +104,13 @@ enum CatalogCacheStatus {
   CACHE_POPULATED = 3,
   CACHE_LOOKUP_FAILURE = 4,
   CACHE_PUT_FAILURE = 5,
+  CACHE_SKIPPED = 6,
   CatalogCacheStatus_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   CatalogCacheStatus_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool CatalogCacheStatus_IsValid(int value);
 const CatalogCacheStatus CatalogCacheStatus_MIN = CACHE_DISABLED;
-const CatalogCacheStatus CatalogCacheStatus_MAX = CACHE_PUT_FAILURE;
+const CatalogCacheStatus CatalogCacheStatus_MAX = CACHE_SKIPPED;
 const int CatalogCacheStatus_ARRAYSIZE = CatalogCacheStatus_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* CatalogCacheStatus_descriptor();

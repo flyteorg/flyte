@@ -37,6 +37,9 @@ service DataCatalog {
     // Return a paginated list of datasets
     rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
 
+    // Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
+    rpc UpdateArtifact (UpdateArtifactRequest) returns (UpdateArtifactResponse);
+
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
     // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -168,6 +171,32 @@ message ListDatasetsResponse {
     repeated Dataset datasets = 1;
     // Token to use to request the next page, pass this into the next requests PaginationOptions
     string next_token = 2;
+}
+
+/*
+ * Request message for updating an Artifact and overwriting its associated ArtifactData.
+ */
+message UpdateArtifactRequest {
+    // ID of dataset the artifact is associated with
+    DatasetID dataset = 1;
+
+    // Either ID of artifact or name of tag to retrieve existing artifact from
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+
+    // List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing
+    // ArtifactData entries will be removed from the underlying blob storage and database.
+    repeated ArtifactData data = 4;
+}
+
+/*
+ * Response message for updating an Artifact.
+ */
+message UpdateArtifactResponse {
+    // The unique ID of the artifact updated
+    string artifact_id = 1;
 }
 
 /*
