@@ -52,7 +52,7 @@ To turn on, add the following to your FlyteAdmin:
             topicName: arn:aws:sns:us-east-2:123456:123-my-topic
           type: aws
 
-.. tabbed:: AWS Pub/Sub
+.. tabbed:: GCP Pub/Sub
 
     .. code:: yaml
 
