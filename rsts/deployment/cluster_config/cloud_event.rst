@@ -100,5 +100,20 @@ Which of these three events is being sent can be distinguished by the subject li
 
 Note that these message wrap the underlying event messages :std:doc:`found here <flyteidl:protos/docs/event/event>`.
 
+CloudEvent Spec
+===============
+
+.. code:: json
+
+    {
+        "specversion" : "1.0",
+        "type" : "com.flyte.resource.workflow",
+        "source" : "https://github.com/flyteorg/flyteadmin",
+        "id" : "D234-1234-1234",
+        "time" : "2018-04-05T17:31:00Z",
+        "jsonschemaurl": "https://github.com/flyteorg/flyteidl/blob/master/jsonschema/workflow_execution.json",
+        "data" : "workflow execution event"
+    }
+
 .. note::
    The message format may eventually change to an enriched and distinct message type in future releases.
