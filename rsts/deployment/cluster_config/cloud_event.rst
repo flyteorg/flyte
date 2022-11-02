@@ -54,6 +54,7 @@ To turn on, add the following to your FlyteAdmin:
 .. tabbed:: AWS Pub/Sub
 
     .. code:: yaml
+
       cloud_events.yaml: |
         cloudEvents:
           enable: true
@@ -68,6 +69,7 @@ To turn on, add the following to your FlyteAdmin:
 .. tabbed:: Apache Kafka
 
     .. code:: yaml
+
       cloud_events.yaml: |
         cloudEvents:
           enable: true
