@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[36]
+  static const ::google::protobuf::internal::ParseTable schema[38]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -164,6 +164,12 @@ extern TagDefaultTypeInternal _Tag_default_instance_;
 class TagPropertyFilter;
 class TagPropertyFilterDefaultTypeInternal;
 extern TagPropertyFilterDefaultTypeInternal _TagPropertyFilter_default_instance_;
+class UpdateArtifactRequest;
+class UpdateArtifactRequestDefaultTypeInternal;
+extern UpdateArtifactRequestDefaultTypeInternal _UpdateArtifactRequest_default_instance_;
+class UpdateArtifactResponse;
+class UpdateArtifactResponseDefaultTypeInternal;
+extern UpdateArtifactResponseDefaultTypeInternal _UpdateArtifactResponse_default_instance_;
 }  // namespace datacatalog
 namespace google {
 namespace protobuf {
@@ -203,6 +209,8 @@ template<> ::datacatalog::ReservationID* Arena::CreateMaybeMessage<::datacatalog
 template<> ::datacatalog::SinglePropertyFilter* Arena::CreateMaybeMessage<::datacatalog::SinglePropertyFilter>(Arena*);
 template<> ::datacatalog::Tag* Arena::CreateMaybeMessage<::datacatalog::Tag>(Arena*);
 template<> ::datacatalog::TagPropertyFilter* Arena::CreateMaybeMessage<::datacatalog::TagPropertyFilter>(Arena*);
+template<> ::datacatalog::UpdateArtifactRequest* Arena::CreateMaybeMessage<::datacatalog::UpdateArtifactRequest>(Arena*);
+template<> ::datacatalog::UpdateArtifactResponse* Arena::CreateMaybeMessage<::datacatalog::UpdateArtifactResponse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace datacatalog {
@@ -1970,6 +1978,308 @@ class ListDatasetsResponse final :
 };
 // -------------------------------------------------------------------
 
+class UpdateArtifactRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.UpdateArtifactRequest) */ {
+ public:
+  UpdateArtifactRequest();
+  virtual ~UpdateArtifactRequest();
+
+  UpdateArtifactRequest(const UpdateArtifactRequest& from);
+
+  inline UpdateArtifactRequest& operator=(const UpdateArtifactRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  UpdateArtifactRequest(UpdateArtifactRequest&& from) noexcept
+    : UpdateArtifactRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline UpdateArtifactRequest& operator=(UpdateArtifactRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const UpdateArtifactRequest& default_instance();
+
+  enum QueryHandleCase {
+    kArtifactId = 2,
+    kTagName = 3,
+    QUERY_HANDLE_NOT_SET = 0,
+  };
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const UpdateArtifactRequest* internal_default_instance() {
+    return reinterpret_cast<const UpdateArtifactRequest*>(
+               &_UpdateArtifactRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    14;
+
+  void Swap(UpdateArtifactRequest* other);
+  friend void swap(UpdateArtifactRequest& a, UpdateArtifactRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UpdateArtifactRequest* New() const final {
+    return CreateMaybeMessage<UpdateArtifactRequest>(nullptr);
+  }
+
+  UpdateArtifactRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<UpdateArtifactRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const UpdateArtifactRequest& from);
+  void MergeFrom(const UpdateArtifactRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UpdateArtifactRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .datacatalog.ArtifactData data = 4;
+  int data_size() const;
+  void clear_data();
+  static const int kDataFieldNumber = 4;
+  ::datacatalog::ArtifactData* mutable_data(int index);
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData >*
+      mutable_data();
+  const ::datacatalog::ArtifactData& data(int index) const;
+  ::datacatalog::ArtifactData* add_data();
+  const ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData >&
+      data() const;
+
+  // .datacatalog.DatasetID dataset = 1;
+  bool has_dataset() const;
+  void clear_dataset();
+  static const int kDatasetFieldNumber = 1;
+  const ::datacatalog::DatasetID& dataset() const;
+  ::datacatalog::DatasetID* release_dataset();
+  ::datacatalog::DatasetID* mutable_dataset();
+  void set_allocated_dataset(::datacatalog::DatasetID* dataset);
+
+  // string artifact_id = 2;
+  private:
+  bool has_artifact_id() const;
+  public:
+  void clear_artifact_id();
+  static const int kArtifactIdFieldNumber = 2;
+  const ::std::string& artifact_id() const;
+  void set_artifact_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_artifact_id(::std::string&& value);
+  #endif
+  void set_artifact_id(const char* value);
+  void set_artifact_id(const char* value, size_t size);
+  ::std::string* mutable_artifact_id();
+  ::std::string* release_artifact_id();
+  void set_allocated_artifact_id(::std::string* artifact_id);
+
+  // string tag_name = 3;
+  private:
+  bool has_tag_name() const;
+  public:
+  void clear_tag_name();
+  static const int kTagNameFieldNumber = 3;
+  const ::std::string& tag_name() const;
+  void set_tag_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_tag_name(::std::string&& value);
+  #endif
+  void set_tag_name(const char* value);
+  void set_tag_name(const char* value, size_t size);
+  ::std::string* mutable_tag_name();
+  ::std::string* release_tag_name();
+  void set_allocated_tag_name(::std::string* tag_name);
+
+  void clear_query_handle();
+  QueryHandleCase query_handle_case() const;
+  // @@protoc_insertion_point(class_scope:datacatalog.UpdateArtifactRequest)
+ private:
+  class HasBitSetters;
+  void set_has_artifact_id();
+  void set_has_tag_name();
+
+  inline bool has_query_handle() const;
+  inline void clear_has_query_handle();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData > data_;
+  ::datacatalog::DatasetID* dataset_;
+  union QueryHandleUnion {
+    QueryHandleUnion() {}
+    ::google::protobuf::internal::ArenaStringPtr artifact_id_;
+    ::google::protobuf::internal::ArenaStringPtr tag_name_;
+  } query_handle_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UpdateArtifactResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.UpdateArtifactResponse) */ {
+ public:
+  UpdateArtifactResponse();
+  virtual ~UpdateArtifactResponse();
+
+  UpdateArtifactResponse(const UpdateArtifactResponse& from);
+
+  inline UpdateArtifactResponse& operator=(const UpdateArtifactResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  UpdateArtifactResponse(UpdateArtifactResponse&& from) noexcept
+    : UpdateArtifactResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline UpdateArtifactResponse& operator=(UpdateArtifactResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const UpdateArtifactResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const UpdateArtifactResponse* internal_default_instance() {
+    return reinterpret_cast<const UpdateArtifactResponse*>(
+               &_UpdateArtifactResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    15;
+
+  void Swap(UpdateArtifactResponse* other);
+  friend void swap(UpdateArtifactResponse& a, UpdateArtifactResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UpdateArtifactResponse* New() const final {
+    return CreateMaybeMessage<UpdateArtifactResponse>(nullptr);
+  }
+
+  UpdateArtifactResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<UpdateArtifactResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const UpdateArtifactResponse& from);
+  void MergeFrom(const UpdateArtifactResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UpdateArtifactResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string artifact_id = 1;
+  void clear_artifact_id();
+  static const int kArtifactIdFieldNumber = 1;
+  const ::std::string& artifact_id() const;
+  void set_artifact_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_artifact_id(::std::string&& value);
+  #endif
+  void set_artifact_id(const char* value);
+  void set_artifact_id(const char* value, size_t size);
+  ::std::string* mutable_artifact_id();
+  ::std::string* release_artifact_id();
+  void set_allocated_artifact_id(::std::string* artifact_id);
+
+  // @@protoc_insertion_point(class_scope:datacatalog.UpdateArtifactResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr artifact_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ReservationID final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.ReservationID) */ {
  public:
@@ -2008,7 +2318,7 @@ class ReservationID final :
                &_ReservationID_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    16;
 
   void Swap(ReservationID* other);
   friend void swap(ReservationID& a, ReservationID& b) {
@@ -2138,7 +2448,7 @@ class GetOrExtendReservationRequest final :
                &_GetOrExtendReservationRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    17;
 
   void Swap(GetOrExtendReservationRequest* other);
   friend void swap(GetOrExtendReservationRequest& a, GetOrExtendReservationRequest& b) {
@@ -2278,7 +2588,7 @@ class Reservation final :
                &_Reservation_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   void Swap(Reservation* other);
   friend void swap(Reservation& a, Reservation& b) {
@@ -2438,7 +2748,7 @@ class GetOrExtendReservationResponse final :
                &_GetOrExtendReservationResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   void Swap(GetOrExtendReservationResponse* other);
   friend void swap(GetOrExtendReservationResponse& a, GetOrExtendReservationResponse& b) {
@@ -2553,7 +2863,7 @@ class ReleaseReservationRequest final :
                &_ReleaseReservationRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   void Swap(ReleaseReservationRequest* other);
   friend void swap(ReleaseReservationRequest& a, ReleaseReservationRequest& b) {
@@ -2683,7 +2993,7 @@ class ReleaseReservationResponse final :
                &_ReleaseReservationResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    21;
 
   void Swap(ReleaseReservationResponse* other);
   friend void swap(ReleaseReservationResponse& a, ReleaseReservationResponse& b) {
@@ -2788,7 +3098,7 @@ class Dataset final :
                &_Dataset_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   void Swap(Dataset* other);
   friend void swap(Dataset& a, Dataset& b) {
@@ -2936,7 +3246,7 @@ class Partition final :
                &_Partition_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    23;
 
   void Swap(Partition* other);
   friend void swap(Partition& a, Partition& b) {
@@ -3071,7 +3381,7 @@ class DatasetID final :
                &_DatasetID_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    24;
 
   void Swap(DatasetID* other);
   friend void swap(DatasetID& a, DatasetID& b) {
@@ -3251,7 +3561,7 @@ class Artifact final :
                &_Artifact_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    25;
 
   void Swap(Artifact* other);
   friend void swap(Artifact& a, Artifact& b) {
@@ -3440,7 +3750,7 @@ class ArtifactData final :
                &_ArtifactData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    26;
 
   void Swap(ArtifactData* other);
   friend void swap(ArtifactData& a, ArtifactData& b) {
@@ -3570,7 +3880,7 @@ class Tag final :
                &_Tag_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    27;
 
   void Swap(Tag* other);
   friend void swap(Tag& a, Tag& b) {
@@ -3739,7 +4049,7 @@ class Metadata final :
                &_Metadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    29;
 
   void Swap(Metadata* other);
   friend void swap(Metadata& a, Metadata& b) {
@@ -3860,7 +4170,7 @@ class FilterExpression final :
                &_FilterExpression_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    30;
 
   void Swap(FilterExpression* other);
   friend void swap(FilterExpression& a, FilterExpression& b) {
@@ -3986,7 +4296,7 @@ class SinglePropertyFilter final :
                &_SinglePropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    31;
 
   void Swap(SinglePropertyFilter* other);
   friend void swap(SinglePropertyFilter& a, SinglePropertyFilter& b) {
@@ -4181,7 +4491,7 @@ class ArtifactPropertyFilter final :
                &_ArtifactPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    30;
+    32;
 
   void Swap(ArtifactPropertyFilter* other);
   friend void swap(ArtifactPropertyFilter& a, ArtifactPropertyFilter& b) {
@@ -4320,7 +4630,7 @@ class TagPropertyFilter final :
                &_TagPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    31;
+    33;
 
   void Swap(TagPropertyFilter* other);
   friend void swap(TagPropertyFilter& a, TagPropertyFilter& b) {
@@ -4459,7 +4769,7 @@ class PartitionPropertyFilter final :
                &_PartitionPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    32;
+    34;
 
   void Swap(PartitionPropertyFilter* other);
   friend void swap(PartitionPropertyFilter& a, PartitionPropertyFilter& b) {
@@ -4585,7 +4895,7 @@ class KeyValuePair final :
                &_KeyValuePair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    33;
+    35;
 
   void Swap(KeyValuePair* other);
   friend void swap(KeyValuePair& a, KeyValuePair& b) {
@@ -4728,7 +5038,7 @@ class DatasetPropertyFilter final :
                &_DatasetPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    34;
+    36;
 
   void Swap(DatasetPropertyFilter* other);
   friend void swap(DatasetPropertyFilter& a, DatasetPropertyFilter& b) {
@@ -4919,7 +5229,7 @@ class PaginationOptions final :
                &_PaginationOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    35;
+    37;
 
   void Swap(PaginationOptions* other);
   friend void swap(PaginationOptions& a, PaginationOptions& b) {
@@ -6102,6 +6412,341 @@ inline void ListDatasetsResponse::set_allocated_next_token(::std::string* next_t
   }
   next_token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), next_token);
   // @@protoc_insertion_point(field_set_allocated:datacatalog.ListDatasetsResponse.next_token)
+}
+
+// -------------------------------------------------------------------
+
+// UpdateArtifactRequest
+
+// .datacatalog.DatasetID dataset = 1;
+inline bool UpdateArtifactRequest::has_dataset() const {
+  return this != internal_default_instance() && dataset_ != nullptr;
+}
+inline void UpdateArtifactRequest::clear_dataset() {
+  if (GetArenaNoVirtual() == nullptr && dataset_ != nullptr) {
+    delete dataset_;
+  }
+  dataset_ = nullptr;
+}
+inline const ::datacatalog::DatasetID& UpdateArtifactRequest::dataset() const {
+  const ::datacatalog::DatasetID* p = dataset_;
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactRequest.dataset)
+  return p != nullptr ? *p : *reinterpret_cast<const ::datacatalog::DatasetID*>(
+      &::datacatalog::_DatasetID_default_instance_);
+}
+inline ::datacatalog::DatasetID* UpdateArtifactRequest::release_dataset() {
+  // @@protoc_insertion_point(field_release:datacatalog.UpdateArtifactRequest.dataset)
+  
+  ::datacatalog::DatasetID* temp = dataset_;
+  dataset_ = nullptr;
+  return temp;
+}
+inline ::datacatalog::DatasetID* UpdateArtifactRequest::mutable_dataset() {
+  
+  if (dataset_ == nullptr) {
+    auto* p = CreateMaybeMessage<::datacatalog::DatasetID>(GetArenaNoVirtual());
+    dataset_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactRequest.dataset)
+  return dataset_;
+}
+inline void UpdateArtifactRequest::set_allocated_dataset(::datacatalog::DatasetID* dataset) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete dataset_;
+  }
+  if (dataset) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      dataset = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, dataset, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  dataset_ = dataset;
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.UpdateArtifactRequest.dataset)
+}
+
+// string artifact_id = 2;
+inline bool UpdateArtifactRequest::has_artifact_id() const {
+  return query_handle_case() == kArtifactId;
+}
+inline void UpdateArtifactRequest::set_has_artifact_id() {
+  _oneof_case_[0] = kArtifactId;
+}
+inline void UpdateArtifactRequest::clear_artifact_id() {
+  if (has_artifact_id()) {
+    query_handle_.artifact_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_query_handle();
+  }
+}
+inline const ::std::string& UpdateArtifactRequest::artifact_id() const {
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactRequest.artifact_id)
+  if (has_artifact_id()) {
+    return query_handle_.artifact_id_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
+}
+inline void UpdateArtifactRequest::set_artifact_id(const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.artifact_id)
+  if (!has_artifact_id()) {
+    clear_query_handle();
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.artifact_id)
+}
+#if LANG_CXX11
+inline void UpdateArtifactRequest::set_artifact_id(::std::string&& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.artifact_id)
+  if (!has_artifact_id()) {
+    clear_query_handle();
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.UpdateArtifactRequest.artifact_id)
+}
+#endif
+inline void UpdateArtifactRequest::set_artifact_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  if (!has_artifact_id()) {
+    clear_query_handle();
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.UpdateArtifactRequest.artifact_id)
+}
+inline void UpdateArtifactRequest::set_artifact_id(const char* value, size_t size) {
+  if (!has_artifact_id()) {
+    clear_query_handle();
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.UpdateArtifactRequest.artifact_id)
+}
+inline ::std::string* UpdateArtifactRequest::mutable_artifact_id() {
+  if (!has_artifact_id()) {
+    clear_query_handle();
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactRequest.artifact_id)
+  return query_handle_.artifact_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* UpdateArtifactRequest::release_artifact_id() {
+  // @@protoc_insertion_point(field_release:datacatalog.UpdateArtifactRequest.artifact_id)
+  if (has_artifact_id()) {
+    clear_has_query_handle();
+    return query_handle_.artifact_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
+}
+inline void UpdateArtifactRequest::set_allocated_artifact_id(::std::string* artifact_id) {
+  if (has_query_handle()) {
+    clear_query_handle();
+  }
+  if (artifact_id != nullptr) {
+    set_has_artifact_id();
+    query_handle_.artifact_id_.UnsafeSetDefault(artifact_id);
+  }
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.UpdateArtifactRequest.artifact_id)
+}
+
+// string tag_name = 3;
+inline bool UpdateArtifactRequest::has_tag_name() const {
+  return query_handle_case() == kTagName;
+}
+inline void UpdateArtifactRequest::set_has_tag_name() {
+  _oneof_case_[0] = kTagName;
+}
+inline void UpdateArtifactRequest::clear_tag_name() {
+  if (has_tag_name()) {
+    query_handle_.tag_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_query_handle();
+  }
+}
+inline const ::std::string& UpdateArtifactRequest::tag_name() const {
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactRequest.tag_name)
+  if (has_tag_name()) {
+    return query_handle_.tag_name_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
+}
+inline void UpdateArtifactRequest::set_tag_name(const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.tag_name)
+  if (!has_tag_name()) {
+    clear_query_handle();
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.tag_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.tag_name)
+}
+#if LANG_CXX11
+inline void UpdateArtifactRequest::set_tag_name(::std::string&& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactRequest.tag_name)
+  if (!has_tag_name()) {
+    clear_query_handle();
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.tag_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.UpdateArtifactRequest.tag_name)
+}
+#endif
+inline void UpdateArtifactRequest::set_tag_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  if (!has_tag_name()) {
+    clear_query_handle();
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.tag_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.UpdateArtifactRequest.tag_name)
+}
+inline void UpdateArtifactRequest::set_tag_name(const char* value, size_t size) {
+  if (!has_tag_name()) {
+    clear_query_handle();
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  query_handle_.tag_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.UpdateArtifactRequest.tag_name)
+}
+inline ::std::string* UpdateArtifactRequest::mutable_tag_name() {
+  if (!has_tag_name()) {
+    clear_query_handle();
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactRequest.tag_name)
+  return query_handle_.tag_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* UpdateArtifactRequest::release_tag_name() {
+  // @@protoc_insertion_point(field_release:datacatalog.UpdateArtifactRequest.tag_name)
+  if (has_tag_name()) {
+    clear_has_query_handle();
+    return query_handle_.tag_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
+}
+inline void UpdateArtifactRequest::set_allocated_tag_name(::std::string* tag_name) {
+  if (has_query_handle()) {
+    clear_query_handle();
+  }
+  if (tag_name != nullptr) {
+    set_has_tag_name();
+    query_handle_.tag_name_.UnsafeSetDefault(tag_name);
+  }
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.UpdateArtifactRequest.tag_name)
+}
+
+// repeated .datacatalog.ArtifactData data = 4;
+inline int UpdateArtifactRequest::data_size() const {
+  return data_.size();
+}
+inline void UpdateArtifactRequest::clear_data() {
+  data_.Clear();
+}
+inline ::datacatalog::ArtifactData* UpdateArtifactRequest::mutable_data(int index) {
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactRequest.data)
+  return data_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData >*
+UpdateArtifactRequest::mutable_data() {
+  // @@protoc_insertion_point(field_mutable_list:datacatalog.UpdateArtifactRequest.data)
+  return &data_;
+}
+inline const ::datacatalog::ArtifactData& UpdateArtifactRequest::data(int index) const {
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactRequest.data)
+  return data_.Get(index);
+}
+inline ::datacatalog::ArtifactData* UpdateArtifactRequest::add_data() {
+  // @@protoc_insertion_point(field_add:datacatalog.UpdateArtifactRequest.data)
+  return data_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData >&
+UpdateArtifactRequest::data() const {
+  // @@protoc_insertion_point(field_list:datacatalog.UpdateArtifactRequest.data)
+  return data_;
+}
+
+inline bool UpdateArtifactRequest::has_query_handle() const {
+  return query_handle_case() != QUERY_HANDLE_NOT_SET;
+}
+inline void UpdateArtifactRequest::clear_has_query_handle() {
+  _oneof_case_[0] = QUERY_HANDLE_NOT_SET;
+}
+inline UpdateArtifactRequest::QueryHandleCase UpdateArtifactRequest::query_handle_case() const {
+  return UpdateArtifactRequest::QueryHandleCase(_oneof_case_[0]);
+}
+// -------------------------------------------------------------------
+
+// UpdateArtifactResponse
+
+// string artifact_id = 1;
+inline void UpdateArtifactResponse::clear_artifact_id() {
+  artifact_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& UpdateArtifactResponse::artifact_id() const {
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactResponse.artifact_id)
+  return artifact_id_.GetNoArena();
+}
+inline void UpdateArtifactResponse::set_artifact_id(const ::std::string& value) {
+  
+  artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.UpdateArtifactResponse.artifact_id)
+}
+#if LANG_CXX11
+inline void UpdateArtifactResponse::set_artifact_id(::std::string&& value) {
+  
+  artifact_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.UpdateArtifactResponse.artifact_id)
+}
+#endif
+inline void UpdateArtifactResponse::set_artifact_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.UpdateArtifactResponse.artifact_id)
+}
+inline void UpdateArtifactResponse::set_artifact_id(const char* value, size_t size) {
+  
+  artifact_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.UpdateArtifactResponse.artifact_id)
+}
+inline ::std::string* UpdateArtifactResponse::mutable_artifact_id() {
+  
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactResponse.artifact_id)
+  return artifact_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* UpdateArtifactResponse::release_artifact_id() {
+  // @@protoc_insertion_point(field_release:datacatalog.UpdateArtifactResponse.artifact_id)
+  
+  return artifact_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void UpdateArtifactResponse::set_allocated_artifact_id(::std::string* artifact_id) {
+  if (artifact_id != nullptr) {
+    
+  } else {
+    
+  }
+  artifact_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), artifact_id);
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.UpdateArtifactResponse.artifact_id)
 }
 
 // -------------------------------------------------------------------
@@ -9002,6 +9647,10 @@ inline void PaginationOptions::set_sortorder(::datacatalog::PaginationOptions_So
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

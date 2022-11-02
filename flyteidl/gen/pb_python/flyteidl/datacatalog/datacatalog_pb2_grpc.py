@@ -52,6 +52,11 @@ class DataCatalogStub(object):
         request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.SerializeToString,
         response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.FromString,
         )
+    self.UpdateArtifact = channel.unary_unary(
+        '/datacatalog.DataCatalog/UpdateArtifact',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
+        )
     self.GetOrExtendReservation = channel.unary_unary(
         '/datacatalog.DataCatalog/GetOrExtendReservation',
         request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.SerializeToString,
@@ -122,6 +127,13 @@ class DataCatalogServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def UpdateArtifact(self, request, context):
+    """Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def GetOrExtendReservation(self, request, context):
     """Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     (ie. another entity owns the reservation) then that reservation is retrieved.
@@ -184,6 +196,11 @@ def add_DataCatalogServicer_to_server(servicer, server):
           servicer.ListDatasets,
           request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.FromString,
           response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.SerializeToString,
+      ),
+      'UpdateArtifact': grpc.unary_unary_rpc_method_handler(
+          servicer.UpdateArtifact,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.SerializeToString,
       ),
       'GetOrExtendReservation': grpc.unary_unary_rpc_method_handler(
           servicer.GetOrExtendReservation,

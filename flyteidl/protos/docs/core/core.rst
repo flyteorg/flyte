@@ -94,6 +94,7 @@ Indicates the status of CatalogCaching. The reason why this is not embedded in T
    "CACHE_POPULATED", "3", "used to indicate that the resultant artifact was added to the cache"
    "CACHE_LOOKUP_FAILURE", "4", "Used to indicate that cache lookup failed because of an error"
    "CACHE_PUT_FAILURE", "5", "Used to indicate that cache lookup failed because of an error"
+   "CACHE_SKIPPED", "6", "Used to indicate the cache lookup was skipped"
 
 
 

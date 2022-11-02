@@ -56,7 +56,8 @@ class AdminLaunchPlanSpec(object):
         'quality_of_service': 'CoreQualityOfService',
         'raw_output_data_config': 'AdminRawOutputDataConfig',
         'max_parallelism': 'int',
-        'interruptible': 'bool'
+        'interruptible': 'bool',
+        'overwrite_cache': 'bool'
     }
 
     attribute_map = {
@@ -73,10 +74,11 @@ class AdminLaunchPlanSpec(object):
         'quality_of_service': 'quality_of_service',
         'raw_output_data_config': 'raw_output_data_config',
         'max_parallelism': 'max_parallelism',
-        'interruptible': 'interruptible'
+        'interruptible': 'interruptible',
+        'overwrite_cache': 'overwrite_cache'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None, overwrite_cache=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -93,6 +95,7 @@ class AdminLaunchPlanSpec(object):
         self._raw_output_data_config = None
         self._max_parallelism = None
         self._interruptible = None
+        self._overwrite_cache = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -123,6 +126,8 @@ class AdminLaunchPlanSpec(object):
             self.max_parallelism = max_parallelism
         if interruptible is not None:
             self.interruptible = interruptible
+        if overwrite_cache is not None:
+            self.overwrite_cache = overwrite_cache
 
     @property
     def workflow_id(self):
@@ -435,6 +440,29 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._interruptible = interruptible
+
+    @property
+    def overwrite_cache(self):
+        """Gets the overwrite_cache of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Allows for all cached values of a workflow and its tasks to be overwritten for a single execution. If enabled, all calculations are performed even if cached results would be available, overwriting the stored data once execution finishes successfully.  # noqa: E501
+
+        :return: The overwrite_cache of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: bool
+        """
+        return self._overwrite_cache
+
+    @overwrite_cache.setter
+    def overwrite_cache(self, overwrite_cache):
+        """Sets the overwrite_cache of this AdminLaunchPlanSpec.
+
+        Allows for all cached values of a workflow and its tasks to be overwritten for a single execution. If enabled, all calculations are performed even if cached results would be available, overwriting the stored data once execution finishes successfully.  # noqa: E501
+
+        :param overwrite_cache: The overwrite_cache of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: bool
+        """
+
+        self._overwrite_cache = overwrite_cache
 
     def to_dict(self):
         """Returns the model properties as a dict"""

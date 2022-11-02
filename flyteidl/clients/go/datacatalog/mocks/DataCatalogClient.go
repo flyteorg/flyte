@@ -447,3 +447,51 @@ func (_m *DataCatalogClient) ReleaseReservation(ctx context.Context, in *datacat
 
 	return r0, r1
 }
+
+type DataCatalogClient_UpdateArtifact struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_UpdateArtifact) Return(_a0 *datacatalog.UpdateArtifactResponse, _a1 error) *DataCatalogClient_UpdateArtifact {
+	return &DataCatalogClient_UpdateArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnUpdateArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_UpdateArtifact {
+	c_call := _m.On("UpdateArtifact", ctx, in, opts)
+	return &DataCatalogClient_UpdateArtifact{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnUpdateArtifactMatch(matchers ...interface{}) *DataCatalogClient_UpdateArtifact {
+	c_call := _m.On("UpdateArtifact", matchers...)
+	return &DataCatalogClient_UpdateArtifact{Call: c_call}
+}
+
+// UpdateArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) UpdateArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.UpdateArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) *datacatalog.UpdateArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.UpdateArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

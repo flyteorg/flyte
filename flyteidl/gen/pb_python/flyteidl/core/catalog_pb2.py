@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.core',
   syntax='proto3',
   serialized_options=_b('Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x1b\x66lyteidl/core/catalog.proto\x12\rflyteidl.core\x1a\x1e\x66lyteidl/core/identifier.proto\"7\n\x12\x43\x61talogArtifactTag\x12\x13\n\x0b\x61rtifact_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\"\xd6\x01\n\x0f\x43\x61talogMetadata\x12-\n\ndataset_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x37\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32!.flyteidl.core.CatalogArtifactTag\x12G\n\x15source_task_execution\x18\x03 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierH\x00\x42\x12\n\x10source_execution\"\x9e\x01\n\x12\x43\x61talogReservation\"\x87\x01\n\x06Status\x12\x18\n\x14RESERVATION_DISABLED\x10\x00\x12\x18\n\x14RESERVATION_ACQUIRED\x10\x01\x12\x16\n\x12RESERVATION_EXISTS\x10\x02\x12\x18\n\x14RESERVATION_RELEASED\x10\x03\x12\x17\n\x13RESERVATION_FAILURE\x10\x04*\x8d\x01\n\x12\x43\x61talogCacheStatus\x12\x12\n\x0e\x43\x41\x43HE_DISABLED\x10\x00\x12\x0e\n\nCACHE_MISS\x10\x01\x12\r\n\tCACHE_HIT\x10\x02\x12\x13\n\x0f\x43\x41\x43HE_POPULATED\x10\x03\x12\x18\n\x14\x43\x41\x43HE_LOOKUP_FAILURE\x10\x04\x12\x15\n\x11\x43\x41\x43HE_PUT_FAILURE\x10\x05\x42\x36Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  serialized_pb=_b('\n\x1b\x66lyteidl/core/catalog.proto\x12\rflyteidl.core\x1a\x1e\x66lyteidl/core/identifier.proto\"7\n\x12\x43\x61talogArtifactTag\x12\x13\n\x0b\x61rtifact_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\"\xd6\x01\n\x0f\x43\x61talogMetadata\x12-\n\ndataset_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x37\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32!.flyteidl.core.CatalogArtifactTag\x12G\n\x15source_task_execution\x18\x03 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierH\x00\x42\x12\n\x10source_execution\"\x9e\x01\n\x12\x43\x61talogReservation\"\x87\x01\n\x06Status\x12\x18\n\x14RESERVATION_DISABLED\x10\x00\x12\x18\n\x14RESERVATION_ACQUIRED\x10\x01\x12\x16\n\x12RESERVATION_EXISTS\x10\x02\x12\x18\n\x14RESERVATION_RELEASED\x10\x03\x12\x17\n\x13RESERVATION_FAILURE\x10\x04*\xa0\x01\n\x12\x43\x61talogCacheStatus\x12\x12\n\x0e\x43\x41\x43HE_DISABLED\x10\x00\x12\x0e\n\nCACHE_MISS\x10\x01\x12\r\n\tCACHE_HIT\x10\x02\x12\x13\n\x0f\x43\x41\x43HE_POPULATED\x10\x03\x12\x18\n\x14\x43\x41\x43HE_LOOKUP_FAILURE\x10\x04\x12\x15\n\x11\x43\x41\x43HE_PUT_FAILURE\x10\x05\x12\x11\n\rCACHE_SKIPPED\x10\x06\x42\x36Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,])
 
@@ -56,11 +56,15 @@ _CATALOGCACHESTATUS = _descriptor.EnumDescriptor(
       name='CACHE_PUT_FAILURE', index=5, number=5,
       serialized_options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='CACHE_SKIPPED', index=6, number=6,
+      serialized_options=None,
+      type=None),
   ],
   containing_type=None,
   serialized_options=None,
   serialized_start=514,
-  serialized_end=655,
+  serialized_end=674,
 )
 _sym_db.RegisterEnumDescriptor(_CATALOGCACHESTATUS)
 
@@ -71,6 +75,7 @@ CACHE_HIT = 2
 CACHE_POPULATED = 3
 CACHE_LOOKUP_FAILURE = 4
 CACHE_PUT_FAILURE = 5
+CACHE_SKIPPED = 6
 
 
 _CATALOGRESERVATION_STATUS = _descriptor.EnumDescriptor(

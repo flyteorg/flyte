@@ -3628,6 +3628,11 @@
         "name": {
           "type": "string",
           "title": "User provided value for the relaunched execution.\nIf none is provided the system will generate a unique string.\n+optional"
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
         }
       },
       "description": "Request to relaunch the referenced execution."
@@ -3693,6 +3698,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -3958,6 +3968,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -5062,6 +5077,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for the interruptible flag of a workflow to be overwritten for a single execution.\nOmitting this field uses the workflow's value as a default.\nAs we need to distinguish between the field not being provided and its default value false, we have to use a wrapper\naround the bool field."
+        },
+        "overwrite_cache": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."
@@ -5315,10 +5335,11 @@
         "CACHE_HIT",
         "CACHE_POPULATED",
         "CACHE_LOOKUP_FAILURE",
-        "CACHE_PUT_FAILURE"
+        "CACHE_PUT_FAILURE",
+        "CACHE_SKIPPED"
       ],
       "default": "CACHE_DISABLED",
-      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error",
+      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped",
       "title": "Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future"
     },
     "coreCatalogMetadata": {

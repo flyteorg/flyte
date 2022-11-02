@@ -32,6 +32,7 @@ class CoreCatalogCacheStatus(object):
     POPULATED = "CACHE_POPULATED"
     LOOKUP_FAILURE = "CACHE_LOOKUP_FAILURE"
     PUT_FAILURE = "CACHE_PUT_FAILURE"
+    SKIPPED = "CACHE_SKIPPED"
 
     """
     Attributes:

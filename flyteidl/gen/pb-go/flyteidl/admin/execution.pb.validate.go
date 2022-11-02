@@ -153,6 +153,8 @@ func (m *ExecutionRelaunchRequest) Validate() error {
 
 	// no validation rules for Name
 
+	// no validation rules for OverwriteCache
+
 	return nil
 }
 
@@ -1371,6 +1373,8 @@ func (m *ExecutionSpec) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for OverwriteCache
 
 	switch m.NotificationOverrides.(type) {
 

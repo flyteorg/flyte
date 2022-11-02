@@ -20,6 +20,8 @@ enum CatalogCacheStatus {
   CACHE_LOOKUP_FAILURE = 4;
   // Used to indicate that cache lookup failed because of an error
   CACHE_PUT_FAILURE = 5;
+  // Used to indicate the cache lookup was skipped
+  CACHE_SKIPPED = 6;
 };
 
 message CatalogArtifactTag {
