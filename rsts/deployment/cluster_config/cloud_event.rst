@@ -40,6 +40,7 @@ To turn on, add the following to your FlyteAdmin:
 .. tabbed:: AWS SNS
 
     .. code:: yaml
+
       cloud_events.yaml: |
         cloudEvents:
           enable: true
