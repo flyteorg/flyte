@@ -133,7 +133,7 @@ else
   fi
 
   # shellcheck disable=SC2086
-  k3d cluster create -p "30082:30082@server:0" -p "30084:30084@server:0" -p "30089:30089@server:0" ${IMAGE_ARG} $K3D_CLUSTER_NAME
+  k3d cluster create -p "30082:30082@server:0" -p "30084:30084@server:0" -p "30088:30088@loadbalancer" -p "30089:30089@server:0" ${IMAGE_ARG} $K3D_CLUSTER_NAME
 fi
 
 if [ -f "${K3D_KUBECONFIG_FILE_PATH}" ]; then

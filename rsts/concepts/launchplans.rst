@@ -10,8 +10,6 @@ In addition to templatized inputs, launch plans allow you to run your workflow o
 plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
 optional notifications. Refer to the :ref:`deployment-cluster-config-notifications` for a deep dive into available notifications.
 
-See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
-
 The Association between Workflows and LaunchPlans
 --------------------------------------------------
 Every workflow comes with a `default` launch plan that has the same name as that of a workflow. The default launch plan is authored (in code) as part of creating a new workflow.

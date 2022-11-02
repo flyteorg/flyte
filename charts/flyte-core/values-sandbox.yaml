@@ -86,6 +86,14 @@ configmap:
         # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
         cloudwatch-enabled: false
 
+# -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+# by default aws use flyte native scheduler i.e flytescheduler
+# To use aws native scheduler please override the eks values
+workflow_scheduler:
+  enabled: true
+  type: native
+
 workflow_notifications:
   enabled: false
   config: {}

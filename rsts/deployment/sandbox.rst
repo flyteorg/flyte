@@ -135,7 +135,7 @@ Flyte configuration on your remote cluster.
 
 #. In order to interact with your Flyte instance using ``flytectl``, initialise your configuration to point to this host ::
 
-    flytectl config init --host='<CONTOUR_URL>' --insecure
+    flytectl config init --host='<CONTOUR_URL>:<PORT>' --insecure
 
 #. Get Minio & Kubernetes dashboard LB URL by running ::
 
@@ -144,6 +144,10 @@ Flyte configuration on your remote cluster.
 #. Open the minio console http://<MINIO_URL>. Your minio username is `minio` and password is `miniostorage`.
 
 #. Open the Kubernetes dashboard http://<K8S_DASHBOARD_URL>.
+
+#. Port-forward to connect minio to flyteadmin using the following command: ::
+
+    kubectl port-forward --address 0.0.0.0 svc/minio 30084:9000 -n flyte
 
 #. Port-forward to connect Postgres using the following command: ::
 

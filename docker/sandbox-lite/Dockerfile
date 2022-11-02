@@ -81,6 +81,7 @@ ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
 ARG FLYTE_TEST="release"
 ENV FLYTE_TEST "${FLYTE_TEST}"
+ENV FLYTE_DEV "False"
 
 RUN addgroup -S docker
 

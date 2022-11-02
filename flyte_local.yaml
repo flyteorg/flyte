@@ -2,6 +2,9 @@
 # Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
 # Look in the artifacts directory in the flyte repo for what's actually run
 # https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
+# Flyte clusters can be run locally with this configuration
+# flytectl demo start --dev
+# flyte start --config flyte_local.yaml
 propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
   kube-config: "$HOME/.flyte/k3s/k3s.yaml"
@@ -22,6 +25,10 @@ tasks:
       - container_array: K8S-ARRAY
 server:
   kube-config: "$HOME/.flyte/k3s/k3s.yaml"
+  httpPort: 30080
+  serviceHttpEndpoint: http://localhost:30080/
+  grpc:
+    port: 30081
 flyteadmin:
   runScheduler: false
 database:
@@ -48,7 +55,7 @@ Logger:
   show-source: true
   level: 5
 admin:
-  endpoint: localhost:8089
+  endpoint: localhost:30081
   insecure: true
 plugins:
   # All k8s plugins default configuration
