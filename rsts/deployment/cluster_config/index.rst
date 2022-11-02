@@ -133,6 +133,14 @@ Cluster Config
     ^^^^^^^^^^^^
     Configure Flyte to to send events to external pub/sub systems.
 
+    ---
+
+    .. link-button:: deployment-cluster-cloud-event
+       :type: ref
+       :text: Cloud Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Configure Flyte to to send events to external pub/sub systems in the CloudEvents format
 
 .. toctree::
     :maxdepth: 1
