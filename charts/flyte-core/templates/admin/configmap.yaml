@@ -64,6 +64,12 @@ data:
     externalEvents: {{ tpl (toYaml .) $ | nindent 6 }}
 {{- end }}
 {{- end }}
+{{- if .Values.cloud_events.enable }}
+{{- with .Values.cloud_events }}
+  cloud_events.yaml: |
+    cloudEvents: {{ tpl (toYaml .) $ | nindent 6 }}
+{{- end }}
+{{- end }}
 {{- if .Values.cluster_resource_manager.enabled }}
   {{- with .Values.cluster_resource_manager.config }}
   cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
