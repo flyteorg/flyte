@@ -5,17 +5,17 @@ image:
   fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
 
 storage:
-  metadataContainer: "development-service-flyte"
-  userDataContainer: "development-service-flyte"
-  type: s3
-  region: us-east-2
+  metadataContainer: my-s3-bucket
+  userDataContainer: my-s3-bucket
+  type: minio
+  region: my-region
 
 database:
   port: 5432
   username: postgres
-  host: opta-service-flyte-postgres.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com
-  dbname: app
-  password: "BzMA1Qvm3gcwiwZXCH5O"
+  host: 127.0.0.1
+  dbname: flyteadmin
+  password: ""
 
 logger:
   level: 1

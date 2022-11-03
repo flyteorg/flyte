@@ -1,5 +1,5 @@
 propeller:
-  rawoutput-prefix: "s3://{{ .Values.storage.userDataContainer }}/data/"
+  rawoutput-prefix: "s3://{{ .Values.storage.userDataContainer }}/userdata/"
   create-flyteworkflow-crd: true
 webhook:
   certDir: /var/run/flyte/certs
@@ -53,15 +53,9 @@ plugins:
   # Logging configuration
   # Escape Helm templating because admin will template these later
   logs:
-    kubernetes-enabled: true
-    kubernetes-template-uri:
-        {{`"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"`}}
-  k8s-array:
-    logs:
-      config:
-        kubernetes-enabled: true
-        kubernetes-template-uri: 
-            {{`"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"`}}
+    cloudwatch-enabled: true
+    cloudwatch-log-group: '/eks/opta-development/cluster'
+    cloudwatch-region: 'us-east-2'
 
 cluster_resources:
   refreshInterval: 5m

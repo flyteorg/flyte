@@ -1,0 +1,228 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/app-root: /console
+  name: flyte-core
+spec:
+  rules:
+  - host: development.uniondemo.run
+    http:
+      paths:
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /healthcheck
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /v1/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /oauth2/*
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  name: flyte-core-grpc
+spec:
+  rules:
+  - host: development.uniondemo.run
+    http:
+      paths:
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AdminService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.DataProxyService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.DataProxyService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AuthMetadataService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.IdentityService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /grpc.health.v1.Health
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /grpc.health.v1.Health/*
+        pathType: ImplementationSpecific
