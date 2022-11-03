@@ -713,6 +713,20 @@ external_events:
     eventTypes:
       - all # Or workflow, node, task. Or "*"
 
+# Cloud events are used to send events (unprocessed, as Admin see them) in cloud event format to
+# an SNS topic (or gcp equivalent)
+cloud_events:
+  enable: false
+  type: aws
+  aws:
+    region: us-east-2
+  eventsPublisher:
+    # Make sure this is not a fifo queue. Admin does not yet support
+    # writing to fifo sns topics.
+    topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
+    eventTypes:
+      - all # Or workflow, node, task. Or "*"
+
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
