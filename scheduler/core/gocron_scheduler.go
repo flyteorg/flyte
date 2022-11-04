@@ -327,9 +327,13 @@ func getFixedRateDurationFromSchedule(unit admin.FixedRateUnit, fixedRateValue u
 }
 
 func NewGoCronScheduler(ctx context.Context, schedules []models.SchedulableEntity, scope promutils.Scope,
-	snapshot snapshoter.Snapshot, rateLimiter *rate.Limiter, executor executor.Executor) Scheduler {
+	snapshot snapshoter.Snapshot, rateLimiter *rate.Limiter, executor executor.Executor, useUtcTz bool) Scheduler {
 	// Create the new cron scheduler and start it off
-	c := cron.New()
+	var opts []cron.Option
+	if useUtcTz {
+		opts = append(opts, cron.WithLocation(time.UTC))
+	}
+	c := cron.New(opts...)
 	c.Start()
 	scheduler := &GoCronScheduler{
 		cron:        c,

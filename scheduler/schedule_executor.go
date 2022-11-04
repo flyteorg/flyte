@@ -68,7 +68,8 @@ func (w *ScheduledExecutor) Run(ctx context.Context) error {
 	// Also Bootstrap the schedules from the snapshot
 	bootStrapCtx, bootStrapCancel := context.WithCancel(ctx)
 	defer bootStrapCancel()
-	gcronScheduler := core.NewGoCronScheduler(bootStrapCtx, schedules, w.scope, snapshot, rateLimiter, executor)
+	useUtcTz := w.workflowExecutorConfig.UseUTCTz
+	gcronScheduler := core.NewGoCronScheduler(bootStrapCtx, schedules, w.scope, snapshot, rateLimiter, executor, useUtcTz)
 	w.scheduler = gcronScheduler
 
 	// Start the go routine to write the update schedules periodically
