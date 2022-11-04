@@ -24,11 +24,12 @@ func TestLazyUploadingTaskReader_Happy(t *testing.T) {
 	tr := &mocks.TaskReader{}
 	tr.OnRead(ctx).Return(ttm, nil)
 
-	rawStore, err := storage.NewInMemoryRawStore(nil, promutils.NewTestScope())
+	ds, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	protoStore := storage.NewDefaultProtobufStore(rawStore, promutils.NewTestScope())
 
-	ltr := NewLazyUploadingTaskReader(tr, dummyPath, protoStore)
+	ltr := NewLazyUploadingTaskReader(tr, dummyPath, ds)
 
 	x, err := ltr.Read(ctx)
 	assert.NoError(t, err)
@@ -38,7 +39,7 @@ func TestLazyUploadingTaskReader_Happy(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, p, dummyPath)
 
-	v, err := rawStore.Head(ctx, dummyPath)
+	v, err := ds.Head(ctx, dummyPath)
 	assert.NoError(t, err)
 	assert.True(t, v.Exists())
 }
@@ -76,11 +77,12 @@ func TestLazyUploadingTaskReader_TaskReadFailure(t *testing.T) {
 	tr := &mocks.TaskReader{}
 	tr.OnRead(ctx).Return(nil, fmt.Errorf("read fail"))
 
-	rawStore, err := storage.NewInMemoryRawStore(nil, promutils.NewTestScope())
+	ds, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	protoStore := storage.NewDefaultProtobufStore(rawStore, promutils.NewTestScope())
 
-	ltr := NewLazyUploadingTaskReader(tr, dummyPath, protoStore)
+	ltr := NewLazyUploadingTaskReader(tr, dummyPath, ds)
 
 	x, err := ltr.Read(ctx)
 	assert.Error(t, err)
@@ -90,7 +92,7 @@ func TestLazyUploadingTaskReader_TaskReadFailure(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, p, storage.DataReference(""))
 
-	v, err := rawStore.Head(ctx, dummyPath)
+	v, err := ds.Head(ctx, dummyPath)
 	assert.NoError(t, err)
 	assert.False(t, v.Exists())
 }
