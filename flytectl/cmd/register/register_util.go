@@ -328,8 +328,8 @@ func validateLPWithSchedule(lpSpec *admin.LaunchPlanSpec, wf *admin.Workflow) er
 	var scheduleParamsWithValues []string
 	// Check for default values
 	if lpSpec.DefaultInputs != nil {
-		for paramName := range lpSpec.DefaultInputs.Parameters {
-			if paramName != schedule.KickoffTimeInputArg {
+		for paramName, paramValue := range lpSpec.DefaultInputs.Parameters {
+			if paramName != schedule.KickoffTimeInputArg && paramValue.GetDefault() != nil {
 				scheduleParamsWithValues = append(scheduleParamsWithValues, paramName)
 			}
 		}
