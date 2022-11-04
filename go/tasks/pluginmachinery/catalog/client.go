@@ -124,11 +124,20 @@ func NewReservationEntry(expiresAt time.Time, heartbeatInterval time.Duration, o
 	}
 }
 
-// Default Catalog client that allows memoization and indexing of intermediate data in Flyte
+// Client represents the default Catalog client that allows memoization and indexing of intermediate data in Flyte
 type Client interface {
+	// Get returns the artifact associated with the given key.
 	Get(ctx context.Context, key Key) (Entry, error)
+	// GetOrExtendReservation tries to retrieve a (valid) reservation for the given key, creating a new one using the
+	// specified owner ID if none was found or updating an existing one if it has expired.
 	GetOrExtendReservation(ctx context.Context, key Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error)
+	// Put stores the given data using the specified key, creating artifact entries as required.
+	// To update an existing artifact, use Update instead.
 	Put(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
+	// Update updates existing data stored at the specified key, overwriting artifact entries with the new data provided.
+	// To create a new (non-existent) artifact, use Put instead.
+	Update(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
+	// ReleaseReservation releases an acquired reservation for the given key and owner ID.
 	ReleaseReservation(ctx context.Context, key Key, ownerID string) error
 }
 
