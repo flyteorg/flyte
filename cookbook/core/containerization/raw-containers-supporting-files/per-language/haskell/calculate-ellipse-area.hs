@@ -8,14 +8,12 @@ calculateEllipseArea a b = pi * a * b
 
 main = do
   args <- getArgs
-  let input_a = args!!0 ++ "/a"
-      input_b = args!!0 ++ "/b"
-  a <- readFile input_a
-  b <- readFile input_b
+  let a = args!!0
+      b = args!!1
 
   let area = calculateEllipseArea (read a::Float) (read b::Float)
 
-  let output_area = args!!1 ++ "/area"
-      output_metadata = args!!1 ++ "/metadata"
+  let output_area = args!!2 ++ "/area"
+      output_metadata = args!!2 ++ "/metadata"
   writeFile output_area (show area)
   writeFile output_metadata "[from haskell rawcontainer]"
