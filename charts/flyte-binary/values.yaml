@@ -25,3 +25,6 @@ paths:
   externalFlyteConfig: ""
 
 # Need to add an aws section for IAM role annotation
+
+proxy:
+  enabled: false

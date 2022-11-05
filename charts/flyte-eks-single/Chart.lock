@@ -1,6 +1,0 @@
-dependencies:
-- name: flyte-binary
-  repository: file://../flyte-binary
-  version: 0.1.0
-digest: sha256:b9283bff7dd4eb6f5626803a6cf39cac15ae841c30b5b61cf284be57d490f85b
-generated: "2022-10-10T18:05:52.717699-07:00"
