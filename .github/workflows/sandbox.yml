@@ -276,6 +276,7 @@ jobs:
           DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: docker/sandbox-bundled
+          allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: ${{ steps.set_version.outputs.build_args }}
