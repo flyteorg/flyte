@@ -81,6 +81,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**delete_project_domain_attributes**](docs/AdminServiceApi.md#delete_project_domain_attributes) | **DELETE** /api/v1/project_domain_attributes/{project}/{domain} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
 *AdminServiceApi* | [**delete_workflow_attributes**](docs/AdminServiceApi.md#delete_workflow_attributes) | **DELETE** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
 *AdminServiceApi* | [**get_active_launch_plan**](docs/AdminServiceApi.md#get_active_launch_plan) | **GET** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**get_description_entity**](docs/AdminServiceApi.md#get_description_entity) | **GET** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
 *AdminServiceApi* | [**get_execution**](docs/AdminServiceApi.md#get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_execution_data**](docs/AdminServiceApi.md#get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_launch_plan**](docs/AdminServiceApi.md#get_launch_plan) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
@@ -96,6 +97,8 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**get_workflow**](docs/AdminServiceApi.md#get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
 *AdminServiceApi* | [**get_workflow_attributes**](docs/AdminServiceApi.md#get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
 *AdminServiceApi* | [**list_active_launch_plans**](docs/AdminServiceApi.md#list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**list_description_entities**](docs/AdminServiceApi.md#list_description_entities) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+*AdminServiceApi* | [**list_description_entities2**](docs/AdminServiceApi.md#list_description_entities2) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
 *AdminServiceApi* | [**list_executions**](docs/AdminServiceApi.md#list_executions) | **GET** /api/v1/executions/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**list_launch_plan_ids**](docs/AdminServiceApi.md#list_launch_plan_ids) | **GET** /api/v1/launch_plan_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
 *AdminServiceApi* | [**list_launch_plans**](docs/AdminServiceApi.md#list_launch_plans) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
@@ -134,6 +137,10 @@ Class | Method | HTTP request | Description
  - [AdminClusterAssignment](docs/AdminClusterAssignment.md)
  - [AdminClusterResourceAttributes](docs/AdminClusterResourceAttributes.md)
  - [AdminCronSchedule](docs/AdminCronSchedule.md)
+ - [AdminDescription](docs/AdminDescription.md)
+ - [AdminDescriptionEntity](docs/AdminDescriptionEntity.md)
+ - [AdminDescriptionEntityList](docs/AdminDescriptionEntityList.md)
+ - [AdminDescriptionFormat](docs/AdminDescriptionFormat.md)
  - [AdminDomain](docs/AdminDomain.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
  - [AdminExecution](docs/AdminExecution.md)
@@ -212,6 +219,7 @@ Class | Method | HTTP request | Description
  - [AdminSchedule](docs/AdminSchedule.md)
  - [AdminSlackNotification](docs/AdminSlackNotification.md)
  - [AdminSort](docs/AdminSort.md)
+ - [AdminSourceCode](docs/AdminSourceCode.md)
  - [AdminSystemMetadata](docs/AdminSystemMetadata.md)
  - [AdminTask](docs/AdminTask.md)
  - [AdminTaskClosure](docs/AdminTaskClosure.md)

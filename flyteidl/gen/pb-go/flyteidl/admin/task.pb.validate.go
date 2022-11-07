@@ -217,6 +217,8 @@ func (m *Task) Validate() error {
 		}
 	}
 
+	// no validation rules for ShortDescription
+
 	return nil
 }
 
@@ -366,6 +368,16 @@ func (m *TaskSpec) Validate() error {
 		if err := v.Validate(); err != nil {
 			return TaskSpecValidationError{
 				field:  "Template",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskSpecValidationError{
+				field:  "Description",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

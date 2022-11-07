@@ -1186,6 +1186,137 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def get_description_entity(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+        """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
+
+        Retrieve an existing description entity description.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_description_entity(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. (required)
+        :param str id_version: Specific version of the resource. (required)
+        :return: AdminDescriptionEntity
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return data
+
+    def get_description_entity_with_http_info(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+        """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
+
+        Retrieve an existing description entity description.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. (required)
+        :param str id_version: Specific version of the resource. (required)
+        :return: AdminDescriptionEntity
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_resource_type', 'id_project', 'id_domain', 'id_name', 'id_version']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_description_entity" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_resource_type' is set
+        if ('id_resource_type' not in params or
+                params['id_resource_type'] is None):
+            raise ValueError("Missing the required parameter `id_resource_type` when calling `get_description_entity`")  # noqa: E501
+        # verify the required parameter 'id_project' is set
+        if ('id_project' not in params or
+                params['id_project'] is None):
+            raise ValueError("Missing the required parameter `id_project` when calling `get_description_entity`")  # noqa: E501
+        # verify the required parameter 'id_domain' is set
+        if ('id_domain' not in params or
+                params['id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_domain` when calling `get_description_entity`")  # noqa: E501
+        # verify the required parameter 'id_name' is set
+        if ('id_name' not in params or
+                params['id_name'] is None):
+            raise ValueError("Missing the required parameter `id_name` when calling `get_description_entity`")  # noqa: E501
+        # verify the required parameter 'id_version' is set
+        if ('id_version' not in params or
+                params['id_version'] is None):
+            raise ValueError("Missing the required parameter `id_version` when calling `get_description_entity`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_resource_type' in params:
+            path_params['id.resource_type'] = params['id_resource_type']  # noqa: E501
+        if 'id_project' in params:
+            path_params['id.project'] = params['id_project']  # noqa: E501
+        if 'id_domain' in params:
+            path_params['id.domain'] = params['id_domain']  # noqa: E501
+        if 'id_name' in params:
+            path_params['id.name'] = params['id_name']  # noqa: E501
+        if 'id_version' in params:
+            path_params['id.version'] = params['id_version']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminDescriptionEntity',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_execution(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
@@ -3040,6 +3171,288 @@ class AdminServiceApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='AdminLaunchPlanList',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def list_description_entities(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+        """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_description_entities(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminDescriptionEntityList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+        else:
+            (data) = self.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return data
+
+    def list_description_entities_with_http_info(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+        """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminDescriptionEntityList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['resource_type', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_description_entities" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities`")  # noqa: E501
+        # verify the required parameter 'id_project' is set
+        if ('id_project' not in params or
+                params['id_project'] is None):
+            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities`")  # noqa: E501
+        # verify the required parameter 'id_domain' is set
+        if ('id_domain' not in params or
+                params['id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities`")  # noqa: E501
+        # verify the required parameter 'id_name' is set
+        if ('id_name' not in params or
+                params['id_name'] is None):
+            raise ValueError("Missing the required parameter `id_name` when calling `list_description_entities`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
+        if 'id_project' in params:
+            path_params['id.project'] = params['id_project']  # noqa: E501
+        if 'id_domain' in params:
+            path_params['id.domain'] = params['id_domain']  # noqa: E501
+        if 'id_name' in params:
+            path_params['id.name'] = params['id_name']  # noqa: E501
+
+        query_params = []
+        if 'limit' in params:
+            query_params.append(('limit', params['limit']))  # noqa: E501
+        if 'token' in params:
+            query_params.append(('token', params['token']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
+        if 'sort_by_key' in params:
+            query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
+        if 'sort_by_direction' in params:
+            query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminDescriptionEntityList',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def list_description_entities2(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
+        """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_description_entities2(resource_type, id_project, id_domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminDescriptionEntityList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_description_entities2_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
+        else:
+            (data) = self.list_description_entities2_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
+            return data
+
+    def list_description_entities2_with_http_info(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
+        """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_description_entities2_with_http_info(resource_type, id_project, id_domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminDescriptionEntityList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['resource_type', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_description_entities2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities2`")  # noqa: E501
+        # verify the required parameter 'id_project' is set
+        if ('id_project' not in params or
+                params['id_project'] is None):
+            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities2`")  # noqa: E501
+        # verify the required parameter 'id_domain' is set
+        if ('id_domain' not in params or
+                params['id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
+        if 'id_project' in params:
+            path_params['id.project'] = params['id_project']  # noqa: E501
+        if 'id_domain' in params:
+            path_params['id.domain'] = params['id_domain']  # noqa: E501
+
+        query_params = []
+        if 'id_name' in params:
+            query_params.append(('id.name', params['id_name']))  # noqa: E501
+        if 'limit' in params:
+            query_params.append(('limit', params['limit']))  # noqa: E501
+        if 'token' in params:
+            query_params.append(('token', params['token']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
+        if 'sort_by_key' in params:
+            query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
+        if 'sort_by_direction' in params:
+            query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminDescriptionEntityList',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

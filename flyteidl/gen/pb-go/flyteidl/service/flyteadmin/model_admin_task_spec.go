@@ -13,4 +13,6 @@ package flyteadmin
 type AdminTaskSpec struct {
 	// Template of the task that encapsulates all the metadata of the task.
 	Template *CoreTaskTemplate `json:"template,omitempty"`
+	// Represents the specification for description entity.
+	Description *AdminDescriptionEntity `json:"description,omitempty"`
 }

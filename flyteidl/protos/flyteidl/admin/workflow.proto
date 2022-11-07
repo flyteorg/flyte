@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 import "flyteidl/core/compiler.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/workflow.proto";
+import "flyteidl/admin/description_entity.proto";
 import "google/protobuf/timestamp.proto";
 
 // Represents a request structure to create a revision of a workflow.
@@ -33,6 +34,9 @@ message Workflow {
     
     // closure encapsulates all the fields that maps to a compiled version of the workflow.
     WorkflowClosure closure  = 2;
+
+    // One-liner overview of the entity.
+    string short_description = 3;
 }
 
 // Represents a list of workflows returned from the admin.
@@ -55,6 +59,9 @@ message WorkflowSpec {
     // propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
     // to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
     repeated core.WorkflowTemplate sub_workflows = 2;
+
+    // Represents the specification for description entity.
+    DescriptionEntity description        = 3;
 }
 
 // A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
