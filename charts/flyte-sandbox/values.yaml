@@ -35,12 +35,11 @@ minio:
     enabled: false
 
 postgresql:
+  auth:
+    postgresPassword: postgres
   shmVolume:
     enabled: false
   primary:
-    extraEnvVars:
-      - name: POSTGRES_HOST_AUTH_METHOD
-        value: trust
     service:
       type: NodePort
       nodePorts:
