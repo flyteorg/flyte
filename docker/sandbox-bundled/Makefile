@@ -9,21 +9,22 @@ export DOCKER_BUILDKIT := 1
 
 .PHONY: images
 images:
-	mkdir -p $(dir $@)
-	docker pull ghcr.io/flyteorg/flyte-binary:$(VERSION) --platform linux/arm64 $(1)
+	mkdir -p docker/sandbox-lite/arm64
+	mkdir -p docker/sandbox-lite/amd64
+	docker pull ghcr.io/flyteorg/flyte-binary:$(VERSION) --platform linux/arm64
 	docker tag ghcr.io/flyteorg/flyte-binary:$(VERSION) ghcr.io/flyteorg/flyte-binary:latest
-	docker save --output  $(dir $@)arm64/flyte.tar ghcr.io/flyteorg/flyte-binary:latest
+	docker save --output  docker/sandbox-lite/arm64/flyte.tar ghcr.io/flyteorg/flyte-binary:latest
 	docker rmi ghcr.io/flyteorg/flyte-binary
-	docker pull ghcr.io/flyteorg/flyte-binary:$(VERSION) --platform linux/amd64 $(1)
+	docker pull ghcr.io/flyteorg/flyte-binary:$(VERSION) --platform linux/amd64
 	docker tag ghcr.io/flyteorg/flyte-binary:$(VERSION) ghcr.io/flyteorg/flyte-binary:latest
-	docker save --output  $(dir $@)amd64/flyte.tar ghcr.io/flyteorg/flyte-binary:latest
+	docker save --output  docker/sandbox-lite/amd64/flyte.tar ghcr.io/flyteorg/flyte-binary:latest
 
 .PHONY: images-ci
 images-ci:
-	mkdir -p $(dir $@)amd64
-	mkdir -p $(dir $@)arm64
-	cp /tmp/flyte-amd64.tar $(dir $@)amd64/flyte.tar
-	cp /tmp/flyte-arm64.tar $(dir $@)arm64/flyte.tar
+	mkdir -p docker/sandbox-lite/arm64
+	mkdir -p docker/sandbox-lite/amd64
+	cp /tmp/flyte-amd64.tar docker/sandbox-lite/amd64/flyte.tar
+	cp /tmp/flyte-arm64.tar docker/sandbox-lite/arm64/flyte.tar
 
 .PHONY: clean
 clean: ## Cleanup state
