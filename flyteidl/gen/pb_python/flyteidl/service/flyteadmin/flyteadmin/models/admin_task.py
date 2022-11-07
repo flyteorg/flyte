@@ -35,25 +35,30 @@ class AdminTask(object):
     """
     swagger_types = {
         'id': 'CoreIdentifier',
-        'closure': 'AdminTaskClosure'
+        'closure': 'AdminTaskClosure',
+        'short_description': 'str'
     }
 
     attribute_map = {
         'id': 'id',
-        'closure': 'closure'
+        'closure': 'closure',
+        'short_description': 'short_description'
     }
 
-    def __init__(self, id=None, closure=None):  # noqa: E501
+    def __init__(self, id=None, closure=None, short_description=None):  # noqa: E501
         """AdminTask - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._closure = None
+        self._short_description = None
         self.discriminator = None
 
         if id is not None:
             self.id = id
         if closure is not None:
             self.closure = closure
+        if short_description is not None:
+            self.short_description = short_description
 
     @property
     def id(self):
@@ -100,6 +105,29 @@ class AdminTask(object):
         """
 
         self._closure = closure
+
+    @property
+    def short_description(self):
+        """Gets the short_description of this AdminTask.  # noqa: E501
+
+        One-liner overview of the entity.  # noqa: E501
+
+        :return: The short_description of this AdminTask.  # noqa: E501
+        :rtype: str
+        """
+        return self._short_description
+
+    @short_description.setter
+    def short_description(self, short_description):
+        """Sets the short_description of this AdminTask.
+
+        One-liner overview of the entity.  # noqa: E501
+
+        :param short_description: The short_description of this AdminTask.  # noqa: E501
+        :type: str
+        """
+
+        self._short_description = short_description
 
     def to_dict(self):
         """Returns the model properties as a dict"""

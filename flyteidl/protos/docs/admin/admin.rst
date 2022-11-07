@@ -657,6 +657,173 @@ Sort.Direction
 
 
 
+.. _ref_flyteidl/admin/description_entity.proto:
+
+flyteidl/admin/description_entity.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.admin.Description:
+
+Description
+------------------------------------------------------------------
+
+Full user description with formatting preserved. This can be rendered
+by clients, such as the console or command line tools with in-tact
+formatting.
+
+
+
+.. csv-table:: Description type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "value", ":ref:`ref_string`", "", "long description - no more than 4KB"
+   "uri", ":ref:`ref_string`", "", "if the description sizes exceed some threshold we can offload the entire description proto altogether to an external data store, like S3 rather than store inline in the db"
+   "format", ":ref:`ref_flyteidl.admin.DescriptionFormat`", "", "Format of the long description"
+   "icon_link", ":ref:`ref_string`", "", "Optional link to an icon for the entity"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.DescriptionEntity:
+
+DescriptionEntity
+------------------------------------------------------------------
+
+DescriptionEntity contains detailed description for the task/workflow.
+Documentation could provide insight into the algorithms, business use case, etc.
+
+
+
+.. csv-table:: DescriptionEntity type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the description entity."
+   "short_description", ":ref:`ref_string`", "", "One-liner overview of the entity."
+   "long_description", ":ref:`ref_flyteidl.admin.Description`", "", "Full user description with formatting preserved."
+   "source_code", ":ref:`ref_flyteidl.admin.SourceCode`", "", "Optional link to source code used to define this entity."
+   "tags", ":ref:`ref_string`", "repeated", "User-specified tags. These are arbitrary and can be used for searching filtering and discovering tasks."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.DescriptionEntityList:
+
+DescriptionEntityList
+------------------------------------------------------------------
+
+Represents a list of DescriptionEntities returned from the admin.
+See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+
+
+
+.. csv-table:: DescriptionEntityList type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "descriptionEntities", ":ref:`ref_flyteidl.admin.DescriptionEntity`", "repeated", "A list of DescriptionEntities returned based on the request."
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.DescriptionEntityListRequest:
+
+DescriptionEntityListRequest
+------------------------------------------------------------------
+
+Represents a request structure to retrieve a list of DescriptionEntities.
+See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+
+
+
+.. csv-table:: DescriptionEntityListRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Identifies the specific type of resource that this identifier corresponds to."
+   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "The identifier for the description entity. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
+   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
+   "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
+   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering for returned list. +optional"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.SourceCode:
+
+SourceCode
+------------------------------------------------------------------
+
+Link to source code used to define this entity
+
+
+
+.. csv-table:: SourceCode type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "link", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+..
+   end messages
+
+
+
+.. _ref_flyteidl.admin.DescriptionFormat:
+
+DescriptionFormat
+------------------------------------------------------------------
+
+The format of the long description
+
+.. csv-table:: Enum DescriptionFormat values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "DESCRIPTION_FORMAT_UNKNOWN", "0", ""
+   "DESCRIPTION_FORMAT_MARKDOWN", "1", ""
+   "DESCRIPTION_FORMAT_HTML", "2", ""
+   "DESCRIPTION_FORMAT_RST", "3", "python default documentation - comments is rst"
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+..
+   end services
+
+
+
+
 .. _ref_flyteidl/admin/event.proto:
 
 flyteidl/admin/event.proto
@@ -3307,6 +3474,7 @@ Tasks can come in many varieties tuned for specialized behavior.
 
    "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the task."
    "closure", ":ref:`ref_flyteidl.admin.TaskClosure`", "", "closure encapsulates all the fields that maps to a compiled version of the task."
+   "short_description", ":ref:`ref_string`", "", "One-liner overview of the entity."
 
 
 
@@ -3413,6 +3581,7 @@ Represents a structure that encapsulates the user-configured specification of th
    :widths: auto
 
    "template", ":ref:`ref_flyteidl.core.TaskTemplate`", "", "Template of the task that encapsulates all the metadata of the task."
+   "description", ":ref:`ref_flyteidl.admin.DescriptionEntity`", "", "Represents the specification for description entity."
 
 
 
@@ -3772,6 +3941,7 @@ in order to produce a directed-acyclic execution graph.
 
    "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow."
    "closure", ":ref:`ref_flyteidl.admin.WorkflowClosure`", "", "closure encapsulates all the fields that maps to a compiled version of the workflow."
+   "short_description", ":ref:`ref_string`", "", "One-liner overview of the entity."
 
 
 
@@ -3918,6 +4088,7 @@ Represents a structure that encapsulates the specification of the workflow.
 
    "template", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "", "Template of the task that encapsulates all the metadata of the workflow."
    "sub_workflows", ":ref:`ref_flyteidl.core.WorkflowTemplate`", "repeated", "Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out to Admin to see other registered workflows). In fact, subworkflows do not even need to be registered."
+   "description", ":ref:`ref_flyteidl.admin.DescriptionEntity`", "", "Represents the specification for description entity."
 
 
 

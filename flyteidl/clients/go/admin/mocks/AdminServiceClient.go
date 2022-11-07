@@ -545,6 +545,54 @@ func (_m *AdminServiceClient) GetActiveLaunchPlan(ctx context.Context, in *admin
 	return r0, r1
 }
 
+type AdminServiceClient_GetDescriptionEntity struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetDescriptionEntity) Return(_a0 *admin.DescriptionEntity, _a1 error) *AdminServiceClient_GetDescriptionEntity {
+	return &AdminServiceClient_GetDescriptionEntity{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetDescriptionEntity(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetDescriptionEntity {
+	c_call := _m.On("GetDescriptionEntity", ctx, in, opts)
+	return &AdminServiceClient_GetDescriptionEntity{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetDescriptionEntityMatch(matchers ...interface{}) *AdminServiceClient_GetDescriptionEntity {
+	c_call := _m.On("GetDescriptionEntity", matchers...)
+	return &AdminServiceClient_GetDescriptionEntity{Call: c_call}
+}
+
+// GetDescriptionEntity provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetDescriptionEntity(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.DescriptionEntity, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.DescriptionEntity
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ObjectGetRequest, ...grpc.CallOption) *admin.DescriptionEntity); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.DescriptionEntity)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ObjectGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetExecution struct {
 	*mock.Call
 }
@@ -1257,6 +1305,54 @@ func (_m *AdminServiceClient) ListActiveLaunchPlans(ctx context.Context, in *adm
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ActiveLaunchPlanListRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_ListDescriptionEntities struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_ListDescriptionEntities) Return(_a0 *admin.DescriptionEntityList, _a1 error) *AdminServiceClient_ListDescriptionEntities {
+	return &AdminServiceClient_ListDescriptionEntities{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnListDescriptionEntities(ctx context.Context, in *admin.DescriptionEntityListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListDescriptionEntities {
+	c_call := _m.On("ListDescriptionEntities", ctx, in, opts)
+	return &AdminServiceClient_ListDescriptionEntities{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnListDescriptionEntitiesMatch(matchers ...interface{}) *AdminServiceClient_ListDescriptionEntities {
+	c_call := _m.On("ListDescriptionEntities", matchers...)
+	return &AdminServiceClient_ListDescriptionEntities{Call: c_call}
+}
+
+// ListDescriptionEntities provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) ListDescriptionEntities(ctx context.Context, in *admin.DescriptionEntityListRequest, opts ...grpc.CallOption) (*admin.DescriptionEntityList, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.DescriptionEntityList
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.DescriptionEntityListRequest, ...grpc.CallOption) *admin.DescriptionEntityList); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.DescriptionEntityList)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.DescriptionEntityListRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

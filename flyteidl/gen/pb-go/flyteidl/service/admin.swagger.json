@@ -447,6 +447,260 @@
         ]
       }
     },
+    "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
+        "description": "Retrieve an existing description entity description.",
+        "operationId": "GetDescriptionEntity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntity"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
+        "operationId": "ListDescriptionEntities2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
+        "operationId": "ListDescriptionEntities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/events/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
@@ -3380,6 +3634,86 @@
       },
       "description": "Options for schedules to run according to a cron expression."
     },
+    "adminDescription": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "title": "long description - no more than 4KB"
+        },
+        "uri": {
+          "type": "string",
+          "title": "if the description sizes exceed some threshold we can offload the entire\ndescription proto altogether to an external data store, like S3 rather than store inline in the db"
+        },
+        "format": {
+          "$ref": "#/definitions/adminDescriptionFormat",
+          "title": "Format of the long description"
+        },
+        "icon_link": {
+          "type": "string",
+          "title": "Optional link to an icon for the entity"
+        }
+      },
+      "description": "Full user description with formatting preserved. This can be rendered\nby clients, such as the console or command line tools with in-tact\nformatting."
+    },
+    "adminDescriptionEntity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "id represents the unique identifier of the description entity."
+        },
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
+        },
+        "long_description": {
+          "$ref": "#/definitions/adminDescription",
+          "description": "Full user description with formatting preserved."
+        },
+        "source_code": {
+          "$ref": "#/definitions/adminSourceCode",
+          "description": "Optional link to source code used to define this entity."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "User-specified tags. These are arbitrary and can be used for searching\nfiltering and discovering tasks."
+        }
+      },
+      "description": "DescriptionEntity contains detailed description for the task/workflow.\nDocumentation could provide insight into the algorithms, business use case, etc."
+    },
+    "adminDescriptionEntityList": {
+      "type": "object",
+      "properties": {
+        "descriptionEntities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminDescriptionEntity"
+          },
+          "description": "A list of DescriptionEntities returned based on the request."
+        },
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      },
+      "title": "Represents a list of DescriptionEntities returned from the admin.\nSee :ref:`ref_flyteidl.admin.DescriptionEntity` for more details"
+    },
+    "adminDescriptionFormat": {
+      "type": "string",
+      "enum": [
+        "DESCRIPTION_FORMAT_UNKNOWN",
+        "DESCRIPTION_FORMAT_MARKDOWN",
+        "DESCRIPTION_FORMAT_HTML",
+        "DESCRIPTION_FORMAT_RST"
+      ],
+      "default": "DESCRIPTION_FORMAT_UNKNOWN",
+      "description": "- DESCRIPTION_FORMAT_RST: python default documentation - comments is rst",
+      "title": "The format of the long description"
+    },
     "adminDomain": {
       "type": "object",
       "properties": {
@@ -4660,6 +4994,15 @@
       },
       "description": "Specifies sort ordering in a list request."
     },
+    "adminSourceCode": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "title": "Link to source code used to define this entity"
+    },
     "adminSystemMetadata": {
       "type": "object",
       "properties": {
@@ -4680,6 +5023,10 @@
         "closure": {
           "$ref": "#/definitions/adminTaskClosure",
           "description": "closure encapsulates all the fields that maps to a compiled version of the task."
+        },
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
         }
       },
       "description": "Flyte workflows are composed of many ordered tasks. That is small, reusable, self-contained logical blocks\narranged to process workflow inputs and produce a deterministic set of outputs.\nTasks can come in many varieties tuned for specialized behavior."
@@ -4897,6 +5244,10 @@
         "template": {
           "$ref": "#/definitions/coreTaskTemplate",
           "description": "Template of the task that encapsulates all the metadata of the task."
+        },
+        "description": {
+          "$ref": "#/definitions/adminDescriptionEntity",
+          "description": "Represents the specification for description entity."
         }
       },
       "description": "Represents a structure that encapsulates the user-configured specification of the task."
@@ -4944,6 +5295,10 @@
         "closure": {
           "$ref": "#/definitions/adminWorkflowClosure",
           "description": "closure encapsulates all the fields that maps to a compiled version of the workflow."
+        },
+        "short_description": {
+          "type": "string",
+          "description": "One-liner overview of the entity."
         }
       },
       "description": "Represents the workflow structure stored in the Admin\nA workflow is created by ordering tasks and associating outputs to inputs\nin order to produce a directed-acyclic execution graph."
@@ -5155,6 +5510,10 @@
             "$ref": "#/definitions/coreWorkflowTemplate"
           },
           "description": "Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the\npropeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out\nto Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered."
+        },
+        "description": {
+          "$ref": "#/definitions/adminDescriptionEntity",
+          "description": "Represents the specification for description entity."
         }
       },
       "description": "Represents a structure that encapsulates the specification of the workflow."

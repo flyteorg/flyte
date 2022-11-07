@@ -217,6 +217,8 @@ func (m *Workflow) Validate() error {
 		}
 	}
 
+	// no validation rules for ShortDescription
+
 	return nil
 }
 
@@ -387,6 +389,16 @@ func (m *WorkflowSpec) Validate() error {
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowSpecValidationError{
+				field:  "Description",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil

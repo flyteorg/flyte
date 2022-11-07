@@ -70,6 +70,8 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/GetNamedEntity",
   "/flyteidl.service.AdminService/UpdateNamedEntity",
   "/flyteidl.service.AdminService/GetVersion",
+  "/flyteidl.service.AdminService/GetDescriptionEntity",
+  "/flyteidl.service.AdminService/ListDescriptionEntities",
 };
 
 std::unique_ptr< AdminService::Stub> AdminService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -129,6 +131,8 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_GetNamedEntity_(AdminService_method_names[47], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_UpdateNamedEntity_(AdminService_method_names[48], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetVersion_(AdminService_method_names[49], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetDescriptionEntity_(AdminService_method_names[50], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListDescriptionEntities_(AdminService_method_names[51], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -1531,6 +1535,62 @@ void AdminService::Stub::experimental_async::GetVersion(::grpc::ClientContext* c
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::GetVersionResponse>::Create(channel_.get(), cq, rpcmethod_GetVersion_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::GetDescriptionEntity(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::flyteidl::admin::DescriptionEntity* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetDescriptionEntity_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetDescriptionEntity(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::DescriptionEntity* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDescriptionEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetDescriptionEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DescriptionEntity* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDescriptionEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetDescriptionEntity(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::DescriptionEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDescriptionEntity_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetDescriptionEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DescriptionEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDescriptionEntity_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DescriptionEntity>* AdminService::Stub::AsyncGetDescriptionEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DescriptionEntity>::Create(channel_.get(), cq, rpcmethod_GetDescriptionEntity_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DescriptionEntity>* AdminService::Stub::PrepareAsyncGetDescriptionEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DescriptionEntity>::Create(channel_.get(), cq, rpcmethod_GetDescriptionEntity_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::ListDescriptionEntities(::grpc::ClientContext* context, const ::flyteidl::admin::DescriptionEntityListRequest& request, ::flyteidl::admin::DescriptionEntityList* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListDescriptionEntities_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::ListDescriptionEntities(::grpc::ClientContext* context, const ::flyteidl::admin::DescriptionEntityListRequest* request, ::flyteidl::admin::DescriptionEntityList* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListDescriptionEntities_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::ListDescriptionEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DescriptionEntityList* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListDescriptionEntities_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::ListDescriptionEntities(::grpc::ClientContext* context, const ::flyteidl::admin::DescriptionEntityListRequest* request, ::flyteidl::admin::DescriptionEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListDescriptionEntities_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::ListDescriptionEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DescriptionEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListDescriptionEntities_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DescriptionEntityList>* AdminService::Stub::AsyncListDescriptionEntitiesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DescriptionEntityListRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DescriptionEntityList>::Create(channel_.get(), cq, rpcmethod_ListDescriptionEntities_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DescriptionEntityList>* AdminService::Stub::PrepareAsyncListDescriptionEntitiesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DescriptionEntityListRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DescriptionEntityList>::Create(channel_.get(), cq, rpcmethod_ListDescriptionEntities_, context, request, false);
+}
+
 AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[0],
@@ -1782,6 +1842,16 @@ AdminService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::GetVersionResponse>(
           std::mem_fn(&AdminService::Service::GetVersion), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[50],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::DescriptionEntity>(
+          std::mem_fn(&AdminService::Service::GetDescriptionEntity), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[51],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::DescriptionEntityListRequest, ::flyteidl::admin::DescriptionEntityList>(
+          std::mem_fn(&AdminService::Service::ListDescriptionEntities), this)));
 }
 
 AdminService::Service::~Service() {
@@ -2131,6 +2201,20 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::GetDescriptionEntity(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::DescriptionEntity* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::ListDescriptionEntities(::grpc::ServerContext* context, const ::flyteidl::admin::DescriptionEntityListRequest* request, ::flyteidl::admin::DescriptionEntityList* response) {
   (void) context;
   (void) request;
   (void) response;
