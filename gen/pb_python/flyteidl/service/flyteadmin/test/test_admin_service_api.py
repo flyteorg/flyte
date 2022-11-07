@@ -106,6 +106,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_description_entity(self):
+        """Test case for get_description_entity
+
+        Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
+        """
+        pass
+
     def test_get_execution(self):
         """Test case for get_execution
 
@@ -207,6 +214,20 @@ class TestAdminServiceApi(unittest.TestCase):
         """Test case for list_active_launch_plans
 
         List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+        """
+        pass
+
+    def test_list_description_entities(self):
+        """Test case for list_description_entities
+
+        Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_description_entities2(self):
+        """Test case for list_description_entities2
+
+        Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
         """
         pass
 

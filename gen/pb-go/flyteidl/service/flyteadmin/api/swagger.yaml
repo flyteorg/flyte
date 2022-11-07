@@ -399,6 +399,240 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskExecutionGetDataResponse"
+  /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}:
+    get:
+      tags:
+      - "AdminService"
+      summary: "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object."
+      description: "Retrieve an existing description entity description."
+      operationId: "GetDescriptionEntity"
+      parameters:
+      - name: "id.resource_type"
+        in: "path"
+        description: "Identifies the specific type of resource that this identifier\
+          \ corresponds to."
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        - "DATASET"
+        x-exportParamName: "IdResourceType"
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User provided value for the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - name: "id.version"
+        in: "path"
+        description: "Specific version of the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdVersion"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminDescriptionEntity"
+  /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}:
+    get:
+      tags:
+      - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions."
+      description: "Fetch existing description entity definitions matching input filters."
+      operationId: "ListDescriptionEntities2"
+      parameters:
+      - name: "resource_type"
+        in: "path"
+        description: "Identifies the specific type of resource that this identifier\
+          \ corresponds to."
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        - "DATASET"
+        x-exportParamName: "ResourceType"
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "query"
+        description: "User provided value for the resource.\nThe combination of project\
+          \ + domain + name uniquely identifies the resource.\n+optional - in certain\
+          \ contexts - like 'List API', 'Launch plans'."
+        required: false
+        type: "string"
+        x-exportParamName: "IdName"
+        x-optionalDataType: "String"
+      - name: "limit"
+        in: "query"
+        description: "Indicates the number of resources to be returned.\n+required."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "Limit"
+        x-optionalDataType: "Int64"
+      - name: "token"
+        in: "query"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Token"
+        x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\nMore info on\
+          \ constructing filters : <Link>\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
+      - name: "sort_by.key"
+        in: "query"
+        description: "Indicates an attribute to sort the response values.\n+required."
+        required: false
+        type: "string"
+        x-exportParamName: "SortByKey"
+        x-optionalDataType: "String"
+      - name: "sort_by.direction"
+        in: "query"
+        description: "Indicates the direction to apply sort key for response values.\n\
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
+        required: false
+        type: "string"
+        default: "DESCENDING"
+        enum:
+        - "DESCENDING"
+        - "ASCENDING"
+        x-exportParamName: "SortByDirection"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminDescriptionEntityList"
+  /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}:
+    get:
+      tags:
+      - "AdminService"
+      summary: "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions."
+      description: "Fetch existing description entity definitions matching input filters."
+      operationId: "ListDescriptionEntities"
+      parameters:
+      - name: "resource_type"
+        in: "path"
+        description: "Identifies the specific type of resource that this identifier\
+          \ corresponds to."
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        - "DATASET"
+        x-exportParamName: "ResourceType"
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User provided value for the resource.\nThe combination of project\
+          \ + domain + name uniquely identifies the resource.\n+optional - in certain\
+          \ contexts - like 'List API', 'Launch plans'"
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - name: "limit"
+        in: "query"
+        description: "Indicates the number of resources to be returned.\n+required."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "Limit"
+        x-optionalDataType: "Int64"
+      - name: "token"
+        in: "query"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Token"
+        x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\nMore info on\
+          \ constructing filters : <Link>\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
+      - name: "sort_by.key"
+        in: "query"
+        description: "Indicates an attribute to sort the response values.\n+required."
+        required: false
+        type: "string"
+        x-exportParamName: "SortByKey"
+        x-optionalDataType: "String"
+      - name: "sort_by.direction"
+        in: "query"
+        description: "Indicates the direction to apply sort key for response values.\n\
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
+        required: false
+        type: "string"
+        default: "DESCENDING"
+        enum:
+        - "DESCENDING"
+        - "ASCENDING"
+        x-exportParamName: "SortByDirection"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminDescriptionEntityList"
   /api/v1/events/nodes:
     post:
       tags:
@@ -3079,6 +3313,135 @@ definitions:
     example:
       schedule: "schedule"
       offset: "offset"
+  adminDescription:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+        title: "long description - no more than 4KB"
+      uri:
+        type: "string"
+        title: "if the description sizes exceed some threshold we can offload the\
+          \ entire\ndescription proto altogether to an external data store, like S3\
+          \ rather than store inline in the db"
+      format:
+        title: "Format of the long description"
+        $ref: "#/definitions/adminDescriptionFormat"
+      icon_link:
+        type: "string"
+        title: "Optional link to an icon for the entity"
+    description: "Full user description with formatting preserved. This can be rendered\n\
+      by clients, such as the console or command line tools with in-tact\nformatting."
+    example:
+      format: {}
+      icon_link: "icon_link"
+      value: "value"
+      uri: "uri"
+  adminDescriptionEntity:
+    type: "object"
+    properties:
+      id:
+        description: "id represents the unique identifier of the description entity."
+        $ref: "#/definitions/coreIdentifier"
+      short_description:
+        type: "string"
+        description: "One-liner overview of the entity."
+      long_description:
+        description: "Full user description with formatting preserved."
+        $ref: "#/definitions/adminDescription"
+      source_code:
+        description: "Optional link to source code used to define this entity."
+        $ref: "#/definitions/adminSourceCode"
+      tags:
+        type: "array"
+        description: "User-specified tags. These are arbitrary and can be used for\
+          \ searching\nfiltering and discovering tasks."
+        items:
+          type: "string"
+    description: "DescriptionEntity contains detailed description for the task/workflow.\n\
+      Documentation could provide insight into the algorithms, business use case,\
+      \ etc."
+    example:
+      short_description: "short_description"
+      id:
+        domain: "domain"
+        resource_type: {}
+        name: "name"
+        project: "project"
+        version: "version"
+      long_description:
+        format: {}
+        icon_link: "icon_link"
+        value: "value"
+        uri: "uri"
+      source_code:
+        link: "link"
+      tags:
+      - "tags"
+      - "tags"
+  adminDescriptionEntityList:
+    type: "object"
+    properties:
+      descriptionEntities:
+        type: "array"
+        description: "A list of DescriptionEntities returned based on the request."
+        items:
+          $ref: "#/definitions/adminDescriptionEntity"
+      token:
+        type: "string"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query. If there are no\
+          \ more results, this value will be empty."
+    title: "Represents a list of DescriptionEntities returned from the admin.\nSee\
+      \ :ref:`ref_flyteidl.admin.DescriptionEntity` for more details"
+    example:
+      descriptionEntities:
+      - short_description: "short_description"
+        id:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        long_description:
+          format: {}
+          icon_link: "icon_link"
+          value: "value"
+          uri: "uri"
+        source_code:
+          link: "link"
+        tags:
+        - "tags"
+        - "tags"
+      - short_description: "short_description"
+        id:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        long_description:
+          format: {}
+          icon_link: "icon_link"
+          value: "value"
+          uri: "uri"
+        source_code:
+          link: "link"
+        tags:
+        - "tags"
+        - "tags"
+      token: "token"
+  adminDescriptionFormat:
+    type: "string"
+    title: "The format of the long description"
+    description: "- DESCRIPTION_FORMAT_RST: python default documentation - comments\
+      \ is rst"
+    enum:
+    - "DESCRIPTION_FORMAT_UNKNOWN"
+    - "DESCRIPTION_FORMAT_MARKDOWN"
+    - "DESCRIPTION_FORMAT_HTML"
+    - "DESCRIPTION_FORMAT_RST"
+    default: "DESCRIPTION_FORMAT_UNKNOWN"
   adminDomain:
     type: "object"
     properties:
@@ -14795,6 +15158,14 @@ definitions:
         title: "Indicates the direction to apply sort key for response values.\n+optional"
         $ref: "#/definitions/SortDirection"
     description: "Specifies sort ordering in a list request."
+  adminSourceCode:
+    type: "object"
+    properties:
+      link:
+        type: "string"
+    title: "Link to source code used to define this entity"
+    example:
+      link: "link"
   adminSystemMetadata:
     type: "object"
     properties:
@@ -14814,11 +15185,15 @@ definitions:
         description: "closure encapsulates all the fields that maps to a compiled\
           \ version of the task."
         $ref: "#/definitions/adminTaskClosure"
+      short_description:
+        type: "string"
+        description: "One-liner overview of the entity."
     description: "Flyte workflows are composed of many ordered tasks. That is small,\
       \ reusable, self-contained logical blocks\narranged to process workflow inputs\
       \ and produce a deterministic set of outputs.\nTasks can come in many varieties\
       \ tuned for specialized behavior."
     example:
+      short_description: "short_description"
       id:
         domain: "domain"
         resource_type: {}
@@ -15747,7 +16122,8 @@ definitions:
       \ for more details"
     example:
       tasks:
-      - id:
+      - short_description: "short_description"
+        id:
           domain: "domain"
           resource_type: {}
           name: "name"
@@ -16006,7 +16382,8 @@ definitions:
               sql:
                 dialect: {}
                 statement: "statement"
-      - id:
+      - short_description: "short_description"
+        id:
           domain: "domain"
           resource_type: {}
           name: "name"
@@ -16316,6 +16693,9 @@ definitions:
         description: "Template of the task that encapsulates all the metadata of the\
           \ task."
         $ref: "#/definitions/coreTaskTemplate"
+      description:
+        description: "Represents the specification for description entity."
+        $ref: "#/definitions/adminDescriptionEntity"
     description: "Represents a structure that encapsulates the user-configured specification\
       \ of the task."
   adminUrlBlob:
@@ -16360,10 +16740,14 @@ definitions:
         description: "closure encapsulates all the fields that maps to a compiled\
           \ version of the workflow."
         $ref: "#/definitions/adminWorkflowClosure"
+      short_description:
+        type: "string"
+        description: "One-liner overview of the entity."
     description: "Represents the workflow structure stored in the Admin\nA workflow\
       \ is created by ordering tasks and associating outputs to inputs\nin order to\
       \ produce a directed-acyclic execution graph."
     example:
+      short_description: "short_description"
       id:
         domain: "domain"
         resource_type: {}
@@ -29872,7 +30256,8 @@ definitions:
       \ for more details"
     example:
       workflows:
-      - id:
+      - short_description: "short_description"
+        id:
           domain: "domain"
           resource_type: {}
           name: "name"
@@ -36411,7 +36796,8 @@ definitions:
                     - "ids"
                     - "ids"
           created_at: "2000-01-23T04:56:07.000+00:00"
-      - id:
+      - short_description: "short_description"
+        id:
           domain: "domain"
           resource_type: {}
           name: "name"
@@ -42967,6 +43353,9 @@ definitions:
           \ do not even need to be registered."
         items:
           $ref: "#/definitions/coreWorkflowTemplate"
+      description:
+        description: "Represents the specification for description entity."
+        $ref: "#/definitions/adminDescriptionEntity"
     description: "Represents a structure that encapsulates the specification of the\
       \ workflow."
   coreAlias:

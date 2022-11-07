@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.admin_description_entity import AdminDescriptionEntity  # noqa: F401,E501
 from flyteadmin.models.core_task_template import CoreTaskTemplate  # noqa: F401,E501
 
 
@@ -33,21 +34,26 @@ class AdminTaskSpec(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'template': 'CoreTaskTemplate'
+        'template': 'CoreTaskTemplate',
+        'description': 'AdminDescriptionEntity'
     }
 
     attribute_map = {
-        'template': 'template'
+        'template': 'template',
+        'description': 'description'
     }
 
-    def __init__(self, template=None):  # noqa: E501
+    def __init__(self, template=None, description=None):  # noqa: E501
         """AdminTaskSpec - a model defined in Swagger"""  # noqa: E501
 
         self._template = None
+        self._description = None
         self.discriminator = None
 
         if template is not None:
             self.template = template
+        if description is not None:
+            self.description = description
 
     @property
     def template(self):
@@ -71,6 +77,29 @@ class AdminTaskSpec(object):
         """
 
         self._template = template
+
+    @property
+    def description(self):
+        """Gets the description of this AdminTaskSpec.  # noqa: E501
+
+        Represents the specification for description entity.  # noqa: E501
+
+        :return: The description of this AdminTaskSpec.  # noqa: E501
+        :rtype: AdminDescriptionEntity
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description):
+        """Sets the description of this AdminTaskSpec.
+
+        Represents the specification for description entity.  # noqa: E501
+
+        :param description: The description of this AdminTaskSpec.  # noqa: E501
+        :type: AdminDescriptionEntity
+        """
+
+        self._description = description
 
     def to_dict(self):
         """Returns the model properties as a dict"""

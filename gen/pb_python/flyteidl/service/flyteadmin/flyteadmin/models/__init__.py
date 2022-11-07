@@ -22,6 +22,10 @@ from flyteadmin.models.admin_auth_role import AdminAuthRole
 from flyteadmin.models.admin_cluster_assignment import AdminClusterAssignment
 from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes
 from flyteadmin.models.admin_cron_schedule import AdminCronSchedule
+from flyteadmin.models.admin_description import AdminDescription
+from flyteadmin.models.admin_description_entity import AdminDescriptionEntity
+from flyteadmin.models.admin_description_entity_list import AdminDescriptionEntityList
+from flyteadmin.models.admin_description_format import AdminDescriptionFormat
 from flyteadmin.models.admin_domain import AdminDomain
 from flyteadmin.models.admin_email_notification import AdminEmailNotification
 from flyteadmin.models.admin_execution import AdminExecution
@@ -100,6 +104,7 @@ from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataCon
 from flyteadmin.models.admin_schedule import AdminSchedule
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort
+from flyteadmin.models.admin_source_code import AdminSourceCode
 from flyteadmin.models.admin_system_metadata import AdminSystemMetadata
 from flyteadmin.models.admin_task import AdminTask
 from flyteadmin.models.admin_task_closure import AdminTaskClosure

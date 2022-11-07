@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/compiler.proto";
+import "flyteidl/admin/description_entity.proto";
 import "google/protobuf/timestamp.proto";
 
 // Represents a request structure to create a revision of a task.
@@ -34,6 +35,9 @@ message Task {
 
     // closure encapsulates all the fields that maps to a compiled version of the task.
     TaskClosure closure      = 2;
+
+    // One-liner overview of the entity.
+    string short_description = 3;
 }
 
 // Represents a list of tasks returned from the admin.
@@ -51,6 +55,9 @@ message TaskList {
 message TaskSpec {
     // Template of the task that encapsulates all the metadata of the task.
     core.TaskTemplate template = 1;
+
+    // Represents the specification for description entity.
+    DescriptionEntity description        = 2;
 }
 
 // Compute task attributes which include values derived from the TaskSpec, as well as plugin-specific data
