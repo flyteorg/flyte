@@ -25,7 +25,7 @@ func TestSetupFlyteDir(t *testing.T) {
 
 func TestPrintSandboxMessage(t *testing.T) {
 	t.Run("Print Sandbox Message", func(t *testing.T) {
-		PrintSandboxMessage(SandBoxConsolePort)
+		PrintSandboxMessage(SandBoxConsolePort, false)
 	})
 }
 

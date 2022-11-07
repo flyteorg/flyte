@@ -32,6 +32,12 @@ To execute commands inside the sandbox container, use exec:
 ::
 
  flytectl sandbox exec -- pwd 	
+
+For just printing the docker commands for bringingup the demo container
+::
+
+ flytectl demo start --dryRun
+
 `
 )
 

@@ -138,8 +138,12 @@ func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, erro
 
 // PullDockerImage will Pull docker image
 func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy ImagePullPolicy,
-	imagePullOptions ImagePullOptions) error {
-
+	imagePullOptions ImagePullOptions, dryRun bool) error {
+	if dryRun {
+		PrintPullImage(image, imagePullOptions)
+		return nil
+	}
+	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, image)
 	if pullPolicy == ImagePullPolicyAlways || pullPolicy == ImagePullPolicyIfNotPresent {
 		if pullPolicy == ImagePullPolicyIfNotPresent {
 			imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
@@ -169,11 +173,61 @@ func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy I
 	return nil
 }
 
-//StartContainer will create and start docker container
+// PrintPullImage helper function to print the sandbox pull image command
+func PrintPullImage(image string, pullOptions ImagePullOptions) {
+	fmt.Printf("%v Run the following command to pull the sandbox image from registry.\n", emoji.Sparkle)
+	var sb strings.Builder
+	sb.WriteString("docker pull  ")
+	if len(pullOptions.Platform) > 0 {
+		sb.WriteString(fmt.Sprintf("--platform %v ", pullOptions.Platform))
+	}
+	sb.WriteString(fmt.Sprintf("%v", image))
+	fmt.Printf("	%v \n", sb.String())
+}
+
+// PrintRemoveContainer helper function to remove sandbox container
+func PrintRemoveContainer(name string) {
+	fmt.Printf("%v Run the following command to remove the existing sandbox\n", emoji.Sparkle)
+	fmt.Printf("	docker container rm %v --force\n", name)
+}
+
+// PrintCreateContainer helper function to print the docker command to run
+func PrintCreateContainer(volumes []mount.Mount, portBindings map[nat.Port][]nat.PortBinding, name, image string, environment []string) {
+	var sb strings.Builder
+	fmt.Printf("%v Run the following command to create new sandbox container\n", emoji.Sparkle)
+	sb.WriteString("	docker create --privileged ")
+	for portProto, bindings := range portBindings {
+		srcPort := portProto.Port()
+		for _, binding := range bindings {
+			sb.WriteString(fmt.Sprintf("-p %v:%v:%v ", binding.HostIP, srcPort, binding.HostPort))
+		}
+	}
+	for _, env := range environment {
+		sb.WriteString(fmt.Sprintf("--env %v ", env))
+	}
+
+	for _, volume := range volumes {
+		sb.WriteString(fmt.Sprintf("--mount type=%v,source=%v,target=%v ", volume.Type, volume.Source, volume.Target))
+	}
+	sb.WriteString(fmt.Sprintf("--name %v ", name))
+	sb.WriteString(fmt.Sprintf("%v", image))
+	fmt.Printf("%v\n", sb.String())
+	fmt.Printf("%v Run the following command to start the sandbox container\n", emoji.Sparkle)
+	fmt.Printf("	docker start %v\n", name)
+	fmt.Printf("%v Run the following command to check the logs and monitor the sandbox container and make sure there are no error during startup and then visit flyteconsole\n", emoji.EightSpokedAsterisk)
+	fmt.Printf("	docker logs -f %v\n", name)
+}
+
+// StartContainer will create and start docker container
 func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, exposedPorts map[nat.Port]struct{},
-	portBindings map[nat.Port][]nat.PortBinding, name, image string, additionalEnvVars []string) (string, error) {
+	portBindings map[nat.Port][]nat.PortBinding, name, image string, additionalEnvVars []string, dryRun bool) (string, error) {
 	// Append the additional env variables to the default list of env
 	Environment = append(Environment, additionalEnvVars...)
+	if dryRun {
+		PrintCreateContainer(volumes, portBindings, name, image, Environment)
+		return "", nil
+	}
+	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Env:          Environment,
 		Image:        image,
