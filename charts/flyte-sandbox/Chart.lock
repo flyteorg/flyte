@@ -1,0 +1,15 @@
+dependencies:
+- name: docker-registry
+  repository: https://helm.twun.io/
+  version: 2.2.2
+- name: kubernetes-dashboard
+  repository: https://kubernetes.github.io/dashboard/
+  version: 5.11.0
+- name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.10.13
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.0
+digest: sha256:99c97c2ddc4cc25142d6fe67f5dffdf307a64b56893ece6c5797c3b462a382ab
+generated: "2022-11-06T20:58:44.810185-08:00"
