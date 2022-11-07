@@ -1,0 +1,7 @@
+-r ../../../common/requirements-common.in
+numpy
+gensim
+nltk
+plotly
+pyemd
+scikit-learn

@@ -35,6 +35,15 @@ Understand how machine learning models can be trained from within Flyte, with an
 
     ---
 
+    .. link-button:: auto/case_studies/ml_training/nlp_processing/index
+       :type: ref
+       :text: NLP Processing with Gensim
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Word embedding and topic modelling on lee background corpus with Gensim
+
+    ---
+
     .. link-button:: auto/case_studies/ml_training/spark_horovod/index
        :type: ref
        :text: Forecast Sales Using Rossmann Store Sales Data with Horovod and Spark
@@ -51,6 +60,7 @@ Understand how machine learning models can be trained from within Flyte, with an
     auto/case_studies/ml_training/pima_diabetes/index
     auto/case_studies/ml_training/house_price_prediction/index
     auto/case_studies/ml_training/mnist_classifier/index
+    auto/case_studies/ml_training/nlp_processing/index
     auto/case_studies/ml_training/spark_horovod/index
 
 

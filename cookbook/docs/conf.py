@@ -149,6 +149,7 @@ class CustomSorter(FileNameSortKey):
         "house_price_predictor.py",
         "multiregion_house_price_predictor.py",
         "keras_spark_rossmann_estimator.py",
+        "word2vec_and_lda.py",
         ## Feature Engineering
         "pytorch_single_node_and_gpu.py",
         "pytorch_single_node_multi_gpu.py",
@@ -270,6 +271,7 @@ examples_dirs = [
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
     "../case_studies/ml_training/mnist_classifier",
+    "../case_studies/ml_training/nlp_processing",
     "../case_studies/ml_training/spark_horovod",
     "../case_studies/feature_engineering/eda",
     "../case_studies/feature_engineering/feast_integration",
@@ -311,6 +313,7 @@ gallery_dirs = [
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
     "auto/case_studies/ml_training/mnist_classifier",
+    "auto/case_studies/ml_training/nlp_processing",
     "auto/case_studies/ml_training/spark_horovod",
     "auto/case_studies/feature_engineering/eda",
     "auto/case_studies/feature_engineering/feast_integration",
