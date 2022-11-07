@@ -9,9 +9,11 @@ docker-registry:
 
 kubernetes-dashboard:
   extraArgs:
-    - --disable-settings-authorizer
     - --enable-insecure-login
     - --enable-skip-login
+  protocolHttp: true
+  service:
+    externalPort: 80
   rbac:
     create: true
     clusterRoleMetrics: false
