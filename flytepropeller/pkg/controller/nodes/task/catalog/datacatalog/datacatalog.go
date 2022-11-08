@@ -28,13 +28,13 @@ var (
 	_ catalog.Client = &CatalogClient{}
 )
 
-// This is the client that caches task executions to DataCatalog service.
+// CatalogClient is the client that caches task executions to DataCatalog service.
 type CatalogClient struct {
 	client      datacatalog.DataCatalogClient
 	maxCacheAge time.Duration
 }
 
-// Helper method to retrieve a dataset that is associated with the task
+// GetDataset retrieves a dataset that is associated with the task represented by the provided catalog.Key.
 func (m *CatalogClient) GetDataset(ctx context.Context, key catalog.Key) (*datacatalog.Dataset, error) {
 	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
@@ -54,7 +54,7 @@ func (m *CatalogClient) GetDataset(ctx context.Context, key catalog.Key) (*datac
 	return datasetResponse.Dataset, nil
 }
 
-// Helper method to retrieve an artifact by the tag
+// GetArtifactByTag retrieves an artifact using the provided tag and dataset.
 func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, dataset *datacatalog.Dataset) (*datacatalog.Artifact, error) {
 	logger.Debugf(ctx, "Get Artifact by tag %v", tagName)
 	artifactQuery := &datacatalog.GetArtifactRequest{
@@ -144,6 +144,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
 }
 
+// CreateDataset creates a Dataset in datacatalog including the associated metadata.
 func (m *CatalogClient) CreateDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
 	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
@@ -170,7 +171,42 @@ func (m *CatalogClient) CreateDataset(ctx context.Context, key catalog.Key, meta
 	return datasetID, nil
 }
 
-func (m *CatalogClient) CreateArtifact(ctx context.Context, datasetID *datacatalog.DatasetID, outputs *core.LiteralMap, md *datacatalog.Metadata) (*datacatalog.Artifact, error) {
+// prepareInputsAndOutputs reads the inputs and outputs of a task and returns them as core.LiteralMaps to be consumed by datacatalog.
+func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog.Key, reader io.OutputReader) (inputs *core.LiteralMap, outputs *core.LiteralMap, err error) {
+	inputs = &core.LiteralMap{}
+	outputs = &core.LiteralMap{}
+	if key.TypedInterface.Inputs != nil && len(key.TypedInterface.Inputs.Variables) != 0 {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			logger.Errorf(ctx, "DataCatalog failed to read inputs err: %s", err)
+			return nil, nil, err
+		}
+		logger.Debugf(ctx, "DataCatalog read inputs")
+		inputs = retInputs
+	}
+
+	if key.TypedInterface.Outputs != nil && len(key.TypedInterface.Outputs.Variables) != 0 {
+		retOutputs, retErr, err := reader.Read(ctx)
+		if err != nil {
+			logger.Errorf(ctx, "DataCatalog failed to read outputs err: %s", err)
+			return nil, nil, err
+		}
+		if retErr != nil {
+			logger.Errorf(ctx, "DataCatalog failed to read outputs, err :%s", retErr.Message)
+			return nil, nil, errors.Errorf("Failed to read outputs. EC: %s, Msg: %s", retErr.Code, retErr.Message)
+		}
+		logger.Debugf(ctx, "DataCatalog read outputs")
+		outputs = retOutputs
+	}
+
+	return inputs, outputs, nil
+}
+
+// CreateArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
+// the provided input values for retrieval.
+func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
+
 	// Create the artifact for the execution that belongs in the task
 	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
 	for name, value := range outputs.Literals {
@@ -185,65 +221,16 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, datasetID *datacatal
 		Id:       string(uuid.NewUUID()),
 		Dataset:  datasetID,
 		Data:     artifactDataList,
-		Metadata: md,
+		Metadata: GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
 	}
 
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
 	_, err := m.client.CreateArtifact(ctx, createArtifactRequest)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact, err)
-		return cachedArtifact, err
-	}
-	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %v", cachedArtifact.Id, len(artifactDataList))
-	return cachedArtifact, nil
-}
-
-// Catalog the task execution as a cached Artifact. We associate an Artifact as the cached data by tagging the Artifact
-// with the hash of the input values.
-//
-// The steps taken to cache an execution:
-// - Ensure a Dataset exists for the Artifact. The Dataset represents the proj/domain/name/version of the task
-// - Create an Artifact with the execution data that belongs to the dataset
-// - Tag the Artifact with a hash generated by the input values
-func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
-
-	// Populate Metadata for later recovery
-	datasetID, err := m.CreateDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
-	if err != nil {
 		return catalog.Status{}, err
 	}
-
-	inputs := &core.LiteralMap{}
-	outputs := &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil && len(key.TypedInterface.Inputs.Variables) != 0 {
-		retInputs, err := key.InputReader.Get(ctx)
-		if err != nil {
-			logger.Errorf(ctx, "DataCatalog failed to read inputs err: %s", err)
-			return catalog.Status{}, err
-		}
-		logger.Debugf(ctx, "DataCatalog read inputs")
-		inputs = retInputs
-	}
-
-	if key.TypedInterface.Outputs != nil && len(key.TypedInterface.Outputs.Variables) != 0 {
-		retOutputs, retErr, err := reader.Read(ctx)
-		if err != nil {
-			logger.Errorf(ctx, "DataCatalog failed to read outputs err: %s", err)
-			return catalog.Status{}, err
-		}
-		if retErr != nil {
-			logger.Errorf(ctx, "DataCatalog failed to read outputs, err :%s", retErr.Message)
-			return catalog.Status{}, errors.Errorf("Failed to read outputs. EC: %s, Msg: %s", retErr.Code, retErr.Message)
-		}
-		logger.Debugf(ctx, "DataCatalog read outputs")
-		outputs = retOutputs
-	}
-
-	// Create the artifact for the execution that belongs in the task
-	cachedArtifact, err := m.CreateArtifact(ctx, datasetID, outputs, GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier))
-	if err != nil {
-		return catalog.Status{}, errors.Wrapf(err, "failed to create dataset for ID %s", key.Identifier.String())
-	}
+	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)
 
 	// Tag the artifact since it is the cached artifact
 	tagName, err := GenerateArtifactTagName(ctx, inputs)
@@ -269,7 +256,108 @@ func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.Outp
 		}
 	}
 
+	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
+}
+
+// UpdateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
+func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+	logger.Debugf(ctx, "Updating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
+
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
+	for name, value := range outputs.Literals {
+		artifactData := &datacatalog.ArtifactData{
+			Name:  name,
+			Value: value,
+		}
+		artifactDataList = append(artifactDataList, artifactData)
+	}
+
+	tagName, err := GenerateArtifactTagName(ctx, inputs)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to generate artifact tag name for key %+v, dataset %+v and execution %+v, err: %+v", key, datasetID, metadata, err)
+		return catalog.Status{}, err
+	}
+
+	updateArtifactRequest := &datacatalog.UpdateArtifactRequest{
+		Dataset:     datasetID,
+		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
+		Data:        artifactDataList,
+	}
+	resp, err := m.client.UpdateArtifact(ctx, updateArtifactRequest)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to update artifact for key %+v, dataset %+v and execution %+v, err: %v", key, datasetID, metadata, err)
+		return catalog.Status{}, err
+	}
+
+	tag := &datacatalog.Tag{
+		Name:       tagName,
+		Dataset:    datasetID,
+		ArtifactId: resp.GetArtifactId(),
+	}
+
+	source, err := GetSourceFromMetadata(GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier), GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier), key.Identifier)
+	if err != nil {
+		return catalog.Status{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
+	}
+
+	logger.Debugf(ctx, "Successfully updated artifact with ID %v and %d outputs for key %+v, dataset %+v and execution %+v", tag.ArtifactId, len(artifactDataList), key, datasetID, metadata)
+	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, source)), nil
+}
+
+// Put stores the result of a task execution as a cached Artifact and associates it with the data by tagging it with
+// the hash of the input values.
+// The CatalogClient will ensure a dataset exists for the Artifact to be created. A Dataset represents the
+// project/domain/name/version of the task executed.
+// Lastly, CatalogClient will create an Artifact tagged with the input value hash and store the provided execution data.
+func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
+	// Ensure dataset exists, idempotent operations. Populate Metadata for later recovery
+	datasetID, err := m.CreateDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	if err != nil {
+		return catalog.Status{}, err
+	}
+
+	inputs, outputs, err := m.prepareInputsAndOutputs(ctx, key, reader)
+	if err != nil {
+		return catalog.Status{}, err
+	}
+
+	return m.CreateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+}
+
+// Update stores the result of a task execution as a cached Artifact, overwriting any already stored data from a previous
+// execution.
+// The CatalogClient will ensure the referenced dataset exists and will silently create a new Artifact if the referenced
+// key does not exist in datacatalog yet.
+// After the operation succeeds, an artifact with the given key and data will be stored in catalog and a tag with the
+// has of the input values will exist.
+func (m *CatalogClient) Update(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
+	// Ensure dataset exists, idempotent operations. Populate Metadata for later recovery
+	datasetID, err := m.CreateDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	if err != nil {
+		return catalog.Status{}, err
+	}
+
+	inputs, outputs, err := m.prepareInputsAndOutputs(ctx, key, reader)
+	if err != nil {
+		return catalog.Status{}, err
+	}
+
+	catalogStatus, err := m.UpdateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			// No existing artifact found (e.g. initial execution of task with overwrite flag already set),
+			// silently ignore error and create artifact instead to make overwriting an idempotent operation.
+			logger.Debugf(ctx, "Artifact %+v for dataset %+v does not exist while updating, creating instead", key, datasetID)
+			return m.CreateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+		}
+
+		logger.Errorf(ctx, "Failed to update artifact %+v for dataset %+v: %v", key, datasetID, err)
+		return catalog.Status{}, err
+	}
+
+	logger.Debugf(ctx, "Successfully updated artifact %+v for dataset %+v", key, datasetID)
+	return catalogStatus, nil
 }
 
 // GetOrExtendReservation attempts to get a reservation for the cachable task. If you have

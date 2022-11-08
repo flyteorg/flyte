@@ -30,6 +30,8 @@ type ExecutionConfig struct {
 	TaskResources TaskResources
 	// Defines whether a workflow has been flagged as interruptible.
 	Interruptible *bool
+	// Defines whether a workflow should skip all its cached results and re-compute its output, overwriting any already stored data.
+	OverwriteCache bool
 }
 
 type TaskPluginOverride struct {

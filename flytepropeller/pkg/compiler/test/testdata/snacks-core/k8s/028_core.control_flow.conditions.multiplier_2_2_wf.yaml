@@ -2,6 +2,7 @@ apiVersion: flyte.lyft.com/v1alpha1
 executionConfig:
   Interruptible: null
   MaxParallelism: 0
+  OverwriteCache: false
   RecoveryExecution: {}
   TaskPluginImpls: null
   TaskResources:
