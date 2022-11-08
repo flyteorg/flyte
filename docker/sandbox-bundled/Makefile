@@ -27,6 +27,7 @@ images-ci:
 	cp /tmp/flyte-arm64.tar docker/sandbox-bundled/images/dockerfiles/tar/arm64/flyte.tar
 	ls -al docker/sandbox-bundled/images/dockerfiles/tar
 	ls -al docker/sandbox-bundled/images/dockerfiles/tar/amd64
+	ls -al docker/sandbox-bundled/images/dockerfiles/tar/arm64
 
 .PHONY: clean
 clean: ## Cleanup state
