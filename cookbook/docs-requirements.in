@@ -13,6 +13,7 @@ sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
 sphinxcontrib-yt
-sphinx-tabs
-docutils
+sphinx-tabs<3.4.1
 astroid
+grpcio < 1.49.0
+grpcio-status < 1.49.0

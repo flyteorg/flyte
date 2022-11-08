@@ -80,6 +80,3 @@ wf.add_workflow_output(
 if __name__ == "__main__":
     print(wf)
     print(wf(in1="hello", in2="foo"))
-
-# %%
-# .. run-example-cmds::

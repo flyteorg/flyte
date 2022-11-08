@@ -20,7 +20,6 @@ from sphinx.errors import ConfigError
 from sphinx_gallery.sorting import FileNameSortKey
 
 sys.path.insert(0, os.path.abspath("../"))
-sys.path.append(os.path.abspath("./_ext"))
 
 # -- Project information -----------------------------------------------------
 
@@ -200,7 +199,6 @@ extensions = [
     "sphinxcontrib.mermaid",
     "sphinxcontrib.yt",
     "sphinx_tabs.tabs",
-    "run_example_cmds_extension",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -358,7 +356,6 @@ ignore_py_files = [
     r"__init__\.py",
     r"config_resource_mgr\.py",
     r"optimize_perf\.py",
-    r"^run_.+\.py",
 ]
 
 sphinx_gallery_conf = {

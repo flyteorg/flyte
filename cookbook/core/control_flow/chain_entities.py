@@ -129,6 +129,3 @@ if __name__ == "__main__":
     print(f"Running {__file__} main...")
     print(f"Running chain_tasks_wf()... {chain_tasks_wf()}")
     print(f"Running chain_workflows_wf()... {chain_workflows_wf()}")
-
-# %%
-# .. run-example-cmds::

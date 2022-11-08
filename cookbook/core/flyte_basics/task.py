@@ -132,5 +132,3 @@ def wf(n: int) -> int:
 #    .. prompt:: bash $
 #
 #      flytectl get execution --project flytesnacks --domain development <execname>
-#
-# .. run-example-cmds::
