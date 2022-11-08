@@ -69,7 +69,7 @@ var typedInterface = core.TypedInterface{
 }
 
 var sampleKey = catalog.Key{
-	Identifier:     core.Identifier{ResourceType: core.ResourceType_TASK, Project: "project", Domain: "domain", Name: "name"},
+	Identifier:     core.Identifier{ResourceType: core.ResourceType_TASK, Project: "project", Domain: "domain", Name: "name", Version: "version"},
 	TypedInterface: typedInterface,
 	CacheVersion:   "1.0.0",
 }
@@ -537,7 +537,207 @@ func TestCatalog_Put(t *testing.T) {
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
 		assert.NotNil(t, s.GetMetadata())
 	})
+}
 
+func TestCatalog_Update(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Overwrite existing cached execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("UpdateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.UpdateArtifactRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset, datasetID))
+				assert.IsType(t, &datacatalog.UpdateArtifactRequest_TagName{}, o.QueryHandle)
+				assert.Equal(t, tagName, o.GetTagName())
+				return true
+			}),
+		).Return(&datacatalog.UpdateArtifactResponse{ArtifactId: "test-artifact"}, nil)
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.Name,
+				Project:      sampleKey.Identifier.Project,
+				Domain:       sampleKey.Identifier.Domain,
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown", // not set in Put request below --> defaults to "unknown"
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.NodeExecutionId.ExecutionId.Name,
+				Domain:  taskID.NodeExecutionId.ExecutionId.Domain,
+				Project: taskID.NodeExecutionId.ExecutionId.Project,
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.NodeExecutionId,
+				RetryAttempt:    0,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, tagName, s.GetMetadata().ArtifactTag.Name)
+		sourceTID := s.GetMetadata().GetSourceTaskExecution()
+		assert.Equal(t, taskID.TaskId.String(), sourceTID.TaskId.String())
+		assert.Equal(t, taskID.RetryAttempt, sourceTID.RetryAttempt)
+		assert.Equal(t, taskID.NodeExecutionId.String(), sourceTID.NodeExecutionId.String())
+	})
+
+	t.Run("Overwrite non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		createDatasetCalled := false
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				createDatasetCalled = true
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		updateArtifactCalled := false
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Run(func(args mock.Arguments) {
+			updateArtifactCalled = true
+		}).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		createArtifactCalled := false
+		mockClient.On("CreateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				_, parseErr := uuid.Parse(o.Artifact.Id)
+				assert.NoError(t, parseErr)
+				assert.True(t, proto.Equal(o.Artifact.Dataset, datasetID))
+				createArtifactCalled = true
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, nil)
+
+		addTagCalled := false
+		mockClient.On("AddTag",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
+				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.Tag.Name)
+				addTagCalled = true
+				return true
+			}),
+		).Return(&datacatalog.AddTagResponse{}, nil)
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.Name,
+				Project:      sampleKey.Identifier.Project,
+				Domain:       sampleKey.Identifier.Domain,
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown", // not set in Put request below --> defaults to "unknown"
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.NodeExecutionId.ExecutionId.Name,
+				Domain:  taskID.NodeExecutionId.ExecutionId.Domain,
+				Project: taskID.NodeExecutionId.ExecutionId.Project,
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.NodeExecutionId,
+				RetryAttempt:    0,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, tagName, s.GetMetadata().ArtifactTag.Name)
+		assert.Nil(t, s.GetMetadata().GetSourceTaskExecution())
+		assert.True(t, createDatasetCalled)
+		assert.True(t, updateArtifactCalled)
+		assert.True(t, createArtifactCalled)
+		assert.True(t, addTagCalled)
+	})
+
+	t.Run("Error while overwriting execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		genericErr := errors.New("generic error")
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Return(nil, genericErr)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, genericErr, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, s.GetCacheStatus())
+		assert.Nil(t, s.GetMetadata())
+	})
 }
 
 var tagName = "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY"

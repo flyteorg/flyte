@@ -734,7 +734,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 
 func Test_task_Handle_Catalog(t *testing.T) {
 
-	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -818,7 +818,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: overwriteCache})
 		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		executionContext.OnGetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(executionContext)
@@ -847,6 +847,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 		catalogFetch      bool
 		catalogFetchError bool
 		catalogWriteError bool
+		catalogSkip       bool
 	}
 	type want struct {
 		handlerPhase handler.EPhase
@@ -898,12 +899,34 @@ func Test_task_Handle_Catalog(t *testing.T) {
 				eventPhase:   core.TaskExecution_SUCCEEDED,
 			},
 		},
+		{
+			"cache-skip-hit",
+			args{
+				catalogFetch: true,
+				catalogSkip:  true,
+			},
+			want{
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
+		{
+			"cache-skip-miss",
+			args{
+				catalogFetch: false,
+				catalogSkip:  true,
+			},
+			want{
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedTaskEventRecorder{}
-			nCtx := createNodeContext(ev, "test", state)
+			nCtx := createNodeContext(ev, "test", state, tt.args.catalogSkip)
 			c := &pluginCatalogMocks.Client{}
 			if tt.args.catalogFetch {
 				or := &ioMocks.OutputReader{}
@@ -918,8 +941,10 @@ func Test_task_Handle_Catalog(t *testing.T) {
 			}
 			if tt.args.catalogWriteError {
 				c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.Status{}, fmt.Errorf("failed to write to catalog"))
+				c.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.Status{}, fmt.Errorf("failed to write to catalog"))
 			} else {
 				c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
+				c.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
 			}
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, eventConfig, testClusterID, promutils.NewTestScope())
 			assert.NoError(t, err)
@@ -944,14 +969,22 @@ func Test_task_Handle_Catalog(t *testing.T) {
 				if tt.args.catalogFetch {
 					if assert.NotNil(t, got.Info().GetInfo().TaskNodeInfo) {
 						assert.NotNil(t, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata)
-						assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+						if tt.args.catalogSkip {
+							assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+						} else {
+							assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+						}
 					}
 					assert.NotNil(t, got.Info().GetInfo().OutputInfo)
 					s := storage.DataReference("/output-dir/outputs.pb")
 					assert.Equal(t, s, got.Info().GetInfo().OutputInfo.OutputURI)
 					r, err := nCtx.DataStore().Head(context.TODO(), s)
 					assert.NoError(t, err)
-					assert.True(t, r.Exists())
+					assert.Equal(t, !tt.args.catalogSkip, r.Exists())
+				}
+				if tt.args.catalogSkip {
+					c.AssertNotCalled(t, "Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+					c.AssertCalled(t, "Update", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 				}
 			}
 		})
@@ -960,7 +993,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 
 func Test_task_Handle_Reservation(t *testing.T) {
 
-	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1046,7 +1079,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: overwriteCache})
 		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		executionContext.OnGetParentInfo().Return(nil)
 		executionContext.OnIncrementParallelism().Return(1)
@@ -1063,6 +1096,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 
 	type args struct {
 		catalogFetch bool
+		catalogSkip  bool
 		pluginPhase  pluginCore.Phase
 		ownerID      string
 	}
@@ -1114,12 +1148,40 @@ func Test_task_Handle_Reservation(t *testing.T) {
 				eventPhase:   core.TaskExecution_SUCCEEDED,
 			},
 		},
+		{
+			"cache-skip-miss",
+			args{
+				catalogFetch: false,
+				catalogSkip:  true,
+				pluginPhase:  pluginCore.PhaseUndefined,
+				ownerID:      "name-n1-1",
+			},
+			want{
+				pluginPhase:  pluginCore.PhaseSuccess,
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
+		{
+			"cache-skip-hit",
+			args{
+				catalogFetch: true,
+				catalogSkip:  true,
+				pluginPhase:  pluginCore.PhaseWaitingForCache,
+				ownerID:      "name-n1-1",
+			},
+			want{
+				pluginPhase:  pluginCore.PhaseSuccess,
+				handlerPhase: handler.EPhaseSuccess,
+				eventPhase:   core.TaskExecution_SUCCEEDED,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedTaskEventRecorder{}
-			nCtx := createNodeContext(ev, "test", state)
+			nCtx := createNodeContext(ev, "test", state, tt.args.catalogSkip)
 			c := &pluginCatalogMocks.Client{}
 			nr := &nodeMocks.NodeStateReader{}
 			st := bytes.NewBuffer([]byte{})
@@ -1142,6 +1204,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, nil)), nil)
 			}
 			c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
+			c.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
 			c.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&datacatalog.Reservation{OwnerId: tt.args.ownerID}, nil)
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, eventConfig, testClusterID, promutils.NewTestScope())
 			assert.NoError(t, err)
@@ -1163,6 +1226,17 @@ func Test_task_Handle_Reservation(t *testing.T) {
 				}
 				assert.Equal(t, tt.want.pluginPhase.String(), state.s.PluginPhase.String())
 				assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
+				// verify catalog.Put was called appropriately (overwrite param should be `true` if catalog cache is skipped)
+				// Put only gets called in the tests defined above that succeed and have an owner ID defined
+				if tt.want.pluginPhase == pluginCore.PhaseSuccess && len(tt.args.ownerID) > 0 {
+					if tt.args.catalogSkip {
+						c.AssertNotCalled(t, "Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+						c.AssertCalled(t, "Update", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+					} else {
+						c.AssertCalled(t, "Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+						c.AssertNotCalled(t, "Update", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+					}
+				}
 			}
 		})
 	}
