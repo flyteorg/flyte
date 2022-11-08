@@ -229,5 +229,3 @@ replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.2021082
 replace github.com/flyteorg/flytepropeller => ../flytepropeller
 
 replace github.com/flyteorg/flytestdlib => ../flytestdlib
-
-replace github.com/flyteorg/flyteplugins => ../flyteplugins

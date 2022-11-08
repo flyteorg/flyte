@@ -378,6 +378,8 @@ github.com/flyteorg/flyteadmin v1.1.50 h1:9KFOW3+A4E1V6ji5EzkDbYHs9HsxmDR71vEPEM
 github.com/flyteorg/flyteadmin v1.1.50/go.mod h1:HAg7oe3MgYKsK9CSTrGlCp2hWHEwUN5E9RuFbdqiJuw=
 github.com/flyteorg/flyteidl v1.1.21 h1:09/xqYWFdUA22bVWKLjkSzhhSJfaJmDAraczpJ/Yiis=
 github.com/flyteorg/flyteidl v1.1.21/go.mod h1:f0AFl7RFycH7+JLq2th0ReH7v+Xse+QTw4jGdIxiS8I=
+github.com/flyteorg/flyteplugins v1.0.15 h1:LewZIw2qSyGy34OoghYeuc7N/KazeVZvD0gNYXt/ZcM=
+github.com/flyteorg/flyteplugins v1.0.15/go.mod h1:GfbmRByI/rSatm/Epoj3bNyrXwIQ9NOXTVwLS6Z0p84=
 github.com/flyteorg/stow v0.3.6 h1:jt50ciM14qhKBaIrB+ppXXY+SXB59FNREFgTJqCyqIk=
 github.com/flyteorg/stow v0.3.6/go.mod h1:5dfBitPM004dwaZdoVylVjxFT4GWAgI0ghAndhNUzCo=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=

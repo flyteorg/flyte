@@ -37,8 +37,6 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
-
-	"go.opentelemetry.io/otel"
 )
 
 const defaultNamespace = "all"
@@ -156,13 +154,14 @@ var startCmd = &cobra.Command{
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
 
-		tracerProvider, err := telemetryutils.NewTracerProvider("flyte", telemetryutils.GetConfig())
-		if err != nil {
-			logger.Errorf(ctx, "Failed to create telemetry tracer provider. %v", err)
-			return err
+		for _, serviceName := range []string{"blobstore", "flytepropeller"} {
+			if err := telemetryutils.RegisterTracerProvider(serviceName, telemetryutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create telemetry tracer provider. %v", err)
+				return err
+			}
 		}
 
-		if tracerProvider != nil {
+		/*if tracerProvider != nil {
 			otel.SetTracerProvider(tracerProvider)
 			defer func() error {
 				if err := tracerProvider.Shutdown(context.Background()); err != nil {
@@ -171,7 +170,7 @@ var startCmd = &cobra.Command{
 				}
 				return nil
 			}()
-		}
+		}*/
 
 		if !cfg.Admin.Disabled {
 			g.Go(func() error {
