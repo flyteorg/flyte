@@ -2106,6 +2106,47 @@ func (_m *AdminServiceServer) UpdateProjectDomainAttributes(_a0 context.Context,
 	return r0, r1
 }
 
+type AdminServiceServer_UpdateTaskExecution struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateTaskExecution) Return(_a0 *admin.TaskExecutionUpdateResponse, _a1 error) *AdminServiceServer_UpdateTaskExecution {
+	return &AdminServiceServer_UpdateTaskExecution{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateTaskExecution(_a0 context.Context, _a1 *admin.TaskExecutionUpdateRequest) *AdminServiceServer_UpdateTaskExecution {
+	c_call := _m.On("UpdateTaskExecution", _a0, _a1)
+	return &AdminServiceServer_UpdateTaskExecution{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnUpdateTaskExecutionMatch(matchers ...interface{}) *AdminServiceServer_UpdateTaskExecution {
+	c_call := _m.On("UpdateTaskExecution", matchers...)
+	return &AdminServiceServer_UpdateTaskExecution{Call: c_call}
+}
+
+// UpdateTaskExecution provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateTaskExecution(_a0 context.Context, _a1 *admin.TaskExecutionUpdateRequest) (*admin.TaskExecutionUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.TaskExecutionUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.TaskExecutionUpdateRequest) *admin.TaskExecutionUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.TaskExecutionUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.TaskExecutionUpdateRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_UpdateWorkflowAttributes struct {
 	*mock.Call
 }

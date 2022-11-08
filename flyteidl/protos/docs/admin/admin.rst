@@ -1373,6 +1373,7 @@ ExecutionUpdateRequest
 
    "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of the execution to update"
    "state", ":ref:`ref_flyteidl.admin.ExecutionState`", "", "State to set as the new value active/archive"
+   "evict_cache", ":ref:`ref_bool`", "", "Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the execution DAG and remove all stored results from datacatalog."
 
 
 
@@ -1387,6 +1388,13 @@ ExecutionUpdateResponse
 
 
 
+
+
+.. csv-table:: ExecutionUpdateResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "cache_eviction_errors", ":ref:`ref_flyteidl.core.CacheEvictionErrorList`", "", "List of errors encountered during cache eviction (if any). Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set."
 
 
 
@@ -3785,6 +3793,49 @@ See :ref:`ref_flyteidl.admin.TaskExecution` for more details
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering for returned list. +optional"
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionUpdateRequest:
+
+TaskExecutionUpdateRequest
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: TaskExecutionUpdateRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Identifier of the task execution to update"
+   "evict_cache", ":ref:`ref_bool`", "", "Indicates the cache of this (finished) task execution should be evicted, instructing flyteadmin to traverse the execution DAG and remove all stored results from datacatalog."
+
+
+
+
+
+
+
+.. _ref_flyteidl.admin.TaskExecutionUpdateResponse:
+
+TaskExecutionUpdateResponse
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: TaskExecutionUpdateResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "cache_eviction_errors", ":ref:`ref_flyteidl.core.CacheEvictionErrorList`", "", ""
 
 
 

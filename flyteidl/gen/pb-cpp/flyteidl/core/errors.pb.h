@@ -33,6 +33,7 @@
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/identifier.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ferrors_2eproto
@@ -43,7 +44,7 @@ struct TableStruct_flyteidl_2fcore_2ferrors_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -52,6 +53,12 @@ struct TableStruct_flyteidl_2fcore_2ferrors_2eproto {
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto();
 namespace flyteidl {
 namespace core {
+class CacheEvictionError;
+class CacheEvictionErrorDefaultTypeInternal;
+extern CacheEvictionErrorDefaultTypeInternal _CacheEvictionError_default_instance_;
+class CacheEvictionErrorList;
+class CacheEvictionErrorListDefaultTypeInternal;
+extern CacheEvictionErrorListDefaultTypeInternal _CacheEvictionErrorList_default_instance_;
 class ContainerError;
 class ContainerErrorDefaultTypeInternal;
 extern ContainerErrorDefaultTypeInternal _ContainerError_default_instance_;
@@ -62,6 +69,8 @@ extern ErrorDocumentDefaultTypeInternal _ErrorDocument_default_instance_;
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::core::CacheEvictionError* Arena::CreateMaybeMessage<::flyteidl::core::CacheEvictionError>(Arena*);
+template<> ::flyteidl::core::CacheEvictionErrorList* Arena::CreateMaybeMessage<::flyteidl::core::CacheEvictionErrorList>(Arena*);
 template<> ::flyteidl::core::ContainerError* Arena::CreateMaybeMessage<::flyteidl::core::ContainerError>(Arena*);
 template<> ::flyteidl::core::ErrorDocument* Arena::CreateMaybeMessage<::flyteidl::core::ErrorDocument>(Arena*);
 }  // namespace protobuf
@@ -89,6 +98,26 @@ inline bool ContainerError_Kind_Parse(
     const ::std::string& name, ContainerError_Kind* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ContainerError_Kind>(
     ContainerError_Kind_descriptor(), name, value);
+}
+enum CacheEvictionError_Code {
+  CacheEvictionError_Code_UNKNOWN = 0,
+  CacheEvictionError_Code_CacheEvictionError_Code_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  CacheEvictionError_Code_CacheEvictionError_Code_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool CacheEvictionError_Code_IsValid(int value);
+const CacheEvictionError_Code CacheEvictionError_Code_Code_MIN = CacheEvictionError_Code_UNKNOWN;
+const CacheEvictionError_Code CacheEvictionError_Code_Code_MAX = CacheEvictionError_Code_UNKNOWN;
+const int CacheEvictionError_Code_Code_ARRAYSIZE = CacheEvictionError_Code_Code_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* CacheEvictionError_Code_descriptor();
+inline const ::std::string& CacheEvictionError_Code_Name(CacheEvictionError_Code value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    CacheEvictionError_Code_descriptor(), value);
+}
+inline bool CacheEvictionError_Code_Parse(
+    const ::std::string& name, CacheEvictionError_Code* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<CacheEvictionError_Code>(
+    CacheEvictionError_Code_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -380,6 +409,323 @@ class ErrorDocument final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ferrors_2eproto;
 };
+// -------------------------------------------------------------------
+
+class CacheEvictionError final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.CacheEvictionError) */ {
+ public:
+  CacheEvictionError();
+  virtual ~CacheEvictionError();
+
+  CacheEvictionError(const CacheEvictionError& from);
+
+  inline CacheEvictionError& operator=(const CacheEvictionError& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CacheEvictionError(CacheEvictionError&& from) noexcept
+    : CacheEvictionError() {
+    *this = ::std::move(from);
+  }
+
+  inline CacheEvictionError& operator=(CacheEvictionError&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CacheEvictionError& default_instance();
+
+  enum SourceCase {
+    kTaskExecutionId = 4,
+    kWorkflowExecutionId = 5,
+    SOURCE_NOT_SET = 0,
+  };
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CacheEvictionError* internal_default_instance() {
+    return reinterpret_cast<const CacheEvictionError*>(
+               &_CacheEvictionError_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(CacheEvictionError* other);
+  friend void swap(CacheEvictionError& a, CacheEvictionError& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CacheEvictionError* New() const final {
+    return CreateMaybeMessage<CacheEvictionError>(nullptr);
+  }
+
+  CacheEvictionError* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CacheEvictionError>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CacheEvictionError& from);
+  void MergeFrom(const CacheEvictionError& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CacheEvictionError* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef CacheEvictionError_Code Code;
+  static const Code UNKNOWN =
+    CacheEvictionError_Code_UNKNOWN;
+  static inline bool Code_IsValid(int value) {
+    return CacheEvictionError_Code_IsValid(value);
+  }
+  static const Code Code_MIN =
+    CacheEvictionError_Code_Code_MIN;
+  static const Code Code_MAX =
+    CacheEvictionError_Code_Code_MAX;
+  static const int Code_ARRAYSIZE =
+    CacheEvictionError_Code_Code_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Code_descriptor() {
+    return CacheEvictionError_Code_descriptor();
+  }
+  static inline const ::std::string& Code_Name(Code value) {
+    return CacheEvictionError_Code_Name(value);
+  }
+  static inline bool Code_Parse(const ::std::string& name,
+      Code* value) {
+    return CacheEvictionError_Code_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // string message = 2;
+  void clear_message();
+  static const int kMessageFieldNumber = 2;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
+  // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+  bool has_node_execution_id() const;
+  void clear_node_execution_id();
+  static const int kNodeExecutionIdFieldNumber = 3;
+  const ::flyteidl::core::NodeExecutionIdentifier& node_execution_id() const;
+  ::flyteidl::core::NodeExecutionIdentifier* release_node_execution_id();
+  ::flyteidl::core::NodeExecutionIdentifier* mutable_node_execution_id();
+  void set_allocated_node_execution_id(::flyteidl::core::NodeExecutionIdentifier* node_execution_id);
+
+  // .flyteidl.core.CacheEvictionError.Code code = 1;
+  void clear_code();
+  static const int kCodeFieldNumber = 1;
+  ::flyteidl::core::CacheEvictionError_Code code() const;
+  void set_code(::flyteidl::core::CacheEvictionError_Code value);
+
+  // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+  bool has_task_execution_id() const;
+  void clear_task_execution_id();
+  static const int kTaskExecutionIdFieldNumber = 4;
+  const ::flyteidl::core::TaskExecutionIdentifier& task_execution_id() const;
+  ::flyteidl::core::TaskExecutionIdentifier* release_task_execution_id();
+  ::flyteidl::core::TaskExecutionIdentifier* mutable_task_execution_id();
+  void set_allocated_task_execution_id(::flyteidl::core::TaskExecutionIdentifier* task_execution_id);
+
+  // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+  bool has_workflow_execution_id() const;
+  void clear_workflow_execution_id();
+  static const int kWorkflowExecutionIdFieldNumber = 5;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& workflow_execution_id() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_workflow_execution_id();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_workflow_execution_id();
+  void set_allocated_workflow_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id);
+
+  void clear_source();
+  SourceCase source_case() const;
+  // @@protoc_insertion_point(class_scope:flyteidl.core.CacheEvictionError)
+ private:
+  class HasBitSetters;
+  void set_has_task_execution_id();
+  void set_has_workflow_execution_id();
+
+  inline bool has_source() const;
+  inline void clear_has_source();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
+  ::flyteidl::core::NodeExecutionIdentifier* node_execution_id_;
+  int code_;
+  union SourceUnion {
+    SourceUnion() {}
+    ::flyteidl::core::TaskExecutionIdentifier* task_execution_id_;
+    ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id_;
+  } source_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_flyteidl_2fcore_2ferrors_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CacheEvictionErrorList final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.CacheEvictionErrorList) */ {
+ public:
+  CacheEvictionErrorList();
+  virtual ~CacheEvictionErrorList();
+
+  CacheEvictionErrorList(const CacheEvictionErrorList& from);
+
+  inline CacheEvictionErrorList& operator=(const CacheEvictionErrorList& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CacheEvictionErrorList(CacheEvictionErrorList&& from) noexcept
+    : CacheEvictionErrorList() {
+    *this = ::std::move(from);
+  }
+
+  inline CacheEvictionErrorList& operator=(CacheEvictionErrorList&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CacheEvictionErrorList& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CacheEvictionErrorList* internal_default_instance() {
+    return reinterpret_cast<const CacheEvictionErrorList*>(
+               &_CacheEvictionErrorList_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(CacheEvictionErrorList* other);
+  friend void swap(CacheEvictionErrorList& a, CacheEvictionErrorList& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CacheEvictionErrorList* New() const final {
+    return CreateMaybeMessage<CacheEvictionErrorList>(nullptr);
+  }
+
+  CacheEvictionErrorList* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CacheEvictionErrorList>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CacheEvictionErrorList& from);
+  void MergeFrom(const CacheEvictionErrorList& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CacheEvictionErrorList* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.core.CacheEvictionError errors = 1;
+  int errors_size() const;
+  void clear_errors();
+  static const int kErrorsFieldNumber = 1;
+  ::flyteidl::core::CacheEvictionError* mutable_errors(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CacheEvictionError >*
+      mutable_errors();
+  const ::flyteidl::core::CacheEvictionError& errors(int index) const;
+  ::flyteidl::core::CacheEvictionError* add_errors();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CacheEvictionError >&
+      errors() const;
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.CacheEvictionErrorList)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CacheEvictionError > errors_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2ferrors_2eproto;
+};
 // ===================================================================
 
 
@@ -580,9 +926,242 @@ inline void ErrorDocument::set_allocated_error(::flyteidl::core::ContainerError*
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ErrorDocument.error)
 }
 
+// -------------------------------------------------------------------
+
+// CacheEvictionError
+
+// .flyteidl.core.CacheEvictionError.Code code = 1;
+inline void CacheEvictionError::clear_code() {
+  code_ = 0;
+}
+inline ::flyteidl::core::CacheEvictionError_Code CacheEvictionError::code() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionError.code)
+  return static_cast< ::flyteidl::core::CacheEvictionError_Code >(code_);
+}
+inline void CacheEvictionError::set_code(::flyteidl::core::CacheEvictionError_Code value) {
+  
+  code_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.CacheEvictionError.code)
+}
+
+// string message = 2;
+inline void CacheEvictionError::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CacheEvictionError::message() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionError.message)
+  return message_.GetNoArena();
+}
+inline void CacheEvictionError::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.CacheEvictionError.message)
+}
+#if LANG_CXX11
+inline void CacheEvictionError::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.CacheEvictionError.message)
+}
+#endif
+inline void CacheEvictionError::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.CacheEvictionError.message)
+}
+inline void CacheEvictionError::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.CacheEvictionError.message)
+}
+inline ::std::string* CacheEvictionError::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CacheEvictionError.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CacheEvictionError::release_message() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.CacheEvictionError.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CacheEvictionError::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.CacheEvictionError.message)
+}
+
+// .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+inline bool CacheEvictionError::has_node_execution_id() const {
+  return this != internal_default_instance() && node_execution_id_ != nullptr;
+}
+inline const ::flyteidl::core::NodeExecutionIdentifier& CacheEvictionError::node_execution_id() const {
+  const ::flyteidl::core::NodeExecutionIdentifier* p = node_execution_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionError.node_execution_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::NodeExecutionIdentifier*>(
+      &::flyteidl::core::_NodeExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::NodeExecutionIdentifier* CacheEvictionError::release_node_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.CacheEvictionError.node_execution_id)
+  
+  ::flyteidl::core::NodeExecutionIdentifier* temp = node_execution_id_;
+  node_execution_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::NodeExecutionIdentifier* CacheEvictionError::mutable_node_execution_id() {
+  
+  if (node_execution_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::NodeExecutionIdentifier>(GetArenaNoVirtual());
+    node_execution_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CacheEvictionError.node_execution_id)
+  return node_execution_id_;
+}
+inline void CacheEvictionError::set_allocated_node_execution_id(::flyteidl::core::NodeExecutionIdentifier* node_execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(node_execution_id_);
+  }
+  if (node_execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      node_execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, node_execution_id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  node_execution_id_ = node_execution_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.CacheEvictionError.node_execution_id)
+}
+
+// .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+inline bool CacheEvictionError::has_task_execution_id() const {
+  return source_case() == kTaskExecutionId;
+}
+inline void CacheEvictionError::set_has_task_execution_id() {
+  _oneof_case_[0] = kTaskExecutionId;
+}
+inline ::flyteidl::core::TaskExecutionIdentifier* CacheEvictionError::release_task_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.CacheEvictionError.task_execution_id)
+  if (has_task_execution_id()) {
+    clear_has_source();
+      ::flyteidl::core::TaskExecutionIdentifier* temp = source_.task_execution_id_;
+    source_.task_execution_id_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::TaskExecutionIdentifier& CacheEvictionError::task_execution_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionError.task_execution_id)
+  return has_task_execution_id()
+      ? *source_.task_execution_id_
+      : *reinterpret_cast< ::flyteidl::core::TaskExecutionIdentifier*>(&::flyteidl::core::_TaskExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::TaskExecutionIdentifier* CacheEvictionError::mutable_task_execution_id() {
+  if (!has_task_execution_id()) {
+    clear_source();
+    set_has_task_execution_id();
+    source_.task_execution_id_ = CreateMaybeMessage< ::flyteidl::core::TaskExecutionIdentifier >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CacheEvictionError.task_execution_id)
+  return source_.task_execution_id_;
+}
+
+// .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+inline bool CacheEvictionError::has_workflow_execution_id() const {
+  return source_case() == kWorkflowExecutionId;
+}
+inline void CacheEvictionError::set_has_workflow_execution_id() {
+  _oneof_case_[0] = kWorkflowExecutionId;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* CacheEvictionError::release_workflow_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.CacheEvictionError.workflow_execution_id)
+  if (has_workflow_execution_id()) {
+    clear_has_source();
+      ::flyteidl::core::WorkflowExecutionIdentifier* temp = source_.workflow_execution_id_;
+    source_.workflow_execution_id_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& CacheEvictionError::workflow_execution_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionError.workflow_execution_id)
+  return has_workflow_execution_id()
+      ? *source_.workflow_execution_id_
+      : *reinterpret_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(&::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* CacheEvictionError::mutable_workflow_execution_id() {
+  if (!has_workflow_execution_id()) {
+    clear_source();
+    set_has_workflow_execution_id();
+    source_.workflow_execution_id_ = CreateMaybeMessage< ::flyteidl::core::WorkflowExecutionIdentifier >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CacheEvictionError.workflow_execution_id)
+  return source_.workflow_execution_id_;
+}
+
+inline bool CacheEvictionError::has_source() const {
+  return source_case() != SOURCE_NOT_SET;
+}
+inline void CacheEvictionError::clear_has_source() {
+  _oneof_case_[0] = SOURCE_NOT_SET;
+}
+inline CacheEvictionError::SourceCase CacheEvictionError::source_case() const {
+  return CacheEvictionError::SourceCase(_oneof_case_[0]);
+}
+// -------------------------------------------------------------------
+
+// CacheEvictionErrorList
+
+// repeated .flyteidl.core.CacheEvictionError errors = 1;
+inline int CacheEvictionErrorList::errors_size() const {
+  return errors_.size();
+}
+inline void CacheEvictionErrorList::clear_errors() {
+  errors_.Clear();
+}
+inline ::flyteidl::core::CacheEvictionError* CacheEvictionErrorList::mutable_errors(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CacheEvictionErrorList.errors)
+  return errors_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CacheEvictionError >*
+CacheEvictionErrorList::mutable_errors() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.CacheEvictionErrorList.errors)
+  return &errors_;
+}
+inline const ::flyteidl::core::CacheEvictionError& CacheEvictionErrorList::errors(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CacheEvictionErrorList.errors)
+  return errors_.Get(index);
+}
+inline ::flyteidl::core::CacheEvictionError* CacheEvictionErrorList::add_errors() {
+  // @@protoc_insertion_point(field_add:flyteidl.core.CacheEvictionErrorList.errors)
+  return errors_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CacheEvictionError >&
+CacheEvictionErrorList::errors() const {
+  // @@protoc_insertion_point(field_list:flyteidl.core.CacheEvictionErrorList.errors)
+  return errors_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
@@ -598,6 +1177,11 @@ template <> struct is_proto_enum< ::flyteidl::core::ContainerError_Kind> : ::std
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::ContainerError_Kind>() {
   return ::flyteidl::core::ContainerError_Kind_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::core::CacheEvictionError_Code> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::CacheEvictionError_Code>() {
+  return ::flyteidl::core::CacheEvictionError_Code_descriptor();
 }
 
 }  // namespace protobuf

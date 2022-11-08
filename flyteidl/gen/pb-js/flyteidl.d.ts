@@ -6363,6 +6363,145 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CacheEvictionError. */
+        interface ICacheEvictionError {
+
+            /** CacheEvictionError code */
+            code?: (flyteidl.core.CacheEvictionError.Code|null);
+
+            /** CacheEvictionError message */
+            message?: (string|null);
+
+            /** CacheEvictionError nodeExecutionId */
+            nodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** CacheEvictionError taskExecutionId */
+            taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CacheEvictionError workflowExecutionId */
+            workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+        }
+
+        /** Represents a CacheEvictionError. */
+        class CacheEvictionError implements ICacheEvictionError {
+
+            /**
+             * Constructs a new CacheEvictionError.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ICacheEvictionError);
+
+            /** CacheEvictionError code. */
+            public code: flyteidl.core.CacheEvictionError.Code;
+
+            /** CacheEvictionError message. */
+            public message: string;
+
+            /** CacheEvictionError nodeExecutionId. */
+            public nodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** CacheEvictionError taskExecutionId. */
+            public taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CacheEvictionError workflowExecutionId. */
+            public workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CacheEvictionError source. */
+            public source?: ("taskExecutionId"|"workflowExecutionId");
+
+            /**
+             * Creates a new CacheEvictionError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CacheEvictionError instance
+             */
+            public static create(properties?: flyteidl.core.ICacheEvictionError): flyteidl.core.CacheEvictionError;
+
+            /**
+             * Encodes the specified CacheEvictionError message. Does not implicitly {@link flyteidl.core.CacheEvictionError.verify|verify} messages.
+             * @param message CacheEvictionError message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ICacheEvictionError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CacheEvictionError message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CacheEvictionError
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.CacheEvictionError;
+
+            /**
+             * Verifies a CacheEvictionError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace CacheEvictionError {
+
+            /** Code enum. */
+            enum Code {
+                UNKNOWN = 0
+            }
+        }
+
+        /** Properties of a CacheEvictionErrorList. */
+        interface ICacheEvictionErrorList {
+
+            /** CacheEvictionErrorList errors */
+            errors?: (flyteidl.core.ICacheEvictionError[]|null);
+        }
+
+        /** Represents a CacheEvictionErrorList. */
+        class CacheEvictionErrorList implements ICacheEvictionErrorList {
+
+            /**
+             * Constructs a new CacheEvictionErrorList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ICacheEvictionErrorList);
+
+            /** CacheEvictionErrorList errors. */
+            public errors: flyteidl.core.ICacheEvictionError[];
+
+            /**
+             * Creates a new CacheEvictionErrorList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CacheEvictionErrorList instance
+             */
+            public static create(properties?: flyteidl.core.ICacheEvictionErrorList): flyteidl.core.CacheEvictionErrorList;
+
+            /**
+             * Encodes the specified CacheEvictionErrorList message. Does not implicitly {@link flyteidl.core.CacheEvictionErrorList.verify|verify} messages.
+             * @param message CacheEvictionErrorList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ICacheEvictionErrorList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CacheEvictionErrorList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CacheEvictionErrorList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.CacheEvictionErrorList;
+
+            /**
+             * Verifies a CacheEvictionErrorList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a WorkflowClosure. */
         interface IWorkflowClosure {
 
@@ -10839,6 +10978,9 @@ export namespace flyteidl {
 
             /** ExecutionUpdateRequest state */
             state?: (flyteidl.admin.ExecutionState|null);
+
+            /** ExecutionUpdateRequest evictCache */
+            evictCache?: (boolean|null);
         }
 
         /** Represents an ExecutionUpdateRequest. */
@@ -10855,6 +10997,9 @@ export namespace flyteidl {
 
             /** ExecutionUpdateRequest state. */
             public state: flyteidl.admin.ExecutionState;
+
+            /** ExecutionUpdateRequest evictCache. */
+            public evictCache: boolean;
 
             /**
              * Creates a new ExecutionUpdateRequest instance using the specified properties.
@@ -10955,6 +11100,9 @@ export namespace flyteidl {
 
         /** Properties of an ExecutionUpdateResponse. */
         interface IExecutionUpdateResponse {
+
+            /** ExecutionUpdateResponse cacheEvictionErrors */
+            cacheEvictionErrors?: (flyteidl.core.ICacheEvictionErrorList|null);
         }
 
         /** Represents an ExecutionUpdateResponse. */
@@ -10965,6 +11113,9 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.admin.IExecutionUpdateResponse);
+
+            /** ExecutionUpdateResponse cacheEvictionErrors. */
+            public cacheEvictionErrors?: (flyteidl.core.ICacheEvictionErrorList|null);
 
             /**
              * Creates a new ExecutionUpdateResponse instance using the specified properties.
@@ -16070,6 +16221,116 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TaskExecutionUpdateRequest. */
+        interface ITaskExecutionUpdateRequest {
+
+            /** TaskExecutionUpdateRequest id */
+            id?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionUpdateRequest evictCache */
+            evictCache?: (boolean|null);
+        }
+
+        /** Represents a TaskExecutionUpdateRequest. */
+        class TaskExecutionUpdateRequest implements ITaskExecutionUpdateRequest {
+
+            /**
+             * Constructs a new TaskExecutionUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskExecutionUpdateRequest);
+
+            /** TaskExecutionUpdateRequest id. */
+            public id?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionUpdateRequest evictCache. */
+            public evictCache: boolean;
+
+            /**
+             * Creates a new TaskExecutionUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskExecutionUpdateRequest): flyteidl.admin.TaskExecutionUpdateRequest;
+
+            /**
+             * Encodes the specified TaskExecutionUpdateRequest message. Does not implicitly {@link flyteidl.admin.TaskExecutionUpdateRequest.verify|verify} messages.
+             * @param message TaskExecutionUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskExecutionUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskExecutionUpdateRequest;
+
+            /**
+             * Verifies a TaskExecutionUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskExecutionUpdateResponse. */
+        interface ITaskExecutionUpdateResponse {
+
+            /** TaskExecutionUpdateResponse cacheEvictionErrors */
+            cacheEvictionErrors?: (flyteidl.core.ICacheEvictionErrorList|null);
+        }
+
+        /** Represents a TaskExecutionUpdateResponse. */
+        class TaskExecutionUpdateResponse implements ITaskExecutionUpdateResponse {
+
+            /**
+             * Constructs a new TaskExecutionUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskExecutionUpdateResponse);
+
+            /** TaskExecutionUpdateResponse cacheEvictionErrors. */
+            public cacheEvictionErrors?: (flyteidl.core.ICacheEvictionErrorList|null);
+
+            /**
+             * Creates a new TaskExecutionUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskExecutionUpdateResponse): flyteidl.admin.TaskExecutionUpdateResponse;
+
+            /**
+             * Encodes the specified TaskExecutionUpdateResponse message. Does not implicitly {@link flyteidl.admin.TaskExecutionUpdateResponse.verify|verify} messages.
+             * @param message TaskExecutionUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskExecutionUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskExecutionUpdateResponse;
+
+            /**
+             * Verifies a TaskExecutionUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a GetVersionResponse. */
         interface IGetVersionResponse {
 
@@ -17680,6 +17941,20 @@ export namespace flyteidl {
             public getTaskExecutionData(request: flyteidl.admin.ITaskExecutionGetDataRequest): Promise<flyteidl.admin.TaskExecutionGetDataResponse>;
 
             /**
+             * Calls UpdateTaskExecution.
+             * @param request TaskExecutionUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and TaskExecutionUpdateResponse
+             */
+            public updateTaskExecution(request: flyteidl.admin.ITaskExecutionUpdateRequest, callback: flyteidl.service.AdminService.UpdateTaskExecutionCallback): void;
+
+            /**
+             * Calls UpdateTaskExecution.
+             * @param request TaskExecutionUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateTaskExecution(request: flyteidl.admin.ITaskExecutionUpdateRequest): Promise<flyteidl.admin.TaskExecutionUpdateResponse>;
+
+            /**
              * Calls UpdateProjectDomainAttributes.
              * @param request ProjectDomainAttributesUpdateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesUpdateResponse
@@ -18157,6 +18432,13 @@ export namespace flyteidl {
              * @param [response] TaskExecutionGetDataResponse
              */
             type GetTaskExecutionDataCallback = (error: (Error|null), response?: flyteidl.admin.TaskExecutionGetDataResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateTaskExecution}.
+             * @param error Error, if any
+             * @param [response] TaskExecutionUpdateResponse
+             */
+            type UpdateTaskExecutionCallback = (error: (Error|null), response?: flyteidl.admin.TaskExecutionUpdateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainAttributes}.

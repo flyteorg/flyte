@@ -460,6 +460,16 @@ service AdminService {
     // };
   }
 
+  // Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc UpdateTaskExecution (flyteidl.admin.TaskExecutionUpdateRequest) returns (flyteidl.admin.TaskExecutionUpdateResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Updates an existing task execution belonging to a project domain."
+    // };
+  }
+
   // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
   rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
     option (google.api.http) = {

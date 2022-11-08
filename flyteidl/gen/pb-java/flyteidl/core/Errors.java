@@ -1820,6 +1820,2483 @@ public final class Errors {
 
   }
 
+  public interface CacheEvictionErrorOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.CacheEvictionError)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Error code to match type of cache eviction error encountered.
+     * </pre>
+     *
+     * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+     */
+    int getCodeValue();
+    /**
+     * <pre>
+     * Error code to match type of cache eviction error encountered.
+     * </pre>
+     *
+     * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+     */
+    flyteidl.core.Errors.CacheEvictionError.Code getCode();
+
+    /**
+     * <pre>
+     * More detailed error message explaining the reason for the cache eviction failure.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <pre>
+     * More detailed error message explaining the reason for the cache eviction failure.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    boolean hasNodeExecutionId();
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecutionId();
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionIdOrBuilder();
+
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    boolean hasTaskExecutionId();
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId();
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder();
+
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    boolean hasWorkflowExecutionId();
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecutionId();
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionIdOrBuilder();
+
+    public flyteidl.core.Errors.CacheEvictionError.SourceCase getSourceCase();
+  }
+  /**
+   * <pre>
+   * Error returned if eviction of cached output fails and should be re-tried by the user.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.CacheEvictionError}
+   */
+  public  static final class CacheEvictionError extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.CacheEvictionError)
+      CacheEvictionErrorOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CacheEvictionError.newBuilder() to construct.
+    private CacheEvictionError(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CacheEvictionError() {
+      code_ = 0;
+      message_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CacheEvictionError(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+              int rawValue = input.readEnum();
+
+              code_ = rawValue;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
+              break;
+            }
+            case 26: {
+              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder subBuilder = null;
+              if (nodeExecutionId_ != null) {
+                subBuilder = nodeExecutionId_.toBuilder();
+              }
+              nodeExecutionId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(nodeExecutionId_);
+                nodeExecutionId_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 34: {
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder subBuilder = null;
+              if (sourceCase_ == 4) {
+                subBuilder = ((flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_).toBuilder();
+              }
+              source_ =
+                  input.readMessage(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_);
+                source_ = subBuilder.buildPartial();
+              }
+              sourceCase_ = 4;
+              break;
+            }
+            case 42: {
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
+              if (sourceCase_ == 5) {
+                subBuilder = ((flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_).toBuilder();
+              }
+              source_ =
+                  input.readMessage(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_);
+                source_ = subBuilder.buildPartial();
+              }
+              sourceCase_ = 5;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionError_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionError_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Errors.CacheEvictionError.class, flyteidl.core.Errors.CacheEvictionError.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code flyteidl.core.CacheEvictionError.Code}
+     */
+    public enum Code
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>UNKNOWN = 0;</code>
+       */
+      UNKNOWN(0),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>UNKNOWN = 0;</code>
+       */
+      public static final int UNKNOWN_VALUE = 0;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static Code valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static Code forNumber(int value) {
+        switch (value) {
+          case 0: return UNKNOWN;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Code>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Code> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Code>() {
+              public Code findValueByNumber(int number) {
+                return Code.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Errors.CacheEvictionError.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Code[] VALUES = values();
+
+      public static Code valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private Code(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.CacheEvictionError.Code)
+    }
+
+    private int sourceCase_ = 0;
+    private java.lang.Object source_;
+    public enum SourceCase
+        implements com.google.protobuf.Internal.EnumLite {
+      TASK_EXECUTION_ID(4),
+      WORKFLOW_EXECUTION_ID(5),
+      SOURCE_NOT_SET(0);
+      private final int value;
+      private SourceCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static SourceCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static SourceCase forNumber(int value) {
+        switch (value) {
+          case 4: return TASK_EXECUTION_ID;
+          case 5: return WORKFLOW_EXECUTION_ID;
+          case 0: return SOURCE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public SourceCase
+    getSourceCase() {
+      return SourceCase.forNumber(
+          sourceCase_);
+    }
+
+    public static final int CODE_FIELD_NUMBER = 1;
+    private int code_;
+    /**
+     * <pre>
+     * Error code to match type of cache eviction error encountered.
+     * </pre>
+     *
+     * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+     */
+    public int getCodeValue() {
+      return code_;
+    }
+    /**
+     * <pre>
+     * Error code to match type of cache eviction error encountered.
+     * </pre>
+     *
+     * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+     */
+    public flyteidl.core.Errors.CacheEvictionError.Code getCode() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Errors.CacheEvictionError.Code result = flyteidl.core.Errors.CacheEvictionError.Code.valueOf(code_);
+      return result == null ? flyteidl.core.Errors.CacheEvictionError.Code.UNRECOGNIZED : result;
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object message_;
+    /**
+     * <pre>
+     * More detailed error message explaining the reason for the cache eviction failure.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * More detailed error message explaining the reason for the cache eviction failure.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NODE_EXECUTION_ID_FIELD_NUMBER = 3;
+    private flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier nodeExecutionId_;
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    public boolean hasNodeExecutionId() {
+      return nodeExecutionId_ != null;
+    }
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecutionId() {
+      return nodeExecutionId_ == null ? flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecutionId_;
+    }
+    /**
+     * <pre>
+     * ID of the node execution the cache eviction failed for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionIdOrBuilder() {
+      return getNodeExecutionId();
+    }
+
+    public static final int TASK_EXECUTION_ID_FIELD_NUMBER = 4;
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    public boolean hasTaskExecutionId() {
+      return sourceCase_ == 4;
+    }
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId() {
+      if (sourceCase_ == 4) {
+         return (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_;
+      }
+      return flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder() {
+      if (sourceCase_ == 4) {
+         return (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_;
+      }
+      return flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+    }
+
+    public static final int WORKFLOW_EXECUTION_ID_FIELD_NUMBER = 5;
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    public boolean hasWorkflowExecutionId() {
+      return sourceCase_ == 5;
+    }
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecutionId() {
+      if (sourceCase_ == 5) {
+         return (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_;
+      }
+      return flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionIdOrBuilder() {
+      if (sourceCase_ == 5) {
+         return (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_;
+      }
+      return flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.UNKNOWN.getNumber()) {
+        output.writeEnum(1, code_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
+      }
+      if (nodeExecutionId_ != null) {
+        output.writeMessage(3, getNodeExecutionId());
+      }
+      if (sourceCase_ == 4) {
+        output.writeMessage(4, (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_);
+      }
+      if (sourceCase_ == 5) {
+        output.writeMessage(5, (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.UNKNOWN.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, code_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
+      }
+      if (nodeExecutionId_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getNodeExecutionId());
+      }
+      if (sourceCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_);
+      }
+      if (sourceCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Errors.CacheEvictionError)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Errors.CacheEvictionError other = (flyteidl.core.Errors.CacheEvictionError) obj;
+
+      if (code_ != other.code_) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (hasNodeExecutionId() != other.hasNodeExecutionId()) return false;
+      if (hasNodeExecutionId()) {
+        if (!getNodeExecutionId()
+            .equals(other.getNodeExecutionId())) return false;
+      }
+      if (!getSourceCase().equals(other.getSourceCase())) return false;
+      switch (sourceCase_) {
+        case 4:
+          if (!getTaskExecutionId()
+              .equals(other.getTaskExecutionId())) return false;
+          break;
+        case 5:
+          if (!getWorkflowExecutionId()
+              .equals(other.getWorkflowExecutionId())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CODE_FIELD_NUMBER;
+      hash = (53 * hash) + code_;
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      if (hasNodeExecutionId()) {
+        hash = (37 * hash) + NODE_EXECUTION_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getNodeExecutionId().hashCode();
+      }
+      switch (sourceCase_) {
+        case 4:
+          hash = (37 * hash) + TASK_EXECUTION_ID_FIELD_NUMBER;
+          hash = (53 * hash) + getTaskExecutionId().hashCode();
+          break;
+        case 5:
+          hash = (37 * hash) + WORKFLOW_EXECUTION_ID_FIELD_NUMBER;
+          hash = (53 * hash) + getWorkflowExecutionId().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionError parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Errors.CacheEvictionError prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Error returned if eviction of cached output fails and should be re-tried by the user.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.CacheEvictionError}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.CacheEvictionError)
+        flyteidl.core.Errors.CacheEvictionErrorOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionError_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionError_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Errors.CacheEvictionError.class, flyteidl.core.Errors.CacheEvictionError.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Errors.CacheEvictionError.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        code_ = 0;
+
+        message_ = "";
+
+        if (nodeExecutionIdBuilder_ == null) {
+          nodeExecutionId_ = null;
+        } else {
+          nodeExecutionId_ = null;
+          nodeExecutionIdBuilder_ = null;
+        }
+        sourceCase_ = 0;
+        source_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionError_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionError getDefaultInstanceForType() {
+        return flyteidl.core.Errors.CacheEvictionError.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionError build() {
+        flyteidl.core.Errors.CacheEvictionError result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionError buildPartial() {
+        flyteidl.core.Errors.CacheEvictionError result = new flyteidl.core.Errors.CacheEvictionError(this);
+        result.code_ = code_;
+        result.message_ = message_;
+        if (nodeExecutionIdBuilder_ == null) {
+          result.nodeExecutionId_ = nodeExecutionId_;
+        } else {
+          result.nodeExecutionId_ = nodeExecutionIdBuilder_.build();
+        }
+        if (sourceCase_ == 4) {
+          if (taskExecutionIdBuilder_ == null) {
+            result.source_ = source_;
+          } else {
+            result.source_ = taskExecutionIdBuilder_.build();
+          }
+        }
+        if (sourceCase_ == 5) {
+          if (workflowExecutionIdBuilder_ == null) {
+            result.source_ = source_;
+          } else {
+            result.source_ = workflowExecutionIdBuilder_.build();
+          }
+        }
+        result.sourceCase_ = sourceCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Errors.CacheEvictionError) {
+          return mergeFrom((flyteidl.core.Errors.CacheEvictionError)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Errors.CacheEvictionError other) {
+        if (other == flyteidl.core.Errors.CacheEvictionError.getDefaultInstance()) return this;
+        if (other.code_ != 0) {
+          setCodeValue(other.getCodeValue());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
+        }
+        if (other.hasNodeExecutionId()) {
+          mergeNodeExecutionId(other.getNodeExecutionId());
+        }
+        switch (other.getSourceCase()) {
+          case TASK_EXECUTION_ID: {
+            mergeTaskExecutionId(other.getTaskExecutionId());
+            break;
+          }
+          case WORKFLOW_EXECUTION_ID: {
+            mergeWorkflowExecutionId(other.getWorkflowExecutionId());
+            break;
+          }
+          case SOURCE_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Errors.CacheEvictionError parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Errors.CacheEvictionError) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int sourceCase_ = 0;
+      private java.lang.Object source_;
+      public SourceCase
+          getSourceCase() {
+        return SourceCase.forNumber(
+            sourceCase_);
+      }
+
+      public Builder clearSource() {
+        sourceCase_ = 0;
+        source_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private int code_ = 0;
+      /**
+       * <pre>
+       * Error code to match type of cache eviction error encountered.
+       * </pre>
+       *
+       * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+       */
+      public int getCodeValue() {
+        return code_;
+      }
+      /**
+       * <pre>
+       * Error code to match type of cache eviction error encountered.
+       * </pre>
+       *
+       * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+       */
+      public Builder setCodeValue(int value) {
+        code_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Error code to match type of cache eviction error encountered.
+       * </pre>
+       *
+       * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionError.Code getCode() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Errors.CacheEvictionError.Code result = flyteidl.core.Errors.CacheEvictionError.Code.valueOf(code_);
+        return result == null ? flyteidl.core.Errors.CacheEvictionError.Code.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * Error code to match type of cache eviction error encountered.
+       * </pre>
+       *
+       * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+       */
+      public Builder setCode(flyteidl.core.Errors.CacheEvictionError.Code value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        code_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Error code to match type of cache eviction error encountered.
+       * </pre>
+       *
+       * <code>.flyteidl.core.CacheEvictionError.Code code = 1;</code>
+       */
+      public Builder clearCode() {
+        
+        code_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <pre>
+       * More detailed error message explaining the reason for the cache eviction failure.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * More detailed error message explaining the reason for the cache eviction failure.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * More detailed error message explaining the reason for the cache eviction failure.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * More detailed error message explaining the reason for the cache eviction failure.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * More detailed error message explaining the reason for the cache eviction failure.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier nodeExecutionId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder> nodeExecutionIdBuilder_;
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public boolean hasNodeExecutionId() {
+        return nodeExecutionIdBuilder_ != null || nodeExecutionId_ != null;
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecutionId() {
+        if (nodeExecutionIdBuilder_ == null) {
+          return nodeExecutionId_ == null ? flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecutionId_;
+        } else {
+          return nodeExecutionIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public Builder setNodeExecutionId(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier value) {
+        if (nodeExecutionIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          nodeExecutionId_ = value;
+          onChanged();
+        } else {
+          nodeExecutionIdBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public Builder setNodeExecutionId(
+          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder builderForValue) {
+        if (nodeExecutionIdBuilder_ == null) {
+          nodeExecutionId_ = builderForValue.build();
+          onChanged();
+        } else {
+          nodeExecutionIdBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public Builder mergeNodeExecutionId(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier value) {
+        if (nodeExecutionIdBuilder_ == null) {
+          if (nodeExecutionId_ != null) {
+            nodeExecutionId_ =
+              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.newBuilder(nodeExecutionId_).mergeFrom(value).buildPartial();
+          } else {
+            nodeExecutionId_ = value;
+          }
+          onChanged();
+        } else {
+          nodeExecutionIdBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public Builder clearNodeExecutionId() {
+        if (nodeExecutionIdBuilder_ == null) {
+          nodeExecutionId_ = null;
+          onChanged();
+        } else {
+          nodeExecutionId_ = null;
+          nodeExecutionIdBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder getNodeExecutionIdBuilder() {
+        
+        onChanged();
+        return getNodeExecutionIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionIdOrBuilder() {
+        if (nodeExecutionIdBuilder_ != null) {
+          return nodeExecutionIdBuilder_.getMessageOrBuilder();
+        } else {
+          return nodeExecutionId_ == null ?
+              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecutionId_;
+        }
+      }
+      /**
+       * <pre>
+       * ID of the node execution the cache eviction failed for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder> 
+          getNodeExecutionIdFieldBuilder() {
+        if (nodeExecutionIdBuilder_ == null) {
+          nodeExecutionIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder>(
+                  getNodeExecutionId(),
+                  getParentForChildren(),
+                  isClean());
+          nodeExecutionId_ = null;
+        }
+        return nodeExecutionIdBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> taskExecutionIdBuilder_;
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public boolean hasTaskExecutionId() {
+        return sourceCase_ == 4;
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId() {
+        if (taskExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 4) {
+            return (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_;
+          }
+          return flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+        } else {
+          if (sourceCase_ == 4) {
+            return taskExecutionIdBuilder_.getMessage();
+          }
+          return flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public Builder setTaskExecutionId(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
+        if (taskExecutionIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          source_ = value;
+          onChanged();
+        } else {
+          taskExecutionIdBuilder_.setMessage(value);
+        }
+        sourceCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public Builder setTaskExecutionId(
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder builderForValue) {
+        if (taskExecutionIdBuilder_ == null) {
+          source_ = builderForValue.build();
+          onChanged();
+        } else {
+          taskExecutionIdBuilder_.setMessage(builderForValue.build());
+        }
+        sourceCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public Builder mergeTaskExecutionId(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
+        if (taskExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 4 &&
+              source_ != flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance()) {
+            source_ = flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.newBuilder((flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            source_ = value;
+          }
+          onChanged();
+        } else {
+          if (sourceCase_ == 4) {
+            taskExecutionIdBuilder_.mergeFrom(value);
+          }
+          taskExecutionIdBuilder_.setMessage(value);
+        }
+        sourceCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public Builder clearTaskExecutionId() {
+        if (taskExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 4) {
+            sourceCase_ = 0;
+            source_ = null;
+            onChanged();
+          }
+        } else {
+          if (sourceCase_ == 4) {
+            sourceCase_ = 0;
+            source_ = null;
+          }
+          taskExecutionIdBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder getTaskExecutionIdBuilder() {
+        return getTaskExecutionIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder() {
+        if ((sourceCase_ == 4) && (taskExecutionIdBuilder_ != null)) {
+          return taskExecutionIdBuilder_.getMessageOrBuilder();
+        } else {
+          if (sourceCase_ == 4) {
+            return (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_;
+          }
+          return flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> 
+          getTaskExecutionIdFieldBuilder() {
+        if (taskExecutionIdBuilder_ == null) {
+          if (!(sourceCase_ == 4)) {
+            source_ = flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance();
+          }
+          taskExecutionIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder>(
+                  (flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier) source_,
+                  getParentForChildren(),
+                  isClean());
+          source_ = null;
+        }
+        sourceCase_ = 4;
+        onChanged();;
+        return taskExecutionIdBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> workflowExecutionIdBuilder_;
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public boolean hasWorkflowExecutionId() {
+        return sourceCase_ == 5;
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecutionId() {
+        if (workflowExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 5) {
+            return (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_;
+          }
+          return flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+        } else {
+          if (sourceCase_ == 5) {
+            return workflowExecutionIdBuilder_.getMessage();
+          }
+          return flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public Builder setWorkflowExecutionId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (workflowExecutionIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          source_ = value;
+          onChanged();
+        } else {
+          workflowExecutionIdBuilder_.setMessage(value);
+        }
+        sourceCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public Builder setWorkflowExecutionId(
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder builderForValue) {
+        if (workflowExecutionIdBuilder_ == null) {
+          source_ = builderForValue.build();
+          onChanged();
+        } else {
+          workflowExecutionIdBuilder_.setMessage(builderForValue.build());
+        }
+        sourceCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public Builder mergeWorkflowExecutionId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (workflowExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 5 &&
+              source_ != flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance()) {
+            source_ = flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.newBuilder((flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            source_ = value;
+          }
+          onChanged();
+        } else {
+          if (sourceCase_ == 5) {
+            workflowExecutionIdBuilder_.mergeFrom(value);
+          }
+          workflowExecutionIdBuilder_.setMessage(value);
+        }
+        sourceCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public Builder clearWorkflowExecutionId() {
+        if (workflowExecutionIdBuilder_ == null) {
+          if (sourceCase_ == 5) {
+            sourceCase_ = 0;
+            source_ = null;
+            onChanged();
+          }
+        } else {
+          if (sourceCase_ == 5) {
+            sourceCase_ = 0;
+            source_ = null;
+          }
+          workflowExecutionIdBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder getWorkflowExecutionIdBuilder() {
+        return getWorkflowExecutionIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionIdOrBuilder() {
+        if ((sourceCase_ == 5) && (workflowExecutionIdBuilder_ != null)) {
+          return workflowExecutionIdBuilder_.getMessageOrBuilder();
+        } else {
+          if (sourceCase_ == 5) {
+            return (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_;
+          }
+          return flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> 
+          getWorkflowExecutionIdFieldBuilder() {
+        if (workflowExecutionIdBuilder_ == null) {
+          if (!(sourceCase_ == 5)) {
+            source_ = flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance();
+          }
+          workflowExecutionIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder>(
+                  (flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier) source_,
+                  getParentForChildren(),
+                  isClean());
+          source_ = null;
+        }
+        sourceCase_ = 5;
+        onChanged();;
+        return workflowExecutionIdBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.CacheEvictionError)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.CacheEvictionError)
+    private static final flyteidl.core.Errors.CacheEvictionError DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Errors.CacheEvictionError();
+    }
+
+    public static flyteidl.core.Errors.CacheEvictionError getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CacheEvictionError>
+        PARSER = new com.google.protobuf.AbstractParser<CacheEvictionError>() {
+      @java.lang.Override
+      public CacheEvictionError parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CacheEvictionError(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CacheEvictionError> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CacheEvictionError> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Errors.CacheEvictionError getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface CacheEvictionErrorListOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.CacheEvictionErrorList)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    java.util.List<flyteidl.core.Errors.CacheEvictionError> 
+        getErrorsList();
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    flyteidl.core.Errors.CacheEvictionError getErrors(int index);
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    int getErrorsCount();
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    java.util.List<? extends flyteidl.core.Errors.CacheEvictionErrorOrBuilder> 
+        getErrorsOrBuilderList();
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    flyteidl.core.Errors.CacheEvictionErrorOrBuilder getErrorsOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.CacheEvictionErrorList}
+   */
+  public  static final class CacheEvictionErrorList extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.CacheEvictionErrorList)
+      CacheEvictionErrorListOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CacheEvictionErrorList.newBuilder() to construct.
+    private CacheEvictionErrorList(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CacheEvictionErrorList() {
+      errors_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CacheEvictionErrorList(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                errors_ = new java.util.ArrayList<flyteidl.core.Errors.CacheEvictionError>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              errors_.add(
+                  input.readMessage(flyteidl.core.Errors.CacheEvictionError.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          errors_ = java.util.Collections.unmodifiableList(errors_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionErrorList_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionErrorList_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Errors.CacheEvictionErrorList.class, flyteidl.core.Errors.CacheEvictionErrorList.Builder.class);
+    }
+
+    public static final int ERRORS_FIELD_NUMBER = 1;
+    private java.util.List<flyteidl.core.Errors.CacheEvictionError> errors_;
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    public java.util.List<flyteidl.core.Errors.CacheEvictionError> getErrorsList() {
+      return errors_;
+    }
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Errors.CacheEvictionErrorOrBuilder> 
+        getErrorsOrBuilderList() {
+      return errors_;
+    }
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    public int getErrorsCount() {
+      return errors_.size();
+    }
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    public flyteidl.core.Errors.CacheEvictionError getErrors(int index) {
+      return errors_.get(index);
+    }
+    /**
+     * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+     */
+    public flyteidl.core.Errors.CacheEvictionErrorOrBuilder getErrorsOrBuilder(
+        int index) {
+      return errors_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < errors_.size(); i++) {
+        output.writeMessage(1, errors_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < errors_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, errors_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Errors.CacheEvictionErrorList)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Errors.CacheEvictionErrorList other = (flyteidl.core.Errors.CacheEvictionErrorList) obj;
+
+      if (!getErrorsList()
+          .equals(other.getErrorsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getErrorsCount() > 0) {
+        hash = (37 * hash) + ERRORS_FIELD_NUMBER;
+        hash = (53 * hash) + getErrorsList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Errors.CacheEvictionErrorList parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Errors.CacheEvictionErrorList prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.CacheEvictionErrorList}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.CacheEvictionErrorList)
+        flyteidl.core.Errors.CacheEvictionErrorListOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionErrorList_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionErrorList_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Errors.CacheEvictionErrorList.class, flyteidl.core.Errors.CacheEvictionErrorList.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Errors.CacheEvictionErrorList.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getErrorsFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (errorsBuilder_ == null) {
+          errors_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          errorsBuilder_.clear();
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Errors.internal_static_flyteidl_core_CacheEvictionErrorList_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionErrorList getDefaultInstanceForType() {
+        return flyteidl.core.Errors.CacheEvictionErrorList.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionErrorList build() {
+        flyteidl.core.Errors.CacheEvictionErrorList result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Errors.CacheEvictionErrorList buildPartial() {
+        flyteidl.core.Errors.CacheEvictionErrorList result = new flyteidl.core.Errors.CacheEvictionErrorList(this);
+        int from_bitField0_ = bitField0_;
+        if (errorsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            errors_ = java.util.Collections.unmodifiableList(errors_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.errors_ = errors_;
+        } else {
+          result.errors_ = errorsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Errors.CacheEvictionErrorList) {
+          return mergeFrom((flyteidl.core.Errors.CacheEvictionErrorList)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Errors.CacheEvictionErrorList other) {
+        if (other == flyteidl.core.Errors.CacheEvictionErrorList.getDefaultInstance()) return this;
+        if (errorsBuilder_ == null) {
+          if (!other.errors_.isEmpty()) {
+            if (errors_.isEmpty()) {
+              errors_ = other.errors_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureErrorsIsMutable();
+              errors_.addAll(other.errors_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.errors_.isEmpty()) {
+            if (errorsBuilder_.isEmpty()) {
+              errorsBuilder_.dispose();
+              errorsBuilder_ = null;
+              errors_ = other.errors_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              errorsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getErrorsFieldBuilder() : null;
+            } else {
+              errorsBuilder_.addAllMessages(other.errors_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Errors.CacheEvictionErrorList parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Errors.CacheEvictionErrorList) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<flyteidl.core.Errors.CacheEvictionError> errors_ =
+        java.util.Collections.emptyList();
+      private void ensureErrorsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          errors_ = new java.util.ArrayList<flyteidl.core.Errors.CacheEvictionError>(errors_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Errors.CacheEvictionError, flyteidl.core.Errors.CacheEvictionError.Builder, flyteidl.core.Errors.CacheEvictionErrorOrBuilder> errorsBuilder_;
+
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Errors.CacheEvictionError> getErrorsList() {
+        if (errorsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(errors_);
+        } else {
+          return errorsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public int getErrorsCount() {
+        if (errorsBuilder_ == null) {
+          return errors_.size();
+        } else {
+          return errorsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionError getErrors(int index) {
+        if (errorsBuilder_ == null) {
+          return errors_.get(index);
+        } else {
+          return errorsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder setErrors(
+          int index, flyteidl.core.Errors.CacheEvictionError value) {
+        if (errorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureErrorsIsMutable();
+          errors_.set(index, value);
+          onChanged();
+        } else {
+          errorsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder setErrors(
+          int index, flyteidl.core.Errors.CacheEvictionError.Builder builderForValue) {
+        if (errorsBuilder_ == null) {
+          ensureErrorsIsMutable();
+          errors_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          errorsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder addErrors(flyteidl.core.Errors.CacheEvictionError value) {
+        if (errorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureErrorsIsMutable();
+          errors_.add(value);
+          onChanged();
+        } else {
+          errorsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder addErrors(
+          int index, flyteidl.core.Errors.CacheEvictionError value) {
+        if (errorsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureErrorsIsMutable();
+          errors_.add(index, value);
+          onChanged();
+        } else {
+          errorsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder addErrors(
+          flyteidl.core.Errors.CacheEvictionError.Builder builderForValue) {
+        if (errorsBuilder_ == null) {
+          ensureErrorsIsMutable();
+          errors_.add(builderForValue.build());
+          onChanged();
+        } else {
+          errorsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder addErrors(
+          int index, flyteidl.core.Errors.CacheEvictionError.Builder builderForValue) {
+        if (errorsBuilder_ == null) {
+          ensureErrorsIsMutable();
+          errors_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          errorsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder addAllErrors(
+          java.lang.Iterable<? extends flyteidl.core.Errors.CacheEvictionError> values) {
+        if (errorsBuilder_ == null) {
+          ensureErrorsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, errors_);
+          onChanged();
+        } else {
+          errorsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder clearErrors() {
+        if (errorsBuilder_ == null) {
+          errors_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          errorsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public Builder removeErrors(int index) {
+        if (errorsBuilder_ == null) {
+          ensureErrorsIsMutable();
+          errors_.remove(index);
+          onChanged();
+        } else {
+          errorsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionError.Builder getErrorsBuilder(
+          int index) {
+        return getErrorsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionErrorOrBuilder getErrorsOrBuilder(
+          int index) {
+        if (errorsBuilder_ == null) {
+          return errors_.get(index);  } else {
+          return errorsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Errors.CacheEvictionErrorOrBuilder> 
+           getErrorsOrBuilderList() {
+        if (errorsBuilder_ != null) {
+          return errorsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(errors_);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionError.Builder addErrorsBuilder() {
+        return getErrorsFieldBuilder().addBuilder(
+            flyteidl.core.Errors.CacheEvictionError.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public flyteidl.core.Errors.CacheEvictionError.Builder addErrorsBuilder(
+          int index) {
+        return getErrorsFieldBuilder().addBuilder(
+            index, flyteidl.core.Errors.CacheEvictionError.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.core.CacheEvictionError errors = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Errors.CacheEvictionError.Builder> 
+           getErrorsBuilderList() {
+        return getErrorsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Errors.CacheEvictionError, flyteidl.core.Errors.CacheEvictionError.Builder, flyteidl.core.Errors.CacheEvictionErrorOrBuilder> 
+          getErrorsFieldBuilder() {
+        if (errorsBuilder_ == null) {
+          errorsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Errors.CacheEvictionError, flyteidl.core.Errors.CacheEvictionError.Builder, flyteidl.core.Errors.CacheEvictionErrorOrBuilder>(
+                  errors_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          errors_ = null;
+        }
+        return errorsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.CacheEvictionErrorList)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.CacheEvictionErrorList)
+    private static final flyteidl.core.Errors.CacheEvictionErrorList DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Errors.CacheEvictionErrorList();
+    }
+
+    public static flyteidl.core.Errors.CacheEvictionErrorList getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CacheEvictionErrorList>
+        PARSER = new com.google.protobuf.AbstractParser<CacheEvictionErrorList>() {
+      @java.lang.Override
+      public CacheEvictionErrorList parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CacheEvictionErrorList(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CacheEvictionErrorList> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CacheEvictionErrorList> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Errors.CacheEvictionErrorList getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_ContainerError_descriptor;
   private static final 
@@ -1830,6 +4307,16 @@ public final class Errors {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_ErrorDocument_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_CacheEvictionError_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_CacheEvictionError_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_CacheEvictionErrorList_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_CacheEvictionErrorList_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1840,16 +4327,27 @@ public final class Errors {
   static {
     java.lang.String[] descriptorData = {
       "\n\032flyteidl/core/errors.proto\022\rflyteidl.c" +
-      "ore\032\035flyteidl/core/execution.proto\"\310\001\n\016C" +
-      "ontainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002" +
-      " \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.core.Conta" +
-      "inerError.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteid" +
-      "l.core.ExecutionError.ErrorKind\",\n\004Kind\022" +
-      "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n" +
-      "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl" +
-      ".core.ContainerErrorB6Z4github.com/flyte" +
-      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
-      "oto3"
+      "ore\032\035flyteidl/core/execution.proto\032\036flyt" +
+      "eidl/core/identifier.proto\"\310\001\n\016Container" +
+      "Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\0220\n\004" +
+      "kind\030\003 \001(\0162\".flyteidl.core.ContainerErro" +
+      "r.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteidl.core.E" +
+      "xecutionError.ErrorKind\",\n\004Kind\022\023\n\017NON_R" +
+      "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo" +
+      "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co" +
+      "ntainerError\"\317\002\n\022CacheEvictionError\0224\n\004c" +
+      "ode\030\001 \001(\0162&.flyteidl.core.CacheEvictionE" +
+      "rror.Code\022\017\n\007message\030\002 \001(\t\022A\n\021node_execu" +
+      "tion_id\030\003 \001(\0132&.flyteidl.core.NodeExecut" +
+      "ionIdentifier\022C\n\021task_execution_id\030\004 \001(\013" +
+      "2&.flyteidl.core.TaskExecutionIdentifier" +
+      "H\000\022K\n\025workflow_execution_id\030\005 \001(\0132*.flyt" +
+      "eidl.core.WorkflowExecutionIdentifierH\000\"" +
+      "\023\n\004Code\022\013\n\007UNKNOWN\020\000B\010\n\006source\"K\n\026CacheE" +
+      "victionErrorList\0221\n\006errors\030\001 \003(\0132!.flyte" +
+      "idl.core.CacheEvictionErrorB6Z4github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
+      "oreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1863,6 +4361,7 @@ public final class Errors {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.Execution.getDescriptor(),
+          flyteidl.core.IdentifierOuterClass.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_core_ContainerError_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -1876,7 +4375,20 @@ public final class Errors {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ErrorDocument_descriptor,
         new java.lang.String[] { "Error", });
+    internal_static_flyteidl_core_CacheEvictionError_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_core_CacheEvictionError_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_CacheEvictionError_descriptor,
+        new java.lang.String[] { "Code", "Message", "NodeExecutionId", "TaskExecutionId", "WorkflowExecutionId", "Source", });
+    internal_static_flyteidl_core_CacheEvictionErrorList_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_flyteidl_core_CacheEvictionErrorList_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_CacheEvictionErrorList_descriptor,
+        new java.lang.String[] { "Errors", });
     flyteidl.core.Execution.getDescriptor();
+    flyteidl.core.IdentifierOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
