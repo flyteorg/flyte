@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-type AdminExecutionUpdateResponse struct {
-	// List of errors encountered during cache eviction (if any). Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
+type AdminTaskExecutionUpdateResponse struct {
 	CacheEvictionErrors *CoreCacheEvictionErrorList `json:"cache_eviction_errors,omitempty"`
 }

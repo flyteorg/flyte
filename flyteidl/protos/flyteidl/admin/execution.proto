@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/core/errors.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/security.proto";
@@ -367,6 +368,10 @@ message ExecutionUpdateRequest {
 
     // State to set as the new value active/archive
     ExecutionState state = 2;
+
+    // Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
+    // execution DAG and remove all stored results from datacatalog.
+    bool evict_cache = 3;
 }
 
 message ExecutionStateChangeDetails {
@@ -380,4 +385,8 @@ message ExecutionStateChangeDetails {
     string principal = 3;
 }
 
-message ExecutionUpdateResponse {}
+message ExecutionUpdateResponse {
+    // List of errors encountered during cache eviction (if any).
+    // Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
+    core.CacheEvictionErrorList cache_eviction_errors = 1;
+}

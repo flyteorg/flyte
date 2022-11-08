@@ -17,6 +17,10 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ferrors_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ContainerError_flyteidl_2fcore_2ferrors_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ferrors_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_NodeExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 namespace flyteidl {
 namespace core {
 class ContainerErrorDefaultTypeInternal {
@@ -27,6 +31,16 @@ class ErrorDocumentDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ErrorDocument> _instance;
 } _ErrorDocument_default_instance_;
+class CacheEvictionErrorDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<CacheEvictionError> _instance;
+  const ::flyteidl::core::TaskExecutionIdentifier* task_execution_id_;
+  const ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id_;
+} _CacheEvictionError_default_instance_;
+class CacheEvictionErrorListDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<CacheEvictionErrorList> _instance;
+} _CacheEvictionErrorList_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 static void InitDefaultsContainerError_flyteidl_2fcore_2ferrors_2eproto() {
@@ -58,13 +72,47 @@ static void InitDefaultsErrorDocument_flyteidl_2fcore_2ferrors_2eproto() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsErrorDocument_flyteidl_2fcore_2ferrors_2eproto}, {
       &scc_info_ContainerError_flyteidl_2fcore_2ferrors_2eproto.base,}};
 
+static void InitDefaultsCacheEvictionError_flyteidl_2fcore_2ferrors_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::core::_CacheEvictionError_default_instance_;
+    new (ptr) ::flyteidl::core::CacheEvictionError();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::core::CacheEvictionError::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<3> scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsCacheEvictionError_flyteidl_2fcore_2ferrors_2eproto}, {
+      &scc_info_NodeExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,
+      &scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,
+      &scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,}};
+
+static void InitDefaultsCacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::core::_CacheEvictionErrorList_default_instance_;
+    new (ptr) ::flyteidl::core::CacheEvictionErrorList();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::core::CacheEvictionErrorList::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_CacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsCacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto}, {
+      &scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto.base,}};
+
 void InitDefaults_flyteidl_2fcore_2ferrors_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ContainerError_flyteidl_2fcore_2ferrors_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ErrorDocument_flyteidl_2fcore_2ferrors_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_CacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2ferrors_2eproto[2];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2ferrors_2eproto[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2ferrors_2eproto[4];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2ferrors_2eproto[2];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2ferrors_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ferrors_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -83,48 +131,81 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ferrors_2eproto::o
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ErrorDocument, error_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, _oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, code_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, message_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, node_execution_id_),
+  offsetof(::flyteidl::core::CacheEvictionErrorDefaultTypeInternal, task_execution_id_),
+  offsetof(::flyteidl::core::CacheEvictionErrorDefaultTypeInternal, workflow_execution_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionError, source_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionErrorList, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CacheEvictionErrorList, errors_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::ContainerError)},
   { 9, -1, sizeof(::flyteidl::core::ErrorDocument)},
+  { 15, -1, sizeof(::flyteidl::core::CacheEvictionError)},
+  { 26, -1, sizeof(::flyteidl::core::CacheEvictionErrorList)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ContainerError_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ErrorDocument_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CacheEvictionError_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CacheEvictionErrorList_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto = {
   {}, AddDescriptors_flyteidl_2fcore_2ferrors_2eproto, "flyteidl/core/errors.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fcore_2ferrors_2eproto::offsets,
-  file_level_metadata_flyteidl_2fcore_2ferrors_2eproto, 2, file_level_enum_descriptors_flyteidl_2fcore_2ferrors_2eproto, file_level_service_descriptors_flyteidl_2fcore_2ferrors_2eproto,
+  file_level_metadata_flyteidl_2fcore_2ferrors_2eproto, 4, file_level_enum_descriptors_flyteidl_2fcore_2ferrors_2eproto, file_level_service_descriptors_flyteidl_2fcore_2ferrors_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "\n\032flyteidl/core/errors.proto\022\rflyteidl.c"
-  "ore\032\035flyteidl/core/execution.proto\"\310\001\n\016C"
-  "ontainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002"
-  " \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.core.Conta"
-  "inerError.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteid"
-  "l.core.ExecutionError.ErrorKind\",\n\004Kind\022"
-  "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n"
-  "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl"
-  ".core.ContainerErrorB6Z4github.com/flyte"
-  "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr"
-  "oto3"
+  "ore\032\035flyteidl/core/execution.proto\032\036flyt"
+  "eidl/core/identifier.proto\"\310\001\n\016Container"
+  "Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\0220\n\004"
+  "kind\030\003 \001(\0162\".flyteidl.core.ContainerErro"
+  "r.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteidl.core.E"
+  "xecutionError.ErrorKind\",\n\004Kind\022\023\n\017NON_R"
+  "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo"
+  "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co"
+  "ntainerError\"\317\002\n\022CacheEvictionError\0224\n\004c"
+  "ode\030\001 \001(\0162&.flyteidl.core.CacheEvictionE"
+  "rror.Code\022\017\n\007message\030\002 \001(\t\022A\n\021node_execu"
+  "tion_id\030\003 \001(\0132&.flyteidl.core.NodeExecut"
+  "ionIdentifier\022C\n\021task_execution_id\030\004 \001(\013"
+  "2&.flyteidl.core.TaskExecutionIdentifier"
+  "H\000\022K\n\025workflow_execution_id\030\005 \001(\0132*.flyt"
+  "eidl.core.WorkflowExecutionIdentifierH\000\""
+  "\023\n\004Code\022\013\n\007UNKNOWN\020\000B\010\n\006source\"K\n\026CacheE"
+  "victionErrorList\0221\n\006errors\030\001 \003(\0132!.flyte"
+  "idl.core.CacheEvictionErrorB6Z4github.co"
+  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c"
+  "oreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ferrors_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ferrors_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto,
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 404,
+  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 851,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
   {
     ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2ferrors_2eproto, deps, 1);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2ferrors_2eproto, deps, 2);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -151,6 +232,25 @@ const ContainerError_Kind ContainerError::RECOVERABLE;
 const ContainerError_Kind ContainerError::Kind_MIN;
 const ContainerError_Kind ContainerError::Kind_MAX;
 const int ContainerError::Kind_ARRAYSIZE;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+const ::google::protobuf::EnumDescriptor* CacheEvictionError_Code_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fcore_2ferrors_2eproto[1];
+}
+bool CacheEvictionError_Code_IsValid(int value) {
+  switch (value) {
+    case 0:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const CacheEvictionError_Code CacheEvictionError::UNKNOWN;
+const CacheEvictionError_Code CacheEvictionError::Code_MIN;
+const CacheEvictionError_Code CacheEvictionError::Code_MAX;
+const int CacheEvictionError::Code_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 // ===================================================================
@@ -909,6 +1009,907 @@ void ErrorDocument::InternalSwap(ErrorDocument* other) {
 }
 
 
+// ===================================================================
+
+void CacheEvictionError::InitAsDefaultInstance() {
+  ::flyteidl::core::_CacheEvictionError_default_instance_._instance.get_mutable()->node_execution_id_ = const_cast< ::flyteidl::core::NodeExecutionIdentifier*>(
+      ::flyteidl::core::NodeExecutionIdentifier::internal_default_instance());
+  ::flyteidl::core::_CacheEvictionError_default_instance_.task_execution_id_ = const_cast< ::flyteidl::core::TaskExecutionIdentifier*>(
+      ::flyteidl::core::TaskExecutionIdentifier::internal_default_instance());
+  ::flyteidl::core::_CacheEvictionError_default_instance_.workflow_execution_id_ = const_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      ::flyteidl::core::WorkflowExecutionIdentifier::internal_default_instance());
+}
+class CacheEvictionError::HasBitSetters {
+ public:
+  static const ::flyteidl::core::NodeExecutionIdentifier& node_execution_id(const CacheEvictionError* msg);
+  static const ::flyteidl::core::TaskExecutionIdentifier& task_execution_id(const CacheEvictionError* msg);
+  static const ::flyteidl::core::WorkflowExecutionIdentifier& workflow_execution_id(const CacheEvictionError* msg);
+};
+
+const ::flyteidl::core::NodeExecutionIdentifier&
+CacheEvictionError::HasBitSetters::node_execution_id(const CacheEvictionError* msg) {
+  return *msg->node_execution_id_;
+}
+const ::flyteidl::core::TaskExecutionIdentifier&
+CacheEvictionError::HasBitSetters::task_execution_id(const CacheEvictionError* msg) {
+  return *msg->source_.task_execution_id_;
+}
+const ::flyteidl::core::WorkflowExecutionIdentifier&
+CacheEvictionError::HasBitSetters::workflow_execution_id(const CacheEvictionError* msg) {
+  return *msg->source_.workflow_execution_id_;
+}
+void CacheEvictionError::clear_node_execution_id() {
+  if (GetArenaNoVirtual() == nullptr && node_execution_id_ != nullptr) {
+    delete node_execution_id_;
+  }
+  node_execution_id_ = nullptr;
+}
+void CacheEvictionError::set_allocated_task_execution_id(::flyteidl::core::TaskExecutionIdentifier* task_execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_source();
+  if (task_execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      task_execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, task_execution_id, submessage_arena);
+    }
+    set_has_task_execution_id();
+    source_.task_execution_id_ = task_execution_id;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.CacheEvictionError.task_execution_id)
+}
+void CacheEvictionError::clear_task_execution_id() {
+  if (has_task_execution_id()) {
+    delete source_.task_execution_id_;
+    clear_has_source();
+  }
+}
+void CacheEvictionError::set_allocated_workflow_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_source();
+  if (workflow_execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      workflow_execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, workflow_execution_id, submessage_arena);
+    }
+    set_has_workflow_execution_id();
+    source_.workflow_execution_id_ = workflow_execution_id;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.CacheEvictionError.workflow_execution_id)
+}
+void CacheEvictionError::clear_workflow_execution_id() {
+  if (has_workflow_execution_id()) {
+    delete source_.workflow_execution_id_;
+    clear_has_source();
+  }
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int CacheEvictionError::kCodeFieldNumber;
+const int CacheEvictionError::kMessageFieldNumber;
+const int CacheEvictionError::kNodeExecutionIdFieldNumber;
+const int CacheEvictionError::kTaskExecutionIdFieldNumber;
+const int CacheEvictionError::kWorkflowExecutionIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+CacheEvictionError::CacheEvictionError()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.core.CacheEvictionError)
+}
+CacheEvictionError::CacheEvictionError(const CacheEvictionError& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.message().size() > 0) {
+    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
+  }
+  if (from.has_node_execution_id()) {
+    node_execution_id_ = new ::flyteidl::core::NodeExecutionIdentifier(*from.node_execution_id_);
+  } else {
+    node_execution_id_ = nullptr;
+  }
+  code_ = from.code_;
+  clear_has_source();
+  switch (from.source_case()) {
+    case kTaskExecutionId: {
+      mutable_task_execution_id()->::flyteidl::core::TaskExecutionIdentifier::MergeFrom(from.task_execution_id());
+      break;
+    }
+    case kWorkflowExecutionId: {
+      mutable_workflow_execution_id()->::flyteidl::core::WorkflowExecutionIdentifier::MergeFrom(from.workflow_execution_id());
+      break;
+    }
+    case SOURCE_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.core.CacheEvictionError)
+}
+
+void CacheEvictionError::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto.base);
+  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&node_execution_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&code_) -
+      reinterpret_cast<char*>(&node_execution_id_)) + sizeof(code_));
+  clear_has_source();
+}
+
+CacheEvictionError::~CacheEvictionError() {
+  // @@protoc_insertion_point(destructor:flyteidl.core.CacheEvictionError)
+  SharedDtor();
+}
+
+void CacheEvictionError::SharedDtor() {
+  message_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete node_execution_id_;
+  if (has_source()) {
+    clear_source();
+  }
+}
+
+void CacheEvictionError::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const CacheEvictionError& CacheEvictionError::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_CacheEvictionError_flyteidl_2fcore_2ferrors_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void CacheEvictionError::clear_source() {
+// @@protoc_insertion_point(one_of_clear_start:flyteidl.core.CacheEvictionError)
+  switch (source_case()) {
+    case kTaskExecutionId: {
+      delete source_.task_execution_id_;
+      break;
+    }
+    case kWorkflowExecutionId: {
+      delete source_.workflow_execution_id_;
+      break;
+    }
+    case SOURCE_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = SOURCE_NOT_SET;
+}
+
+
+void CacheEvictionError::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.core.CacheEvictionError)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && node_execution_id_ != nullptr) {
+    delete node_execution_id_;
+  }
+  node_execution_id_ = nullptr;
+  code_ = 0;
+  clear_source();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* CacheEvictionError::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<CacheEvictionError*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.CacheEvictionError.Code code = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_code(static_cast<::flyteidl::core::CacheEvictionError_Code>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string message = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.core.CacheEvictionError.message");
+        object = msg->mutable_message();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::NodeExecutionIdentifier::_InternalParse;
+        object = msg->mutable_node_execution_id();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::TaskExecutionIdentifier::_InternalParse;
+        object = msg->mutable_task_execution_id();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::WorkflowExecutionIdentifier::_InternalParse;
+        object = msg->mutable_workflow_execution_id();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool CacheEvictionError::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.core.CacheEvictionError)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .flyteidl.core.CacheEvictionError.Code code = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_code(static_cast< ::flyteidl::core::CacheEvictionError_Code >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string message = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_message()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->message().data(), static_cast<int>(this->message().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.CacheEvictionError.message"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_node_execution_id()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_task_execution_id()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_workflow_execution_id()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.core.CacheEvictionError)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.core.CacheEvictionError)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void CacheEvictionError::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.core.CacheEvictionError)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.core.CacheEvictionError.Code code = 1;
+  if (this->code() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->code(), output);
+  }
+
+  // string message = 2;
+  if (this->message().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->message().data(), static_cast<int>(this->message().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.CacheEvictionError.message");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->message(), output);
+  }
+
+  // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+  if (this->has_node_execution_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, HasBitSetters::node_execution_id(this), output);
+  }
+
+  // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+  if (has_task_execution_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, HasBitSetters::task_execution_id(this), output);
+  }
+
+  // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+  if (has_workflow_execution_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, HasBitSetters::workflow_execution_id(this), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.core.CacheEvictionError)
+}
+
+::google::protobuf::uint8* CacheEvictionError::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.CacheEvictionError)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.core.CacheEvictionError.Code code = 1;
+  if (this->code() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->code(), target);
+  }
+
+  // string message = 2;
+  if (this->message().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->message().data(), static_cast<int>(this->message().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.CacheEvictionError.message");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->message(), target);
+  }
+
+  // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+  if (this->has_node_execution_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        3, HasBitSetters::node_execution_id(this), target);
+  }
+
+  // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+  if (has_task_execution_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, HasBitSetters::task_execution_id(this), target);
+  }
+
+  // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+  if (has_workflow_execution_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, HasBitSetters::workflow_execution_id(this), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.CacheEvictionError)
+  return target;
+}
+
+size_t CacheEvictionError::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.core.CacheEvictionError)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string message = 2;
+  if (this->message().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->message());
+  }
+
+  // .flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+  if (this->has_node_execution_id()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *node_execution_id_);
+  }
+
+  // .flyteidl.core.CacheEvictionError.Code code = 1;
+  if (this->code() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->code());
+  }
+
+  switch (source_case()) {
+    // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+    case kTaskExecutionId: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *source_.task_execution_id_);
+      break;
+    }
+    // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+    case kWorkflowExecutionId: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *source_.workflow_execution_id_);
+      break;
+    }
+    case SOURCE_NOT_SET: {
+      break;
+    }
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void CacheEvictionError::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.CacheEvictionError)
+  GOOGLE_DCHECK_NE(&from, this);
+  const CacheEvictionError* source =
+      ::google::protobuf::DynamicCastToGenerated<CacheEvictionError>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.CacheEvictionError)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.core.CacheEvictionError)
+    MergeFrom(*source);
+  }
+}
+
+void CacheEvictionError::MergeFrom(const CacheEvictionError& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.core.CacheEvictionError)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.message().size() > 0) {
+
+    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
+  }
+  if (from.has_node_execution_id()) {
+    mutable_node_execution_id()->::flyteidl::core::NodeExecutionIdentifier::MergeFrom(from.node_execution_id());
+  }
+  if (from.code() != 0) {
+    set_code(from.code());
+  }
+  switch (from.source_case()) {
+    case kTaskExecutionId: {
+      mutable_task_execution_id()->::flyteidl::core::TaskExecutionIdentifier::MergeFrom(from.task_execution_id());
+      break;
+    }
+    case kWorkflowExecutionId: {
+      mutable_workflow_execution_id()->::flyteidl::core::WorkflowExecutionIdentifier::MergeFrom(from.workflow_execution_id());
+      break;
+    }
+    case SOURCE_NOT_SET: {
+      break;
+    }
+  }
+}
+
+void CacheEvictionError::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.core.CacheEvictionError)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CacheEvictionError::CopyFrom(const CacheEvictionError& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.core.CacheEvictionError)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CacheEvictionError::IsInitialized() const {
+  return true;
+}
+
+void CacheEvictionError::Swap(CacheEvictionError* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void CacheEvictionError::InternalSwap(CacheEvictionError* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  message_.Swap(&other->message_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(node_execution_id_, other->node_execution_id_);
+  swap(code_, other->code_);
+  swap(source_, other->source_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
+}
+
+::google::protobuf::Metadata CacheEvictionError::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2ferrors_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void CacheEvictionErrorList::InitAsDefaultInstance() {
+}
+class CacheEvictionErrorList::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int CacheEvictionErrorList::kErrorsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+CacheEvictionErrorList::CacheEvictionErrorList()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.core.CacheEvictionErrorList)
+}
+CacheEvictionErrorList::CacheEvictionErrorList(const CacheEvictionErrorList& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      errors_(from.errors_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:flyteidl.core.CacheEvictionErrorList)
+}
+
+void CacheEvictionErrorList::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_CacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto.base);
+}
+
+CacheEvictionErrorList::~CacheEvictionErrorList() {
+  // @@protoc_insertion_point(destructor:flyteidl.core.CacheEvictionErrorList)
+  SharedDtor();
+}
+
+void CacheEvictionErrorList::SharedDtor() {
+}
+
+void CacheEvictionErrorList::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const CacheEvictionErrorList& CacheEvictionErrorList::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_CacheEvictionErrorList_flyteidl_2fcore_2ferrors_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void CacheEvictionErrorList::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.core.CacheEvictionErrorList)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  errors_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* CacheEvictionErrorList::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<CacheEvictionErrorList*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated .flyteidl.core.CacheEvictionError errors = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::flyteidl::core::CacheEvictionError::_InternalParse;
+          object = msg->add_errors();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool CacheEvictionErrorList::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.core.CacheEvictionErrorList)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .flyteidl.core.CacheEvictionError errors = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_errors()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.core.CacheEvictionErrorList)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.core.CacheEvictionErrorList)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void CacheEvictionErrorList::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.core.CacheEvictionErrorList)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .flyteidl.core.CacheEvictionError errors = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->errors_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1,
+      this->errors(static_cast<int>(i)),
+      output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.core.CacheEvictionErrorList)
+}
+
+::google::protobuf::uint8* CacheEvictionErrorList::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.CacheEvictionErrorList)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .flyteidl.core.CacheEvictionError errors = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->errors_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, this->errors(static_cast<int>(i)), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.CacheEvictionErrorList)
+  return target;
+}
+
+size_t CacheEvictionErrorList::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.core.CacheEvictionErrorList)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .flyteidl.core.CacheEvictionError errors = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->errors_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          this->errors(static_cast<int>(i)));
+    }
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void CacheEvictionErrorList::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.CacheEvictionErrorList)
+  GOOGLE_DCHECK_NE(&from, this);
+  const CacheEvictionErrorList* source =
+      ::google::protobuf::DynamicCastToGenerated<CacheEvictionErrorList>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.CacheEvictionErrorList)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.core.CacheEvictionErrorList)
+    MergeFrom(*source);
+  }
+}
+
+void CacheEvictionErrorList::MergeFrom(const CacheEvictionErrorList& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.core.CacheEvictionErrorList)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  errors_.MergeFrom(from.errors_);
+}
+
+void CacheEvictionErrorList::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.core.CacheEvictionErrorList)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CacheEvictionErrorList::CopyFrom(const CacheEvictionErrorList& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.core.CacheEvictionErrorList)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CacheEvictionErrorList::IsInitialized() const {
+  return true;
+}
+
+void CacheEvictionErrorList::Swap(CacheEvictionErrorList* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void CacheEvictionErrorList::InternalSwap(CacheEvictionErrorList* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  CastToBase(&errors_)->InternalSwap(CastToBase(&other->errors_));
+}
+
+::google::protobuf::Metadata CacheEvictionErrorList::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2ferrors_2eproto[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace core
 }  // namespace flyteidl
@@ -919,6 +1920,12 @@ template<> PROTOBUF_NOINLINE ::flyteidl::core::ContainerError* Arena::CreateMayb
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::ErrorDocument* Arena::CreateMaybeMessage< ::flyteidl::core::ErrorDocument >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::ErrorDocument >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::CacheEvictionError* Arena::CreateMaybeMessage< ::flyteidl::core::CacheEvictionError >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::CacheEvictionError >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::CacheEvictionErrorList* Arena::CreateMaybeMessage< ::flyteidl::core::CacheEvictionErrorList >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::CacheEvictionErrorList >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

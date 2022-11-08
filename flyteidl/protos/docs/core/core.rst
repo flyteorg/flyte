@@ -528,6 +528,52 @@ flyteidl/core/errors.proto
 
 
 
+.. _ref_flyteidl.core.CacheEvictionError:
+
+CacheEvictionError
+------------------------------------------------------------------
+
+Error returned if eviction of cached output fails and should be re-tried by the user.
+
+
+
+.. csv-table:: CacheEvictionError type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "code", ":ref:`ref_flyteidl.core.CacheEvictionError.Code`", "", "Error code to match type of cache eviction error encountered."
+   "message", ":ref:`ref_string`", "", "More detailed error message explaining the reason for the cache eviction failure."
+   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "ID of the node execution the cache eviction failed for."
+   "task_execution_id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "ID of the task execution the cache eviction failed for (if the node execution was part of a task execution)."
+   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution)."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.CacheEvictionErrorList:
+
+CacheEvictionErrorList
+------------------------------------------------------------------
+
+List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+
+
+
+.. csv-table:: CacheEvictionErrorList type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "errors", ":ref:`ref_flyteidl.core.CacheEvictionError`", "repeated", ""
+
+
+
+
+
+
+
 .. _ref_flyteidl.core.ContainerError:
 
 ContainerError
@@ -576,6 +622,21 @@ failure reasons to the execution engine.
 
 ..
    end messages
+
+
+
+.. _ref_flyteidl.core.CacheEvictionError.Code:
+
+CacheEvictionError.Code
+------------------------------------------------------------------
+
+
+
+.. csv-table:: Enum CacheEvictionError.Code values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "UNKNOWN", "0", ""
 
 
 

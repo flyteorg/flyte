@@ -42,7 +42,6 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**GetProjectAttributes**](docs/AdminServiceApi.md#getprojectattributes) | **Get** /api/v1/project_attributes/{project} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
 *AdminServiceApi* | [**GetProjectDomainAttributes**](docs/AdminServiceApi.md#getprojectdomainattributes) | **Get** /api/v1/project_domain_attributes/{project}/{domain} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
 *AdminServiceApi* | [**GetTask**](docs/AdminServiceApi.md#gettask) | **Get** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
-*AdminServiceApi* | [**GetTaskExecution**](docs/AdminServiceApi.md#gettaskexecution) | **Get** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
 *AdminServiceApi* | [**GetTaskExecutionData**](docs/AdminServiceApi.md#gettaskexecutiondata) | **Get** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
 *AdminServiceApi* | [**GetVersion**](docs/AdminServiceApi.md#getversion) | **Get** /api/v1/version | 
 *AdminServiceApi* | [**GetWorkflow**](docs/AdminServiceApi.md#getworkflow) | **Get** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
@@ -76,6 +75,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**UpdateProject**](docs/AdminServiceApi.md#updateproject) | **Put** /api/v1/projects/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60;  flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
 *AdminServiceApi* | [**UpdateProjectAttributes**](docs/AdminServiceApi.md#updateprojectattributes) | **Put** /api/v1/project_attributes/{attributes.project} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
 *AdminServiceApi* | [**UpdateProjectDomainAttributes**](docs/AdminServiceApi.md#updateprojectdomainattributes) | **Put** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**UpdateTaskExecution**](docs/AdminServiceApi.md#updatetaskexecution) | **Get** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
 *AdminServiceApi* | [**UpdateWorkflowAttributes**](docs/AdminServiceApi.md#updateworkflowattributes) | **Put** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
 
 
@@ -181,6 +181,7 @@ Class | Method | HTTP request | Description
  - [AdminTaskExecutionEventResponse](docs/AdminTaskExecutionEventResponse.md)
  - [AdminTaskExecutionGetDataResponse](docs/AdminTaskExecutionGetDataResponse.md)
  - [AdminTaskExecutionList](docs/AdminTaskExecutionList.md)
+ - [AdminTaskExecutionUpdateResponse](docs/AdminTaskExecutionUpdateResponse.md)
  - [AdminTaskList](docs/AdminTaskList.md)
  - [AdminTaskResourceAttributes](docs/AdminTaskResourceAttributes.md)
  - [AdminTaskResourceSpec](docs/AdminTaskResourceSpec.md)
@@ -204,6 +205,7 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
+ - [CacheEvictionErrorCode](docs/CacheEvictionErrorCode.md)
  - [CatalogReservationStatus](docs/CatalogReservationStatus.md)
  - [ComparisonExpressionOperator](docs/ComparisonExpressionOperator.md)
  - [ConjunctionExpressionLogicalOperator](docs/ConjunctionExpressionLogicalOperator.md)
@@ -221,6 +223,8 @@ Class | Method | HTTP request | Description
  - [CoreBlobType](docs/CoreBlobType.md)
  - [CoreBooleanExpression](docs/CoreBooleanExpression.md)
  - [CoreBranchNode](docs/CoreBranchNode.md)
+ - [CoreCacheEvictionError](docs/CoreCacheEvictionError.md)
+ - [CoreCacheEvictionErrorList](docs/CoreCacheEvictionErrorList.md)
  - [CoreCatalogArtifactTag](docs/CoreCatalogArtifactTag.md)
  - [CoreCatalogCacheStatus](docs/CoreCatalogCacheStatus.md)
  - [CoreCatalogMetadata](docs/CoreCatalogMetadata.md)

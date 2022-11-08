@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
 
 // Error message to propagate detailed errors from container executions to the execution
 // engine.
@@ -32,4 +33,30 @@ message ContainerError {
 message ErrorDocument {
     // The error raised during execution.
     ContainerError error = 1;
+}
+
+// Error returned if eviction of cached output fails and should be re-tried by the user.
+message CacheEvictionError {
+    enum Code {
+        UNKNOWN = 0;
+    }
+
+    // Error code to match type of cache eviction error encountered.
+    Code code = 1;
+    // More detailed error message explaining the reason for the cache eviction failure.
+    string message = 2;
+    // ID of the node execution the cache eviction failed for.
+    core.NodeExecutionIdentifier node_execution_id = 3;
+    // Source of the node execution.
+    oneof source {
+        // ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+        core.TaskExecutionIdentifier task_execution_id = 4;
+        // ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+        core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+    }
+}
+
+// List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+message CacheEvictionErrorList {
+    repeated CacheEvictionError errors = 1;
 }

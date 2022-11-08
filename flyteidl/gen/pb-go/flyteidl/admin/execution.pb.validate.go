@@ -1804,6 +1804,8 @@ func (m *ExecutionUpdateRequest) Validate() error {
 
 	// no validation rules for State
 
+	// no validation rules for EvictCache
+
 	return nil
 }
 
@@ -1951,6 +1953,16 @@ var _ interface {
 func (m *ExecutionUpdateResponse) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if v, ok := interface{}(m.GetCacheEvictionErrors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionUpdateResponseValidationError{
+				field:  "CacheEvictionErrors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil

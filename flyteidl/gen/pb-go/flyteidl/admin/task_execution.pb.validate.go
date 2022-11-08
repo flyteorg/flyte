@@ -749,3 +749,160 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskExecutionGetDataResponseValidationError{}
+
+// Validate checks the field values on TaskExecutionUpdateRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *TaskExecutionUpdateRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionUpdateRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for EvictCache
+
+	return nil
+}
+
+// TaskExecutionUpdateRequestValidationError is the validation error returned
+// by TaskExecutionUpdateRequest.Validate if the designated constraints aren't met.
+type TaskExecutionUpdateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskExecutionUpdateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskExecutionUpdateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskExecutionUpdateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskExecutionUpdateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskExecutionUpdateRequestValidationError) ErrorName() string {
+	return "TaskExecutionUpdateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskExecutionUpdateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskExecutionUpdateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskExecutionUpdateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskExecutionUpdateRequestValidationError{}
+
+// Validate checks the field values on TaskExecutionUpdateResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *TaskExecutionUpdateResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetCacheEvictionErrors()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionUpdateResponseValidationError{
+				field:  "CacheEvictionErrors",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// TaskExecutionUpdateResponseValidationError is the validation error returned
+// by TaskExecutionUpdateResponse.Validate if the designated constraints
+// aren't met.
+type TaskExecutionUpdateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskExecutionUpdateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskExecutionUpdateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskExecutionUpdateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskExecutionUpdateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskExecutionUpdateResponseValidationError) ErrorName() string {
+	return "TaskExecutionUpdateResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskExecutionUpdateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskExecutionUpdateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskExecutionUpdateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskExecutionUpdateResponseValidationError{}

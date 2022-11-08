@@ -183,3 +183,194 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ErrorDocumentValidationError{}
+
+// Validate checks the field values on CacheEvictionError with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CacheEvictionError) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if v, ok := interface{}(m.GetNodeExecutionId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CacheEvictionErrorValidationError{
+				field:  "NodeExecutionId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.Source.(type) {
+
+	case *CacheEvictionError_TaskExecutionId:
+
+		if v, ok := interface{}(m.GetTaskExecutionId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CacheEvictionErrorValidationError{
+					field:  "TaskExecutionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CacheEvictionError_WorkflowExecutionId:
+
+		if v, ok := interface{}(m.GetWorkflowExecutionId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CacheEvictionErrorValidationError{
+					field:  "WorkflowExecutionId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CacheEvictionErrorValidationError is the validation error returned by
+// CacheEvictionError.Validate if the designated constraints aren't met.
+type CacheEvictionErrorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CacheEvictionErrorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CacheEvictionErrorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CacheEvictionErrorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CacheEvictionErrorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CacheEvictionErrorValidationError) ErrorName() string {
+	return "CacheEvictionErrorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CacheEvictionErrorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCacheEvictionError.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CacheEvictionErrorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CacheEvictionErrorValidationError{}
+
+// Validate checks the field values on CacheEvictionErrorList with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CacheEvictionErrorList) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetErrors() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CacheEvictionErrorListValidationError{
+					field:  fmt.Sprintf("Errors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CacheEvictionErrorListValidationError is the validation error returned by
+// CacheEvictionErrorList.Validate if the designated constraints aren't met.
+type CacheEvictionErrorListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CacheEvictionErrorListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CacheEvictionErrorListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CacheEvictionErrorListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CacheEvictionErrorListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CacheEvictionErrorListValidationError) ErrorName() string {
+	return "CacheEvictionErrorListValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CacheEvictionErrorListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCacheEvictionErrorList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CacheEvictionErrorListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CacheEvictionErrorListValidationError{}
