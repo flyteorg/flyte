@@ -24,13 +24,13 @@ func (_m DatasetManager_CreateDataset) Return(_a0 *datacatalog.CreateDatasetResp
 }
 
 func (_m *DatasetManager) OnCreateDataset(ctx context.Context, request *datacatalog.CreateDatasetRequest) *DatasetManager_CreateDataset {
-	c := _m.On("CreateDataset", ctx, request)
-	return &DatasetManager_CreateDataset{Call: c}
+	c_call := _m.On("CreateDataset", ctx, request)
+	return &DatasetManager_CreateDataset{Call: c_call}
 }
 
 func (_m *DatasetManager) OnCreateDatasetMatch(matchers ...interface{}) *DatasetManager_CreateDataset {
-	c := _m.On("CreateDataset", matchers...)
-	return &DatasetManager_CreateDataset{Call: c}
+	c_call := _m.On("CreateDataset", matchers...)
+	return &DatasetManager_CreateDataset{Call: c_call}
 }
 
 // CreateDataset provides a mock function with given fields: ctx, request
@@ -65,13 +65,13 @@ func (_m DatasetManager_GetDataset) Return(_a0 *datacatalog.GetDatasetResponse, 
 }
 
 func (_m *DatasetManager) OnGetDataset(ctx context.Context, request *datacatalog.GetDatasetRequest) *DatasetManager_GetDataset {
-	c := _m.On("GetDataset", ctx, request)
-	return &DatasetManager_GetDataset{Call: c}
+	c_call := _m.On("GetDataset", ctx, request)
+	return &DatasetManager_GetDataset{Call: c_call}
 }
 
 func (_m *DatasetManager) OnGetDatasetMatch(matchers ...interface{}) *DatasetManager_GetDataset {
-	c := _m.On("GetDataset", matchers...)
-	return &DatasetManager_GetDataset{Call: c}
+	c_call := _m.On("GetDataset", matchers...)
+	return &DatasetManager_GetDataset{Call: c_call}
 }
 
 // GetDataset provides a mock function with given fields: ctx, request
@@ -106,13 +106,13 @@ func (_m DatasetManager_ListDatasets) Return(_a0 *datacatalog.ListDatasetsRespon
 }
 
 func (_m *DatasetManager) OnListDatasets(ctx context.Context, request *datacatalog.ListDatasetsRequest) *DatasetManager_ListDatasets {
-	c := _m.On("ListDatasets", ctx, request)
-	return &DatasetManager_ListDatasets{Call: c}
+	c_call := _m.On("ListDatasets", ctx, request)
+	return &DatasetManager_ListDatasets{Call: c_call}
 }
 
 func (_m *DatasetManager) OnListDatasetsMatch(matchers ...interface{}) *DatasetManager_ListDatasets {
-	c := _m.On("ListDatasets", matchers...)
-	return &DatasetManager_ListDatasets{Call: c}
+	c_call := _m.On("ListDatasets", matchers...)
+	return &DatasetManager_ListDatasets{Call: c_call}
 }
 
 // ListDatasets provides a mock function with given fields: ctx, request

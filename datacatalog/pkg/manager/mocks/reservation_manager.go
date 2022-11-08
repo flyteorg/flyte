@@ -24,13 +24,13 @@ func (_m ReservationManager_GetOrExtendReservation) Return(_a0 *datacatalog.GetO
 }
 
 func (_m *ReservationManager) OnGetOrExtendReservation(_a0 context.Context, _a1 *datacatalog.GetOrExtendReservationRequest) *ReservationManager_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", _a0, _a1)
-	return &ReservationManager_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", _a0, _a1)
+	return &ReservationManager_GetOrExtendReservation{Call: c_call}
 }
 
 func (_m *ReservationManager) OnGetOrExtendReservationMatch(matchers ...interface{}) *ReservationManager_GetOrExtendReservation {
-	c := _m.On("GetOrExtendReservation", matchers...)
-	return &ReservationManager_GetOrExtendReservation{Call: c}
+	c_call := _m.On("GetOrExtendReservation", matchers...)
+	return &ReservationManager_GetOrExtendReservation{Call: c_call}
 }
 
 // GetOrExtendReservation provides a mock function with given fields: _a0, _a1
@@ -65,13 +65,13 @@ func (_m ReservationManager_ReleaseReservation) Return(_a0 *datacatalog.ReleaseR
 }
 
 func (_m *ReservationManager) OnReleaseReservation(_a0 context.Context, _a1 *datacatalog.ReleaseReservationRequest) *ReservationManager_ReleaseReservation {
-	c := _m.On("ReleaseReservation", _a0, _a1)
-	return &ReservationManager_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", _a0, _a1)
+	return &ReservationManager_ReleaseReservation{Call: c_call}
 }
 
 func (_m *ReservationManager) OnReleaseReservationMatch(matchers ...interface{}) *ReservationManager_ReleaseReservation {
-	c := _m.On("ReleaseReservation", matchers...)
-	return &ReservationManager_ReleaseReservation{Call: c}
+	c_call := _m.On("ReleaseReservation", matchers...)
+	return &ReservationManager_ReleaseReservation{Call: c_call}
 }
 
 // ReleaseReservation provides a mock function with given fields: _a0, _a1

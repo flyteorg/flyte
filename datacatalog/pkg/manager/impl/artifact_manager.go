@@ -39,6 +39,13 @@ type artifactMetrics struct {
 	validationErrorCounter   labeled.Counter
 	alreadyExistsCounter     labeled.Counter
 	doesNotExistCounter      labeled.Counter
+	updateResponseTime       labeled.StopWatch
+	updateSuccessCounter     labeled.Counter
+	updateFailureCounter     labeled.Counter
+	updateDataSuccessCounter labeled.Counter
+	updateDataFailureCounter labeled.Counter
+	deleteDataSuccessCounter labeled.Counter
+	deleteDataFailureCounter labeled.Counter
 }
 
 type artifactManager struct {
@@ -137,44 +144,11 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.
 
 	datasetID := request.Dataset
 
-	var artifactModel models.Artifact
-	switch request.QueryHandle.(type) {
-	case *datacatalog.GetArtifactRequest_ArtifactId:
-		logger.Debugf(ctx, "Get artifact by id %v", request.GetArtifactId())
-		artifactKey := transformers.ToArtifactKey(datasetID, request.GetArtifactId())
-		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
-
-		if err != nil {
-			if errors.IsDoesNotExistError(err) {
-				logger.Warnf(ctx, "Artifact does not exist id: %+v, err %v", request.GetArtifactId(), err)
-				m.systemMetrics.doesNotExistCounter.Inc(ctx)
-			} else {
-				logger.Errorf(ctx, "Unable to retrieve artifact by id: %+v, err %v", request.GetArtifactId(), err)
-				m.systemMetrics.getFailureCounter.Inc(ctx)
-			}
-			return nil, err
-		}
-	case *datacatalog.GetArtifactRequest_TagName:
-		logger.Debugf(ctx, "Get artifact by tag %v", request.GetTagName())
-		tagKey := transformers.ToTagKey(datasetID, request.GetTagName())
-		tag, err := m.repo.TagRepo().Get(ctx, tagKey)
-
-		if err != nil {
-			if errors.IsDoesNotExistError(err) {
-				logger.Infof(ctx, "Artifact does not exist tag: %+v, err %v", request.GetTagName(), err)
-				m.systemMetrics.doesNotExistCounter.Inc(ctx)
-			} else {
-				logger.Errorf(ctx, "Unable to retrieve Artifact by tag %v, err: %v", request.GetTagName(), err)
-				m.systemMetrics.getFailureCounter.Inc(ctx)
-			}
-			return nil, err
-		}
-
-		artifactModel = tag.Artifact
-	}
-
-	if len(artifactModel.ArtifactData) == 0 {
-		return nil, errors.NewDataCatalogErrorf(codes.Internal, "artifact [%+v] does not have artifact data associated", request)
+	artifactModel, err := m.findArtifact(ctx, datasetID, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to retrieve artifact for get artifact request %v, err: %v", request, err)
+		m.systemMetrics.getFailureCounter.Inc(ctx)
+		return nil, err
 	}
 
 	artifact, err := transformers.FromArtifactModel(artifactModel)
@@ -196,6 +170,57 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.
 	return &datacatalog.GetArtifactResponse{
 		Artifact: artifact,
 	}, nil
+}
+
+type artifactQueryHandle interface {
+	GetArtifactId() string
+	GetTagName() string
+}
+
+func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatalog.DatasetID, queryHandle artifactQueryHandle) (models.Artifact, error) {
+	var artifactModel models.Artifact
+
+	key := queryHandle.GetArtifactId()
+	if len(key) > 0 {
+		logger.Debugf(ctx, "Get artifact by id %v", key)
+		artifactKey := transformers.ToArtifactKey(datasetID, key)
+		var err error
+		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
+
+		if err != nil {
+			if errors.IsDoesNotExistError(err) {
+				logger.Warnf(ctx, "Artifact does not exist id: %+v, err %v", key, err)
+				m.systemMetrics.doesNotExistCounter.Inc(ctx)
+			} else {
+				logger.Errorf(ctx, "Unable to retrieve artifact by id: %+v, err %v", key, err)
+			}
+			return models.Artifact{}, err
+		}
+	} else {
+		key = queryHandle.GetTagName()
+
+		logger.Debugf(ctx, "Get artifact by tag %v", key)
+		tagKey := transformers.ToTagKey(datasetID, key)
+		tag, err := m.repo.TagRepo().Get(ctx, tagKey)
+
+		if err != nil {
+			if errors.IsDoesNotExistError(err) {
+				logger.Infof(ctx, "Artifact does not exist tag: %+v, err %v", key, err)
+				m.systemMetrics.doesNotExistCounter.Inc(ctx)
+			} else {
+				logger.Errorf(ctx, "Unable to retrieve Artifact by tag %v, err: %v", key, err)
+			}
+			return models.Artifact{}, err
+		}
+
+		artifactModel = tag.Artifact
+	}
+
+	if len(artifactModel.ArtifactData) == 0 {
+		return models.Artifact{}, errors.NewDataCatalogErrorf(codes.Internal, "artifact [%+v] with key %v does not have artifact data associated", artifactModel, key)
+	}
+
+	return artifactModel, nil
 }
 
 func (m *artifactManager) getArtifactDataList(ctx context.Context, artifactDataModels []models.ArtifactData) ([]*datacatalog.ArtifactData, error) {
@@ -283,6 +308,103 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	return &datacatalog.ListArtifactsResponse{Artifacts: artifactsList, NextToken: token}, nil
 }
 
+// UpdateArtifact updates the given artifact, currently only allowing the associated ArtifactData to be replaced. All
+// stored data will be overwritten in the underlying blob storage, no longer existing data (based on ArtifactData name)
+// will be deleted.
+func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatalog.UpdateArtifactRequest) (*datacatalog.UpdateArtifactResponse, error) {
+	ctx = contextutils.WithProjectDomain(ctx, request.Dataset.Project, request.Dataset.Domain)
+
+	timer := m.systemMetrics.updateResponseTime.Start(ctx)
+	defer timer.Stop()
+
+	err := validators.ValidateUpdateArtifactRequest(request)
+	if err != nil {
+		logger.Warningf(ctx, "Invalid update artifact request %v, err: %v", request, err)
+		m.systemMetrics.validationErrorCounter.Inc(ctx)
+		m.systemMetrics.updateFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// artifact must already exist, verify first
+	artifactModel, err := m.findArtifact(ctx, request.GetDataset(), request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get artifact for update artifact request %v, err: %v", request, err)
+		m.systemMetrics.updateFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	artifact, err := transformers.FromArtifactModel(artifactModel)
+	if err != nil {
+		logger.Errorf(ctx, "Error in transforming update artifact request %+v, err %v", artifactModel, err)
+		m.systemMetrics.transformerErrorCounter.Inc(ctx)
+		m.systemMetrics.updateFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// overwrite existing artifact data and upload new entries, building a map of artifact data names to remove
+	// deleted entries from the blob storage after the upload completed
+	artifactDataNames := make(map[string]struct{})
+	artifactDataModels := make([]models.ArtifactData, len(request.Data))
+	for i, artifactData := range request.Data {
+		artifactDataNames[artifactData.Name] = struct{}{}
+
+		dataLocation, err := m.artifactStore.PutData(ctx, artifact, artifactData)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to store artifact data during update, err: %v", err)
+			m.systemMetrics.updateDataFailureCounter.Inc(ctx)
+			m.systemMetrics.updateFailureCounter.Inc(ctx)
+			return nil, err
+		}
+
+		artifactDataModels[i].Name = artifactData.Name
+		artifactDataModels[i].Location = dataLocation.String()
+		m.systemMetrics.updateDataSuccessCounter.Inc(ctx)
+	}
+
+	removedArtifactData := make([]models.ArtifactData, 0)
+	for _, artifactData := range artifactModel.ArtifactData {
+		if _, ok := artifactDataNames[artifactData.Name]; !ok {
+			removedArtifactData = append(removedArtifactData, artifactData)
+		}
+	}
+
+	// update artifact in DB, also replaces/upserts associated artifact data
+	artifactModel.ArtifactData = artifactDataModels
+	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
+	if err != nil {
+		if errors.IsDoesNotExistError(err) {
+			logger.Warnf(ctx, "Artifact does not exist key: %+v, err %v", artifact.Id, err)
+			m.systemMetrics.doesNotExistCounter.Inc(ctx)
+		} else {
+			logger.Errorf(ctx, "Failed to update artifact %v, err: %v", artifactModel, err)
+		}
+		m.systemMetrics.updateFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// delete all artifact data no longer present in the updated artifact from the blob storage.
+	// blob storage data is removed last in case the DB update fail, which would leave us with artifact data DB entries
+	// without underlying blob data. this might still leave orphaned data in blob storage, however we can more easily
+	// clean that up periodically and don't risk serving artifact data records that will fail when retrieved.
+	for _, artifactData := range removedArtifactData {
+		if err := m.artifactStore.DeleteData(ctx, artifactData); err != nil {
+			logger.Errorf(ctx, "Failed to delete artifact data during update, err: %v", err)
+			m.systemMetrics.deleteDataFailureCounter.Inc(ctx)
+			m.systemMetrics.updateFailureCounter.Inc(ctx)
+			return nil, err
+		}
+
+		m.systemMetrics.deleteDataSuccessCounter.Inc(ctx)
+	}
+
+	logger.Debugf(ctx, "Successfully updated artifact id: %v", artifact.Id)
+
+	m.systemMetrics.updateSuccessCounter.Inc(ctx)
+	return &datacatalog.UpdateArtifactResponse{
+		ArtifactId: artifact.Id,
+	}, nil
+}
+
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
@@ -300,6 +422,13 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		doesNotExistCounter:      labeled.NewCounter("does_not_exists_count", "The number of times an artifact was not found", artifactScope, labeled.EmitUnlabeledMetric),
 		listSuccessCounter:       labeled.NewCounter("list_success_count", "The number of times list artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		listFailureCounter:       labeled.NewCounter("list_failure_count", "The number of times list artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
+		updateResponseTime:       labeled.NewStopWatch("update_duration", "The duration of the update artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
+		updateSuccessCounter:     labeled.NewCounter("update_success_count", "The number of times update artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		updateFailureCounter:     labeled.NewCounter("update_failure_count", "The number of times update artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
+		updateDataSuccessCounter: labeled.NewCounter("update_data_success_count", "The number of times update artifact data succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		updateDataFailureCounter: labeled.NewCounter("update_data_failure_count", "The number of times update artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
+		deleteDataSuccessCounter: labeled.NewCounter("delete_data_success_count", "The number of times delete artifact data succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		deleteDataFailureCounter: labeled.NewCounter("delete_data_failure_count", "The number of times delete artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
 	}
 
 	return &artifactManager{

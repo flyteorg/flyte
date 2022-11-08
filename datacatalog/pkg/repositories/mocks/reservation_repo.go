@@ -26,13 +26,13 @@ func (_m ReservationRepo_Create) Return(_a0 error) *ReservationRepo_Create {
 }
 
 func (_m *ReservationRepo) OnCreate(ctx context.Context, reservation models.Reservation, now time.Time) *ReservationRepo_Create {
-	c := _m.On("Create", ctx, reservation, now)
-	return &ReservationRepo_Create{Call: c}
+	c_call := _m.On("Create", ctx, reservation, now)
+	return &ReservationRepo_Create{Call: c_call}
 }
 
 func (_m *ReservationRepo) OnCreateMatch(matchers ...interface{}) *ReservationRepo_Create {
-	c := _m.On("Create", matchers...)
-	return &ReservationRepo_Create{Call: c}
+	c_call := _m.On("Create", matchers...)
+	return &ReservationRepo_Create{Call: c_call}
 }
 
 // Create provides a mock function with given fields: ctx, reservation, now
@@ -58,13 +58,13 @@ func (_m ReservationRepo_Delete) Return(_a0 error) *ReservationRepo_Delete {
 }
 
 func (_m *ReservationRepo) OnDelete(ctx context.Context, reservation models.ReservationKey, ownerID string) *ReservationRepo_Delete {
-	c := _m.On("Delete", ctx, reservation, ownerID)
-	return &ReservationRepo_Delete{Call: c}
+	c_call := _m.On("Delete", ctx, reservation, ownerID)
+	return &ReservationRepo_Delete{Call: c_call}
 }
 
 func (_m *ReservationRepo) OnDeleteMatch(matchers ...interface{}) *ReservationRepo_Delete {
-	c := _m.On("Delete", matchers...)
-	return &ReservationRepo_Delete{Call: c}
+	c_call := _m.On("Delete", matchers...)
+	return &ReservationRepo_Delete{Call: c_call}
 }
 
 // Delete provides a mock function with given fields: ctx, reservation, ownerID
@@ -90,13 +90,13 @@ func (_m ReservationRepo_Get) Return(_a0 models.Reservation, _a1 error) *Reserva
 }
 
 func (_m *ReservationRepo) OnGet(ctx context.Context, reservationKey models.ReservationKey) *ReservationRepo_Get {
-	c := _m.On("Get", ctx, reservationKey)
-	return &ReservationRepo_Get{Call: c}
+	c_call := _m.On("Get", ctx, reservationKey)
+	return &ReservationRepo_Get{Call: c_call}
 }
 
 func (_m *ReservationRepo) OnGetMatch(matchers ...interface{}) *ReservationRepo_Get {
-	c := _m.On("Get", matchers...)
-	return &ReservationRepo_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &ReservationRepo_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: ctx, reservationKey
@@ -129,13 +129,13 @@ func (_m ReservationRepo_Update) Return(_a0 error) *ReservationRepo_Update {
 }
 
 func (_m *ReservationRepo) OnUpdate(ctx context.Context, reservation models.Reservation, now time.Time) *ReservationRepo_Update {
-	c := _m.On("Update", ctx, reservation, now)
-	return &ReservationRepo_Update{Call: c}
+	c_call := _m.On("Update", ctx, reservation, now)
+	return &ReservationRepo_Update{Call: c_call}
 }
 
 func (_m *ReservationRepo) OnUpdateMatch(matchers ...interface{}) *ReservationRepo_Update {
-	c := _m.On("Update", matchers...)
-	return &ReservationRepo_Update{Call: c}
+	c_call := _m.On("Update", matchers...)
+	return &ReservationRepo_Update{Call: c_call}
 }
 
 // Update provides a mock function with given fields: ctx, reservation, now

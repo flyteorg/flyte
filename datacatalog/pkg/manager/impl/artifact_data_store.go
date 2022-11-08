@@ -17,6 +17,7 @@ const artifactDataFile = "data.pb"
 type ArtifactDataStore interface {
 	PutData(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error)
 	GetData(ctx context.Context, dataModel models.ArtifactData) (*core.Literal, error)
+	DeleteData(ctx context.Context, dataModel models.ArtifactData) error
 }
 
 type artifactDataStore struct {
@@ -52,6 +53,15 @@ func (m *artifactDataStore) GetData(ctx context.Context, dataModel models.Artifa
 	}
 
 	return &value, nil
+}
+
+// DeleteData removes the stored artifact data from the underlying blob storage
+func (m *artifactDataStore) DeleteData(ctx context.Context, dataModel models.ArtifactData) error {
+	if err := m.store.Delete(ctx, storage.DataReference(dataModel.Location)); err != nil {
+		return errors.NewDataCatalogErrorf(codes.Internal, "Unable to delete artifact data in location %s, err %v", dataModel.Location, err)
+	}
+
+	return nil
 }
 
 func NewArtifactDataStore(store *storage.DataStore, storagePrefix storage.DataReference) ArtifactDataStore {
