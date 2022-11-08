@@ -24,4 +24,6 @@ func TestFailingRawStore(t *testing.T) {
 	assert.Error(t, f.WriteRaw(ctx, "", 0, storage.Options{}, bytes.NewReader(nil)))
 
 	assert.Error(t, f.CopyRaw(ctx, "", "", storage.Options{}))
+
+	assert.Error(t, f.Delete(ctx, ""))
 }

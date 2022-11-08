@@ -51,6 +51,7 @@ type metrics struct {
 	catalogPutSuccessCount         labeled.Counter
 	catalogMissCount               labeled.Counter
 	catalogHitCount                labeled.Counter
+	catalogSkipCount               labeled.Counter
 	pluginExecutionLatency         labeled.StopWatch
 	pluginQueueLatency             labeled.StopWatch
 	reservationGetSuccessCount     labeled.Counter
@@ -563,39 +564,47 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	// STEP 1: Check Cache
 	if (ts.PluginPhase == pluginCore.PhaseUndefined || ts.PluginPhase == pluginCore.PhaseWaitingForCache) && checkCatalog {
 		// This is assumed to be first time. we will check catalog and call handle
-		entry, err := t.CheckCatalogCache(ctx, tCtx.tr, nCtx.InputReader(), tCtx.ow)
-		if err != nil {
-			logger.Errorf(ctx, "failed to check catalog cache with error")
-			return handler.UnknownTransition, err
-		}
-
-		if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
-			r := tCtx.ow.GetReader()
-			if r == nil {
-				return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "failed to reader outputs from a CacheHIT. Unexpected!")
-			}
-
-			// TODO @kumare this can be optimized, if we have paths then the reader could be pipelined to a sink
-			o, ee, err := r.Read(ctx)
-			if err != nil {
-				logger.Errorf(ctx, "failed to read from catalog, err: %s", err.Error())
-				return handler.UnknownTransition, err
-			}
-
-			if ee != nil {
-				logger.Errorf(ctx, "got execution error from catalog output reader? This should not happen, err: %s", ee.String())
-				return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "execution error from a cache output, bad state: %s", ee.String())
-			}
-
-			if err := nCtx.DataStore().WriteProtobuf(ctx, tCtx.ow.GetOutputPath(), storage.Options{}, o); err != nil {
-				logger.Errorf(ctx, "failed to write cached value to datastore, err: %s", err.Error())
-				return handler.UnknownTransition, err
-			}
-
-			pluginTrns.CacheHit(tCtx.ow.GetOutputPath(), nil, entry)
+		// If the cache should be skipped (requested by user for the execution), do not check datacatalog for any cached
+		// data, but instead always perform calculations again and overwrite the stored data after successful execution.
+		if nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
+			logger.Info(ctx, "Execution config forced cache skip, not checking catalog")
+			pluginTrns.PopulateCacheInfo(catalog.NewCatalogEntry(nil, cacheSkipped))
+			t.metrics.catalogSkipCount.Inc(ctx)
 		} else {
-			logger.Infof(ctx, "No CacheHIT. Status [%s]", entry.GetStatus().GetCacheStatus().String())
-			pluginTrns.PopulateCacheInfo(entry)
+			entry, err := t.CheckCatalogCache(ctx, tCtx.tr, nCtx.InputReader(), tCtx.ow)
+			if err != nil {
+				logger.Errorf(ctx, "failed to check catalog cache with error")
+				return handler.UnknownTransition, err
+			}
+
+			if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
+				r := tCtx.ow.GetReader()
+				if r == nil {
+					return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "failed to reader outputs from a CacheHIT. Unexpected!")
+				}
+
+				// TODO @kumare this can be optimized, if we have paths then the reader could be pipelined to a sink
+				o, ee, err := r.Read(ctx)
+				if err != nil {
+					logger.Errorf(ctx, "failed to read from catalog, err: %s", err.Error())
+					return handler.UnknownTransition, err
+				}
+
+				if ee != nil {
+					logger.Errorf(ctx, "got execution error from catalog output reader? This should not happen, err: %s", ee.String())
+					return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "execution error from a cache output, bad state: %s", ee.String())
+				}
+
+				if err := nCtx.DataStore().WriteProtobuf(ctx, tCtx.ow.GetOutputPath(), storage.Options{}, o); err != nil {
+					logger.Errorf(ctx, "failed to write cached value to datastore, err: %s", err.Error())
+					return handler.UnknownTransition, err
+				}
+
+				pluginTrns.CacheHit(tCtx.ow.GetOutputPath(), nil, entry)
+			} else {
+				logger.Infof(ctx, "No CacheHIT. Status [%s]", entry.GetStatus().GetCacheStatus().String())
+				pluginTrns.PopulateCacheInfo(entry)
+			}
 		}
 	}
 
@@ -880,6 +889,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 			unsupportedTaskType:            labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
 			catalogHitCount:                labeled.NewCounter("discovery_hit_count", "Task cached in Discovery", scope),
 			catalogMissCount:               labeled.NewCounter("discovery_miss_count", "Task not cached in Discovery", scope),
+			catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task lookup skipped in Discovery", scope),
 			catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
 			catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
 			catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),

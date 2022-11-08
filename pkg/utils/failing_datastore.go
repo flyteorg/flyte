@@ -34,3 +34,7 @@ func (FailingRawStore) ReadRaw(ctx context.Context, reference storage.DataRefere
 func (FailingRawStore) WriteRaw(ctx context.Context, reference storage.DataReference, size int64, opts storage.Options, raw io.Reader) error {
 	return fmt.Errorf("failed write raw")
 }
+
+func (FailingRawStore) Delete(ctx context.Context, reference storage.DataReference) error {
+	return fmt.Errorf("failed to delete")
+}
