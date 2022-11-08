@@ -745,19 +745,19 @@ cluster_resource_manager:
       customData:
         - production:
             - projectQuotaCpu:
-                value: "50"
+                value: "5"
             - projectQuotaMemory:
-                value: "40000Mi"
+                value: "4000Mi"
         - staging:
             - projectQuotaCpu:
-                value: "20"
+                value: "2"
             - projectQuotaMemory:
-                value: "30000Mi"
+                value: "3000Mi"
         - development:
             - projectQuotaCpu:
-                value: "40"
+                value: "4"
             - projectQuotaMemory:
-                value: "30000Mi"
+                value: "3000Mi"
 
   # -- Resource templates that should be applied
   templates:
