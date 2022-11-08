@@ -40,3 +40,19 @@ func (a *AdminFetcherExtClient) FetchProjectDomainAttributes(ctx context.Context
 	}
 	return projectDomainAttr, nil
 }
+
+func (a *AdminFetcherExtClient) FetchProjectAttributes(ctx context.Context, project string,
+	rsType admin.MatchableResource) (*admin.ProjectAttributesGetResponse, error) {
+	projectDomainAttr, err := a.AdminServiceClient().GetProjectAttributes(ctx,
+		&admin.ProjectAttributesGetRequest{
+			Project:      project,
+			ResourceType: rsType,
+		})
+	if err != nil {
+		return nil, err
+	}
+	if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, fmt.Errorf("attribute doesn't exist")
+	}
+	return projectDomainAttr, nil
+}

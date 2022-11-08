@@ -47,3 +47,17 @@ func TestDeleteProjectDomainAttributesError(t *testing.T) {
 	err := adminDeleterExt.DeleteProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
+
+func TestDeleteProjectAttributes(t *testing.T) {
+	deleteAttributeMatchFetcherSetup()
+	adminClient.OnDeleteProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	err := adminDeleterExt.DeleteProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
+	assert.Nil(t, err)
+}
+
+func TestDeleteProjectAttributesError(t *testing.T) {
+	deleteAttributeMatchFetcherSetup()
+	adminClient.OnDeleteProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	err := adminDeleterExt.DeleteProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
+	assert.Equal(t, fmt.Errorf("failed"), err)
+}

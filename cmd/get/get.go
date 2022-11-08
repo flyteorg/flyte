@@ -65,7 +65,7 @@ func CreateGetCommand() *cobra.Command {
 			Long:  pluginOverrideLong, PFlagProvider: pluginoverride.DefaultFetchConfig},
 		"workflow-execution-config": {CmdFunc: getWorkflowExecutionConfigFunc, Aliases: []string{"workflow-execution-config"},
 			Short: workflowExecutionConfigShort,
-			Long:  workflowExecutionConfigLong, PFlagProvider: workflowexecutionconfig.DefaultFetchConfig},
+			Long:  workflowExecutionConfigLong, PFlagProvider: workflowexecutionconfig.DefaultFetchConfig, ProjectDomainNotRequired: true},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)
