@@ -271,6 +271,7 @@ jobs:
             VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images
           fi
           pwd
+          ls -l .
           ls -alR docker/sandbox-bundled/images
       - name: debug
         run: |
