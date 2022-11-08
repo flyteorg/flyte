@@ -249,13 +249,6 @@ jobs:
           tags: |
             ${{ inputs.version }}
             type=sha,format=long,
-      - name: Prepare Sandbox images for single binary
-        run: |
-          if [ ${{ steps.set_version.outputs.flyte_version }} = "latest" ]; then
-            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images-ci
-          else
-            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images
-          fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -270,11 +263,13 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: debug
+      - name: Prepare Sandbox images for single binary
         run: |
-          ls -al docker/sandbox-bundled/images/dockerfiles/tar
-          ls -al docker/sandbox-bundled/images/dockerfiles/tar/amd64
-          ls -al docker/sandbox-bundled/images/dockerfiles/tar/arm64
+          if [ ${{ steps.set_version.outputs.flyte_version }} = "latest" ]; then
+            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images-ci
+          else
+            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images
+          fi
       - name: Build and push Image
         uses: docker/build-push-action@v3
         env:
