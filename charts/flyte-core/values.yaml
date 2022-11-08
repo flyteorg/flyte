@@ -543,11 +543,6 @@ configmap:
         cpu: 100m
         memory: 500Mi
         storage: 500Mi
-      limits:
-        cpu: 2
-        memory: 1Gi
-        storage: 20Mi
-        gpu: 1
 
   # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
   admin:

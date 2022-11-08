@@ -212,9 +212,6 @@ data:
         memory: 500Mi
         storage: 500Mi
       limits:
-        cpu: 2
-        gpu: 1
-        memory: 1Gi
         storage: 2000Mi
   cluster_resources.yaml: | 
     cluster_resources:
@@ -904,7 +901,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
+        configChecksum: "226827e501530ff8412bd64089221acf79df01f0efdfbe4af2b3458c38fb616"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1288,7 +1285,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
+        configChecksum: "226827e501530ff8412bd64089221acf79df01f0efdfbe4af2b3458c38fb616"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
