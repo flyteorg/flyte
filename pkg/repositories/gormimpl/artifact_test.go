@@ -1,9 +1,8 @@
 package gormimpl
 
 import (
-	"testing"
-
 	"context"
+	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
@@ -351,4 +350,212 @@ func TestListArtifactsNoPartitions(t *testing.T) {
 	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
 	assert.Len(t, artifacts[0].ArtifactData, 1)
 	assert.Len(t, artifacts[0].Partitions, 0)
+}
+
+func TestUpdateArtifact(t *testing.T) {
+	ctx := context.Background()
+	artifact := getTestArtifact()
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	artifactUpdated := false
+	GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactUpdated = true
+		})
+	artifactDataDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1 AND name NOT IN ($2,$3)`).
+		WithRowsNum(0).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDataDeleted = true
+		})
+	artifactDataUpserted := false
+	GlobalMock.NewMock().WithQuery(`INSERT INTO "artifact_data" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name","location") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10),($11,$12,$13,$14,$15,$16,$17,$18,$19,$20) ON CONFLICT DO NOTHING`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDataUpserted = true
+		})
+
+	updateInput := models.Artifact{
+		ArtifactKey: models.ArtifactKey{
+			ArtifactID: artifact.ArtifactID,
+		},
+		ArtifactData: []models.ArtifactData{
+			{
+				Name:     "test-dataloc-name",
+				Location: "test-dataloc-location",
+			},
+			{
+				Name:     "additional-test-dataloc-name",
+				Location: "additional-test-dataloc-location",
+			},
+		},
+	}
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	err := artifactRepo.Update(ctx, updateInput)
+	assert.NoError(t, err)
+	assert.True(t, artifactUpdated)
+	assert.True(t, artifactDataDeleted)
+	assert.True(t, artifactDataUpserted)
+}
+
+func TestUpdateArtifactDoesNotExist(t *testing.T) {
+	ctx := context.Background()
+	artifact := getTestArtifact()
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	updateInput := models.Artifact{
+		ArtifactKey: models.ArtifactKey{
+			ArtifactID: artifact.ArtifactID,
+		},
+		ArtifactData: []models.ArtifactData{
+			{
+				Name:     "test-dataloc-name",
+				Location: "test-dataloc-location",
+			},
+			{
+				Name:     "additional-test-dataloc-name",
+				Location: "additional-test-dataloc-location",
+			},
+		},
+	}
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	err := artifactRepo.Update(ctx, updateInput)
+	assert.Error(t, err)
+	dcErr, ok := err.(apiErrors.DataCatalogError)
+	assert.True(t, ok)
+	assert.Equal(t, dcErr.Code(), codes.NotFound)
+}
+
+func TestUpdateArtifactError(t *testing.T) {
+	artifact := getTestArtifact()
+
+	t.Run("ArtifactUpdate", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+			WithExecException()
+
+		updateInput := models.Artifact{
+			ArtifactKey: models.ArtifactKey{
+				ArtifactID: artifact.ArtifactID,
+			},
+			ArtifactData: []models.ArtifactData{
+				{
+					Name:     "test-dataloc-name",
+					Location: "test-dataloc-location",
+				},
+				{
+					Name:     "additional-test-dataloc-name",
+					Location: "additional-test-dataloc-location",
+				},
+			},
+		}
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Update(ctx, updateInput)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+	})
+
+	t.Run("ArtifactDataDelete", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		artifactUpdated := false
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+			WithRowsNum(1).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactUpdated = true
+			})
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1 AND name NOT IN ($2,$3)`).
+			WithExecException()
+
+		updateInput := models.Artifact{
+			ArtifactKey: models.ArtifactKey{
+				ArtifactID: artifact.ArtifactID,
+			},
+			ArtifactData: []models.ArtifactData{
+				{
+					Name:     "test-dataloc-name",
+					Location: "test-dataloc-location",
+				},
+				{
+					Name:     "additional-test-dataloc-name",
+					Location: "additional-test-dataloc-location",
+				},
+			},
+		}
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Update(ctx, updateInput)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.True(t, artifactUpdated)
+	})
+
+	t.Run("ArtifactDataUpsert", func(t *testing.T) {
+		ctx := context.Background()
+
+		GlobalMock := mocket.Catcher.Reset()
+		GlobalMock.Logging = true
+
+		artifactUpdated := false
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+			WithRowsNum(1).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactUpdated = true
+			})
+		artifactDataDeleted := false
+		GlobalMock.NewMock().
+			WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1 AND name NOT IN ($2,$3)`).
+			WithRowsNum(0).
+			WithCallback(func(s string, values []driver.NamedValue) {
+				artifactDataDeleted = true
+			})
+		GlobalMock.NewMock().WithQuery(`INSERT INTO "artifact_data" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name","location") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10),($11,$12,$13,$14,$15,$16,$17,$18,$19,$20) ON CONFLICT DO NOTHING`).
+			WithExecException()
+
+		updateInput := models.Artifact{
+			ArtifactKey: models.ArtifactKey{
+				ArtifactID: artifact.ArtifactID,
+			},
+			ArtifactData: []models.ArtifactData{
+				{
+					Name:     "test-dataloc-name",
+					Location: "test-dataloc-location",
+				},
+				{
+					Name:     "additional-test-dataloc-name",
+					Location: "additional-test-dataloc-location",
+				},
+			},
+		}
+
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		err := artifactRepo.Update(ctx, updateInput)
+		assert.Error(t, err)
+		dcErr, ok := err.(apiErrors.DataCatalogError)
+		assert.True(t, ok)
+		assert.Equal(t, dcErr.Code(), codes.Internal)
+		assert.True(t, artifactUpdated)
+		assert.True(t, artifactDataDeleted)
+	})
 }

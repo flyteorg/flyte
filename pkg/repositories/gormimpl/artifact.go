@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type artifactRepo struct {
@@ -117,4 +118,65 @@ func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, i
 		return []models.Artifact{}, h.errorTransformer.ToDataCatalogError(tx.Error)
 	}
 	return artifacts, nil
+}
+
+// Update updates the given artifact and its associated ArtifactData in database. The ArtifactData entries are upserted
+// (ignoring conflicts, as no updates to the database model are to be expected) and any longer existing data is deleted.
+func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) error {
+	timer := h.repoMetrics.UpdateDuration.Start(ctx)
+	defer timer.Stop()
+
+	tx := h.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// ensure all artifact fields in DB are up-to-date
+	if res := tx.Model(&models.Artifact{ArtifactKey: artifact.ArtifactKey}).Updates(artifact); res.Error != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(res.Error)
+	} else if res.RowsAffected == 0 {
+		// no rows affected --> artifact not found
+		tx.Rollback()
+		return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
+			Dataset: &datacatalog.DatasetID{
+				Project: artifact.DatasetProject,
+				Domain:  artifact.DatasetDomain,
+				Name:    artifact.DatasetName,
+				Version: artifact.DatasetVersion,
+			},
+			Id: artifact.ArtifactID,
+		})
+	}
+
+	artifactDataNames := make([]string, len(artifact.ArtifactData))
+	for i := range artifact.ArtifactData {
+		artifactDataNames[i] = artifact.ArtifactData[i].Name
+		// ensure artifact data is fully associated with correct artifact
+		artifact.ArtifactData[i].ArtifactKey = artifact.ArtifactKey
+	}
+
+	// delete all removed artifact data entries from the DB
+	if err := tx.Where(&models.ArtifactData{ArtifactKey: artifact.ArtifactKey}).Where("name NOT IN ?", artifactDataNames).Delete(&models.ArtifactData{}).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	// upsert artifact data, adding new entries and ignoring conflicts (no actual data changed)
+	if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(artifact.ArtifactData).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	return nil
 }

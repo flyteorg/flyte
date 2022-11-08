@@ -6,6 +6,8 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 )
 
+//go:generate mockery -name=DatasetRepo -output=../mocks -case=underscore
+
 type DatasetRepo interface {
 	Create(ctx context.Context, in models.Dataset) error
 	Get(ctx context.Context, in models.DatasetKey) (models.Dataset, error)

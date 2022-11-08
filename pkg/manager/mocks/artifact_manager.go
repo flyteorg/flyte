@@ -24,13 +24,13 @@ func (_m ArtifactManager_CreateArtifact) Return(_a0 *datacatalog.CreateArtifactR
 }
 
 func (_m *ArtifactManager) OnCreateArtifact(ctx context.Context, request *datacatalog.CreateArtifactRequest) *ArtifactManager_CreateArtifact {
-	c := _m.On("CreateArtifact", ctx, request)
-	return &ArtifactManager_CreateArtifact{Call: c}
+	c_call := _m.On("CreateArtifact", ctx, request)
+	return &ArtifactManager_CreateArtifact{Call: c_call}
 }
 
 func (_m *ArtifactManager) OnCreateArtifactMatch(matchers ...interface{}) *ArtifactManager_CreateArtifact {
-	c := _m.On("CreateArtifact", matchers...)
-	return &ArtifactManager_CreateArtifact{Call: c}
+	c_call := _m.On("CreateArtifact", matchers...)
+	return &ArtifactManager_CreateArtifact{Call: c_call}
 }
 
 // CreateArtifact provides a mock function with given fields: ctx, request
@@ -65,13 +65,13 @@ func (_m ArtifactManager_GetArtifact) Return(_a0 *datacatalog.GetArtifactRespons
 }
 
 func (_m *ArtifactManager) OnGetArtifact(ctx context.Context, request *datacatalog.GetArtifactRequest) *ArtifactManager_GetArtifact {
-	c := _m.On("GetArtifact", ctx, request)
-	return &ArtifactManager_GetArtifact{Call: c}
+	c_call := _m.On("GetArtifact", ctx, request)
+	return &ArtifactManager_GetArtifact{Call: c_call}
 }
 
 func (_m *ArtifactManager) OnGetArtifactMatch(matchers ...interface{}) *ArtifactManager_GetArtifact {
-	c := _m.On("GetArtifact", matchers...)
-	return &ArtifactManager_GetArtifact{Call: c}
+	c_call := _m.On("GetArtifact", matchers...)
+	return &ArtifactManager_GetArtifact{Call: c_call}
 }
 
 // GetArtifact provides a mock function with given fields: ctx, request
@@ -106,13 +106,13 @@ func (_m ArtifactManager_ListArtifacts) Return(_a0 *datacatalog.ListArtifactsRes
 }
 
 func (_m *ArtifactManager) OnListArtifacts(ctx context.Context, request *datacatalog.ListArtifactsRequest) *ArtifactManager_ListArtifacts {
-	c := _m.On("ListArtifacts", ctx, request)
-	return &ArtifactManager_ListArtifacts{Call: c}
+	c_call := _m.On("ListArtifacts", ctx, request)
+	return &ArtifactManager_ListArtifacts{Call: c_call}
 }
 
 func (_m *ArtifactManager) OnListArtifactsMatch(matchers ...interface{}) *ArtifactManager_ListArtifacts {
-	c := _m.On("ListArtifacts", matchers...)
-	return &ArtifactManager_ListArtifacts{Call: c}
+	c_call := _m.On("ListArtifacts", matchers...)
+	return &ArtifactManager_ListArtifacts{Call: c_call}
 }
 
 // ListArtifacts provides a mock function with given fields: ctx, request
@@ -130,6 +130,47 @@ func (_m *ArtifactManager) ListArtifacts(ctx context.Context, request *datacatal
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.ListArtifactsRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ArtifactManager_UpdateArtifact struct {
+	*mock.Call
+}
+
+func (_m ArtifactManager_UpdateArtifact) Return(_a0 *datacatalog.UpdateArtifactResponse, _a1 error) *ArtifactManager_UpdateArtifact {
+	return &ArtifactManager_UpdateArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ArtifactManager) OnUpdateArtifact(ctx context.Context, request *datacatalog.UpdateArtifactRequest) *ArtifactManager_UpdateArtifact {
+	c_call := _m.On("UpdateArtifact", ctx, request)
+	return &ArtifactManager_UpdateArtifact{Call: c_call}
+}
+
+func (_m *ArtifactManager) OnUpdateArtifactMatch(matchers ...interface{}) *ArtifactManager_UpdateArtifact {
+	c_call := _m.On("UpdateArtifact", matchers...)
+	return &ArtifactManager_UpdateArtifact{Call: c_call}
+}
+
+// UpdateArtifact provides a mock function with given fields: ctx, request
+func (_m *ArtifactManager) UpdateArtifact(ctx context.Context, request *datacatalog.UpdateArtifactRequest) (*datacatalog.UpdateArtifactResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *datacatalog.UpdateArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.UpdateArtifactRequest) *datacatalog.UpdateArtifactResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.UpdateArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.UpdateArtifactRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
