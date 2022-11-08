@@ -102,3 +102,64 @@ redis:
   # --- enable or disable Redis Statefulset installation
   enabled: false
 
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  standaloneDeployment: false
+  # -- Service account name to run with
+  service_account_name: flyteadmin
+  # -- Annotations for ClusterResource pods
+  podAnnotations: {}
+  # -- Configmap for ClusterResource parameters
+  config:
+    # -- ClusterResource parameters
+    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
+    cluster_resources:
+      # -- How frequently to run the sync process
+      refreshInterval: 5m
+      templatePath: "/etc/flyte/clusterresource/templates"
+      # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+      standaloneDeployment: false
+      customData:
+        - production:
+            - projectQuotaCpu:
+                value: "50"
+            - projectQuotaMemory:
+                value: "40000Mi"
+        - staging:
+            - projectQuotaCpu:
+                value: "20"
+            - projectQuotaMemory:
+                value: "30000Mi"
+        - development:
+            - projectQuotaCpu:
+                value: "40"
+            - projectQuotaMemory:
+                value: "30000Mi"
+
+  # -- Resource templates that should be applied
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
