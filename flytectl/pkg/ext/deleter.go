@@ -18,6 +18,9 @@ type AdminDeleterExtInterface interface {
 
 	// DeleteProjectDomainAttributes deletes project domain attributes for a particular matchable resource
 	DeleteProjectDomainAttributes(ctx context.Context, project, domain string, rsType admin.MatchableResource) error
+
+	// DeleteProjectAttributes deletes project attributes for a particular matchable resource
+	DeleteProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) error
 }
 
 // AdminDeleterExtClient is used for interacting with extended features used for deleting/archiving data in admin service

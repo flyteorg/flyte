@@ -79,3 +79,20 @@ func TestFetchProjectDomainAttributesError(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("attribute doesn't exist"), err)
 	})
 }
+
+func TestFetchProjectAttributesError(t *testing.T) {
+	t.Run("failed api", func(t *testing.T) {
+		getAttributeMatchFetcherSetup()
+		adminClient.OnGetProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		_, err := adminFetcherExt.FetchProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
+		assert.Equal(t, fmt.Errorf("failed"), err)
+	})
+	t.Run("empty data from api", func(t *testing.T) {
+		getAttributeMatchFetcherSetup()
+		pResp := &admin.ProjectAttributesGetResponse{}
+		adminClient.OnGetProjectAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
+		_, err := adminFetcherExt.FetchProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
+		assert.NotNil(t, err)
+		assert.Equal(t, fmt.Errorf("attribute doesn't exist"), err)
+	})
+}

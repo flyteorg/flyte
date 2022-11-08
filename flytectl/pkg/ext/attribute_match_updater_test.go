@@ -53,3 +53,20 @@ func TestUpdateProjectDomainAttributesError(t *testing.T) {
 	err := adminUpdaterExt.UpdateProjectDomainAttributes(ctx, "dummyProject", "domainValue", nil)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
+
+func TestUpdateProjectAttributes(t *testing.T) {
+	updateAttributeMatchFetcherSetup()
+	matchingAttr := &admin.MatchingAttributes{
+		Target: &admin.MatchingAttributes_TaskResourceAttributes{},
+	}
+	adminClient.OnUpdateProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, nil)
+	err := adminUpdaterExt.UpdateProjectAttributes(ctx, "dummyProject", matchingAttr)
+	assert.Nil(t, err)
+}
+
+func TestUpdateProjectAttributesError(t *testing.T) {
+	updateAttributeMatchFetcherSetup()
+	adminClient.OnUpdateProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	err := adminUpdaterExt.UpdateProjectAttributes(ctx, "dummyProject", nil)
+	assert.Equal(t, fmt.Errorf("failed"), err)
+}

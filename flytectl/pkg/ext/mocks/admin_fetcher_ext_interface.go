@@ -422,6 +422,47 @@ func (_m *AdminFetcherExtInterface) FetchNodeExecutionDetails(ctx context.Contex
 	return r0, r1
 }
 
+type AdminFetcherExtInterface_FetchProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchProjectAttributes) Return(_a0 *admin.ProjectAttributesGetResponse, _a1 error) *AdminFetcherExtInterface_FetchProjectAttributes {
+	return &AdminFetcherExtInterface_FetchProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) *AdminFetcherExtInterface_FetchProjectAttributes {
+	c_call := _m.On("FetchProjectAttributes", ctx, project, rsType)
+	return &AdminFetcherExtInterface_FetchProjectAttributes{Call: c_call}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchProjectAttributesMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchProjectAttributes {
+	c_call := _m.On("FetchProjectAttributes", matchers...)
+	return &AdminFetcherExtInterface_FetchProjectAttributes{Call: c_call}
+}
+
+// FetchProjectAttributes provides a mock function with given fields: ctx, project, rsType
+func (_m *AdminFetcherExtInterface) FetchProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) (*admin.ProjectAttributesGetResponse, error) {
+	ret := _m.Called(ctx, project, rsType)
+
+	var r0 *admin.ProjectAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, admin.MatchableResource) *admin.ProjectAttributesGetResponse); ok {
+		r0 = rf(ctx, project, rsType)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, admin.MatchableResource) error); ok {
+		r1 = rf(ctx, project, rsType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminFetcherExtInterface_FetchProjectDomainAttributes struct {
 	*mock.Call
 }

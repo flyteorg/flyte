@@ -24,3 +24,11 @@ func (a *AdminDeleterExtClient) DeleteProjectDomainAttributes(ctx context.Contex
 	})
 	return err
 }
+
+func (a *AdminDeleterExtClient) DeleteProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) error {
+	_, err := a.AdminServiceClient().DeleteProjectAttributes(ctx, &admin.ProjectAttributesDeleteRequest{
+		Project:      project,
+		ResourceType: rsType,
+	})
+	return err
+}

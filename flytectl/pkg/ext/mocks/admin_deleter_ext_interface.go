@@ -51,6 +51,38 @@ func (_m *AdminDeleterExtInterface) AdminServiceClient() service.AdminServiceCli
 	return r0
 }
 
+type AdminDeleterExtInterface_DeleteProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminDeleterExtInterface_DeleteProjectAttributes) Return(_a0 error) *AdminDeleterExtInterface_DeleteProjectAttributes {
+	return &AdminDeleterExtInterface_DeleteProjectAttributes{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *AdminDeleterExtInterface) OnDeleteProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) *AdminDeleterExtInterface_DeleteProjectAttributes {
+	c_call := _m.On("DeleteProjectAttributes", ctx, project, rsType)
+	return &AdminDeleterExtInterface_DeleteProjectAttributes{Call: c_call}
+}
+
+func (_m *AdminDeleterExtInterface) OnDeleteProjectAttributesMatch(matchers ...interface{}) *AdminDeleterExtInterface_DeleteProjectAttributes {
+	c_call := _m.On("DeleteProjectAttributes", matchers...)
+	return &AdminDeleterExtInterface_DeleteProjectAttributes{Call: c_call}
+}
+
+// DeleteProjectAttributes provides a mock function with given fields: ctx, project, rsType
+func (_m *AdminDeleterExtInterface) DeleteProjectAttributes(ctx context.Context, project string, rsType admin.MatchableResource) error {
+	ret := _m.Called(ctx, project, rsType)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, admin.MatchableResource) error); ok {
+		r0 = rf(ctx, project, rsType)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type AdminDeleterExtInterface_DeleteProjectDomainAttributes struct {
 	*mock.Call
 }

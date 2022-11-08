@@ -18,6 +18,9 @@ type AdminUpdaterExtInterface interface {
 
 	// UpdateProjectDomainAttributes updates project domain attributes for a particular matchable resource
 	UpdateProjectDomainAttributes(ctx context.Context, project, domain string, matchingAttr *admin.MatchingAttributes) error
+
+	// UpdateProjectAttributes updates project attributes for a particular matchable resource
+	UpdateProjectAttributes(ctx context.Context, project string, matchingAttr *admin.MatchingAttributes) error
 }
 
 // AdminUpdaterExtClient is used for interacting with extended features used for updating data in admin service

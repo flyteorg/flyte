@@ -29,3 +29,14 @@ func (a *AdminUpdaterExtClient) UpdateProjectDomainAttributes(ctx context.Contex
 		})
 	return err
 }
+
+func (a *AdminUpdaterExtClient) UpdateProjectAttributes(ctx context.Context, project string, matchingAttr *admin.MatchingAttributes) error {
+	_, err := a.AdminServiceClient().UpdateProjectAttributes(ctx,
+		&admin.ProjectAttributesUpdateRequest{
+			Attributes: &admin.ProjectAttributes{
+				Project:            project,
+				MatchingAttributes: matchingAttr,
+			},
+		})
+	return err
+}

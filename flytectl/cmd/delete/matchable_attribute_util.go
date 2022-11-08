@@ -26,12 +26,21 @@ func deleteMatchableAttr(ctx context.Context, project, domain, workflowName stri
 		if dryRun {
 			fmt.Print("skipping DeleteProjectDomainAttributes request (dryRun)\n")
 		} else {
-			err := deleter.DeleteProjectDomainAttributes(ctx, project, domain, rsType)
-			if err != nil {
-				return err
+			if len(domain) == 0 {
+				err := deleter.DeleteProjectAttributes(ctx, project, rsType)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Deleted matchable resources from %v project \n", project)
+			} else {
+				err := deleter.DeleteProjectDomainAttributes(ctx, project, domain, rsType)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Deleted matchable resources from %v project and domain %v\n", project, domain)
 			}
 		}
-		fmt.Printf("Deleted matchable resources from %v project and domain %v\n", project, domain)
+
 	}
 	return nil
 }
