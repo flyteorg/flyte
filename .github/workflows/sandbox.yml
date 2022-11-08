@@ -270,6 +270,11 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: debug
+        run: |
+          ls -al docker/sandbox-bundled/images/dockerfiles/tar
+          ls -al docker/sandbox-bundled/images/dockerfiles/tar/amd64
+          ls -al docker/sandbox-bundled/images/dockerfiles/tar/arm64
       - name: Build and push Image
         uses: docker/build-push-action@v3
         env:
