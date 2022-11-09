@@ -44,7 +44,7 @@ secrets:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: TzJYYUZiRTExTzRUcWhVUQ==
+  haSharedSecret: aXh1RFlGVG81cjZncUtMZA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -187,25 +187,25 @@ data:
     true\n  level: 1\nadmin:\n  endpoint: localhost:8089\n  insecure: true\nplugins:\n
     \ # All k8s plugins default configuration\n  k8s:\n    inject-finalizer: true\n
     \   default-env-vars:\n      - AWS_METADATA_SERVICE_TIMEOUT: 5\n      - AWS_METADATA_SERVICE_NUM_ATTEMPTS:
-    20\n      - FLYTE_AWS_ENDPOINT: \"http://flyte-sandbox-minio:9000\"\n      - FLYTE_AWS_ACCESS_KEY_ID:
-    minio\n      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage\n  # Logging configuration\n
-    \ # Escape Helm templating because admin will template these later\n  logs:\n
-    \   kubernetes-enabled: true\n    kubernetes-template-uri:\n        \"http://localhost:30080/kubernetes-dashboard/#/log/{{
-    .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}\"\n  k8s-array:\n
-    \   logs:\n      config:\n        kubernetes-enabled: true\n        kubernetes-template-uri:
-    \n            \"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace
-    }}/{{ .podName }}/pod?namespace={{ .namespace }}\"\n\ncluster_resources:\n  refreshInterval:
-    5m\n  templatePath: \"/etc/flyte/cluster-resource-templates\"\n  # -- Starts the
-    cluster resource manager in standalone mode with requisite auth credentials to
-    call flyteadmin service endpoints\n  standaloneDeployment: false\n  customData:\n
-    \ - production:\n    - projectQuotaCpu:\n        value: \"5\"\n    - projectQuotaMemory:\n
-    \       value: \"4000Mi\"\n  - staging:\n    - projectQuotaCpu:\n        value:
-    \"2\"\n    - projectQuotaMemory:\n        value: \"3000Mi\"\n  - development:\n
-    \   - projectQuotaCpu:\n        value: \"4\"\n    - projectQuotaMemory:\n        value:
-    \"3000Mi\"\n  refresh: 5m\ntask_resources:\n  defaults:\n    cpu: 500m\n    memory:
-    500Mi\n    storage: 500Mi\ncatalog-cache:\n  endpoint: localhost:8081\n  insecure:
-    true\n  type: datacatalog\nnamespace_mapping:\n  template: \"{{ project }}-{{
-    domain }}\"\n"
+    20\n      - FLYTE_AWS_ENDPOINT: \"http://flyte-sandbox-minio.flyte:9000\"\n      -
+    FLYTE_AWS_ACCESS_KEY_ID: minio\n      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage\n
+    \ # Logging configuration\n  # Escape Helm templating because admin will template
+    these later\n  logs:\n    kubernetes-enabled: true\n    kubernetes-template-uri:\n
+    \       \"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{
+    .podName }}/pod?namespace={{ .namespace }}\"\n  k8s-array:\n    logs:\n      config:\n
+    \       kubernetes-enabled: true\n        kubernetes-template-uri: \n            \"http://localhost:30080/kubernetes-dashboard/#/log/{{
+    .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}\"\n\ncluster_resources:\n
+    \ refreshInterval: 5m\n  templatePath: \"/etc/flyte/cluster-resource-templates\"\n
+    \ # -- Starts the cluster resource manager in standalone mode with requisite auth
+    credentials to call flyteadmin service endpoints\n  standaloneDeployment: false\n
+    \ customData:\n  - production:\n    - projectQuotaCpu:\n        value: \"5\"\n
+    \   - projectQuotaMemory:\n        value: \"4000Mi\"\n  - staging:\n    - projectQuotaCpu:\n
+    \       value: \"2\"\n    - projectQuotaMemory:\n        value: \"3000Mi\"\n  -
+    development:\n    - projectQuotaCpu:\n        value: \"4\"\n    - projectQuotaMemory:\n
+    \       value: \"3000Mi\"\n  refresh: 5m\ntask_resources:\n  defaults:\n    cpu:
+    500m\n    memory: 500Mi\n    storage: 500Mi\ncatalog-cache:\n  endpoint: localhost:8081\n
+    \ insecure: true\n  type: datacatalog\nnamespace_mapping:\n  template: \"{{ project
+    }}-{{ domain }}\"\n"
 kind: ConfigMap
 metadata:
   labels:
@@ -945,7 +945,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 061003822f76af68ccf200e57eb6d85c7854f7932ef9ffd8b73581ef23ad7aa9
+        checksum/secret: 23be03d286090de5dd98bb240a988b79f0b94e896f19aaecbb6fa2e6c703b5c4
       labels:
         app: docker-registry
         release: flyte-sandbox
