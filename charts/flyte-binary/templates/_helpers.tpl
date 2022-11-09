@@ -76,7 +76,7 @@ endpoint: "http://localhost:30002"
 Extra Minio env vars for propeller
 */}}
 {{- define "flyte-binary.minioExtraEnvVars" -}}
-- FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
+- FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio:9000"
 - FLYTE_AWS_ACCESS_KEY_ID: minio
 - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
 {{- end }}

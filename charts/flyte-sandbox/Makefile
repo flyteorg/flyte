@@ -17,12 +17,19 @@ start:
 stop:
 	$(BREW_BIN)/k3d cluster delete $(K3D_CLUSTER_NAME)
 
-.PHONY: bootstrap
-bootstrap: start
+.PHONY: render
+render: start
 	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) get namespace flyte || \
 	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) create namespace flyte
 	$(BREW_BIN)/helm template \
 		--skip-tests \
 		--namespace flyte \
 		flyte-sandbox . | \
-	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) --namespace=flyte apply -f -
+	$(BREW_BIN)/kubectl apply \
+		--context=k3d-$(K3D_CLUSTER_NAME) \
+		--namespace=flyte \
+		-f - --dry-run=client -o yaml > output.yaml
+
+.PHONY: bootstrap
+bootstrap: render
+	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) --namespace=flyte apply -f output.yaml
