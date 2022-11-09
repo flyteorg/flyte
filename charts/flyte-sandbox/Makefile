@@ -25,11 +25,11 @@ render: start
 		--skip-tests \
 		--namespace flyte \
 		flyte-sandbox . | \
-	$(BREW_BIN)/kubectl apply \
+	$(BREW_BIN)/kubectl create \
 		--context=k3d-$(K3D_CLUSTER_NAME) \
 		--namespace=flyte \
 		-f - --dry-run=client -o yaml > output.yaml
 
 .PHONY: bootstrap
-bootstrap: render
+bootstrap:
 	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) --namespace=flyte apply -f output.yaml
