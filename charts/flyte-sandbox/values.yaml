@@ -5,7 +5,24 @@ docker-registry:
     type: NodePort
     nodePort: 30000
 
-# flyte-binary:
+flyte-binary:
+  networking:
+    host: true
+  image:
+    fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
+  storage:
+    metadataContainer: flyte-sandbox
+    userDataContainer: flyte-sandbox
+    type: minio
+    region: my-region
+  database:
+    port: 30001
+    username: postgres
+    host: 127.0.0.1
+    dbname: flyteadmin
+    password: postgres
+  logger:
+    level: 1
 
 kubernetes-dashboard:
   extraArgs:

@@ -27,9 +27,9 @@ dependencies:
   - name: docker-registry
     version: 2.2.2
     repository: https://helm.twun.io/
-  # - name: flyte-binary
-  #   version: 0.1.0
-  #   repository: file://../flyte-binary
+  - name: flyte-binary
+    version: 0.1.0
+    repository: file://../flyte-binary
   - name: kubernetes-dashboard
     version: 5.11.0
     repository: https://kubernetes.github.io/dashboard/

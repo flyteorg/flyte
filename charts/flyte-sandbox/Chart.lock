@@ -2,6 +2,9 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io/
   version: 2.2.2
+- name: flyte-binary
+  repository: file://../flyte-binary
+  version: 0.1.0
 - name: kubernetes-dashboard
   repository: https://kubernetes.github.io/dashboard/
   version: 5.11.0
@@ -11,5 +14,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.1.0
-digest: sha256:99c97c2ddc4cc25142d6fe67f5dffdf307a64b56893ece6c5797c3b462a382ab
-generated: "2022-11-06T20:58:44.810185-08:00"
+digest: sha256:ce2d6bd1488364f3ca98cc306554e479f1190ac828925af78a468a52f752449c
+generated: "2022-11-08T21:33:26.465931-08:00"
