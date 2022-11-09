@@ -4,8 +4,6 @@ package flyteidl.plugins;
 
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
-import "google/protobuf/timestamp.proto";
-
 // RayJobSpec defines the desired state of RayJob
 message RayJob {
   // RayClusterSpec is the cluster template to run the job

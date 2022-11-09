@@ -14,6 +14,47 @@ type DataProxyServiceServer struct {
 	mock.Mock
 }
 
+type DataProxyServiceServer_CreateDownloadLink struct {
+	*mock.Call
+}
+
+func (_m DataProxyServiceServer_CreateDownloadLink) Return(_a0 *service.CreateDownloadLinkResponse, _a1 error) *DataProxyServiceServer_CreateDownloadLink {
+	return &DataProxyServiceServer_CreateDownloadLink{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataProxyServiceServer) OnCreateDownloadLink(_a0 context.Context, _a1 *service.CreateDownloadLinkRequest) *DataProxyServiceServer_CreateDownloadLink {
+	c_call := _m.On("CreateDownloadLink", _a0, _a1)
+	return &DataProxyServiceServer_CreateDownloadLink{Call: c_call}
+}
+
+func (_m *DataProxyServiceServer) OnCreateDownloadLinkMatch(matchers ...interface{}) *DataProxyServiceServer_CreateDownloadLink {
+	c_call := _m.On("CreateDownloadLink", matchers...)
+	return &DataProxyServiceServer_CreateDownloadLink{Call: c_call}
+}
+
+// CreateDownloadLink provides a mock function with given fields: _a0, _a1
+func (_m *DataProxyServiceServer) CreateDownloadLink(_a0 context.Context, _a1 *service.CreateDownloadLinkRequest) (*service.CreateDownloadLinkResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *service.CreateDownloadLinkResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateDownloadLinkRequest) *service.CreateDownloadLinkResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.CreateDownloadLinkResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.CreateDownloadLinkRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataProxyServiceServer_CreateDownloadLocation struct {
 	*mock.Call
 }

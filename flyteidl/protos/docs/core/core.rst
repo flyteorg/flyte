@@ -2236,6 +2236,7 @@ Task Metadata
    "deprecated_error_message", ":ref:`ref_string`", "", "If set, this indicates that this task is deprecated. This will enable owners of tasks to notify consumers of the ending of support for a given task."
    "interruptible", ":ref:`ref_bool`", "", ""
    "cache_serializable", ":ref:`ref_bool`", "", "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
+   "generates_deck", ":ref:`ref_bool`", "", "Indicates whether the task will generate a Deck URI when it finishes executing."
 
 
 

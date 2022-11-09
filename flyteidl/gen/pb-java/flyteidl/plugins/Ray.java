@@ -4108,24 +4108,23 @@ public final class Ray {
   static {
     java.lang.String[] descriptorData = {
       "\n\032flyteidl/plugins/ray.proto\022\020flyteidl.p" +
-      "lugins\032\037google/protobuf/timestamp.proto\"" +
-      "P\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034.flyteid" +
-      "l.plugins.RayCluster\022\023\n\013runtime_env\030\002 \001(" +
-      "\t\"\204\001\n\nRayCluster\0228\n\017head_group_spec\030\001 \001(" +
-      "\0132\037.flyteidl.plugins.HeadGroupSpec\022<\n\021wo" +
-      "rker_group_spec\030\002 \003(\0132!.flyteidl.plugins" +
-      ".WorkerGroupSpec\"\225\001\n\rHeadGroupSpec\022M\n\020ra" +
-      "y_start_params\030\001 \003(\01323.flyteidl.plugins." +
-      "HeadGroupSpec.RayStartParamsEntry\0325\n\023Ray" +
-      "StartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
-      " \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ngroup_na" +
-      "me\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min_replic" +
-      "as\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n\020ray_st" +
-      "art_params\030\005 \003(\01325.flyteidl.plugins.Work" +
-      "erGroupSpec.RayStartParamsEntry\0325\n\023RaySt" +
-      "artParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
-      "(\t:\0028\001B9Z7github.com/flyteorg/flyteidl/g" +
-      "en/pb-go/flyteidl/pluginsb\006proto3"
+      "lugins\"P\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034." +
+      "flyteidl.plugins.RayCluster\022\023\n\013runtime_e" +
+      "nv\030\002 \001(\t\"\204\001\n\nRayCluster\0228\n\017head_group_sp" +
+      "ec\030\001 \001(\0132\037.flyteidl.plugins.HeadGroupSpe" +
+      "c\022<\n\021worker_group_spec\030\002 \003(\0132!.flyteidl." +
+      "plugins.WorkerGroupSpec\"\225\001\n\rHeadGroupSpe" +
+      "c\022M\n\020ray_start_params\030\001 \003(\01323.flyteidl.p" +
+      "lugins.HeadGroupSpec.RayStartParamsEntry" +
+      "\0325\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005" +
+      "value\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ng" +
+      "roup_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min" +
+      "_replicas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n" +
+      "\020ray_start_params\030\005 \003(\01325.flyteidl.plugi" +
+      "ns.WorkerGroupSpec.RayStartParamsEntry\0325" +
+      "\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
+      "lue\030\002 \001(\t:\0028\001B9Z7github.com/flyteorg/fly" +
+      "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4138,7 +4137,6 @@ public final class Ray {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.google.protobuf.TimestampProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_plugins_RayJob_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4176,7 +4174,6 @@ public final class Ray {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_WorkerGroupSpec_RayStartParamsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    com.google.protobuf.TimestampProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

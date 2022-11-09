@@ -17,6 +17,54 @@ type DataProxyServiceClient struct {
 	mock.Mock
 }
 
+type DataProxyServiceClient_CreateDownloadLink struct {
+	*mock.Call
+}
+
+func (_m DataProxyServiceClient_CreateDownloadLink) Return(_a0 *service.CreateDownloadLinkResponse, _a1 error) *DataProxyServiceClient_CreateDownloadLink {
+	return &DataProxyServiceClient_CreateDownloadLink{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataProxyServiceClient) OnCreateDownloadLink(ctx context.Context, in *service.CreateDownloadLinkRequest, opts ...grpc.CallOption) *DataProxyServiceClient_CreateDownloadLink {
+	c_call := _m.On("CreateDownloadLink", ctx, in, opts)
+	return &DataProxyServiceClient_CreateDownloadLink{Call: c_call}
+}
+
+func (_m *DataProxyServiceClient) OnCreateDownloadLinkMatch(matchers ...interface{}) *DataProxyServiceClient_CreateDownloadLink {
+	c_call := _m.On("CreateDownloadLink", matchers...)
+	return &DataProxyServiceClient_CreateDownloadLink{Call: c_call}
+}
+
+// CreateDownloadLink provides a mock function with given fields: ctx, in, opts
+func (_m *DataProxyServiceClient) CreateDownloadLink(ctx context.Context, in *service.CreateDownloadLinkRequest, opts ...grpc.CallOption) (*service.CreateDownloadLinkResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *service.CreateDownloadLinkResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateDownloadLinkRequest, ...grpc.CallOption) *service.CreateDownloadLinkResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.CreateDownloadLinkResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.CreateDownloadLinkRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataProxyServiceClient_CreateDownloadLocation struct {
 	*mock.Call
 }

@@ -95,6 +95,9 @@ message TaskMetadata {
 
     // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     bool cache_serializable = 9;
+
+    // Indicates whether the task will generate a Deck URI when it finishes executing.
+    bool generates_deck = 10;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -261,7 +264,7 @@ message K8sPod {
    K8sObjectMetadata metadata = 1;
 
    // Defines the primary pod spec created when a task is executed.
-   // This should be a JSON-marshalled pod spec, which can be defined in 
+   // This should be a JSON-marshalled pod spec, which can be defined in
    // - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
    // - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
    google.protobuf.Struct pod_spec = 2;

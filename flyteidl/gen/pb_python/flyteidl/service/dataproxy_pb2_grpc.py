@@ -24,6 +24,11 @@ class DataProxyServiceStub(object):
         request_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationRequest.SerializeToString,
         response_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationResponse.FromString,
         )
+    self.CreateDownloadLink = channel.unary_unary(
+        '/flyteidl.service.DataProxyService/CreateDownloadLink',
+        request_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLinkRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLinkResponse.FromString,
+        )
 
 
 class DataProxyServiceServicer(object):
@@ -44,6 +49,13 @@ class DataProxyServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def CreateDownloadLink(self, request, context):
+    """CreateDownloadLocation creates a signed url to download artifacts.
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -56,6 +68,11 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
           servicer.CreateDownloadLocation,
           request_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationRequest.FromString,
           response_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLocationResponse.SerializeToString,
+      ),
+      'CreateDownloadLink': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateDownloadLink,
+          request_deserializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLinkRequest.FromString,
+          response_serializer=flyteidl_dot_service_dot_dataproxy__pb2.CreateDownloadLinkResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

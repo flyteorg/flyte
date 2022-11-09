@@ -24,4 +24,6 @@ type CoreTaskMetadata struct {
 	DeprecatedErrorMessage string `json:"deprecated_error_message,omitempty"`
 	Interruptible bool `json:"interruptible,omitempty"`
 	CacheSerializable bool `json:"cache_serializable,omitempty"`
+	// Indicates whether the task will generate a Deck URI when it finishes executing.
+	GeneratesDeck bool `json:"generates_deck,omitempty"`
 }
