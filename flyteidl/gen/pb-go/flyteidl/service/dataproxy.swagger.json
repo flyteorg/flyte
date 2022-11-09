@@ -15,10 +15,38 @@
     "application/json"
   ],
   "paths": {
+    "/api/v1/dataproxy/artifact_link": {
+      "post": {
+        "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
+        "description": "Creates a read-only http location that is accessible for tasks at runtime.",
+        "operationId": "CreateDownloadLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceCreateDownloadLinkResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceCreateDownloadLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
     "/api/v1/dataproxy/artifact_urn": {
       "get": {
         "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
-        "description": "Creates a read-only http location that is accessible for tasks at runtime.",
+        "description": "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime.",
         "operationId": "CreateDownloadLocation",
         "responses": {
           "200": {
@@ -77,6 +105,82 @@
     }
   },
   "definitions": {
+    "coreNodeExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "execution_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+        }
+      },
+      "description": "Encapsulation of fields that identify a Flyte node execution entity."
+    },
+    "coreWorkflowExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User or system provided value for the resource."
+        }
+      },
+      "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+    },
+    "serviceArtifactType": {
+      "type": "string",
+      "enum": [
+        "ARTIFACT_TYPE_UNDEFINED",
+        "ARTIFACT_TYPE_DECK"
+      ],
+      "default": "ARTIFACT_TYPE_UNDEFINED",
+      "description": "- ARTIFACT_TYPE_UNDEFINED: ARTIFACT_TYPE_UNDEFINED is the default, often invalid, value for the enum.\n - ARTIFACT_TYPE_DECK: ARTIFACT_TYPE_DECK refers to the deck html file optionally generated after a task, a workflow or a launch plan\nfinishes executing.",
+      "title": "ArtifactType"
+    },
+    "serviceCreateDownloadLinkRequest": {
+      "type": "object",
+      "properties": {
+        "artifact_type": {
+          "$ref": "#/definitions/serviceArtifactType",
+          "description": "ArtifactType of the artifact requested."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this\nexceeds the platform allowed max.\n+optional. The default value comes from a global config."
+        },
+        "node_execution_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier",
+          "description": "NodeId is the unique identifier for the node execution. For a task node, this will retrieve the output of the\nmost recent attempt of the task."
+        }
+      },
+      "title": "CreateDownloadLinkRequest defines the request parameters to create a download link (signed url)"
+    },
+    "serviceCreateDownloadLinkResponse": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when will the signed URL expire."
+        }
+      },
+      "title": "CreateDownloadLinkResponse defines the response for the generated links"
+    },
     "serviceCreateDownloadLocationResponse": {
       "type": "object",
       "properties": {
