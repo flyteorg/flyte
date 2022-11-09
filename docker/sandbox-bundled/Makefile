@@ -21,10 +21,11 @@ images:
 
 .PHONY: images-ci
 images-ci:
-	mkdir -p docker/sandbox-bundled/images/dockerfiles/tar/arm64
-	mkdir -p docker/sandbox-bundled/images/dockerfiles/tar/amd64
-	cp /tmp/flyte-amd64.tar docker/sandbox-bundled/images/dockerfiles/tar/amd64/flyte.tar
-	cp /tmp/flyte-arm64.tar docker/sandbox-bundled/images/dockerfiles/tar/arm64/flyte.tar
+	mkdir -p images/dockerfiles/tar/arm64
+	mkdir -p images/dockerfiles/tar/amd64
+	ls -lR /tmp
+	cp /tmp/flyte-amd64.tar images/dockerfiles/tar/amd64/flyte.tar
+	cp /tmp/flyte-arm64.tar images/dockerfiles/tar/arm64/flyte.tar
 
 .PHONY: clean
 clean: ## Cleanup state
