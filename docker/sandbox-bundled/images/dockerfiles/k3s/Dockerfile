@@ -10,7 +10,7 @@ RUN --security=insecure podman pull --arch ${TARGETARCH} envoyproxy/envoy:v1.23-
 RUN --security=insecure podman pull --arch ${TARGETARCH} rancher/pause:3.1 && podman save -o /tmp/images/pause.tar rancher/pause:3.1
 RUN --security=insecure podman pull --arch ${TARGETARCH} kubernetesui/metrics-scraper:v1.0.8 && podman save -o /tmp/images/metrics-scraper.tar kubernetesui/metrics-scraper:v1.0.8
 RUN --security=insecure podman pull --arch ${TARGETARCH} registry:2 && podman save -o /tmp/images/registry.tar registry:2
-RUN --security=insecure podman pull --arch ${TARGETARCH} bitnami/minideb:buster && podman save -o /tmp/images/minio.tar bitnami/minideb:buster
+RUN --security=insecure podman pull --arch ${TARGETARCH} bitnami/minio:2022-debian-11 && podman save -o /tmp/images/minio.tar bitnami/minio:2022-debian-11
 
 FROM rancher/k3s:v1.24.4-k3s1
 

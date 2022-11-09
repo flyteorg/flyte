@@ -598,7 +598,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyte-binary:latest
+        image: ghcr.io/flyteorg/flyte-binary:sha-98829c7f9031f4a4b96d6314453243f2b28f9d20
         imagePullPolicy: Never
         name: flyte
         ports:
@@ -708,7 +708,7 @@ spec:
         - --enable-insecure-login
         - --enable-skip-login
         - --disable-settings-authorizer
-        image: kubernetesui/dashboard
+        image: kubernetesui/dashboard:v2.6.1
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
@@ -765,7 +765,7 @@ spec:
           value: minio
         - name: MINIO_ROOT_PASSWORD
           value: miniostorage
-        image: bitnami/minideb:buster
+        image: bitnami/minio:2022-debian-11
         imagePullPolicy: Never
         name: minio
         ports:
@@ -800,7 +800,7 @@ spec:
       - env:
         - name: POSTGRES_HOST_AUTH_METHOD
           value: trust
-        image: postgres
+        image: postgres:14-alpine
         imagePullPolicy: Never
         name: postgres
         ports:
@@ -835,7 +835,7 @@ spec:
       - args:
         - envoy
         - -c /etc/envoy/config.yaml
-        image: envoyproxy/envoy
+        image: envoyproxy/envoy:v1.23-latest
         imagePullPolicy: Never
         name: proxy
         ports:
@@ -869,7 +869,7 @@ spec:
         app: registry
     spec:
       containers:
-      - image: registry
+      - image: registry:2
         imagePullPolicy: Never
         name: registry
         ports:
