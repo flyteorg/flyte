@@ -32,7 +32,8 @@ minio:
     nodePorts:
       api: 30002
   persistence:
-    enabled: false
+    enabled: true
+    storageClass: local-path
 
 postgresql:
   auth:
@@ -45,4 +46,5 @@ postgresql:
       nodePorts:
         postgresql: 30001
     persistence:
-      enabled: false
+      enabled: true
+      storageClass: local-path
