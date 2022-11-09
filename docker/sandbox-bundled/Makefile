@@ -23,7 +23,6 @@ images:
 images-ci:
 	mkdir -p images/dockerfiles/tar/arm64
 	mkdir -p images/dockerfiles/tar/amd64
-	ls -lR /tmp
 	cp /tmp/flyte-amd64.tar images/dockerfiles/tar/amd64/flyte.tar
 	cp /tmp/flyte-arm64.tar images/dockerfiles/tar/arm64/flyte.tar
 
