@@ -56,7 +56,7 @@ The following is required for non-sandbox deployments:
 
 .. note::
 
-   Flyte's Ingress routes traffic to either Flyte Console or FlyteAdmin based on the url path.
+   Flyte's Ingress routes traffic to either Flyte Console or FlyteAdmin based on the URL path.
 
 .. prompt:: bash
 
@@ -85,8 +85,10 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
 
     .. note::
 
-      Make sure to create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
+      Make sure to:   
+      * Create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
       steps.
+      * Configure `https://localhost:30081/callback` as a `redirect URI <https://developers.google.com/identity/openid-connect/openid-connect#setredirecturi>__.`
 
 .. tabbed:: Okta
 
@@ -123,7 +125,7 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
-#. Store the `client_secret` in a k8s secret as follows:
+#. Store the `client_secret` in a K8s secret as follows:
 
    .. prompt:: bash
 
@@ -179,8 +181,29 @@ Apply Configuration
           - http://flyteadmin.flyte.svc.cluster.local:80
 
    Save and exit your editor.
+   
+#. Replace the default `clientSecret` for `flytepropeller` using an encoded password of your choice:
 
-#. Restart `flyteadmin` for the changes to take effect:
+   .. prompt:: bash
+   
+      pip install bcrypt && python -c 'import bcrypt; import base64; print(base64.b64encode(bcrypt.hashpw("mypassword".encode("utf-8"), bcrypt.gensalt(6))))'
+      
+#. In the `flyte-admin-base-config` configMap, find the following section and replace `foobar` with the encoded password generated in the previous step:
+
+   .. code-block:: yaml
+   
+      secrets:
+       adminOauthClientCredentials:
+        enabled: true
+        clientSecret: foobar
+        clientId: flytepropeller
+
+Save and exit your editor.
+
+.. note::
+   This step is required to address security advisory `GHSA-67x4-qr35-qvrm <https://github.com/flyteorg/flyteadmin/security/advisories/GHSA-67x4-qr35-qvrm>`__.
+
+5. Restart `flyteadmin` for the changes to take effect:
 
    .. prompt:: bash
 
