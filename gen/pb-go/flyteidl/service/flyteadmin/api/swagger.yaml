@@ -11756,6 +11756,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -12006,6 +12007,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -15258,6 +15260,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+              generates_deck: true
             task_type_version: 1
             custom:
               fields:
@@ -15524,6 +15527,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+            generates_deck: true
           task_type_version: 1
           custom:
             fields:
@@ -16187,6 +16191,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -16447,6 +16452,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -20831,6 +20837,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -21081,6 +21088,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+                generates_deck: true
               task_type_version: 1
               custom:
                 fields:
@@ -27631,6 +27639,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+              generates_deck: true
             task_type_version: 1
             custom:
               fields:
@@ -27881,6 +27890,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+              generates_deck: true
             task_type_version: 1
             custom:
               fields:
@@ -34340,6 +34350,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                  generates_deck: true
                 task_type_version: 1
                 custom:
                   fields:
@@ -34590,6 +34601,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                  generates_deck: true
                 task_type_version: 1
                 custom:
                   fields:
@@ -40880,6 +40892,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                  generates_deck: true
                 task_type_version: 1
                 custom:
                   fields:
@@ -41130,6 +41143,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                  generates_deck: true
                 task_type_version: 1
                 custom:
                   fields:
@@ -44106,6 +44120,7 @@ definitions:
           deprecated_error_message: "deprecated_error_message"
           interruptible: true
           timeout: "timeout"
+          generates_deck: true
         task_type_version: 1
         custom:
           fields:
@@ -50424,6 +50439,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+            generates_deck: true
           task_type_version: 1
           custom:
             fields:
@@ -50674,6 +50690,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+            generates_deck: true
           task_type_version: 1
           custom:
             fields:
@@ -53419,8 +53436,8 @@ definitions:
         $ref: "#/definitions/coreK8sObjectMetadata"
       pod_spec:
         title: "Defines the primary pod spec created when a task is executed.\nThis\
-          \ should be a JSON-marshalled pod spec, which can be defined in \n- go,\
-          \ using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n\
+          \ should be a JSON-marshalled pod spec, which can be defined in\n- go, using:\
+          \ https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n\
           - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
         $ref: "#/definitions/protobufStruct"
     description: "Defines a pod spec and additional pod metadata that is created when\
@@ -55420,6 +55437,11 @@ definitions:
         format: "boolean"
         title: "Indicates whether the system should attempt to execute discoverable\
           \ instances in serial to avoid duplicate work"
+      generates_deck:
+        type: "boolean"
+        format: "boolean"
+        description: "Indicates whether the task will generate a Deck URI when it\
+          \ finishes executing."
     title: "Task Metadata"
     example:
       retries:
@@ -55434,6 +55456,7 @@ definitions:
       deprecated_error_message: "deprecated_error_message"
       interruptible: true
       timeout: "timeout"
+      generates_deck: true
   coreTaskNode:
     type: "object"
     properties:
@@ -55588,6 +55611,7 @@ definitions:
         deprecated_error_message: "deprecated_error_message"
         interruptible: true
         timeout: "timeout"
+        generates_deck: true
       task_type_version: 1
       custom:
         fields:
@@ -62737,6 +62761,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+              generates_deck: true
             task_type_version: 1
             custom:
               fields:
@@ -62987,6 +63012,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+              generates_deck: true
             task_type_version: 1
             custom:
               fields:

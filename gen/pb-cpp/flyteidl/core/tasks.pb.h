@@ -919,6 +919,12 @@ class TaskMetadata final :
   bool cache_serializable() const;
   void set_cache_serializable(bool value);
 
+  // bool generates_deck = 10;
+  void clear_generates_deck();
+  static const int kGeneratesDeckFieldNumber = 10;
+  bool generates_deck() const;
+  void set_generates_deck(bool value);
+
   // bool interruptible = 8;
   private:
   bool has_interruptible() const;
@@ -946,6 +952,7 @@ class TaskMetadata final :
   ::flyteidl::core::RetryStrategy* retries_;
   bool discoverable_;
   bool cache_serializable_;
+  bool generates_deck_;
   union InterruptibleValueUnion {
     InterruptibleValueUnion() {}
     bool interruptible_;
@@ -2999,6 +3006,20 @@ inline void TaskMetadata::set_cache_serializable(bool value) {
   
   cache_serializable_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.cache_serializable)
+}
+
+// bool generates_deck = 10;
+inline void TaskMetadata::clear_generates_deck() {
+  generates_deck_ = false;
+}
+inline bool TaskMetadata::generates_deck() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.generates_deck)
+  return generates_deck_;
+}
+inline void TaskMetadata::set_generates_deck(bool value) {
+  
+  generates_deck_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.generates_deck)
 }
 
 inline bool TaskMetadata::has_interruptible_value() const {

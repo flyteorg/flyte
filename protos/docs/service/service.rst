@@ -234,6 +234,51 @@ flyteidl/service/dataproxy.proto
 
 
 
+.. _ref_flyteidl.service.CreateDownloadLinkRequest:
+
+CreateDownloadLinkRequest
+------------------------------------------------------------------
+
+CreateDownloadLinkRequest defines the request parameters to create a download link (signed url)
+
+
+
+.. csv-table:: CreateDownloadLinkRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "artifact_type", ":ref:`ref_flyteidl.service.ArtifactType`", "", "ArtifactType of the artifact requested."
+   "expires_in", ":ref:`ref_google.protobuf.Duration`", "", "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this exceeds the platform allowed max. +optional. The default value comes from a global config."
+   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "NodeId is the unique identifier for the node execution. For a task node, this will retrieve the output of the most recent attempt of the task."
+
+
+
+
+
+
+
+.. _ref_flyteidl.service.CreateDownloadLinkResponse:
+
+CreateDownloadLinkResponse
+------------------------------------------------------------------
+
+CreateDownloadLinkResponse defines the response for the generated links
+
+
+
+.. csv-table:: CreateDownloadLinkResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "signed_url", ":ref:`ref_string`", "repeated", "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+   "expires_at", ":ref:`ref_google.protobuf.Timestamp`", "", "ExpiresAt defines when will the signed URL expire."
+
+
+
+
+
+
+
 .. _ref_flyteidl.service.CreateDownloadLocationRequest:
 
 CreateDownloadLocationRequest
@@ -329,6 +374,22 @@ CreateUploadLocationResponse
    end messages
 
 
+
+.. _ref_flyteidl.service.ArtifactType:
+
+ArtifactType
+------------------------------------------------------------------
+
+ArtifactType
+
+.. csv-table:: Enum ArtifactType values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+
+   "ARTIFACT_TYPE_UNDEFINED", "0", "ARTIFACT_TYPE_UNDEFINED is the default, often invalid, value for the enum."
+   "ARTIFACT_TYPE_DECK", "1", "ARTIFACT_TYPE_DECK refers to the deck html file optionally generated after a task, a workflow or a launch plan finishes executing."
+
+
 ..
    end enums
 
@@ -351,6 +412,7 @@ DataProxyService defines an RPC Service that allows access to user-data in a con
 
    "CreateUploadLocation", ":ref:`ref_flyteidl.service.CreateUploadLocationRequest`", ":ref:`ref_flyteidl.service.CreateUploadLocationResponse`", "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain."
    "CreateDownloadLocation", ":ref:`ref_flyteidl.service.CreateDownloadLocationRequest`", ":ref:`ref_flyteidl.service.CreateDownloadLocationResponse`", "CreateDownloadLocation creates a signed url to download artifacts."
+   "CreateDownloadLink", ":ref:`ref_flyteidl.service.CreateDownloadLinkRequest`", ":ref:`ref_flyteidl.service.CreateDownloadLinkResponse`", "CreateDownloadLocation creates a signed url to download artifacts."
 
 ..
    end services
