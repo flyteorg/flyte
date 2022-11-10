@@ -56,13 +56,13 @@ configmap:
     task_resources:
       defaults:
         cpu: 500m
-        memory: 500Mi
+        memory: 1Gi
         storage: 500Mi
       limits:
-        cpu: 20
-        memory: 10Gi
+        cpu: 2
+        memory: 4Gi
         storage: 20Mi
-        gpu: 10
+        gpu: 5
 
 
   # -- Kubernetes specific Flyte configuration
@@ -140,19 +140,19 @@ cluster_resource_manager:
       customData:
         - production:
             - projectQuotaCpu:
-                value: "50"
+                value: "8"
             - projectQuotaMemory:
-                value: "40000Mi"
+                value: "16Gi"
         - staging:
             - projectQuotaCpu:
-                value: "20"
+                value: "8"
             - projectQuotaMemory:
-                value: "30000Mi"
+                value: "16Gi"
         - development:
             - projectQuotaCpu:
-                value: "40"
+                value: "8"
             - projectQuotaMemory:
-                value: "30000Mi"
+                value: "16Gi"
 
   # -- Resource templates that should be applied
   templates:

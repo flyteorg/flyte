@@ -72,20 +72,30 @@ cluster_resources:
   customData:
   - production:
     - projectQuotaCpu:
-        value: "50"
+        value: "8"
     - projectQuotaMemory:
-        value: "40000Mi"
+        value: "16Gi"
   - staging:
     - projectQuotaCpu:
-        value: "20"
+        value: "8"
     - projectQuotaMemory:
-        value: "30000Mi"
+        value: "16Gi"
   - development:
     - projectQuotaCpu:
-        value: "40"
+        value: "8"
     - projectQuotaMemory:
-        value: "30000Mi"
+        value: "16Gi"
   refresh: 5m
+task_resources:
+  defaults:
+    cpu: 500m
+    memory: 1Gi
+    storage: 500Mi
+  limits:
+    cpu: 2
+    memory: 4Gi
+    storage: 20Mi
+    gpu: 5
 flyte:
   admin:
     disableClusterResourceManager: true
