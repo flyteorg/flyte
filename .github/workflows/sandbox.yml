@@ -168,13 +168,12 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Export ARM64 Image
         uses: docker/build-push-action@v3
-        if: ${{ github.event_name != 'release' }}
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/arm64
-          tags: ${{ steps.dind-names.outputs.tags }}
+          tags: flyte-binary:sandbox
           build-args: ""
           file: Dockerfile
           cache-from: type=gha
@@ -182,13 +181,12 @@ jobs:
           outputs: type=docker,dest=/tmp/flyte-arm64.tar
       - name: Export AMD64 Image
         uses: docker/build-push-action@v3
-        if: ${{ github.event_name != 'release' }}
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/amd64
-          tags: ${{ steps.dind-names.outputs.tags }}
+          tags: flyte-binary:sandbox
           build-args: ""
           file: Dockerfile
           cache-from: type=gha
@@ -209,7 +207,6 @@ jobs:
           cache-to: type=gha,mode=max
           push: ${{ github.event_name == 'release' }}
       - name: Upload Artifact GitHub Action
-        if: ${{ github.event_name != 'release' }}
         uses: actions/upload-artifact@v2
         with:
           name: single-binary-image
@@ -224,18 +221,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-      - name: Set flyte version to release
-        id: set_version
-        run: |
-          if [ ${{ github.event_name}} = "release" ]; then
-            echo ::set-output name=flyte_version::$(echo ${{ github.event.release.tag_name }})
-            echo ::set-output name=build_args::$(echo FLYTE_VERSION=${{ github.event.release.tag_name }})
-          else
-            echo ::set-output name=flyte_version::latest
-            echo ::set-output name=build_args::"FLYTE_VERSION=''"
-          fi
       - uses: actions/download-artifact@v3
-        if: ${{ github.event_name != 'release' }}
         with:
           name: single-binary-image
           path: /tmp/
@@ -265,11 +251,7 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Prepare Sandbox images for single binary
         run: |
-          if [ ${{ steps.set_version.outputs.flyte_version }} = "latest" ]; then
-            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images-ci
-          else
-            VERSION=${{ steps.set_version.outputs.flyte_version }} make -C docker/sandbox-bundled images
-          fi
+          make -C docker/sandbox-bundled images-ci
       - name: Build and push Image
         uses: docker/build-push-action@v3
         env:
@@ -279,7 +261,6 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.dind-names.outputs.tags }}
-          build-args: ${{ steps.set_version.outputs.build_args }}
           file: docker/sandbox-bundled/images/dockerfiles/k3s/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
