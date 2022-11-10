@@ -24,6 +24,7 @@ func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 					ClientID:    "my-client",
 					RedirectURI: "client/",
 					Scopes:      []string{"all"},
+					Audience:    "http://dummyServer",
 				},
 			},
 		},
@@ -35,6 +36,7 @@ func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 	assert.Equal(t, "my-client", resp.ClientId)
 	assert.Equal(t, "client/", resp.RedirectUri)
 	assert.Equal(t, []string{"all"}, resp.Scopes)
+	assert.Equal(t, "http://dummyServer", resp.Audience)
 }
 
 func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
