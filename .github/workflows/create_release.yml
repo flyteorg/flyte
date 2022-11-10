@@ -34,12 +34,12 @@ jobs:
       matrix:
         component:
           [
-            flyteconsole,
-            flytepropeller,
-            flyteadmin,
-            datacatalog,
-            flytescheduler,
-            flytecopilot,
+              flyteconsole,
+              flytepropeller,
+              flyteadmin,
+              datacatalog,
+              flytescheduler,
+              flytecopilot,
           ]
     steps:
       - name: Checkout
