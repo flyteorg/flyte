@@ -47,6 +47,7 @@ var (
 	}
 	StdWriterPrefixLen = 8
 	StartingBufLen     = 32*1024 + StdWriterPrefixLen + 1
+	ExtraHosts         = []string{"host.docker.internal:127.0.0.1"}
 )
 
 // GetDockerClient will returns the docker client
@@ -237,6 +238,7 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 		Mounts:       volumes,
 		PortBindings: portBindings,
 		Privileged:   true,
+		ExtraHosts:   ExtraHosts, // add it because linux machine doesn't have this host name by default
 	}, nil,
 		nil, name)
 
