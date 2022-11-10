@@ -477,4 +477,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_appAuth.thirdPartyConfig.flyteClient.audience", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("appAuth.thirdPartyConfig.flyteClient.audience", testValue)
+			if vString, err := cmdFlags.GetString("appAuth.thirdPartyConfig.flyteClient.audience"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ThirdParty.FlyteClientConfig.Audience)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
