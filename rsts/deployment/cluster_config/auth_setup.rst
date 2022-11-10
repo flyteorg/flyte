@@ -88,7 +88,7 @@ Flyte supports connecting with external OIdC providers. Here are some examples f
       Make sure to:   
       * Create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
       steps.
-      * Configure `https://localhost:30081/callback` as a `redirect URI <https://developers.google.com/identity/openid-connect/openid-connect#setredirecturi>__.`
+      * For sandbox deployments, configure `https://localhost:30081/callback` as a `redirect URI <https://developers.google.com/identity/openid-connect/openid-connect#setredirecturi>__.`
 
 .. tabbed:: Okta
 
