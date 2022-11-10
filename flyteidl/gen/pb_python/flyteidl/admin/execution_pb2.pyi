@@ -1,7 +1,6 @@
 from flyteidl.admin import cluster_assignment_pb2 as _cluster_assignment_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
-from flyteidl.core import errors_pb2 as _errors_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import security_pb2 as _security_pb2
@@ -199,20 +198,16 @@ class ExecutionTerminateResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ExecutionUpdateRequest(_message.Message):
-    __slots__ = ["evict_cache", "id", "state"]
-    EVICT_CACHE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["id", "state"]
     ID_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
-    evict_cache: bool
     id: _identifier_pb2.WorkflowExecutionIdentifier
     state: ExecutionState
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., state: _Optional[_Union[ExecutionState, str]] = ..., evict_cache: bool = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., state: _Optional[_Union[ExecutionState, str]] = ...) -> None: ...
 
 class ExecutionUpdateResponse(_message.Message):
-    __slots__ = ["cache_eviction_errors"]
-    CACHE_EVICTION_ERRORS_FIELD_NUMBER: _ClassVar[int]
-    cache_eviction_errors: _errors_pb2.CacheEvictionErrorList
-    def __init__(self, cache_eviction_errors: _Optional[_Union[_errors_pb2.CacheEvictionErrorList, _Mapping]] = ...) -> None: ...
+    __slots__ = []
+    def __init__(self) -> None: ...
 
 class LiteralMapBlob(_message.Message):
     __slots__ = ["uri", "values"]

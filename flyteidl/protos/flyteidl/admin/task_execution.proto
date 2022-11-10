@@ -4,7 +4,6 @@ package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/admin/common.proto";
-import "flyteidl/core/errors.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
@@ -149,17 +148,4 @@ message TaskExecutionGetDataResponse {
 
     // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs               = 4;
-}
-
-message TaskExecutionUpdateRequest {
-    // Identifier of the task execution to update
-    core.TaskExecutionIdentifier id = 1;
-
-    // Indicates the cache of this (finished) task execution should be evicted, instructing flyteadmin to traverse the
-    // execution DAG and remove all stored results from datacatalog.
-    bool evict_cache = 2;
-}
-
-message TaskExecutionUpdateResponse {
-    core.CacheEvictionErrorList cache_eviction_errors = 1;
 }

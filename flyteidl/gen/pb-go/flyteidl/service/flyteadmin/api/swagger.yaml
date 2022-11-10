@@ -1910,8 +1910,8 @@ paths:
   : get:
       tags:
       - "AdminService"
-      summary: "Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`."
-      operationId: "UpdateTaskExecution"
+      summary: "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`."
+      operationId: "GetTaskExecution"
       parameters:
       - name: "id.node_execution_id.execution_id.project"
         in: "path"
@@ -1988,21 +1988,11 @@ paths:
         - "DATASET"
         x-exportParamName: "IdTaskIdResourceType"
         x-optionalDataType: "String"
-      - name: "evict_cache"
-        in: "query"
-        description: "Indicates the cache of this (finished) task execution should\
-          \ be evicted, instructing flyteadmin to traverse the\nexecution DAG and\
-          \ remove all stored results from datacatalog."
-        required: false
-        type: "boolean"
-        format: "boolean"
-        x-exportParamName: "EvictCache"
-        x-optionalDataType: "Bool"
       responses:
         200:
           description: "A successful response."
           schema:
-            $ref: "#/definitions/adminTaskExecutionUpdateResponse"
+            $ref: "#/definitions/flyteidladminTaskExecution"
   ? /api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}
   : get:
       tags:
@@ -2835,11 +2825,6 @@ definitions:
     - "SINGLE"
     - "MULTIPART"
     default: "SINGLE"
-  CacheEvictionErrorCode:
-    type: "string"
-    enum:
-    - "UNKNOWN"
-    default: "UNKNOWN"
   CatalogReservationStatus:
     type: "string"
     description: "Indicates the status of a catalog reservation operation.\n\n - RESERVATION_DISABLED:\
@@ -4501,75 +4486,8 @@ definitions:
       state:
         title: "State to set as the new value active/archive"
         $ref: "#/definitions/adminExecutionState"
-      evict_cache:
-        type: "boolean"
-        format: "boolean"
-        description: "Indicates the cache of this (finished) execution should be evicted,\
-          \ instructing flyteadmin to traverse the\nexecution DAG and remove all stored\
-          \ results from datacatalog."
   adminExecutionUpdateResponse:
     type: "object"
-    properties:
-      cache_eviction_errors:
-        description: "List of errors encountered during cache eviction (if any).\n\
-          Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest`\
-          \ is set."
-        $ref: "#/definitions/coreCacheEvictionErrorList"
-    example:
-      cache_eviction_errors:
-        errors:
-        - code: {}
-          workflow_execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          task_execution_id:
-            task_id:
-              domain: "domain"
-              resource_type: {}
-              name: "name"
-              project: "project"
-              version: "version"
-            node_execution_id:
-              execution_id:
-                domain: "domain"
-                name: "name"
-                project: "project"
-              node_id: "node_id"
-            retry_attempt: 0
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          message: "message"
-        - code: {}
-          workflow_execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          task_execution_id:
-            task_id:
-              domain: "domain"
-              resource_type: {}
-              name: "name"
-              project: "project"
-              version: "version"
-            node_execution_id:
-              execution_id:
-                domain: "domain"
-                name: "name"
-                project: "project"
-              node_id: "node_id"
-            retry_attempt: 0
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          message: "message"
   adminFixedRate:
     type: "object"
     properties:
@@ -16101,66 +16019,6 @@ definitions:
             uri: "uri"
             ttl: "ttl"
       token: "token"
-  adminTaskExecutionUpdateResponse:
-    type: "object"
-    properties:
-      cache_eviction_errors:
-        $ref: "#/definitions/coreCacheEvictionErrorList"
-    example:
-      cache_eviction_errors:
-        errors:
-        - code: {}
-          workflow_execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          task_execution_id:
-            task_id:
-              domain: "domain"
-              resource_type: {}
-              name: "name"
-              project: "project"
-              version: "version"
-            node_execution_id:
-              execution_id:
-                domain: "domain"
-                name: "name"
-                project: "project"
-              node_id: "node_id"
-            retry_attempt: 0
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          message: "message"
-        - code: {}
-          workflow_execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          task_execution_id:
-            task_id:
-              domain: "domain"
-              resource_type: {}
-              name: "name"
-              project: "project"
-              version: "version"
-            node_execution_id:
-              execution_id:
-                domain: "domain"
-                name: "name"
-                project: "project"
-              node_id: "node_id"
-            retry_attempt: 0
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          message: "message"
   adminTaskList:
     type: "object"
     properties:
@@ -44048,119 +43906,6 @@ definitions:
                   integer: "integer"
                 var: "var"
               operator: {}
-  coreCacheEvictionError:
-    type: "object"
-    properties:
-      code:
-        description: "Error code to match type of cache eviction error encountered."
-        $ref: "#/definitions/CacheEvictionErrorCode"
-      message:
-        type: "string"
-        description: "More detailed error message explaining the reason for the cache\
-          \ eviction failure."
-      node_execution_id:
-        description: "ID of the node execution the cache eviction failed for."
-        $ref: "#/definitions/coreNodeExecutionIdentifier"
-      task_execution_id:
-        description: "ID of the task execution the cache eviction failed for (if the\
-          \ node execution was part of a task execution)."
-        $ref: "#/definitions/coreTaskExecutionIdentifier"
-      workflow_execution_id:
-        description: "ID of the workflow execution the cache eviction failed for (if\
-          \ the node execution was part of a workflow execution)."
-        $ref: "#/definitions/coreWorkflowExecutionIdentifier"
-    description: "Error returned if eviction of cached output fails and should be\
-      \ re-tried by the user."
-    example:
-      code: {}
-      workflow_execution_id:
-        domain: "domain"
-        name: "name"
-        project: "project"
-      task_execution_id:
-        task_id:
-          domain: "domain"
-          resource_type: {}
-          name: "name"
-          project: "project"
-          version: "version"
-        node_execution_id:
-          execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          node_id: "node_id"
-        retry_attempt: 0
-      node_execution_id:
-        execution_id:
-          domain: "domain"
-          name: "name"
-          project: "project"
-        node_id: "node_id"
-      message: "message"
-  coreCacheEvictionErrorList:
-    type: "object"
-    properties:
-      errors:
-        type: "array"
-        items:
-          $ref: "#/definitions/coreCacheEvictionError"
-    description: "List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered\
-      \ during a cache eviction request."
-    example:
-      errors:
-      - code: {}
-        workflow_execution_id:
-          domain: "domain"
-          name: "name"
-          project: "project"
-        task_execution_id:
-          task_id:
-            domain: "domain"
-            resource_type: {}
-            name: "name"
-            project: "project"
-            version: "version"
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          retry_attempt: 0
-        node_execution_id:
-          execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          node_id: "node_id"
-        message: "message"
-      - code: {}
-        workflow_execution_id:
-          domain: "domain"
-          name: "name"
-          project: "project"
-        task_execution_id:
-          task_id:
-            domain: "domain"
-            resource_type: {}
-            name: "name"
-            project: "project"
-            version: "version"
-          node_execution_id:
-            execution_id:
-              domain: "domain"
-              name: "name"
-              project: "project"
-            node_id: "node_id"
-          retry_attempt: 0
-        node_execution_id:
-          execution_id:
-            domain: "domain"
-            name: "name"
-            project: "project"
-          node_id: "node_id"
-        message: "message"
   coreCatalogArtifactTag:
     type: "object"
     properties:

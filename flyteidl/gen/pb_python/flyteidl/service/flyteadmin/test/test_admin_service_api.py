@@ -176,6 +176,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_task_execution(self):
+        """Test case for get_task_execution
+
+        Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
+        """
+        pass
+
     def test_get_task_execution_data(self):
         """Test case for get_task_execution_data
 
@@ -403,13 +410,6 @@ class TestAdminServiceApi(unittest.TestCase):
         """Test case for update_project_domain_attributes
 
         Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
-        """
-        pass
-
-    def test_update_task_execution(self):
-        """Test case for update_task_execution
-
-        Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
         """
         pass
 

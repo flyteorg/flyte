@@ -210,11 +210,6 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataResponse.FromString,
                 )
-        self.UpdateTaskExecution = channel.unary_unary(
-                '/flyteidl.service.AdminService/UpdateTaskExecution',
-                request_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateResponse.FromString,
-                )
         self.UpdateProjectDomainAttributes = channel.unary_unary(
                 '/flyteidl.service.AdminService/UpdateProjectDomainAttributes',
                 request_serializer=flyteidl_dot_admin_dot_project__domain__attributes__pb2.ProjectDomainAttributesUpdateRequest.SerializeToString,
@@ -560,13 +555,6 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UpdateTaskExecution(self, request, context):
-        """Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def UpdateProjectDomainAttributes(self, request, context):
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
         """
@@ -860,11 +848,6 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetTaskExecutionData,
                     request_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataResponse.SerializeToString,
-            ),
-            'UpdateTaskExecution': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateTaskExecution,
-                    request_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateResponse.SerializeToString,
             ),
             'UpdateProjectDomainAttributes': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateProjectDomainAttributes,
@@ -1567,23 +1550,6 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetTaskExecutionData',
             flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataRequest.SerializeToString,
             flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def UpdateTaskExecution(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateTaskExecution',
-            flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateRequest.SerializeToString,
-            flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionUpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

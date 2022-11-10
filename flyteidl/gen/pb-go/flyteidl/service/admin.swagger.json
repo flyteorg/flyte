@@ -2179,13 +2179,13 @@
     },
     "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
-        "summary": "Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`.",
-        "operationId": "UpdateTaskExecution",
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "GetTaskExecution",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminTaskExecutionUpdateResponse"
+              "$ref": "#/definitions/flyteidladminTaskExecution"
             }
           }
         },
@@ -2266,14 +2266,6 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
-          },
-          {
-            "name": "evict_cache",
-            "description": "Indicates the cache of this (finished) task execution should be evicted, instructing flyteadmin to traverse the\nexecution DAG and remove all stored results from datacatalog.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
           }
         ],
         "tags": [
@@ -3196,13 +3188,6 @@
       ],
       "default": "SINGLE"
     },
-    "CacheEvictionErrorCode": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN"
-      ],
-      "default": "UNKNOWN"
-    },
     "CatalogReservationStatus": {
       "type": "string",
       "enum": [
@@ -4030,22 +4015,11 @@
         "state": {
           "$ref": "#/definitions/adminExecutionState",
           "title": "State to set as the new value active/archive"
-        },
-        "evict_cache": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the\nexecution DAG and remove all stored results from datacatalog."
         }
       }
     },
     "adminExecutionUpdateResponse": {
-      "type": "object",
-      "properties": {
-        "cache_eviction_errors": {
-          "$ref": "#/definitions/coreCacheEvictionErrorList",
-          "description": "List of errors encountered during cache eviction (if any).\nWill only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set."
-        }
-      }
+      "type": "object"
     },
     "adminFixedRate": {
       "type": "object",
@@ -5134,14 +5108,6 @@
       },
       "title": "Response structure for a query to list of task execution entities.\nSee :ref:`ref_flyteidl.admin.TaskExecution` for more details"
     },
-    "adminTaskExecutionUpdateResponse": {
-      "type": "object",
-      "properties": {
-        "cache_eviction_errors": {
-          "$ref": "#/definitions/coreCacheEvictionErrorList"
-        }
-      }
-    },
     "adminTaskList": {
       "type": "object",
       "properties": {
@@ -5626,44 +5592,6 @@
         }
       },
       "description": "BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at\nruntime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives)."
-    },
-    "coreCacheEvictionError": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "$ref": "#/definitions/CacheEvictionErrorCode",
-          "description": "Error code to match type of cache eviction error encountered."
-        },
-        "message": {
-          "type": "string",
-          "description": "More detailed error message explaining the reason for the cache eviction failure."
-        },
-        "node_execution_id": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier",
-          "description": "ID of the node execution the cache eviction failed for."
-        },
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "ID of the task execution the cache eviction failed for (if the node execution was part of a task execution)."
-        },
-        "workflow_execution_id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution)."
-        }
-      },
-      "description": "Error returned if eviction of cached output fails and should be re-tried by the user."
-    },
-    "coreCacheEvictionErrorList": {
-      "type": "object",
-      "properties": {
-        "errors": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreCacheEvictionError"
-          }
-        }
-      },
-      "description": "List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request."
     },
     "coreCatalogArtifactTag": {
       "type": "object",
