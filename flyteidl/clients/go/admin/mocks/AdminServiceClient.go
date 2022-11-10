@@ -2465,54 +2465,6 @@ func (_m *AdminServiceClient) UpdateProjectDomainAttributes(ctx context.Context,
 	return r0, r1
 }
 
-type AdminServiceClient_UpdateTaskExecution struct {
-	*mock.Call
-}
-
-func (_m AdminServiceClient_UpdateTaskExecution) Return(_a0 *admin.TaskExecutionUpdateResponse, _a1 error) *AdminServiceClient_UpdateTaskExecution {
-	return &AdminServiceClient_UpdateTaskExecution{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AdminServiceClient) OnUpdateTaskExecution(ctx context.Context, in *admin.TaskExecutionUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateTaskExecution {
-	c_call := _m.On("UpdateTaskExecution", ctx, in, opts)
-	return &AdminServiceClient_UpdateTaskExecution{Call: c_call}
-}
-
-func (_m *AdminServiceClient) OnUpdateTaskExecutionMatch(matchers ...interface{}) *AdminServiceClient_UpdateTaskExecution {
-	c_call := _m.On("UpdateTaskExecution", matchers...)
-	return &AdminServiceClient_UpdateTaskExecution{Call: c_call}
-}
-
-// UpdateTaskExecution provides a mock function with given fields: ctx, in, opts
-func (_m *AdminServiceClient) UpdateTaskExecution(ctx context.Context, in *admin.TaskExecutionUpdateRequest, opts ...grpc.CallOption) (*admin.TaskExecutionUpdateResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 *admin.TaskExecutionUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.TaskExecutionUpdateRequest, ...grpc.CallOption) *admin.TaskExecutionUpdateResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.TaskExecutionUpdateResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.TaskExecutionUpdateRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type AdminServiceClient_UpdateWorkflowAttributes struct {
 	*mock.Call
 }

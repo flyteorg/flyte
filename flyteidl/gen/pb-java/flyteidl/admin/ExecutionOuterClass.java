@@ -24045,16 +24045,6 @@ public final class ExecutionOuterClass {
      * <code>.flyteidl.admin.ExecutionState state = 2;</code>
      */
     flyteidl.admin.ExecutionOuterClass.ExecutionState getState();
-
-    /**
-     * <pre>
-     * Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
-     * execution DAG and remove all stored results from datacatalog.
-     * </pre>
-     *
-     * <code>bool evict_cache = 3;</code>
-     */
-    boolean getEvictCache();
   }
   /**
    * Protobuf type {@code flyteidl.admin.ExecutionUpdateRequest}
@@ -24113,11 +24103,6 @@ public final class ExecutionOuterClass {
               int rawValue = input.readEnum();
 
               state_ = rawValue;
-              break;
-            }
-            case 24: {
-
-              evictCache_ = input.readBool();
               break;
             }
             default: {
@@ -24210,20 +24195,6 @@ public final class ExecutionOuterClass {
       return result == null ? flyteidl.admin.ExecutionOuterClass.ExecutionState.UNRECOGNIZED : result;
     }
 
-    public static final int EVICT_CACHE_FIELD_NUMBER = 3;
-    private boolean evictCache_;
-    /**
-     * <pre>
-     * Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
-     * execution DAG and remove all stored results from datacatalog.
-     * </pre>
-     *
-     * <code>bool evict_cache = 3;</code>
-     */
-    public boolean getEvictCache() {
-      return evictCache_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -24244,9 +24215,6 @@ public final class ExecutionOuterClass {
       if (state_ != flyteidl.admin.ExecutionOuterClass.ExecutionState.EXECUTION_ACTIVE.getNumber()) {
         output.writeEnum(2, state_);
       }
-      if (evictCache_ != false) {
-        output.writeBool(3, evictCache_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -24263,10 +24231,6 @@ public final class ExecutionOuterClass {
       if (state_ != flyteidl.admin.ExecutionOuterClass.ExecutionState.EXECUTION_ACTIVE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, state_);
-      }
-      if (evictCache_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, evictCache_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -24289,8 +24253,6 @@ public final class ExecutionOuterClass {
             .equals(other.getId())) return false;
       }
       if (state_ != other.state_) return false;
-      if (getEvictCache()
-          != other.getEvictCache()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -24308,9 +24270,6 @@ public final class ExecutionOuterClass {
       }
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + state_;
-      hash = (37 * hash) + EVICT_CACHE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getEvictCache());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -24452,8 +24411,6 @@ public final class ExecutionOuterClass {
         }
         state_ = 0;
 
-        evictCache_ = false;
-
         return this;
       }
 
@@ -24486,7 +24443,6 @@ public final class ExecutionOuterClass {
           result.id_ = idBuilder_.build();
         }
         result.state_ = state_;
-        result.evictCache_ = evictCache_;
         onBuilt();
         return result;
       }
@@ -24540,9 +24496,6 @@ public final class ExecutionOuterClass {
         }
         if (other.state_ != 0) {
           setStateValue(other.getStateValue());
-        }
-        if (other.getEvictCache() != false) {
-          setEvictCache(other.getEvictCache());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -24787,47 +24740,6 @@ public final class ExecutionOuterClass {
       public Builder clearState() {
         
         state_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private boolean evictCache_ ;
-      /**
-       * <pre>
-       * Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
-       * execution DAG and remove all stored results from datacatalog.
-       * </pre>
-       *
-       * <code>bool evict_cache = 3;</code>
-       */
-      public boolean getEvictCache() {
-        return evictCache_;
-      }
-      /**
-       * <pre>
-       * Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
-       * execution DAG and remove all stored results from datacatalog.
-       * </pre>
-       *
-       * <code>bool evict_cache = 3;</code>
-       */
-      public Builder setEvictCache(boolean value) {
-        
-        evictCache_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the
-       * execution DAG and remove all stored results from datacatalog.
-       * </pre>
-       *
-       * <code>bool evict_cache = 3;</code>
-       */
-      public Builder clearEvictCache() {
-        
-        evictCache_ = false;
         onChanged();
         return this;
       }
@@ -25856,34 +25768,6 @@ public final class ExecutionOuterClass {
   public interface ExecutionUpdateResponseOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.ExecutionUpdateResponse)
       com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    boolean hasCacheEvictionErrors();
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    flyteidl.core.Errors.CacheEvictionErrorList getCacheEvictionErrors();
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    flyteidl.core.Errors.CacheEvictionErrorListOrBuilder getCacheEvictionErrorsOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.admin.ExecutionUpdateResponse}
@@ -25913,7 +25797,6 @@ public final class ExecutionOuterClass {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
-      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -25924,19 +25807,6 @@ public final class ExecutionOuterClass {
             case 0:
               done = true;
               break;
-            case 10: {
-              flyteidl.core.Errors.CacheEvictionErrorList.Builder subBuilder = null;
-              if (cacheEvictionErrors_ != null) {
-                subBuilder = cacheEvictionErrors_.toBuilder();
-              }
-              cacheEvictionErrors_ = input.readMessage(flyteidl.core.Errors.CacheEvictionErrorList.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(cacheEvictionErrors_);
-                cacheEvictionErrors_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -25969,42 +25839,6 @@ public final class ExecutionOuterClass {
               flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse.class, flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse.Builder.class);
     }
 
-    public static final int CACHE_EVICTION_ERRORS_FIELD_NUMBER = 1;
-    private flyteidl.core.Errors.CacheEvictionErrorList cacheEvictionErrors_;
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    public boolean hasCacheEvictionErrors() {
-      return cacheEvictionErrors_ != null;
-    }
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    public flyteidl.core.Errors.CacheEvictionErrorList getCacheEvictionErrors() {
-      return cacheEvictionErrors_ == null ? flyteidl.core.Errors.CacheEvictionErrorList.getDefaultInstance() : cacheEvictionErrors_;
-    }
-    /**
-     * <pre>
-     * List of errors encountered during cache eviction (if any).
-     * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-     * </pre>
-     *
-     * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-     */
-    public flyteidl.core.Errors.CacheEvictionErrorListOrBuilder getCacheEvictionErrorsOrBuilder() {
-      return getCacheEvictionErrors();
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -26019,9 +25853,6 @@ public final class ExecutionOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (cacheEvictionErrors_ != null) {
-        output.writeMessage(1, getCacheEvictionErrors());
-      }
       unknownFields.writeTo(output);
     }
 
@@ -26031,10 +25862,6 @@ public final class ExecutionOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (cacheEvictionErrors_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getCacheEvictionErrors());
-      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -26050,11 +25877,6 @@ public final class ExecutionOuterClass {
       }
       flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse other = (flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse) obj;
 
-      if (hasCacheEvictionErrors() != other.hasCacheEvictionErrors()) return false;
-      if (hasCacheEvictionErrors()) {
-        if (!getCacheEvictionErrors()
-            .equals(other.getCacheEvictionErrors())) return false;
-      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -26066,10 +25888,6 @@ public final class ExecutionOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasCacheEvictionErrors()) {
-        hash = (37 * hash) + CACHE_EVICTION_ERRORS_FIELD_NUMBER;
-        hash = (53 * hash) + getCacheEvictionErrors().hashCode();
-      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -26203,12 +26021,6 @@ public final class ExecutionOuterClass {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (cacheEvictionErrorsBuilder_ == null) {
-          cacheEvictionErrors_ = null;
-        } else {
-          cacheEvictionErrors_ = null;
-          cacheEvictionErrorsBuilder_ = null;
-        }
         return this;
       }
 
@@ -26235,11 +26047,6 @@ public final class ExecutionOuterClass {
       @java.lang.Override
       public flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse buildPartial() {
         flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse result = new flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse(this);
-        if (cacheEvictionErrorsBuilder_ == null) {
-          result.cacheEvictionErrors_ = cacheEvictionErrors_;
-        } else {
-          result.cacheEvictionErrors_ = cacheEvictionErrorsBuilder_.build();
-        }
         onBuilt();
         return result;
       }
@@ -26288,9 +26095,6 @@ public final class ExecutionOuterClass {
 
       public Builder mergeFrom(flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse other) {
         if (other == flyteidl.admin.ExecutionOuterClass.ExecutionUpdateResponse.getDefaultInstance()) return this;
-        if (other.hasCacheEvictionErrors()) {
-          mergeCacheEvictionErrors(other.getCacheEvictionErrors());
-        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -26318,168 +26122,6 @@ public final class ExecutionOuterClass {
           }
         }
         return this;
-      }
-
-      private flyteidl.core.Errors.CacheEvictionErrorList cacheEvictionErrors_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Errors.CacheEvictionErrorList, flyteidl.core.Errors.CacheEvictionErrorList.Builder, flyteidl.core.Errors.CacheEvictionErrorListOrBuilder> cacheEvictionErrorsBuilder_;
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public boolean hasCacheEvictionErrors() {
-        return cacheEvictionErrorsBuilder_ != null || cacheEvictionErrors_ != null;
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public flyteidl.core.Errors.CacheEvictionErrorList getCacheEvictionErrors() {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          return cacheEvictionErrors_ == null ? flyteidl.core.Errors.CacheEvictionErrorList.getDefaultInstance() : cacheEvictionErrors_;
-        } else {
-          return cacheEvictionErrorsBuilder_.getMessage();
-        }
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public Builder setCacheEvictionErrors(flyteidl.core.Errors.CacheEvictionErrorList value) {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          cacheEvictionErrors_ = value;
-          onChanged();
-        } else {
-          cacheEvictionErrorsBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public Builder setCacheEvictionErrors(
-          flyteidl.core.Errors.CacheEvictionErrorList.Builder builderForValue) {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          cacheEvictionErrors_ = builderForValue.build();
-          onChanged();
-        } else {
-          cacheEvictionErrorsBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public Builder mergeCacheEvictionErrors(flyteidl.core.Errors.CacheEvictionErrorList value) {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          if (cacheEvictionErrors_ != null) {
-            cacheEvictionErrors_ =
-              flyteidl.core.Errors.CacheEvictionErrorList.newBuilder(cacheEvictionErrors_).mergeFrom(value).buildPartial();
-          } else {
-            cacheEvictionErrors_ = value;
-          }
-          onChanged();
-        } else {
-          cacheEvictionErrorsBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public Builder clearCacheEvictionErrors() {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          cacheEvictionErrors_ = null;
-          onChanged();
-        } else {
-          cacheEvictionErrors_ = null;
-          cacheEvictionErrorsBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public flyteidl.core.Errors.CacheEvictionErrorList.Builder getCacheEvictionErrorsBuilder() {
-        
-        onChanged();
-        return getCacheEvictionErrorsFieldBuilder().getBuilder();
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      public flyteidl.core.Errors.CacheEvictionErrorListOrBuilder getCacheEvictionErrorsOrBuilder() {
-        if (cacheEvictionErrorsBuilder_ != null) {
-          return cacheEvictionErrorsBuilder_.getMessageOrBuilder();
-        } else {
-          return cacheEvictionErrors_ == null ?
-              flyteidl.core.Errors.CacheEvictionErrorList.getDefaultInstance() : cacheEvictionErrors_;
-        }
-      }
-      /**
-       * <pre>
-       * List of errors encountered during cache eviction (if any).
-       * Will only be populated if `evict_cache` of :ref:`ref_flyteidl.admin.ExecutionUpdateRequest` is set.
-       * </pre>
-       *
-       * <code>.flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Errors.CacheEvictionErrorList, flyteidl.core.Errors.CacheEvictionErrorList.Builder, flyteidl.core.Errors.CacheEvictionErrorListOrBuilder> 
-          getCacheEvictionErrorsFieldBuilder() {
-        if (cacheEvictionErrorsBuilder_ == null) {
-          cacheEvictionErrorsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Errors.CacheEvictionErrorList, flyteidl.core.Errors.CacheEvictionErrorList.Builder, flyteidl.core.Errors.CacheEvictionErrorListOrBuilder>(
-                  getCacheEvictionErrors(),
-                  getParentForChildren(),
-                  isClean());
-          cacheEvictionErrors_ = null;
-        }
-        return cacheEvictionErrorsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -26651,112 +26293,109 @@ public final class ExecutionOuterClass {
       "\n\036flyteidl/admin/execution.proto\022\016flytei" +
       "dl.admin\032\'flyteidl/admin/cluster_assignm" +
       "ent.proto\032\033flyteidl/admin/common.proto\032\034" +
-      "flyteidl/core/literals.proto\032\032flyteidl/c" +
-      "ore/errors.proto\032\035flyteidl/core/executio" +
-      "n.proto\032\036flyteidl/core/identifier.proto\032" +
-      "\034flyteidl/core/security.proto\032\036google/pr" +
-      "otobuf/duration.proto\032\037google/protobuf/t" +
-      "imestamp.proto\032\036google/protobuf/wrappers" +
-      ".proto\"\237\001\n\026ExecutionCreateRequest\022\017\n\007pro" +
-      "ject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t" +
-      "\022+\n\004spec\030\004 \001(\0132\035.flyteidl.admin.Executio" +
-      "nSpec\022)\n\006inputs\030\005 \001(\0132\031.flyteidl.core.Li" +
-      "teralMap\"\177\n\030ExecutionRelaunchRequest\0226\n\002" +
-      "id\030\001 \001(\0132*.flyteidl.core.WorkflowExecuti" +
-      "onIdentifier\022\014\n\004name\030\003 \001(\t\022\027\n\017overwrite_" +
-      "cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027ExecutionRecoverRe" +
-      "quest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workfl" +
-      "owExecutionIdentifier\022\014\n\004name\030\002 \001(\t\0223\n\010m" +
-      "etadata\030\003 \001(\0132!.flyteidl.admin.Execution" +
-      "Metadata\"Q\n\027ExecutionCreateResponse\0226\n\002i" +
-      "d\030\001 \001(\0132*.flyteidl.core.WorkflowExecutio" +
-      "nIdentifier\"U\n\033WorkflowExecutionGetReque" +
-      "st\0226\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
-      "xecutionIdentifier\"\243\001\n\tExecution\0226\n\002id\030\001" +
-      " \001(\0132*.flyteidl.core.WorkflowExecutionId" +
-      "entifier\022+\n\004spec\030\002 \001(\0132\035.flyteidl.admin." +
-      "ExecutionSpec\0221\n\007closure\030\003 \001(\0132 .flyteid" +
-      "l.admin.ExecutionClosure\"M\n\rExecutionLis" +
-      "t\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl.admin.E" +
-      "xecution\022\r\n\005token\030\002 \001(\t\"X\n\016LiteralMapBlo" +
-      "b\022/\n\006values\030\001 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbo" +
-      "rtMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002" +
-      " \001(\t\"\360\005\n\020ExecutionClosure\0225\n\007outputs\030\001 \001" +
-      "(\0132\036.flyteidl.admin.LiteralMapBlobB\002\030\001H\000" +
-      "\022.\n\005error\030\002 \001(\0132\035.flyteidl.core.Executio" +
-      "nErrorH\000\022\031\n\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016a" +
-      "bort_metadata\030\014 \001(\0132\035.flyteidl.admin.Abo" +
-      "rtMetadataH\000\0224\n\013output_data\030\r \001(\0132\031.flyt" +
-      "eidl.core.LiteralMapB\002\030\001H\000\0226\n\017computed_i" +
-      "nputs\030\003 \001(\0132\031.flyteidl.core.LiteralMapB\002" +
-      "\030\001\0225\n\005phase\030\004 \001(\0162&.flyteidl.core.Workfl" +
-      "owExecution.Phase\022.\n\nstarted_at\030\005 \001(\0132\032." +
-      "google.protobuf.Timestamp\022+\n\010duration\030\006 " +
-      "\001(\0132\031.google.protobuf.Duration\022.\n\ncreate" +
-      "d_at\030\007 \001(\0132\032.google.protobuf.Timestamp\022." +
-      "\n\nupdated_at\030\010 \001(\0132\032.google.protobuf.Tim" +
-      "estamp\0223\n\rnotifications\030\t \003(\0132\034.flyteidl" +
-      ".admin.Notification\022.\n\013workflow_id\030\013 \001(\013" +
-      "2\031.flyteidl.core.Identifier\022I\n\024state_cha" +
-      "nge_details\030\016 \001(\0132+.flyteidl.admin.Execu" +
-      "tionStateChangeDetailsB\017\n\routput_result\"" +
-      "+\n\016SystemMetadata\022\031\n\021execution_cluster\030\001" +
-      " \001(\t\"\332\003\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(\016" +
-      "2/.flyteidl.admin.ExecutionMetadata.Exec" +
-      "utionMode\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030" +
-      "\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032.google.pro" +
-      "tobuf.Timestamp\022E\n\025parent_node_execution" +
-      "\030\005 \001(\0132&.flyteidl.core.NodeExecutionIden" +
-      "tifier\022G\n\023reference_execution\030\020 \001(\0132*.fl" +
-      "yteidl.core.WorkflowExecutionIdentifier\022" +
-      "7\n\017system_metadata\030\021 \001(\0132\036.flyteidl.admi" +
-      "n.SystemMetadata\"g\n\rExecutionMode\022\n\n\006MAN" +
-      "UAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELA" +
-      "UNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020" +
-      "\005\"G\n\020NotificationList\0223\n\rnotifications\030\001" +
-      " \003(\0132\034.flyteidl.admin.Notification\"\200\006\n\rE" +
-      "xecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.flyt" +
-      "eidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031.f" +
-      "lyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata\030" +
-      "\003 \001(\0132!.flyteidl.admin.ExecutionMetadata" +
-      "\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admin" +
-      ".NotificationListH\000\022\025\n\013disable_all\030\006 \001(\010" +
-      "H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Labe" +
-      "ls\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admin" +
-      ".Annotations\0228\n\020security_context\030\n \001(\0132\036" +
-      ".flyteidl.core.SecurityContext\022/\n\tauth_r" +
-      "ole\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001\022" +
-      ";\n\022quality_of_service\030\021 \001(\0132\037.flyteidl.c" +
-      "ore.QualityOfService\022\027\n\017max_parallelism\030" +
-      "\022 \001(\005\022C\n\026raw_output_data_config\030\023 \001(\0132#." +
-      "flyteidl.admin.RawOutputDataConfig\022=\n\022cl" +
-      "uster_assignment\030\024 \001(\0132!.flyteidl.admin." +
-      "ClusterAssignment\0221\n\rinterruptible\030\025 \001(\013" +
-      "2\032.google.protobuf.BoolValue\022\027\n\017overwrit" +
-      "e_cache\030\026 \001(\010B\030\n\026notification_overridesJ" +
-      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
-      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
-      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
-      "orkflowExecutionIdentifier\"\336\001\n WorkflowE" +
-      "xecutionGetDataResponse\022,\n\007outputs\030\001 \001(\013" +
-      "2\027.flyteidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030" +
-      "\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013fu" +
-      "ll_inputs\030\003 \001(\0132\031.flyteidl.core.LiteralM" +
-      "ap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core" +
-      ".LiteralMap\"\224\001\n\026ExecutionUpdateRequest\0226" +
-      "\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
-      "tionIdentifier\022-\n\005state\030\002 \001(\0162\036.flyteidl" +
-      ".admin.ExecutionState\022\023\n\013evict_cache\030\003 \001" +
-      "(\010\"\220\001\n\033ExecutionStateChangeDetails\022-\n\005st" +
-      "ate\030\001 \001(\0162\036.flyteidl.admin.ExecutionStat" +
-      "e\022/\n\013occurred_at\030\002 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022\021\n\tprincipal\030\003 \001(\t\"_\n\027Executi" +
-      "onUpdateResponse\022D\n\025cache_eviction_error" +
-      "s\030\001 \001(\0132%.flyteidl.core.CacheEvictionErr" +
-      "orList*>\n\016ExecutionState\022\024\n\020EXECUTION_AC" +
+      "flyteidl/core/literals.proto\032\035flyteidl/c" +
+      "ore/execution.proto\032\036flyteidl/core/ident" +
+      "ifier.proto\032\034flyteidl/core/security.prot" +
+      "o\032\036google/protobuf/duration.proto\032\037googl" +
+      "e/protobuf/timestamp.proto\032\036google/proto" +
+      "buf/wrappers.proto\"\237\001\n\026ExecutionCreateRe" +
+      "quest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014" +
+      "\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.flyteidl.ad" +
+      "min.ExecutionSpec\022)\n\006inputs\030\005 \001(\0132\031.flyt" +
+      "eidl.core.LiteralMap\"\177\n\030ExecutionRelaunc" +
+      "hRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wor" +
+      "kflowExecutionIdentifier\022\014\n\004name\030\003 \001(\t\022\027" +
+      "\n\017overwrite_cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027Execut" +
+      "ionRecoverRequest\0226\n\002id\030\001 \001(\0132*.flyteidl" +
+      ".core.WorkflowExecutionIdentifier\022\014\n\004nam" +
+      "e\030\002 \001(\t\0223\n\010metadata\030\003 \001(\0132!.flyteidl.adm" +
+      "in.ExecutionMetadata\"Q\n\027ExecutionCreateR" +
+      "esponse\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Work" +
+      "flowExecutionIdentifier\"U\n\033WorkflowExecu" +
+      "tionGetRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.co" +
+      "re.WorkflowExecutionIdentifier\"\243\001\n\tExecu" +
+      "tion\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflo" +
+      "wExecutionIdentifier\022+\n\004spec\030\002 \001(\0132\035.fly" +
+      "teidl.admin.ExecutionSpec\0221\n\007closure\030\003 \001" +
+      "(\0132 .flyteidl.admin.ExecutionClosure\"M\n\r" +
+      "ExecutionList\022-\n\nexecutions\030\001 \003(\0132\031.flyt" +
+      "eidl.admin.Execution\022\r\n\005token\030\002 \001(\t\"X\n\016L" +
+      "iteralMapBlob\022/\n\006values\030\001 \001(\0132\031.flyteidl" +
+      ".core.LiteralMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n" +
+      "\004data\"1\n\rAbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n" +
+      "\tprincipal\030\002 \001(\t\"\360\005\n\020ExecutionClosure\0225\n" +
+      "\007outputs\030\001 \001(\0132\036.flyteidl.admin.LiteralM" +
+      "apBlobB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.c" +
+      "ore.ExecutionErrorH\000\022\031\n\013abort_cause\030\n \001(" +
+      "\tB\002\030\001H\000\0227\n\016abort_metadata\030\014 \001(\0132\035.flytei" +
+      "dl.admin.AbortMetadataH\000\0224\n\013output_data\030" +
+      "\r \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\0226" +
+      "\n\017computed_inputs\030\003 \001(\0132\031.flyteidl.core." +
+      "LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162&.flyteidl" +
+      ".core.WorkflowExecution.Phase\022.\n\nstarted" +
+      "_at\030\005 \001(\0132\032.google.protobuf.Timestamp\022+\n" +
+      "\010duration\030\006 \001(\0132\031.google.protobuf.Durati" +
+      "on\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf" +
+      ".Timestamp\022.\n\nupdated_at\030\010 \001(\0132\032.google." +
+      "protobuf.Timestamp\0223\n\rnotifications\030\t \003(" +
+      "\0132\034.flyteidl.admin.Notification\022.\n\013workf" +
+      "low_id\030\013 \001(\0132\031.flyteidl.core.Identifier\022" +
+      "I\n\024state_change_details\030\016 \001(\0132+.flyteidl" +
+      ".admin.ExecutionStateChangeDetailsB\017\n\rou" +
+      "tput_result\"+\n\016SystemMetadata\022\031\n\021executi" +
+      "on_cluster\030\001 \001(\t\"\332\003\n\021ExecutionMetadata\022=" +
+      "\n\004mode\030\001 \001(\0162/.flyteidl.admin.ExecutionM" +
+      "etadata.ExecutionMode\022\021\n\tprincipal\030\002 \001(\t" +
+      "\022\017\n\007nesting\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132" +
+      "\032.google.protobuf.Timestamp\022E\n\025parent_no" +
+      "de_execution\030\005 \001(\0132&.flyteidl.core.NodeE" +
+      "xecutionIdentifier\022G\n\023reference_executio" +
+      "n\030\020 \001(\0132*.flyteidl.core.WorkflowExecutio" +
+      "nIdentifier\0227\n\017system_metadata\030\021 \001(\0132\036.f" +
+      "lyteidl.admin.SystemMetadata\"g\n\rExecutio" +
+      "nMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYST" +
+      "EM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r" +
+      "\n\tRECOVERED\020\005\"G\n\020NotificationList\0223\n\rnot" +
+      "ifications\030\001 \003(\0132\034.flyteidl.admin.Notifi" +
+      "cation\"\200\006\n\rExecutionSpec\022.\n\013launch_plan\030" +
+      "\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006inpu" +
+      "ts\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\022" +
+      "3\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Execu" +
+      "tionMetadata\0229\n\rnotifications\030\005 \001(\0132 .fl" +
+      "yteidl.admin.NotificationListH\000\022\025\n\013disab" +
+      "le_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteid" +
+      "l.admin.Labels\0220\n\013annotations\030\010 \001(\0132\033.fl" +
+      "yteidl.admin.Annotations\0228\n\020security_con" +
+      "text\030\n \001(\0132\036.flyteidl.core.SecurityConte" +
+      "xt\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl.admin.A" +
+      "uthRoleB\002\030\001\022;\n\022quality_of_service\030\021 \001(\0132" +
+      "\037.flyteidl.core.QualityOfService\022\027\n\017max_" +
+      "parallelism\030\022 \001(\005\022C\n\026raw_output_data_con" +
+      "fig\030\023 \001(\0132#.flyteidl.admin.RawOutputData" +
+      "Config\022=\n\022cluster_assignment\030\024 \001(\0132!.fly" +
+      "teidl.admin.ClusterAssignment\0221\n\rinterru" +
+      "ptible\030\025 \001(\0132\032.google.protobuf.BoolValue" +
+      "\022\027\n\017overwrite_cache\030\026 \001(\010B\030\n\026notificatio" +
+      "n_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n" +
+      "\032ExecutionTerminateResponse\"Y\n\037WorkflowE" +
+      "xecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fly" +
+      "teidl.core.WorkflowExecutionIdentifier\"\336" +
+      "\001\n WorkflowExecutionGetDataResponse\022,\n\007o" +
+      "utputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030" +
+      "\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBl" +
+      "obB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.c" +
+      "ore.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.f" +
+      "lyteidl.core.LiteralMap\"\177\n\026ExecutionUpda" +
+      "teRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
+      "rkflowExecutionIdentifier\022-\n\005state\030\002 \001(\016" +
+      "2\036.flyteidl.admin.ExecutionState\"\220\001\n\033Exe" +
+      "cutionStateChangeDetails\022-\n\005state\030\001 \001(\0162" +
+      "\036.flyteidl.admin.ExecutionState\022/\n\013occur" +
+      "red_at\030\002 \001(\0132\032.google.protobuf.Timestamp" +
+      "\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRe" +
+      "sponse*>\n\016ExecutionState\022\024\n\020EXECUTION_AC" +
       "TIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5github" +
       ".com/flyteorg/flyteidl/gen/pb-go/flyteid" +
       "l/adminb\006proto3"
@@ -26775,7 +26414,6 @@ public final class ExecutionOuterClass {
           flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor(),
           flyteidl.admin.Common.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
-          flyteidl.core.Errors.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Security.getDescriptor(),
@@ -26896,7 +26534,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionUpdateRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionUpdateRequest_descriptor,
-        new java.lang.String[] { "Id", "State", "EvictCache", });
+        new java.lang.String[] { "Id", "State", });
     internal_static_flyteidl_admin_ExecutionStateChangeDetails_descriptor =
       getDescriptor().getMessageTypes().get(19);
     internal_static_flyteidl_admin_ExecutionStateChangeDetails_fieldAccessorTable = new
@@ -26908,11 +26546,10 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionUpdateResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionUpdateResponse_descriptor,
-        new java.lang.String[] { "CacheEvictionErrors", });
+        new java.lang.String[] { });
     flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor();
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
-    flyteidl.core.Errors.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Security.getDescriptor();

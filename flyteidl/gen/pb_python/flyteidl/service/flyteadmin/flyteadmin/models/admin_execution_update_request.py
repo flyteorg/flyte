@@ -35,30 +35,25 @@ class AdminExecutionUpdateRequest(object):
     """
     swagger_types = {
         'id': 'CoreWorkflowExecutionIdentifier',
-        'state': 'AdminExecutionState',
-        'evict_cache': 'bool'
+        'state': 'AdminExecutionState'
     }
 
     attribute_map = {
         'id': 'id',
-        'state': 'state',
-        'evict_cache': 'evict_cache'
+        'state': 'state'
     }
 
-    def __init__(self, id=None, state=None, evict_cache=None):  # noqa: E501
+    def __init__(self, id=None, state=None):  # noqa: E501
         """AdminExecutionUpdateRequest - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._state = None
-        self._evict_cache = None
         self.discriminator = None
 
         if id is not None:
             self.id = id
         if state is not None:
             self.state = state
-        if evict_cache is not None:
-            self.evict_cache = evict_cache
 
     @property
     def id(self):
@@ -101,29 +96,6 @@ class AdminExecutionUpdateRequest(object):
         """
 
         self._state = state
-
-    @property
-    def evict_cache(self):
-        """Gets the evict_cache of this AdminExecutionUpdateRequest.  # noqa: E501
-
-        Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the execution DAG and remove all stored results from datacatalog.  # noqa: E501
-
-        :return: The evict_cache of this AdminExecutionUpdateRequest.  # noqa: E501
-        :rtype: bool
-        """
-        return self._evict_cache
-
-    @evict_cache.setter
-    def evict_cache(self, evict_cache):
-        """Sets the evict_cache of this AdminExecutionUpdateRequest.
-
-        Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the execution DAG and remove all stored results from datacatalog.  # noqa: E501
-
-        :param evict_cache: The evict_cache of this AdminExecutionUpdateRequest.  # noqa: E501
-        :type: bool
-        """
-
-        self._evict_cache = evict_cache
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -32,7 +32,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/admin/common.pb.h"
-#include "flyteidl/core/errors.pb.h"
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/literals.pb.h"
@@ -50,7 +49,7 @@ struct TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[9]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -80,12 +79,6 @@ extern TaskExecutionListDefaultTypeInternal _TaskExecutionList_default_instance_
 class TaskExecutionListRequest;
 class TaskExecutionListRequestDefaultTypeInternal;
 extern TaskExecutionListRequestDefaultTypeInternal _TaskExecutionListRequest_default_instance_;
-class TaskExecutionUpdateRequest;
-class TaskExecutionUpdateRequestDefaultTypeInternal;
-extern TaskExecutionUpdateRequestDefaultTypeInternal _TaskExecutionUpdateRequest_default_instance_;
-class TaskExecutionUpdateResponse;
-class TaskExecutionUpdateResponseDefaultTypeInternal;
-extern TaskExecutionUpdateResponseDefaultTypeInternal _TaskExecutionUpdateResponse_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
@@ -97,8 +90,6 @@ template<> ::flyteidl::admin::TaskExecutionGetDataResponse* Arena::CreateMaybeMe
 template<> ::flyteidl::admin::TaskExecutionGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionGetRequest>(Arena*);
 template<> ::flyteidl::admin::TaskExecutionList* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionList>(Arena*);
 template<> ::flyteidl::admin::TaskExecutionListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionListRequest>(Arena*);
-template<> ::flyteidl::admin::TaskExecutionUpdateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionUpdateRequest>(Arena*);
-template<> ::flyteidl::admin::TaskExecutionUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionUpdateResponse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -1198,243 +1189,6 @@ class TaskExecutionGetDataResponse final :
   ::flyteidl::admin::UrlBlob* outputs_;
   ::flyteidl::core::LiteralMap* full_inputs_;
   ::flyteidl::core::LiteralMap* full_outputs_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
-};
-// -------------------------------------------------------------------
-
-class TaskExecutionUpdateRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.TaskExecutionUpdateRequest) */ {
- public:
-  TaskExecutionUpdateRequest();
-  virtual ~TaskExecutionUpdateRequest();
-
-  TaskExecutionUpdateRequest(const TaskExecutionUpdateRequest& from);
-
-  inline TaskExecutionUpdateRequest& operator=(const TaskExecutionUpdateRequest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  TaskExecutionUpdateRequest(TaskExecutionUpdateRequest&& from) noexcept
-    : TaskExecutionUpdateRequest() {
-    *this = ::std::move(from);
-  }
-
-  inline TaskExecutionUpdateRequest& operator=(TaskExecutionUpdateRequest&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const TaskExecutionUpdateRequest& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const TaskExecutionUpdateRequest* internal_default_instance() {
-    return reinterpret_cast<const TaskExecutionUpdateRequest*>(
-               &_TaskExecutionUpdateRequest_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    7;
-
-  void Swap(TaskExecutionUpdateRequest* other);
-  friend void swap(TaskExecutionUpdateRequest& a, TaskExecutionUpdateRequest& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline TaskExecutionUpdateRequest* New() const final {
-    return CreateMaybeMessage<TaskExecutionUpdateRequest>(nullptr);
-  }
-
-  TaskExecutionUpdateRequest* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<TaskExecutionUpdateRequest>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const TaskExecutionUpdateRequest& from);
-  void MergeFrom(const TaskExecutionUpdateRequest& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(TaskExecutionUpdateRequest* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // .flyteidl.core.TaskExecutionIdentifier id = 1;
-  bool has_id() const;
-  void clear_id();
-  static const int kIdFieldNumber = 1;
-  const ::flyteidl::core::TaskExecutionIdentifier& id() const;
-  ::flyteidl::core::TaskExecutionIdentifier* release_id();
-  ::flyteidl::core::TaskExecutionIdentifier* mutable_id();
-  void set_allocated_id(::flyteidl::core::TaskExecutionIdentifier* id);
-
-  // bool evict_cache = 2;
-  void clear_evict_cache();
-  static const int kEvictCacheFieldNumber = 2;
-  bool evict_cache() const;
-  void set_evict_cache(bool value);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionUpdateRequest)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::flyteidl::core::TaskExecutionIdentifier* id_;
-  bool evict_cache_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
-};
-// -------------------------------------------------------------------
-
-class TaskExecutionUpdateResponse final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.TaskExecutionUpdateResponse) */ {
- public:
-  TaskExecutionUpdateResponse();
-  virtual ~TaskExecutionUpdateResponse();
-
-  TaskExecutionUpdateResponse(const TaskExecutionUpdateResponse& from);
-
-  inline TaskExecutionUpdateResponse& operator=(const TaskExecutionUpdateResponse& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  TaskExecutionUpdateResponse(TaskExecutionUpdateResponse&& from) noexcept
-    : TaskExecutionUpdateResponse() {
-    *this = ::std::move(from);
-  }
-
-  inline TaskExecutionUpdateResponse& operator=(TaskExecutionUpdateResponse&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const TaskExecutionUpdateResponse& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const TaskExecutionUpdateResponse* internal_default_instance() {
-    return reinterpret_cast<const TaskExecutionUpdateResponse*>(
-               &_TaskExecutionUpdateResponse_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    8;
-
-  void Swap(TaskExecutionUpdateResponse* other);
-  friend void swap(TaskExecutionUpdateResponse& a, TaskExecutionUpdateResponse& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline TaskExecutionUpdateResponse* New() const final {
-    return CreateMaybeMessage<TaskExecutionUpdateResponse>(nullptr);
-  }
-
-  TaskExecutionUpdateResponse* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<TaskExecutionUpdateResponse>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const TaskExecutionUpdateResponse& from);
-  void MergeFrom(const TaskExecutionUpdateResponse& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(TaskExecutionUpdateResponse* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // .flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;
-  bool has_cache_eviction_errors() const;
-  void clear_cache_eviction_errors();
-  static const int kCacheEvictionErrorsFieldNumber = 1;
-  const ::flyteidl::core::CacheEvictionErrorList& cache_eviction_errors() const;
-  ::flyteidl::core::CacheEvictionErrorList* release_cache_eviction_errors();
-  ::flyteidl::core::CacheEvictionErrorList* mutable_cache_eviction_errors();
-  void set_allocated_cache_eviction_errors(::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionUpdateResponse)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
 };
@@ -2806,125 +2560,9 @@ inline void TaskExecutionGetDataResponse::set_allocated_full_outputs(::flyteidl:
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.full_outputs)
 }
 
-// -------------------------------------------------------------------
-
-// TaskExecutionUpdateRequest
-
-// .flyteidl.core.TaskExecutionIdentifier id = 1;
-inline bool TaskExecutionUpdateRequest::has_id() const {
-  return this != internal_default_instance() && id_ != nullptr;
-}
-inline const ::flyteidl::core::TaskExecutionIdentifier& TaskExecutionUpdateRequest::id() const {
-  const ::flyteidl::core::TaskExecutionIdentifier* p = id_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionUpdateRequest.id)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TaskExecutionIdentifier*>(
-      &::flyteidl::core::_TaskExecutionIdentifier_default_instance_);
-}
-inline ::flyteidl::core::TaskExecutionIdentifier* TaskExecutionUpdateRequest::release_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionUpdateRequest.id)
-  
-  ::flyteidl::core::TaskExecutionIdentifier* temp = id_;
-  id_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::TaskExecutionIdentifier* TaskExecutionUpdateRequest::mutable_id() {
-  
-  if (id_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::TaskExecutionIdentifier>(GetArenaNoVirtual());
-    id_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionUpdateRequest.id)
-  return id_;
-}
-inline void TaskExecutionUpdateRequest::set_allocated_id(::flyteidl::core::TaskExecutionIdentifier* id) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
-  }
-  if (id) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      id = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, id, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  id_ = id;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionUpdateRequest.id)
-}
-
-// bool evict_cache = 2;
-inline void TaskExecutionUpdateRequest::clear_evict_cache() {
-  evict_cache_ = false;
-}
-inline bool TaskExecutionUpdateRequest::evict_cache() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionUpdateRequest.evict_cache)
-  return evict_cache_;
-}
-inline void TaskExecutionUpdateRequest::set_evict_cache(bool value) {
-  
-  evict_cache_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.admin.TaskExecutionUpdateRequest.evict_cache)
-}
-
-// -------------------------------------------------------------------
-
-// TaskExecutionUpdateResponse
-
-// .flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;
-inline bool TaskExecutionUpdateResponse::has_cache_eviction_errors() const {
-  return this != internal_default_instance() && cache_eviction_errors_ != nullptr;
-}
-inline const ::flyteidl::core::CacheEvictionErrorList& TaskExecutionUpdateResponse::cache_eviction_errors() const {
-  const ::flyteidl::core::CacheEvictionErrorList* p = cache_eviction_errors_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionUpdateResponse.cache_eviction_errors)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::CacheEvictionErrorList*>(
-      &::flyteidl::core::_CacheEvictionErrorList_default_instance_);
-}
-inline ::flyteidl::core::CacheEvictionErrorList* TaskExecutionUpdateResponse::release_cache_eviction_errors() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionUpdateResponse.cache_eviction_errors)
-  
-  ::flyteidl::core::CacheEvictionErrorList* temp = cache_eviction_errors_;
-  cache_eviction_errors_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::CacheEvictionErrorList* TaskExecutionUpdateResponse::mutable_cache_eviction_errors() {
-  
-  if (cache_eviction_errors_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::CacheEvictionErrorList>(GetArenaNoVirtual());
-    cache_eviction_errors_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionUpdateResponse.cache_eviction_errors)
-  return cache_eviction_errors_;
-}
-inline void TaskExecutionUpdateResponse::set_allocated_cache_eviction_errors(::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(cache_eviction_errors_);
-  }
-  if (cache_eviction_errors) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      cache_eviction_errors = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, cache_eviction_errors, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  cache_eviction_errors_ = cache_eviction_errors;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionUpdateResponse.cache_eviction_errors)
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

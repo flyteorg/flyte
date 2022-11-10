@@ -1,5 +1,4 @@
 from flyteidl.admin import common_pb2 as _common_pb2
-from flyteidl.core import errors_pb2 as _errors_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
@@ -103,17 +102,3 @@ class TaskExecutionListRequest(_message.Message):
     sort_by: _common_pb2.Sort
     token: str
     def __init__(self, node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., filters: _Optional[str] = ..., sort_by: _Optional[_Union[_common_pb2.Sort, _Mapping]] = ...) -> None: ...
-
-class TaskExecutionUpdateRequest(_message.Message):
-    __slots__ = ["evict_cache", "id"]
-    EVICT_CACHE_FIELD_NUMBER: _ClassVar[int]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    evict_cache: bool
-    id: _identifier_pb2.TaskExecutionIdentifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., evict_cache: bool = ...) -> None: ...
-
-class TaskExecutionUpdateResponse(_message.Message):
-    __slots__ = ["cache_eviction_errors"]
-    CACHE_EVICTION_ERRORS_FIELD_NUMBER: _ClassVar[int]
-    cache_eviction_errors: _errors_pb2.CacheEvictionErrorList
-    def __init__(self, cache_eviction_errors: _Optional[_Union[_errors_pb2.CacheEvictionErrorList, _Mapping]] = ...) -> None: ...

@@ -35,7 +35,6 @@
 #include "flyteidl/admin/cluster_assignment.pb.h"
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/core/literals.pb.h"
-#include "flyteidl/core/errors.pb.h"
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/security.pb.h"
@@ -3028,12 +3027,6 @@ class ExecutionUpdateRequest final :
   ::flyteidl::admin::ExecutionState state() const;
   void set_state(::flyteidl::admin::ExecutionState value);
 
-  // bool evict_cache = 3;
-  void clear_evict_cache();
-  static const int kEvictCacheFieldNumber = 3;
-  bool evict_cache() const;
-  void set_evict_cache(bool value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionUpdateRequest)
  private:
   class HasBitSetters;
@@ -3041,7 +3034,6 @@ class ExecutionUpdateRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::WorkflowExecutionIdentifier* id_;
   int state_;
-  bool evict_cache_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
 };
@@ -3279,21 +3271,11 @@ class ExecutionUpdateResponse final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;
-  bool has_cache_eviction_errors() const;
-  void clear_cache_eviction_errors();
-  static const int kCacheEvictionErrorsFieldNumber = 1;
-  const ::flyteidl::core::CacheEvictionErrorList& cache_eviction_errors() const;
-  ::flyteidl::core::CacheEvictionErrorList* release_cache_eviction_errors();
-  ::flyteidl::core::CacheEvictionErrorList* mutable_cache_eviction_errors();
-  void set_allocated_cache_eviction_errors(::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors);
-
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionUpdateResponse)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
 };
@@ -6416,20 +6398,6 @@ inline void ExecutionUpdateRequest::set_state(::flyteidl::admin::ExecutionState 
   // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionUpdateRequest.state)
 }
 
-// bool evict_cache = 3;
-inline void ExecutionUpdateRequest::clear_evict_cache() {
-  evict_cache_ = false;
-}
-inline bool ExecutionUpdateRequest::evict_cache() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionUpdateRequest.evict_cache)
-  return evict_cache_;
-}
-inline void ExecutionUpdateRequest::set_evict_cache(bool value) {
-  
-  evict_cache_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionUpdateRequest.evict_cache)
-}
-
 // -------------------------------------------------------------------
 
 // ExecutionStateChangeDetails
@@ -6550,51 +6518,6 @@ inline void ExecutionStateChangeDetails::set_allocated_principal(::std::string* 
 // -------------------------------------------------------------------
 
 // ExecutionUpdateResponse
-
-// .flyteidl.core.CacheEvictionErrorList cache_eviction_errors = 1;
-inline bool ExecutionUpdateResponse::has_cache_eviction_errors() const {
-  return this != internal_default_instance() && cache_eviction_errors_ != nullptr;
-}
-inline const ::flyteidl::core::CacheEvictionErrorList& ExecutionUpdateResponse::cache_eviction_errors() const {
-  const ::flyteidl::core::CacheEvictionErrorList* p = cache_eviction_errors_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionUpdateResponse.cache_eviction_errors)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::CacheEvictionErrorList*>(
-      &::flyteidl::core::_CacheEvictionErrorList_default_instance_);
-}
-inline ::flyteidl::core::CacheEvictionErrorList* ExecutionUpdateResponse::release_cache_eviction_errors() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionUpdateResponse.cache_eviction_errors)
-  
-  ::flyteidl::core::CacheEvictionErrorList* temp = cache_eviction_errors_;
-  cache_eviction_errors_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::CacheEvictionErrorList* ExecutionUpdateResponse::mutable_cache_eviction_errors() {
-  
-  if (cache_eviction_errors_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::CacheEvictionErrorList>(GetArenaNoVirtual());
-    cache_eviction_errors_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionUpdateResponse.cache_eviction_errors)
-  return cache_eviction_errors_;
-}
-inline void ExecutionUpdateResponse::set_allocated_cache_eviction_errors(::flyteidl::core::CacheEvictionErrorList* cache_eviction_errors) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(cache_eviction_errors_);
-  }
-  if (cache_eviction_errors) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      cache_eviction_errors = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, cache_eviction_errors, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  cache_eviction_errors_ = cache_eviction_errors;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionUpdateResponse.cache_eviction_errors)
-}
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop

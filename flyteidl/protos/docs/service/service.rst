@@ -74,7 +74,6 @@ Standard response codes for both are defined here: https://github.com/grpc-ecosy
    "GetTaskExecution", ":ref:`ref_flyteidl.admin.TaskExecutionGetRequest`", ":ref:`ref_flyteidl.admin.TaskExecution`", "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`."
    "ListTaskExecutions", ":ref:`ref_flyteidl.admin.TaskExecutionListRequest`", ":ref:`ref_flyteidl.admin.TaskExecutionList`", "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`."
    "GetTaskExecutionData", ":ref:`ref_flyteidl.admin.TaskExecutionGetDataRequest`", ":ref:`ref_flyteidl.admin.TaskExecutionGetDataResponse`", "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`."
-   "UpdateTaskExecution", ":ref:`ref_flyteidl.admin.TaskExecutionUpdateRequest`", ":ref:`ref_flyteidl.admin.TaskExecutionUpdateResponse`", "Update execution belonging to project domain :ref:`ref_flyteidl.admin.TaskExecution`."
    "UpdateProjectDomainAttributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesUpdateRequest`", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesUpdateResponse`", "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain."
    "GetProjectDomainAttributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesGetRequest`", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesGetResponse`", "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain."
    "DeleteProjectDomainAttributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesDeleteRequest`", ":ref:`ref_flyteidl.admin.ProjectDomainAttributesDeleteResponse`", "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain."
@@ -219,6 +218,110 @@ RPCs defined in this service must be anonymously accessible.
 
    "GetOAuth2Metadata", ":ref:`ref_flyteidl.service.OAuth2MetadataRequest`", ":ref:`ref_flyteidl.service.OAuth2MetadataResponse`", "Anonymously accessible. Retrieves local or external oauth authorization server metadata."
    "GetPublicClientConfig", ":ref:`ref_flyteidl.service.PublicClientAuthConfigRequest`", ":ref:`ref_flyteidl.service.PublicClientAuthConfigResponse`", "Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization requests."
+
+..
+   end services
+
+
+
+
+.. _ref_flyteidl/service/cache.proto:
+
+flyteidl/service/cache.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.service.EvictCacheResponse:
+
+EvictCacheResponse
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictCacheResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "errors", ":ref:`ref_flyteidl.core.CacheEvictionErrorList`", "", "List of errors encountered during cache eviction (if any)."
+
+
+
+
+
+
+
+.. _ref_flyteidl.service.EvictExecutionCacheRequest:
+
+EvictExecutionCacheRequest
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictExecutionCacheRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of execution to evict cache for."
+
+
+
+
+
+
+
+.. _ref_flyteidl.service.EvictTaskExecutionCacheRequest:
+
+EvictTaskExecutionCacheRequest
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictTaskExecutionCacheRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Identifier of task execution to evict cache for."
+
+
+
+
+
+
+..
+   end messages
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+
+.. _ref_flyteidl.service.CacheService:
+
+CacheService
+------------------------------------------------------------------
+
+CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
+
+.. csv-table:: CacheService service methods
+   :header: "Method Name", "Request Type", "Response Type", "Description"
+   :widths: auto
+
+   "EvictExecutionCache", ":ref:`ref_flyteidl.service.EvictExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`."
+   "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictTaskExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
 
 ..
    end services

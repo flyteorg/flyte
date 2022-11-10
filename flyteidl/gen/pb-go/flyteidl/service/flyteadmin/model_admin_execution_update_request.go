@@ -12,6 +12,4 @@ package flyteadmin
 type AdminExecutionUpdateRequest struct {
 	Id *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
 	State *AdminExecutionState `json:"state,omitempty"`
-	// Indicates the cache of this (finished) execution should be evicted, instructing flyteadmin to traverse the execution DAG and remove all stored results from datacatalog.
-	EvictCache bool `json:"evict_cache,omitempty"`
 }
