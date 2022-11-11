@@ -35,11 +35,11 @@ CacheService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_EvictTaskExecutionCache_(CacheService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status CacheService::Stub::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictExecutionCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) {
+::grpc::Status CacheService::Stub::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_EvictExecutionCache_, context, request, response);
 }
 
-void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)> f) {
+void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_EvictExecutionCache_, context, request, response, std::move(f));
 }
 
@@ -47,7 +47,7 @@ void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientC
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_EvictExecutionCache_, context, request, response, std::move(f));
 }
 
-void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_EvictExecutionCache_, context, request, response, reactor);
 }
 
@@ -55,19 +55,19 @@ void CacheService::Stub::experimental_async::EvictExecutionCache(::grpc::ClientC
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_EvictExecutionCache_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::AsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictExecutionCacheRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::AsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::EvictCacheResponse>::Create(channel_.get(), cq, rpcmethod_EvictExecutionCache_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::PrepareAsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictExecutionCacheRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::PrepareAsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::EvictCacheResponse>::Create(channel_.get(), cq, rpcmethod_EvictExecutionCache_, context, request, false);
 }
 
-::grpc::Status CacheService::Stub::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) {
+::grpc::Status CacheService::Stub::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_EvictTaskExecutionCache_, context, request, response);
 }
 
-void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)> f) {
+void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_EvictTaskExecutionCache_, context, request, response, std::move(f));
 }
 
@@ -75,7 +75,7 @@ void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::Cli
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_EvictTaskExecutionCache_, context, request, response, std::move(f));
 }
 
-void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_EvictTaskExecutionCache_, context, request, response, reactor);
 }
 
@@ -83,11 +83,11 @@ void CacheService::Stub::experimental_async::EvictTaskExecutionCache(::grpc::Cli
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_EvictTaskExecutionCache_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::AsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::AsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::EvictCacheResponse>::Create(channel_.get(), cq, rpcmethod_EvictTaskExecutionCache_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::PrepareAsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* CacheService::Stub::PrepareAsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::EvictCacheResponse>::Create(channel_.get(), cq, rpcmethod_EvictTaskExecutionCache_, context, request, false);
 }
 
@@ -95,26 +95,26 @@ CacheService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       CacheService_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< CacheService::Service, ::flyteidl::service::EvictExecutionCacheRequest, ::flyteidl::service::EvictCacheResponse>(
+      new ::grpc::internal::RpcMethodHandler< CacheService::Service, ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(
           std::mem_fn(&CacheService::Service::EvictExecutionCache), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       CacheService_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< CacheService::Service, ::flyteidl::service::EvictTaskExecutionCacheRequest, ::flyteidl::service::EvictCacheResponse>(
+      new ::grpc::internal::RpcMethodHandler< CacheService::Service, ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(
           std::mem_fn(&CacheService::Service::EvictTaskExecutionCache), this)));
 }
 
 CacheService::Service::~Service() {
 }
 
-::grpc::Status CacheService::Service::EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) {
+::grpc::Status CacheService::Service::EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status CacheService::Service::EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictTaskExecutionCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) {
+::grpc::Status CacheService::Service::EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) {
   (void) context;
   (void) request;
   (void) response;

@@ -25,7 +25,7 @@ func (_m CacheServiceClient_EvictExecutionCache) Return(_a0 *service.EvictCacheR
 	return &CacheServiceClient_EvictExecutionCache{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *CacheServiceClient) OnEvictExecutionCache(ctx context.Context, in *service.EvictExecutionCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictExecutionCache {
+func (_m *CacheServiceClient) OnEvictExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictExecutionCache {
 	c_call := _m.On("EvictExecutionCache", ctx, in, opts)
 	return &CacheServiceClient_EvictExecutionCache{Call: c_call}
 }
@@ -36,7 +36,7 @@ func (_m *CacheServiceClient) OnEvictExecutionCacheMatch(matchers ...interface{}
 }
 
 // EvictExecutionCache provides a mock function with given fields: ctx, in, opts
-func (_m *CacheServiceClient) EvictExecutionCache(ctx context.Context, in *service.EvictExecutionCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
+func (_m *CacheServiceClient) EvictExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -47,7 +47,7 @@ func (_m *CacheServiceClient) EvictExecutionCache(ctx context.Context, in *servi
 	ret := _m.Called(_ca...)
 
 	var r0 *service.EvictCacheResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictExecutionCacheRequest, ...grpc.CallOption) *service.EvictCacheResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) *service.EvictCacheResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
@@ -56,7 +56,7 @@ func (_m *CacheServiceClient) EvictExecutionCache(ctx context.Context, in *servi
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictExecutionCacheRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -73,7 +73,7 @@ func (_m CacheServiceClient_EvictTaskExecutionCache) Return(_a0 *service.EvictCa
 	return &CacheServiceClient_EvictTaskExecutionCache{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *CacheServiceClient) OnEvictTaskExecutionCache(ctx context.Context, in *service.EvictTaskExecutionCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictTaskExecutionCache {
+func (_m *CacheServiceClient) OnEvictTaskExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictTaskExecutionCache {
 	c_call := _m.On("EvictTaskExecutionCache", ctx, in, opts)
 	return &CacheServiceClient_EvictTaskExecutionCache{Call: c_call}
 }
@@ -84,7 +84,7 @@ func (_m *CacheServiceClient) OnEvictTaskExecutionCacheMatch(matchers ...interfa
 }
 
 // EvictTaskExecutionCache provides a mock function with given fields: ctx, in, opts
-func (_m *CacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *service.EvictTaskExecutionCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
+func (_m *CacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -95,7 +95,7 @@ func (_m *CacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *s
 	ret := _m.Called(_ca...)
 
 	var r0 *service.EvictCacheResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictTaskExecutionCacheRequest, ...grpc.CallOption) *service.EvictCacheResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) *service.EvictCacheResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
@@ -104,7 +104,7 @@ func (_m *CacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *s
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictTaskExecutionCacheRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
