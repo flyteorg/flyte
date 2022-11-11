@@ -18890,49 +18890,28 @@ export namespace flyteidl {
             public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): CacheService;
 
             /**
-             * Calls EvictExecutionCache.
+             * Calls EvictCache.
              * @param request EvictCacheRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and EvictCacheResponse
              */
-            public evictExecutionCache(request: flyteidl.service.IEvictCacheRequest, callback: flyteidl.service.CacheService.EvictExecutionCacheCallback): void;
+            public evictCache(request: flyteidl.service.IEvictCacheRequest, callback: flyteidl.service.CacheService.EvictCacheCallback): void;
 
             /**
-             * Calls EvictExecutionCache.
+             * Calls EvictCache.
              * @param request EvictCacheRequest message or plain object
              * @returns Promise
              */
-            public evictExecutionCache(request: flyteidl.service.IEvictCacheRequest): Promise<flyteidl.service.EvictCacheResponse>;
-
-            /**
-             * Calls EvictTaskExecutionCache.
-             * @param request EvictCacheRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and EvictCacheResponse
-             */
-            public evictTaskExecutionCache(request: flyteidl.service.IEvictCacheRequest, callback: flyteidl.service.CacheService.EvictTaskExecutionCacheCallback): void;
-
-            /**
-             * Calls EvictTaskExecutionCache.
-             * @param request EvictCacheRequest message or plain object
-             * @returns Promise
-             */
-            public evictTaskExecutionCache(request: flyteidl.service.IEvictCacheRequest): Promise<flyteidl.service.EvictCacheResponse>;
+            public evictCache(request: flyteidl.service.IEvictCacheRequest): Promise<flyteidl.service.EvictCacheResponse>;
         }
 
         namespace CacheService {
 
             /**
-             * Callback as used by {@link flyteidl.service.CacheService#evictExecutionCache}.
+             * Callback as used by {@link flyteidl.service.CacheService#evictCache}.
              * @param error Error, if any
              * @param [response] EvictCacheResponse
              */
-            type EvictExecutionCacheCallback = (error: (Error|null), response?: flyteidl.service.EvictCacheResponse) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.service.CacheService#evictTaskExecutionCache}.
-             * @param error Error, if any
-             * @param [response] EvictCacheResponse
-             */
-            type EvictTaskExecutionCacheCallback = (error: (Error|null), response?: flyteidl.service.EvictCacheResponse) => void;
+            type EvictCacheCallback = (error: (Error|null), response?: flyteidl.service.EvictCacheResponse) => void;
         }
 
         /** Properties of a CreateUploadLocationResponse. */

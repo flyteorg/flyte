@@ -115,34 +115,31 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fcache_2eproto[] =
   "\021task_execution_id\030\002 \001(\0132&.flyteidl.core"
   ".TaskExecutionIdentifierH\000B\004\n\002id\"K\n\022Evic"
   "tCacheResponse\0225\n\006errors\030\001 \001(\0132%.flyteid"
-  "l.core.CacheEvictionErrorList2\217\006\n\014CacheS"
-  "ervice\022\341\001\n\023EvictExecutionCache\022#.flyteid"
-  "l.service.EvictCacheRequest\032$.flyteidl.s"
-  "ervice.EvictCacheResponse\"\177\202\323\344\223\002y*t/api/"
-  "v1/cache/executions/{workflow_execution_"
-  "id.project}/{workflow_execution_id.domai"
-  "n}/{workflow_execution_id.name}:\001*\022\232\004\n\027E"
-  "victTaskExecutionCache\022#.flyteidl.servic"
-  "e.EvictCacheRequest\032$.flyteidl.service.E"
-  "victCacheResponse\"\263\003\202\323\344\223\002\254\003*\246\003/api/v1/ca"
-  "che/task_executions/{task_execution_id.n"
-  "ode_execution_id.execution_id.project}/{"
-  "task_execution_id.node_execution_id.exec"
-  "ution_id.domain}/{task_execution_id.node"
-  "_execution_id.execution_id.name}/{task_e"
-  "xecution_id.node_execution_id.node_id}/{"
-  "task_execution_id.task_id.project}/{task"
-  "_execution_id.task_id.domain}/{task_exec"
-  "ution_id.task_id.name}/{task_execution_i"
-  "d.task_id.version}/{task_execution_id.re"
-  "try_attempt}:\001*B9Z7github.com/flyteorg/f"
+  "l.core.CacheEvictionErrorList2\227\005\n\014CacheS"
+  "ervice\022\206\005\n\nEvictCache\022#.flyteidl.service"
+  ".EvictCacheRequest\032$.flyteidl.service.Ev"
+  "ictCacheResponse\"\254\004\202\323\344\223\002\245\004*t/api/v1/cach"
+  "e/executions/{workflow_execution_id.proj"
+  "ect}/{workflow_execution_id.domain}/{wor"
+  "kflow_execution_id.name}:\001*Z\251\003*\246\003/api/v1"
+  "/cache/task_executions/{task_execution_i"
+  "d.node_execution_id.execution_id.project"
+  "}/{task_execution_id.node_execution_id.e"
+  "xecution_id.domain}/{task_execution_id.n"
+  "ode_execution_id.execution_id.name}/{tas"
+  "k_execution_id.node_execution_id.node_id"
+  "}/{task_execution_id.task_id.project}/{t"
+  "ask_execution_id.task_id.domain}/{task_e"
+  "xecution_id.task_id.name}/{task_executio"
+  "n_id.task_id.version}/{task_execution_id"
+  ".retry_attempt}B9Z7github.com/flyteorg/f"
   "lyteidl/gen/pb-go/flyteidl/serviceb\006prot"
   "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fcache_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fcache_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fcache_2eproto,
-  "flyteidl/service/cache.proto", &assign_descriptors_table_flyteidl_2fservice_2fcache_2eproto, 1242,
+  "flyteidl/service/cache.proto", &assign_descriptors_table_flyteidl_2fservice_2fcache_2eproto, 1122,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fcache_2eproto() {

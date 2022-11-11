@@ -49,71 +49,45 @@ class CacheService final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-    virtual ::grpc::Status EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> AsyncEvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictExecutionCacheRaw(context, request, cq));
+    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
+    virtual ::grpc::Status EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> AsyncEvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictCacheRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictExecutionCacheRaw(context, request, cq));
-    }
-    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
-    virtual ::grpc::Status EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> AsyncEvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictTaskExecutionCacheRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictTaskExecutionCacheRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictCacheRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
-      // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-      virtual void EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void EvictExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void EvictExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
-      virtual void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
+      virtual void EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void EvictCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void EvictCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* AsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* AsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* AsyncEvictCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
-    ::grpc::Status EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> AsyncEvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictExecutionCacheRaw(context, request, cq));
+    ::grpc::Status EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> AsyncEvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictCacheRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictExecutionCacheRaw(context, request, cq));
-    }
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::flyteidl::service::EvictCacheResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> AsyncEvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(AsyncEvictTaskExecutionCacheRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictTaskExecutionCacheRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>> PrepareAsyncEvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>>(PrepareAsyncEvictCacheRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
-      void EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
-      void EvictExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
-      void EvictExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void EvictExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
-      void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
-      void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void EvictTaskExecutionCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
+      void EvictCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, std::function<void(::grpc::Status)>) override;
+      void EvictCache(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void EvictCache(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -125,12 +99,9 @@ class CacheService final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class experimental_async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* AsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* AsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictTaskExecutionCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_EvictExecutionCache_;
-    const ::grpc::internal::RpcMethod rpcmethod_EvictTaskExecutionCache_;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* AsyncEvictCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::service::EvictCacheResponse>* PrepareAsyncEvictCacheRaw(::grpc::ClientContext* context, const ::flyteidl::service::EvictCacheRequest& request, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_EvictCache_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -138,282 +109,147 @@ class CacheService final {
    public:
     Service();
     virtual ~Service();
-    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-    virtual ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response);
-    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
-    virtual ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response);
+    // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
+    virtual ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response);
   };
   template <class BaseClass>
-  class WithAsyncMethod_EvictExecutionCache : public BaseClass {
+  class WithAsyncMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_EvictExecutionCache() {
+    WithAsyncMethod_EvictCache() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_EvictExecutionCache() override {
+    ~WithAsyncMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestEvictExecutionCache(::grpc::ServerContext* context, ::flyteidl::service::EvictCacheRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::service::EvictCacheResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestEvictCache(::grpc::ServerContext* context, ::flyteidl::service::EvictCacheRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::service::EvictCacheResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
+  typedef WithAsyncMethod_EvictCache<Service > AsyncService;
   template <class BaseClass>
-  class WithAsyncMethod_EvictTaskExecutionCache : public BaseClass {
+  class ExperimentalWithCallbackMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::MarkMethodAsync(1);
-    }
-    ~WithAsyncMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestEvictTaskExecutionCache(::grpc::ServerContext* context, ::flyteidl::service::EvictCacheRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::service::EvictCacheResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_EvictExecutionCache<WithAsyncMethod_EvictTaskExecutionCache<Service > > AsyncService;
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_EvictExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_EvictExecutionCache() {
+    ExperimentalWithCallbackMethod_EvictCache() {
       ::grpc::Service::experimental().MarkMethodCallback(0,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::service::EvictCacheRequest* request,
                  ::flyteidl::service::EvictCacheResponse* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->EvictExecutionCache(context, request, response, controller);
+                   return this->EvictCache(context, request, response, controller);
                  }));
     }
-    void SetMessageAllocatorFor_EvictExecutionCache(
+    void SetMessageAllocatorFor_EvictCache(
         ::grpc::experimental::MessageAllocator< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>*>(
           ::grpc::Service::experimental().GetHandler(0))
               ->SetMessageAllocator(allocator);
     }
-    ~ExperimentalWithCallbackMethod_EvictExecutionCache() override {
+    ~ExperimentalWithCallbackMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
+  typedef ExperimentalWithCallbackMethod_EvictCache<Service > ExperimentalCallbackService;
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_EvictTaskExecutionCache : public BaseClass {
+  class WithGenericMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithCallbackMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::experimental().MarkMethodCallback(1,
-        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(
-          [this](::grpc::ServerContext* context,
-                 const ::flyteidl::service::EvictCacheRequest* request,
-                 ::flyteidl::service::EvictCacheResponse* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->EvictTaskExecutionCache(context, request, response, controller);
-                 }));
-    }
-    void SetMessageAllocatorFor_EvictTaskExecutionCache(
-        ::grpc::experimental::MessageAllocator< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>* allocator) {
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>*>(
-          ::grpc::Service::experimental().GetHandler(1))
-              ->SetMessageAllocator(allocator);
-    }
-    ~ExperimentalWithCallbackMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  typedef ExperimentalWithCallbackMethod_EvictExecutionCache<ExperimentalWithCallbackMethod_EvictTaskExecutionCache<Service > > ExperimentalCallbackService;
-  template <class BaseClass>
-  class WithGenericMethod_EvictExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_EvictExecutionCache() {
+    WithGenericMethod_EvictCache() {
       ::grpc::Service::MarkMethodGeneric(0);
     }
-    ~WithGenericMethod_EvictExecutionCache() override {
+    ~WithGenericMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_EvictTaskExecutionCache : public BaseClass {
+  class WithRawMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::MarkMethodGeneric(1);
-    }
-    ~WithGenericMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_EvictExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_EvictExecutionCache() {
+    WithRawMethod_EvictCache() {
       ::grpc::Service::MarkMethodRaw(0);
     }
-    ~WithRawMethod_EvictExecutionCache() override {
+    ~WithRawMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestEvictExecutionCache(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestEvictCache(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawMethod_EvictTaskExecutionCache : public BaseClass {
+  class ExperimentalWithRawCallbackMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithRawMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::MarkMethodRaw(1);
-    }
-    ~WithRawMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestEvictTaskExecutionCache(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_EvictExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_EvictExecutionCache() {
+    ExperimentalWithRawCallbackMethod_EvictCache() {
       ::grpc::Service::experimental().MarkMethodRawCallback(0,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
                  ::grpc::ByteBuffer* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->EvictExecutionCache(context, request, response, controller);
+                   this->EvictCache(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithRawCallbackMethod_EvictExecutionCache() override {
+    ~ExperimentalWithRawCallbackMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void EvictExecutionCache(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void EvictCache(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_EvictTaskExecutionCache : public BaseClass {
+  class WithStreamedUnaryMethod_EvictCache : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithRawCallbackMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(1,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->EvictTaskExecutionCache(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void EvictTaskExecutionCache(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_EvictExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_EvictExecutionCache() {
+    WithStreamedUnaryMethod_EvictCache() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(std::bind(&WithStreamedUnaryMethod_EvictExecutionCache<BaseClass>::StreamedEvictExecutionCache, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(std::bind(&WithStreamedUnaryMethod_EvictCache<BaseClass>::StreamedEvictCache, this, std::placeholders::_1, std::placeholders::_2)));
     }
-    ~WithStreamedUnaryMethod_EvictExecutionCache() override {
+    ~WithStreamedUnaryMethod_EvictCache() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status EvictExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
+    ::grpc::Status EvictCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedEvictExecutionCache(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::service::EvictCacheRequest,::flyteidl::service::EvictCacheResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedEvictCache(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::service::EvictCacheRequest,::flyteidl::service::EvictCacheResponse>* server_unary_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_EvictTaskExecutionCache : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_EvictTaskExecutionCache() {
-      ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::service::EvictCacheRequest, ::flyteidl::service::EvictCacheResponse>(std::bind(&WithStreamedUnaryMethod_EvictTaskExecutionCache<BaseClass>::StreamedEvictTaskExecutionCache, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_EvictTaskExecutionCache() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status EvictTaskExecutionCache(::grpc::ServerContext* context, const ::flyteidl::service::EvictCacheRequest* request, ::flyteidl::service::EvictCacheResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedEvictTaskExecutionCache(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::service::EvictCacheRequest,::flyteidl::service::EvictCacheResponse>* server_unary_streamer) = 0;
-  };
-  typedef WithStreamedUnaryMethod_EvictExecutionCache<WithStreamedUnaryMethod_EvictTaskExecutionCache<Service > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_EvictCache<Service > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_EvictExecutionCache<WithStreamedUnaryMethod_EvictTaskExecutionCache<Service > > StreamedService;
+  typedef WithStreamedUnaryMethod_EvictCache<Service > StreamedService;
 };
 
 }  // namespace service
