@@ -9,14 +9,14 @@ import "google/api/annotations.proto";
 import "flyteidl/core/errors.proto";
 import "flyteidl/core/identifier.proto";
 
-message EvictExecutionCacheRequest {
-  // Identifier of execution to evict cache for.
-  core.WorkflowExecutionIdentifier id = 1;
-}
-
-message EvictTaskExecutionCacheRequest {
-  // Identifier of task execution to evict cache for.
-  core.TaskExecutionIdentifier id = 1;
+message EvictCacheRequest {
+  // Identifier of resource cached data should be evicted for.
+  oneof id {
+    // Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for.
+    core.WorkflowExecutionIdentifier workflow_execution_id = 1;
+    // Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for.
+    core.TaskExecutionIdentifier task_execution_id = 2;
+  }
 }
 
 message EvictCacheResponse {
@@ -27,9 +27,9 @@ message EvictCacheResponse {
 // CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
 service CacheService {
   // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-  rpc EvictExecutionCache (EvictExecutionCacheRequest) returns (EvictCacheResponse) {
+  rpc EvictExecutionCache (EvictCacheRequest) returns (EvictCacheResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/cache/executions/{id.project}/{id.domain}/{id.name}"
+      delete: "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
       body: "*"
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -38,9 +38,9 @@ service CacheService {
   }
 
   // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
-  rpc EvictTaskExecutionCache (EvictTaskExecutionCacheRequest) returns (EvictCacheResponse) {
+  rpc EvictTaskExecutionCache (EvictCacheRequest) returns (EvictCacheResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/cache/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+      delete: "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
       body: "*"
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {

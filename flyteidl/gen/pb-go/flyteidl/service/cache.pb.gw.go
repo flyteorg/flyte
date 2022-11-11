@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 func request_CacheService_EvictExecutionCache_0(ctx context.Context, marshaler runtime.Marshaler, client CacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq EvictExecutionCacheRequest
+	var protoReq EvictCacheRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -47,37 +47,37 @@ func request_CacheService_EvictExecutionCache_0(ctx context.Context, marshaler r
 		_   = err
 	)
 
-	val, ok = pathParams["id.project"]
+	val, ok = pathParams["workflow_execution_id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.project")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workflow_execution_id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.project", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "workflow_execution_id.project", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.project", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_execution_id.project", err)
 	}
 
-	val, ok = pathParams["id.domain"]
+	val, ok = pathParams["workflow_execution_id.domain"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workflow_execution_id.domain")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "workflow_execution_id.domain", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_execution_id.domain", err)
 	}
 
-	val, ok = pathParams["id.name"]
+	val, ok = pathParams["workflow_execution_id.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "workflow_execution_id.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "workflow_execution_id.name", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "workflow_execution_id.name", err)
 	}
 
 	msg, err := client.EvictExecutionCache(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -86,7 +86,7 @@ func request_CacheService_EvictExecutionCache_0(ctx context.Context, marshaler r
 }
 
 func request_CacheService_EvictTaskExecutionCache_0(ctx context.Context, marshaler runtime.Marshaler, client CacheServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq EvictTaskExecutionCacheRequest
+	var protoReq EvictCacheRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -104,103 +104,103 @@ func request_CacheService_EvictTaskExecutionCache_0(ctx context.Context, marshal
 		_   = err
 	)
 
-	val, ok = pathParams["id.node_execution_id.execution_id.project"]
+	val, ok = pathParams["task_execution_id.node_execution_id.execution_id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.node_execution_id.execution_id.project")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.node_execution_id.execution_id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.execution_id.project", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.node_execution_id.execution_id.project", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.execution_id.project", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.node_execution_id.execution_id.project", err)
 	}
 
-	val, ok = pathParams["id.node_execution_id.execution_id.domain"]
+	val, ok = pathParams["task_execution_id.node_execution_id.execution_id.domain"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.node_execution_id.execution_id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.node_execution_id.execution_id.domain")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.execution_id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.node_execution_id.execution_id.domain", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.execution_id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.node_execution_id.execution_id.domain", err)
 	}
 
-	val, ok = pathParams["id.node_execution_id.execution_id.name"]
+	val, ok = pathParams["task_execution_id.node_execution_id.execution_id.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.node_execution_id.execution_id.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.node_execution_id.execution_id.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.execution_id.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.node_execution_id.execution_id.name", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.execution_id.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.node_execution_id.execution_id.name", err)
 	}
 
-	val, ok = pathParams["id.node_execution_id.node_id"]
+	val, ok = pathParams["task_execution_id.node_execution_id.node_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.node_execution_id.node_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.node_execution_id.node_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.node_id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.node_execution_id.node_id", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.node_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.node_execution_id.node_id", err)
 	}
 
-	val, ok = pathParams["id.task_id.project"]
+	val, ok = pathParams["task_execution_id.task_id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.project")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.task_id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.project", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.task_id.project", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.project", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.task_id.project", err)
 	}
 
-	val, ok = pathParams["id.task_id.domain"]
+	val, ok = pathParams["task_execution_id.task_id.domain"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.task_id.domain")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.task_id.domain", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.task_id.domain", err)
 	}
 
-	val, ok = pathParams["id.task_id.name"]
+	val, ok = pathParams["task_execution_id.task_id.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.task_id.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.task_id.name", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.task_id.name", err)
 	}
 
-	val, ok = pathParams["id.task_id.version"]
+	val, ok = pathParams["task_execution_id.task_id.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.task_id.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.task_id.version", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.task_id.version", err)
 	}
 
-	val, ok = pathParams["id.retry_attempt"]
+	val, ok = pathParams["task_execution_id.retry_attempt"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.retry_attempt")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_execution_id.retry_attempt")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.retry_attempt", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_execution_id.retry_attempt", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.retry_attempt", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_execution_id.retry_attempt", err)
 	}
 
 	msg, err := client.EvictTaskExecutionCache(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -290,9 +290,9 @@ func RegisterCacheServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_CacheService_EvictExecutionCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "cache", "executions", "id.project", "id.domain", "id.name"}, ""))
+	pattern_CacheService_EvictExecutionCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "cache", "executions", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
 
-	pattern_CacheService_EvictTaskExecutionCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "cache", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
+	pattern_CacheService_EvictTaskExecutionCache_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "cache", "task_executions", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
 )
 
 var (

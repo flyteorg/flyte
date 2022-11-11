@@ -17,12 +17,12 @@ class CacheServiceStub(object):
         """
         self.EvictExecutionCache = channel.unary_unary(
                 '/flyteidl.service.CacheService/EvictExecutionCache',
-                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
+                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
                 )
         self.EvictTaskExecutionCache = channel.unary_unary(
                 '/flyteidl.service.CacheService/EvictTaskExecutionCache',
-                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.SerializeToString,
+                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
                 )
 
@@ -50,12 +50,12 @@ def add_CacheServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'EvictExecutionCache': grpc.unary_unary_rpc_method_handler(
                     servicer.EvictExecutionCache,
-                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.FromString,
+                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.FromString,
                     response_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.SerializeToString,
             ),
             'EvictTaskExecutionCache': grpc.unary_unary_rpc_method_handler(
                     servicer.EvictTaskExecutionCache,
-                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.FromString,
+                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.FromString,
                     response_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.SerializeToString,
             ),
     }
@@ -81,7 +81,7 @@ class CacheService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictExecutionCache',
-            flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
+            flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
             flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -98,7 +98,7 @@ class CacheService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictTaskExecutionCache',
-            flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.SerializeToString,
+            flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
             flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -15,7 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/cache/executions/{id.project}/{id.domain}/{id.name}": {
+    "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "delete": {
         "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.",
         "operationId": "EvictExecutionCache",
@@ -29,21 +29,21 @@
         },
         "parameters": [
           {
-            "name": "id.project",
+            "name": "workflow_execution_id.project",
             "description": "Name of the project the resource belongs to.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.domain",
+            "name": "workflow_execution_id.domain",
             "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.name",
+            "name": "workflow_execution_id.name",
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
@@ -54,7 +54,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/serviceEvictExecutionCacheRequest"
+              "$ref": "#/definitions/serviceEvictCacheRequest"
             }
           }
         ],
@@ -63,7 +63,7 @@
         ]
       }
     },
-    "/api/v1/cache/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+    "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "delete": {
         "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.",
         "operationId": "EvictTaskExecutionCache",
@@ -77,62 +77,62 @@
         },
         "parameters": [
           {
-            "name": "id.node_execution_id.execution_id.project",
+            "name": "task_execution_id.node_execution_id.execution_id.project",
             "description": "Name of the project the resource belongs to.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.node_execution_id.execution_id.domain",
+            "name": "task_execution_id.node_execution_id.execution_id.domain",
             "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.node_execution_id.execution_id.name",
+            "name": "task_execution_id.node_execution_id.execution_id.name",
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.node_execution_id.node_id",
+            "name": "task_execution_id.node_execution_id.node_id",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.task_id.project",
+            "name": "task_execution_id.task_id.project",
             "description": "Name of the project the resource belongs to.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.task_id.domain",
+            "name": "task_execution_id.task_id.domain",
             "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.task_id.name",
+            "name": "task_execution_id.task_id.name",
             "description": "User provided value for the resource.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.task_id.version",
+            "name": "task_execution_id.task_id.version",
             "description": "Specific version of the resource.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.retry_attempt",
+            "name": "task_execution_id.retry_attempt",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -143,7 +143,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/serviceEvictTaskExecutionCacheRequest"
+              "$ref": "#/definitions/serviceEvictCacheRequest"
             }
           }
         ],
@@ -283,30 +283,25 @@
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
     },
+    "serviceEvictCacheRequest": {
+      "type": "object",
+      "properties": {
+        "workflow_execution_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "description": "Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for."
+        },
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier",
+          "description": "Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for."
+        }
+      }
+    },
     "serviceEvictCacheResponse": {
       "type": "object",
       "properties": {
         "errors": {
           "$ref": "#/definitions/coreCacheEvictionErrorList",
           "description": "List of errors encountered during cache eviction (if any)."
-        }
-      }
-    },
-    "serviceEvictExecutionCacheRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "Identifier of execution to evict cache for."
-        }
-      }
-    },
-    "serviceEvictTaskExecutionCacheRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "Identifier of task execution to evict cache for."
         }
       }
     }

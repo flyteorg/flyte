@@ -234,6 +234,28 @@ flyteidl/service/cache.proto
 
 
 
+.. _ref_flyteidl.service.EvictCacheRequest:
+
+EvictCacheRequest
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictCacheRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for."
+   "task_execution_id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for."
+
+
+
+
+
+
+
 .. _ref_flyteidl.service.EvictCacheResponse:
 
 EvictCacheResponse
@@ -248,48 +270,6 @@ EvictCacheResponse
    :widths: auto
 
    "errors", ":ref:`ref_flyteidl.core.CacheEvictionErrorList`", "", "List of errors encountered during cache eviction (if any)."
-
-
-
-
-
-
-
-.. _ref_flyteidl.service.EvictExecutionCacheRequest:
-
-EvictExecutionCacheRequest
-------------------------------------------------------------------
-
-
-
-
-
-.. csv-table:: EvictExecutionCacheRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of execution to evict cache for."
-
-
-
-
-
-
-
-.. _ref_flyteidl.service.EvictTaskExecutionCacheRequest:
-
-EvictTaskExecutionCacheRequest
-------------------------------------------------------------------
-
-
-
-
-
-.. csv-table:: EvictTaskExecutionCacheRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Identifier of task execution to evict cache for."
 
 
 
@@ -320,8 +300,8 @@ CacheService defines an RPC Service for interacting with cached data in Flyte on
    :header: "Method Name", "Request Type", "Response Type", "Description"
    :widths: auto
 
-   "EvictExecutionCache", ":ref:`ref_flyteidl.service.EvictExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`."
-   "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictTaskExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
+   "EvictExecutionCache", ":ref:`ref_flyteidl.service.EvictCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`."
+   "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
 
 ..
    end services
