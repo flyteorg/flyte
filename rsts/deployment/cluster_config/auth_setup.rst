@@ -182,13 +182,28 @@ Apply Configuration
 
    Save and exit your editor.
    
-#. Replace the default `clientSecret` for `flytepropeller` using an encoded password of your choice:
+#. Replace the default `clientSecret` for `flytepropeller` using an encoded/hashed secret of your choice:
 
    .. prompt:: bash
    
       pip install bcrypt && python -c 'import bcrypt; import base64; print(base64.b64encode(bcrypt.hashpw("mypassword".encode("utf-8"), bcrypt.gensalt(6))))'
       
-#. In the `flyte-admin-base-config` configMap, find the following section and replace `foobar` with the encoded password generated in the previous step:
+#. In the `values.yaml` file for the `flyte-core` release, find the following section and insert the encoded/hashed secret generated in the previous step:
+
+   .. code-block:: yaml
+      auth:
+          appAuth:
+              authServerType: Self
+              selfAuthServer:
+                  ...
+                  staticClients:
+                      ...
+                      flytepropeller:
+                          audience: null
+                          client_secret: <your client secret hashed and base64 encoded>
+
+
+#. While in the same file, find the following section and replace `foobar` with the non-hashed/non-encoded version of the secret you used in step #3:
 
    .. code-block:: yaml
    
@@ -198,12 +213,12 @@ Apply Configuration
         clientSecret: foobar
         clientId: flytepropeller
 
-Save and exit your editor.
-
 .. note::
    This step is required to address security advisory `GHSA-67x4-qr35-qvrm <https://github.com/flyteorg/flyteadmin/security/advisories/GHSA-67x4-qr35-qvrm>`__.
 
-5. Restart `flyteadmin` for the changes to take effect:
+Save and exit your editor.
+
+6. Restart `flyteadmin` for the changes to take effect:
 
    .. prompt:: bash
 
