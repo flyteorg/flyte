@@ -17,8 +17,8 @@
   "paths": {
     "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "delete": {
-        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.",
-        "operationId": "EvictExecutionCache",
+        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "EvictCache",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -65,8 +65,8 @@
     },
     "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "delete": {
-        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.",
-        "operationId": "EvictTaskExecutionCache",
+        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "EvictCache2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -139,12 +139,19 @@
             "format": "int64"
           },
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/serviceEvictCacheRequest"
-            }
+            "name": "task_execution_id.task_id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
           }
         ],
         "tags": [

@@ -44024,64 +44024,31 @@
                 };
     
                 /**
-                 * Callback as used by {@link flyteidl.service.CacheService#evictExecutionCache}.
+                 * Callback as used by {@link flyteidl.service.CacheService#evictCache}.
                  * @memberof flyteidl.service.CacheService
-                 * @typedef EvictExecutionCacheCallback
+                 * @typedef EvictCacheCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
                  * @param {flyteidl.service.EvictCacheResponse} [response] EvictCacheResponse
                  */
     
                 /**
-                 * Calls EvictExecutionCache.
-                 * @function evictExecutionCache
+                 * Calls EvictCache.
+                 * @function evictCache
                  * @memberof flyteidl.service.CacheService
                  * @instance
                  * @param {flyteidl.service.IEvictCacheRequest} request EvictCacheRequest message or plain object
-                 * @param {flyteidl.service.CacheService.EvictExecutionCacheCallback} callback Node-style callback called with the error, if any, and EvictCacheResponse
+                 * @param {flyteidl.service.CacheService.EvictCacheCallback} callback Node-style callback called with the error, if any, and EvictCacheResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(CacheService.prototype.evictExecutionCache = function evictExecutionCache(request, callback) {
-                    return this.rpcCall(evictExecutionCache, $root.flyteidl.service.EvictCacheRequest, $root.flyteidl.service.EvictCacheResponse, request, callback);
-                }, "name", { value: "EvictExecutionCache" });
+                Object.defineProperty(CacheService.prototype.evictCache = function evictCache(request, callback) {
+                    return this.rpcCall(evictCache, $root.flyteidl.service.EvictCacheRequest, $root.flyteidl.service.EvictCacheResponse, request, callback);
+                }, "name", { value: "EvictCache" });
     
                 /**
-                 * Calls EvictExecutionCache.
-                 * @function evictExecutionCache
-                 * @memberof flyteidl.service.CacheService
-                 * @instance
-                 * @param {flyteidl.service.IEvictCacheRequest} request EvictCacheRequest message or plain object
-                 * @returns {Promise<flyteidl.service.EvictCacheResponse>} Promise
-                 * @variation 2
-                 */
-    
-                /**
-                 * Callback as used by {@link flyteidl.service.CacheService#evictTaskExecutionCache}.
-                 * @memberof flyteidl.service.CacheService
-                 * @typedef EvictTaskExecutionCacheCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.service.EvictCacheResponse} [response] EvictCacheResponse
-                 */
-    
-                /**
-                 * Calls EvictTaskExecutionCache.
-                 * @function evictTaskExecutionCache
-                 * @memberof flyteidl.service.CacheService
-                 * @instance
-                 * @param {flyteidl.service.IEvictCacheRequest} request EvictCacheRequest message or plain object
-                 * @param {flyteidl.service.CacheService.EvictTaskExecutionCacheCallback} callback Node-style callback called with the error, if any, and EvictCacheResponse
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(CacheService.prototype.evictTaskExecutionCache = function evictTaskExecutionCache(request, callback) {
-                    return this.rpcCall(evictTaskExecutionCache, $root.flyteidl.service.EvictCacheRequest, $root.flyteidl.service.EvictCacheResponse, request, callback);
-                }, "name", { value: "EvictTaskExecutionCache" });
-    
-                /**
-                 * Calls EvictTaskExecutionCache.
-                 * @function evictTaskExecutionCache
+                 * Calls EvictCache.
+                 * @function evictCache
                  * @memberof flyteidl.service.CacheService
                  * @instance
                  * @param {flyteidl.service.IEvictCacheRequest} request EvictCacheRequest message or plain object

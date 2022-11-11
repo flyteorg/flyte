@@ -300,8 +300,7 @@ CacheService defines an RPC Service for interacting with cached data in Flyte on
    :header: "Method Name", "Request Type", "Response Type", "Description"
    :widths: auto
 
-   "EvictExecutionCache", ":ref:`ref_flyteidl.service.EvictCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`."
-   "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
+   "EvictCache", ":ref:`ref_flyteidl.service.EvictCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`."
 
 ..
    end services

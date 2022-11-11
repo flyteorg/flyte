@@ -17,74 +17,26 @@ type CacheServiceClient struct {
 	mock.Mock
 }
 
-type CacheServiceClient_EvictExecutionCache struct {
+type CacheServiceClient_EvictCache struct {
 	*mock.Call
 }
 
-func (_m CacheServiceClient_EvictExecutionCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceClient_EvictExecutionCache {
-	return &CacheServiceClient_EvictExecutionCache{Call: _m.Call.Return(_a0, _a1)}
+func (_m CacheServiceClient_EvictCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceClient_EvictCache {
+	return &CacheServiceClient_EvictCache{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *CacheServiceClient) OnEvictExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictExecutionCache {
-	c_call := _m.On("EvictExecutionCache", ctx, in, opts)
-	return &CacheServiceClient_EvictExecutionCache{Call: c_call}
+func (_m *CacheServiceClient) OnEvictCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictCache {
+	c_call := _m.On("EvictCache", ctx, in, opts)
+	return &CacheServiceClient_EvictCache{Call: c_call}
 }
 
-func (_m *CacheServiceClient) OnEvictExecutionCacheMatch(matchers ...interface{}) *CacheServiceClient_EvictExecutionCache {
-	c_call := _m.On("EvictExecutionCache", matchers...)
-	return &CacheServiceClient_EvictExecutionCache{Call: c_call}
+func (_m *CacheServiceClient) OnEvictCacheMatch(matchers ...interface{}) *CacheServiceClient_EvictCache {
+	c_call := _m.On("EvictCache", matchers...)
+	return &CacheServiceClient_EvictCache{Call: c_call}
 }
 
-// EvictExecutionCache provides a mock function with given fields: ctx, in, opts
-func (_m *CacheServiceClient) EvictExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 *service.EvictCacheResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) *service.EvictCacheResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*service.EvictCacheResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictCacheRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type CacheServiceClient_EvictTaskExecutionCache struct {
-	*mock.Call
-}
-
-func (_m CacheServiceClient_EvictTaskExecutionCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceClient_EvictTaskExecutionCache {
-	return &CacheServiceClient_EvictTaskExecutionCache{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *CacheServiceClient) OnEvictTaskExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) *CacheServiceClient_EvictTaskExecutionCache {
-	c_call := _m.On("EvictTaskExecutionCache", ctx, in, opts)
-	return &CacheServiceClient_EvictTaskExecutionCache{Call: c_call}
-}
-
-func (_m *CacheServiceClient) OnEvictTaskExecutionCacheMatch(matchers ...interface{}) *CacheServiceClient_EvictTaskExecutionCache {
-	c_call := _m.On("EvictTaskExecutionCache", matchers...)
-	return &CacheServiceClient_EvictTaskExecutionCache{Call: c_call}
-}
-
-// EvictTaskExecutionCache provides a mock function with given fields: ctx, in, opts
-func (_m *CacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
+// EvictCache provides a mock function with given fields: ctx, in, opts
+func (_m *CacheServiceClient) EvictCache(ctx context.Context, in *service.EvictCacheRequest, opts ...grpc.CallOption) (*service.EvictCacheResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]

@@ -26,25 +26,17 @@ message EvictCacheResponse {
 
 // CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
 service CacheService {
-  // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-  rpc EvictExecutionCache (EvictCacheRequest) returns (EvictCacheResponse) {
+  // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc EvictCache (EvictCacheRequest) returns (EvictCacheResponse) {
     option (google.api.http) = {
       delete: "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+      additional_bindings: {
+        delete: "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+      }
       body: "*"
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Evicts all cached data for the referenced (workflow) execution."
-    // };
-  }
-
-  // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
-  rpc EvictTaskExecutionCache (EvictCacheRequest) returns (EvictCacheResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
-      body: "*"
-    };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Evicts all cached data for the referenced task execution."
     // };
   }
 }
