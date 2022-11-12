@@ -28,6 +28,7 @@ build: flyte
 		--tag flyte-sandbox:latest .
 
 .PHONY: start
+start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
 start:
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
@@ -38,7 +39,7 @@ start:
 			--publish "30001:30001" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
-			flyte-sandbox:latest
+			$(FLYTE_SANDBOX_IMAGE)
 
 .PHONY: kubeconfig
 .SILENT: kubeconfig
