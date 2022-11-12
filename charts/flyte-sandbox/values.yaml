@@ -1,4 +1,8 @@
 docker-registry:
+  image:
+    repository: registry
+    tag: sandbox
+    pullPolicy: Never
   persistence:
     enabled: false
   service:
@@ -9,7 +13,8 @@ flyte-binary:
   networking:
     host: true
   image:
-    fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
+    fqn: "flyte-binary:sandbox"
+    pullPolicy: Never
   storage:
     metadataContainer: flyte-sandbox
     userDataContainer: flyte-sandbox
@@ -25,6 +30,10 @@ flyte-binary:
     level: 1
 
 kubernetes-dashboard:
+  image:
+    repository: kubernetesui/dashboard
+    tag: sandbox
+    pullPolicy: Never
   extraArgs:
     - --enable-insecure-login
     - --enable-skip-login
@@ -37,6 +46,10 @@ kubernetes-dashboard:
     clusterReadOnlyRole: true
 
 minio:
+  image:
+    repository: bitnami/minio
+    tag: sandbox
+    pullPolicy: Never
   auth:
     rootUser: minio
     rootPassword: miniostorage
@@ -53,6 +66,10 @@ minio:
     storageClass: local-path
 
 postgresql:
+  image:
+    repository: bitnami/postgresql
+    tag: sandbox
+    pullPolicy: Never
   auth:
     postgresPassword: postgres
   shmVolume:
@@ -70,5 +87,5 @@ sandbox:
   proxy:
     image:
       repository: envoyproxy/envoy
-      tag: v1.23-latest
+      tag: sandbox
       pullPolicy: Never
