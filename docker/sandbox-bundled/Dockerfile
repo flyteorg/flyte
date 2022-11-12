@@ -3,11 +3,12 @@
 FROM --platform=linux/amd64 mgoltzsche/podman:minimal AS builder
 
 ARG TARGETARCH
+ENV TARGETARCH "${TARGETARCH}"
 
 WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
-RUN --security=insecure ./preload manifests.txt
+RUN --security=insecure ./preload manifest.txt
 
 FROM rancher/k3s:v1.24.4-k3s1
 
