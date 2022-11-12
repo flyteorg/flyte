@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyte
+  name: flytebinary
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: flyte
+  template:
+    metadata:
+      labels:
+        app: flyte
+    spec:
+      {{- if .Values.networking.host }}
+      hostNetwork: true
+      {{- end }}
+      initContainers:
+      - name: wait-for-db
+        {{- with .Values.images.postgres }}
+        image: {{ printf "%s:%s" .repository .tag | quote }}
+        imagePullPolicy: {{ .pullPolicy | quote }}
+        {{- end }}
+        command:
+        - pg_isready
+        args:
+        - -h
+        - {{ .Values.database.host | quote }}
+        - -p
+        - {{ .Values.database.port | quote }}
+        - -U
+        - {{ .Values.database.username | quote }}
+      containers:
+      - name: flyte
+        {{- with .Values.images.flyte }}
+        image: {{ printf "%s:%s" .repository .tag | quote }}
+        imagePullPolicy: {{ .pullPolicy | quote }}
+        {{- end }}
+        args:
+        - start
+        - --config
+        - /etc/flyte/flyte.yaml
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - containerPort: 8088
+          name: http
+        - containerPort: 8089
+          name: grpc
+        - containerPort: 9443
+          name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/cluster-resource-templates
+          name: cluster-resource-templates
+        {{- if eq .Values.paths.externalFlyteConfig "" }}
+        - mountPath: /etc/flyte/flyte.yaml
+          subPath: flyte.yaml
+          name: config
+        {{- else }}
+        - mountPath: /etc/flyte/flyte.yaml
+          name: config
+        {{- end }}
+        - mountPath: /var/run/flyte
+          name: state
+        {{- if .Values.database.password }}
+        {{- include "flyte-binary.database.secretvolmount" . | nindent 8 }}
+        {{- end }}
+      serviceAccountName: flyte
+      volumes:
+      - name: cluster-resource-templates
+        configMap:
+          name: cluster-resource-templates
+      {{- if eq .Values.paths.externalFlyteConfig "" }}
+      - name: config
+        configMap:
+          name: flyte-backend-config
+      {{- else }}
+      - hostPath:
+          path: {{ .Values.paths.externalFlyteConfig }}
+          type: File
+        name: config
+      {{- end }}
+      - name: state
+        emptyDir: {}
+      {{- if .Values.database.password }}
+      {{- include "flyte-binary.database.secretvol" . | nindent 6 }}
+      {{- end }}
