@@ -26,7 +26,9 @@ spec:
         - pg_isready
         args:
         - -h
-        - '{{ .Values.database.host }}:{{ .Values.database.port }}'
+        - {{ .Values.database.host | quote }}
+        - -p
+        - {{ .Values.database.port | quote }}
       containers:
       - name: flyte
         image: "{{ .Values.image.fqn }}"
