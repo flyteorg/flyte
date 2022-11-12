@@ -19,6 +19,14 @@ spec:
       {{- if .Values.networking.host }}
       hostNetwork: true
       {{- end }}
+      initContainers:
+      - name: wait-for-db
+        image: postgres
+        command:
+        - pg_isready
+        args:
+        - -h
+        - '{{ .Values.database.host }}:{{ .Values.database.port }}'
       containers:
       - name: flyte
         image: "{{ .Values.image.fqn }}"
