@@ -62,6 +62,11 @@ plugins:
         kubernetes-enabled: true
         kubernetes-template-uri: 
             {{`"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"`}}
+cluster_resources:
+  refreshInterval: 5m
+  templatePath: "/etc/flyte/cluster-resource-templates"
+  # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
+  standaloneDeployment: false
 catalog-cache:
   endpoint: localhost:8081
   insecure: true
