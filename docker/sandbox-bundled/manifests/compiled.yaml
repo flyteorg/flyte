@@ -44,7 +44,7 @@ secrets:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: eGRqTHJPQ0FPWkJvSHFMSA==
+  haSharedSecret: RHYzNUhpdEhuN1h3YXNuMA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -194,7 +194,10 @@ data:
     \       \"http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{
     .podName }}/pod?namespace={{ .namespace }}\"\n  k8s-array:\n    logs:\n      config:\n
     \       kubernetes-enabled: true\n        kubernetes-template-uri: \n            \"http://localhost:30080/kubernetes-dashboard/#/log/{{
-    .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}\"\ncatalog-cache:\n
+    .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}\"\ncluster_resources:\n
+    \ refreshInterval: 5m\n  templatePath: \"/etc/flyte/cluster-resource-templates\"\n
+    \ # -- Starts the cluster resource manager in standalone mode with requisite auth
+    credentials to call flyteadmin service endpoints\n  standaloneDeployment: false\ncatalog-cache:\n
     \ endpoint: localhost:8081\n  insecure: true\n  type: datacatalog\nnamespace_mapping:\n
     \ template: \"{{ project }}-{{ domain }}\"\n"
 kind: ConfigMap
@@ -922,7 +925,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 363aa4c51571bf7ec82462362ac71553e6f441c9376f40697515da3bd480c3ef
+        checksum/secret: 15ae881a7f552ae4355124900f13abed2ab6cff7606067aa946b55e970be15d7
       labels:
         app: docker-registry
         release: flyte-sandbox
