@@ -1,15 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}-proxy-config
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "flyte-sandbox.labels" . | nindent 4 }}
+  name: {{ include "flyte-sandbox.proxyConfigMapName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-sandbox.labels" . | nindent 4 }}
 data:
   envoy.yaml: |
     admin:
         access_log_path: /dev/stdout
-
     static_resources:
         listeners:
             - address:

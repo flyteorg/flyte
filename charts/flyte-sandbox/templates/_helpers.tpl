@@ -60,3 +60,18 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Selector labels for Envoy proxy
+*/}}
+{{- define "flyte-sandbox.proxySelectorLabels" -}}
+{{ include "flyte-sandbox.selectorLabels" . }}
+app.kubernetes.io/component: proxy
+{{- end }}
+
+{{/*
+Name of Envoy proxy configmap
+*/}}
+{{- define "flyte-sandbox.proxyConfigMapName" -}}
+{{- printf "%s-proxy-config" (include "flyte-sandbox.fullname" .) -}}
+{{- end }}

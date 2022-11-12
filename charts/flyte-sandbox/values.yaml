@@ -65,3 +65,10 @@ postgresql:
     persistence:
       enabled: true
       storageClass: local-path
+
+sandbox:
+  proxy:
+    image:
+      repository: envoyproxy/envoy
+      tag: v1.23-latest
+      pullPolicy: Never
