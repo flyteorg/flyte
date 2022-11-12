@@ -78,7 +78,7 @@ data:
         default-env-vars:
           - AWS_METADATA_SERVICE_TIMEOUT: 5
           - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-          - FLYTE_AWS_ENDPOINT: "http://minio.minio:9000"
+          - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
       # Logging configuration
@@ -93,34 +93,11 @@ data:
             kubernetes-enabled: true
             kubernetes-template-uri: 
                 "http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
-    
     cluster_resources:
       refreshInterval: 5m
       templatePath: "/etc/flyte/cluster-resource-templates"
       # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
       standaloneDeployment: false
-      customData:
-      - production:
-        - projectQuotaCpu:
-            value: "5"
-        - projectQuotaMemory:
-            value: "4000Mi"
-      - staging:
-        - projectQuotaCpu:
-            value: "2"
-        - projectQuotaMemory:
-            value: "3000Mi"
-      - development:
-        - projectQuotaCpu:
-            value: "4"
-        - projectQuotaMemory:
-            value: "3000Mi"
-      refresh: 5m
-    task_resources:
-      defaults:
-        cpu: 500m
-        memory: 500Mi
-        storage: 500Mi
     catalog-cache:
       endpoint: localhost:8081
       insecure: true
@@ -145,19 +122,6 @@ data:
     kind: Namespace
     metadata:
       name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
-  project_resource_quota.yaml: |
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }}
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }}
-        limits.memory: {{ projectQuotaMemory }}
 ---
 # Source: flyte-binary/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -294,10 +258,23 @@ spec:
         app: flyte
     spec:
       hostNetwork: true
+      initContainers:
+      - name: wait-for-db
+        image: "postgres:15-alpine"
+        imagePullPolicy: "IfNotPresent"
+        command:
+        - pg_isready
+        args:
+        - -h
+        - "127.0.0.1"
+        - -p
+        - "5432"
+        - -U
+        - "postgres"
       containers:
       - name: flyte
         image: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: "IfNotPresent"
         args:
         - start
         - --config

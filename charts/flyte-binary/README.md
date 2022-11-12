@@ -13,7 +13,12 @@ Chart for basic single Flyte executable deployment
 | database.password | string | `""` |  |
 | database.port | int | `5432` |  |
 | database.username | string | `"postgres"` |  |
-| image.fqn | string | `"ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"` |  |
+| images.flyte.pullPolicy | string | `"IfNotPresent"` |  |
+| images.flyte.repository | string | `"ghcr.io/flyteorg/flyte-sandbox"` |  |
+| images.flyte.tag | string | `"flytebinary_1007"` |  |
+| images.postgres.pullPolicy | string | `"IfNotPresent"` |  |
+| images.postgres.repository | string | `"postgres"` |  |
+| images.postgres.tag | string | `"15-alpine"` |  |
 | logger.level | int | `1` |  |
 | networking.host | bool | `true` |  |
 | paths.externalFlyteConfig | string | `""` |  |

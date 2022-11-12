@@ -166,6 +166,9 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Setup destination directories for image tarballs
+        run: |
+          mkdir -p docker/sandbox-bundled/images/tar/{arm64,amd64}
       - name: Export ARM64 Image
         uses: docker/build-push-action@v3
         env:
@@ -178,7 +181,7 @@ jobs:
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/flyte-arm64.tar
+          outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
         uses: docker/build-push-action@v3
         env:
@@ -191,7 +194,7 @@ jobs:
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=docker,dest=/tmp/flyte-amd64.tar
+          outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Build and push Image
         if: ${{ github.event_name == 'release' }}
         uses: docker/build-push-action@v3
@@ -210,8 +213,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: single-binary-image
-          path: /tmp/flyte-*.tar
-
+          path: docker/sandbox-bundled/images/tar
 
   trigger-sandbox-bundled-build:
     runs-on: ubuntu-latest
@@ -224,7 +226,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
-          path: /tmp/
+          path: docker/sandbox-bundled/images/tar
       - name: Prepare DIND Image Names
         id: dind-names
         uses: docker/metadata-action@v3
@@ -249,12 +251,6 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Prepare Sandbox images for single binary
-        run: |
-          mkdir -p images/tar/amd64
-          cp /tmp/flyte-amd64.tar images/tar/amd64/flyte-binary.tar
-          mkdir -p images/tar/arm64
-          cp /tmp/flyte-arm64.tar images/tar/arm64/flyte-binary.tar
       - name: Build and push Image
         uses: docker/build-push-action@v3
         env:
