@@ -251,7 +251,10 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Prepare Sandbox images for single binary
         run: |
-          make -C docker/sandbox-bundled images-ci
+          mkdir -p images/tar/amd64
+          cp /tmp/flyte-amd64.tar images/tar/amd64/flyte-binary.tar
+          mkdir -p images/tar/arm64
+          cp /tmp/flyte-arm64.tar images/tar/arm64/flyte-binary.tar
       - name: Build and push Image
         uses: docker/build-push-action@v3
         env:
@@ -261,7 +264,6 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.dind-names.outputs.tags }}
-          file: docker/sandbox-bundled/images/dockerfiles/k3s/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
