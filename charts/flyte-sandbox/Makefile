@@ -1,5 +1,6 @@
 BREW_BIN := $(shell brew --prefix)/bin
 K3D_CLUSTER_NAME := flyte-sandbox
+OUTPUT_MANIFEST := ../../docker/sandbox-bundled/manifests/compiled.yaml
 
 .PHONY: start
 start:
@@ -28,8 +29,8 @@ render: start
 	$(BREW_BIN)/kubectl create \
 		--context=k3d-$(K3D_CLUSTER_NAME) \
 		--namespace=flyte \
-		-f - --dry-run=client -o yaml > output.yaml
+		-f - --dry-run=client -o yaml > $(OUTPUT_MANIFEST)
 
 .PHONY: bootstrap
 bootstrap:
-	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) --namespace=flyte apply -f output.yaml
+	$(BREW_BIN)/kubectl --context=k3d-$(K3D_CLUSTER_NAME) --namespace=flyte apply -f $(OUTPUT_MANIFEST)
