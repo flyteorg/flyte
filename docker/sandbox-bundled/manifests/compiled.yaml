@@ -44,7 +44,7 @@ secrets:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UHQxU0lHQ0dpS3FkcklZZQ==
+  haSharedSecret: eGRqTHJPQ0FPWkJvSHFMSA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -922,7 +922,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ab0e2c61e480542d5d7879e51c220f3eaf0c3ab78abc1d8c84dd05f0e14f3a50
+        checksum/secret: 363aa4c51571bf7ec82462362ac71553e6f441c9376f40697515da3bd480c3ef
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1033,6 +1033,8 @@ spec:
         - 127.0.0.1
         - -p
         - "30001"
+        - -U
+        - postgres
         command:
         - pg_isready
         image: bitnami/postgresql:sandbox
