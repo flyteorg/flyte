@@ -1,9 +1,16 @@
 networking:
   host: true
 
-image:
-  fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
-  pullPolicy: IfNotPresent
+images:
+  flyte:
+    repository: ghcr.io/flyteorg/flyte-sandbox
+    tag: flytebinary_1007
+    pullPolicy: IfNotPresent
+  # Used for wait-for-db init container
+  postgres:
+    repository: postgres
+    tag: 15-alpine
+    pullPolicy: IfNotPresent
 
 storage:
   metadataContainer: my-s3-bucket

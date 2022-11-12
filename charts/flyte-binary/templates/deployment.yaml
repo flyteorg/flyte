@@ -21,7 +21,10 @@ spec:
       {{- end }}
       initContainers:
       - name: wait-for-db
-        image: postgres
+        {{- with .Values.images.postgres }}
+        image: {{ printf "%s:%s" .repository .tag | quote }}
+        imagePullPolicy: {{ .pullPolicy | quote }}
+        {{- end }}
         command:
         - pg_isready
         args:
@@ -31,8 +34,10 @@ spec:
         - {{ .Values.database.port | quote }}
       containers:
       - name: flyte
-        image: "{{ .Values.image.fqn }}"
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- with .Values.images.flyte }}
+        image: {{ printf "%s:%s" .repository .tag | quote }}
+        imagePullPolicy: {{ .pullPolicy | quote }}
+        {{- end }}
         args:
         - start
         - --config
