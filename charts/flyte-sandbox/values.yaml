@@ -12,9 +12,15 @@ docker-registry:
 flyte-binary:
   networking:
     host: true
-  image:
-    fqn: "flyte-binary:sandbox"
-    pullPolicy: Never
+  images:
+    flyte:
+      repository: flyte-binary
+      tag: sandbox
+      pullPolicy: Never
+    postgres:
+      repository: bitnami/postgresql
+      tag: sandbox
+      pullPolicy: Never
   storage:
     metadataContainer: flyte-sandbox
     userDataContainer: flyte-sandbox
