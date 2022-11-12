@@ -44,7 +44,7 @@ secrets:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RHYzNUhpdEhuN1h3YXNuMA==
+  haSharedSecret: REI1YnN4WDdKUGRybjNwbg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -925,7 +925,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 15ae881a7f552ae4355124900f13abed2ab6cff7606067aa946b55e970be15d7
+        checksum/secret: 53ec6e8a96c4c224daea2d1c775d471d317649216e38145286f732c426f50350
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1032,14 +1032,19 @@ spec:
       hostNetwork: true
       initContainers:
       - args:
-        - -h
-        - 127.0.0.1
-        - -p
-        - "30001"
-        - -U
-        - postgres
+        - |
+          until pg_isready \
+            -h 127.0.0.1 \
+            -p 30001 \
+            -U postgres
+          do
+            echo waiting for database
+            sleep 0.1
+          done
         command:
-        - pg_isready
+        - sh
+        - -e
+        - -c
         image: bitnami/postgresql:sandbox
         imagePullPolicy: Never
         name: wait-for-db

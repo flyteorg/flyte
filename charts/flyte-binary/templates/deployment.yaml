@@ -26,14 +26,19 @@ spec:
         imagePullPolicy: {{ .pullPolicy | quote }}
         {{- end }}
         command:
-        - pg_isready
+        - sh
+        - -e
+        - -c
         args:
-        - -h
-        - {{ .Values.database.host | quote }}
-        - -p
-        - {{ .Values.database.port | quote }}
-        - -U
-        - {{ .Values.database.username | quote }}
+        - |
+          until pg_isready \
+            -h {{ .Values.database.host }} \
+            -p {{ .Values.database.port }} \
+            -U {{ .Values.database.username }}
+          do
+            echo waiting for database
+            sleep 0.1
+          done
       containers:
       - name: flyte
         {{- with .Values.images.flyte }}
