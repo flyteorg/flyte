@@ -32,7 +32,7 @@ spec:
       containers:
       - name: flyte
         image: "{{ .Values.image.fqn }}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         args:
         - start
         - --config

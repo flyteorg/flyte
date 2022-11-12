@@ -3,6 +3,7 @@ networking:
 
 image:
   fqn: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
+  pullPolicy: IfNotPresent
 
 storage:
   metadataContainer: my-s3-bucket
