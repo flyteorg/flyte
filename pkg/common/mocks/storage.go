@@ -24,7 +24,8 @@ type TestDataStore struct {
 		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error
 	ConstructReferenceCb func(
 		ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error)
-	Store map[storage.DataReference][]byte
+	DeleteCb func(ctx context.Context, reference storage.DataReference) error
+	Store    map[storage.DataReference][]byte
 }
 
 func (t *TestDataStore) Head(ctx context.Context, reference storage.DataReference) (storage.Metadata, error) {
@@ -75,6 +76,10 @@ func (t *TestDataStore) ConstructReference(
 	}
 	nestedPath := strings.Join(nestedKeys, "/")
 	return storage.DataReference(fmt.Sprintf("%s/%v", reference, nestedPath)), nil
+}
+
+func (t *TestDataStore) Delete(ctx context.Context, reference storage.DataReference) error {
+	return t.DeleteCb(ctx, reference)
 }
 
 func GetMockStorageClient() *storage.DataStore {

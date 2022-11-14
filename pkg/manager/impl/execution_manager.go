@@ -1060,6 +1060,7 @@ func (m *ExecutionManager) RelaunchExecution(
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
+	executionSpec.OverwriteCache = request.GetOverwriteCache()
 	var executionModel *models.Execution
 	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
 		Project: request.Id.Project,

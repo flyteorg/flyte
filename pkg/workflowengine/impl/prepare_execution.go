@@ -57,10 +57,13 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 	}
 	if workflowExecutionConfig != nil {
 		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism)
+
 		if workflowExecutionConfig.GetInterruptible() != nil {
 			interruptible := workflowExecutionConfig.GetInterruptible().GetValue()
 			executionConfig.Interruptible = &interruptible
 		}
+
+		executionConfig.OverwriteCache = workflowExecutionConfig.GetOverwriteCache()
 	}
 	if taskResources != nil {
 		var requests = v1alpha1.TaskResourceSpec{}

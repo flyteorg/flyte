@@ -78,6 +78,11 @@ type ApplicationConfig struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 	// Interruptible indicates whether all tasks should be run as interruptible by default (unless specified otherwise via the execution/workflow/task definition)
 	Interruptible bool `json:"interruptible"`
+	// OverwriteCache indicates all workflows and tasks should skip all their cached results and re-compute their outputs,
+	// overwriting any already stored data.
+	// Note that setting this setting to `true` effectively disabled all caching in Flyte as all executions launched
+	// will have their OverwriteCache setting enabled.
+	OverwriteCache bool `json:"overwriteCache"`
 
 	// Optional: security context override to apply this execution.
 	// iam_role references the fully qualified name of Identity & Access Management role to impersonate.
@@ -158,11 +163,17 @@ func (a *ApplicationConfig) GetInterruptible() *wrappers.BoolValue {
 	}
 }
 
+func (a *ApplicationConfig) GetOverwriteCache() bool {
+	return a.OverwriteCache
+}
+
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object
 func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() admin.WorkflowExecutionConfig {
-	// These two should always be set, one is a number, and the other returns nil when empty.
+	// These values should always be set as their fallback values equals to their zero value or nil,
+	// providing a sensible default even if the actual value was not set.
 	wec := admin.WorkflowExecutionConfig{
 		MaxParallelism: a.GetMaxParallelism(),
+		OverwriteCache: a.GetOverwriteCache(),
 		Interruptible:  a.GetInterruptible(),
 	}
 

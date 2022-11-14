@@ -256,7 +256,7 @@ func GetMatchableResource(ctx context.Context, resourceManager interfaces.Resour
 }
 
 // MergeIntoExecConfig into workflowExecConfig (higher priority) from spec (lower priority) and return the
-// a new object with the merged changes.
+// new object with the merged changes.
 // After settings project is done, can move this function back to execution manager. Currently shared with resource.
 func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) admin.WorkflowExecutionConfig {
 	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
@@ -291,5 +291,10 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	if workflowExecConfig.GetInterruptible() == nil && spec.GetInterruptible() != nil {
 		workflowExecConfig.Interruptible = spec.GetInterruptible()
 	}
+
+	if !workflowExecConfig.GetOverwriteCache() && spec.GetOverwriteCache() {
+		workflowExecConfig.OverwriteCache = spec.GetOverwriteCache()
+	}
+
 	return workflowExecConfig
 }
