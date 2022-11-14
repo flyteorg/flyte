@@ -22,4 +22,6 @@ type WorkflowExecutionConfigInterface interface {
 	GetLabels() *admin.Labels
 	// GetInterruptible indicates a workflow should be flagged as interruptible for a single execution. If omitted, the workflow's default is used.
 	GetInterruptible() *wrappers.BoolValue
+	// GetOverwriteCache indicates a workflow should skip all its cached results and re-compute its output, overwriting any already stored data.
+	GetOverwriteCache() bool
 }
