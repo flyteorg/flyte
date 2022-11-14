@@ -17,8 +17,14 @@ flyte:
 	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
 	docker rmi flyte-binary:sandbox
 
+manifests/compiled.yaml:
+	mkdir -p $(dir $@)
+	kubectl kustomize \
+		--enable-helm \
+		--load-restrictor=LoadRestrictionsNone kustomize > $@
+
 .PHONY: build
-build: flyte
+build: flyte manifests/compiled.yaml
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
@@ -59,7 +65,7 @@ console:
 	python -m venv .venv
 	. .venv/bin/activate && pip install flytekit
 
-.PHONY: example
-example: export FLYTECTL_CONFIG := example/config.yaml
-example: .venv
-	. .venv/bin/activate && pyflyte run --remote example/example.py wf --n 500 --mean 42 --sigma 2
+.PHONY: test
+test: export FLYTECTL_CONFIG := test/config.yaml
+test: .venv
+	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
