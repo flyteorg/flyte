@@ -37,10 +37,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.images.postgres.tag | string | `"sandbox"` |  |
 | flyte-binary.logger.level | int | `1` |  |
 | flyte-binary.networking.host | bool | `true` |  |
-| flyte-binary.storage.metadataContainer | string | `"flyte-sandbox"` |  |
 | flyte-binary.storage.region | string | `"my-region"` |  |
 | flyte-binary.storage.type | string | `"minio"` |  |
-| flyte-binary.storage.userDataContainer | string | `"flyte-sandbox"` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.image.pullPolicy | string | `"Never"` |  |
@@ -53,7 +51,7 @@ A Helm chart for the Flyte local sandbox
 | kubernetes-dashboard.service.externalPort | int | `80` |  |
 | minio.auth.rootPassword | string | `"miniostorage"` |  |
 | minio.auth.rootUser | string | `"minio"` |  |
-| minio.defaultBuckets | string | `"flyte-sandbox"` |  |
+| minio.defaultBuckets | string | `"my-s3-bucket"` |  |
 | minio.extraEnvVars[0].name | string | `"MINIO_BROWSER_REDIRECT_URL"` |  |
 | minio.extraEnvVars[0].value | string | `"http://localhost:30080/minio"` |  |
 | minio.image.pullPolicy | string | `"Never"` |  |

@@ -44,7 +44,7 @@ secrets:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: REI1YnN4WDdKUGRybjNwbg==
+  haSharedSecret: RWFrRUMzR1JQMXFFamN2UQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -174,7 +174,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  flyte.yaml: "propeller:\n  rawoutput-prefix: \"s3://flyte-sandbox/data/\"\n  create-flyteworkflow-crd:
+  flyte.yaml: "propeller:\n  rawoutput-prefix: \"s3://my-s3-bucket/data/\"\n  create-flyteworkflow-crd:
     true\nwebhook:\n  certDir: /var/run/flyte/certs\n  localCert: true\ntasks:\n  task-plugins:\n
     \   enabled-plugins:\n      - container\n      - sidecar\n      - K8S-ARRAY\n
     \   default-for-task-types:\n      - container: container\n      - container_array:
@@ -183,7 +183,7 @@ data:
     /etc/db/pass.txt\nstorage:\n  type: minio\n  connection:\n    region: my-region\n
     \   access-key: minio\n    auth-type: accesskey\n    secret-key: miniostorage\n
     \   disable-ssl: true\n    endpoint: \"http://localhost:30002\"\n  cache:\n    max_size_mbs:
-    10\n    target_gc_percent: 100\n  container: \"flyte-sandbox\"\nlogger:\n  show-source:
+    10\n    target_gc_percent: 100\n  container: \"my-s3-bucket\"\nlogger:\n  show-source:
     true\n  level: 1\nadmin:\n  endpoint: localhost:8089\n  insecure: true\nplugins:\n
     \ # All k8s plugins default configuration\n  k8s:\n    inject-finalizer: true\n
     \   default-env-vars:\n      - AWS_METADATA_SERVICE_TIMEOUT: 5\n      - AWS_METADATA_SERVICE_NUM_ATTEMPTS:
@@ -925,7 +925,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 53ec6e8a96c4c224daea2d1c775d471d317649216e38145286f732c426f50350
+        checksum/secret: ad57ac57fccede4f84a5b79bdd130cf14b38f71d49a483119a2eeab48cc8d1b0
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1206,7 +1206,7 @@ spec:
               key: root-password
               name: flyte-sandbox-minio
         - name: MINIO_DEFAULT_BUCKETS
-          value: flyte-sandbox
+          value: my-s3-bucket
         - name: MINIO_BROWSER
           value: "on"
         - name: MINIO_PROMETHEUS_AUTH_TYPE

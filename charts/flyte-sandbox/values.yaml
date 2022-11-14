@@ -22,8 +22,6 @@ flyte-binary:
       tag: sandbox
       pullPolicy: Never
   storage:
-    metadataContainer: flyte-sandbox
-    userDataContainer: flyte-sandbox
     type: minio
     region: my-region
   database:
@@ -59,7 +57,7 @@ minio:
   auth:
     rootUser: minio
     rootPassword: miniostorage
-  defaultBuckets: flyte-sandbox
+  defaultBuckets: my-s3-bucket
   extraEnvVars:
     - name: MINIO_BROWSER_REDIRECT_URL
       value: http://localhost:30080/minio
