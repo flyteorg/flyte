@@ -62,7 +62,7 @@ jobs:
         with:
           file: coverage.txt
           flags: unittests
-          fail_ci_if_error: true
+          fail_ci_if_error: false
       - uses: actions/setup-go@v2
         with:
           go-version: '1.18'
