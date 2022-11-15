@@ -191,7 +191,8 @@ Apply Configuration
 #. In the `values.yaml` file for the `flyte-core` release, find the following section and insert the encoded/hashed secret generated in the previous step:
 
    .. code-block:: yaml
-                          client_secret: <your client secret hashed and base64 encoded>
+      
+      client_secret: <your client secret hashed and base64 encoded>
 
 
 #. While in the same file, find the following section and replace `foobar` with the non-hashed/non-encoded version of the secret you used in step #3:
