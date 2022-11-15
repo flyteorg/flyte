@@ -87,8 +87,11 @@ jobs:
           fetch-depth: "0"
 
       - name: Install Helm
-        uses: azure/setup-helm@v1
-
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest' # default is latest (stable)
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+        id: install
       - name: Configure Git
         run: |
           git config user.name "${{ github.actor }}"
