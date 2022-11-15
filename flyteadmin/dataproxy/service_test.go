@@ -14,7 +14,6 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/flyteorg/flyteadmin/pkg/config"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -36,16 +35,14 @@ func init() {
 	labeled.SetMetricKeys(contextutils.DomainKey)
 }
 
-func Test_createShardedStorageLocation(t *testing.T) {
-	selector, err := ioutils.NewBase36PrefixShardSelector(context.TODO())
-	assert.NoError(t, err)
+func Test_createStorageLocation(t *testing.T) {
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	loc, err := createShardedStorageLocation(context.Background(), selector, dataStore, config.DataProxyUploadConfig{
+	loc, err := createStorageLocation(context.Background(), dataStore, config.DataProxyUploadConfig{
 		StoragePrefix: "blah",
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "/u8/blah", loc.String())
+	assert.Equal(t, "/blah", loc.String())
 }
 
 func TestCreateUploadLocation(t *testing.T) {

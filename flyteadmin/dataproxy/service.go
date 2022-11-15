@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -64,7 +63,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
 	urlSafeMd5 := base32.StdEncoding.EncodeToString(req.ContentMd5)
 
-	storagePath, err := createShardedStorageLocation(ctx, s.shardSelector, s.dataStore, s.cfg.Upload,
+	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
 		req.Project, req.Domain, urlSafeMd5, req.Filename)
 	if err != nil {
 		return nil, err
@@ -135,23 +134,13 @@ func (s Service) validateCreateDownloadLocationRequest(req *service.CreateDownlo
 	return nil
 }
 
-// createShardedStorageLocation creates a location in storage destination to maximize read/write performance in most
-// block stores. The final location should look something like: s3://<my bucket>/<shard length>/<file name>
-func createShardedStorageLocation(ctx context.Context, shardSelector ioutils.ShardSelector, store *storage.DataStore,
+// createStorageLocation creates a location in storage destination to maximize read/write performance in most
+// block stores. The final location should look something like: s3://<my bucket>/<file name>
+func createStorageLocation(ctx context.Context, store *storage.DataStore,
 	cfg config.DataProxyUploadConfig, keyParts ...string) (storage.DataReference, error) {
-	keySuffixArr := make([]string, 0, 4)
-	if len(cfg.StoragePrefix) > 0 {
-		keySuffixArr = append(keySuffixArr, cfg.StoragePrefix)
-	}
-
-	keySuffixArr = append(keySuffixArr, keyParts...)
-	prefix, err := shardSelector.GetShardPrefix(ctx, []byte(strings.Join(keySuffixArr, "/")))
-	if err != nil {
-		return "", err
-	}
 
 	storagePath, err := store.ConstructReference(ctx, store.GetBaseContainerFQN(ctx),
-		append([]string{prefix}, keySuffixArr...)...)
+		append([]string{cfg.StoragePrefix}, keyParts...)...)
 	if err != nil {
 		return "", fmt.Errorf("failed to construct datastore reference. Error: %w", err)
 	}
