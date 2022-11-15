@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
 
-FROM --platform=linux/amd64 mgoltzsche/podman:minimal AS builder
+FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
 
 ARG TARGETARCH
 ENV TARGETARCH "${TARGETARCH}"
