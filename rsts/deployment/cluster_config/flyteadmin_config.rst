@@ -669,6 +669,7 @@ Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
     tokenSigningRSAKeySecretName: token_rsa_key.pem
   thirdPartyConfig:
     flyteClient:
+      audience: ""
       clientId: flytectl
       redirectUri: http://localhost:53593/callback
       scopes:
@@ -782,6 +783,7 @@ Defines settings to instruct flyte cli tools (and optionally others) on what con
 .. code-block:: yaml
 
   flyteClient:
+    audience: ""
     clientId: flytectl
     redirectUri: http://localhost:53593/callback
     scopes:
@@ -984,6 +986,7 @@ flyteClient (`config.FlyteClientConfig`_)
 
 .. code-block:: yaml
 
+  audience: ""
   clientId: flytectl
   redirectUri: http://localhost:53593/callback
   scopes:
@@ -1029,6 +1032,18 @@ Recommended scopes for the client to request.
 
   - all
   - offline
+  
+
+audience (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Audience to use when initiating OAuth2 authorization requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 config.UserAuthConfig
@@ -1929,6 +1944,16 @@ interruptible (bool)
   "false"
   
 
+overwriteCache (bool)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 assumableIamRole (string)
 --------------------------------------------------------------------------------
 
@@ -2293,11 +2318,11 @@ catalogcache (`catalog.Config`_)
 .. code-block:: yaml
 
   reader:
-    maxItems: 1000
+    maxItems: 10000
     maxRetries: 3
     workers: 10
   writer:
-    maxItems: 1000
+    maxItems: 10000
     maxRetries: 3
     workers: 10
   
@@ -2359,7 +2384,7 @@ Catalog reader workqueue config. Make sure the index cache must be big enough to
 
 .. code-block:: yaml
 
-  maxItems: 1000
+  maxItems: 10000
   maxRetries: 3
   workers: 10
   
@@ -2373,7 +2398,7 @@ Catalog writer workqueue config. Make sure the index cache must be big enough to
 
 .. code-block:: yaml
 
-  maxItems: 1000
+  maxItems: 10000
   maxRetries: 3
   workers: 10
   
@@ -2414,7 +2439,7 @@ Maximum number of entries to keep in the index.
 
 .. code-block:: yaml
 
-  "1000"
+  "10000"
   
 
 config.K8sPluginConfig
@@ -3193,9 +3218,9 @@ config for a workflow node
 .. code-block:: yaml
 
   default-deadlines:
-    node-active-deadline: 48h0m0s
-    node-execution-deadline: 48h0m0s
-    workflow-active-deadline: 72h0m0s
+    node-active-deadline: 0s
+    node-execution-deadline: 0s
+    workflow-active-deadline: 0s
   interruptible-failure-threshold: 1
   max-node-retries-system-failures: 3
   
@@ -3616,9 +3641,9 @@ Default value for timeouts
 
 .. code-block:: yaml
 
-  node-active-deadline: 48h0m0s
-  node-execution-deadline: 48h0m0s
-  workflow-active-deadline: 72h0m0s
+  node-active-deadline: 0s
+  node-execution-deadline: 0s
+  workflow-active-deadline: 0s
   
 
 max-node-retries-system-failures (int64)
@@ -3657,7 +3682,7 @@ Default value of node execution timeout that includes the time spent to run the 
 
 .. code-block:: yaml
 
-  48h0m0s
+  0s
   
 
 node-active-deadline (`config.Duration`_)
@@ -3669,7 +3694,7 @@ Default value of node timeout that includes the time spent queued.
 
 .. code-block:: yaml
 
-  48h0m0s
+  0s
   
 
 workflow-active-deadline (`config.Duration`_)
@@ -3681,7 +3706,7 @@ Default value of workflow timeout that includes the time spent queued.
 
 .. code-block:: yaml
 
-  72h0m0s
+  0s
   
 
 config.Port
@@ -3920,6 +3945,7 @@ workflowExecutor (`interfaces.WorkflowExecutorConfig`_)
     adminRateLimit:
       burst: 10
       tps: 100
+    useUTCTz: false
   region: ""
   scheduleQueueName: ""
   scheme: local
@@ -4084,6 +4110,7 @@ local (`interfaces.FlyteWorkflowExecutorConfig`_)
   adminRateLimit:
     burst: 10
     tps: 100
+  useUTCTz: false
   
 
 interfaces.FlyteWorkflowExecutorConfig
@@ -4098,6 +4125,16 @@ adminRateLimit (`interfaces.AdminRateLimit`_)
 
   burst: 10
   tps: 100
+  
+
+useUTCTz (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 interfaces.AdminRateLimit
@@ -4256,6 +4293,7 @@ Deprecated please use auth.appAuth.thirdPartyConfig instead.
 .. code-block:: yaml
 
   flyteClient:
+    audience: ""
     clientId: ""
     redirectUri: ""
     scopes: []
