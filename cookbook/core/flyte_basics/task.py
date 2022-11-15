@@ -1,5 +1,6 @@
-# .. _basics_of_tasks:
 """
+.. _basics_of_tasks:
+
 Tasks
 -----
 

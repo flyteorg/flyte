@@ -89,7 +89,7 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
 
 
 # %%
-# :ref:`single_task_execution` can be used to execute just the task without needing to create a workflow.
+# :ref:`Single task execution <single_task_execution>` can be used to execute just the task without needing to create a workflow.
 # To trigger an execution, you will need to provide:
 #
 # Project (flyteexamples): the project under which the execution will be created

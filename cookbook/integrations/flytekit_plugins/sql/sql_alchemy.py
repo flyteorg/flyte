@@ -30,7 +30,7 @@ from flytekitplugins.sqlalchemy import SQLAlchemyConfig, SQLAlchemyTask
 #
 # .. note::
 #
-#   The output of SQLAlchemyTask is a :py:class:`~flytekit.types.schema.FlyteSchema` by default.
+#   The output of SQLAlchemyTask is a ``FlyteSchema`` by default.
 #
 # .. caution::
 #
@@ -67,7 +67,7 @@ sql_task = SQLAlchemyTask(
 #
 # .. code::
 #
-# pyflyte --config ~/.flyte/your-config.yaml run --destination-dir /app --remote --image ghcr.io/flyteorg/flytekit:py3.8-sqlalchemy-latest integrations/flytekit_plugins/sql/sql_alchemy.py my_wf --min_length 3 --max_length 100 --limit 50
+#   pyflyte --config ~/.flyte/your-config.yaml run --destination-dir /app --remote --image ghcr.io/flyteorg/flytekit:py3.8-sqlalchemy-latest integrations/flytekit_plugins/sql/sql_alchemy.py my_wf --min_length 3 --max_length 100 --limit 50
 #
 # Note also we added the ``destination-dir`` argument, since by default ``pyflyte run`` copies code into ``/root`` which
 # is not what that image's workdir is set to.

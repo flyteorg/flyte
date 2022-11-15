@@ -84,8 +84,8 @@ image to a registry.
       .. tip:: Recommended
 
          The ``flytekit-python-template`` ships with a helper script called `docker_build_and_tag.sh
-         <https://github.com/flyteorg/flytekit-python-template/blob/main/docker_build_and_tag.sh>`__ , which makes it
-         possible to build and image, tag it correctly and optionally use the git-SHA as the version. We recommend using
+         <https://github.com/flyteorg/flytekit-python-template/blob/main/simple-example/%7B%7Bcookiecutter.project_name%7D%7D/docker_build_and_tag.sh>`__,
+         which makes it possible to build and image, tag it correctly and optionally use the git-SHA as the version. We recommend using
          such a script to track versions more effectively and using a CI/CD pipeline to deploy your code.
 
          .. prompt:: bash $

@@ -14,7 +14,7 @@ For a more complete example refer to the :std:ref:`example-spark`
 
 #. Ensure you have ``flytekit>=0.16.0``
 #. Enable Spark in backend, following the previous section.
-#. Install the `flytekit spark plugin <https://pypi.org/project/flytekitplugins-spark/>`_ ::
+#. Install the `flytekit spark plugin <https://pypi.org/project/flytekitplugins-spark/>`__ ::
 
     pip install flytekitplugins-spark
 

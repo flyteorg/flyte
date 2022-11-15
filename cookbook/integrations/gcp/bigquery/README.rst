@@ -19,5 +19,5 @@ This plugin is purely a spec. Since SQL is completely portable, there is no need
 
 
 Configuring the backend to get bigquery working
-------------------------------------------------
+-----------------------------------------------
 - BigQuery plugins are `enabled in flytepropeller's config <https://docs.flyte.org/en/latest/deployment/plugin_setup/gcp/bigquery.html#deployment-plugin-setup-gcp-bigquery>`_

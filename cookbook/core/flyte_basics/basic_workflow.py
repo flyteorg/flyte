@@ -2,7 +2,8 @@
 Workflows
 ----------
 
-Once you have a handle on :ref:`tasks <basics_of_tasks>`, we can dive into Flyte workflows. Together, Flyte tasks and workflows make up the fundamental building blocks of Flyte.
+Once you have a handle on :ref:`tasks <basics_of_tasks>`, you can dive into Flyte workflows.
+Together, Flyte tasks and workflows make up the fundamental building blocks of Flyte.
 
 Workflows bind together two or more tasks. They can be written as Python functions, but it is essential to make a
 critical distinction between tasks and workflows.

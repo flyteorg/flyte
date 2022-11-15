@@ -199,7 +199,7 @@ Monitor the execution by providing the execution name from the ``create executio
 
 .. tip::
 
-   Alternatively, visit `the Flyte sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/flyte.workflows.example.my_wf>`__,
+   Alternatively, visit the Flyte sandbox console at ``http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/flyte.workflows.example.my_wf``,
    click launch, and provide a ``message`` as input.
 
    .. TODO: update so that it reflects the new workflow with the message input https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/getting_started/getting_started_fastreg.gif

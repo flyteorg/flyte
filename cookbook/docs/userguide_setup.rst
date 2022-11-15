@@ -123,4 +123,4 @@ Replace ``<version>`` with version from console UI, it may look something like `
 What's Next?
 ^^^^^^^^^^^^
 
-Try out the examples in :doc:`Flyte Basics <core/flyte_basics/index>` section.
+Try out the examples in :doc:`Flyte Basics <auto/core/flyte_basics/index>` section.

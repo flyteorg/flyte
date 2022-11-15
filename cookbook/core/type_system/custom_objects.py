@@ -1,4 +1,6 @@
 """
+.. _dataclass_type:
+
 Using Custom Python Objects
 ---------------------------
 

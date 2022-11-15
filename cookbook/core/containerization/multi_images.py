@@ -23,14 +23,14 @@ If you wish to build and push your Docker image to Dockerhub through your accoun
 1. Create an account with `Dockerhub <https://hub.docker.com/signup>`__.
 2. Build a Docker image using the Dockerfile:
 
-.. code-block::
+    .. code-block::
 
-   docker build . -f ./<dockerfile-folder>/<dockerfile-name> -t <your-name>/<docker-image-name>:<version>
+        docker build . -f ./<dockerfile-folder>/<dockerfile-name> -t <your-name>/<docker-image-name>:<version>
 3. Once the Docker image is built, login to your Dockerhub account from the CLI:
 
-.. code-block::
+    .. code-block::
 
-   docker login
+        docker login
 4. It prompts you to enter the username and the password.
 5. Push the Docker image to Dockerhub:
 
@@ -42,13 +42,13 @@ Example: Suppose your Dockerfile is named `Dockerfile.prediction`, Docker image 
 
 .. code-block::
 
-   docker build -f ./path-to-dockerfile/Dockerfile.prediction -t username/multi-images-prediction:latest
-   docker login
-   docker push dockerhub_name/multi-images-prediction
+    docker build -f ./path-to-dockerfile/Dockerfile.prediction -t username/multi-images-prediction:latest
+    docker login
+    docker push dockerhub_name/multi-images-prediction
 
 .. tip::
 
-   Sometimes, ``docker login`` may not be successful. In such cases, execute ``docker logout`` and ``docker login``.
+    Sometimes, ``docker login`` may not be successful. In such cases, execute ``docker logout`` and ``docker login``.
 
 Let's dive into the example.
 """

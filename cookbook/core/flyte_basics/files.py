@@ -9,7 +9,7 @@ literals which are backed by the
 `blob type <https://github.com/flyteorg/flyteidl/blob/cee566b2e6e109120f1bb34c980b1cfaf006a473/protos/flyteidl/core/types.proto#L47>`__.
 
 Let's assume our mission here is pretty simple. We download a few csv file
-links, read them with the python built-in :py:func:`csv.DictReader` function,
+links, read them with the python built-in :py:class:`csv.DictReader` function,
 normalize some pre-specified columns, and output the normalized columns to
 another csv file.
 

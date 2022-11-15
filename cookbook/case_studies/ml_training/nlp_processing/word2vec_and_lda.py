@@ -57,7 +57,7 @@ lee_train_file = os.path.join(data_dir, "lee_background.cor")
 
 
 # %%
-# We declare ``NamedTuple``s which will be used as signatures of the Flyte task outputs.
+# We declare ``NamedTuple``\s which will be used as signatures of the Flyte task outputs.
 # The variable names and types correspond to the values of the unpacked tuples returned
 # from the corresponding Flyte task.
 plotdata = typing.NamedTuple(

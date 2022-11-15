@@ -1,6 +1,6 @@
 """
 Deploying Workflows - Registration
------------------------------------
+----------------------------------
 
 Locally, Flytekit relies on the Python interpreter to execute tasks and workflows.
 To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
@@ -12,7 +12,7 @@ following steps:
 2. Providing packaging in the form of Docker images for code when needed. In some cases packaging isn't needed,
    because the code itself is portable- for example SQL, or the task references a remote service - SageMaker Builtin
    algorithms, or the code can be safely transferred over;
-3. Alternatively, packaging with :ref:`deployment-fast-registration`;
+3. Alternatively, packaging with :ref:`Fast Registration`;
 4. Registering the serialized workflows and tasks.
 
 Using remote Flyte provides:
@@ -27,7 +27,7 @@ Build Your Dockerfile
 ^^^^^^^^^^^^^^^^^^^^^^
 
 1. Commit your changes. Some of the steps below default to referencing the git sha.
-2. Run ``pyflyte register``. This :doc:`command <flytekit:pyflyte-register>` compiles all Flyte entities and sends it to the backend as specified by your config file.
+2. Run ``pyflyte register``. This command compiles all Flyte entities and sends it to the backend as specified by your config file.
 3. Build a container image that holds your code.
 
 .. code-block:: docker
@@ -132,9 +132,8 @@ where
 - :code:`--version` is a unique string used to identify the version of your entities to be registered under a project and domain.
 - If required, you can specify a :code:`--k8sServiceAccount` and :code:`--assumableIamRole` which your tasks will run with.
 
-
 Fast Registration
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 Re-building a new Docker container image for every code change you make is cumbersome and slow.
 If you're making purely code changes that **do not** require updating your container definition, you can make use of
 fast serialization and registration to speed up your iteration process and reduce the time it takes to upload new entity

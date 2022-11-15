@@ -95,8 +95,8 @@ def chain_tasks_wf() -> pd.DataFrame:
 
 
 # %%
-# SubWorkflows
-# ^^^^^^^^^^^^
+# Chain SubWorkflows
+# ^^^^^^^^^^^^^^^^^^
 #
 # Similar to tasks, you can chain :ref:`subworkflows <subworkflows>`.
 @workflow

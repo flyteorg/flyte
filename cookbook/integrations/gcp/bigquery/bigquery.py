@@ -1,6 +1,6 @@
 """
 BigQuery Query
-############
+##############
 
 This example shows how to use a Flyte BigQueryTask to execute a query.
 """

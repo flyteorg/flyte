@@ -13,14 +13,14 @@ ensure that everything is as you expected and hence, data will not crash your pi
 How to Define the Integration
 -----------------------------
 
-Great Expectations supports native execution of expectations against various `Datasources <https://docs.greatexpectations.io/docs/reference/datasources>`__,
+Great Expectations supports native execution of expectations against various `Datasources <https://docs.greatexpectations.io/docs/terms/datasource/>`__,
 such as Pandas dataframes, Spark dataframes, and SQL databases via SQLAlchemy.
 
 We're supporting two Flyte types that should suit Great Expectations' ``Datasources``:
 
 - :py:class:`flytekit.types.file.FlyteFile`: ``FlyteFile`` represents an automatic persistence object in Flyte.
   It can represent files in remote storage and Flyte transparently materializes them in every task execution.
-- :py:class:`flytekit.types.schema.FlyteSchema`: ``FlyteSchema`` supports tabular data, which the plugin will convert into a parquet file and validate the data using Great Expectations.
+- :py:class:`flytekit.types.structured.StructuredDataset`: ``StructuredDataset`` supports pandas dataframes, which the plugin will convert into a parquet file and validate the data using Great Expectations.
 
 .. note::
   Flyte types are added because, in Great Expectations, we have the privilege to give a non-string (Pandas/Spark DataFrame) when using a

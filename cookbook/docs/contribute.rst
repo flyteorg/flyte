@@ -142,12 +142,13 @@ Build Docker container:
 Package the examples by running
 
 .. prompt:: bash
-   
+
    pyflyte --pkgs core package --image core:v1 -f
 
 Register the examples by running
 
 .. prompt:: bash
+
    flytectl register files --archive -p flytesnacks -d development --archive flyte-package.tgz --version v1
 
 Visit ``https://localhost:30081/console`` to view the Flyte console, which consists of the examples present in the

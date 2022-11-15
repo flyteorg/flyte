@@ -1,6 +1,6 @@
-###################
+##############
 Bioinformatics
-###################
+##############
 
 **Bioinformatics** is defined as the application of tools of computation and analysis to capture and interpret biological data.
 

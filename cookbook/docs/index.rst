@@ -130,7 +130,7 @@ Table of Contents
    :hidden:
 
    |plane| Getting Started <https://docs.flyte.org/en/latest/getting_started.html>
-   |book-reader| User Guide <index>
+   |book-reader| User Guide <self>
    |chalkboard| Tutorials <tutorials>
    |project-diagram| Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
    |rocket| Deployment <https://docs.flyte.org/en/latest/deployment/index.html>
@@ -164,8 +164,8 @@ Table of Contents
    Tutorials <tutorials>
    ml_training
    feature_engineering
-   bioinformatics
-   flytelab
+   bioinformatics_examples
+   flyte_lab
 
 .. toctree::
    :maxdepth: -1

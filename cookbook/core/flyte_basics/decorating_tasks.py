@@ -107,4 +107,4 @@ if __name__ == "__main__":
 # In this example, you learned how to modify the behavior of tasks via function decorators using the built-in
 # :py:func:`~functools.wraps` decorator pattern. To learn more about how to extend Flyte at a deeper level, for
 # example creating custom types, custom tasks, or backend plugins,
-# see :ref:`Extending Flyte <sphx_glr_auto_core_extend_flyte>`.
+# see :ref:`Extending Flyte <plugins_extend>`.

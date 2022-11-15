@@ -145,3 +145,18 @@ jobs:
               "tag_name": "'${{ needs.bump-version.outputs.version }}'",
               "prerelease": false
           }'
+
+  docs_warnings:
+    name: Docs Warnings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Report Sphinx Warnings
+        id: sphinx-warnings
+        run: |
+          sudo apt-get install python3-sphinx
+          cd cookbook
+          pip install -r docs-requirements.txt
+          cd docs && make html
