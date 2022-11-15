@@ -191,15 +191,6 @@ Apply Configuration
 #. In the `values.yaml` file for the `flyte-core` release, find the following section and insert the encoded/hashed secret generated in the previous step:
 
    .. code-block:: yaml
-      auth:
-          appAuth:
-              authServerType: Self
-              selfAuthServer:
-                  ...
-                  staticClients:
-                      ...
-                      flytepropeller:
-                          audience: null
                           client_secret: <your client secret hashed and base64 encoded>
 
 
