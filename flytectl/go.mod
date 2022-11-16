@@ -3,7 +3,6 @@ module github.com/flyteorg/flytectl
 go 1.18
 
 require (
-	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/disiqueira/gotree v1.0.0
 	github.com/docker/docker v20.10.7+incompatible
@@ -44,6 +43,7 @@ require (
 )
 
 require (
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/flyteorg/flytepropeller v1.1.1
 	golang.org/x/text v0.3.7
 )

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/flyteorg/flytectl/pkg/configutil"
@@ -34,16 +35,36 @@ func WriteIntoFile(data []byte, file string) error {
 	return nil
 }
 
+func CreatePathAndFile(pathToConfig string) error {
+	p, err := filepath.Abs(pathToConfig)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(p), os.ModePerm); err != nil {
+		return err
+	}
+
+	// Created a empty file with right permission
+	if _, err := os.Stat(p); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.WriteFile(p, []byte(""), os.ModePerm); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // SetupFlyteDir will create .flyte dir if not exist
 func SetupFlyteDir() error {
-	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm); err != nil {
+	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm); err != nil {
 		return err
 	}
 
 	// Created a empty file with right permission
 	if _, err := os.Stat(docker.Kubeconfig); err != nil {
 		if os.IsNotExist(err) {
-			if err := ioutil.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
+			if err := os.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
 				return err
 			}
 		}
@@ -52,12 +73,36 @@ func SetupFlyteDir() error {
 	return nil
 }
 
-// PrintSandboxMessage will print sandbox success message
-func PrintSandboxMessage(flyteConsolePort int, dryRun bool) {
+// PrintDemoMessage will print sandbox success message
+func PrintDemoMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
 	kubeconfig := strings.Join([]string{
 		"$KUBECONFIG",
-		f.FilePathJoin(f.UserHomeDir(), ".kube", "config"),
-		docker.Kubeconfig,
+		kubeconfigLocation,
+	}, ":")
+
+	var successMsg string
+	if dryRun {
+		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessagePending, flyteConsolePort)
+	} else {
+		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessage, flyteConsolePort)
+
+	}
+	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, successMsg, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
+	fmt.Printf("%v Run the following command to export sandbox environment variables for accessing flytectl\n", emoji.Sparkle)
+	fmt.Printf("	export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
+	if dryRun {
+		fmt.Printf("%v Run the following command to export kubeconfig variables for accessing flyte pods locally\n", emoji.Sparkle)
+		fmt.Printf("	export KUBECONFIG=%v \n", kubeconfig)
+	}
+	fmt.Printf("%s Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000\n", emoji.Whale)
+	fmt.Printf("%s The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console\n", emoji.OpenFileFolder)
+}
+
+// PrintSandboxMessage will print sandbox success message
+func PrintSandboxMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
+	kubeconfig := strings.Join([]string{
+		"$KUBECONFIG",
+		kubeconfigLocation,
 	}, ":")
 
 	var successMsg string

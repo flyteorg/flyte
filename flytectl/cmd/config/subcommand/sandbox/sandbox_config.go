@@ -4,7 +4,7 @@ import "github.com/flyteorg/flytectl/pkg/docker"
 
 // Config holds configuration flags for sandbox command.
 type Config struct {
-	Source string `json:"source" pflag:",Path of your source code"`
+	DeprecatedSource string `json:"source" pflag:",deprecated, path of your source code, please build images with local daemon"`
 
 	// Flytectl sandbox only supports Flyte version available in Github release https://github.com/flyteorg/flyte/tags.
 	// Flytectl sandbox will only work for v0.10.0+.

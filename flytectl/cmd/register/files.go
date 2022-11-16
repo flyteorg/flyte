@@ -151,7 +151,7 @@ func Register(ctx context.Context, args []string, cfg *config.Config, cmdCtx cmd
 			return fmt.Errorf("failed to upload source code from [%v]. Error: %w", sourceCodePath, err)
 		}
 
-		logger.Infof(ctx, "Source code successfully uploaded to [%v]", uploadLocation)
+		logger.Infof(ctx, "DeprecatedSource code successfully uploaded to [%v]", uploadLocation)
 	}
 
 	var registerResults []Result

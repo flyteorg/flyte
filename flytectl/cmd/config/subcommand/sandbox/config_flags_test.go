@@ -106,7 +106,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("source", testValue)
 			if vString, err := cmdFlags.GetString("source"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Source)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DeprecatedSource)
 
 			} else {
 				assert.FailNow(t, err.Error())

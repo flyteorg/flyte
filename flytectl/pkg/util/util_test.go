@@ -1,7 +1,11 @@
 package util
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/flyteorg/flytectl/pkg/docker"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +29,7 @@ func TestSetupFlyteDir(t *testing.T) {
 
 func TestPrintSandboxMessage(t *testing.T) {
 	t.Run("Print Sandbox Message", func(t *testing.T) {
-		PrintSandboxMessage(SandBoxConsolePort, false)
+		PrintSandboxMessage(SandBoxConsolePort, docker.SandboxKubeconfig, false)
 	})
 }
 
@@ -79,4 +83,16 @@ func TestIsVersionGreaterThan(t *testing.T) {
 		_, err := IsVersionGreaterThan(testVersion, "vvvvvvvv")
 		assert.NotNil(t, err)
 	})
+}
+
+func TestCreatePathAndFile(t *testing.T) {
+	dir, err := os.MkdirTemp("", "flytectl")
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	testFile := filepath.Join(dir, "testfile.yaml")
+	err = CreatePathAndFile(testFile)
+	assert.NoError(t, err)
+	_, err = os.Stat(testFile)
+	assert.NoError(t, err)
 }
