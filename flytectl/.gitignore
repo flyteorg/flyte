@@ -8,3 +8,5 @@ _test
 docs/build/*
 cmd/upgrade/flyte.ext
 .vscode
+# direnv
+.envrc
