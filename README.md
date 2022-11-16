@@ -23,32 +23,31 @@ Code. Ship. Scale.
 
 <p align="center">
   <a href="https://github.com/flyteorg/flyte/releases/latest">
-    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg" alt="Current Release" />
-  </a>
+    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg" alt="Current Release" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
-    <img src="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg" alt="Sandbox Build" />
-  </a>
+    <img src="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg" alt="Sandbox Build" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/tests.yml">
-    <img src="https://github.com/flyteorg/flyte/actions/workflows/tests.yml/badge.svg" alt="End-to-End Tests" />
-  </a>
+    <img src="https://github.com/flyteorg/flyte/actions/workflows/tests.yml/badge.svg" alt="End-to-End Tests" /></a>
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
-    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg" alt="License" />
-  </a>
-  <img src="https://img.shields.io/github/commit-activity/w/flyteorg/flyte.svg?style=plastic" alt="Commit Activity" />
-  <img src="https://img.shields.io/github/commits-since/flyteorg/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
-  <img src="https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=plastic" alt="GitHub Milestones Completed" />
-  <img src="https://img.shields.io/github/milestones/progress-percent/flyteorg/flyte/18?style=plastic" alt="GitHub Next Milestone Percentage" />
+    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg" alt="License" /></a>
+  <a href="https://github.com/flyteorg/flyte/commits">
+    <img src="https://img.shields.io/github/commit-activity/w/flyteorg/flyte.svg" alt="Commit Activity" /></a>
+  <a href="https://github.com/flyteorg/flyte/commits">
+    <img src="https://img.shields.io/github/commits-since/flyteorg/flyte/latest.svg" alt="Commits since Last Release" /></a>
+  <a href="https://github.com/flyteorg/flyte/milestones?state=closed">
+    <img src="https://img.shields.io/github/milestones/closed/flyteorg/flyte" alt="GitHub Milestones Completed" /></a>
+  <a href="https://github.com/flyteorg/flyte/milestone/29">
+    <img src="https://img.shields.io/github/milestones/progress-percent/flyteorg/flyte/29" alt="GitHub Next Milestone Percentage" /></a>
   <a href="https://flyte.rtfd.io">
-    <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
-  </a>
-  <a href="https://bestpractices.coreinfrastructure.org/projects/4670"><img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge"></a>
-  <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" />
+    <img src="https://readthedocs.org/projects/flyte/badge/?version=latest" alt="Docs" /></a>
+  <a href="https://bestpractices.coreinfrastructure.org/projects/4670">
+    <img src="https://bestpractices.coreinfrastructure.org/projects/4670/badge" alt="OpenSSF Best Practices" /></a>
   <a href="https://artifacthub.io/packages/search?repo=flyte">
-    <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" />
-  </a>
+    <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" /></a>
+  <a href="https://twitter.com/flyteorg">
+    <img src="https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social" alt="Twitter Follow" /></a>
   <a href="https://slack.flyte.org">
-    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Join Flyte Slack" />
-  </a>
+    <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Join Flyte Slack" /></a>
 </p>
 
 <h3 align="center">
@@ -164,6 +163,9 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
   - [Flytekit plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first-class support in Python
   - Arbitrary Flytekit-less containers tasks ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/raw_container.html))
 - Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
+  - Versioned data, code, and models
+  - Automatically tracked executions
+  - Declarative pipelines
 - **Multi-cloud support** (AWS, GCP, and others)
 - No single point of failure, and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty

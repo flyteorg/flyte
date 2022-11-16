@@ -16,7 +16,7 @@ RUN go mod download
 COPY --from=flyteconsole /app/dist /app/flyte/cmd/single/dist
 
 COPY cmd/ /app/flyte/cmd/
-RUN --mount=type=cache,target=/root/.cache/go-build go build -tags console -v -o /flyte cmd/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod  go build -tags console -v -o /flyte cmd/main.go
 
 FROM alpine:3.15 AS base
 
@@ -81,6 +81,7 @@ ENV FLYTE_VERSION "${FLYTE_VERSION}"
 
 ARG FLYTE_TEST="release"
 ENV FLYTE_TEST "${FLYTE_TEST}"
+ENV FLYTE_DEV "False"
 
 RUN addgroup -S docker
 

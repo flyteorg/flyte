@@ -65,6 +65,18 @@ Whether to run Catalog in secure mode or not
   "false"
   
 
+readHeaderTimeoutSeconds (int)
+--------------------------------------------------------------------------------
+
+The amount of time allowed to read request headers.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "32"
+  
+
 Section: database
 ================================================================================
 
@@ -181,7 +193,7 @@ maxOpenConnections sets the maximum number of open connections to the database.
 
 .. code-block:: yaml
 
-  "1000"
+  "100"
   
 
 connMaxLifeTime (`config.Duration`_)

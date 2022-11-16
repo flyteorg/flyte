@@ -13,12 +13,22 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: compile
 compile:
-	go build -o flyte -ldflags=$(LD_FLAGS) ./cmd/
+	@if [ ! -d "cmd/single/dist" ]; then\
+		docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release;\
+        	docker cp flyteconsole:/app/dist cmd/single;\
+        	docker rm -f flyteconsole;\
+        fi
+	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
 	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
+	@if [ ! -d "cmd/single/dist" ]; then\
+		docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release;\
+		docker cp flyteconsole:/app/dist cmd/single;\
+		docker rm -f flyteconsole;\
+	fi
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: update_boilerplate
 update_boilerplate:
@@ -88,3 +98,4 @@ help: ## List available commands and their usage
 .PHONY: setup_local_dev
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
+
