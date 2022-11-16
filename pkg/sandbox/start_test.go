@@ -103,7 +103,7 @@ func TestStartFunc(t *testing.T) {
 		Platform:     "",
 	}
 	assert.Nil(t, util.SetupFlyteDir())
-	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s"), os.ModePerm))
+	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm))
 	assert.Nil(t, ioutil.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm))
 
 	fakePod.SetName("flyte")
@@ -146,7 +146,7 @@ func TestStartFunc(t *testing.T) {
 		assert.Nil(t, reader)
 	})
 	t.Run("Successfully run demo cluster with source code", func(t *testing.T) {
-		sandboxCmdConfig.DefaultConfig.Source = f.UserHomeDir()
+		sandboxCmdConfig.DefaultConfig.DeprecatedSource = f.UserHomeDir()
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
@@ -162,7 +162,7 @@ func TestStartFunc(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Successfully run demo cluster with abs path of source code", func(t *testing.T) {
-		sandboxCmdConfig.DefaultConfig.Source = "../"
+		sandboxCmdConfig.DefaultConfig.DeprecatedSource = "../"
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		sandboxSetup()
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
@@ -279,7 +279,7 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Successfully run demo cluster command", func(t *testing.T) {
 		//	mockOutStream := new(io.Writer)
-		//cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
+		// cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
 		client := testclient.NewSimpleClientset()
 		k8s.Client = client
 		_, err := client.CoreV1().Pods("flyte").Create(ctx, &fakePod, v1.CreateOptions{})
@@ -306,7 +306,7 @@ func TestStartFunc(t *testing.T) {
 		}).Return(reader, nil)
 		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		docker.Client = mockDocker
-		sandboxCmdConfig.DefaultConfig.Source = ""
+		sandboxCmdConfig.DefaultConfig.DeprecatedSource = ""
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		k8s.ContextMgr = mockK8sContextMgr
 		ghutil.Client = githubMock
@@ -314,12 +314,10 @@ func TestStartFunc(t *testing.T) {
 		mockK8sContextMgr.OnCopyContextMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		err = StartSandboxCluster(context.Background(), []string{}, config)
 		assert.Nil(t, err)
-		err = StartDemoCluster(context.Background(), []string{}, config)
-		assert.Nil(t, err)
 	})
 	t.Run("Error in running demo cluster command", func(t *testing.T) {
-		//mockOutStream := new(io.Writer)
-		//cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
+		// mockOutStream := new(io.Writer)
+		// cmdCtx := cmdCore.NewCommandContext(admin.InitializeMockClientset(), *mockOutStream)
 		sandboxSetup()
 		docker.Client = mockDocker
 		mockDocker.OnContainerListMatch(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
@@ -362,7 +360,6 @@ func TestMonitorFlyteDeployment(t *testing.T) {
 
 		err = WatchFlyteDeployment(ctx, client.CoreV1())
 		assert.NotNil(t, err)
-
 	})
 
 	t.Run("Monitor k8s deployment success", func(t *testing.T) {
@@ -385,13 +382,10 @@ func TestMonitorFlyteDeployment(t *testing.T) {
 
 		err = WatchFlyteDeployment(ctx, client.CoreV1())
 		assert.Nil(t, err)
-
 	})
-
 }
 
 func TestGetFlyteDeploymentCount(t *testing.T) {
-
 	ctx := context.Background()
 	client := testclient.NewSimpleClientset()
 	c, err := getFlyteDeployment(ctx, client.CoreV1())

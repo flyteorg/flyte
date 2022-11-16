@@ -24,11 +24,14 @@ import (
 )
 
 var (
-	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
+	FlyteStateDir           = f.FilePathJoin(f.UserHomeDir(), ".flyte", "state")
+	Kubeconfig              = f.FilePathJoin(FlyteStateDir, "kubeconfig")
+	SandboxKubeconfig       = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
 	SuccessMessage          = "Deploying Flyte..."
 	FlyteSandboxClusterName = "flyte-sandbox"
 	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
 	Source                  = "/root"
+	StateDirMountDest       = "/srv/flyte"
 	K3sDir                  = "/etc/rancher/"
 	Client                  Docker
 	Volumes                 = []mount.Mount{
@@ -126,20 +129,18 @@ func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, e
 // GetDemoPorts will return demo ports
 func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
 	return nat.ParsePortSpecs([]string{
-		"0.0.0.0:30080:30080", // Flyteconsole Port
-		"0.0.0.0:30081:30081", // Flyteadmin Port
-		"0.0.0.0:30082:30082", // K8s Dashboard Port
-		"0.0.0.0:30084:30084", // Minio API Port
-		"0.0.0.0:30086:30086", // K8s cluster
-		"0.0.0.0:30088:30088", // Minio Console Port
-		"0.0.0.0:30089:30089", // Postgres Port
-		"0.0.0.0:30090:30090", // Webhook service
+		"0.0.0.0:6443:6443",   // K3s API Port
+		"0.0.0.0:30080:30080", // HTTP Port
+		"0.0.0.0:30000:30000", // Registry Port
+		"0.0.0.0:30001:30001", // Postgres Port
+		"0.0.0.0:30002:30002", // Minio API Port (use HTTP port for minio console)
 	})
 }
 
 // PullDockerImage will Pull docker image
 func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy ImagePullPolicy,
 	imagePullOptions ImagePullOptions, dryRun bool) error {
+
 	if dryRun {
 		PrintPullImage(image, imagePullOptions)
 		return nil
@@ -222,6 +223,7 @@ func PrintCreateContainer(volumes []mount.Mount, portBindings map[nat.Port][]nat
 // StartContainer will create and start docker container
 func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, exposedPorts map[nat.Port]struct{},
 	portBindings map[nat.Port][]nat.PortBinding, name, image string, additionalEnvVars []string, dryRun bool) (string, error) {
+
 	// Append the additional env variables to the default list of env
 	Environment = append(Environment, additionalEnvVars...)
 	if dryRun {
@@ -250,6 +252,45 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 		return "", err
 	}
 	return resp.ID, nil
+}
+
+// CopyContainerFile try to create the container, see if the source file is there, copy it to the destination
+func CopyContainerFile(ctx context.Context, cli Docker, source, destination, name, image string) error {
+	resp, err := cli.ContainerCreate(ctx, &container.Config{Image: image}, &container.HostConfig{}, nil, nil, name)
+	if err != nil {
+		return err
+	}
+	var removeErr error
+	defer func() {
+		removeErr = cli.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{
+			Force: true,
+		})
+	}()
+	_, err = cli.ContainerStatPath(ctx, resp.ID, source)
+	if err != nil {
+		return err
+	}
+	reader, _, err := cli.CopyFromContainer(ctx, resp.ID, source)
+	if err != nil {
+		return err
+	}
+	tarFile := destination + ".tar"
+	outFile, err := os.Create(tarFile)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+	defer reader.Close()
+	_, err = io.Copy(outFile, reader)
+	if err != nil {
+		return err
+	}
+	r, _ := os.Open(tarFile)
+	err = f.ExtractTar(r, destination)
+	if err != nil {
+		return err
+	}
+	return removeErr
 }
 
 // ReadLogs will return io scanner for reading the logs of a container

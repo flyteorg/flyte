@@ -63,7 +63,7 @@ func (k *ContextManager) CheckConfig() error {
 	return err
 }
 
-// CopyKubeContext copies context srcCtxName part of srcConfigAccess to targetCtxName part of targetConfigAccess.
+// CopyContext copies context srcCtxName part of srcConfigAccess to targetCtxName part of targetConfigAccess.
 func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error {
 	err := k.CheckConfig()
 	if err != nil {

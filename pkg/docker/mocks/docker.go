@@ -325,6 +325,45 @@ func (_m *Docker) ContainerStart(ctx context.Context, containerID string, option
 	return r0
 }
 
+type Docker_ContainerStatPath struct {
+	*mock.Call
+}
+
+func (_m Docker_ContainerStatPath) Return(_a0 types.ContainerPathStat, _a1 error) *Docker_ContainerStatPath {
+	return &Docker_ContainerStatPath{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *Docker) OnContainerStatPath(ctx context.Context, containerID string, path string) *Docker_ContainerStatPath {
+	c_call := _m.On("ContainerStatPath", ctx, containerID, path)
+	return &Docker_ContainerStatPath{Call: c_call}
+}
+
+func (_m *Docker) OnContainerStatPathMatch(matchers ...interface{}) *Docker_ContainerStatPath {
+	c_call := _m.On("ContainerStatPath", matchers...)
+	return &Docker_ContainerStatPath{Call: c_call}
+}
+
+// ContainerStatPath provides a mock function with given fields: ctx, containerID, path
+func (_m *Docker) ContainerStatPath(ctx context.Context, containerID string, path string) (types.ContainerPathStat, error) {
+	ret := _m.Called(ctx, containerID, path)
+
+	var r0 types.ContainerPathStat
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) types.ContainerPathStat); ok {
+		r0 = rf(ctx, containerID, path)
+	} else {
+		r0 = ret.Get(0).(types.ContainerPathStat)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, containerID, path)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type Docker_ContainerWait struct {
 	*mock.Call
 }
@@ -366,6 +405,54 @@ func (_m *Docker) ContainerWait(ctx context.Context, containerID string, conditi
 	}
 
 	return r0, r1
+}
+
+type Docker_CopyFromContainer struct {
+	*mock.Call
+}
+
+func (_m Docker_CopyFromContainer) Return(_a0 io.ReadCloser, _a1 types.ContainerPathStat, _a2 error) *Docker_CopyFromContainer {
+	return &Docker_CopyFromContainer{Call: _m.Call.Return(_a0, _a1, _a2)}
+}
+
+func (_m *Docker) OnCopyFromContainer(ctx context.Context, containerID string, srcPath string) *Docker_CopyFromContainer {
+	c_call := _m.On("CopyFromContainer", ctx, containerID, srcPath)
+	return &Docker_CopyFromContainer{Call: c_call}
+}
+
+func (_m *Docker) OnCopyFromContainerMatch(matchers ...interface{}) *Docker_CopyFromContainer {
+	c_call := _m.On("CopyFromContainer", matchers...)
+	return &Docker_CopyFromContainer{Call: c_call}
+}
+
+// CopyFromContainer provides a mock function with given fields: ctx, containerID, srcPath
+func (_m *Docker) CopyFromContainer(ctx context.Context, containerID string, srcPath string) (io.ReadCloser, types.ContainerPathStat, error) {
+	ret := _m.Called(ctx, containerID, srcPath)
+
+	var r0 io.ReadCloser
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) io.ReadCloser); ok {
+		r0 = rf(ctx, containerID, srcPath)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(io.ReadCloser)
+		}
+	}
+
+	var r1 types.ContainerPathStat
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) types.ContainerPathStat); ok {
+		r1 = rf(ctx, containerID, srcPath)
+	} else {
+		r1 = ret.Get(1).(types.ContainerPathStat)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, string, string) error); ok {
+		r2 = rf(ctx, containerID, srcPath)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 type Docker_ImageList struct {

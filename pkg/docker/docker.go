@@ -25,6 +25,8 @@ type Docker interface {
 	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
 	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
 	ImageList(ctx context.Context, listOption types.ImageListOptions) ([]types.ImageSummary, error)
+	ContainerStatPath(ctx context.Context, containerID, path string) (types.ContainerPathStat, error)
+	CopyFromContainer(ctx context.Context, containerID, srcPath string) (io.ReadCloser, types.ContainerPathStat, error)
 }
 
 type FlyteDocker struct {
