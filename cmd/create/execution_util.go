@@ -113,7 +113,8 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 			Project: project,
 			Domain:  domain,
 		},
-		Name: targetExecutionName,
+		Name:           targetExecutionName,
+		OverwriteCache: executionConfig.OverwriteCache,
 	})
 	if err != nil {
 		return err
@@ -167,6 +168,7 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securi
 			AuthRole:          authRole,
 			SecurityContext:   securityContext,
 			ClusterAssignment: clusterAssignment,
+			OverwriteCache:    executionConfig.OverwriteCache,
 		},
 		Inputs: inputs,
 	}

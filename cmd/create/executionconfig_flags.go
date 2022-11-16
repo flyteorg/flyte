@@ -50,9 +50,9 @@ func (ExecutionConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg ExecutionConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("ExecutionConfig", pflag.ExitOnError)
-	cmdFlags.StringVar(&executionConfig.ExecFile, fmt.Sprintf("%v%v", prefix, "execFile"), executionConfig.ExecFile, "file for the execution params.If not specified defaults to <<workflow/task>_name>.execution_spec.yaml")
-	cmdFlags.StringVar(&executionConfig.TargetDomain, fmt.Sprintf("%v%v", prefix, "targetDomain"), executionConfig.TargetDomain, "project where execution needs to be created.If not specified configured domain would be used.")
-	cmdFlags.StringVar(&executionConfig.TargetProject, fmt.Sprintf("%v%v", prefix, "targetProject"), executionConfig.TargetProject, "project where execution needs to be created.If not specified configured project would be used.")
+	cmdFlags.StringVar(&executionConfig.ExecFile, fmt.Sprintf("%v%v", prefix, "execFile"), executionConfig.ExecFile, "file for the execution params. If not specified defaults to <<workflow/task>_name>.execution_spec.yaml")
+	cmdFlags.StringVar(&executionConfig.TargetDomain, fmt.Sprintf("%v%v", prefix, "targetDomain"), executionConfig.TargetDomain, "project where execution needs to be created. If not specified configured domain would be used.")
+	cmdFlags.StringVar(&executionConfig.TargetProject, fmt.Sprintf("%v%v", prefix, "targetProject"), executionConfig.TargetProject, "project where execution needs to be created. If not specified configured project would be used.")
 	cmdFlags.StringVar(&executionConfig.KubeServiceAcct, fmt.Sprintf("%v%v", prefix, "kubeServiceAcct"), executionConfig.KubeServiceAcct, "kubernetes service account AuthRole for launching execution.")
 	cmdFlags.StringVar(&executionConfig.IamRoleARN, fmt.Sprintf("%v%v", prefix, "iamRoleARN"), executionConfig.IamRoleARN, "iam role ARN AuthRole for launching execution.")
 	cmdFlags.StringVar(&executionConfig.Relaunch, fmt.Sprintf("%v%v", prefix, "relaunch"), executionConfig.Relaunch, "execution id to be relaunched.")
@@ -60,6 +60,7 @@ func (cfg ExecutionConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.BoolVar(&executionConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), executionConfig.DryRun, "execute command without making any modifications.")
 	cmdFlags.StringVar(&executionConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), executionConfig.Version, "specify version of execution workflow/task.")
 	cmdFlags.StringVar(&executionConfig.ClusterPool, fmt.Sprintf("%v%v", prefix, "clusterPool"), executionConfig.ClusterPool, "specify which cluster pool to assign execution to.")
+	cmdFlags.BoolVar(&executionConfig.OverwriteCache, fmt.Sprintf("%v%v", prefix, "overwriteCache"), executionConfig.OverwriteCache, "skip cached results when performing execution, causing all outputs to be re-calculated and stored data to be overwritten. Does not work for recovered executions.")
 	cmdFlags.StringVar(&executionConfig.Workflow, fmt.Sprintf("%v%v", prefix, "workflow"), executionConfig.Workflow, "")
 	cmdFlags.StringVar(&executionConfig.Task, fmt.Sprintf("%v%v", prefix, "task"), executionConfig.Task, "")
 	return cmdFlags

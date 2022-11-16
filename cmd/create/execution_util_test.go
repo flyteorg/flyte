@@ -212,3 +212,13 @@ func Test_resolveOverrides(t *testing.T) {
 	assert.Equal(t, "v1", cfg.Version)
 	assert.Equal(t, "gpu", cfg.ClusterPool)
 }
+
+func TestCreateExecutionForRelaunchOverwritingCache(t *testing.T) {
+	s := setup()
+	createExecutionUtilSetup()
+	executionConfig.OverwriteCache = true
+	relaunchRequest.OverwriteCache = true // ensure request has overwriteCache param set
+	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
+	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
+	assert.Nil(t, err)
+}
