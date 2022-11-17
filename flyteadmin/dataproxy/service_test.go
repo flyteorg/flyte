@@ -5,6 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	stdlibConfig "github.com/flyteorg/flytestdlib/config"
 
@@ -24,9 +30,11 @@ import (
 func TestNewService(t *testing.T) {
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
+
+	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
 	s, err := NewService(config.DataProxyConfig{
 		Upload: config.DataProxyUploadConfig{},
-	}, dataStore)
+	}, nodeExecutionManager, dataStore)
 	assert.NoError(t, err)
 	assert.NotNil(t, s)
 }
@@ -48,7 +56,8 @@ func Test_createStorageLocation(t *testing.T) {
 func TestCreateUploadLocation(t *testing.T) {
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	s, err := NewService(config.DataProxyConfig{}, dataStore)
+	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
+	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, dataStore)
 	assert.NoError(t, err)
 	t.Run("No project/domain", func(t *testing.T) {
 		_, err = s.CreateUploadLocation(context.Background(), &service.CreateUploadLocationRequest{})
@@ -73,9 +82,53 @@ func TestCreateUploadLocation(t *testing.T) {
 	})
 }
 
+func TestCreateDownloadLink(t *testing.T) {
+	dataStore := commonMocks.GetMockStorageClient()
+	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
+	nodeExecutionManager.SetGetNodeExecutionFunc(func(ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+		return &admin.NodeExecution{
+			Closure: &admin.NodeExecutionClosure{
+				DeckUri: "s3://something/something",
+			},
+		}, nil
+	})
+
+	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, nodeExecutionManager, dataStore)
+	assert.NoError(t, err)
+
+	t.Run("Invalid expiry", func(t *testing.T) {
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ExpiresIn: durationpb.New(-time.Hour),
+		})
+		assert.Error(t, err)
+	})
+
+	t.Run("valid config", func(t *testing.T) {
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
+				NodeExecutionId: &core.NodeExecutionIdentifier{},
+			},
+			ExpiresIn: durationpb.New(time.Hour),
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("use default ExpiresIn", func(t *testing.T) {
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
+				NodeExecutionId: &core.NodeExecutionIdentifier{},
+			},
+		})
+		assert.NoError(t, err)
+	})
+}
+
 func TestCreateDownloadLocation(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
-	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, dataStore)
+	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
+	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, nodeExecutionManager, dataStore)
 	assert.NoError(t, err)
 
 	t.Run("Invalid expiry", func(t *testing.T) {

@@ -111,13 +111,14 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	configuration := runtime2.NewConfigurationProvider()
-	service.RegisterAdminServiceServer(grpcServer, adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin")))
+	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
+	service.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
 		service.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
 		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
-	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, dataStorageClient)
+	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize dataProxy service. Error: %w", err)
 	}
