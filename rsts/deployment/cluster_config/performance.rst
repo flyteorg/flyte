@@ -247,3 +247,16 @@ The Project and Domain Shard Strategies, denoted by "type: project" and "type: d
 Multi-Cluster mode
 ===================
 In our experience at Lyft, we saw that the Kubernetes cluster would have problems before FlytePropeller or FlyteAdmin would have impact. Thus Flyte supports adding multiple dataplane clusters by default. Each dataplane cluster, has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
+
+
+Improving etcd Performance
+===========================
+
+Offloading Static Workflow Information from CRD
+-----------------------------------------------
+
+Flyte using a k8s CRD (Custom Resource Definition) to store and track workflow executions. This resources includes the workflow definition, for example tasks and subworkflows that are involved and the dependencies between nodes, but it also includes that execution status of the workflow. The later information (ie. runtime status) is dynamic, meaning it will change during the workflows execution as nodes transition phases and the workflow execution progresses. However, the former information (ie. workflow definition) remains static, meaning it will never change and is only consulted to retrieve node definitions and workflow dependencies.
+
+CRDs are stored within etcd, a key-value datastore heavily used in kubernetes. The performance of etcd, as with all key-value stores, is strongly correlated with the size of the data. In Flyte's case, to guarantee only-once execution of nodes we need to persist workflow state by updating the CRD at every node phase change. This means that degredation of etcd performance (ex. caused by large CRDs) can impose non-negligible overhead on workflow executions. Additionally, etcd has a limit on the size of CRDs that very large workflows may exceed.
+
+To combat the challenges of large FlyteWorkflow CRDs Flyte includes a configuration option to offload the static portions of the CRD (ie. workflow / task / subworkflow definitions and node dependencies) to the blobstore. This functionality can be enabled by setting the `useOffloadedWorkflowClosure` option to `true` in the FlyteAdmin configuration. When set, the FlyteWorkflow CRD will populate a `WorkflowClosureReference` field on the CRD with the location of the static data and FlytePropeller will read this information (through a cache) during each workflow evaluation. One important note is that currently this requires FlyteAdmin and FlytePropeller to have access to the same blobstore since FlyteAdmin only specifies a blobstore location in the CRD.
