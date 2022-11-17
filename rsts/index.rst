@@ -58,6 +58,8 @@
 What is Flyte?
 ==============
 
+`Flyte Tags <_tags/tagsindex.html>`__
+
 .. raw:: html
 
    <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and machine learning processes at scale. </p>
