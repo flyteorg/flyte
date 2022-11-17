@@ -57,11 +57,9 @@ configmap:
       defaults:
         cpu: 500m
         memory: 1Gi
-        storage: 500Mi
       limits:
         cpu: 2
         memory: 4Gi
-        storage: 20Mi
         gpu: 5
 
 
