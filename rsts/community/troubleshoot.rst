@@ -3,6 +3,8 @@
 Troubleshooting Guide
 ---------------------
 
+.. tags:: Basic, _troubleshoot
+
 .. admonition:: Why did we craft this guide?
 
     To help streamline your onboarding experience as much as possible, and sort out common issues.

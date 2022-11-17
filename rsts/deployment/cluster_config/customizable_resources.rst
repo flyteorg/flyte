@@ -4,6 +4,8 @@
 Adding New Customizable Resources
 #################################
 
+.. tags:: Infrastructure, Advanced
+
 As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values.
 Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
 
@@ -115,7 +117,7 @@ The Flyte plugin registers the resource and the desired quota of every resource 
    The ResourceManager can use a Redis instance as an external store to track and manage resource pool allocation. By default, it is disabled, and can be enabled with:
 
    .. code-block:: yaml
-       
+
        resourcemanager:
           type: redis
           resourceMaxQuota: 100
@@ -148,7 +150,7 @@ In this manner, Flyte plugins intelligently throttle resource usage during paral
 
 Example
 ^^^^^^^^
-Let’s take an example to understand resource allocation and deallocation when a plugin requests resources. 
+Let's take an example to understand resource allocation and deallocation when a plugin requests resources. 
 
 Flyte has a built-in `Qubole <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/plugins/plugins.html#qubolehivejob>`__ plugin. This plugin allows Flyte tasks to send Hive commands to Qubole. In the plugin, a single Qubole cluster is considered a resource, and sending a single Hive command to a Qubole cluster consumes a token of the corresponding resource. 
 The resource is allocated when the status is **“AllocationGranted”**. Qubole plugin calls:
@@ -186,6 +188,6 @@ How can you force ResourceManager to force runtime quota allocation constraints?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Runtime quota allocation constraints can be achieved using ResourceConstraintsSpec. It is a contact that a plugin can specify at different project and namespace levels.
 
-Let’s take an example to understand it.
+Let's take an example to understand it.
 
 You can set ResourceConstraintsSpec to ``nil`` objects, which means there would be no allocation constraints at the respective project and namespace level. When ResourceConstraintsSpec specifies ``nil`` ProjectScopeResourceConstraint, and a non-nil NamespaceScopeResourceConstraint, it suggests no constraints specified at any project or namespace level.

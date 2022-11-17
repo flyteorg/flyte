@@ -4,6 +4,8 @@
 Understand the Lifecycle of a Flyte Workflow
 #################################################################
 
+.. tags:: Basic, Design
+
 Let's understand how Flyte's plugin machinery works and how information flows from one component to another in Flyte.
 
 Under the hood, Flyte relies on a primitive called “Plugins”. Every task that you run on Flyte is powered by a plugin. Some of these plugins are native and guaranteed by Flyte system. These native plugins, for example, run your Flyte tasks inside a k8s pod. There are three native plugins, namely, ``Container``, ``K8sPod``, and ``Sql``.

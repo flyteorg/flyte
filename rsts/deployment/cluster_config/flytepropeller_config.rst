@@ -4,6 +4,8 @@
 Flyte Propeller Configuration
 #########################################
 
+.. tags:: Configuration, Advanced
+
 - `admin <#section-admin>`_
 
 - `catalog-cache <#section-catalog-cache>`_

@@ -3,6 +3,8 @@
 Nodes
 =====
 
+.. tags:: Basic, Glossary
+
 A node represents a unit of execution or work within a workflow. Ordinarily, a node encapsulates an instance of 
 a :ref:`task <divedeep-tasks>`, but it can also contain an entire subworkflow or trigger an external workflow. 
 Nodes can have inputs and outputs, which are used to coordinate task inputs and outputs. 

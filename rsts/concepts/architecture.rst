@@ -4,6 +4,8 @@
 Component Architecture
 ######################
 
+.. tags:: Advanced, Glossary, Design
+
 This document aims to demystify how Flyte's major components ``Flyteidl``, ``Flytekit``, ``Flytectl``, ``FlyteConsole``, ``FlyteAdmin``, ``FlytePropeller``, and ``FlytePlugins`` fit together at a high level.
 
 FlyteIDL

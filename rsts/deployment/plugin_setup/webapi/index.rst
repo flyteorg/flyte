@@ -4,6 +4,7 @@
 Web API Plugin Setup
 ####################
 
+.. tags:: WebAPI, Integration, Data, Advanced
 
 .. panels::
     :header: text-center

@@ -4,6 +4,8 @@
 Flyte API Playground: Swagger
 #############################
 
+.. tags:: Basic
+
 Flyte services expose gRPC services for efficient/low latency communication across all services as well as for external clients (FlyteCTL, FlyteConsole, Flytekit Remote, etc.).
 
 The service definitions are defined `here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/service>`__.

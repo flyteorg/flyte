@@ -4,6 +4,8 @@
 Understand How Flyte Handles Data
 #################################
 
+.. tags:: Basic, Glossary, Design
+
 Types of Data
 =============
 

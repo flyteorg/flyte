@@ -2,6 +2,9 @@
 
 Projects
 ========
+
+.. tags:: Basic, Glossary
+
 A project in Flyte is a group of :ref:`workflows <divedeep-workflows>` and :ref:`tasks <divedeep-tasks>` tied together to achieve a goal. 
 
 A Flyte project can map to an engineering project or everything that's owned by a team or an individual. There cannot be multiple projects with the same name in Flyte. 

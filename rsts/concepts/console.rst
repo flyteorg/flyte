@@ -1,8 +1,10 @@
 .. _divedeep-console:
 
-#############
+############
 FlyteConsole
-#############
+############
+
+.. tags:: Intermediate, Contribute
 
 FlyteConsole is the web UI for the Flyte platform. Here's a video that dives into the graph UX:
 

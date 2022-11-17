@@ -1,8 +1,10 @@
 .. _divedeep-admin:
 
-###########
+##########
 FlyteAdmin
-###########
+##########
+
+.. tags:: Advanced, Design
 
 Admin Structure
 ===============
@@ -13,7 +15,6 @@ FlyteAdmin serves as the main Flyte API to process all client requests to the sy
 2. Flytekit, which in turn calls FlyteAdmin to register, launch workflows, etc.
 
 Below, we'll dive into each component defined in admin in more detail.
-
 
 RPC
 ---
