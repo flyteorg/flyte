@@ -3,7 +3,7 @@
 Troubleshooting Guide
 ---------------------
 
-.. tags:: Basic, _troubleshoot
+.. tags:: Troubleshoot, Basic
 
 .. admonition:: Why did we craft this guide?
 
