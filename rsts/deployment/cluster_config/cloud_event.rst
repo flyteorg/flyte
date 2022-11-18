@@ -1,8 +1,10 @@
 .. _deployment-cluster-config-cloud-event:
 
-#################
+############
 Cloud Events
-#################
+############
+
+.. tags:: Infrastructure, AWS, GCP, Advanced
 
 Progress of Flyte workflow and task execution is delimited by a series of
 events that are passed from the FlytePropeller to FlyteAdmin. Administrators
@@ -16,6 +18,7 @@ consumption, outside the Flyte platform.
 *********
 Use cases
 *********
+
 CloudEvents is a specification for describing event data in common formats
 to provide interoperability across services, platforms and systems.
 
@@ -25,6 +28,7 @@ integrating with existing systems within your organization.
 *************************
 Supported Implementations
 *************************
+
 Event egress can be configured to work with **AWS** using
 `SQS <https://aws.amazon.com/sqs/>`_ and
 `SNS <https://aws.amazon.com/sns/>`_,

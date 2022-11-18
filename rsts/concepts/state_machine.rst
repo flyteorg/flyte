@@ -1,8 +1,10 @@
 .. _divedeep-state-machine:
 
-#################################################
+################################################
 Understanding the State Transition in a Workflow
-#################################################
+################################################
+
+.. tags:: Basic, Design
 
 High Level Overview of How a Workflow Progresses to Success
 ===========================================================

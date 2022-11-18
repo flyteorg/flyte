@@ -4,6 +4,8 @@
 Registration
 ############
 
+.. tags:: Basic, Glossary, Design
+
 During registration, Flyte validates the workflow structure and saves the workflow. The registration process also updates the workflow graph. 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/executions/flyte_wf_registration_overview.svg?sanitize=true

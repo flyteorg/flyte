@@ -4,6 +4,8 @@
 Understanding Authentication in Detail
 ######################################
 
+.. tags:: Authentication, Design, Advanced
+
 .. _auth-openid-appendix:
 
 **************

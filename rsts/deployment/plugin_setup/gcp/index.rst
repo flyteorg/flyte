@@ -4,6 +4,7 @@
 GCP Plugins Setup
 #################
 
+.. tags:: GCP, Integration, Data, Advanced
 
 .. panels::
     :header: text-center

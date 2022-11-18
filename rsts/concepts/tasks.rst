@@ -1,9 +1,11 @@
 .. _divedeep-tasks:
 
 Tasks
-======
+=====
 
-Tasks are fully independent units of execution and first-class entities of Flyte. 
+.. tags:: Basic, Glossary
+
+Tasks are fully independent units of execution and first-class entities of Flyte.
 They are the fundamental building blocks and extension points that encapsulate the users' code.
 
 Characteristics
@@ -34,7 +36,7 @@ When deciding if a unit of execution constitutes a Flyte task, consider these qu
 Dynamic Tasks
 --------------
 
-"Dynamic tasks" is a misnomer. 
+"Dynamic tasks" is a misnomer.
 Flyte is one-of-a-kind workflow engine that ships with the concept of truly `Dynamic Workflows <https://blog.flyte.org/dynamic-workflows-in-flyte>`__!
 Users can generate workflows in reaction to user inputs or computed values at runtime. 
 These executions are evaluated to generate a static graph before execution.
@@ -48,7 +50,7 @@ Plugins
 Flyte exposes an extensible model to express tasks in an execution-independent language. 
 It contains first-class task plugins (for example: `Papermill <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-papermill/flytekitplugins/papermill/task.py>`__, 
 `Great Expectations <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-greatexpectations/flytekitplugins/great_expectations/task.py>`__, and :ref:`more <integrations>`.) 
-that execute the Flyte tasks. 
+that execute the Flyte tasks.
 Almost any action can be implemented and introduced into Flyte as a "Plugin", which includes:
 
 - Tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake, etc.

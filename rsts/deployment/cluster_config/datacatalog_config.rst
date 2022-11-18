@@ -4,6 +4,8 @@
 Flyte Datacatalog Configuration
 #########################################
 
+.. tags:: Configuration, Advanced
+
 - `application <#section-application>`_
 
 - `database <#section-database>`_
