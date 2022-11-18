@@ -121,6 +121,17 @@ Troubles with handling large responses in ``FlyteRemote.sync``
 - To fix this, edit the ``flyte-admin-base-config`` config map using the command ``kubectl edit cm flyte-admin-base-config -n flyte`` to increase the ``maxMessageSizeBytes`` value.
 
 
+Issues with long running workflow executions (more than an hour)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- ```flytekit.exceptions.scopes.FlyteScopedUserException: An error occurred (ExpiredToken) when calling the AssumeRole operation: The security token included in the request is expired```
+- ```Called process exited with error code: 1.  Stderr dump:\n\nb'upload failed: ../../tmp/flyte-kvw3xxto/sandbox/local_flytekit/engine_dir/error.pb to s3://<s3_bucket>/metadata/propeller/<project_name>-development-<execution_id>/n1/data/0/error.pb An error occurred (AccessDenied) when calling the PutObject operation: Access Denied```
+- instruction is explained  `here <https://aws.amazon.com/blogs/security/enable-federated-api-access-to-your-aws-resources-for-up-to-12-hours-using-iam-roles/>`__ 
+- To verify the assumed IAM role has the PutObject permissions. You can verify this by checking the service account annotated role. ```kubectl get sa -n /<project_name>-development my-aws-role -o yaml```
+
+
+
+
+
 I Still Need Help!
 ^^^^^^^^^^^^^^^^^^
 Our `Slack <https://slack.flyte.org/>`__ community is always available and ready to help!
