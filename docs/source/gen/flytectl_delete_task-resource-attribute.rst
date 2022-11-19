@@ -73,7 +73,7 @@ Options inherited from parent commands
       --admin.clientSecretEnvVar string            Environment variable containing the client secret
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                      Command for external authentication token generation
-      --admin.defaultServiceConfig string          
+      --admin.defaultServiceConfig string
       --admin.endpoint string                      For admin types,  specify where the uri of the service is located.
       --admin.insecure                             Use insecure connection.
       --admin.insecureSkipVerify                   InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
@@ -125,5 +125,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as executions and resource attributes.
 

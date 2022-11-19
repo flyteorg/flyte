@@ -24,7 +24,7 @@ Options
       --admin.clientSecretEnvVar string            Environment variable containing the client secret
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                      Command for external authentication token generation
-      --admin.defaultServiceConfig string          
+      --admin.defaultServiceConfig string
       --admin.endpoint string                      For admin types,  specify where the uri of the service is located.
       --admin.insecure                             Use insecure connection.
       --admin.insecureSkipVerify                   InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
@@ -81,7 +81,7 @@ SEE ALSO
 * :doc:`flytectl_completion` 	 - Generates completion script.
 * :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 * :doc:`flytectl_create` 	 - Creates various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
-* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as executions and resource attributes.
 * :doc:`flytectl_demo` 	 - Helps with demo interactions like start, teardown, status, and exec.
 * :doc:`flytectl_get` 	 - Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
 * :doc:`flytectl_register` 	 - Registers tasks, workflows, and launch plans from a list of generated serialized files.
