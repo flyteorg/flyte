@@ -2,7 +2,9 @@
 .. _flyte_pickle:
 
 Using Flyte Pickle
-----------------------------
+------------------
+
+.. tags:: Basic
 
 Flyte enforces type safety by leveraging type information to be able to compile
 tasks/workflows, which enables all sorts of nice features (like static analysis of tasks/workflows, conditional branching, etc.)

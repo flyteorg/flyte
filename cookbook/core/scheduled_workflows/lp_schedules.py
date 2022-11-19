@@ -2,7 +2,9 @@
 .. _launchplan_schedules:
 
 Scheduling Workflows Example
------------------------------
+----------------------------
+
+.. tags:: Basic
 
 :ref:`flyte:divedeep-launchplans` can be set to run automatically on a schedule using the Flyte Native Scheduler.
 For workflows that depend on knowing the kick-off time, Flyte supports passing in the scheduled time (not the actual time, which may be a few seconds off) as an argument to the workflow.

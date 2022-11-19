@@ -3,6 +3,8 @@
 Great Expectations
 ==================
 
+.. tags:: Integration, Data, DataFrame, Intermediate
+
 **Great Expectations** is a Python-based open-source library for validating, documenting, and profiling your data.
 It helps maintain data quality and improve communication about data between teams.
 

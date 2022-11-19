@@ -1,6 +1,8 @@
 Papermill
 =========
 
+.. tags:: Integration, Jupyter, Intermediate
+
 It is possible to run a Jupyter notebook as a Flyte task using `papermill <https://github.com/nteract/papermill>`_.
 Papermill executes the notebook as a whole, so before using this plugin, it is essential to construct your notebook as
 recommended by papermill. When using this plugin, there are a few important things to keep in mind:

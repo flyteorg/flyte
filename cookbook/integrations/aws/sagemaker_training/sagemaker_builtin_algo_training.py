@@ -1,6 +1,7 @@
 """
 Built-in Sagemaker Algorithms
 #############################
+
 This example will show how it is possible to work with built-in algorithms with Amazon Sagemaker and perform hyper-parameter optimization using Sagemaker HPO.
 
 

@@ -4,6 +4,8 @@
 Writing Custom Flyte Types
 --------------------------
 
+.. tags:: Extensibility, Contribute, Intermediate
+
 Flyte is a strongly-typed framework for authoring tasks and workflows. But there are situations when the existing
 types do not directly work. This is true with any programming language!
 

@@ -2,6 +2,8 @@
 Decorating Workflows
 --------------------
 
+.. tags:: Intermediate
+
 The behavior of workflows can be modified in a light-weight fashion by using the built-in :py:func:`~functools.wraps`
 decorator pattern, similar to using decorators to
 :ref:`customize task behavior <sphx_glr_auto_core_flyte_basics_decorating_tasks.py>`. However, unlike in the case of

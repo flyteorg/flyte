@@ -2,7 +2,7 @@
 .. _larger_apps_build:
 
 Setup a Project
-----------------
+---------------
 
 Prerequisites
 ^^^^^^^^^^^^^^^^

@@ -199,6 +199,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     "sphinxcontrib.yt",
     "sphinx_tabs.tabs",
+    "sphinx_tags",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -222,6 +223,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The master toctree document.
 master_doc = "index"
+
+# Tags config
+tags_create_tags = True
+tags_page_title = "Tag"
+tags_overview_title = "All Tags"
 
 pygments_style = "tango"
 pygments_dark_style = "monokai"

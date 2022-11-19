@@ -1,6 +1,9 @@
 """
 Conditions
---------------
+----------
+
+.. tags:: Intermediate
+
 Flytekit supports conditions as a first class construct in the language. Conditions offer a way to selectively execute
 branches of a workflow based on static or dynamic data produced by other tasks or come in as workflow inputs.
 Conditions are very performant to be evaluated. However, they are limited to certain binary and logical operators and can

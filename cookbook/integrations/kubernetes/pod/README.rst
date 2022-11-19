@@ -1,6 +1,8 @@
 Kubernetes Pods
 ===============
 
+.. tags:: Integration, Kubernetes, Advanced
+
 Flyte tasks (Python functions decorated with :py:func:`@task <flytekit:flytekit.task>`) are essentially single functions loaded in one container.
 But often, there is a need to run a job with more than one container, in cases such as:
 

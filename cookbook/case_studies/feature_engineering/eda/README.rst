@@ -1,6 +1,8 @@
 EDA, Feature Engineering, and Modeling With Papermill
 =====================================================
 
+.. tags:: Data, Jupyter, Intermediate
+
 Exploratory Data Analysis (EDA) refers to the critical process of performing initial investigations on data to discover patterns,
 spot anomalies, test hypotheses and check assumptions with the help of summary statistics and graphical representations.
 

@@ -2,6 +2,8 @@
 Reference Task
 --------------
 
+.. tags:: Intermediate
+
 A :py:func:`flytekit.reference_task` references the Flyte tasks that have already been defined, serialized, and registered.
 You can reference tasks from other projects and create a workflow that uses tasks declared by others.
 These tasks can be in their own containers, python runtimes, flytekit versions, and even different languages.

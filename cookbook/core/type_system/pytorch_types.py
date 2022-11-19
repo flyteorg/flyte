@@ -4,6 +4,8 @@
 PyTorch Types
 =============
 
+.. tags:: MachineLearning, Basic
+
 Flyte promotes the use of strongly-typed data to make it easier to write pipelines that are more robust and easier to test.
 Flyte is primarily used for machine learning besides data engineering. To simplify the communication between Flyte tasks, especially when passing
 around tensors and models, we added support for the PyTorch types.

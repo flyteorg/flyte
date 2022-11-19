@@ -4,6 +4,8 @@
 User Container Task Plugin
 --------------------------
 
+.. tags:: Extensibility, Contribute, Intermediate
+
 A user container task plugin runs a user-defined container that has the user code.
 
 This tutorial will walk you through writing your own sensor-style plugin that allows users to wait for a file to land

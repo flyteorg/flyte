@@ -1,6 +1,8 @@
 """
 Workflows
-----------
+---------
+
+.. tags:: Basic
 
 Once you have a handle on :ref:`tasks <basics_of_tasks>`, you can dive into Flyte workflows.
 Together, Flyte tasks and workflows make up the fundamental building blocks of Flyte.

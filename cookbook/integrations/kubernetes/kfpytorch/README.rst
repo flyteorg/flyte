@@ -3,6 +3,8 @@
 Kubeflow Pytorch
 ================
 
+.. tags:: Integration, DistributedComputing, MachineLearning, KubernetesOperator, Advanced
+
 This plugin uses the Kubeflow Pytorch Operator and provides an extremely simplified interface for executing distributed training using various pytorch backends.
 
 Installation

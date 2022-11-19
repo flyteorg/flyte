@@ -1,6 +1,8 @@
 Example Contribution Guide
 ###########################
 
+.. tags:: Contribute, Basic
+
 The examples documentation provides an easy way for the community to learn about the rich set of
 features that Flyte offers, and we are constantly improving them with your help!
 

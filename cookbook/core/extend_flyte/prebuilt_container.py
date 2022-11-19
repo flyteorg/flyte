@@ -4,6 +4,8 @@
 Pre-built Container Task Plugin
 -------------------------------
 
+.. tags:: Extensibility, Contribute, Intermediate
+
 A pre-built container task plugin runs a pre-built container. The following are the advantages of using a pre-built container in comparison to a user-defined container:
 
 - Shifts the burden of writing Dockerfile from the user who uses the task in workflows to the author of the task type.

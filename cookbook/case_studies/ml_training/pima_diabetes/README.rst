@@ -1,5 +1,7 @@
 Diabetes Classification
-------------------------
+-----------------------
+
+.. tags:: MachineLearning, Intermediate
 
 The workflow demonstrates how to train an XGBoost model. The workflow is designed for the `Pima Indian Diabetes dataset <https://github.com/jbrownlee/Datasets/blob/master/pima-indians-diabetes.names>`__.
 

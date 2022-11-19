@@ -2,6 +2,8 @@
 Add Docstrings to Workflows
 ---------------------------
 
+.. tags:: Basic
+
 Documented code helps enhance the readability of the code. Flyte supports docstrings to document your code.
 Docstrings are stored in FlyteAdmin and shown on the UI in the launch form.
 

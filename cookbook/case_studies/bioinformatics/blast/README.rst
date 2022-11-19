@@ -3,6 +3,8 @@
 Nucleotide Sequence Querying with BLASTX
 ----------------------------------------
 
+.. tags:: Advanced
+
 This tutorial shows how computational biology intermixes with Flyte. The problem statement we will be looking at is
 querying a nucleotide sequence against a local protein database, to identify potential homologues.
 This guide will show you how to:

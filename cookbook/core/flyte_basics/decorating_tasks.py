@@ -2,6 +2,8 @@
 Decorating Tasks
 ----------------
 
+.. tags:: Intermediate
+
 A simple way of modifying the behavior of tasks is by using decorators to wrap your task functions.
 
 In order to make sure that your decorated function contains all the type annotation and docstring

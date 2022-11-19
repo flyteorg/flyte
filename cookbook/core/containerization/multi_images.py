@@ -4,6 +4,8 @@
 Multiple Container Images in a Single Workflow
 ----------------------------------------------
 
+.. tags:: Containerization, Intermediate
+
 When working locally, it is recommended to install all requirements of your project locally (maybe in a single virtual environment). It gets complicated when you want to deploy your code to a remote
 environment since most tasks in Flyte (function tasks) are deployed using a Docker Container.
 

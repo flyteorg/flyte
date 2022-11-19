@@ -2,6 +2,8 @@
 AWS Athena
 ##########
 
+.. tags:: Data, Integration, AWS, Advanced
+
 Executing Athena Queries
 ========================
 Flyte backend can be connected with Athena. Once enabled, it allows you to query AWS Athena service (Presto + ANSI SQL Support) and retrieve typed schema (optionally).

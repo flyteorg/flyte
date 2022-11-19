@@ -1,6 +1,7 @@
 """
 Distributed Pytorch
---------------------
+-------------------
+
 This example is adapted from the default example available on Kubeflow's pytorch site.
 `here <https://github.com/kubeflow/pytorch-operator/blob/b7fef224fef1ef0117f6e74961b557270fcf4b04/examples/mnist/mnist.py>`_
 It has been modified to show how to integrate it with Flyte and can be probably simplified and cleaned up.

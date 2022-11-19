@@ -1,6 +1,7 @@
 """
 Custom Sagemaker Algorithms
 ###########################
+
 This script shows an example of how to simply convert your tensorflow training scripts to run on Amazon Sagemaker
 with very few modifications.
 """

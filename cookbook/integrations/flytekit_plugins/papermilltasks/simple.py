@@ -1,6 +1,7 @@
 """
 Jupyter Notebook Tasks
------------------------
+----------------------
+
 In this example, we will show how to create a flyte task that runs a simple notebook, accepts one input variable, transforms it, and produces
 one output. This can be generalized to multiple inputs and outputs.
 

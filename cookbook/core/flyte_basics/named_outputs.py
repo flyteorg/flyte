@@ -2,6 +2,8 @@
 Named Outputs
 -------------
 
+.. tags:: Basic
+
 By default, Flyte names the outputs of a task or workflow using a standardized convention. All the outputs are named
 as ``o1, o2, o3, ... o<n>.`` where ``o`` is the standard prefix and ``1, 2, .. <n>`` is the index position within the return values.
 

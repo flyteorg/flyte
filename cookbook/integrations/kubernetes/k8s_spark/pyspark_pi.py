@@ -2,7 +2,8 @@
 .. _intermediate_using_spark_tasks:
 
 Writing a PySpark Task
-------------------------
+----------------------
+
 Flyte has an optional plugin that makes it possible to run `Apache Spark <https://spark.apache.org/>`_ jobs natively on your kubernetes cluster. This plugin has been used extensively at Lyft and is battle tested.
 It makes it extremely easy to run your pyspark (coming soon to scala/java) code as a task. The plugin creates a new virtual cluster for the spark execution dynamically and Flyte will manage the execution, auto-scaling
 for the spark job.

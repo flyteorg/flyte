@@ -1,6 +1,8 @@
 AWS Sagemaker Pytorch
 =====================
 
+.. tags:: Integration, MachineLearning, AWS, Advanced
+
 This plugin shows an example of using Sagemaker custom training, with Pytorch distributed training.
 
 

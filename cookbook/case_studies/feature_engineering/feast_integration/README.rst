@@ -1,6 +1,8 @@
 Feast Integration
 -----------------
 
+.. tags:: Data, MachineLearning, Advanced
+
 `Feast <https://feast.dev/>`__ is an operational data system for managing and serving machine learning features to models in production.
 
 Flyte provides a way to train models and perform feature engineering as a single pipeline.

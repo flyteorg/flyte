@@ -4,6 +4,8 @@
 User Guide
 ##############
 
+`Flytesnacks Tags <_tags/tagsindex.html>`__
+
 If this is your first time using Flyte, check out the `Getting Started <https://docs.flyte.org/en/latest/getting_started.html>`_ guide.
 
 This *User Guide*, the :doc:`Tutorials <tutorials>`, and the :doc:`Integrations <integrations>` examples cover all of
@@ -190,6 +192,7 @@ Table of Contents
    auto/integrations/aws/sagemaker_training/index
    auto/integrations/aws/sagemaker_pytorch/index
    auto/integrations/aws/athena/index
+   auto/integrations/aws/batch/index
    auto/integrations/external_services/hive/index
    auto/integrations/external_services/snowflake/index
    auto/integrations/gcp/bigquery/index

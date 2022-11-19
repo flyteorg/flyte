@@ -1,6 +1,8 @@
 Dolt
 ====
 
+.. tags:: Integration, Data, SQL, Intermediate
+
 The ``DoltTable`` plugin is a wrapper that uses `Dolt <https://github.com/dolthub/dolt>`__ to move data between
 ``pandas.DataFrame``'s at execution time and database tables at rest.
 

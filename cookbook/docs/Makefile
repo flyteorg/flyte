@@ -19,3 +19,4 @@ clean:
 	rm -rf _build
 	rm -rf auto_*
 	rm -rf auto/*
+	rm -rf _tags/*

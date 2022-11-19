@@ -1,6 +1,8 @@
 """
 Working With Folders
----------------------
+--------------------
+
+.. tags:: Data, Basic
 
 In addition to files, folders are another fundamental operating system primitive users often work with. Flyte supports folders
 in the form of `multi-part blobs <https://github.com/flyteorg/flyteidl/blob/237f025a15c0102675ad41d2d1e66869afa80822/protos/flyteidl/core/types.proto#L73>`__.

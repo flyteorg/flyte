@@ -4,6 +4,8 @@
 SubWorkflows
 ------------
 
+.. tags:: Intermediate
+
 Subworkflows are similar to :ref:`launch plans <Launch plans>` since they allow users to kick off one workflow from within another.
 
 What's the Difference?

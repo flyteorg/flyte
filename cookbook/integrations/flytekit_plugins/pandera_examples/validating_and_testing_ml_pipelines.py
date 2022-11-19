@@ -2,6 +2,8 @@
 Validating and Testing Machine Learning Pipelines
 -------------------------------------------------
 
+.. tags:: Integration, DataFrame, MachineLearning, Intermediate
+
 In this example we'll show you how to use :ref:`pandera.SchemaModel <pandera:schema_models>`
 to annotate dataframe inputs and outputs in an `sklearn <https://scikit-learn.org/stable/>`__
 model-training pipeline.

@@ -1,6 +1,8 @@
 """
 Using Enum types
--------------------------
+----------------
+
+.. tags:: Basic
 
 Sometimes you may want to restrict the set of inputs / outputs to a finite set of acceptable values. This is commonly
 achieved using Enum types in programming languages.

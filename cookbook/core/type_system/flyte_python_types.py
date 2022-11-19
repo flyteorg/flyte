@@ -2,7 +2,9 @@
 .. _flytekit_to_flyte_type_mapping:
 
 Flyte and Python Types
------------------------
+----------------------
+
+.. tags:: Basic
 
 FlyteKit automatically maps Python types to Flyte types. This section provides details of the mappings, but for the most
 part you can skip this section, as almost all of Python types are mapped automatically.

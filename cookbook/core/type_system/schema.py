@@ -1,6 +1,8 @@
 """
 Using Schemas
-------------------
+-------------
+
+.. tags:: DataFrame, Basic
 
 This example explains how an untyped schema is passed between tasks using :py:class:`pandas.DataFrame`.
 Flytekit makes it possible for users to directly return or accept a :py:class:`pandas.DataFrame`, which are automatically

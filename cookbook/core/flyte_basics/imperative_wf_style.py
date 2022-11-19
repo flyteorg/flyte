@@ -4,6 +4,8 @@
 Imperative Workflows
 --------------------
 
+.. tags:: Basic
+
 Workflows are typically created and specified by decorating a function with the ``@workflow`` decorator. This will
 run through the body of the function at compile time, using the subsequent calls of the underlying tasks to determine
 and record the workflow structure. This is the declarative style and makes sense when a human is writing it up by hand.

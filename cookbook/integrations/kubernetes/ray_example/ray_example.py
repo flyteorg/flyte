@@ -1,6 +1,7 @@
 """
 Ray Tasks
-----------
+---------
+
 Ray task allows you to run a Ray job on an existing Ray cluster or create a Ray cluster by using the Ray operator.
 
 

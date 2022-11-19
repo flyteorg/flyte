@@ -31,3 +31,4 @@ download-artifact/
 typescript
 .bash_history
 .venv/
+cookbook/docs/_tags/

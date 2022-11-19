@@ -2,6 +2,8 @@
 Run Bash Scripts Using ShellTask
 --------------------------------
 
+.. tags:: Intermediate
+
 To run bash scripts from within Flyte, ShellTask can be used. In this example, let's define three ShellTasks to run simple bash commands.
 
 .. note::

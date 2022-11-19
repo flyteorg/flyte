@@ -2,6 +2,8 @@
 Chain Flyte Entities
 --------------------
 
+.. tags:: Basic
+
 Data passing between tasks or workflows need not necessarily happen through parameters.
 In such a case, if you want to explicitly construct the dependency, flytekit provides a mechanism to chain Flyte entities using the ``>>`` operator.
 

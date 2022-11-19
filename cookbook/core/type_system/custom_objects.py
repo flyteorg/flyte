@@ -4,6 +4,8 @@
 Using Custom Python Objects
 ---------------------------
 
+.. tags:: Basic
+
 Flyte supports passing JSON between tasks. But to simplify the usage for the users and introduce type-safety,
 Flytekit supports passing custom data objects between tasks.
 

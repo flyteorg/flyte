@@ -4,6 +4,8 @@
 Tasks
 -----
 
+.. tags:: Basic
+
 Task is a fundamental building block and an extension point of Flyte, which encapsulates the users' code. They possess the following properties:
 
 #. Versioned (usually tied to the ``git sha``)

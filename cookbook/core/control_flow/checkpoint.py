@@ -1,6 +1,8 @@
 """
 Intratask Checkpoints
-----------------------
+---------------------
+
+.. tags:: MachineLearning, Intermediate
 
 .. note::
 

@@ -2,7 +2,7 @@
 .. _larger_apps_deploy:
 
 Deploy to the Cloud
---------------------------------
+-------------------
 
 Prerequisites
 ^^^^^^^^^^^^^^^^

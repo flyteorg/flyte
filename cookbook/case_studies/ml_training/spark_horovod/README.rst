@@ -1,7 +1,9 @@
 .. _spark_horovod:
 
 Forecasting Rossman Store Sales with Horovod and Spark
-----------------------------------------------------------------------
+------------------------------------------------------
+
+.. tags:: MachineLearning, Integration, Advanced
 
 The problem statement we will be looking at is forecasting sales using `rossmann store sales <https://www.kaggle.com/c/rossmann-store-sales>`__ data.
 Our example is an adaptation of the `Horovod-Spark example <https://github.com/horovod/horovod/blob/master/examples/spark/keras/keras_spark_rossmann_estimator.py>`__.

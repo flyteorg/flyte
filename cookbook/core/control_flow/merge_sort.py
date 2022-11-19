@@ -2,7 +2,9 @@
 .. _advanced_merge_sort:
 
 Implementing Merge Sort
-------------------------
+-----------------------
+
+.. tags:: Intermediate
 
 FlyteIdl (the fundamental building block of the Flyte Language) allows various programming language features:
 conditionals, recursion, custom typing, and more.

@@ -2,7 +2,7 @@
 .. _larger_apps_iterate:
 
 Iterate and Re-deploy
-----------------------
+---------------------
 
 In this guide, you'll learn how to iterate on and re-deploy your tasks and workflows.
 

@@ -2,7 +2,9 @@
 .. _raw_container:
 
 Using Raw Containers
----------------------
+--------------------
+
+.. tags:: Containerization, Advanced
 
 This example demonstrates how to use arbitrary containers in 5 different languages, all orchestrated in flytekit seamlessly.
 Flyte mounts an input data volume where all the data needed by the container is available and an output data volume

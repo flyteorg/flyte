@@ -1,8 +1,12 @@
 """
 Customizing Task Resources
----------------------------
+--------------------------
+
+.. tags:: Deployment, Infrastructure, Basic
+
 One of the reasons to use a hosted Flyte environment is the potential of leveraging CPU, memory and storage resources, far greater than what's available locally.
 Flytekit makes it possible to specify these requirements declaratively and close to where the task itself is declared.
+
 """
 
 # %%

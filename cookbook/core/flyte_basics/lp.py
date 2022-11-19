@@ -2,6 +2,8 @@
 Launch Plans
 ------------
 
+.. tags:: Basic
+
 Launch plans bind a partial or complete list of inputs necessary to launch a workflow, along
 with optional run-time overrides such as notifications, schedules and more.
 Launch plan inputs must only assign inputs already defined in the reference workflow definition.

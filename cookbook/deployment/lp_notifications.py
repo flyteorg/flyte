@@ -3,6 +3,8 @@
 Notifications
 #############
 
+.. tags:: Intermediate
+
 """
 
 # %%

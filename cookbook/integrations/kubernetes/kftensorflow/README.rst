@@ -1,6 +1,8 @@
 Kubeflow TensorFlow
 ===================
 
+.. tags:: Integration, DistributedComputing, MachineLearning, KubernetesOperator, Advanced
+
 TensorFlow operator is useful to natively run distributed TensorFlow training jobs on Flyte.
 It is a wrapper built around `Kubeflow's TensorFlow operator <https://www.kubeflow.org/docs/components/training/tftraining/>`__.
 

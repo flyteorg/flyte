@@ -1,6 +1,6 @@
 """
 Single Node, Multi GPU Training
---------------------------------
+-------------------------------
 
 When you need to scale up model training in pytorch, you can use the :py:class:`~torch:torch.nn.DataParallel` for
 single node, multi-gpu/cpu training or :py:class:`~torch:torch.nn.parallel.DistributedDataParallel` for multi-node,

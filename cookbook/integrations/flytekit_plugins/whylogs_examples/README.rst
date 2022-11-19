@@ -1,6 +1,8 @@
 whylogs
 =======
 
+.. tags:: Intermediate, Data, DataFrame, Intermediate
+
 whylogs is an open source software that allows you to log and inspect differents aspects of your data and ML models. 
 It creates efficient and mergeable statistical summaries of your datasets, called profiles, that have similar properties 
 to logs produced by regular software applications.

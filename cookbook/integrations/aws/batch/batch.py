@@ -1,6 +1,7 @@
 """
 AWS Batch
-############
+#########
+
 This example shows how to use a Flyte AWS batch plugin to execute a tasks on batch service.
 With AWS Batch, there is no need to install and manage batch computing software or server clusters
 that you use to run your jobs, allowing you to focus on analyzing results and solving problems.
