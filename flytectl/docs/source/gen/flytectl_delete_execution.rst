@@ -25,11 +25,11 @@ Get an execution to check its state:
 ::
 
  flytectl get execution  -d development  -p flytesnacks
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | NAME (7)   | WORKFLOW NAME                                                           | TYPE     | PHASE     | STARTED                        | ELAPSED TIME  |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | c6a51x2l9e | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:13:04.680476300Z | 15.540361300s |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
 
 Terminate multiple executions with their names:
 ::
@@ -41,15 +41,15 @@ Get an execution to find the state of previously terminated executions:
 ::
 
  flytectl get execution  -d development  -p flytesnacks
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | NAME (7)   | WORKFLOW NAME                                                           | TYPE     | PHASE     | STARTED                        | ELAPSED TIME  |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | c6a51x2l9e | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:13:04.680476300Z | 15.540361300s |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | eeam9s8sny | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:14:04.803084100Z | 42.306385500s |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
  | p4wv4hwgc4 | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:14:27.476307400Z | 19.727504400s |
-  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- ---------------
 
 Usage
 
@@ -79,7 +79,7 @@ Options inherited from parent commands
       --admin.clientSecretEnvVar string            Environment variable containing the client secret
       --admin.clientSecretLocation string          File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                      Command for external authentication token generation
-      --admin.defaultServiceConfig string          
+      --admin.defaultServiceConfig string
       --admin.endpoint string                      For admin types,  specify where the uri of the service is located.
       --admin.insecure                             Use insecure connection.
       --admin.insecureSkipVerify                   InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
@@ -131,5 +131,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as tasks, workflows, launch plans, executions, and projects.
+* :doc:`flytectl_delete` 	 - Terminates/deletes various Flyte resources such as executions and resource attributes.
 
