@@ -10,6 +10,7 @@ ARG FLYTE_VERSION="master"
 WORKDIR /flyteorg/build
 RUN git clone --depth=1 https://github.com/flyteorg/flyte.git ./flyte -b $FLYTE_VERSION
 WORKDIR /flyteorg/build/flyte
+RUN go get github.com/flyteorg/flyteadmin@doc-hub
 RUN go mod download
 COPY --from=flyteconsole /app/dist cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
