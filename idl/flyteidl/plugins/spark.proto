@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+message SparkApplication {
+    enum Type {
+        PYTHON = 0;
+        JAVA = 1;
+        SCALA = 2;
+        R = 3;
+    }
+}
+
+// Custom Proto for Spark Plugin.
+message SparkJob {
+    SparkApplication.Type applicationType = 1;
+    string mainApplicationFile = 2;
+    string mainClass = 3;
+    map<string, string> sparkConf = 4;
+    map<string, string> hadoopConf = 5;
+    string executorPath = 6; // Executor path for Python jobs.
+}

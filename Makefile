@@ -1,5 +1,7 @@
 export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
+
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -34,6 +36,12 @@ linux_compile:
 update_boilerplate:
 	@boilerplate/update.sh
 
+.PHONY: generate
+generate: update_boilerplate install doc_gen_deps # get latest boiler plate, install tools, generate protos, mock, pflags and  get doc dependencies
+	./script/generate_protos.sh
+	./script/generate_mocks.sh
+	go generate ./...
+
 .PHONY: kustomize
 kustomize:
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
@@ -49,7 +57,7 @@ release_automation:
 	bash script/generate_config_docs.sh
 
 .PHONY: deploy_sandbox
-deploy_sandbox: 
+deploy_sandbox:
 	bash script/deploy.sh
 
 .PHONY: install-piptools
@@ -99,3 +107,16 @@ help: ## List available commands and their usage
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
 
+
+PLACEHOLDER := "__version__\ =\ \"0.0.0+develop\""
+PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
+
+.PHONY: update_pyversion
+update_pyversion:
+	grep "$(PLACEHOLDER)" "setup.py"
+	sed -i "s/$(PLACEHOLDER)/__version__ = \"${VERSION}\"/g" "setup.py"
+
+.PHONY: update_npmversion
+update_npmversion:
+	grep "$(PLACEHOLDER_NPM)" "package.json"
+	sed -i "s/$(PLACEHOLDER_NPM)/\"version\":  \"${VERSION}\"/g" "package.json"

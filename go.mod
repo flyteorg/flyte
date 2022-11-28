@@ -14,6 +14,27 @@ require (
 	gorm.io/driver/postgres v1.2.3
 	k8s.io/client-go v0.24.1
 	sigs.k8s.io/controller-runtime v0.12.1
+
+	github.com/antihax/optional v1.0.0
+	github.com/go-test/deep v1.0.7
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/golang/protobuf v1.4.3
+	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/jinzhu/copier v0.3.5
+	github.com/mitchellh/mapstructure v1.4.1
+	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
+	github.com/pkg/errors v0.9.1
+	github.com/spf13/pflag v1.0.5
+	github.com/stretchr/testify v1.7.0
+	github.com/vektra/mockery v1.1.2 // indirect
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
+	golang.org/x/oauth2 v0.0.0-20210126194326-f9ce19ea3013
+	google.golang.org/api v0.38.0
+	google.golang.org/genproto v0.0.0-20210126160654-44e461bb6506
+	google.golang.org/grpc v1.35.0
+	k8s.io/apimachinery v0.20.2
 )
 
 require (
@@ -71,7 +92,6 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.2.5 // indirect
 	github.com/flyteorg/flyteplugins v1.0.18 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -219,3 +239,4 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+replace github.com/flyteorg/flyteidl => ./
