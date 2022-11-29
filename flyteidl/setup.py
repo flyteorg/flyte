@@ -15,7 +15,7 @@ setup(
     install_requires=[
         'googleapis-common-protos',
         'protoc_gen_swagger',
-        'protobuf>=3.5.0,<4.0.0',
+        'protobuf>=4.21.1,<5.0.0',
         # Packages in here should rarely be pinned. This is because these
         # packages (at the specified version) are required for project
         # consuming this library. By pinning to a specific version you are the
