@@ -1,10 +1,10 @@
-.. _deployment-cluster-config-performance:
+.. _administrator-configuration-performance:
 
 ######################################################
 Optimizing Performance
 ######################################################
 
-.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-cluster-config-monitoring`.
+.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`administrator-configuration-monitoring`.
 
 The video below contains an overview of the Flyte architecture, what is meant by "performance", details of one loop in FlytePropeller, and a demo of the Grafana Labs dashboard.
 

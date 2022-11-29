@@ -1,4 +1,4 @@
-.. administrator-flyte-configuration:
+.. _administrator-configuration:
 
 ##############
 Cluster Config
@@ -54,7 +54,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-config-notifications
+    .. link-button:: administrator-configuration-notifications
        :type: ref
        :text: Notifications
        :classes: btn-block stretched-link
@@ -63,7 +63,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-config-eventing
+    .. link-button:: administrator-configuration-cloud-event
        :type: ref
        :text: External Events
        :classes: btn-block stretched-link
@@ -72,7 +72,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-config-monitoring
+    .. link-button:: administrator-configuration-monitoring
        :type: ref
        :text: Monitoring
        :classes: btn-block stretched-link
@@ -81,7 +81,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-config-performance
+    .. link-button:: administrator-configuration-performance
        :type: ref
        :text: Optimizing Performance
        :classes: btn-block stretched-link
@@ -90,7 +90,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-config-eventing
+    .. link-button:: administrator-configuration-eventing
        :type: ref
        :text: Platform Events
        :classes: btn-block stretched-link
@@ -111,4 +111,4 @@ Cluster Config
     monitoring
     notifications
     performance
-    eventing
+    cloud_event

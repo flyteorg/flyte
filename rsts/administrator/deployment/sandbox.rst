@@ -15,7 +15,7 @@ The follow section explains how you can use each of these modes and provides mor
 many features are intentionally removed from this environment to ensure that the startup times and runtime footprints are low.
 
 .. warning::
-    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
+    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`administrator` guide.
 
 *******************************************
 Flyte Sandbox as a Single Docker Container
@@ -61,14 +61,14 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
 
     #. A Sandbox deployment takes over the entire cluster
     #. It needs special cluster roles that will need access to create namespaces, pods, etc.
-    #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the :ref:`deployment` guides.
+    #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the :ref:`administrator` guides.
 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_k8s_cluster.png
    :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
 
 
-.. _deploy-sandbox-local:
+.. _administrator-deployment-sandbox-local:
 
 Deploy Flyte Sandbox on Your Local Machine
 ==========================================
@@ -85,7 +85,7 @@ Recommended using ``flytectl sandbox start`` as described in :ref:`getting-start
 
         docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30088:30088 cr.flyte.org/flyteorg/flyte-sandbox
 
-.. _deployment-sandbox-dedicated-k8s-cluster:
+.. _administrator-deployment-sandbox-dedicated-k8s-cluster:
 
 Deploy Flyte Sandbox to a Cloud Kubernetes Cluster
 ==================================================
@@ -115,7 +115,7 @@ If you can access your cluster with ``kubectl cluster-info``, you're ready to de
 Deployment
 ----------
 
-We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with deploying the sandbox
+We'll proceed like with :ref:`locally hosted flyte <administrator-deployment-sandbox-local>` with deploying the sandbox
 Flyte configuration on your remote cluster.
 
 

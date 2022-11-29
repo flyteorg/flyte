@@ -1,4 +1,4 @@
-.. _deployment-cluster-config-cloud-event:
+.. _administrator-configuration-cloud-event:
 
 ############
 Cloud Events
@@ -10,8 +10,8 @@ Progress of Flyte workflow and task execution is delimited by a series of
 events that are passed from the FlytePropeller to FlyteAdmin. Administrators
 can configure FlyteAdmin to send these `cloud events <https://cloudevents.io/>`_ onwards to a pub/sub system like
 SNS/SQS as well. Note that this configuration is distinct from the
-configuration for notifications :ref:`deployment-cluster-config-notifications`,
-and :ref:`deployment-cluster-config-eventing`.
+configuration for notifications :ref:`administrator-configuration-notifications`,
+and :ref:`administrator-configuration-eventing`.
 They should use separate topics/queues. These events are meant for external
 consumption, outside the Flyte platform.
 

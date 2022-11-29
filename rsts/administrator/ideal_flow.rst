@@ -1,4 +1,4 @@
-.. _ideal-flow:
+.. _administrator-long-term:
 
 Streamlining Your Flyte Workflows
 --------------------------------------

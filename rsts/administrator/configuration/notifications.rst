@@ -1,4 +1,4 @@
-.. _deployment-cluster-config-notifications:
+.. _administrator-configuration-notifications:
 
 Notifications
 -------------
