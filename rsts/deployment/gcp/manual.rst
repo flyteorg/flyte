@@ -281,6 +281,17 @@ There are multiple commands needed to achieve this. If you create it through the
     --region us-west1 \
     --num-nodes 6
 
+Create a GPU Node Pool in GKE
+=============================
+Flyte will use the default node pool created by the command above, but if need special hardware like a GPU, you will have to create a node pool that can create nodes with gpus attached.
+
+The first step is to install a DaemonSet that nodes will to install gpu drivers when initally provisioning the instance.
+
+.. code-block:: bash
+
+  kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+
 Create the GKE Context
 ======================
 Initialize your kubecontext to point to GKE cluster using the following command:
