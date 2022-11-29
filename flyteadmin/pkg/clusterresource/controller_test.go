@@ -2,10 +2,10 @@ package clusterresource
 
 import (
 	"context"
+	"crypto/md5" // #nosec
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -27,57 +27,23 @@ const domain = "domain-bar"
 
 var testScope = mockScope.NewTestScope()
 
-type mockFileInfo struct {
-	name    string
-	modTime time.Time
-}
-
-func (i *mockFileInfo) Name() string {
-	return i.name
-}
-
-func (i *mockFileInfo) Size() int64 {
-	return 0
-}
-
-func (i *mockFileInfo) Mode() os.FileMode {
-	return os.ModeExclusive
-}
-
-func (i *mockFileInfo) ModTime() time.Time {
-	return i.modTime
-}
-
-func (i *mockFileInfo) IsDir() bool {
-	return false
-}
-
-func (i *mockFileInfo) Sys() interface{} {
-	return nil
-}
-
 func TestTemplateAlreadyApplied(t *testing.T) {
 	const namespace = "namespace"
 	const fileName = "fileName"
-	var lastModifiedTime = time.Now()
 	testController := controller{
 		metrics: newMetrics(testScope),
 	}
-	mockFile := mockFileInfo{
-		name:    fileName,
-		modTime: lastModifiedTime,
-	}
-	assert.False(t, testController.templateAlreadyApplied(namespace, &mockFile))
+	checksum1 := md5.Sum([]byte("template1")) // #nosec
+	checksum2 := md5.Sum([]byte("template2")) // #nosec
+	assert.False(t, testController.templateAlreadyApplied(namespace, fileName, checksum1))
 
-	testController.appliedTemplates = make(map[string]map[string]time.Time)
-	testController.appliedTemplates[namespace] = make(map[string]time.Time)
-	assert.False(t, testController.templateAlreadyApplied(namespace, &mockFile))
+	testController.appliedTemplates = make(map[string]TemplateChecksums)
+	testController.setTemplateChecksum(namespace, fileName, checksum1)
+	assert.True(t, testController.templateAlreadyApplied(namespace, fileName, checksum1))
+	assert.False(t, testController.templateAlreadyApplied(namespace, fileName, checksum2))
 
-	testController.appliedTemplates[namespace][fileName] = lastModifiedTime.Add(-10 * time.Minute)
-	assert.False(t, testController.templateAlreadyApplied(namespace, &mockFile))
-
-	testController.appliedTemplates[namespace][fileName] = lastModifiedTime
-	assert.True(t, testController.templateAlreadyApplied(namespace, &mockFile))
+	testController.setTemplateChecksum(namespace, fileName, checksum2)
+	assert.True(t, testController.templateAlreadyApplied(namespace, fileName, checksum2))
 }
 
 func TestPopulateTemplateValues(t *testing.T) {
