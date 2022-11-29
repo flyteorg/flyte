@@ -3,6 +3,8 @@
 Monitoring
 ----------
 
+.. tags:: Infrastructure, Advanced
+
 .. tip:: The Flyte core team publishes and maintains Grafana dashboards built using Prometheus data sources, which can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`__.
 
 Metrics for Executions

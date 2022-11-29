@@ -4,6 +4,8 @@
 Timeline of a workflow execution
 ########################################
 
+.. tags:: Intermediate, Glossary
+
 The illustration below shows the timeline view of a workflow execution. 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/monitoring/flyte_wf_timeline.svg?sanitize=true

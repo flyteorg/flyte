@@ -4,6 +4,8 @@
 AWS
 ######
 
+.. tags:: AWS, Deployment, Advanced, Infrastructure
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2

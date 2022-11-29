@@ -4,11 +4,13 @@
 Optimizing Performance
 ######################################################
 
+.. tags:: Infrastructure, Kubernetes, Advanced
+
 .. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-cluster-config-monitoring`.
 
 The video below contains an overview of the Flyte architecture, what is meant by "performance", details of one loop in FlytePropeller, and a demo of the Grafana Labs dashboard.
 
-..  youtube:: FJ-rG9lZDhY 
+..  youtube:: FJ-rG9lZDhY
 
 Scaling up FlytePropeller
 ==========================

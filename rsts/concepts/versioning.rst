@@ -3,6 +3,8 @@
 Versions
 ========
 
+.. tags:: Basic, Glossary
+
 One of the most important features and reasons for certain design decisions in Flyte is the need for machine learning and data practitioners to experiment.
 When users experiment, they do so in isolation and try multiple iterations.
 Unlike traditional software, the users must conduct multiple experiments concurrently with different environments, algorithms, etc.

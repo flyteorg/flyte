@@ -108,6 +108,15 @@ Cluster Config
 
     ---
 
+    .. link-button:: deployment-cluster-config-cloud-event
+       :type: ref
+       :text: Cloud Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    How to set up Flyte to emit events to third-parties in CloudEvents format.
+
+    ---
+
     .. link-button:: deployment-cluster-config-monitoring
        :type: ref
        :text: Monitoring
@@ -123,16 +132,6 @@ Cluster Config
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Improve the performance of the core Flyte engine.
-
-    ---
-
-    .. link-button:: deployment-cluster-config-eventing
-       :type: ref
-       :text: Platform Events
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Configure Flyte to to send events to external pub/sub systems.
-
 
 .. toctree::
     :maxdepth: 1
@@ -152,3 +151,4 @@ Cluster Config
     notifications
     performance
     eventing
+    cloud_event

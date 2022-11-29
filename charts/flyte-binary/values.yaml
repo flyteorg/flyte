@@ -1,0 +1,38 @@
+networking:
+  host: true
+
+images:
+  flyte:
+    repository: ghcr.io/flyteorg/flyte-sandbox
+    tag: flytebinary_1007
+    pullPolicy: IfNotPresent
+  # Used for wait-for-db init container
+  postgres:
+    repository: postgres
+    tag: 15-alpine
+    pullPolicy: IfNotPresent
+
+storage:
+  metadataContainer: my-s3-bucket
+  userDataContainer: my-s3-bucket
+  type: minio
+  region: my-region
+
+database:
+  port: 5432
+  username: postgres
+  host: 127.0.0.1
+  dbname: flyteadmin
+  password: ""
+
+logger:
+  level: 1
+
+paths:
+  # Specify full path to Flyte binary config file here if being provided externally
+  externalFlyteConfig: ""
+
+# Need to add an aws section for IAM role annotation
+
+proxy:
+  enabled: false

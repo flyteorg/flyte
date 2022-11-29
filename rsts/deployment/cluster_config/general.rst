@@ -1,7 +1,9 @@
 .. _deployment-cluster-config-general:
 
 Configuring Custom K8s Resources
-----------------------------------
+--------------------------------
+
+.. tags:: Infrastructure, Kubernetes, Advanced
 
 ***************************
 Configurable Resource Types

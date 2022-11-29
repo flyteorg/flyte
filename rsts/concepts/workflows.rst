@@ -3,6 +3,8 @@
 Workflows
 =========
 
+.. tags:: Basic, Glossary
+
 A workflow is a directed acyclic graph (DAG) of units of work encapsulated by :ref:`nodes <divedeep-nodes>`.
 Specific instantiations of a workflow (commonly bound with input arguments) are referred to as **workflow executions**,
 or just executions. In other words, a workflow is a template for an ordered task execution.

@@ -1,0 +1,20 @@
+{{/*
+Create the config only if not mounted in externally
+*/}}
+{{- if eq .Values.paths.externalFlyteConfig "" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-backend-config
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
+data:
+  flyte.yaml: | {{ tpl (.Files.Get "_flyte_config.yaml") $ | nindent 4 }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-resource-templates
+  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
+data:
+{{ (.Files.Glob "cluster-resource-templates/*.yaml").AsConfig | indent 2 }}

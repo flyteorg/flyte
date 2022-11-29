@@ -1,7 +1,10 @@
 .. _concepts-schedules:
 
 Schedules
-==========
+=========
+
+.. tags:: Basic, Glossary
+
 Workflows can be run automatically using :ref:`schedules <cookbook:launchplan_schedules>` associated with launch plans.
 
 Only one launch plan version for a given {Project, Domain, Name} combination can be active, which means only one schedule can be active for a launch plan. This is because a single active schedule can exist across all versions of the launch plan. 
@@ -26,7 +29,7 @@ Cron expression strings use :ref:`this <cron_expression_table>` syntax. They are
 .. _rate_unit:
 
 Format
----------------
+------
 
 A cron expression represents a set of times, with the help of 5 space-separated fields.
 
@@ -50,13 +53,13 @@ A cron expression represents a set of times, with the help of 5 space-separated 
 
 
 Cron schedules
-----------------
+--------------
 An incorrect cron schedule expression leads to a failure in triggering the schedule. :ref:`Here <cron_expression_table>` is a table that shows the format of a cron expression.
 
 Below is another example:
 
 .. code-block:: default
-    
+
     cron_lp_every_min_of_hour = LaunchPlan.get_or_create(
     name="my_cron_scheduled_lp",
     workflow=date_formatter_wf,
@@ -66,7 +69,7 @@ Below is another example:
         schedule="@hourly", # Following schedule runs every hour at beginning of the hour
         kickoff_time_input_arg="kickoff_time",
     ),
-	
+
 	)
 
 

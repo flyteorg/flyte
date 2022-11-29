@@ -1,0 +1,6 @@
+
+
+Your Flyte binary installation should be run with this config:
+```yaml
+{{ tpl (.Files.Get "_flyte_config.yaml") $ }}
+```

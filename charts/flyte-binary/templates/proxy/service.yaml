@@ -1,0 +1,12 @@
+{{- if .Values.proxy.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy
+spec:
+  ports:
+    - name: http
+      port: 8000
+  selector:
+    app: proxy
+{{- end }}

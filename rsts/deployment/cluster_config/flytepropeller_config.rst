@@ -4,6 +4,8 @@
 Flyte Propeller Configuration
 #########################################
 
+.. tags:: Configuration, Advanced
+
 - `admin <#section-admin>`_
 
 - `catalog-cache <#section-catalog-cache>`_
@@ -3338,9 +3340,9 @@ config for a workflow node
 .. code-block:: yaml
 
   default-deadlines:
-    node-active-deadline: 48h0m0s
-    node-execution-deadline: 48h0m0s
-    workflow-active-deadline: 72h0m0s
+    node-active-deadline: 0s
+    node-execution-deadline: 0s
+    workflow-active-deadline: 0s
   interruptible-failure-threshold: 1
   max-node-retries-system-failures: 3
   
@@ -3907,9 +3909,9 @@ Default value for timeouts
 
 .. code-block:: yaml
 
-  node-active-deadline: 48h0m0s
-  node-execution-deadline: 48h0m0s
-  workflow-active-deadline: 72h0m0s
+  node-active-deadline: 0s
+  node-execution-deadline: 0s
+  workflow-active-deadline: 0s
   
 
 max-node-retries-system-failures (int64)
@@ -3948,7 +3950,7 @@ Default value of node execution timeout that includes the time spent to run the 
 
 .. code-block:: yaml
 
-  48h0m0s
+  0s
   
 
 node-active-deadline (`config.Duration`_)
@@ -3960,7 +3962,7 @@ Default value of node timeout that includes the time spent queued.
 
 .. code-block:: yaml
 
-  48h0m0s
+  0s
   
 
 workflow-active-deadline (`config.Duration`_)
@@ -3972,7 +3974,7 @@ Default value of workflow timeout that includes the time spent queued.
 
 .. code-block:: yaml
 
-  72h0m0s
+  0s
   
 
 config.Port

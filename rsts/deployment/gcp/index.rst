@@ -4,6 +4,8 @@
 GCP
 ######
 
+.. tags:: Infrastructure, GCP, Deployment, Advanced
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2

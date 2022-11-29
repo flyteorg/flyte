@@ -4,6 +4,8 @@
 Flyte Datacatalog Configuration
 #########################################
 
+.. tags:: Configuration, Advanced
+
 - `application <#section-application>`_
 
 - `database <#section-database>`_
@@ -63,6 +65,18 @@ Whether to run Catalog in secure mode or not
 .. code-block:: yaml
 
   "false"
+  
+
+readHeaderTimeoutSeconds (int)
+--------------------------------------------------------------------------------
+
+The amount of time allowed to read request headers.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "32"
   
 
 Section: database
@@ -181,7 +195,7 @@ maxOpenConnections sets the maximum number of open connections to the database.
 
 .. code-block:: yaml
 
-  "1000"
+  "100"
   
 
 connMaxLifeTime (`config.Duration`_)

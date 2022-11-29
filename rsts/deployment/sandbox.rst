@@ -4,6 +4,8 @@
 Sandbox Deployment
 ###################
 
+.. tags:: Deployment, Infrastructure, Design, Intermediate
+
 .. warning::
     The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
 
