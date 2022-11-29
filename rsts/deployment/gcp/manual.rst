@@ -283,13 +283,21 @@ There are multiple commands needed to achieve this. If you create it through the
 
 Create a GPU Node Pool in GKE
 =============================
-Flyte will use the default node pool created by the command above, but if need special hardware like a GPU, you will have to create a node pool that can create nodes with gpus attached.
+Flyte will use the default node pool created by the command above, but if there is need for special hardware like a GPU, you will have to create a node pool that can create nodes with gpus attached.
 
-The first step is to install a DaemonSet that nodes will to install gpu drivers when initally provisioning the instance.
+The first step is to install `this DaemonSet <https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#installing_drivers>`__ that nodes will use to install gpu drivers when initally provisioning the node instance.
 
 .. code-block:: bash
 
   kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+Next you will create the actual node pool. This can be done via the GKE dashboard.
+
+Go to your cluster and enter the cluster, <my-flyte-cluster>. At the top hit the "ADD NODE POOL" button. Since gpu machines can be expensive, it is wise to set the "Number of nodes (per zone)" field to 1. The node pool can be resized to 0 after the node pool creation but during the creation process there needs to be atleast 1. If you do resize the node pool to 0 after creation, then you should check the "Enable cluster autoscaler" box. 
+
+Next in the sidebar you can configure the instance template for the node pool. Select the GPU machine family and adjust the cpu and RAM according to your needs. Then you can hit create at the bottom to create the node pool. 
+
+After the creation of the node pool, you will notice that by default GKE will taint the node pool with nvidia.com/gpu=present. To configure flyte to be able to schedule pods to this node pool, you will have to follow `this <https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/configure_use_gpus.html#sphx-glr-auto-deployment-configure-use-gpus-py>`__.
 
 
 Create the GKE Context
