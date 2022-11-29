@@ -16,3 +16,5 @@ docs/build/
 tmp/
 .python-version
 __pycache__/
+
+venv/

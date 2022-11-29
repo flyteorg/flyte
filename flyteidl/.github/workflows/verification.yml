@@ -51,19 +51,20 @@ jobs:
       - name: Proto-Datacatalog-Go
         run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l go --go_source_relative --validate_out
 
+      # Python is going to be generated using buf
       # Python
-      - name: Proto-Service-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l python
-      - name: Proto-Admin-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l python
-      - name: Proto-Core-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l python
-      - name: Proto-Event-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l python
-      - name: Proto-Plugins-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l python
-      - name: Proto-Datacatalog-Python
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l python
+      # - name: Proto-Service-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l python
+      # - name: Proto-Admin-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l python
+      # - name: Proto-Core-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l python
+      # - name: Proto-Event-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l python
+      # - name: Proto-Plugins-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l python
+      # - name: Proto-Datacatalog-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l python
 
       # Cpp
       - name: Proto-Service-Cpp
@@ -98,10 +99,31 @@ jobs:
           name: generated
           path: ./gen
 
+  generate-protos-buf:
+    name: Generate python protos using buf
+    runs-on: ubuntu-latest
+    needs: [ generate-protos ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: bufbuild/buf-setup-action@v1
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - name: "Run buf generate"
+        run: buf generate
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated-buf
+          path: ./gen
+
   generate-admin-swagger-code:
     runs-on: ubuntu-latest
     name: Generate Admin Swagger Code
-    needs: [ generate-protos ]
+    needs:
+      - generate-protos
+      - generate-protos-buf
     container:
       image: lyft/protocgenerator:8167e11d3b3439373c2f033080a4b550078884a2
       options: --cpus 1
@@ -115,6 +137,10 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: generated
+          path: ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated-buf
           path: ./gen
       - run: ls gen/pb-go/flyteidl/service/
       - run: cp -R gen/pb-go/flyteidl/service/ ../
