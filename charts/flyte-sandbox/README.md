@@ -35,7 +35,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.images.postgres.pullPolicy | string | `"Never"` |  |
 | flyte-binary.images.postgres.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.images.postgres.tag | string | `"sandbox"` |  |
-| flyte-binary.logger.level | int | `1` |  |
+| flyte-binary.logger.level | int | `6` |  |
 | flyte-binary.networking.host | bool | `true` |  |
 | flyte-binary.storage.region | string | `"my-region"` |  |
 | flyte-binary.storage.type | string | `"minio"` |  |
