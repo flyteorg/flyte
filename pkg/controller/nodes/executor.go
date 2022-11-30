@@ -264,14 +264,16 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 	}
 
 	deckFile := storage.DataReference(recovered.Closure.GetDeckUri())
-	metadata, err := nCtx.DataStore().Head(ctx, deckFile)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to check the existence of deck file. Error: %v", err)
-		return handler.PhaseInfoUndefined, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to check the existence of deck file.")
-	}
+	if len(deckFile) > 0 {
+		metadata, err := nCtx.DataStore().Head(ctx, deckFile)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to check the existence of deck file. Error: %v", err)
+			return handler.PhaseInfoUndefined, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to check the existence of deck file.")
+		}
 
-	if metadata.Exists() {
-		oi.DeckURI = &deckFile
+		if metadata.Exists() {
+			oi.DeckURI = &deckFile
+		}
 	}
 
 	if err := c.store.WriteProtobuf(ctx, outputFile, so, outputs); err != nil {
