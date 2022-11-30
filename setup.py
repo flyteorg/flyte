@@ -11,6 +11,10 @@ setup(
     maintainer_email='admin@flyte.org',
     packages=find_packages('gen/pb_python'),
     package_dir={'': 'gen/pb_python'},
+    # https://github.com/pypa/setuptools/issues/3136 describes an extension to
+    # setuptools that would involve a simpler way to specify this, but while
+    # that does not happen we have to package the pyi files manually like so:
+    package_data={'flyteidl': ["*.pyi", "**/*.pyi"]},
     dependency_links=[],
     install_requires=[
         'googleapis-common-protos',
