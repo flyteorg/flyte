@@ -113,6 +113,8 @@ jobs:
         run: rm -rf ./gen
       - name: "Run buf generate"
         run: buf generate
+      - name: "Include __init__.py files"
+        run: find gen/pb_python -type d -exec touch {}/__init__.py \;
       - uses: actions/upload-artifact@master
         with:
           name: generated-buf
