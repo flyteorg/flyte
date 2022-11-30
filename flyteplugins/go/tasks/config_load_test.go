@@ -4,18 +4,16 @@ import (
 	"context"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	sagemakerConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
-
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	sagemakerConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -26,7 +24,6 @@ func TestLoadConfig(t *testing.T) {
 
 	err := configAccessor.UpdateConfig(context.TODO())
 	assert.NoError(t, err)
-
 	t.Run("k8s-config-test", func(t *testing.T) {
 
 		k8sConfig := flyteK8sConfig.GetK8sPluginConfig()
@@ -125,5 +122,29 @@ func TestLoadConfig(t *testing.T) {
 
 	t.Run("sagemaker-config-test", func(t *testing.T) {
 		assert.NotNil(t, sagemakerConfig.GetSagemakerConfig())
+	})
+}
+
+func TestLoadIncorrectConfig(t *testing.T) {
+	t.Run("logs-config-test-accept-bad-config", func(t *testing.T) {
+		configAccessor := viper.NewAccessor(config.Options{
+			StrictMode:  false,
+			SearchPaths: []string{"testdata/incorrect-config.yaml"},
+		})
+
+		err := configAccessor.UpdateConfig(context.TODO())
+		assert.NoError(t, err)
+		assert.NotNil(t, logs.GetLogConfig())
+		assert.True(t, logs.GetLogConfig().IsKubernetesEnabled)
+	})
+
+	t.Run("logs-config-test-failfast", func(t *testing.T) {
+		configAccessor := viper.NewAccessor(config.Options{
+			StrictMode:  true,
+			SearchPaths: []string{"testdata/incorrect-config.yaml"},
+		})
+
+		err := configAccessor.UpdateConfig(context.TODO())
+		assert.Error(t, err)
 	})
 }
