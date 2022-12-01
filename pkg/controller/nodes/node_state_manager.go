@@ -15,6 +15,7 @@ type nodeStateManager struct {
 	b          *handler.BranchNodeState
 	d          *handler.DynamicNodeState
 	w          *handler.WorkflowNodeState
+	g          *handler.GateNodeState
 }
 
 func (n *nodeStateManager) PutTaskNodeState(s handler.TaskNodeState) error {
@@ -34,6 +35,11 @@ func (n *nodeStateManager) PutDynamicNodeState(s handler.DynamicNodeState) error
 
 func (n *nodeStateManager) PutWorkflowNodeState(s handler.WorkflowNodeState) error {
 	n.w = &s
+	return nil
+}
+
+func (n *nodeStateManager) PutGateNodeState(s handler.GateNodeState) error {
+	n.g = &s
 	return nil
 }
 
@@ -85,11 +91,21 @@ func (n nodeStateManager) GetWorkflowNodeState() handler.WorkflowNodeState {
 	return ws
 }
 
+func (n nodeStateManager) GetGateNodeState() handler.GateNodeState {
+	gn := n.nodeStatus.GetGateNodeStatus()
+	gs := handler.GateNodeState{}
+	if gn != nil {
+		gs.Phase = gn.GetGateNodePhase()
+	}
+	return gs
+}
+
 func (n *nodeStateManager) clearNodeStatus() {
 	n.t = nil
 	n.b = nil
 	n.d = nil
 	n.w = nil
+	n.g = nil
 	n.nodeStatus.ClearLastAttemptStartedAt()
 }
 

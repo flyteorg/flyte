@@ -196,7 +196,7 @@ func (in *Inputs) UnmarshalJSON(b []byte) error {
 }
 
 func (in *Inputs) MarshalJSON() ([]byte, error) {
-	if in == nil {
+	if in == nil || in.LiteralMap == nil {
 		return nilJSON, nil
 	}
 

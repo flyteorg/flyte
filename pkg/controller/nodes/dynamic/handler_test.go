@@ -55,6 +55,10 @@ func (t *dynamicNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState)
 	return nil
 }
 
+func (t dynamicNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+	panic("not implemented")
+}
+
 var tID = "task-1"
 
 var eventConfig = &config.EventConfig{

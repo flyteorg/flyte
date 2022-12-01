@@ -254,4 +254,10 @@ func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n *nodeStateMa
 		t.SetWorkflowNodePhase(n.w.Phase)
 		t.SetExecutionError(n.w.Error)
 	}
+
+	// Update gate node status
+	if n.g != nil {
+		t := s.GetOrCreateGateNodeStatus()
+		t.SetGateNodePhase(n.g.Phase)
+	}
 }

@@ -153,6 +153,40 @@ func (_m *ExecutableNode) GetExecutionDeadline() *time.Duration {
 	return r0
 }
 
+type ExecutableNode_GetGateNode struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetGateNode) Return(_a0 v1alpha1.ExecutableGateNode) *ExecutableNode_GetGateNode {
+	return &ExecutableNode_GetGateNode{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetGateNode() *ExecutableNode_GetGateNode {
+	c_call := _m.On("GetGateNode")
+	return &ExecutableNode_GetGateNode{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetGateNodeMatch(matchers ...interface{}) *ExecutableNode_GetGateNode {
+	c_call := _m.On("GetGateNode", matchers...)
+	return &ExecutableNode_GetGateNode{Call: c_call}
+}
+
+// GetGateNode provides a mock function with given fields:
+func (_m *ExecutableNode) GetGateNode() v1alpha1.ExecutableGateNode {
+	ret := _m.Called()
+
+	var r0 v1alpha1.ExecutableGateNode
+	if rf, ok := ret.Get(0).(func() v1alpha1.ExecutableGateNode); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.ExecutableGateNode)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetID struct {
 	*mock.Call
 }

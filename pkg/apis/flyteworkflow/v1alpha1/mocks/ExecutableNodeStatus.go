@@ -25,6 +25,11 @@ func (_m *ExecutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
 }
 
+// ClearGateNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) ClearGateNodeStatus() {
+	_m.Called()
+}
+
 // ClearLastAttemptStartedAt provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearLastAttemptStartedAt() {
 	_m.Called()
@@ -205,6 +210,40 @@ func (_m *ExecutableNodeStatus) GetExecutionError() *core.ExecutionError {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*core.ExecutionError)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_GetGateNodeStatus struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetGateNodeStatus) Return(_a0 v1alpha1.MutableGateNodeStatus) *ExecutableNodeStatus_GetGateNodeStatus {
+	return &ExecutableNodeStatus_GetGateNodeStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetGateNodeStatus() *ExecutableNodeStatus_GetGateNodeStatus {
+	c_call := _m.On("GetGateNodeStatus")
+	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetGateNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetGateNodeStatus {
+	c_call := _m.On("GetGateNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c_call}
+}
+
+// GetGateNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetGateNodeStatus() v1alpha1.MutableGateNodeStatus {
+	ret := _m.Called()
+
+	var r0 v1alpha1.MutableGateNodeStatus
+	if rf, ok := ret.Get(0).(func() v1alpha1.MutableGateNodeStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.MutableGateNodeStatus)
 		}
 	}
 
@@ -407,6 +446,40 @@ func (_m *ExecutableNodeStatus) GetOrCreateDynamicNodeStatus() v1alpha1.MutableD
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.MutableDynamicNodeStatus)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_GetOrCreateGateNodeStatus struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetOrCreateGateNodeStatus) Return(_a0 v1alpha1.MutableGateNodeStatus) *ExecutableNodeStatus_GetOrCreateGateNodeStatus {
+	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOrCreateGateNodeStatus() *ExecutableNodeStatus_GetOrCreateGateNodeStatus {
+	c_call := _m.On("GetOrCreateGateNodeStatus")
+	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOrCreateGateNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateGateNodeStatus {
+	c_call := _m.On("GetOrCreateGateNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
+}
+
+// GetOrCreateGateNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetOrCreateGateNodeStatus() v1alpha1.MutableGateNodeStatus {
+	ret := _m.Called()
+
+	var r0 v1alpha1.MutableGateNodeStatus
+	if rf, ok := ret.Get(0).(func() v1alpha1.MutableGateNodeStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.MutableGateNodeStatus)
 		}
 	}
 

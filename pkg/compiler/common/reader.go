@@ -40,6 +40,7 @@ type Node interface {
 	GetMetadata() *core.NodeMetadata
 	GetTask() Task
 	GetSubWorkflow() Workflow
+	GetGateNode() *core.GateNode
 }
 
 // An immutable task that represents the final output of the compiler.

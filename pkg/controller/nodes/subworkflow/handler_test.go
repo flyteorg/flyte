@@ -56,6 +56,10 @@ func (t workflowNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState)
 	panic("not implemented")
 }
 
+func (t workflowNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+	panic("not implemented")
+}
+
 var wfExecID = &core.WorkflowExecutionIdentifier{
 	Project: "project",
 	Domain:  "domain",
