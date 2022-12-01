@@ -4,8 +4,8 @@ import (
 	"context"
 
 	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/storage"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
@@ -34,19 +34,32 @@ func createSubJobList(count int) []*Job {
 	return res
 }
 
-func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata, outputPrefix, baseOutputSandbox storage.DataReference, jobStore *JobStore,
-	dataStore *storage.DataStore, cfg *config.Config, currentState *State, metrics ExecutorMetrics) (newState *State, err error) {
+func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, jobStore *JobStore,
+	cfg *config.Config, currentState *State, metrics ExecutorMetrics) (newState *State, err error) {
 	newState = currentState
 	parentState := currentState.State
-	jobName := taskMeta.GetTaskExecutionID().GetGeneratedName()
+	jobName := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	job := jobStore.Get(jobName)
+	outputPrefix := tCtx.OutputWriter().GetOutputPrefixPath()
+	baseOutputSandbox := tCtx.OutputWriter().GetRawOutputPrefix()
+	dataStore := tCtx.DataStore()
+	// Check that the taskTemplate is valid
+	var taskTemplate *core2.TaskTemplate
+	taskTemplate, err = tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read task template")
+	} else if taskTemplate == nil {
+		return nil, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+	}
+	retry := toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries)
+
 	// If job isn't currently being monitored (recovering from a restart?), add it to the sync-cache and return
 	if job == nil {
 		logger.Info(ctx, "Job not found in cache, adding it. [%v]", jobName)
 
 		_, err = jobStore.GetOrCreate(jobName, &Job{
 			ID:             *currentState.ExternalJobID,
-			OwnerReference: taskMeta.GetOwnerID(),
+			OwnerReference: tCtx.TaskExecutionMetadata().GetOwnerID(),
 			SubJobs:        createSubJobList(currentState.GetExecutionArraySize()),
 		})
 
@@ -107,6 +120,10 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 				}
 			} else {
 				msg.Collect(childIdx, "Job failed")
+			}
+
+			if subJob.Status.Phase == core.PhaseRetryableFailure && *retry.Attempts == int64(len(subJob.Attempts)) {
+				actualPhase = core.PhasePermanentFailure
 			}
 		} else if subJob.Status.Phase.IsSuccess() {
 			actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, baseOutputSandbox, childIdx, originalIdx)
