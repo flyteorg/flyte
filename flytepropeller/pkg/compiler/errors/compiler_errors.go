@@ -90,6 +90,9 @@ const (
 
 	// Given value cannot be assigned to any union variant in a binding
 	IncompatibleBindingUnionValue ErrorCode = "IncompatibleBindingUnionValue"
+
+	// A gate node is missing a condition.
+	NoConditionFound ErrorCode = "NoConditionFound"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -312,6 +315,14 @@ func NewIncompatibleBindingUnionValue(nodeID, sinkParam, expectedType, binding s
 		fmt.Sprintf(
 			"Input [%v] on node [%v] expects bindings of union type [%v].  Received [%v] which does not match any of the variants.",
 			sinkParam, nodeID, expectedType, binding),
+		nodeID,
+	)
+}
+
+func NewNoConditionFound(nodeID string) *CompileError {
+	return newError(
+		NoConditionFound,
+		fmt.Sprintf("Can't find any condition in gate node [%v].", nodeID),
 		nodeID,
 	)
 }

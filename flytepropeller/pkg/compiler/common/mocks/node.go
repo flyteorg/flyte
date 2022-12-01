@@ -82,6 +82,40 @@ func (_m *Node) GetCoreNode() *core.Node {
 	return r0
 }
 
+type Node_GetGateNode struct {
+	*mock.Call
+}
+
+func (_m Node_GetGateNode) Return(_a0 *core.GateNode) *Node_GetGateNode {
+	return &Node_GetGateNode{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Node) OnGetGateNode() *Node_GetGateNode {
+	c_call := _m.On("GetGateNode")
+	return &Node_GetGateNode{Call: c_call}
+}
+
+func (_m *Node) OnGetGateNodeMatch(matchers ...interface{}) *Node_GetGateNode {
+	c_call := _m.On("GetGateNode", matchers...)
+	return &Node_GetGateNode{Call: c_call}
+}
+
+// GetGateNode provides a mock function with given fields:
+func (_m *Node) GetGateNode() *core.GateNode {
+	ret := _m.Called()
+
+	var r0 *core.GateNode
+	if rf, ok := ret.Get(0).(func() *core.GateNode); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.GateNode)
+		}
+	}
+
+	return r0
+}
+
 type Node_GetId struct {
 	*mock.Call
 }

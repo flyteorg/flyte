@@ -118,6 +118,36 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 		}
 	case *core.Node_BranchNode:
 		iface, _ = validateBranchInterface(w, node, errs.NewScope())
+	case *core.Node_GateNode:
+		gateNode := node.GetGateNode()
+		if approve := gateNode.GetApprove(); approve != nil {
+			iface = &core.TypedInterface{
+				Inputs:  &core.VariableMap{Variables: map[string]*core.Variable{}},
+				Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+			}
+		} else if signal := gateNode.GetSignal(); signal != nil {
+			if signal.GetType() == nil {
+				errs.Collect(errors.NewValueRequiredErr(node.GetId(), "GateNode.Signal.Type"))
+			} else if len(signal.GetOutputVariableName()) == 0 {
+				errs.Collect(errors.NewValueRequiredErr(node.GetId(), "GateNode.Signal.OutputVariableName"))
+			} else {
+				iface = &core.TypedInterface{
+					Inputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+					Outputs: &core.VariableMap{Variables: map[string]*core.Variable{
+						signal.GetOutputVariableName(): &core.Variable{
+							Type: signal.GetType(),
+						},
+					}},
+				}
+			}
+		} else if sleep := gateNode.GetSleep(); sleep != nil {
+			iface = &core.TypedInterface{
+				Inputs:  &core.VariableMap{Variables: map[string]*core.Variable{}},
+				Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+			}
+		} else {
+			errs.Collect(errors.NewNoConditionFound(node.GetId()))
+		}
 	default:
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Target"))
 	}

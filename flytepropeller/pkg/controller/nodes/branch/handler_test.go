@@ -54,6 +54,10 @@ func (t branchNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) e
 	panic("not implemented")
 }
 
+func (t branchNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+	panic("not implemented")
+}
+
 type parentInfo struct {
 }
 

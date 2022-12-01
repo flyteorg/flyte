@@ -76,6 +76,38 @@ func (_m *NodeStateReader) GetDynamicNodeState() handler.DynamicNodeState {
 	return r0
 }
 
+type NodeStateReader_GetGateNodeState struct {
+	*mock.Call
+}
+
+func (_m NodeStateReader_GetGateNodeState) Return(_a0 handler.GateNodeState) *NodeStateReader_GetGateNodeState {
+	return &NodeStateReader_GetGateNodeState{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeStateReader) OnGetGateNodeState() *NodeStateReader_GetGateNodeState {
+	c_call := _m.On("GetGateNodeState")
+	return &NodeStateReader_GetGateNodeState{Call: c_call}
+}
+
+func (_m *NodeStateReader) OnGetGateNodeStateMatch(matchers ...interface{}) *NodeStateReader_GetGateNodeState {
+	c_call := _m.On("GetGateNodeState", matchers...)
+	return &NodeStateReader_GetGateNodeState{Call: c_call}
+}
+
+// GetGateNodeState provides a mock function with given fields:
+func (_m *NodeStateReader) GetGateNodeState() handler.GateNodeState {
+	ret := _m.Called()
+
+	var r0 handler.GateNodeState
+	if rf, ok := ret.Get(0).(func() handler.GateNodeState); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(handler.GateNodeState)
+	}
+
+	return r0
+}
+
 type NodeStateReader_GetTaskNodeState struct {
 	*mock.Call
 }
