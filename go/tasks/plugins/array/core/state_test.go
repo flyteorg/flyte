@@ -334,6 +334,22 @@ func TestSummaryToPhase(t *testing.T) {
 				core.PhaseSuccess: 10,
 			},
 		},
+		{
+			"FailedToRetry",
+			PhaseWriteToDiscoveryThenFail,
+			map[core.Phase]int64{
+				core.PhaseSuccess:          5,
+				core.PhasePermanentFailure: 5,
+			},
+		},
+		{
+			"Retrying",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:          5,
+				core.PhaseRetryableFailure: 5,
+			},
+		},
 	}
 
 	for _, tt := range tests {
