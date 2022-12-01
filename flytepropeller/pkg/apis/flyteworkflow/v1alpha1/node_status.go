@@ -184,6 +184,29 @@ func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
 	}
 }
 
+type GateNodePhase int
+
+const (
+	GateNodePhaseUndefined GateNodePhase = iota
+	GateNodePhaseExecuting
+)
+
+type GateNodeStatus struct {
+	MutableStruct
+	Phase GateNodePhase `json:"phase,omitempty"`
+}
+
+func (in *GateNodeStatus) GetGateNodePhase() GateNodePhase {
+	return in.Phase
+}
+
+func (in *GateNodeStatus) SetGateNodePhase(phase GateNodePhase) {
+	if in.Phase != phase {
+		in.SetDirty()
+		in.Phase = phase
+	}
+}
+
 type NodeStatus struct {
 	MutableStruct
 	Phase                NodePhase     `json:"phase,omitempty"`
@@ -211,6 +234,7 @@ type NodeStatus struct {
 
 	TaskNodeStatus    *TaskNodeStatus    `json:",omitempty"`
 	DynamicNodeStatus *DynamicNodeStatus `json:"dynamicNodeStatus,omitempty"`
+	GateNodeStatus    *GateNodeStatus    `json:"gateNodeStatus,omitempty"`
 	// In case of Failing/Failed Phase, an execution error can be optionally associated with the Node
 	Error *ExecutionError `json:"error,omitempty"`
 
@@ -284,6 +308,13 @@ func (in *NodeStatus) GetTaskStatus() MutableTaskNodeStatus {
 	return in.TaskNodeStatus
 }
 
+func (in *NodeStatus) GetGateNodeStatus() MutableGateNodeStatus {
+	if in.GateNodeStatus == nil {
+		return nil
+	}
+	return in.GateNodeStatus
+}
+
 func (in NodeStatus) VisitNodeStatuses(visitor NodeStatusVisitFn) {
 	for n, s := range in.SubNodeStatus {
 		visitor(n, s)
@@ -314,6 +345,11 @@ func (in *NodeStatus) ClearLastAttemptStartedAt() {
 
 func (in *NodeStatus) ClearSubNodeStatus() {
 	in.SubNodeStatus = nil
+	in.SetDirty()
+}
+
+func (in *NodeStatus) ClearGateNodeStatus() {
+	in.GateNodeStatus = nil
 	in.SetDirty()
 }
 
@@ -410,6 +446,17 @@ func (in *NodeStatus) GetOrCreateTaskStatus() MutableTaskNodeStatus {
 	}
 
 	return in.TaskNodeStatus
+}
+
+func (in *NodeStatus) GetOrCreateGateNodeStatus() MutableGateNodeStatus {
+	if in.GateNodeStatus == nil {
+		in.SetDirty()
+		in.GateNodeStatus = &GateNodeStatus{
+			MutableStruct: MutableStruct{},
+		}
+	}
+
+	return in.GateNodeStatus
 }
 
 func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, err *core.ExecutionError) {

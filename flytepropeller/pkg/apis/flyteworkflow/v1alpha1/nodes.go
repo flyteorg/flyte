@@ -100,6 +100,7 @@ type NodeSpec struct {
 	BranchNode    *BranchNodeSpec               `json:"branch,omitempty"`
 	TaskRef       *TaskID                       `json:"task,omitempty"`
 	WorkflowNode  *WorkflowNodeSpec             `json:"workflow,omitempty"`
+	GateNode      *GateNodeSpec                 `json:"gate,omitempty"`
 	InputBindings []*Binding                    `json:"inputBindings,omitempty"`
 	Config        *typesv1.ConfigMap            `json:"config,omitempty"`
 	RetryStrategy *RetryStrategy                `json:"retry,omitempty"`
@@ -196,6 +197,13 @@ func (in *NodeSpec) GetBranchNode() ExecutableBranchNode {
 		return nil
 	}
 	return in.BranchNode
+}
+
+func (in *NodeSpec) GetGateNode() ExecutableGateNode {
+	if in.GateNode == nil {
+		return nil
+	}
+	return in.GateNode
 }
 
 func (in *NodeSpec) GetTaskID() *TaskID {

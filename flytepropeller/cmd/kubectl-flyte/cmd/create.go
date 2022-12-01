@@ -14,6 +14,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	compilerErrors "github.com/flyteorg/flytepropeller/pkg/compiler/errors"
@@ -200,6 +201,9 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 	if err != nil {
 		return err
 	}
+	flyteWf.ExecutionID = v1alpha1.WorkflowExecutionIdentifier{
+		WorkflowExecutionIdentifier: executionID,
+	}
 	if flyteWf.Annotations == nil {
 		flyteWf.Annotations = *c.annotations.value
 	} else {
@@ -209,7 +213,7 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 	}
 
 	if c.dryRun {
-		fmt.Printf("Dry Run mode enabled. Printing the compiled workflow.")
+		fmt.Printf("Dry Run mode enabled. Printing the compiled workflow.\n")
 		j, err := json.Marshal(flyteWf)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to marshal final workflow to Propeller format.")

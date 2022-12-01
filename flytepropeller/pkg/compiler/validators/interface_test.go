@@ -2,14 +2,19 @@ package validators
 
 import (
 	"testing"
+	"time"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestValidateInterface(t *testing.T) {
@@ -272,6 +277,98 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 			}
 
 			errs = errors.NewCompileErrors()
+			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, iface, ifaceOk, errs)
+		})
+	})
+
+	t.Run("GateNode", func(t *testing.T) {
+		t.Run("Approve", func(t *testing.T) {
+			wfBuilder := mocks.WorkflowBuilder{}
+
+			gateNode := &core.GateNode{
+				Condition: &core.GateNode_Approve{
+					Approve: &core.ApproveCondition{
+						SignalId: "foo",
+					},
+				},
+			}
+
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetCoreNode").Return(&core.Node{
+				Target: &core.Node_GateNode{
+					GateNode: gateNode,
+				},
+			})
+			nodeBuilder.OnGetInterface().Return(nil)
+
+			nodeBuilder.On("GetGateNode").Return(gateNode)
+			nodeBuilder.On("GetId").Return("node_1")
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+			errs := errors.NewCompileErrors()
+			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, iface, ifaceOk, errs)
+		})
+
+		t.Run("Signal", func(t *testing.T) {
+			wfBuilder := mocks.WorkflowBuilder{}
+
+			gateNode := &core.GateNode{
+				Condition: &core.GateNode_Signal{
+					Signal: &core.SignalCondition{
+						SignalId: "foo",
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_BOOLEAN,
+							},
+						},
+						OutputVariableName: "foo",
+					},
+				},
+			}
+
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetCoreNode").Return(&core.Node{
+				Target: &core.Node_GateNode{
+					GateNode: gateNode,
+				},
+			})
+			nodeBuilder.OnGetInterface().Return(nil)
+
+			nodeBuilder.On("GetGateNode").Return(gateNode)
+			nodeBuilder.On("GetId").Return("node_1")
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+			errs := errors.NewCompileErrors()
+			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, iface, ifaceOk, errs)
+		})
+
+		t.Run("Sleep", func(t *testing.T) {
+			wfBuilder := mocks.WorkflowBuilder{}
+
+			gateNode := &core.GateNode{
+				Condition: &core.GateNode_Sleep{
+					Sleep: &core.SleepCondition{
+						Duration: durationpb.New(time.Minute),
+					},
+				},
+			}
+
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetCoreNode").Return(&core.Node{
+				Target: &core.Node_GateNode{
+					GateNode: gateNode,
+				},
+			})
+			nodeBuilder.OnGetInterface().Return(nil)
+
+			nodeBuilder.On("GetGateNode").Return(gateNode)
+			nodeBuilder.On("GetId").Return("node_1")
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+			errs := errors.NewCompileErrors()
 			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
 			assertNonEmptyInterface(t, iface, ifaceOk, errs)
 		})

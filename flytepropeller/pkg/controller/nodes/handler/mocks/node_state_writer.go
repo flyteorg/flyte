@@ -76,6 +76,38 @@ func (_m *NodeStateWriter) PutDynamicNodeState(s handler.DynamicNodeState) error
 	return r0
 }
 
+type NodeStateWriter_PutGateNodeState struct {
+	*mock.Call
+}
+
+func (_m NodeStateWriter_PutGateNodeState) Return(_a0 error) *NodeStateWriter_PutGateNodeState {
+	return &NodeStateWriter_PutGateNodeState{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeStateWriter) OnPutGateNodeState(s handler.GateNodeState) *NodeStateWriter_PutGateNodeState {
+	c_call := _m.On("PutGateNodeState", s)
+	return &NodeStateWriter_PutGateNodeState{Call: c_call}
+}
+
+func (_m *NodeStateWriter) OnPutGateNodeStateMatch(matchers ...interface{}) *NodeStateWriter_PutGateNodeState {
+	c_call := _m.On("PutGateNodeState", matchers...)
+	return &NodeStateWriter_PutGateNodeState{Call: c_call}
+}
+
+// PutGateNodeState provides a mock function with given fields: s
+func (_m *NodeStateWriter) PutGateNodeState(s handler.GateNodeState) error {
+	ret := _m.Called(s)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(handler.GateNodeState) error); ok {
+		r0 = rf(s)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type NodeStateWriter_PutTaskNodeState struct {
 	*mock.Call
 }

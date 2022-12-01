@@ -380,6 +380,10 @@ func (t taskNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) err
 	panic("not implemented")
 }
 
+func (t taskNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+	panic("not implemented")
+}
+
 func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) resourcemanager.BaseResourceManager {
 	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(ctx, rmConfig.TypeNoop, scope)
 	rm, _ := rmBuilder.BuildResourceManager(ctx)
