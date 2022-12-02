@@ -24,6 +24,7 @@ const (
 	RoutineLabelKey    Key = "routine"
 	LaunchPlanIDKey    Key = "lp"
 	ResourceVersionKey Key = "res_ver"
+	SignalIDKey        Key = "signal"
 )
 
 func (k Key) String() string {
@@ -124,6 +125,11 @@ func WithTaskID(ctx context.Context, taskID string) context.Context {
 // Gets a new context with TaskType set.
 func WithTaskType(ctx context.Context, taskType string) context.Context {
 	return context.WithValue(ctx, TaskTypeKey, taskType)
+}
+
+// Gets a new context with SignalID set.
+func WithSignalID(ctx context.Context, signalID string) context.Context {
+	return context.WithValue(ctx, SignalIDKey, signalID)
 }
 
 // Gets a new context with Go Routine label key set and a label assigned to the context using pprof.Labels.
