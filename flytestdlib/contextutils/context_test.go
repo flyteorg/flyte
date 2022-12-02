@@ -102,6 +102,13 @@ func TestWithTaskID(t *testing.T) {
 	assert.Equal(t, "task", ctx.Value(TaskIDKey))
 }
 
+func TestWithSignalID(t *testing.T) {
+	ctx := context.Background()
+	assert.Nil(t, ctx.Value(SignalIDKey))
+	ctx = WithSignalID(ctx, "signal")
+	assert.Equal(t, "signal", ctx.Value(SignalIDKey))
+}
+
 func TestGetFields(t *testing.T) {
 	ctx := context.Background()
 	ctx = WithJobID(WithNamespace(ctx, "ns123"), "job123")
