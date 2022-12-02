@@ -1,0 +1,16 @@
+version: v1
+managed:
+  enabled: true
+  optimize_for: CODE_SIZE
+  go_package_prefix:
+    default: github.com/flyteorg/flyte/gen/pb-go
+plugins:
+  - plugin: buf.build/protocolbuffers/go
+    out: gen/pb-go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc/go
+    out: gen/pb-go
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
