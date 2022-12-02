@@ -10,7 +10,7 @@ import "flyteidl/core/literals.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/event";
 
 message WorkflowExecutionEvent {
   // Workflow execution id

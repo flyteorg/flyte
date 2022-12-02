@@ -12,7 +12,7 @@ import "flyteidl/core/security.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 // to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to

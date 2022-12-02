@@ -8,7 +8,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/workflow.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // Represents a request structure to create a revision of a workflow.
 // See :ref:`ref_flyteidl.admin.Workflow` for more details

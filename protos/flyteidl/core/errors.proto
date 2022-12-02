@@ -4,7 +4,7 @@ package flyteidl.core;
 
 import "flyteidl/core/execution.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Error message to propagate detailed errors from container executions to the execution
 // engine.

@@ -5,7 +5,7 @@ package flyteidl.plugins;
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/plugins";
 
 // Represents an Execution that was launched and could be waited on.
 message Waitable {

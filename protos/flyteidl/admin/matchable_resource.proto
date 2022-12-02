@@ -8,7 +8,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 // based on matching tags.

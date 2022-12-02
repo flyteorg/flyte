@@ -4,7 +4,7 @@ package flyteidl.core;
 
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Define a set of simple types.
 enum SimpleType {

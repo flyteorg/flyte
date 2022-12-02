@@ -4,7 +4,7 @@ package flyteidl.admin;
 
 import "flyteidl/admin/matchable_resource.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // Defines a set of custom matching attributes at the project level.
 // For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`

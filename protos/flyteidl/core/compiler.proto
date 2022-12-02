@@ -5,7 +5,7 @@ package flyteidl.core;
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/workflow.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 // step uses this created ConnectionSet

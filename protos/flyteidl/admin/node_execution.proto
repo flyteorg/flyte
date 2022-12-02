@@ -11,7 +11,7 @@ import "flyteidl/core/literals.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // A message used to fetch a single node execution entity.
 // See :ref:`ref_flyteidl.admin.NodeExecution` for more details

@@ -3,7 +3,11 @@ name: Publish Buf Package
 on:
   release:
     types: [created]
-
+  push:
+    branches:
+      - main
+    paths:
+      - protos
 jobs:
   buf:
     runs-on: ubuntu-latest

@@ -12,7 +12,7 @@ import "flyteidl/core/tasks.proto";
 import "flyteidl/core/types.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Defines a condition and the execution unit that should be executed if the condition is satisfied.
 message IfBlock {

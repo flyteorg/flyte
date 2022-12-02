@@ -4,7 +4,7 @@ package flyteidl.core;
 
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Indicates various phases of Workflow Execution
 message WorkflowExecution {

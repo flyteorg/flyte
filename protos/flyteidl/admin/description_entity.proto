@@ -5,7 +5,7 @@ package flyteidl.admin;
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/identifier.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // DescriptionEntity contains detailed description for the task/workflow.
 // Documentation could provide insight into the algorithms, business use case, etc.

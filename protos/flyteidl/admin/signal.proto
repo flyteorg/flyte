@@ -7,7 +7,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/types.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/admin";
 
 // SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
 // See :ref:`ref_flyteidl.admin.Signal` for more details

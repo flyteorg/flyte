@@ -4,7 +4,7 @@ package flyteidl.core;
 
 import "flyteidl/core/literals.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/core";
 
 // Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
 // Each expression results in a boolean result.

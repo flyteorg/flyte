@@ -5,7 +5,7 @@ package flyteidl.plugins.sagemaker;
 import "flyteidl/plugins/sagemaker/parameter_ranges.proto";
 import "flyteidl/plugins/sagemaker/training_job.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/plugins";
 
 // A pass-through for SageMaker's hyperparameter tuning job
 message HyperparameterTuningJob {

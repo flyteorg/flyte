@@ -6,7 +6,7 @@ import "flyteidl/core/literals.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/datacatalog";
 
 /*
    * Data Catalog service definition

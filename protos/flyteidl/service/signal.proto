@@ -5,7 +5,7 @@ import "flyteidl/admin/signal.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+option go_package = "github.com/flyteorg/flyte/gen/pb-go/flyteidl/service";
 
 // SignalService defines an RPC Service that may create, update, and retrieve signal(s).
 service SignalService {
