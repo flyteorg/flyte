@@ -1,6 +1,6 @@
 export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
-
+include boilerplate/flyte/golang_test_targets/Makefile
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
@@ -30,10 +30,6 @@ linux_compile:
 	fi
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
-.PHONY: update_boilerplate
-update_boilerplate:
-	@boilerplate/update.sh
-
 .PHONY: kustomize
 kustomize:
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
@@ -49,7 +45,7 @@ release_automation:
 	bash script/generate_config_docs.sh
 
 .PHONY: deploy_sandbox
-deploy_sandbox: 
+deploy_sandbox:
 	bash script/deploy.sh
 
 .PHONY: install-piptools
@@ -99,3 +95,15 @@ help: ## List available commands and their usage
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
 
+.PHONY: buf
+buf:
+	buf format protos -w
+	buf mod update protos
+	buf generate
+	buf generate buf.build/unionai/protoc-gen-swagger --template buf.gen.swagger.yaml
+
+.PHONY: generate
+generate: buf
+	go mod tidy
+	go generate ./...
+	@script/generate_mocks.sh
