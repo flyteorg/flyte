@@ -31,7 +31,7 @@ flyte-binary:
     dbname: flyteadmin
     password: postgres
   logger:
-    level: 6
+    level: 1
 
 kubernetes-dashboard:
   image:

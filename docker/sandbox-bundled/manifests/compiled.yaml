@@ -385,7 +385,7 @@ data:
     \   access-key: minio\n    auth-type: accesskey\n    secret-key: miniostorage\n
     \   disable-ssl: true\n    endpoint: \"http://localhost:30002\"\n  cache:\n    max_size_mbs:
     10\n    target_gc_percent: 100\n  container: \"my-s3-bucket\"\nlogger:\n  show-source:
-    true\n  level: 6\nadmin:\n  endpoint: localhost:8089\n  insecure: true\nplugins:\n
+    true\n  level: 1\nadmin:\n  endpoint: localhost:8089\n  insecure: true\nplugins:\n
     \ # All k8s plugins default configuration\n  k8s:\n    inject-finalizer: true\n
     \   default-env-vars:\n      - AWS_METADATA_SERVICE_TIMEOUT: 5\n      - AWS_METADATA_SERVICE_NUM_ATTEMPTS:
     20\n      - FLYTE_AWS_ENDPOINT: \"http://flyte-sandbox-minio.flyte:9000\"\n      -

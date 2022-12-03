@@ -1,5 +1,5 @@
 .PHONY: flyte
-flyte: FLYTE_BINARY_VERSION := latest
+flyte: FLYTE_BINARY_VERSION := mysql
 flyte:
 	mkdir -p images/tar/amd64
 	docker pull --platform linux/amd64 \
@@ -31,10 +31,10 @@ build: flyte manifests/compiled.yaml
 		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
 		--platform linux/arm64,linux/amd64
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
-		--tag flyte-sandbox:latest .
+		--tag flyte-sandbox:mysql .
 
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
+start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:mysql
 start:
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
