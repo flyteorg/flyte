@@ -7,7 +7,7 @@
 package service
 
 import (
-	_ "github.com/flyteorg/flyte/gen/pb-go/protoc-gen-swagger/options"
+	_ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

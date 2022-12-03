@@ -2,10 +2,6 @@ version: v1
 managed:
   enabled: true
   optimize_for: CODE_SIZE
-  go_package_prefix:
-    default: github.com/flyteorg/flyte/gen/pb-go
-    except:
-      - buf.build/googleapis/googleapis
 plugins:
   - plugin: buf.build/protocolbuffers/go
     out: gen/pb-go
@@ -19,7 +15,7 @@ plugins:
 # TODO(Yuvraj): Please move remote to plugin/local
 #  - remote: grpc-gateway
   - remote: buf.build/grpc-ecosystem/plugins/grpc-gateway
-    out: gen/pb-go/gateway
+    out: gen/gateway
     opt:
       - paths=import
       - standalone=true
