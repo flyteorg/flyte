@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/flyteorg/flytestdlib/version"
+	"github.com/flyteorg/flyte/stdlib/version"
 	"github.com/spf13/cobra"
 )
 

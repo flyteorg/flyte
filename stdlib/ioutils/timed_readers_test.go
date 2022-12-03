@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/stdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

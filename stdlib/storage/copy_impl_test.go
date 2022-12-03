@@ -7,11 +7,11 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/stdlib/errors"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytestdlib/ioutils"
+	"github.com/flyteorg/flyte/stdlib/ioutils"
 )
 
 type notSeekerReader struct {

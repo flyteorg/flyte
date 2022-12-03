@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/stdlib/config"
+	"github.com/flyteorg/flyte/stdlib/internal/utils"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 )

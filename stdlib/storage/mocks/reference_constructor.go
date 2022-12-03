@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	storage "github.com/flyteorg/flytestdlib/storage"
+	storage "github.com/flyteorg/flyte/stdlib/storage"
 	mock "github.com/stretchr/testify/mock"
 )
 

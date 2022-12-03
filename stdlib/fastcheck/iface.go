@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/stdlib/promutils"
 )
 
 // Filter provides an interface to check if a Key of type []byte was ever seen.

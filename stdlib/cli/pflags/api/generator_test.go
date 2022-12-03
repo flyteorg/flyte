@@ -67,7 +67,7 @@ func TestNewGenerator(t *testing.T) {
 
 	for _, typ := range testCases {
 		t.Run("Test "+typ.TypeName, func(t *testing.T) {
-			g, err := NewGenerator("github.com/flyteorg/flytestdlib/cli/pflags/api", typ.TypeName, typ.DefaultVariableName, typ.shouldBindDefaultVariable)
+			g, err := NewGenerator("github.com/flyteorg/flyte/stdlib/cli/pflags/api", typ.TypeName, typ.DefaultVariableName, typ.shouldBindDefaultVariable)
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}

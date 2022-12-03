@@ -25,10 +25,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/internal/utils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/stdlib/config"
+	"github.com/flyteorg/flyte/stdlib/contextutils"
+	"github.com/flyteorg/flyte/stdlib/internal/utils"
+	"github.com/flyteorg/flyte/stdlib/promutils/labeled"
 )
 
 type mockStowLoc struct {

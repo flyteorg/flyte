@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	cache "github.com/flyteorg/flytestdlib/cache"
+	cache "github.com/flyteorg/flyte/stdlib/cache"
 
 	mock "github.com/stretchr/testify/mock"
 )

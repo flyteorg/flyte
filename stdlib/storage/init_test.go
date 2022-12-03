@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/stdlib/contextutils"
+	"github.com/flyteorg/flyte/stdlib/promutils"
+	"github.com/flyteorg/flyte/stdlib/promutils/labeled"
 )
 
 var metrics *dataStoreMetrics

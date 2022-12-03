@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	stdErrs "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	stdErrs "github.com/flyteorg/flyte/stdlib/errors"
+	"github.com/flyteorg/flyte/stdlib/promutils/labeled"
 
 	"github.com/flyteorg/stow"
 	"github.com/pkg/errors"

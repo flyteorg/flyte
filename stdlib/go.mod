@@ -1,4 +1,4 @@
-module github.com/flyteorg/flytestdlib
+module github.com/flyteorg/flyte/stdlib
 
 go 1.18
 

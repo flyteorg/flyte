@@ -9,7 +9,7 @@ import (
 
 	"net/url"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/stdlib/logger"
 )
 
 const (

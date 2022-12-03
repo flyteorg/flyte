@@ -3,7 +3,7 @@ package labeled
 import (
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/stdlib/contextutils"
 	"github.com/stretchr/testify/assert"
 )
 

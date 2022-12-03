@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/stdlib/atomic"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/stdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/stdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )

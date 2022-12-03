@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/stdlib/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -5,8 +5,8 @@ import (
 
 	"encoding/json"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/stdlib/config"
+	"github.com/flyteorg/flyte/stdlib/config/viper"
 	"github.com/spf13/pflag"
 )
 

@@ -20,11 +20,11 @@ import (
 	"github.com/flyteorg/stow/swift"
 	errs "github.com/pkg/errors"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/stdlib/contextutils"
+	"github.com/flyteorg/flyte/stdlib/errors"
+	"github.com/flyteorg/flyte/stdlib/logger"
+	"github.com/flyteorg/flyte/stdlib/promutils"
+	"github.com/flyteorg/flyte/stdlib/promutils/labeled"
 )
 
 const (
