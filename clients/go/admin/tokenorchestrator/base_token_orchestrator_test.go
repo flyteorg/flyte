@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	cacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/clients/go/admin/cache"
+	cacheMocks "github.com/flyteorg/flyte/clients/go/admin/cache/mocks"
+	"github.com/flyteorg/flyte/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/config"
 )
 

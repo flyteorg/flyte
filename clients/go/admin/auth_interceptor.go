@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/logger"
 
 	"google.golang.org/grpc/codes"

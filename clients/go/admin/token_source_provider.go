@@ -13,12 +13,12 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
-	"github.com/flyteorg/flyteidl/clients/go/admin/externalprocess"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
-	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/clients/go/admin/deviceflow"
+	"github.com/flyteorg/flyte/clients/go/admin/externalprocess"
+	"github.com/flyteorg/flyte/clients/go/admin/pkce"
+	"github.com/flyteorg/flyte/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/logger"
 )
 

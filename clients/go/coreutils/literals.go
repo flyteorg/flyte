@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/jsonpb"

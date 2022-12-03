@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/clients/go/admin/oauth"
 )
 
 func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenChannel chan *oauth2.Token,

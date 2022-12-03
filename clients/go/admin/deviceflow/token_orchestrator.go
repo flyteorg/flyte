@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flytestdlib/logger"
 )
 

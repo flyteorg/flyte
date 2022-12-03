@@ -17,15 +17,15 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	mocks2 "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	mocks2 "github.com/flyteorg/flyte/clients/go/admin/mocks"
 	"github.com/stretchr/testify/mock"
 
-	service2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	service2 "github.com/flyteorg/flyte/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/config"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
+	"github.com/flyteorg/flyte/clients/go/admin/cache/mocks"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

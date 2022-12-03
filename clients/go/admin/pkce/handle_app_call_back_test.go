@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/clients/go/admin/oauth"
 
 	"github.com/stretchr/testify/assert"
 	testhttp "github.com/stretchr/testify/http"

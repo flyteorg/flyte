@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
+	"github.com/flyteorg/flyte/clients/go/admin/deviceflow"
+	"github.com/flyteorg/flyte/clients/go/admin/pkce"
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
 )

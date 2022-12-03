@@ -18,13 +18,13 @@ import (
 	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	cachemocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
-	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/clients/go/admin/cache"
+	cachemocks "github.com/flyteorg/flyte/clients/go/admin/cache/mocks"
+	"github.com/flyteorg/flyte/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/clients/go/admin/pkce"
+	"github.com/flyteorg/flyte/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/logger"
 )
