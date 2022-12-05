@@ -249,6 +249,8 @@ func (m *TaskMetadata) Validate() error {
 
 	// no validation rules for GeneratesDeck
 
+	// no validation rules for Tags
+
 	switch m.InterruptibleValue.(type) {
 
 	case *TaskMetadata_Interruptible:

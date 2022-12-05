@@ -8020,6 +8020,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -10029,6 +10031,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -11757,6 +11761,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -12008,6 +12014,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -12542,6 +12550,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -15261,6 +15271,8 @@ definitions:
               interruptible: true
               timeout: "timeout"
               generates_deck: true
+              tags:
+                key: "tags"
             task_type_version: 1
             custom:
               fields:
@@ -15528,6 +15540,8 @@ definitions:
             interruptible: true
             timeout: "timeout"
             generates_deck: true
+            tags:
+              key: "tags"
           task_type_version: 1
           custom:
             fields:
@@ -16192,6 +16206,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -16453,6 +16469,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -17101,6 +17119,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -19110,6 +19130,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -20838,6 +20860,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -21089,6 +21113,8 @@ definitions:
                 interruptible: true
                 timeout: "timeout"
                 generates_deck: true
+                tags:
+                  key: "tags"
               task_type_version: 1
               custom:
                 fields:
@@ -21623,6 +21649,8 @@ definitions:
                   tier: {}
                   spec:
                     queueing_budget: "queueing_budget"
+                tags:
+                  key: "tags"
               failure_node:
                 branch_node:
                   if_else:
@@ -23903,6 +23931,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:
@@ -25912,6 +25942,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:
@@ -27640,6 +27672,8 @@ definitions:
               interruptible: true
               timeout: "timeout"
               generates_deck: true
+              tags:
+                key: "tags"
             task_type_version: 1
             custom:
               fields:
@@ -27891,6 +27925,8 @@ definitions:
               interruptible: true
               timeout: "timeout"
               generates_deck: true
+              tags:
+                key: "tags"
             task_type_version: 1
             custom:
               fields:
@@ -28425,6 +28461,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:
@@ -30614,6 +30652,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -32623,6 +32663,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -34351,6 +34393,8 @@ definitions:
                   interruptible: true
                   timeout: "timeout"
                   generates_deck: true
+                  tags:
+                    key: "tags"
                 task_type_version: 1
                 custom:
                   fields:
@@ -34602,6 +34646,8 @@ definitions:
                   interruptible: true
                   timeout: "timeout"
                   generates_deck: true
+                  tags:
+                    key: "tags"
                 task_type_version: 1
                 custom:
                   fields:
@@ -35136,6 +35182,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -37156,6 +37204,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -39165,6 +39215,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -40893,6 +40945,8 @@ definitions:
                   interruptible: true
                   timeout: "timeout"
                   generates_deck: true
+                  tags:
+                    key: "tags"
                 task_type_version: 1
                 custom:
                   fields:
@@ -41144,6 +41198,8 @@ definitions:
                   interruptible: true
                   timeout: "timeout"
                   generates_deck: true
+                  tags:
+                    key: "tags"
                 task_type_version: 1
                 custom:
                   fields:
@@ -41678,6 +41734,8 @@ definitions:
                     tier: {}
                     spec:
                       queueing_budget: "queueing_budget"
+                  tags:
+                    key: "tags"
                 failure_node:
                   branch_node:
                     if_else:
@@ -44121,6 +44179,8 @@ definitions:
           interruptible: true
           timeout: "timeout"
           generates_deck: true
+          tags:
+            key: "tags"
         task_type_version: 1
         custom:
           fields:
@@ -44667,6 +44727,8 @@ definitions:
             tier: {}
             spec:
               queueing_budget: "queueing_budget"
+          tags:
+            key: "tags"
         failure_node:
           branch_node:
             if_else:
@@ -46703,6 +46765,8 @@ definitions:
               tier: {}
               spec:
                 queueing_budget: "queueing_budget"
+            tags:
+              key: "tags"
           failure_node:
             branch_node:
               if_else:
@@ -48712,6 +48776,8 @@ definitions:
               tier: {}
               spec:
                 queueing_budget: "queueing_budget"
+            tags:
+              key: "tags"
           failure_node:
             branch_node:
               if_else:
@@ -50440,6 +50506,8 @@ definitions:
             interruptible: true
             timeout: "timeout"
             generates_deck: true
+            tags:
+              key: "tags"
           task_type_version: 1
           custom:
             fields:
@@ -50691,6 +50759,8 @@ definitions:
             interruptible: true
             timeout: "timeout"
             generates_deck: true
+            tags:
+              key: "tags"
           task_type_version: 1
           custom:
             fields:
@@ -51225,6 +51295,8 @@ definitions:
               tier: {}
               spec:
                 queueing_budget: "queueing_budget"
+            tags:
+              key: "tags"
           failure_node:
             branch_node:
               if_else:
@@ -55442,6 +55514,12 @@ definitions:
         format: "boolean"
         description: "Indicates whether the task will generate a Deck URI when it\
           \ finishes executing."
+      tags:
+        type: "object"
+        title: "Arbitrary tags that allow users and the platform to store small but\
+          \ arbitrary labels"
+        additionalProperties:
+          type: "string"
     title: "Task Metadata"
     example:
       retries:
@@ -55457,6 +55535,8 @@ definitions:
       interruptible: true
       timeout: "timeout"
       generates_deck: true
+      tags:
+        key: "tags"
   coreTaskNode:
     type: "object"
     properties:
@@ -55612,6 +55692,8 @@ definitions:
         interruptible: true
         timeout: "timeout"
         generates_deck: true
+        tags:
+          key: "tags"
       task_type_version: 1
       custom:
         fields:
@@ -56270,6 +56352,12 @@ definitions:
         description: "Defines how the system should behave when a failure is detected\
           \ in the workflow execution."
         $ref: "#/definitions/WorkflowMetadataOnFailurePolicy"
+      tags:
+        type: "object"
+        title: "Arbitrary tags that allow users and the platform to store small but\
+          \ arbitrary labels"
+        additionalProperties:
+          type: "string"
     description: "This is workflow layer metadata. These settings are only applicable\
       \ to the workflow as a whole, and do not\npercolate down to child entities (like\
       \ tasks) launched by the workflow."
@@ -56279,6 +56367,8 @@ definitions:
         tier: {}
         spec:
           queueing_budget: "queueing_budget"
+      tags:
+        key: "tags"
   coreWorkflowMetadataDefaults:
     type: "object"
     properties:
@@ -56701,6 +56791,8 @@ definitions:
           tier: {}
           spec:
             queueing_budget: "queueing_budget"
+        tags:
+          key: "tags"
       failure_node:
         branch_node:
           if_else:
@@ -59025,6 +59117,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:
@@ -61034,6 +61128,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:
@@ -62762,6 +62858,8 @@ definitions:
               interruptible: true
               timeout: "timeout"
               generates_deck: true
+              tags:
+                key: "tags"
             task_type_version: 1
             custom:
               fields:
@@ -63013,6 +63111,8 @@ definitions:
               interruptible: true
               timeout: "timeout"
               generates_deck: true
+              tags:
+                key: "tags"
             task_type_version: 1
             custom:
               fields:
@@ -63547,6 +63647,8 @@ definitions:
                 tier: {}
                 spec:
                   queueing_budget: "queueing_budget"
+              tags:
+                key: "tags"
             failure_node:
               branch_node:
                 if_else:

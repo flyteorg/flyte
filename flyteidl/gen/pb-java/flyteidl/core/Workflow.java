@@ -14379,6 +14379,60 @@ public final class Workflow {
      * <code>.flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;</code>
      */
     flyteidl.core.Workflow.WorkflowMetadata.OnFailurePolicy getOnFailure();
+
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+    int getTagsCount();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+    boolean containsTags(
+        java.lang.String key);
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getTags();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getTagsMap();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    java.lang.String getTagsOrThrow(
+        java.lang.String key);
   }
   /**
    * <pre>
@@ -14444,6 +14498,19 @@ public final class Workflow {
               onFailure_ = rawValue;
               break;
             }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+                tags_ = com.google.protobuf.MapField.newMapField(
+                    TagsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000004;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              tags__ = input.readMessage(
+                  TagsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              tags_.getMutableMap().put(
+                  tags__.getKey(), tags__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -14468,6 +14535,18 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 3:
+          return internalGetTags();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -14604,6 +14683,7 @@ public final class Workflow {
       // @@protoc_insertion_point(enum_scope:flyteidl.core.WorkflowMetadata.OnFailurePolicy)
     }
 
+    private int bitField0_;
     public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 1;
     private flyteidl.core.Execution.QualityOfService qualityOfService_;
     /**
@@ -14662,6 +14742,98 @@ public final class Workflow {
       return result == null ? flyteidl.core.Workflow.WorkflowMetadata.OnFailurePolicy.UNRECOGNIZED : result;
     }
 
+    public static final int TAGS_FIELD_NUMBER = 3;
+    private static final class TagsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> tags_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetTags() {
+      if (tags_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            TagsDefaultEntryHolder.defaultEntry);
+      }
+      return tags_;
+    }
+
+    public int getTagsCount() {
+      return internalGetTags().getMap().size();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    public boolean containsTags(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetTags().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getTags() {
+      return getTagsMap();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+      return internalGetTags().getMap();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    public java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 3;</code>
+     */
+
+    public java.lang.String getTagsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -14682,6 +14854,12 @@ public final class Workflow {
       if (onFailure_ != flyteidl.core.Workflow.WorkflowMetadata.OnFailurePolicy.FAIL_IMMEDIATELY.getNumber()) {
         output.writeEnum(2, onFailure_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetTags(),
+          TagsDefaultEntryHolder.defaultEntry,
+          3);
       unknownFields.writeTo(output);
     }
 
@@ -14698,6 +14876,16 @@ public final class Workflow {
       if (onFailure_ != flyteidl.core.Workflow.WorkflowMetadata.OnFailurePolicy.FAIL_IMMEDIATELY.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, onFailure_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetTags().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        tags__ = TagsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, tags__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -14720,6 +14908,8 @@ public final class Workflow {
             .equals(other.getQualityOfService())) return false;
       }
       if (onFailure_ != other.onFailure_) return false;
+      if (!internalGetTags().equals(
+          other.internalGetTags())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -14737,6 +14927,10 @@ public final class Workflow {
       }
       hash = (37 * hash) + ON_FAILURE_FIELD_NUMBER;
       hash = (53 * hash) + onFailure_;
+      if (!internalGetTags().getMap().isEmpty()) {
+        hash = (37 * hash) + TAGS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetTags().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -14849,6 +15043,28 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetMutableTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -14883,6 +15099,7 @@ public final class Workflow {
         }
         onFailure_ = 0;
 
+        internalGetMutableTags().clear();
         return this;
       }
 
@@ -14909,12 +15126,17 @@ public final class Workflow {
       @java.lang.Override
       public flyteidl.core.Workflow.WorkflowMetadata buildPartial() {
         flyteidl.core.Workflow.WorkflowMetadata result = new flyteidl.core.Workflow.WorkflowMetadata(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (qualityOfServiceBuilder_ == null) {
           result.qualityOfService_ = qualityOfService_;
         } else {
           result.qualityOfService_ = qualityOfServiceBuilder_.build();
         }
         result.onFailure_ = onFailure_;
+        result.tags_ = internalGetTags();
+        result.tags_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -14969,6 +15191,8 @@ public final class Workflow {
         if (other.onFailure_ != 0) {
           setOnFailureValue(other.getOnFailureValue());
         }
+        internalGetMutableTags().mergeFrom(
+            other.internalGetTags());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -14997,6 +15221,7 @@ public final class Workflow {
         }
         return this;
       }
+      private int bitField0_;
 
       private flyteidl.core.Execution.QualityOfService qualityOfService_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -15213,6 +15438,157 @@ public final class Workflow {
         
         onFailure_ = 0;
         onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> tags_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetTags() {
+        if (tags_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        return tags_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableTags() {
+        onChanged();;
+        if (tags_ == null) {
+          tags_ = com.google.protobuf.MapField.newMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        if (!tags_.isMutable()) {
+          tags_ = tags_.copy();
+        }
+        return tags_;
+      }
+
+      public int getTagsCount() {
+        return internalGetTags().getMap().size();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public boolean containsTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetTags().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getTagsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getTags() {
+        return getTagsMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+        return internalGetTags().getMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public java.lang.String getTagsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public java.lang.String getTagsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearTags() {
+        internalGetMutableTags().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public Builder removeTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableTags() {
+        return internalGetMutableTags().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+      public Builder putTags(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 3;</code>
+       */
+
+      public Builder putAllTags(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableTags().getMutableMap()
+            .putAll(values);
         return this;
       }
       @java.lang.Override
@@ -19374,6 +19750,11 @@ public final class Workflow {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -19444,26 +19825,29 @@ public final class Workflow {
       "kflow_node\030\007 \001(\0132\033.flyteidl.core.Workflo" +
       "wNodeH\000\0220\n\013branch_node\030\010 \001(\0132\031.flyteidl." +
       "core.BranchNodeH\000\022,\n\tgate_node\030\t \001(\0132\027.f" +
-      "lyteidl.core.GateNodeH\000B\010\n\006target\"\347\001\n\020Wo" +
+      "lyteidl.core.GateNodeH\000B\010\n\006target\"\315\002\n\020Wo" +
       "rkflowMetadata\022;\n\022quality_of_service\030\001 \001" +
       "(\0132\037.flyteidl.core.QualityOfService\022C\n\no" +
       "n_failure\030\002 \001(\0162/.flyteidl.core.Workflow" +
-      "Metadata.OnFailurePolicy\"Q\n\017OnFailurePol" +
-      "icy\022\024\n\020FAIL_IMMEDIATELY\020\000\022(\n$FAIL_AFTER_" +
-      "EXECUTABLE_NODES_COMPLETE\020\001\"1\n\030WorkflowM" +
-      "etadataDefaults\022\025\n\rinterruptible\030\001 \001(\010\"\332" +
-      "\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
-      "dl.core.Identifier\0221\n\010metadata\030\002 \001(\0132\037.f" +
-      "lyteidl.core.WorkflowMetadata\0220\n\tinterfa" +
-      "ce\030\003 \001(\0132\035.flyteidl.core.TypedInterface\022" +
-      "\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.Node\022\'\n\007o" +
-      "utputs\030\005 \003(\0132\026.flyteidl.core.Binding\022)\n\014" +
-      "failure_node\030\006 \001(\0132\023.flyteidl.core.Node\022" +
-      "B\n\021metadata_defaults\030\007 \001(\0132\'.flyteidl.co" +
-      "re.WorkflowMetadataDefaults\"@\n\021TaskNodeO" +
-      "verrides\022+\n\tresources\030\001 \001(\0132\030.flyteidl.c" +
-      "ore.ResourcesB6Z4github.com/flyteorg/fly" +
-      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "Metadata.OnFailurePolicy\0227\n\004tags\030\003 \003(\0132)" +
+      ".flyteidl.core.WorkflowMetadata.TagsEntr" +
+      "y\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
+      "(\t:\0028\001\"Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDI" +
+      "ATELY\020\000\022(\n$FAIL_AFTER_EXECUTABLE_NODES_C" +
+      "OMPLETE\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n" +
+      "\rinterruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplat" +
+      "e\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.core.Workf" +
+      "lowMetadata\0220\n\tinterface\030\003 \001(\0132\035.flyteid" +
+      "l.core.TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.f" +
+      "lyteidl.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.fly" +
+      "teidl.core.Binding\022)\n\014failure_node\030\006 \001(\013" +
+      "2\023.flyteidl.core.Node\022B\n\021metadata_defaul" +
+      "ts\030\007 \001(\0132\'.flyteidl.core.WorkflowMetadat" +
+      "aDefaults\"@\n\021TaskNodeOverrides\022+\n\tresour" +
+      "ces\030\001 \001(\0132\030.flyteidl.core.ResourcesB6Z4g" +
+      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
+      "yteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19563,7 +19947,13 @@ public final class Workflow {
     internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowMetadata_descriptor,
-        new java.lang.String[] { "QualityOfService", "OnFailure", });
+        new java.lang.String[] { "QualityOfService", "OnFailure", "Tags", });
+    internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_descriptor =
+      internal_static_flyteidl_core_WorkflowMetadata_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable = new

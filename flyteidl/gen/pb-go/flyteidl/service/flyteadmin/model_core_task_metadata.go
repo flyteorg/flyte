@@ -26,4 +26,5 @@ type CoreTaskMetadata struct {
 	CacheSerializable bool `json:"cache_serializable,omitempty"`
 	// Indicates whether the task will generate a Deck URI when it finishes executing.
 	GeneratesDeck bool `json:"generates_deck,omitempty"`
+	Tags map[string]string `json:"tags,omitempty"`
 }
