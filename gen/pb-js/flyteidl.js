@@ -3834,6 +3834,7 @@
                  * @interface IWorkflowMetadata
                  * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] WorkflowMetadata qualityOfService
                  * @property {flyteidl.core.WorkflowMetadata.OnFailurePolicy|null} [onFailure] WorkflowMetadata onFailure
+                 * @property {Object.<string,string>|null} [tags] WorkflowMetadata tags
                  */
     
                 /**
@@ -3845,6 +3846,7 @@
                  * @param {flyteidl.core.IWorkflowMetadata=} [properties] Properties to set
                  */
                 function WorkflowMetadata(properties) {
+                    this.tags = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -3866,6 +3868,14 @@
                  * @instance
                  */
                 WorkflowMetadata.prototype.onFailure = 0;
+    
+                /**
+                 * WorkflowMetadata tags.
+                 * @member {Object.<string,string>} tags
+                 * @memberof flyteidl.core.WorkflowMetadata
+                 * @instance
+                 */
+                WorkflowMetadata.prototype.tags = $util.emptyObject;
     
                 /**
                  * Creates a new WorkflowMetadata instance using the specified properties.
@@ -3895,6 +3905,9 @@
                         $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.onFailure != null && message.hasOwnProperty("onFailure"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.onFailure);
+                    if (message.tags != null && message.hasOwnProperty("tags"))
+                        for (var keys = Object.keys(message.tags), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -3912,7 +3925,7 @@
                 WorkflowMetadata.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.WorkflowMetadata();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.WorkflowMetadata(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -3921,6 +3934,14 @@
                             break;
                         case 2:
                             message.onFailure = reader.int32();
+                            break;
+                        case 3:
+                            reader.skip().pos++;
+                            if (message.tags === $util.emptyObject)
+                                message.tags = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.tags[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -3954,6 +3975,14 @@
                         case 1:
                             break;
                         }
+                    if (message.tags != null && message.hasOwnProperty("tags")) {
+                        if (!$util.isObject(message.tags))
+                            return "tags: object expected";
+                        var key = Object.keys(message.tags);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.tags[key[i]]))
+                                return "tags: string{k:string} expected";
+                    }
                     return null;
                 };
     
@@ -12018,6 +12047,7 @@
                  * @property {boolean|null} [interruptible] TaskMetadata interruptible
                  * @property {boolean|null} [cacheSerializable] TaskMetadata cacheSerializable
                  * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
+                 * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  */
     
                 /**
@@ -12029,6 +12059,7 @@
                  * @param {flyteidl.core.ITaskMetadata=} [properties] Properties to set
                  */
                 function TaskMetadata(properties) {
+                    this.tags = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -12107,6 +12138,14 @@
                  */
                 TaskMetadata.prototype.generatesDeck = false;
     
+                /**
+                 * TaskMetadata tags.
+                 * @member {Object.<string,string>} tags
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.tags = $util.emptyObject;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -12163,6 +12202,9 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).bool(message.cacheSerializable);
                     if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
                         writer.uint32(/* id 10, wireType 0 =*/80).bool(message.generatesDeck);
+                    if (message.tags != null && message.hasOwnProperty("tags"))
+                        for (var keys = Object.keys(message.tags), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -12180,7 +12222,7 @@
                 TaskMetadata.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskMetadata();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskMetadata(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -12210,6 +12252,14 @@
                             break;
                         case 10:
                             message.generatesDeck = reader.bool();
+                            break;
+                        case 11:
+                            reader.skip().pos++;
+                            if (message.tags === $util.emptyObject)
+                                message.tags = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.tags[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12266,6 +12316,14 @@
                     if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
                         if (typeof message.generatesDeck !== "boolean")
                             return "generatesDeck: boolean expected";
+                    if (message.tags != null && message.hasOwnProperty("tags")) {
+                        if (!$util.isObject(message.tags))
+                            return "tags: object expected";
+                        var key = Object.keys(message.tags);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.tags[key[i]]))
+                                return "tags: string{k:string} expected";
+                    }
                     return null;
                 };
     

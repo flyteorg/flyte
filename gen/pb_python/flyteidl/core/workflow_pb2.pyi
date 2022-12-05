@@ -130,16 +130,25 @@ class TaskNodeOverrides(_message.Message):
     def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...
 
 class WorkflowMetadata(_message.Message):
-    __slots__ = ["on_failure", "quality_of_service"]
+    __slots__ = ["on_failure", "quality_of_service", "tags"]
     class OnFailurePolicy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
+    class TagsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     FAIL_AFTER_EXECUTABLE_NODES_COMPLETE: WorkflowMetadata.OnFailurePolicy
     FAIL_IMMEDIATELY: WorkflowMetadata.OnFailurePolicy
     ON_FAILURE_FIELD_NUMBER: _ClassVar[int]
     QUALITY_OF_SERVICE_FIELD_NUMBER: _ClassVar[int]
+    TAGS_FIELD_NUMBER: _ClassVar[int]
     on_failure: WorkflowMetadata.OnFailurePolicy
     quality_of_service: _execution_pb2.QualityOfService
-    def __init__(self, quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., on_failure: _Optional[_Union[WorkflowMetadata.OnFailurePolicy, str]] = ...) -> None: ...
+    tags: _containers.ScalarMap[str, str]
+    def __init__(self, quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., on_failure: _Optional[_Union[WorkflowMetadata.OnFailurePolicy, str]] = ..., tags: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class WorkflowMetadataDefaults(_message.Message):
     __slots__ = ["interruptible"]

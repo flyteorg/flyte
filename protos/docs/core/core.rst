@@ -2237,6 +2237,29 @@ Task Metadata
    "interruptible", ":ref:`ref_bool`", "", ""
    "cache_serializable", ":ref:`ref_bool`", "", "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
    "generates_deck", ":ref:`ref_bool`", "", "Indicates whether the task will generate a Deck URI when it finishes executing."
+   "tags", ":ref:`ref_flyteidl.core.TaskMetadata.TagsEntry`", "repeated", "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.TaskMetadata.TagsEntry:
+
+TaskMetadata.TagsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: TaskMetadata.TagsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
 
 
 
@@ -3119,6 +3142,29 @@ percolate down to child entities (like tasks) launched by the workflow.
 
    "quality_of_service", ":ref:`ref_flyteidl.core.QualityOfService`", "", "Indicates the runtime priority of workflow executions."
    "on_failure", ":ref:`ref_flyteidl.core.WorkflowMetadata.OnFailurePolicy`", "", "Defines how the system should behave when a failure is detected in the workflow execution."
+   "tags", ":ref:`ref_flyteidl.core.WorkflowMetadata.TagsEntry`", "repeated", "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.WorkflowMetadata.TagsEntry:
+
+WorkflowMetadata.TagsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: WorkflowMetadata.TagsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
 
 
 

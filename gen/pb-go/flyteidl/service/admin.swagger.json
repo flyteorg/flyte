@@ -6820,6 +6820,13 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Indicates whether the task will generate a Deck URI when it finishes executing."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
         }
       },
       "title": "Task Metadata"
@@ -7039,6 +7046,13 @@
         "on_failure": {
           "$ref": "#/definitions/WorkflowMetadataOnFailurePolicy",
           "description": "Defines how the system should behave when a failure is detected in the workflow execution."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
         }
       },
       "description": "This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not\npercolate down to child entities (like tasks) launched by the workflow."
