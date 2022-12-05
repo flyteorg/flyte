@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/condition.pb.h"
@@ -51,7 +54,7 @@ struct TableStruct_flyteidl_2fcore_2fworkflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[16]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -102,6 +105,9 @@ extern WorkflowMetadataDefaultTypeInternal _WorkflowMetadata_default_instance_;
 class WorkflowMetadataDefaults;
 class WorkflowMetadataDefaultsDefaultTypeInternal;
 extern WorkflowMetadataDefaultsDefaultTypeInternal _WorkflowMetadataDefaults_default_instance_;
+class WorkflowMetadata_TagsEntry_DoNotUse;
+class WorkflowMetadata_TagsEntry_DoNotUseDefaultTypeInternal;
+extern WorkflowMetadata_TagsEntry_DoNotUseDefaultTypeInternal _WorkflowMetadata_TagsEntry_DoNotUse_default_instance_;
 class WorkflowNode;
 class WorkflowNodeDefaultTypeInternal;
 extern WorkflowNodeDefaultTypeInternal _WorkflowNode_default_instance_;
@@ -126,6 +132,7 @@ template<> ::flyteidl::core::TaskNode* Arena::CreateMaybeMessage<::flyteidl::cor
 template<> ::flyteidl::core::TaskNodeOverrides* Arena::CreateMaybeMessage<::flyteidl::core::TaskNodeOverrides>(Arena*);
 template<> ::flyteidl::core::WorkflowMetadata* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowMetadata>(Arena*);
 template<> ::flyteidl::core::WorkflowMetadataDefaults* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowMetadataDefaults>(Arena*);
+template<> ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::WorkflowNode* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowNode>(Arena*);
 template<> ::flyteidl::core::WorkflowTemplate* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowTemplate>(Arena*);
 }  // namespace protobuf
@@ -1923,6 +1930,30 @@ class Node final :
 };
 // -------------------------------------------------------------------
 
+class WorkflowMetadata_TagsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<WorkflowMetadata_TagsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<WorkflowMetadata_TagsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  WorkflowMetadata_TagsEntry_DoNotUse();
+  WorkflowMetadata_TagsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const WorkflowMetadata_TagsEntry_DoNotUse& other);
+  static const WorkflowMetadata_TagsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const WorkflowMetadata_TagsEntry_DoNotUse*>(&_WorkflowMetadata_TagsEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
 class WorkflowMetadata final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.WorkflowMetadata) */ {
  public:
@@ -1961,7 +1992,7 @@ class WorkflowMetadata final :
                &_WorkflowMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(WorkflowMetadata* other);
   friend void swap(WorkflowMetadata& a, WorkflowMetadata& b) {
@@ -2016,6 +2047,7 @@ class WorkflowMetadata final :
 
   // nested types ----------------------------------------------------
 
+
   typedef WorkflowMetadata_OnFailurePolicy OnFailurePolicy;
   static const OnFailurePolicy FAIL_IMMEDIATELY =
     WorkflowMetadata_OnFailurePolicy_FAIL_IMMEDIATELY;
@@ -2044,6 +2076,15 @@ class WorkflowMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // map<string, string> tags = 3;
+  int tags_size() const;
+  void clear_tags();
+  static const int kTagsFieldNumber = 3;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      tags() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_tags();
+
   // .flyteidl.core.QualityOfService quality_of_service = 1;
   bool has_quality_of_service() const;
   void clear_quality_of_service();
@@ -2064,6 +2105,12 @@ class WorkflowMetadata final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      WorkflowMetadata_TagsEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > tags_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   int on_failure_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2109,7 +2156,7 @@ class WorkflowMetadataDefaults final :
                &_WorkflowMetadataDefaults_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(WorkflowMetadataDefaults* other);
   friend void swap(WorkflowMetadataDefaults& a, WorkflowMetadataDefaults& b) {
@@ -2221,7 +2268,7 @@ class WorkflowTemplate final :
                &_WorkflowTemplate_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(WorkflowTemplate* other);
   friend void swap(WorkflowTemplate& a, WorkflowTemplate& b) {
@@ -2402,7 +2449,7 @@ class TaskNodeOverrides final :
                &_TaskNodeOverrides_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(TaskNodeOverrides* other);
   friend void swap(TaskNodeOverrides& a, TaskNodeOverrides& b) {
@@ -4094,6 +4141,8 @@ inline Node::TargetCase Node::target_case() const {
 }
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 // WorkflowMetadata
 
 // .flyteidl.core.QualityOfService quality_of_service = 1;
@@ -4153,6 +4202,24 @@ inline void WorkflowMetadata::set_on_failure(::flyteidl::core::WorkflowMetadata_
   
   on_failure_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.WorkflowMetadata.on_failure)
+}
+
+// map<string, string> tags = 3;
+inline int WorkflowMetadata::tags_size() const {
+  return tags_.size();
+}
+inline void WorkflowMetadata::clear_tags() {
+  tags_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+WorkflowMetadata::tags() const {
+  // @@protoc_insertion_point(field_map:flyteidl.core.WorkflowMetadata.tags)
+  return tags_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+WorkflowMetadata::mutable_tags() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.core.WorkflowMetadata.tags)
+  return tags_.MutableMap();
 }
 
 // -------------------------------------------------------------------
@@ -4529,6 +4596,8 @@ inline void TaskNodeOverrides::set_allocated_resources(::flyteidl::core::Resourc
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -42,7 +42,8 @@ class CoreTaskMetadata(object):
         'deprecated_error_message': 'str',
         'interruptible': 'bool',
         'cache_serializable': 'bool',
-        'generates_deck': 'bool'
+        'generates_deck': 'bool',
+        'tags': 'dict(str, str)'
     }
 
     attribute_map = {
@@ -54,10 +55,11 @@ class CoreTaskMetadata(object):
         'deprecated_error_message': 'deprecated_error_message',
         'interruptible': 'interruptible',
         'cache_serializable': 'cache_serializable',
-        'generates_deck': 'generates_deck'
+        'generates_deck': 'generates_deck',
+        'tags': 'tags'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._discoverable = None
@@ -69,6 +71,7 @@ class CoreTaskMetadata(object):
         self._interruptible = None
         self._cache_serializable = None
         self._generates_deck = None
+        self._tags = None
         self.discriminator = None
 
         if discoverable is not None:
@@ -89,6 +92,8 @@ class CoreTaskMetadata(object):
             self.cache_serializable = cache_serializable
         if generates_deck is not None:
             self.generates_deck = generates_deck
+        if tags is not None:
+            self.tags = tags
 
     @property
     def discoverable(self):
@@ -292,6 +297,27 @@ class CoreTaskMetadata(object):
         """
 
         self._generates_deck = generates_deck
+
+    @property
+    def tags(self):
+        """Gets the tags of this CoreTaskMetadata.  # noqa: E501
+
+
+        :return: The tags of this CoreTaskMetadata.  # noqa: E501
+        :rtype: dict(str, str)
+        """
+        return self._tags
+
+    @tags.setter
+    def tags(self, tags):
+        """Sets the tags of this CoreTaskMetadata.
+
+
+        :param tags: The tags of this CoreTaskMetadata.  # noqa: E501
+        :type: dict(str, str)
+        """
+
+        self._tags = tags
 
     def to_dict(self):
         """Returns the model properties as a dict"""

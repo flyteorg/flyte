@@ -28,13 +28,14 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protob
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Alias_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ApproveCondition_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowMetadataDefaults_flyteidl_2fcore_2fworkflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SignalCondition_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SleepCondition_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowNode_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_NodeMetadata_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskNode_flyteidl_2fcore_2fworkflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_GateNode_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_BranchNode_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fduration_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Duration_google_2fprotobuf_2fduration_2eproto;
@@ -101,6 +102,10 @@ class NodeDefaultTypeInternal {
   const ::flyteidl::core::BranchNode* branch_node_;
   const ::flyteidl::core::GateNode* gate_node_;
 } _Node_default_instance_;
+class WorkflowMetadata_TagsEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<WorkflowMetadata_TagsEntry_DoNotUse> _instance;
+} _WorkflowMetadata_TagsEntry_DoNotUse_default_instance_;
 class WorkflowMetadataDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<WorkflowMetadata> _instance;
@@ -281,6 +286,19 @@ static void InitDefaultsAlias_flyteidl_2fcore_2fworkflow_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_Alias_flyteidl_2fcore_2fworkflow_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsAlias_flyteidl_2fcore_2fworkflow_2eproto}, {}};
 
+static void InitDefaultsWorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::core::_WorkflowMetadata_TagsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse();
+  }
+  ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsWorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto}, {}};
+
 static void InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -292,9 +310,10 @@ static void InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto() {
   ::flyteidl::core::WorkflowMetadata::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto}, {
-      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto}, {
+      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,
+      &scc_info_WorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto.base,}};
 
 static void InitDefaultsWorkflowMetadataDefaults_flyteidl_2fcore_2fworkflow_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -355,13 +374,14 @@ void InitDefaults_flyteidl_2fcore_2fworkflow_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_GateNode_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_NodeMetadata_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Alias_flyteidl_2fcore_2fworkflow_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_WorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowMetadataDefaults_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto[16];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto[17];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto[1];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fworkflow_2eproto = nullptr;
 
@@ -466,6 +486,15 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto:
   offsetof(::flyteidl::core::NodeDefaultTypeInternal, branch_node_),
   offsetof(::flyteidl::core::NodeDefaultTypeInternal, gate_node_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Node, target_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse, value_),
+  0,
+  1,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -473,6 +502,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto:
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, quality_of_service_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, on_failure_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, tags_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadataDefaults, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -511,10 +541,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 68, -1, sizeof(::flyteidl::core::NodeMetadata)},
   { 78, -1, sizeof(::flyteidl::core::Alias)},
   { 85, -1, sizeof(::flyteidl::core::Node)},
-  { 100, -1, sizeof(::flyteidl::core::WorkflowMetadata)},
-  { 107, -1, sizeof(::flyteidl::core::WorkflowMetadataDefaults)},
-  { 113, -1, sizeof(::flyteidl::core::WorkflowTemplate)},
-  { 125, -1, sizeof(::flyteidl::core::TaskNodeOverrides)},
+  { 100, 107, sizeof(::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse)},
+  { 109, -1, sizeof(::flyteidl::core::WorkflowMetadata)},
+  { 117, -1, sizeof(::flyteidl::core::WorkflowMetadataDefaults)},
+  { 123, -1, sizeof(::flyteidl::core::WorkflowTemplate)},
+  { 135, -1, sizeof(::flyteidl::core::TaskNodeOverrides)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -530,6 +561,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_NodeMetadata_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_Alias_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_Node_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_WorkflowMetadata_TagsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_WorkflowMetadata_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_WorkflowMetadataDefaults_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_WorkflowTemplate_default_instance_),
@@ -539,7 +571,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto = {
   {}, AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto, "flyteidl/core/workflow.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fcore_2fworkflow_2eproto::offsets,
-  file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto, 16, file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fworkflow_2eproto,
+  file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto, 17, file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fworkflow_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
@@ -590,31 +622,34 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "kflow_node\030\007 \001(\0132\033.flyteidl.core.Workflo"
   "wNodeH\000\0220\n\013branch_node\030\010 \001(\0132\031.flyteidl."
   "core.BranchNodeH\000\022,\n\tgate_node\030\t \001(\0132\027.f"
-  "lyteidl.core.GateNodeH\000B\010\n\006target\"\347\001\n\020Wo"
+  "lyteidl.core.GateNodeH\000B\010\n\006target\"\315\002\n\020Wo"
   "rkflowMetadata\022;\n\022quality_of_service\030\001 \001"
   "(\0132\037.flyteidl.core.QualityOfService\022C\n\no"
   "n_failure\030\002 \001(\0162/.flyteidl.core.Workflow"
-  "Metadata.OnFailurePolicy\"Q\n\017OnFailurePol"
-  "icy\022\024\n\020FAIL_IMMEDIATELY\020\000\022(\n$FAIL_AFTER_"
-  "EXECUTABLE_NODES_COMPLETE\020\001\"1\n\030WorkflowM"
-  "etadataDefaults\022\025\n\rinterruptible\030\001 \001(\010\"\332"
-  "\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001(\0132\031.flytei"
-  "dl.core.Identifier\0221\n\010metadata\030\002 \001(\0132\037.f"
-  "lyteidl.core.WorkflowMetadata\0220\n\tinterfa"
-  "ce\030\003 \001(\0132\035.flyteidl.core.TypedInterface\022"
-  "\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.Node\022\'\n\007o"
-  "utputs\030\005 \003(\0132\026.flyteidl.core.Binding\022)\n\014"
-  "failure_node\030\006 \001(\0132\023.flyteidl.core.Node\022"
-  "B\n\021metadata_defaults\030\007 \001(\0132\'.flyteidl.co"
-  "re.WorkflowMetadataDefaults\"@\n\021TaskNodeO"
-  "verrides\022+\n\tresources\030\001 \001(\0132\030.flyteidl.c"
-  "ore.ResourcesB6Z4github.com/flyteorg/fly"
-  "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+  "Metadata.OnFailurePolicy\0227\n\004tags\030\003 \003(\0132)"
+  ".flyteidl.core.WorkflowMetadata.TagsEntr"
+  "y\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001"
+  "(\t:\0028\001\"Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDI"
+  "ATELY\020\000\022(\n$FAIL_AFTER_EXECUTABLE_NODES_C"
+  "OMPLETE\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n"
+  "\rinterruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplat"
+  "e\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier"
+  "\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.core.Workf"
+  "lowMetadata\0220\n\tinterface\030\003 \001(\0132\035.flyteid"
+  "l.core.TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.f"
+  "lyteidl.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.fly"
+  "teidl.core.Binding\022)\n\014failure_node\030\006 \001(\013"
+  "2\023.flyteidl.core.Node\022B\n\021metadata_defaul"
+  "ts\030\007 \001(\0132\'.flyteidl.core.WorkflowMetadat"
+  "aDefaults\"@\n\021TaskNodeOverrides\022+\n\tresour"
+  "ces\030\001 \001(\0132\030.flyteidl.core.ResourcesB6Z4g"
+  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
+  "yteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2677,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2779,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
@@ -5999,6 +6034,47 @@ void Node::InternalSwap(Node* other) {
 
 // ===================================================================
 
+WorkflowMetadata_TagsEntry_DoNotUse::WorkflowMetadata_TagsEntry_DoNotUse() {}
+WorkflowMetadata_TagsEntry_DoNotUse::WorkflowMetadata_TagsEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void WorkflowMetadata_TagsEntry_DoNotUse::MergeFrom(const WorkflowMetadata_TagsEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata WorkflowMetadata_TagsEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto[12];
+}
+void WorkflowMetadata_TagsEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool WorkflowMetadata_TagsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      WorkflowMetadata_TagsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.core.WorkflowMetadata.TagsEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.core.WorkflowMetadata.TagsEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+
+// ===================================================================
+
 void WorkflowMetadata::InitAsDefaultInstance() {
   ::flyteidl::core::_WorkflowMetadata_default_instance_._instance.get_mutable()->quality_of_service_ = const_cast< ::flyteidl::core::QualityOfService*>(
       ::flyteidl::core::QualityOfService::internal_default_instance());
@@ -6021,6 +6097,7 @@ void WorkflowMetadata::clear_quality_of_service() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int WorkflowMetadata::kQualityOfServiceFieldNumber;
 const int WorkflowMetadata::kOnFailureFieldNumber;
+const int WorkflowMetadata::kTagsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 WorkflowMetadata::WorkflowMetadata()
@@ -6032,6 +6109,7 @@ WorkflowMetadata::WorkflowMetadata(const WorkflowMetadata& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  tags_.MergeFrom(from.tags_);
   if (from.has_quality_of_service()) {
     quality_of_service_ = new ::flyteidl::core::QualityOfService(*from.quality_of_service_);
   } else {
@@ -6073,6 +6151,7 @@ void WorkflowMetadata::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  tags_.Clear();
   if (GetArenaNoVirtual() == nullptr && quality_of_service_ != nullptr) {
     delete quality_of_service_;
   }
@@ -6113,6 +6192,25 @@ const char* WorkflowMetadata::_InternalParse(const char* begin, const char* end,
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
         msg->set_on_failure(static_cast<::flyteidl::core::WorkflowMetadata_OnFailurePolicy>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // map<string, string> tags = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->tags_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
         break;
       }
       default: {
@@ -6170,6 +6268,32 @@ bool WorkflowMetadata::MergePartialFromCodedStream(
         break;
       }
 
+      // map<string, string> tags = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          WorkflowMetadata_TagsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              WorkflowMetadata_TagsEntry_DoNotUse,
+              ::std::string, ::std::string,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&tags_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.WorkflowMetadata.TagsEntry.key"));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.value().data(), static_cast<int>(parser.value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.WorkflowMetadata.TagsEntry.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -6209,6 +6333,55 @@ void WorkflowMetadata::SerializeWithCachedSizes(
       2, this->on_failure(), output);
   }
 
+  // map<string, string> tags = 3;
+  if (!this->tags().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.core.WorkflowMetadata.TagsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.core.WorkflowMetadata.TagsEntry.value");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->tags().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->tags().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->tags().begin();
+          it != this->tags().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<WorkflowMetadata_TagsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(tags_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(3, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<WorkflowMetadata_TagsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->tags().begin();
+          it != this->tags().end(); ++it) {
+        entry.reset(tags_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(3, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -6235,6 +6408,55 @@ void WorkflowMetadata::SerializeWithCachedSizes(
       2, this->on_failure(), target);
   }
 
+  // map<string, string> tags = 3;
+  if (!this->tags().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.core.WorkflowMetadata.TagsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.core.WorkflowMetadata.TagsEntry.value");
+      }
+    };
+
+    if (false &&
+        this->tags().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->tags().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->tags().begin();
+          it != this->tags().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<WorkflowMetadata_TagsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(tags_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(3, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<WorkflowMetadata_TagsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->tags().begin();
+          it != this->tags().end(); ++it) {
+        entry.reset(tags_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(3, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -6255,6 +6477,20 @@ size_t WorkflowMetadata::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // map<string, string> tags = 3;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->tags_size());
+  {
+    ::std::unique_ptr<WorkflowMetadata_TagsEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+        it = this->tags().begin();
+        it != this->tags().end(); ++it) {
+      entry.reset(tags_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
 
   // .flyteidl.core.QualityOfService quality_of_service = 1;
   if (this->has_quality_of_service()) {
@@ -6296,6 +6532,7 @@ void WorkflowMetadata::MergeFrom(const WorkflowMetadata& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  tags_.MergeFrom(from.tags_);
   if (from.has_quality_of_service()) {
     mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
   }
@@ -6329,6 +6566,7 @@ void WorkflowMetadata::Swap(WorkflowMetadata* other) {
 void WorkflowMetadata::InternalSwap(WorkflowMetadata* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  tags_.Swap(&other->tags_);
   swap(quality_of_service_, other->quality_of_service_);
   swap(on_failure_, other->on_failure_);
 }
@@ -7618,6 +7856,9 @@ template<> PROTOBUF_NOINLINE ::flyteidl::core::Alias* Arena::CreateMaybeMessage<
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::Node* Arena::CreateMaybeMessage< ::flyteidl::core::Node >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::Node >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::WorkflowMetadata_TagsEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::WorkflowMetadata* Arena::CreateMaybeMessage< ::flyteidl::core::WorkflowMetadata >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::WorkflowMetadata >(arena);

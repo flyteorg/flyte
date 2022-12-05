@@ -1597,6 +1597,9 @@ export namespace flyteidl {
 
             /** WorkflowMetadata onFailure */
             onFailure?: (flyteidl.core.WorkflowMetadata.OnFailurePolicy|null);
+
+            /** WorkflowMetadata tags */
+            tags?: ({ [k: string]: string }|null);
         }
 
         /** Represents a WorkflowMetadata. */
@@ -1613,6 +1616,9 @@ export namespace flyteidl {
 
             /** WorkflowMetadata onFailure. */
             public onFailure: flyteidl.core.WorkflowMetadata.OnFailurePolicy;
+
+            /** WorkflowMetadata tags. */
+            public tags: { [k: string]: string };
 
             /**
              * Creates a new WorkflowMetadata instance using the specified properties.
@@ -5095,6 +5101,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck */
             generatesDeck?: (boolean|null);
+
+            /** TaskMetadata tags */
+            tags?: ({ [k: string]: string }|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -5132,6 +5141,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck. */
             public generatesDeck: boolean;
+
+            /** TaskMetadata tags. */
+            public tags: { [k: string]: string };
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

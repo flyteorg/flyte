@@ -196,6 +196,9 @@ message WorkflowMetadata {
 
     // Defines how the system should behave when a failure is detected in the workflow execution.
     OnFailurePolicy on_failure = 2;
+
+    // Arbitrary tags that allow users and the platform to store small but arbitrary labels
+    map<string, string> tags = 3; 
 }
 
 // The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to

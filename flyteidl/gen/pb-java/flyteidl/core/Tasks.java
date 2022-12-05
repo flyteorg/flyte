@@ -3454,6 +3454,60 @@ public final class Tasks {
      */
     boolean getGeneratesDeck();
 
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+    int getTagsCount();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+    boolean containsTags(
+        java.lang.String key);
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getTags();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getTagsMap();
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    java.lang.String getTagsOrThrow(
+        java.lang.String key);
+
     public flyteidl.core.Tasks.TaskMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
@@ -3572,6 +3626,19 @@ public final class Tasks {
               generatesDeck_ = input.readBool();
               break;
             }
+            case 90: {
+              if (!((mutable_bitField0_ & 0x00000200) != 0)) {
+                tags_ = com.google.protobuf.MapField.newMapField(
+                    TagsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000200;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              tags__ = input.readMessage(
+                  TagsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              tags_.getMutableMap().put(
+                  tags__.getKey(), tags__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3596,6 +3663,18 @@ public final class Tasks {
       return flyteidl.core.Tasks.internal_static_flyteidl_core_TaskMetadata_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 11:
+          return internalGetTags();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -3604,6 +3683,7 @@ public final class Tasks {
               flyteidl.core.Tasks.TaskMetadata.class, flyteidl.core.Tasks.TaskMetadata.Builder.class);
     }
 
+    private int bitField0_;
     private int interruptibleValueCase_ = 0;
     private java.lang.Object interruptibleValue_;
     public enum InterruptibleValueCase
@@ -3875,6 +3955,98 @@ public final class Tasks {
       return generatesDeck_;
     }
 
+    public static final int TAGS_FIELD_NUMBER = 11;
+    private static final class TagsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Tasks.internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> tags_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetTags() {
+      if (tags_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            TagsDefaultEntryHolder.defaultEntry);
+      }
+      return tags_;
+    }
+
+    public int getTagsCount() {
+      return internalGetTags().getMap().size();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    public boolean containsTags(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetTags().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getTags() {
+      return getTagsMap();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+      return internalGetTags().getMap();
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    public java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; tags = 11;</code>
+     */
+
+    public java.lang.String getTagsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3917,6 +4089,12 @@ public final class Tasks {
       if (generatesDeck_ != false) {
         output.writeBool(10, generatesDeck_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetTags(),
+          TagsDefaultEntryHolder.defaultEntry,
+          11);
       unknownFields.writeTo(output);
     }
 
@@ -3961,6 +4139,16 @@ public final class Tasks {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(10, generatesDeck_);
       }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetTags().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        tags__ = TagsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(11, tags__);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4001,6 +4189,8 @@ public final class Tasks {
           != other.getCacheSerializable()) return false;
       if (getGeneratesDeck()
           != other.getGeneratesDeck()) return false;
+      if (!internalGetTags().equals(
+          other.internalGetTags())) return false;
       if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
       switch (interruptibleValueCase_) {
         case 8:
@@ -4046,6 +4236,10 @@ public final class Tasks {
       hash = (37 * hash) + GENERATES_DECK_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getGeneratesDeck());
+      if (!internalGetTags().getMap().isEmpty()) {
+        hash = (37 * hash) + TAGS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetTags().hashCode();
+      }
       switch (interruptibleValueCase_) {
         case 8:
           hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
@@ -4166,6 +4360,28 @@ public final class Tasks {
         return flyteidl.core.Tasks.internal_static_flyteidl_core_TaskMetadata_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 11:
+            return internalGetTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 11:
+            return internalGetMutableTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -4220,6 +4436,7 @@ public final class Tasks {
 
         generatesDeck_ = false;
 
+        internalGetMutableTags().clear();
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
         return this;
@@ -4248,6 +4465,8 @@ public final class Tasks {
       @java.lang.Override
       public flyteidl.core.Tasks.TaskMetadata buildPartial() {
         flyteidl.core.Tasks.TaskMetadata result = new flyteidl.core.Tasks.TaskMetadata(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.discoverable_ = discoverable_;
         if (runtimeBuilder_ == null) {
           result.runtime_ = runtime_;
@@ -4271,6 +4490,9 @@ public final class Tasks {
         }
         result.cacheSerializable_ = cacheSerializable_;
         result.generatesDeck_ = generatesDeck_;
+        result.tags_ = internalGetTags();
+        result.tags_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
         return result;
@@ -4346,6 +4568,8 @@ public final class Tasks {
         if (other.getGeneratesDeck() != false) {
           setGeneratesDeck(other.getGeneratesDeck());
         }
+        internalGetMutableTags().mergeFrom(
+            other.internalGetTags());
         switch (other.getInterruptibleValueCase()) {
           case INTERRUPTIBLE: {
             setInterruptible(other.getInterruptible());
@@ -4398,6 +4622,7 @@ public final class Tasks {
         return this;
       }
 
+      private int bitField0_;
 
       private boolean discoverable_ ;
       /**
@@ -5182,6 +5407,157 @@ public final class Tasks {
         
         generatesDeck_ = false;
         onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> tags_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetTags() {
+        if (tags_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        return tags_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableTags() {
+        onChanged();;
+        if (tags_ == null) {
+          tags_ = com.google.protobuf.MapField.newMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        if (!tags_.isMutable()) {
+          tags_ = tags_.copy();
+        }
+        return tags_;
+      }
+
+      public int getTagsCount() {
+        return internalGetTags().getMap().size();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public boolean containsTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetTags().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getTagsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getTags() {
+        return getTagsMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+        return internalGetTags().getMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public java.lang.String getTagsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public java.lang.String getTagsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearTags() {
+        internalGetMutableTags().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public Builder removeTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableTags() {
+        return internalGetMutableTags().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+      public Builder putTags(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Arbitrary tags that allow users and the platform to store small but arbitrary labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; tags = 11;</code>
+       */
+
+      public Builder putAllTags(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableTags().getMutableMap()
+            .putAll(values);
         return this;
       }
       @java.lang.Override
@@ -17690,6 +18066,11 @@ public final class Tasks {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_TaskMetadata_TagsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_TaskTemplate_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -17770,7 +18151,7 @@ public final class Tasks {
       "ype\030\001 \001(\0162*.flyteidl.core.RuntimeMetadat" +
       "a.RuntimeType\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor" +
       "\030\003 \001(\t\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFLYT" +
-      "E_SDK\020\001\"\321\002\n\014TaskMetadata\022\024\n\014discoverable" +
+      "E_SDK\020\001\"\263\003\n\014TaskMetadata\022\024\n\014discoverable" +
       "\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.core." +
       "RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.googl" +
       "e.protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.f" +
@@ -17778,59 +18159,62 @@ public final class Tasks {
       "version\030\006 \001(\t\022 \n\030deprecated_error_messag" +
       "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000\022\032\n\022cach" +
       "e_serializable\030\t \001(\010\022\026\n\016generates_deck\030\n" +
-      " \001(\010B\025\n\023interruptible_value\"\220\004\n\014TaskTemp" +
-      "late\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
-      "ier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\0132\033.fl" +
-      "yteidl.core.TaskMetadata\0220\n\tinterface\030\004 " +
-      "\001(\0132\035.flyteidl.core.TypedInterface\022\'\n\006cu" +
-      "stom\030\005 \001(\0132\027.google.protobuf.Struct\022-\n\tc" +
-      "ontainer\030\006 \001(\0132\030.flyteidl.core.Container" +
-      "H\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl.core.K8sP" +
-      "odH\000\022!\n\003sql\030\022 \001(\0132\022.flyteidl.core.SqlH\000\022" +
-      "\031\n\021task_type_version\030\007 \001(\005\0228\n\020security_c" +
-      "ontext\030\010 \001(\0132\036.flyteidl.core.SecurityCon" +
-      "text\0227\n\006config\030\020 \003(\0132\'.flyteidl.core.Tas" +
-      "kTemplate.ConfigEntry\032-\n\013ConfigEntry\022\013\n\003" +
-      "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'" +
-      "\n\rContainerPort\022\026\n\016container_port\030\001 \001(\r\"" +
-      "\255\003\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030" +
-      "\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030" +
-      ".flyteidl.core.Resources\022(\n\003env\030\005 \003(\0132\033." +
-      "flyteidl.core.KeyValuePair\022/\n\006config\030\006 \003" +
-      "(\0132\033.flyteidl.core.KeyValuePairB\002\030\001\022+\n\005p" +
-      "orts\030\007 \003(\0132\034.flyteidl.core.ContainerPort" +
-      "\0225\n\013data_config\030\t \001(\0132 .flyteidl.core.Da" +
-      "taLoadingConfig\022;\n\014architecture\030\n \001(\0162%." +
-      "flyteidl.core.Container.Architecture\"I\n\014" +
-      "Architecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020\001\022\t\n\005" +
-      "ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n\nIOSt" +
-      "rategy\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl" +
-      ".core.IOStrategy.DownloadMode\0229\n\013upload_" +
-      "mode\030\002 \001(\0162$.flyteidl.core.IOStrategy.Up" +
-      "loadMode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAG" +
-      "ER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWN" +
-      "LOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000" +
-      "\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001" +
-      "\n\021DataLoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\n" +
-      "input_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n" +
-      "\006format\030\004 \001(\01621.flyteidl.core.DataLoadin" +
-      "gConfig.LiteralMapFormat\022.\n\013io_strategy\030" +
-      "\005 \001(\0132\031.flyteidl.core.IOStrategy\"1\n\020Lite" +
-      "ralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROT" +
-      "O\020\002\"g\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .flytei" +
-      "dl.core.K8sObjectMetadata\022)\n\010pod_spec\030\002 " +
-      "\001(\0132\027.google.protobuf.Struct\"\374\001\n\021K8sObje" +
-      "ctMetadata\022<\n\006labels\030\001 \003(\0132,.flyteidl.co" +
-      "re.K8sObjectMetadata.LabelsEntry\022F\n\013anno" +
-      "tations\030\002 \003(\01321.flyteidl.core.K8sObjectM" +
-      "etadata.AnnotationsEntry\032-\n\013LabelsEntry\022" +
-      "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Annot" +
-      "ationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
-      "\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001(\t\022+\n\007dialect" +
-      "\030\002 \001(\0162\032.flyteidl.core.Sql.Dialect\"7\n\007Di" +
-      "alect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002" +
-      "\022\t\n\005OTHER\020\003B6Z4github.com/flyteorg/flyte" +
-      "idl/gen/pb-go/flyteidl/coreb\006proto3"
+      " \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl.core.TaskM" +
+      "etadata.TagsEntry\032+\n\tTagsEntry\022\013\n\003key\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023interruptible_" +
+      "value\"\220\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010m" +
+      "etadata\030\003 \001(\0132\033.flyteidl.core.TaskMetada" +
+      "ta\0220\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Ty" +
+      "pedInterface\022\'\n\006custom\030\005 \001(\0132\027.google.pr" +
+      "otobuf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyte" +
+      "idl.core.ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025." +
+      "flyteidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.fl" +
+      "yteidl.core.SqlH\000\022\031\n\021task_type_version\030\007" +
+      " \001(\005\0228\n\020security_context\030\010 \001(\0132\036.flyteid" +
+      "l.core.SecurityContext\0227\n\006config\030\020 \003(\0132\'" +
+      ".flyteidl.core.TaskTemplate.ConfigEntry\032" +
+      "-\n\013ConfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
+      "(\t:\0028\001B\010\n\006target\"\'\n\rContainerPort\022\026\n\016con" +
+      "tainer_port\030\001 \001(\r\"\255\003\n\tContainer\022\r\n\005image" +
+      "\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n" +
+      "\tresources\030\004 \001(\0132\030.flyteidl.core.Resourc" +
+      "es\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyValue" +
+      "Pair\022/\n\006config\030\006 \003(\0132\033.flyteidl.core.Key" +
+      "ValuePairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl." +
+      "core.ContainerPort\0225\n\013data_config\030\t \001(\0132" +
+      " .flyteidl.core.DataLoadingConfig\022;\n\014arc" +
+      "hitecture\030\n \001(\0162%.flyteidl.core.Containe" +
+      "r.Architecture\"I\n\014Architecture\022\013\n\007UNKNOW" +
+      "N\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n" +
+      "\006ARM_V7\020\004\"\233\002\n\nIOStrategy\022=\n\rdownload_mod" +
+      "e\030\001 \001(\0162&.flyteidl.core.IOStrategy.Downl" +
+      "oadMode\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl." +
+      "core.IOStrategy.UploadMode\"L\n\014DownloadMo" +
+      "de\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREA" +
+      "M\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022" +
+      "\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\r" +
+      "DO_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n" +
+      "\007enabled\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013ou" +
+      "tput_path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flytei" +
+      "dl.core.DataLoadingConfig.LiteralMapForm" +
+      "at\022.\n\013io_strategy\030\005 \001(\0132\031.flyteidl.core." +
+      "IOStrategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000" +
+      "\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metad" +
+      "ata\030\001 \001(\0132 .flyteidl.core.K8sObjectMetad" +
+      "ata\022)\n\010pod_spec\030\002 \001(\0132\027.google.protobuf." +
+      "Struct\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001" +
+      " \003(\0132,.flyteidl.core.K8sObjectMetadata.L" +
+      "abelsEntry\022F\n\013annotations\030\002 \003(\01321.flytei" +
+      "dl.core.K8sObjectMetadata.AnnotationsEnt" +
+      "ry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001" +
+      "(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatemen" +
+      "t\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core" +
+      ".Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010" +
+      "\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4github." +
+      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
+      "/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -17873,7 +18257,13 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
-        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "InterruptibleValue", });
+        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "Tags", "InterruptibleValue", });
+    internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor =
+      internal_static_flyteidl_core_TaskMetadata_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_TaskMetadata_TagsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_TaskTemplate_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new

@@ -35,25 +35,30 @@ class CoreWorkflowMetadata(object):
     """
     swagger_types = {
         'quality_of_service': 'CoreQualityOfService',
-        'on_failure': 'WorkflowMetadataOnFailurePolicy'
+        'on_failure': 'WorkflowMetadataOnFailurePolicy',
+        'tags': 'dict(str, str)'
     }
 
     attribute_map = {
         'quality_of_service': 'quality_of_service',
-        'on_failure': 'on_failure'
+        'on_failure': 'on_failure',
+        'tags': 'tags'
     }
 
-    def __init__(self, quality_of_service=None, on_failure=None):  # noqa: E501
+    def __init__(self, quality_of_service=None, on_failure=None, tags=None):  # noqa: E501
         """CoreWorkflowMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._quality_of_service = None
         self._on_failure = None
+        self._tags = None
         self.discriminator = None
 
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
         if on_failure is not None:
             self.on_failure = on_failure
+        if tags is not None:
+            self.tags = tags
 
     @property
     def quality_of_service(self):
@@ -100,6 +105,27 @@ class CoreWorkflowMetadata(object):
         """
 
         self._on_failure = on_failure
+
+    @property
+    def tags(self):
+        """Gets the tags of this CoreWorkflowMetadata.  # noqa: E501
+
+
+        :return: The tags of this CoreWorkflowMetadata.  # noqa: E501
+        :rtype: dict(str, str)
+        """
+        return self._tags
+
+    @tags.setter
+    def tags(self, tags):
+        """Sets the tags of this CoreWorkflowMetadata.
+
+
+        :param tags: The tags of this CoreWorkflowMetadata.  # noqa: E501
+        :type: dict(str, str)
+        """
+
+        self._tags = tags
 
     def to_dict(self):
         """Returns the model properties as a dict"""

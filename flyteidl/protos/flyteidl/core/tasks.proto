@@ -98,6 +98,9 @@ message TaskMetadata {
 
     // Indicates whether the task will generate a Deck URI when it finishes executing.
     bool generates_deck = 10;
+
+    // Arbitrary tags that allow users and the platform to store small but arbitrary labels
+    map<string, string> tags = 11;
 }
 
 // A Task structure that uniquely identifies a task in the system

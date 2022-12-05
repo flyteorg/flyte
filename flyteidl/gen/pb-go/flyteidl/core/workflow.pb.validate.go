@@ -1160,6 +1160,8 @@ func (m *WorkflowMetadata) Validate() error {
 
 	// no validation rules for OnFailure
 
+	// no validation rules for Tags
+
 	return nil
 }
 
