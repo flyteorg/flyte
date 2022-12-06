@@ -17,6 +17,7 @@ flyte:
 	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
 	docker rmi flyte-binary:sandbox
 
+.PHONY: manifests/compiled.yaml
 manifests/compiled.yaml:
 	mkdir -p $(dir $@)
 	kubectl kustomize \

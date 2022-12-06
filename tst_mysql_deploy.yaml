@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox-mysql
+    app.kubernetes.io/name: flyte-sandbox-mysql
+  name: flyte-sandbox-mysql-standin
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: mysql
+      app.kubernetes.io/instance: flyte-sandbox-mysql
+      app.kubernetes.io/name: flyte-sandbox-mysql
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: mysql
+        app.kubernetes.io/instance: flyte-sandbox-mysql
+        app.kubernetes.io/name: flyte-sandbox-mysql
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: awesomesauce
+        image: mysql:8.0.31
+        imagePullPolicy: IfNotPresent
+        name: mysqlexample
+        ports:
+        - containerPort: 3306
+          name: maybeodbc
