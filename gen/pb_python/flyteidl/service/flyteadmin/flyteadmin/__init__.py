@@ -209,6 +209,7 @@ from flyteadmin.models.core_resources import CoreResources
 from flyteadmin.models.core_retry_strategy import CoreRetryStrategy
 from flyteadmin.models.core_runtime_metadata import CoreRuntimeMetadata
 from flyteadmin.models.core_scalar import CoreScalar
+from flyteadmin.models.core_schema import CoreSchema
 from flyteadmin.models.core_schema_type import CoreSchemaType
 from flyteadmin.models.core_secret import CoreSecret
 from flyteadmin.models.core_security_context import CoreSecurityContext
@@ -257,7 +258,6 @@ from flyteadmin.models.flyteidladmin_node_execution import FlyteidladminNodeExec
 from flyteadmin.models.flyteidladmin_task_execution import FlyteidladminTaskExecution
 from flyteadmin.models.flyteidladmin_task_node_metadata import FlyteidladminTaskNodeMetadata
 from flyteadmin.models.flyteidladmin_workflow_node_metadata import FlyteidladminWorkflowNodeMetadata
-from flyteadmin.models.flyteidlcore_schema import FlyteidlcoreSchema
 from flyteadmin.models.flyteidlevent_dynamic_workflow_node_metadata import FlyteidleventDynamicWorkflowNodeMetadata
 from flyteadmin.models.flyteidlevent_task_node_metadata import FlyteidleventTaskNodeMetadata
 from flyteadmin.models.flyteidlevent_workflow_node_metadata import FlyteidleventWorkflowNodeMetadata

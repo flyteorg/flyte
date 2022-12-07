@@ -15,7 +15,6 @@ from flyteidl.admin import version_pb2 as _version_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.admin import description_entity_pb2 as _description_entity_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
-from protoc_gen_swagger.options import annotations_pb2 as _annotations_pb2_1
 from google.protobuf import descriptor as _descriptor
 from typing import ClassVar as _ClassVar
 

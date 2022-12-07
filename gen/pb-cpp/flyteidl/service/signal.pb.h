@@ -31,7 +31,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include "google/api/annotations.pb.h"
 #include "flyteidl/admin/signal.pb.h"
-#include "protoc-gen-swagger/options/annotations.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fservice_2fsignal_2eproto

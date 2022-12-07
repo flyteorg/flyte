@@ -57,6 +57,13 @@ class SignalService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Signal>> PrepareAsyncGetOrCreateSignal(::grpc::ClientContext* context, const ::flyteidl::admin::SignalGetOrCreateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Signal>>(PrepareAsyncGetOrCreateSignalRaw(context, request, cq));
     }
+    // Purposefully left out an HTTP API for this RPC call. This is meant to idempotently retrieve
+    // a signal, meaning the first call will create the signal and all subsequent calls will
+    // fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
+    // is not exposed to mitigate unintended behavior.
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a signal, creating it if it does not exist."
+    // };
     // Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.
     virtual ::grpc::Status ListSignals(::grpc::ClientContext* context, const ::flyteidl::admin::SignalListRequest& request, ::flyteidl::admin::SignalList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::SignalList>> AsyncListSignals(::grpc::ClientContext* context, const ::flyteidl::admin::SignalListRequest& request, ::grpc::CompletionQueue* cq) {
@@ -81,6 +88,13 @@ class SignalService final {
       virtual void GetOrCreateSignal(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Signal* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetOrCreateSignal(::grpc::ClientContext* context, const ::flyteidl::admin::SignalGetOrCreateRequest* request, ::flyteidl::admin::Signal* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetOrCreateSignal(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Signal* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Purposefully left out an HTTP API for this RPC call. This is meant to idempotently retrieve
+      // a signal, meaning the first call will create the signal and all subsequent calls will
+      // fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
+      // is not exposed to mitigate unintended behavior.
+      // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      //   description: "Retrieve a signal, creating it if it does not exist."
+      // };
       // Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.
       virtual void ListSignals(::grpc::ClientContext* context, const ::flyteidl::admin::SignalListRequest* request, ::flyteidl::admin::SignalList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListSignals(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::SignalList* response, std::function<void(::grpc::Status)>) = 0;
@@ -169,6 +183,13 @@ class SignalService final {
     virtual ~Service();
     // Fetches or creates a :ref:`ref_flyteidl.admin.Signal`.
     virtual ::grpc::Status GetOrCreateSignal(::grpc::ServerContext* context, const ::flyteidl::admin::SignalGetOrCreateRequest* request, ::flyteidl::admin::Signal* response);
+    // Purposefully left out an HTTP API for this RPC call. This is meant to idempotently retrieve
+    // a signal, meaning the first call will create the signal and all subsequent calls will
+    // fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
+    // is not exposed to mitigate unintended behavior.
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a signal, creating it if it does not exist."
+    // };
     // Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.
     virtual ::grpc::Status ListSignals(::grpc::ServerContext* context, const ::flyteidl::admin::SignalListRequest* request, ::flyteidl::admin::SignalList* response);
     // Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition

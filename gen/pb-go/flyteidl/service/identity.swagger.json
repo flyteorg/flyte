@@ -18,7 +18,6 @@
     "/me": {
       "get": {
         "summary": "Retrieves user information about the currently logged in user.",
-        "description": "Retrieves authenticated identity info.",
         "operationId": "UserInfo",
         "responses": {
           "200": {

@@ -20,10 +20,10 @@ from flyteadmin.models.core_binary import CoreBinary  # noqa: F401,E501
 from flyteadmin.models.core_blob import CoreBlob  # noqa: F401,E501
 from flyteadmin.models.core_error import CoreError  # noqa: F401,E501
 from flyteadmin.models.core_primitive import CorePrimitive  # noqa: F401,E501
+from flyteadmin.models.core_schema import CoreSchema  # noqa: F401,E501
 from flyteadmin.models.core_structured_dataset import CoreStructuredDataset  # noqa: F401,E501
 from flyteadmin.models.core_union import CoreUnion  # noqa: F401,E501
 from flyteadmin.models.core_void import CoreVoid  # noqa: F401,E501
-from flyteadmin.models.flyteidlcore_schema import FlyteidlcoreSchema  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -44,7 +44,7 @@ class CoreScalar(object):
         'primitive': 'CorePrimitive',
         'blob': 'CoreBlob',
         'binary': 'CoreBinary',
-        'schema': 'FlyteidlcoreSchema',
+        'schema': 'CoreSchema',
         'none_type': 'CoreVoid',
         'error': 'CoreError',
         'generic': 'ProtobufStruct',
@@ -166,7 +166,7 @@ class CoreScalar(object):
 
 
         :return: The schema of this CoreScalar.  # noqa: E501
-        :rtype: FlyteidlcoreSchema
+        :rtype: CoreSchema
         """
         return self._schema
 
@@ -176,7 +176,7 @@ class CoreScalar(object):
 
 
         :param schema: The schema of this CoreScalar.  # noqa: E501
-        :type: FlyteidlcoreSchema
+        :type: CoreSchema
         """
 
         self._schema = schema

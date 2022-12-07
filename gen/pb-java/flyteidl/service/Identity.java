@@ -2086,18 +2086,15 @@ public final class Identity {
     java.lang.String[] descriptorData = {
       "\n\037flyteidl/service/identity.proto\022\020flyte" +
       "idl.service\032\034google/api/annotations.prot" +
-      "o\032,protoc-gen-swagger/options/annotation" +
-      "s.proto\"\021\n\017UserInfoRequest\"\226\001\n\020UserInfoR" +
-      "esponse\022\017\n\007subject\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032" +
-      "\n\022preferred_username\030\003 \001(\t\022\022\n\ngiven_name" +
-      "\030\004 \001(\t\022\023\n\013family_name\030\005 \001(\t\022\r\n\005email\030\006 \001" +
-      "(\t\022\017\n\007picture\030\007 \001(\t2\235\001\n\017IdentityService\022" +
-      "\211\001\n\010UserInfo\022!.flyteidl.service.UserInfo" +
-      "Request\032\".flyteidl.service.UserInfoRespo" +
-      "nse\"6\202\323\344\223\002\005\022\003/me\222A(\032&Retrieves authentic" +
-      "ated identity info.B9Z7github.com/flyteo" +
-      "rg/flyteidl/gen/pb-go/flyteidl/serviceb\006" +
-      "proto3"
+      "o\"\021\n\017UserInfoRequest\"\226\001\n\020UserInfoRespons" +
+      "e\022\017\n\007subject\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032\n\022pref" +
+      "erred_username\030\003 \001(\t\022\022\n\ngiven_name\030\004 \001(\t" +
+      "\022\023\n\013family_name\030\005 \001(\t\022\r\n\005email\030\006 \001(\t\022\017\n\007" +
+      "picture\030\007 \001(\t2q\n\017IdentityService\022^\n\010User" +
+      "Info\022!.flyteidl.service.UserInfoRequest\032" +
+      "\".flyteidl.service.UserInfoResponse\"\013\202\323\344" +
+      "\223\002\005\022\003/meB9Z7github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2111,7 +2108,6 @@ public final class Identity {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
-          grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_UserInfoRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -2128,11 +2124,9 @@ public final class Identity {
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
-    registry.add(grpc.gateway.protoc_gen_swagger.options.Annotations.openapiv2Operation);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
-    grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
