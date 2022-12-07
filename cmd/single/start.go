@@ -154,7 +154,7 @@ var startCmd = &cobra.Command{
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
 
-		for _, serviceName := range []string{"admin-client", "blobstore-client", "flytepropeller", "k8s-client"} {
+		for _, serviceName := range []string{"admin-client", "blobstore-client", "datacatalog-client", "flytepropeller", "k8s-client"} {
 			if err := telemetryutils.RegisterTracerProvider(serviceName, telemetryutils.GetConfig()) ; err != nil {
 				logger.Errorf(ctx, "Failed to create telemetry tracer provider. %v", err)
 				return err
