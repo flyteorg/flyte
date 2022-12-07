@@ -4,8 +4,6 @@
 Flyte Scheduler Configuration
 #########################################
 
-.. tags:: Configuration, Advanced
-
 - `admin <#section-admin>`_
 
 - `auth <#section-auth>`_
