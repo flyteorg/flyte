@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.flyteidlcore_schema import FlyteidlcoreSchema  # noqa: E501
+from flyteadmin.models.core_schema import CoreSchema  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestFlyteidlcoreSchema(unittest.TestCase):
-    """FlyteidlcoreSchema unit test stubs"""
+class TestCoreSchema(unittest.TestCase):
+    """CoreSchema unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestFlyteidlcoreSchema(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testFlyteidlcoreSchema(self):
-        """Test FlyteidlcoreSchema"""
+    def testCoreSchema(self):
+        """Test CoreSchema"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.flyteidlcore_schema.FlyteidlcoreSchema()  # noqa: E501
+        # model = flyteadmin.models.core_schema.CoreSchema()  # noqa: E501
         pass
 
 

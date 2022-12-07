@@ -4,7 +4,7 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-import "protoc-gen-swagger/options/annotations.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
 
 message UserInfoRequest {}
 
@@ -40,8 +40,8 @@ service IdentityService {
     option (google.api.http) = {
       get: "/me"
     };
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      description: "Retrieves authenticated identity info."
-    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieves authenticated identity info."
+    // };
   }
 }
