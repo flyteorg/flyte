@@ -18,7 +18,6 @@
     "/api/v1/dataproxy/artifact_link": {
       "post": {
         "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
-        "description": "Creates a read-only http location that is accessible for tasks at runtime.",
         "operationId": "CreateDownloadLink",
         "responses": {
           "200": {
@@ -46,7 +45,6 @@
     "/api/v1/dataproxy/artifact_urn": {
       "get": {
         "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
-        "description": "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime.",
         "operationId": "CreateDownloadLocation",
         "responses": {
           "200": {
@@ -78,7 +76,6 @@
       },
       "post": {
         "summary": "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.",
-        "description": "Creates a write-only http location that is accessible for tasks at runtime.",
         "operationId": "CreateUploadLocation",
         "responses": {
           "200": {

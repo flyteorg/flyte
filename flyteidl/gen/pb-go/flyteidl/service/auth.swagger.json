@@ -18,7 +18,6 @@
     "/.well-known/oauth-authorization-server": {
       "get": {
         "summary": "Anonymously accessible. Retrieves local or external oauth authorization server metadata.",
-        "description": "Retrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible.",
         "operationId": "GetOAuth2Metadata",
         "responses": {
           "200": {
@@ -36,7 +35,6 @@
     "/config/v1/flyte_client": {
       "get": {
         "summary": "Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization\nrequests.",
-        "description": "Retrieves public flyte client info. This endpoint is anonymously accessible.",
         "operationId": "GetPublicClientConfig",
         "responses": {
           "200": {

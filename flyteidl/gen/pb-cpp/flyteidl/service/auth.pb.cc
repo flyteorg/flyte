@@ -163,51 +163,45 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto[] =
   "\n\033flyteidl/service/auth.proto\022\020flyteidl."
-  "service\032\034google/api/annotations.proto\032,p"
-  "rotoc-gen-swagger/options/annotations.pr"
-  "oto\"\027\n\025OAuth2MetadataRequest\"\315\002\n\026OAuth2M"
-  "etadataResponse\022\016\n\006issuer\030\001 \001(\t\022\036\n\026autho"
-  "rization_endpoint\030\002 \001(\t\022\026\n\016token_endpoin"
-  "t\030\003 \001(\t\022 \n\030response_types_supported\030\004 \003("
-  "\t\022\030\n\020scopes_supported\030\005 \003(\t\022-\n%token_end"
-  "point_auth_methods_supported\030\006 \003(\t\022\020\n\010jw"
-  "ks_uri\030\007 \001(\t\022(\n code_challenge_methods_s"
-  "upported\030\010 \003(\t\022\035\n\025grant_types_supported\030"
-  "\t \003(\t\022%\n\035device_authorization_endpoint\030\n"
-  " \001(\t\"\037\n\035PublicClientAuthConfigRequest\"\256\001"
-  "\n\036PublicClientAuthConfigResponse\022\021\n\tclie"
-  "nt_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sco"
-  "pes\030\003 \003(\t\022\"\n\032authorization_metadata_key\030"
-  "\004 \001(\t\022\035\n\025service_http_endpoint\030\005 \001(\t\022\020\n\010"
-  "audience\030\006 \001(\t2\374\003\n\023AuthMetadataService\022\365"
-  "\001\n\021GetOAuth2Metadata\022\'.flyteidl.service."
-  "OAuth2MetadataRequest\032(.flyteidl.service"
-  ".OAuth2MetadataResponse\"\214\001\202\323\344\223\002)\022\'/.well"
-  "-known/oauth-authorization-server\222AZ\032XRe"
-  "trieves OAuth2 authorization server meta"
-  "data. This endpoint is anonymously acces"
-  "sible.\022\354\001\n\025GetPublicClientConfig\022/.flyte"
-  "idl.service.PublicClientAuthConfigReques"
-  "t\0320.flyteidl.service.PublicClientAuthCon"
-  "figResponse\"p\202\323\344\223\002\031\022\027/config/v1/flyte_cl"
-  "ient\222AN\032LRetrieves public flyte client i"
-  "nfo. This endpoint is anonymously access"
-  "ible.B9Z7github.com/flyteorg/flyteidl/ge"
-  "n/pb-go/flyteidl/serviceb\006proto3"
+  "service\032\034google/api/annotations.proto\"\027\n"
+  "\025OAuth2MetadataRequest\"\315\002\n\026OAuth2Metadat"
+  "aResponse\022\016\n\006issuer\030\001 \001(\t\022\036\n\026authorizati"
+  "on_endpoint\030\002 \001(\t\022\026\n\016token_endpoint\030\003 \001("
+  "\t\022 \n\030response_types_supported\030\004 \003(\t\022\030\n\020s"
+  "copes_supported\030\005 \003(\t\022-\n%token_endpoint_"
+  "auth_methods_supported\030\006 \003(\t\022\020\n\010jwks_uri"
+  "\030\007 \001(\t\022(\n code_challenge_methods_support"
+  "ed\030\010 \003(\t\022\035\n\025grant_types_supported\030\t \003(\t\022"
+  "%\n\035device_authorization_endpoint\030\n \001(\t\"\037"
+  "\n\035PublicClientAuthConfigRequest\"\256\001\n\036Publ"
+  "icClientAuthConfigResponse\022\021\n\tclient_id\030"
+  "\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006scopes\030\003 "
+  "\003(\t\022\"\n\032authorization_metadata_key\030\004 \001(\t\022"
+  "\035\n\025service_http_endpoint\030\005 \001(\t\022\020\n\010audien"
+  "ce\030\006 \001(\t2\315\002\n\023AuthMetadataService\022\227\001\n\021Get"
+  "OAuth2Metadata\022\'.flyteidl.service.OAuth2"
+  "MetadataRequest\032(.flyteidl.service.OAuth"
+  "2MetadataResponse\"/\202\323\344\223\002)\022\'/.well-known/"
+  "oauth-authorization-server\022\233\001\n\025GetPublic"
+  "ClientConfig\022/.flyteidl.service.PublicCl"
+  "ientAuthConfigRequest\0320.flyteidl.service"
+  ".PublicClientAuthConfigResponse\"\037\202\323\344\223\002\031\022"
+  "\027/config/v1/flyte_clientB9Z7github.com/f"
+  "lyteorg/flyteidl/gen/pb-go/flyteidl/serv"
+  "iceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fauth_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fauth_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto,
-  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1272,
+  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1051,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fauth_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
   {
     ::AddDescriptors_google_2fapi_2fannotations_2eproto,
-    ::AddDescriptors_protoc_2dgen_2dswagger_2foptions_2fannotations_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fauth_2eproto, deps, 2);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fauth_2eproto, deps, 1);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.

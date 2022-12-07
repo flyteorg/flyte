@@ -6379,53 +6379,45 @@ public final class Dataproxy {
     java.lang.String[] descriptorData = {
       "\n flyteidl/service/dataproxy.proto\022\020flyt" +
       "eidl.service\032\034google/api/annotations.pro" +
-      "to\032,protoc-gen-swagger/options/annotatio" +
-      "ns.proto\032\036google/protobuf/duration.proto" +
-      "\032\037google/protobuf/timestamp.proto\032\036flyte" +
-      "idl/core/identifier.proto\"v\n\034CreateUploa" +
-      "dLocationResponse\022\022\n\nsigned_url\030\001 \001(\t\022\022\n" +
-      "\nnative_url\030\002 \001(\t\022.\n\nexpires_at\030\003 \001(\0132\032." +
-      "google.protobuf.Timestamp\"\224\001\n\033CreateUplo" +
-      "adLocationRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
-      "main\030\002 \001(\t\022\020\n\010filename\030\003 \001(\t\022-\n\nexpires_" +
-      "in\030\004 \001(\0132\031.google.protobuf.Duration\022\023\n\013c" +
-      "ontent_md5\030\005 \001(\014\"f\n\035CreateDownloadLocati" +
-      "onRequest\022\022\n\nnative_url\030\001 \001(\t\022-\n\nexpires" +
-      "_in\030\002 \001(\0132\031.google.protobuf.Duration:\002\030\001" +
-      "\"h\n\036CreateDownloadLocationResponse\022\022\n\nsi" +
-      "gned_url\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(\0132\032.goo" +
-      "gle.protobuf.Timestamp:\002\030\001\"\320\001\n\031CreateDow" +
-      "nloadLinkRequest\0225\n\rartifact_type\030\001 \001(\0162" +
-      "\036.flyteidl.service.ArtifactType\022-\n\nexpir" +
-      "es_in\030\002 \001(\0132\031.google.protobuf.Duration\022C" +
-      "\n\021node_execution_id\030\003 \001(\0132&.flyteidl.cor" +
-      "e.NodeExecutionIdentifierH\000B\010\n\006source\"`\n" +
-      "\032CreateDownloadLinkResponse\022\022\n\nsigned_ur" +
-      "l\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.pro" +
-      "tobuf.Timestamp*C\n\014ArtifactType\022\033\n\027ARTIF" +
-      "ACT_TYPE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DE" +
-      "CK\020\0012\236\006\n\020DataProxyService\022\360\001\n\024CreateUplo" +
-      "adLocation\022-.flyteidl.service.CreateUplo" +
-      "adLocationRequest\032..flyteidl.service.Cre" +
-      "ateUploadLocationResponse\"y\202\323\344\223\002#\"\036/api/" +
-      "v1/dataproxy/artifact_urn:\001*\222AM\032KCreates" +
-      " a write-only http location that is acce" +
-      "ssible for tasks at runtime.\022\251\002\n\026CreateD" +
-      "ownloadLocation\022/.flyteidl.service.Creat" +
-      "eDownloadLocationRequest\0320.flyteidl.serv" +
-      "ice.CreateDownloadLocationResponse\"\253\001\210\002\001" +
-      "\202\323\344\223\002 \022\036/api/v1/dataproxy/artifact_urn\222A" +
-      "\177\032}Deprecated: Please use CreateDownload" +
-      "Link instead. Creates a read-only http l" +
-      "ocation that is accessible for tasks at " +
-      "runtime.\022\352\001\n\022CreateDownloadLink\022+.flytei" +
-      "dl.service.CreateDownloadLinkRequest\032,.f" +
-      "lyteidl.service.CreateDownloadLinkRespon" +
-      "se\"y\202\323\344\223\002$\"\037/api/v1/dataproxy/artifact_l" +
-      "ink:\001*\222AL\032JCreates a read-only http loca" +
-      "tion that is accessible for tasks at run" +
-      "time.B9Z7github.com/flyteorg/flyteidl/ge" +
-      "n/pb-go/flyteidl/serviceb\006proto3"
+      "to\032\036google/protobuf/duration.proto\032\037goog" +
+      "le/protobuf/timestamp.proto\032\036flyteidl/co" +
+      "re/identifier.proto\"v\n\034CreateUploadLocat" +
+      "ionResponse\022\022\n\nsigned_url\030\001 \001(\t\022\022\n\nnativ" +
+      "e_url\030\002 \001(\t\022.\n\nexpires_at\030\003 \001(\0132\032.google" +
+      ".protobuf.Timestamp\"\224\001\n\033CreateUploadLoca" +
+      "tionRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002" +
+      " \001(\t\022\020\n\010filename\030\003 \001(\t\022-\n\nexpires_in\030\004 \001" +
+      "(\0132\031.google.protobuf.Duration\022\023\n\013content" +
+      "_md5\030\005 \001(\014\"f\n\035CreateDownloadLocationRequ" +
+      "est\022\022\n\nnative_url\030\001 \001(\t\022-\n\nexpires_in\030\002 " +
+      "\001(\0132\031.google.protobuf.Duration:\002\030\001\"h\n\036Cr" +
+      "eateDownloadLocationResponse\022\022\n\nsigned_u" +
+      "rl\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp:\002\030\001\"\320\001\n\031CreateDownloadL" +
+      "inkRequest\0225\n\rartifact_type\030\001 \001(\0162\036.flyt" +
+      "eidl.service.ArtifactType\022-\n\nexpires_in\030" +
+      "\002 \001(\0132\031.google.protobuf.Duration\022C\n\021node" +
+      "_execution_id\030\003 \001(\0132&.flyteidl.core.Node" +
+      "ExecutionIdentifierH\000B\010\n\006source\"`\n\032Creat" +
+      "eDownloadLinkResponse\022\022\n\nsigned_url\030\001 \003(" +
+      "\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.protobuf." +
+      "Timestamp*C\n\014ArtifactType\022\033\n\027ARTIFACT_TY" +
+      "PE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012\374" +
+      "\003\n\020DataProxyService\022\240\001\n\024CreateUploadLoca" +
+      "tion\022-.flyteidl.service.CreateUploadLoca" +
+      "tionRequest\032..flyteidl.service.CreateUpl" +
+      "oadLocationResponse\")\202\323\344\223\002#\"\036/api/v1/dat" +
+      "aproxy/artifact_urn:\001*\022\246\001\n\026CreateDownloa" +
+      "dLocation\022/.flyteidl.service.CreateDownl" +
+      "oadLocationRequest\0320.flyteidl.service.Cr" +
+      "eateDownloadLocationResponse\")\210\002\001\202\323\344\223\002 \022" +
+      "\036/api/v1/dataproxy/artifact_urn\022\233\001\n\022Crea" +
+      "teDownloadLink\022+.flyteidl.service.Create" +
+      "DownloadLinkRequest\032,.flyteidl.service.C" +
+      "reateDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api/" +
+      "v1/dataproxy/artifact_link:\001*B9Z7github." +
+      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
+      "/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6439,7 +6431,6 @@ public final class Dataproxy {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
-          grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
@@ -6483,11 +6474,9 @@ public final class Dataproxy {
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
-    registry.add(grpc.gateway.protoc_gen_swagger.options.Annotations.openapiv2Operation);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
-    grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

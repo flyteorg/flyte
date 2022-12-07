@@ -18,7 +18,6 @@
     "/api/v1/signals": {
       "post": {
         "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
-        "description": "Set a signal value.",
         "operationId": "SetSignal",
         "responses": {
           "200": {
@@ -26,14 +25,6 @@
             "schema": {
               "$ref": "#/definitions/adminSignalSetResponse"
             }
-          },
-          "400": {
-            "description": "Returned for bad request that may have failed validation.",
-            "schema": {}
-          },
-          "409": {
-            "description": "Returned for a request that references an identical entity that has already been registered.",
-            "schema": {}
           }
         },
         "parameters": [
@@ -54,7 +45,6 @@
     "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.",
-        "description": "Fetch existing signal definitions matching the input signal id filters.",
         "operationId": "ListSignals",
         "responses": {
           "200": {
@@ -467,7 +457,7 @@
           "$ref": "#/definitions/coreBinary"
         },
         "schema": {
-          "$ref": "#/definitions/flyteidlcoreSchema"
+          "$ref": "#/definitions/coreSchema"
         },
         "none_type": {
           "$ref": "#/definitions/coreVoid"
@@ -485,6 +475,18 @@
           "$ref": "#/definitions/coreUnion"
         }
       }
+    },
+    "coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
     "coreSchemaType": {
       "type": "object",
@@ -642,18 +644,6 @@
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
-    },
-    "flyteidlcoreSchema": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/coreSchemaType"
-        }
-      },
-      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
     "protobufListValue": {
       "type": "object",
