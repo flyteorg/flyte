@@ -122,33 +122,3 @@ Replace ``<ACCESS_TOKEN>`` with your access token.
 .. code-block:: bash
 
     helm upgrade -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml flyteorg/flyte-core
-
-9. Register the Databricks plugin example.
-
-.. code-block:: bash
-
-  # TODO: Blocked by flytesnack PR
-  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
-
-
-10.  Launch an execution
-
-.. tabbed:: Flyte Console
-
-  * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
-  * Click on `Launch` to open up the launch form.
-  * Submit the form.
-
-.. tabbed:: Flytectl
-
-  * Retrieve an execution form in the form of a yaml file:
-
-    .. code-block:: bash
-
-       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development snowflake.workflows.example.snowflake_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/flytectl.yaml
-
-  * Launch! 🚀
-
-    .. code-block:: bash
-
-       flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
