@@ -510,40 +510,6 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                 container_array: k8s-array
                 spark: spark
 
-  .. tabbed:: Databricks
-
-    Since sandbox uses minio, it needs additional configuration.
-
-    .. code-block:: yaml
-
-      configmap:
-        enabled_plugins:
-          # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
-          tasks:
-            # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
-            task-plugins:
-              # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
-              # plugins
-              enabled-plugins:
-                - container
-                - sidecar
-                - k8s-array
-                - databricks
-              default-for-task-types:
-                container: container
-                sidecar: sidecar
-                container_array: k8s-array
-                spark: databricks
-      databricks:
-        enabled: True
-        plugin_config:
-          plugins:
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint-4.py
-              databricksInstance: dbc-a53b7a3c-614c
-
-
-
 5. Upgrade the Flyte Helm release:
 
 .. code-block:: bash
