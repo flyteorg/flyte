@@ -1,0 +1,95 @@
+docker-registry:
+  image:
+    repository: registry
+    tag: sandbox
+    pullPolicy: Never
+  persistence:
+    enabled: false
+  service:
+    type: NodePort
+    nodePort: 30000
+
+flyte-binary:
+  networking:
+    host: true
+  images:
+    flyte:
+      repository: flyte-binary
+      tag: sandbox
+      pullPolicy: Never
+    postgres:
+      repository: bitnami/postgresql
+      tag: sandbox
+      pullPolicy: Never
+  storage:
+    type: minio
+    region: my-region
+  database:
+    port: 30001
+    username: postgres
+    host: 127.0.0.1
+    dbname: flyteadmin
+    password: postgres
+  logger:
+    level: 6
+
+kubernetes-dashboard:
+  image:
+    repository: kubernetesui/dashboard
+    tag: sandbox
+    pullPolicy: Never
+  extraArgs:
+    - --enable-insecure-login
+    - --enable-skip-login
+  protocolHttp: true
+  service:
+    externalPort: 80
+  rbac:
+    create: true
+    clusterRoleMetrics: false
+    clusterReadOnlyRole: true
+
+minio:
+  image:
+    repository: bitnami/minio
+    tag: sandbox
+    pullPolicy: Never
+  auth:
+    rootUser: minio
+    rootPassword: miniostorage
+  defaultBuckets: my-s3-bucket
+  extraEnvVars:
+    - name: MINIO_BROWSER_REDIRECT_URL
+      value: http://localhost:30080/minio
+  service:
+    type: NodePort
+    nodePorts:
+      api: 30002
+  persistence:
+    enabled: true
+    storageClass: local-path
+
+postgresql:
+  image:
+    repository: bitnami/postgresql
+    tag: sandbox
+    pullPolicy: Never
+  auth:
+    postgresPassword: postgres
+  shmVolume:
+    enabled: false
+  primary:
+    service:
+      type: NodePort
+      nodePorts:
+        postgresql: 30001
+    persistence:
+      enabled: true
+      storageClass: local-path
+
+sandbox:
+  proxy:
+    image:
+      repository: envoyproxy/envoy
+      tag: sandbox
+      pullPolicy: Never

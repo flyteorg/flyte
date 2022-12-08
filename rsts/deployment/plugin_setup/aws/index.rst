@@ -4,6 +4,7 @@
 AWS Plugins Setup
 #################
 
+.. tags:: AWS, Integration, MachineLearning, Data, Advanced
 
 .. panels::
     :header: text-center

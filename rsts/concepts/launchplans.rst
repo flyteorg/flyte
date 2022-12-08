@@ -1,7 +1,10 @@
 .. _divedeep-launchplans:
-  
+
 Launch plans
-=============
+============
+
+.. tags:: Basic, Glossary, Design
+
 Launch plans help execute workflows. A workflow can be associated with multiple launch plans and launch plan versions, but an individual launch plan is always associated with a single, specific workflow. After creating a launch plan, it is easy to share and execute them.
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
@@ -10,10 +13,9 @@ In addition to templatized inputs, launch plans allow you to run your workflow o
 plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
 optional notifications. Refer to the :ref:`deployment-cluster-config-notifications` for a deep dive into available notifications.
 
-See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
-
 The Association between Workflows and LaunchPlans
---------------------------------------------------
+-------------------------------------------------
+
 Every workflow comes with a `default` launch plan that has the same name as that of a workflow. The default launch plan is authored (in code) as part of creating a new workflow.
 A launch plan version can only ever be mapped to one workflow version; meaning a launch plan version cannot be used twice. This is because part of what makes a new launch plan version is the mapping to the specific workflow version.
 

@@ -3,6 +3,8 @@
 Domains
 =======
 
+.. tags:: Basic, Glossary
+
 Domains provide an abstraction to isolate resources and feature configuration for different
 deployment environments. 
 

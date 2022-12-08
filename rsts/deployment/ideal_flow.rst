@@ -1,7 +1,9 @@
 .. _ideal-flow:
 
 Streamlining Your Flyte Workflows
---------------------------------------
+---------------------------------
+
+.. tags:: Deployment, Basic
 
 Flyte has a wide range of applications, including model training, data processing, ELT/ETL, and bioinformatics. 
 Regardless of the domain, when workflows are built and deployed, we may need automation to reduce human-in-the-loop to some extent; 
@@ -16,7 +18,7 @@ Before diving into an example use case that explains how DevOps could power Flyt
 - Executions can be monitored using logs on :ref:`Flyte UI <ui>`.
 
 .. note::
-    
+
     Currently, Flyte does not support the promotion of workflows across various stages (development, staging, production). This promotion process is expected to be handled externally through CI/CD process.
 
 Case Study: MLOps at Lyft

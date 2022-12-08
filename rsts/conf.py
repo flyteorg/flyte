@@ -23,14 +23,14 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
 # -- Project information -----------------------------------------------------
 
-project = u"Flyte"
-copyright = u"2022, Flyte Authors"
-author = u"Flyte"
+project = "Flyte"
+copyright = "2022, Flyte Authors"
+author = "Flyte"
 
 # The short X.Y version
-version = u""
+version = ""
 # The full version, including alpha/beta/rc tags
-release = u"1.3.0-b1"
+release = "1.3.0-b3"
 
 # -- General configuration ---------------------------------------------------
 
@@ -64,6 +64,7 @@ extensions = [
     "sphinxcontrib.video",
     "sphinxcontrib.yt",
     "sphinx_tabs.tabs",
+    "sphinx_tags",
 ]
 
 extlinks = {
@@ -98,7 +99,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = [u"_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -181,14 +182,14 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "Flyte.tex", u"Flyte Documentation", u"Flyte Authors", "manual"),
+    (master_doc, "Flyte.tex", "Flyte Documentation", "Flyte Authors", "manual"),
 ]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "flyte", u"Flyte Documentation", [author], 1)]
+man_pages = [(master_doc, "flyte", "Flyte Documentation", [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -199,7 +200,7 @@ texinfo_documents = [
     (
         master_doc,
         "Flyte",
-        u"Flyte Documentation",
+        "Flyte Documentation",
         author,
         "Flyte",
         "Accelerate your ML and data workflows to production.",
@@ -210,6 +211,11 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
+
+# Tags config
+tags_create_tags = True
+tags_page_title = "Tag"
+tags_overview_title = "All Tags"
 
 # -- Options for intersphinx extension ---------------------------------------
 

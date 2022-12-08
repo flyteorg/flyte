@@ -54,9 +54,11 @@
 
    API Reference <reference/index>
 
-   
+
 What is Flyte?
 ==============
+
+`Flyte Tags <_tags/tagsindex.html>`__
 
 .. raw:: html
 

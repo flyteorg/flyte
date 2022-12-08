@@ -1,10 +1,12 @@
 .. _contribute_Flyte:
 
-######################
+#####################
 Contributing to Flyte
-######################
+#####################
 
-Thank you for taking the time to contribute to Flyte! 
+.. tags:: Contribute, Basic
+
+Thank you for taking the time to contribute to Flyte!
 Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`__ before contributing to Flyte.
 
 Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.

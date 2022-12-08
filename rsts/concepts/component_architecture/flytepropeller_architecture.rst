@@ -4,7 +4,9 @@
 FlytePropeller Architecture
 ###########################
 
-.. note:: 
+.. tags:: Advanced, Design
+
+.. note::
    In the frame of this document, we use the term “workflow” to describe the single execution of a workflow definition.
 
 Introduction
@@ -13,7 +15,7 @@ Introduction
 A Flyte :ref:`workflow <divedeep-workflows>` is represented as a Directed Acyclic Graph (DAG) of interconnected Nodes. Flyte supports a robust collection of Node types to ensure diverse functionality.
 - ``TaskNodes`` support a plugin system to externally add system integrations.
 - Control flow can be altered during runtime using ``BranchNodes``, which prune downstream evaluation paths based on input. 
-- ``DynamicNodes`` add nodes to the DAG. 
+- ``DynamicNodes`` add nodes to the DAG.
 - ``WorkflowNodes`` allow embedding workflows within each other.
 
 FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a K8s controller and adheres to the established K8s design principles. In this scheme, resources are periodically evaluated and the goal is to transition from the observed state to a requested state. 

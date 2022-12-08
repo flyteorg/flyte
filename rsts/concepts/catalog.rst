@@ -3,6 +3,8 @@
 What is Data Catalog?
 =====================
 
+.. tags:: Advanced, Design
+
 `DataCatalog <https://github.com/flyteorg/datacatalog>`__ is a service to index parameterized, strongly-typed data artifacts across revisions. It allows clients to query artifacts based on meta information and tags.
 
 

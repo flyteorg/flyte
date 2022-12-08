@@ -69,6 +69,7 @@ plugins:
   logs:
     kubernetes-enabled: true
     kubernetes-url: "http://localhost:30082"
+    kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 cluster_resources:
   refreshInterval: 5m
   templatePath: "/etc/flyte/clusterresource/templates"
@@ -77,25 +78,28 @@ cluster_resources:
   customData:
   - production:
     - projectQuotaCpu:
-        value: "5"
+        value: "8"
     - projectQuotaMemory:
-        value: "4000Mi"
+        value: "16Gi"
   - staging:
     - projectQuotaCpu:
-        value: "2"
+        value: "8"
     - projectQuotaMemory:
-        value: "3000Mi"
+        value: "16Gi"
   - development:
     - projectQuotaCpu:
-        value: "4"
+        value: "8"
     - projectQuotaMemory:
-        value: "3000Mi"
+        value: "16Gi"
   refresh: 5m
 task_resources:
   defaults:
     cpu: 500m
-    memory: 500Mi
-    storage: 500Mi
+    memory: 1Gi
+  limits:
+    cpu: 2
+    memory: 4Gi
+    gpu: 5
 catalog-cache:
   endpoint: localhost:8081
   insecure: true

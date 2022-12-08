@@ -5,6 +5,8 @@
 Using Multiple Kubernetes Clusters
 ##################################
 
+.. tags:: Kubernetes, Infrastructure, Advanced
+
 Scaling Beyond Kubernetes
 -------------------------
 

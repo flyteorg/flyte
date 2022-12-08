@@ -4,6 +4,8 @@
 Migrating Your Authentication Config
 ####################################
 
+.. tags:: Authentication, Infrastructure, Advanced
+
 Flyte previously shipped with only a barebones OIDC setup, and relied on an external authorization server. This
 migration guide helps you move to Admin's own authorization server.
 

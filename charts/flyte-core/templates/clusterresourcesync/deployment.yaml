@@ -39,6 +39,8 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
+          - mountPath: /var/run/credentials
+            name: flyte-admin-secrets
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
         - configMap:
@@ -47,6 +49,9 @@ spec:
         - configMap:
             name: flyte-clusterresourcesync-config
           name: config-volume
+        - name: flyte-admin-secrets
+          secret:
+            secretName: flyte-admin-secrets
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
         - name: auth
           secret:

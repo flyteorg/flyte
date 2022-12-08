@@ -4,6 +4,8 @@
 Deployment Overview
 ###################
 
+.. tags:: Deployment, Infrastructure, Advanced
+
 Up until now, the Flyte backend you've been working with has likely been accessible only on ``localhost`` and likely entirely in one Docker container. In order to handle the production load and make use of all the additional features Flyte offers, you need to replace, add, and configure certain components. This page describes at a high-level what a production-ready deployment might look like.
 
 *******************

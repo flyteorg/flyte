@@ -1,10 +1,13 @@
 .. _deployment-cluster-config-eventing:
 
-#################
+###############
 Platform Events
-#################
+###############
 
-Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the FlytePropeller to FlyteAdmin. Administrators can configure FlyteAdmin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-cluster-config-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
+.. tags:: Configuration, Infrastructure, Advanced
+
+Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the FlytePropeller to FlyteAdmin.
+Administrators can configure FlyteAdmin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-cluster-config-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
 
 *********
 Use cases
@@ -15,6 +18,7 @@ The external events flow can be useful for tracking data lineage and integrating
 *************************
 Supported Implementations
 *************************
+
 Event egress can be configured to work with **AWS** using `SQS <https://aws.amazon.com/sqs/>`_ and `SNS <https://aws.amazon.com/sns/>`_ or **GCP** `Cloud Pub/Sub <https://cloud.google.com/pubsub>`_.
 
 *************
@@ -37,8 +41,10 @@ To turn on, add the following to your FlyteAdmin:
       type: aws
 
 Helm
-======
-There should already be a section for this in the ``values.yaml`` file. Update the settings under the ``external_events`` key and turn ``enable`` to ``true``. The same flag is used for Helm as for Admin itself.
+====
+
+There should already be a section for this in the ``values.yaml`` file.
+Update the settings under the ``external_events`` key and turn ``enable`` to ``true``. The same flag is used for Helm as for Admin itself.
 
 *****
 Usage
