@@ -60,6 +60,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.clientSecretFile"), DefaultConfig.UserAuth.OpenID.DeprecatedClientSecretFile, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.baseUrl"), DefaultConfig.UserAuth.OpenID.BaseURL.String(), "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "userAuth.openId.scopes"), DefaultConfig.UserAuth.OpenID.Scopes, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.httpProxyURL"), DefaultConfig.UserAuth.HTTPProxyURL.String(), "OPTIONAL: HTTP Proxy to be used for OAuth requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.cookieHashKeySecretName"), DefaultConfig.UserAuth.CookieHashKeySecretName, "OPTIONAL: Secret name to use for cookie hash key.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.cookieBlockKeySecretName"), DefaultConfig.UserAuth.CookieBlockKeySecretName, "OPTIONAL: Secret name to use for cookie block key.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.cookieSetting.sameSitePolicy"), DefaultConfig.UserAuth.CookieSetting.SameSitePolicy.String(), "OPTIONAL: Allows you to declare if your cookie should be restricted to a first-party or same-site context.Wrapper around http.SameSite.")

@@ -239,6 +239,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_userAuth.httpProxyURL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.UserAuth.HTTPProxyURL.String()
+
+			cmdFlags.Set("userAuth.httpProxyURL", testValue)
+			if vString, err := cmdFlags.GetString("userAuth.httpProxyURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.UserAuth.HTTPProxyURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_userAuth.cookieHashKeySecretName", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -43,10 +43,14 @@ func setupMockedAuthContextAtEndpoint(endpoint string) *mocks.AuthenticationCont
 		},
 		Scopes: []string{"openid", "other"},
 	}
+	dummyHTTPClient := &http.Client{
+		Timeout: IdpConnectionTimeout,
+	}
 	mockAuthCtx.OnCookieManagerMatch().Return(mockCookieHandler)
 	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
+	mockAuthCtx.OnGetHTTPClient().Return(dummyHTTPClient)
 	return mockAuthCtx
 }
 
