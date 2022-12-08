@@ -57,6 +57,7 @@ func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer,
 func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.AuthenticationContext, authHandler http.HandlerFunc) http.HandlerFunc {
 
 	return func(writer http.ResponseWriter, request *http.Request) {
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, authCtx.GetHTTPClient())
 		// Since we only do one thing if there are no errors anywhere along the chain, we can save code by just
 		// using one variable and checking for errors at the end.
 		idToken, accessToken, refreshToken, err := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
@@ -139,6 +140,8 @@ func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationCo
 	return func(writer http.ResponseWriter, request *http.Request) {
 		logger.Debugf(ctx, "Running callback handler... for RequestURI %v", request.RequestURI)
 		authorizationCode := request.FormValue(AuthorizationResponseCodeType)
+
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, authCtx.GetHTTPClient())
 
 		err := VerifyCsrfCookie(ctx, request)
 		if err != nil {
