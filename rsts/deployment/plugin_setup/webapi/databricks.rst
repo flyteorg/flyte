@@ -89,7 +89,9 @@ This guide gives an overview of how to set up Databricks in your Flyte deploymen
 
 5. Create a Databricks account and follow the docs for creating an Access token.
 
-6. Add Databricks access token to FlytePropeller.
+6. Create a `Instance Profile <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`_ for the Spark cluster, it allows the spark job to access your data in the s3 bucket.
+
+7. Add Databricks access token to FlytePropeller.
 
 .. note::
         Refer to the `access token <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-access-tokens>`__ to understand setting up the Databricks access token.
@@ -115,13 +117,13 @@ The configuration will look as follows:
 
 Replace ``<ACCESS_TOKEN>`` with your access token.
 
-7. Upgrade the Flyte Helm release.
+8. Upgrade the Flyte Helm release.
 
 .. code-block:: bash
 
     helm upgrade -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml flyteorg/flyte-core
 
-8. Register the Databricks plugin example.
+9. Register the Databricks plugin example.
 
 .. code-block:: bash
 
@@ -129,7 +131,7 @@ Replace ``<ACCESS_TOKEN>`` with your access token.
   flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
 
 
-9.  Launch an execution
+10.  Launch an execution
 
 .. tabbed:: Flyte Console
 
