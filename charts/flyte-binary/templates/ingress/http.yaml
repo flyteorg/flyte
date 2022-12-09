@@ -156,6 +156,6 @@ spec:
         path: /oauth2/*
         pathType: ImplementationSpecific
     {{- if .Values.ingress.host }}
-    host: {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.host.service "context" $ ) }}
+    host: {{ include "flyte-binary.renderTemplate" ( dict "value" .Values.ingress.host "context" $ ) }}
     {{- end }}
 {{- end }}
