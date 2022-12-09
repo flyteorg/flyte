@@ -1,0 +1,30 @@
+{{- if not .Values.clusterResourceTemplates.externalConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.clusterResourceTemplates.labels }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.clusterResourceTemplates.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.clusterResourceTemplates.annotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.clusterResourceTemplates.annotations "context" $) | nindent 4 }}
+    {{- end }}
+data:
+  {{- if .Values.clusterResourceTemplates.inline }}
+  templates.yaml: |
+    {{- toYaml .Values.clusterResourceTemplates.inline | nindent 4 }}
+  {{- else if .Values.clusterResourceTemplates.sourcePath }}
+  {{- (.Files.Glob .Values.clusterResourceTemplates.sourcePath).AsConfig | nindent 2 }}
+  {{- else }}
+  {{- (.Files.Glob "defaults/cluster-resource-templates/*.yaml").AsConfig | nindent 2 }}
+  {{- end }}
+{{- end }}

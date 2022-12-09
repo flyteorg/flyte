@@ -1,38 +1,132 @@
-networking:
-  host: true
+nameOverride: ""
+fullnameOverride: ""
+commonLabels: {}
+commonAnnotations: {}
 
-images:
-  flyte:
+configuration:
+  database:
+    username: postgres
+    password: ""
+    passwordPath: ""
+    host: 127.0.0.1
+    port: 5432
+    dbname: flyte
+    options: sslmode=disable
+  storage:
+    metadataContainer: "my-organization-flyte-container"
+    userDataContainer: "my-organization-flyte-container"
+    provider: s3
+    providerConfig:
+      s3:
+        region: "us-east-1"
+        disableSSL: false
+        endpoint: ""
+        authType: "iam"
+        accessKey: ""
+        secretKey: ""
+      gcs:
+        project: "my-organization-gcp-project"
+  logging:
+    level: 1
+    plugins:
+      kubernetes:
+        enabled: false
+        templateUri: ""
+      cloudwatch:
+        enabled: false
+        templateUri: ""
+      stackdriver:
+        enabled: false
+        templateUri: ""
+      custom: []
+  externalConfigMap: ""
+  inline: {}
+  labels: {}
+  annotations: {}
+  sourcePath: ""
+
+clusterResourceTemplates:
+  externalConfigMap: ""
+  inline: {}
+  labels: {}
+  annotations: {}
+  sourcePath: ""
+
+deployment:
+  image:
     repository: ghcr.io/flyteorg/flyte-sandbox
     tag: flytebinary_1007
     pullPolicy: IfNotPresent
-  # Used for wait-for-db init container
-  postgres:
-    repository: postgres
-    tag: 15-alpine
-    pullPolicy: IfNotPresent
+  extraEnvVars: []
+  extraEnvVarsConfigMap: ""
+  extraEnvVarsSecret: ""
+  command: []
+  args: []
+  livenessProbe: {}
+  readinessProbe: {}
+  startupProbe: {}
+  lifecycleHooks: {}
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 1
+  podSecurityContext:
+    enabled: false
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+  waitForDB:
+    image:
+      repository: postgres
+      tag: 15-alpine
+      pullPolicy: IfNotPresent
+    command: []
+    args: []
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  extraVolumeMounts: []
+  extraVolumes: []
+  sidecars: []
+  initContainers: []
+  imagePullSecrets: []
+  extraPodSpec: {}
 
-storage:
-  metadataContainer: my-s3-bucket
-  userDataContainer: my-s3-bucket
-  type: minio
-  region: my-region
+service:
+  type: ClusterIP
+  ports:
+    http: ""
+    grpc: ""
+  nodePorts:
+    http: ""
+    grpc: ""
+  clusterIP: ""
+  labels: {}
+  annotations: {}
+  loadBalancerIP: ""
+  externalTrafficPolicy: Cluster
+  loadBalancerSourceRanges: []
+  extraPorts: []
+  sessionAffinity: None
+  sessionAffinityConfig: {}
 
-database:
-  port: 5432
-  username: postgres
-  host: 127.0.0.1
-  dbname: flyteadmin
-  password: ""
+ingress:
+  create: false
+  name: ""
+  labels: {}
+  annotations: {}
+  host: ""
 
-logger:
-  level: 1
+rbac:
+  create: true
+  name: ""
+  labels: {}
+  annotations: {}
 
-paths:
-  # Specify full path to Flyte binary config file here if being provided externally
-  externalFlyteConfig: ""
-
-# Need to add an aws section for IAM role annotation
-
-proxy:
-  enabled: false
+serviceAccount:
+  create: true
+  name: ""
+  labels: {}
+  annotations: {}

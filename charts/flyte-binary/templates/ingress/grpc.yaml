@@ -1,0 +1,98 @@
+{{- if .Values.ingress.create }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-binary.fullname" . }}-grpc
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.labels }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.labels "context" $) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.annotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.annotations "context" $) | nindent 4 }}
+    {{- end }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.AdminService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.DataProxyService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.DataProxyService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.AuthMetadataService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.IdentityService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /grpc.health.v1.Health
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /grpc.health.v1.Health/*
+        pathType: ImplementationSpecific
+    {{- if .Values.ingress.host }}
+    host: {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.host.service "context" $ ) }}
+    {{- end }}
+{{- end }}
