@@ -1,7 +1,23 @@
+{{- if .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyte-role
+  name: {{ include "flyte-binary.rbac.clusterRoleName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.rbac.labels }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.rbac.labels "context" $) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.rbac.annotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.rbac.annotations "context" $) | nindent 4 }}
+    {{- end }}
 rules:
 - apiGroups:
       - ""
@@ -68,18 +84,4 @@ rules:
       - list
       - patch
       - update
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: flyte-role-binding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: flyte-role
-subjects:
-  - kind: ServiceAccount
-    name: flyte
-    # Have to add a namespace explicitly here so that the generated manifest has it
-    # since kubectl apply --namespace won't update it.
-    namespace: {{ .Release.Namespace }}
+{{- end }}

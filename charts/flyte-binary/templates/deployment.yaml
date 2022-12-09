@@ -1,107 +1,204 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: flyte
-  name: flytebinary
+  name: {{ include "flyte-binary.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.deployment.labels }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.labels "context" $) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.deployment.annotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.annotations "context" $) | nindent 4 }}
+    {{- end }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
-    matchLabels:
-      app: flyte
+    matchLabels: {{- include "flyte-binary.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-        app: flyte
+      labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
+        {{- if .Values.commonLabels }}
+        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.deployment.podLabels }}
+        {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if not .Values.configuration.existingConfigmap }}
+        checksum/configuration: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if not .Values.clusterResourceTemplates.existingConfigmap }}
+        checksum/cluster-resource-templates: {{ include (print $.Template.BasePath "/cluster-resource-templates.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
+        checksum/db-password-secret: {{ include (print $.Template.BasePath "/db-password-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.commonAnnotations }}
+        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.deployment.podAnnotations }}
+        {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
     spec:
-      {{- if .Values.networking.host }}
-      hostNetwork: true
+      {{- if .Values.deployment.extraPodSpec }}
+      {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraPodSpec "context" $) | nindent 6 }}
       {{- end }}
+      {{- if .Values.deployment.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.deployment.podSecurityContext "enabled" | toYaml | nindent 12 }}
+      {{- end }}
+      serviceAccountName: {{ include "flyte-binary.serviceAccountName" . }}
+      {{- if or .Values.deployment.initContainers (not .Values.configuration.externalConfigMap) }}
       initContainers:
-      - name: wait-for-db
-        {{- with .Values.images.postgres }}
-        image: {{ printf "%s:%s" .repository .tag | quote }}
-        imagePullPolicy: {{ .pullPolicy | quote }}
+        {{- if not .Values.configuration.externalConfigMap }}
+        - name: wait-for-db
+          {{- with .Values.deployment.waitForDB.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          command:
+            {{- if .Values.deployment.waitForDB.command }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.waitForDB.command "context" $) | nindent 12 }}
+            {{- else }}
+            - sh
+            - -ec
+            {{- end }}
+          args:
+            {{- if .Values.deployment.waitForDB.args }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.waitForDB.args "context" $) | nindent 12 }}
+            {{- else }}
+            {{- with .Values.configuration.database }}
+            - |
+              until pg_isready \
+                -h {{ .host }} \
+                -p {{ .port }} \
+                -U {{ .username }}
+              do
+                echo waiting for database
+                sleep 0.1
+              done
+            {{- end }}
+            {{- end }}
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
         {{- end }}
-        command:
-        - sh
-        - -e
-        - -c
-        args:
-        - |
-          until pg_isready \
-            -h {{ .Values.database.host }} \
-            -p {{ .Values.database.port }} \
-            -U {{ .Values.database.username }}
-          do
-            echo waiting for database
-            sleep 0.1
-          done
+        {{- if .Values.deployment.initContainers }}
+        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.initContainers "context" $ ) | nindent 8 }}
+        {{- end }}
+      {{- end }}
       containers:
-      - name: flyte
-        {{- with .Values.images.flyte }}
-        image: {{ printf "%s:%s" .repository .tag | quote }}
-        imagePullPolicy: {{ .pullPolicy | quote }}
+        - name: flyte
+          {{- with .Values.deployment.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          {{- if .Values.deployment.command }}
+          command: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.command "context" $) | nindent 12 }}
+          {{- end }}
+          args:
+            {{- if .Values.deployment.args }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.args "context" $) | nindent 12 }}
+            {{- else }}
+            - start
+            - --config
+            - /etc/flyte/config.d/*.yaml
+            {{- end }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- if .Values.deployment.extraEnvVars }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.deployment.extraEnvVarsConfigMap .Values.deployment.extraEnvVarsSecret }}
+          envFrom:
+            {{- if .Values.deployment.extraEnvVarsConfigMap }}
+            - configMapRef:
+                name: {{ .Values.deployment.extraEnvVarsConfigMap }}
+            {{- end }}
+            {{- if .Values.deployment.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.deployment.extraEnvVarsSecret }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8088
+            - name: grpc
+              containerPort: 8089
+            - name: webhook
+              containerPort: 9443
+          {{- if .Values.deployment.startupProbe }}
+          startupProbe: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.customStartupProbe "context" $) | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+          {{- if .Values.deployment.livenessProbe }}
+          {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.livenessProbe "context" $) | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthcheck
+              port: http
+          {{- end }}
+          readinessProbe:
+          {{- if .Values.deployment.readinessProbe }}
+          {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.readinessProbe "context" $) | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthcheck
+              port: http
+          {{- end }}
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.lifecycleHooks }}
+          lifecycle: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cluster-resource-templates
+              mountPath: /etc/flyte/cluster-resource-templates
+            - name: config
+              mountPath: /etc/flyte/config.d
+            {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
+            - name: db-pass
+              mountPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . }}
+              subPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . | base }}
+            {{- end }}
+            - name: state
+              mountPath: /var/run/flyte
+            {{- if .Values.deployment.extraVolumeMounts }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+        {{- if .Values.deployment.sidecars }}
+        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.sidecars "context" $ ) | nindent 8 }}
         {{- end }}
-        args:
-        - start
-        - --config
-        - /etc/flyte/flyte.yaml
-        resources:
-          limits:
-            cpu: 1
-            memory: 1Gi
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        ports:
-        - containerPort: 8088
-          name: http
-        - containerPort: 8089
-          name: grpc
-        - containerPort: 9443
-          name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/cluster-resource-templates
-          name: cluster-resource-templates
-        {{- if eq .Values.paths.externalFlyteConfig "" }}
-        - mountPath: /etc/flyte/flyte.yaml
-          subPath: flyte.yaml
-          name: config
-        {{- else }}
-        - mountPath: /etc/flyte/flyte.yaml
-          name: config
-        {{- end }}
-        - mountPath: /var/run/flyte
-          name: state
-        {{- if .Values.database.password }}
-        {{- include "flyte-binary.database.secretvolmount" . | nindent 8 }}
-        {{- end }}
-      serviceAccountName: flyte
       volumes:
-      - name: cluster-resource-templates
-        configMap:
-          name: cluster-resource-templates
-      {{- if eq .Values.paths.externalFlyteConfig "" }}
-      - name: config
-        configMap:
-          name: flyte-backend-config
-      {{- else }}
-      - hostPath:
-          path: {{ .Values.paths.externalFlyteConfig }}
-          type: File
-        name: config
-      {{- end }}
-      - name: state
-        emptyDir: {}
-      {{- if .Values.database.password }}
-      {{- include "flyte-binary.database.secretvol" . | nindent 6 }}
-      {{- end }}
+        - name: cluster-resource-templates
+          configMap:
+            name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+        - name: config
+          configMap:
+            name: {{ include "flyte-binary.configuration.configMapName" . }}
+        {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
+        - name: db-pass
+          secret:
+            secretName: {{ include "flyte-binary.configuration.database.passwordSecretName" . }}
+        {{- end }}
+        - name: state
+          emptyDir: {}
+        {{- if .Values.deployment.extraVolumes }}
+        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.extraVolumes "context" $ ) | nindent 8 }}
+        {{- end }}
