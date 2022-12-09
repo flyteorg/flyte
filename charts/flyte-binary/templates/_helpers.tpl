@@ -170,3 +170,10 @@ Get the Flyte webhook secret name.
 {{- define "flyte-binary.webhook.secretName" -}}
 {{- printf "%s-webhook-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
+
+{{/*
+Get the Flyte ClusterRole name.
+*/}}
+{{- define "flyte-binary.rbac.clusterRoleName" -}}
+{{- printf "%s-cluster-role" (include "flyte-binary.fullname" .) -}}
+{{- end -}}

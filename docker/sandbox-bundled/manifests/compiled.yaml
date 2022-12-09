@@ -698,7 +698,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: cGkwZUJabFc0MUxEbFlKTw==
+  haSharedSecret: VFJSYnVDUjdjWEJGalVxMw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -816,7 +816,6 @@ spec:
   selector:
     app.kubernetes.io/instance: sandbox
     app.kubernetes.io/name: flyte-binary
-  sessionAffinity: None
   type: ClusterIP
 ---
 apiVersion: v1
@@ -1001,7 +1000,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: 90d5a70eb33bb2cd2e5dd88c0e09eb5fe2329120746a9722a96fcae824b7f575
+        checksum/secret: bd96846d8245819002524b26963f34ae9e80c9dfafb9601e935ca745acc6fbea
       labels:
         app: docker-registry
         release: sandbox

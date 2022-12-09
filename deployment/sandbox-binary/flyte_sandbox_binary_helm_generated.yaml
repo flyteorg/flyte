@@ -223,7 +223,6 @@ metadata:
   annotations:
 spec:
   type: ClusterIP
-  sessionAffinity: None
   ports:
     - name: http
       port: 8088

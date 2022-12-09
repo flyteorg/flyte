@@ -57,7 +57,6 @@ Chart for basic single Flyte executable deployment
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-sandbox"` |  |
 | deployment.image.tag | string | `"flytebinary_1007"` |  |
-| deployment.imagePullSecrets | list | `[]` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
 | deployment.lifecycleHooks | object | `{}` |  |
@@ -83,12 +82,10 @@ Chart for basic single Flyte executable deployment
 | ingress.create | bool | `false` |  |
 | ingress.host | string | `""` |  |
 | ingress.labels | object | `{}` |  |
-| ingress.name | string | `""` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
 | rbac.labels | object | `{}` |  |
-| rbac.name | string | `""` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
 | service.externalTrafficPolicy | string | `"Cluster"` |  |
@@ -100,11 +97,8 @@ Chart for basic single Flyte executable deployment
 | service.nodePorts.http | string | `""` |  |
 | service.ports.grpc | string | `""` |  |
 | service.ports.http | string | `""` |  |
-| service.sessionAffinity | string | `"None"` |  |
-| service.sessionAffinityConfig | object | `{}` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
-| serviceAccount.name | string | `""` |  |
 
