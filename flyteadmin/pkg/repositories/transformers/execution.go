@@ -3,6 +3,7 @@ package transformers
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -40,6 +41,7 @@ type CreateExecutionModelInput struct {
 	InputsURI             storage.DataReference
 	UserInputsURI         storage.DataReference
 	SecurityContext       *core.SecurityContext
+	LaunchEntity          core.ResourceType
 }
 
 // CreateExecutionModel transforms a ExecutionCreateRequest to a Execution model
@@ -102,6 +104,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		UserInputsURI:         input.UserInputsURI,
 		User:                  requestSpec.Metadata.Principal,
 		State:                 &activeExecution,
+		LaunchEntity:          strings.ToLower(input.LaunchEntity.String()),
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.

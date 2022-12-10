@@ -286,6 +286,7 @@ func TestCreateExecution(t *testing.T) {
 			assert.Equal(t, principal, spec.Metadata.Principal)
 			assert.Equal(t, rawOutput, spec.RawOutputDataConfig.OutputLocationPrefix)
 			assert.True(t, proto.Equal(spec.ClusterAssignment, &clusterAssignment))
+			assert.Equal(t, "launch_plan", input.LaunchEntity)
 			return nil
 		})
 	setDefaultLpCallbackForExecTest(repository)
@@ -4099,6 +4100,13 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		return newlyCreatedWorkflow, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
+	taskIdentifier := &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Project:      "flytekit",
+		Domain:       "production",
+		Name:         "simple_task",
+		Version:      "12345",
+	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
 		func(input interfaces.Identifier) (models.Task, error) {
 			createdAt := time.Now()
@@ -4106,13 +4114,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 			taskClosure := &admin.TaskClosure{
 				CompiledTask: &core.CompiledTask{
 					Template: &core.TaskTemplate{
-						Id: &core.Identifier{
-							ResourceType: core.ResourceType_TASK,
-							Project:      "flytekit",
-							Domain:       "production",
-							Name:         "simple_task",
-							Version:      "12345",
-						},
+						Id:   taskIdentifier,
 						Type: "python-task",
 						Metadata: &core.TaskMetadata{
 							Runtime: &core.RuntimeMetadata{
@@ -4199,6 +4201,21 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 				Type:    "python",
 			}, nil
 		})
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
+		func(ctx context.Context, input models.Execution) error {
+			var spec admin.ExecutionSpec
+			err := proto.Unmarshal(input.Spec, &spec)
+			assert.NoError(t, err)
+			assert.Equal(t, models.ExecutionKey{
+				Project: "flytekit",
+				Domain:  "production",
+				Name:    "singletaskexec",
+			}, input.ExecutionKey)
+			assert.Equal(t, "task", input.LaunchEntity)
+			assert.Equal(t, "UNDEFINED", input.Phase)
+			assert.True(t, proto.Equal(taskIdentifier, spec.LaunchPlan))
+			return nil
+		})
 
 	mockStorage := getMockStorageForExecTest(context.Background())
 	workflowManager := NewWorkflowManager(
@@ -4218,13 +4235,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		Domain:  "production",
 		Name:    "singletaskexec",
 		Spec: &admin.ExecutionSpec{
-			LaunchPlan: &core.Identifier{
-				Project:      "flytekit",
-				Domain:       "production",
-				Name:         "simple_task",
-				Version:      "12345",
-				ResourceType: core.ResourceType_TASK,
-			},
+			LaunchPlan: taskIdentifier,
 		},
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
