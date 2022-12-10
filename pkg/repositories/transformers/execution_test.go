@@ -88,6 +88,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		SourceExecutionID:     sourceID,
 		Cluster:               cluster,
 		SecurityContext:       securityCtx,
+		LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "project", execution.Project)
@@ -100,6 +101,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
 	assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 	assert.Equal(t, sourceID, execution.SourceExecutionID)
+	assert.Equal(t, "launch_plan", execution.LaunchEntity)
 	expectedSpec := execRequest.Spec
 	expectedSpec.Metadata.Principal = principal
 	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{

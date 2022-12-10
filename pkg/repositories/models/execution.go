@@ -58,4 +58,6 @@ type Execution struct {
 	User string `gorm:"index" valid:"length(0|255)"`
 	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
 	State *int32 `gorm:"index;default:0"`
+	// The resource type of the entity used to launch the execution, one of 'launch_plan' or 'task'
+	LaunchEntity string
 }
