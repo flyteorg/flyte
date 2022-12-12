@@ -397,7 +397,7 @@ var Migrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&models.Execution{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Model(&models.Execution{}).Migrator().DropColumn(&models.Execution{}, "launch_type")
+			return tx.Model(&models.Execution{}).Migrator().DropColumn(&models.Execution{}, "launch_entity")
 		},
 	},
 }
