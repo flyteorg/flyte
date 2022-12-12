@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM apache/spark-py:3.3.1
 LABEL org.opencontainers.image.source https://github.com/flyteorg/flytesnacks
 
 WORKDIR /root
@@ -7,9 +7,11 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONPATH /root
 ENV DEBIAN_FRONTEND=noninteractive
+ARG spark_uid=1001
 
-# Install Python3 and other basics
-RUN apt-get update && apt-get install -y python3.8 python3.8-venv make build-essential libssl-dev python3-pip curl
+## Install Python3 and other basics
+USER 0
+RUN apt-get update && apt-get install -y python3 python3-venv make build-essential libssl-dev python3-pip curl wget
 
 # Install AWS CLI to run on AWS (for GCS install GSutil). This will be removed
 # in future versions to make it completely portable
@@ -21,30 +23,18 @@ RUN bash /opt/install.sh --install-dir=/opt
 ENV PATH $PATH:/opt/google-cloud-sdk/bin
 WORKDIR /root
 
-ENV VENV /opt/venv
 # Virtual environment
+ENV VENV /opt/venv
 RUN python3 -m venv ${VENV}
 ENV PATH="${VENV}/bin:$PATH"
-
 RUN pip3 install wheel
 
 # Install Python dependencies
 COPY k8s_spark/requirements.txt /root
 RUN pip install -r /root/requirements.txt
 
-RUN flytekit_install_spark3.sh
-
-# Adding Tini support for the spark pods
-RUN wget  https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
-    cp tini /sbin/tini && cp tini /usr/bin/tini && \
-    chmod a+x /sbin/tini && chmod a+x /usr/bin/tini
-
-# Setup Spark environment
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV SPARK_HOME /opt/spark
-ENV SPARK_VERSION 3.2.1
-ENV PYSPARK_PYTHON ${VENV}/bin/python3
-ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
+RUN wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.2/hadoop-aws-3.2.2.jar -P /opt/spark/jars && \
+    wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.563/aws-java-sdk-bundle-1.11.563.jar -P /opt/spark/jars
 
 # Copy the makefile targets to expose on the container. This makes it easier to register.
 # Delete this after we update CI
@@ -65,6 +55,11 @@ ENV FLYTE_INTERNAL_IMAGE $tag
 RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/
 RUN chmod a+x /usr/local/bin/flytekit_venv
 
+# Set /root user and group
+RUN chown -R ${spark_uid}:${spark_uid} /root
+
 # For spark we want to use the default entrypoint which is part of the
 # distribution, also enable the virtualenv for this image.
 ENTRYPOINT ["/opt/entrypoint.sh"]
+
+USER ${spark_uid}
