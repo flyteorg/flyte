@@ -38,13 +38,22 @@ export const executionFilterGenerator: {
     },
   ],
   [ResourceType.UNSPECIFIED]: noFilters,
-  [ResourceType.WORKFLOW]: ({ name }) => [
-    {
-      key: 'workflow.name',
-      operation: FilterOperationName.EQ,
-      value: name,
-    },
-  ],
+  [ResourceType.WORKFLOW]: ({ name }, version) =>
+    version
+      ? [
+          {
+            key: 'workflow.version',
+            operation: FilterOperationName.EQ,
+            value: version,
+          },
+        ]
+      : [
+          {
+            key: 'workflow.name',
+            operation: FilterOperationName.EQ,
+            value: name,
+          },
+        ],
 };
 
 const workflowListGenerator = ({ project, domain }: ResourceIdentifier) =>

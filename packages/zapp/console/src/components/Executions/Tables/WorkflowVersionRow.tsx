@@ -69,7 +69,7 @@ export const WorkflowVersionRow: React.FC<WorkflowVersionRowProps> = ({
             workflow.id.version,
           )
         : [],
-    [workflow.id],
+    [workflow.id.version],
   );
 
   const executions = useWorkflowExecutions(
