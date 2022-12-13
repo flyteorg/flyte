@@ -33,10 +33,10 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
-        {{- if .Values.flyteconsole.ga.enabled }}
         env:
         - name: ENABLE_GA
           value: "{{ .Values.flyteconsole.ga.enabled }}"
+        {{- if .Values.flyteconsole.ga.enabled }}
         - name: GA_TRACKING_ID
           value: "{{ .Values.flyteconsole.ga.tracking_id }}"
         {{- end }}
