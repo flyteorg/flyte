@@ -823,6 +823,9 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        env:
+        - name: ENABLE_GA
+          value: "false"
         resources: 
           limits:
             cpu: 250m
