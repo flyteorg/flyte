@@ -41,6 +41,7 @@ var entityToTableName = map[common.Entity]string{
 	common.Workflow:            "workflows",
 	common.NamedEntity:         "entities",
 	common.NamedEntityMetadata: "named_entity_metadata",
+	common.Signal:              "signals",
 }
 
 var innerJoinExecToNodeExec = fmt.Sprintf(

@@ -22,6 +22,7 @@ type Repository interface {
 	NamedEntityRepo() NamedEntityRepoInterface
 	SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface
 	ScheduleEntitiesSnapshotRepo() schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
+	SignalRepo() SignalRepoInterface
 
 	GetGormDB() *gorm.DB
 }
