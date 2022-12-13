@@ -17,6 +17,7 @@ const (
 	NamedEntity         = "nen"
 	NamedEntityMetadata = "nem"
 	Project             = "p"
+	Signal              = "s"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters
