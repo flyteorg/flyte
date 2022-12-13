@@ -4217,6 +4217,18 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 			return nil
 		})
 
+	var launchplan *models.LaunchPlan
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(func(input models.LaunchPlan) error {
+		launchplan = &input
+		return nil
+	})
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		if launchplan == nil {
+			return models.LaunchPlan{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "launchplan not found")
+		}
+		return *launchplan, nil
+	})
+
 	mockStorage := getMockStorageForExecTest(context.Background())
 	workflowManager := NewWorkflowManager(
 		repository,
@@ -4255,45 +4267,17 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 			},
 		},
 	}
-	marshaller := jsonpb.Marshaler{}
-	stringReq, ferr := marshaller.MarshalToString(&request)
-	assert.NoError(t, ferr)
-	println(fmt.Sprintf("req: %+v", stringReq))
-	_, err := execManager.CreateExecution(context.TODO(), admin.ExecutionCreateRequest{
-		Project: "flytekit",
-		Domain:  "production",
-		Name:    "singletaskexec",
-		Spec: &admin.ExecutionSpec{
-			LaunchPlan: &core.Identifier{
-				Project:      "flytekit",
-				Domain:       "production",
-				Name:         "simple_task",
-				Version:      "12345",
-				ResourceType: core.ResourceType_TASK,
-			},
-			AuthRole: &admin.AuthRole{
-				KubernetesServiceAccount: "foo",
-			},
-		},
-		Inputs: &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"a": {
-					Value: &core.Literal_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Primitive{
-								Primitive: &core.Primitive{
-									Value: &core.Primitive_Integer{
-										Integer: 999,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}, time.Now())
 
+	marshaller := jsonpb.Marshaler{}
+	_, ferr := marshaller.MarshalToString(&request)
+	assert.NoError(t, ferr)
+
+	// test once to create an initial launchplan
+	_, err := execManager.CreateExecution(context.TODO(), request, time.Now())
+	assert.NoError(t, err)
+
+	// test again to ensure existing launchplan retrieval works
+	_, err = execManager.CreateExecution(context.TODO(), request, time.Now())
 	assert.NoError(t, err)
 }
 
