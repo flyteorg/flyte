@@ -69,6 +69,10 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/flyteidl.service.SignalService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
                                                   path: "/minio"
                                               redirect:
                                                   path_redirect: "/minio/"

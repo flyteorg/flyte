@@ -41,6 +41,13 @@ spec:
                 name: flyteadmin
                 port:
                   number: 81
+          - path: /flyteidl.service.SignalService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific

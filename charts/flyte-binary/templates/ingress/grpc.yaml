@@ -27,6 +27,13 @@ spec:
             name: {{ include "flyte-binary.fullname" . }}
             port:
               number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
         path: /flyteidl.service.AdminService
         pathType: ImplementationSpecific
       - backend:
