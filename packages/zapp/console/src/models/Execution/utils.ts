@@ -79,10 +79,6 @@ export const makeTaskExecutionPath = ({
     retryAttempt,
   ].join('/');
 
-/** Generates the API endpoint for the CreateDownloadLocation request */
-export const makeCreateDownloadLocationPath = (nativeUrl: string) =>
-  `${endpointPrefixes.dataProxyArtifactUrn}?native_url=${nativeUrl}`;
-
 /** Transformer to coerce an `Admin.ExecutionList` into a standard shape */
 export const executionListTransformer = createPaginationTransformer<Execution, Admin.ExecutionList>(
   'executions',

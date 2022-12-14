@@ -77,7 +77,6 @@ export const ExecutionDetailsActions = ({
   const [initialParameters, setInitialParameters] = useState<
     TaskInitialLaunchParameters | undefined
   >(undefined);
-
   const executionData = useNodeExecutionData(nodeExecutionId);
   const execution = useNodeExecution(nodeExecutionId);
   const { compiledWorkflowClosure } = useNodeExecutionContext();
@@ -168,7 +167,7 @@ export const ExecutionDetailsActions = ({
               <Close />
             </IconButton>
           </div>
-          <ExecutionNodeDeck deckUri={execution.value.closure.deckUri} />
+          <ExecutionNodeDeck nodeExecutionId={nodeExecutionId} />
         </Dialog>
       )}
     </>

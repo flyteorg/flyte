@@ -50,11 +50,6 @@ export interface Execution extends Admin.IExecution {
   spec: ExecutionSpec;
 }
 
-export interface DownloadLocation extends Service.CreateDownloadLocationResponse {
-  signedUrl: string;
-  expiresAt: Protobuf.ITimestamp;
-}
-
 /** Node executions */
 export interface WorkflowNodeMetadata {
   executionId: WorkflowExecutionIdentifier;

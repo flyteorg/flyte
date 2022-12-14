@@ -2,6 +2,7 @@ src/generated/
 .github/
 .dist/
 dist/
+lib/
 node_modules/
 tsd/
 webpack.common.config.ts

@@ -24,6 +24,7 @@ const str = {
   cachePopulatedMessage: 'The result of this execution was written to cache.',
   cachePutFailure: 'Failed to write output for this execution to cache.',
   mapCacheMessage: "Check the detail panel for each task's cache status.",
+  cacheSkippedMessage: 'Cache skipped.',
   unknownCacheStatusString: 'Cache status is unknown',
   viewSourceExecutionString: 'View source execution',
   fromCache: 'From cache',

@@ -11,7 +11,6 @@ import { makeIdentifierPath } from 'models/Common/utils';
 import { defaultExecutionPrincipal } from './constants';
 import { ExecutionState } from './enums';
 import {
-  DownloadLocation,
   Execution,
   ExecutionData,
   ExecutionMetadata,
@@ -23,7 +22,6 @@ import {
 } from './types';
 import {
   executionListTransformer,
-  makeCreateDownloadLocationPath,
   makeExecutionPath,
   makeNodeExecutionListPath,
   makeNodeExecutionPath,
@@ -58,12 +56,22 @@ export const getExecution = (id: WorkflowExecutionIdentifier, config?: RequestCo
     config,
   );
 
-/** Fetches a signed url of the native url */
-export const getDownloadLocation = (nativeUrl: string, config?: RequestConfig) =>
-  getAdminEntity<Service.CreateDownloadLocationResponse, DownloadLocation>(
+/** Creates a signed url to download artifacts */
+export const createDownloadLink = (
+  nodeExecutionId: Core.NodeExecutionIdentifier,
+  config?: RequestConfig,
+) =>
+  postAdminEntity<Service.CreateDownloadLinkRequest, Service.CreateDownloadLinkResponse>(
     {
-      path: makeCreateDownloadLocationPath(nativeUrl),
-      messageType: Service.CreateDownloadLocationResponse,
+      data: {
+        artifactType: Service.ArtifactType.ARTIFACT_TYPE_DECK,
+        source: 'nodeExecutionId',
+        nodeExecutionId,
+      },
+      path: endpointPrefixes.dataProxyArtifactLink,
+      requestMessageType: Service.CreateDownloadLinkRequest,
+      responseMessageType: Service.CreateDownloadLinkResponse,
+      method: 'post',
     },
     config,
   );

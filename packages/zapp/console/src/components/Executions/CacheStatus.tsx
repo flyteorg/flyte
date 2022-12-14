@@ -55,7 +55,7 @@ const NodeExecutionCacheStatusIcon: React.FC<
       return <MapCacheIcon {...props} ref={ref} data-testid="cache-icon" />;
     }
     default: {
-      assertNever(status);
+      assertNever(status as never);
       return null;
     }
   }

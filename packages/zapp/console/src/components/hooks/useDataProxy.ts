@@ -1,17 +1,19 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { DownloadLocation } from 'models/Execution/types';
+import { Core, Service } from 'flyteidl';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 
 /** A hook for fetching a NodeExecution */
-export function useDownloadLocation(nativeUrl: string): FetchableData<DownloadLocation> {
-  const { getDownloadLocation } = useAPIContext();
-  return useFetchableData<DownloadLocation, string>(
+export function useDownloadLink(
+  nodeExecutionId: Core.NodeExecutionIdentifier,
+): FetchableData<Service.CreateDownloadLinkResponse> {
+  const { createDownloadLink } = useAPIContext();
+  return useFetchableData<Service.CreateDownloadLinkResponse, Core.NodeExecutionIdentifier>(
     {
-      debugName: 'CreateDownloadLocation',
-      defaultValue: {} as DownloadLocation,
-      doFetch: (nativeUrl) => getDownloadLocation(nativeUrl),
+      debugName: 'CreateDownloadLink',
+      defaultValue: {} as Service.CreateDownloadLinkResponse,
+      doFetch: (nodeExecutionId) => createDownloadLink(nodeExecutionId),
     },
-    nativeUrl,
+    nodeExecutionId,
   );
 }

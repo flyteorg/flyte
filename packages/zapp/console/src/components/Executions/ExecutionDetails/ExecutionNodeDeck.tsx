@@ -1,14 +1,17 @@
-import { useDownloadLocation } from 'components/hooks/useDataProxy';
+import { useDownloadLink } from 'components/hooks/useDataProxy';
 import { WaitForData } from 'components/common/WaitForData';
 import * as React from 'react';
+import { Core } from 'flyteidl';
 
-/** Fetches and renders the deck data for a given `deckUri` */
-export const ExecutionNodeDeck: React.FC<{ deckUri: string }> = ({ deckUri }) => {
-  const downloadLocation = useDownloadLocation(deckUri);
+/** Fetches and renders the deck data for a given `nodeExecutionId` */
+export const ExecutionNodeDeck: React.FC<{ nodeExecutionId: Core.NodeExecutionIdentifier }> = ({
+  nodeExecutionId,
+}) => {
+  const downloadLink = useDownloadLink(nodeExecutionId);
 
   return (
-    <WaitForData {...downloadLocation}>
-      <iframe title="deck" height="100%" src={downloadLocation.value.signedUrl} />
+    <WaitForData {...downloadLink}>
+      <iframe title="deck" height="100%" src={downloadLink?.value?.signedUrl?.[0]} />
     </WaitForData>
   );
 };
