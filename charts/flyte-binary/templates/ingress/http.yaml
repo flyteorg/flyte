@@ -15,8 +15,11 @@ metadata:
     {{- if .Values.commonAnnotations }}
     {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.ingress.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.annotations "context" $) | nindent 4 }}
+    {{- if .Values.ingress.commonAnnotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.commonAnnotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.httpAnnotations }}
+    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.httpAnnotations "context" $) | nindent 4 }}
     {{- end }}
 spec:
   rules:
