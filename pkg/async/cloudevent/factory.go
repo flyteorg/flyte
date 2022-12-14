@@ -63,15 +63,19 @@ func NewCloudEventsPublisher(ctx context.Context, config runtimeInterfaces.Cloud
 		return cloudEventImplementations.NewCloudEventsPublisher(&cloudEventImplementations.PubSubSender{Pub: publisher}, scope, config.EventsPublisherConfig.EventTypes)
 	case cloudEventImplementations.Kafka:
 		saramaConfig := sarama.NewConfig()
-		saramaConfig.Version = config.KafkaConfig.Version
+		var err error
+		saramaConfig.Version, err = sarama.ParseKafkaVersion(config.KafkaConfig.Version)
+		if err != nil {
+			logger.Fatalf(ctx, "failed to parse kafka version, %v", err)
+			panic(err)
+		}
 		sender, err := kafka_sarama.NewSender(config.KafkaConfig.Brokers, saramaConfig, config.EventsPublisherConfig.TopicName)
 		if err != nil {
 			panic(err)
 		}
-		defer sender.Close(ctx)
 		client, err := cloudevents.NewClient(sender, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
 		if err != nil {
-			logger.Fatalf(ctx, "failed to create client, %v", err)
+			logger.Fatalf(ctx, "failed to create kafka client, %v", err)
 			panic(err)
 		}
 		return cloudEventImplementations.NewCloudEventsPublisher(&cloudEventImplementations.KafkaSender{Client: client}, scope, config.EventsPublisherConfig.EventTypes)
