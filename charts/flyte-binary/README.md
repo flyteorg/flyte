@@ -78,9 +78,11 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | fullnameOverride | string | `""` |  |
-| ingress.annotations | object | `{}` |  |
+| ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
+| ingress.grpcAnnotations | object | `{}` |  |
 | ingress.host | string | `""` |  |
+| ingress.httpAnnotations | object | `{}` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |

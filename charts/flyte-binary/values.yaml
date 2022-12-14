@@ -211,8 +211,12 @@ ingress:
   create: false
   # labels Add labels to ingress resources
   labels: {}
-  # annotations Add annotations to ingress resources
-  annotations: {}
+  # commonAnnotations Add common annotations to all ingress resources
+  commonAnnotations: {}
+  # httpAnnotations Add common annotations to http ingress resource
+  httpAnnotations: {}
+  # grpcAnnotations Add common annotations to grpc ingress resource
+  grpcAnnotations: {}
   # host Hostname to bind to ingress resources
   host: ""
 

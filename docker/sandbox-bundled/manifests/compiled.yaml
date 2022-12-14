@@ -698,7 +698,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: STlobkttaDVFa2U2bGdlcQ==
+  haSharedSecret: TmlVTUpabjh5RGI5c3E3Mg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1000,7 +1000,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: b17a9119359b95b314adcf1c1cabf60554d2bc93fb7cd1a83ffd2554e6fee7cd
+        checksum/secret: 5bd04f7a79cf46595637b045ca93a072b7add79ded27415becc6db6b01cdcc42
       labels:
         app: docker-registry
         release: sandbox
