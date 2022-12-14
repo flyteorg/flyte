@@ -1,7 +1,6 @@
 package interfaces
 
 import (
-	"github.com/Shopify/sarama"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
@@ -205,7 +204,8 @@ type GCPConfig struct {
 }
 
 type KafkaConfig struct {
-	Version sarama.KafkaVersion
+	// The version of Kafka, e.g. 2.1.0, 0.8.2.0
+	Version string `json:"version"`
 	// kafka broker addresses
 	Brokers []string `json:"brokers"`
 }

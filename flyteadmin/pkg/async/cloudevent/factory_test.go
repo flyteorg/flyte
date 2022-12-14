@@ -56,7 +56,10 @@ func TestInvalidKafkaConfig(t *testing.T) {
 		Enable:                true,
 		Type:                  implementations.Kafka,
 		EventsPublisherConfig: runtimeInterfaces.EventsPublisherConfig{TopicName: "topic"},
+		KafkaConfig:           runtimeInterfaces.KafkaConfig{Version: "0.8.2.0"},
 	}
+	NewCloudEventsPublisher(context.Background(), cfg, promutils.NewTestScope())
+	cfg.KafkaConfig = runtimeInterfaces.KafkaConfig{Version: "2.1.0"}
 	NewCloudEventsPublisher(context.Background(), cfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
 }
