@@ -1,20 +1,193 @@
-{{/*
-Create the config only if not mounted in externally
-*/}}
-{{- if eq .Values.paths.externalFlyteConfig "" }}
+{{- if not .Values.configuration.externalConfigMap }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-backend-config
-  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
+  name: {{ include "flyte-binary.configuration.configMapName" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.configuration.labels }}
+    {{- tpl ( .Values.configuration.labels | toYaml ) . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.configuration.annotations }}
+    {{- tpl ( .Values.configuration.annotations | toYaml ) . | nindent 4 }}
+    {{- end }}
 data:
-  flyte.yaml: | {{ tpl (.Files.Get "_flyte_config.yaml") $ | nindent 4 }}
+  000-core.yaml: |
+    admin:
+      endpoint: localhost:8089
+      insecure: true
+    catalog-cache:
+      endpoint: localhost:8081
+      insecure: true
+      type: datacatalog
+    cluster_resources:
+      standaloneDeployment: false
+      templatePath: /etc/flyte/cluster-resource-templates
+    logger:
+      show-source: true
+      level: {{ default 1 .Values.configuration.logging.level }}
+    propeller:
+      create-flyteworkflow-crd: true
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: {{ include "flyte-binary.webhook.secretName" . }}
+      serviceName: {{ include "flyte-binary.webhook.serviceName" . }}
+      servicePort: 443
+  001-plugins.yaml: |
+    tasks:
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - K8S-ARRAY
+        default-for-task-types:
+          - container: container
+          - container_array: K8S-ARRAY
+    plugins:
+      logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
+      k8s-array:
+        logs:
+          config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
+  002-database.yaml: |
+    {{- with .Values.configuration.database }}
+    database:
+      postgres:
+        username: {{ .username }}
+        {{- if .password }}
+        passwordPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" $ }}
+        {{- else }}
+        passwordPath: {{ .passwordPath }}
+        {{- end }}
+        host: {{ .host }}
+        port: {{ .port }}
+        dbname: {{ .dbname }}
+        options: {{ .options | quote }}
+    {{- end }}
+  003-storage.yaml: |
+    propeller:
+      rawoutput-prefix: {{ include "flyte-binary.configuration.storage.userDataPrefix" . }}
+    {{- with .Values.configuration.storage }}
+    storage:
+    {{- if eq "s3" .provider }}
+      {{- with .providerConfig.s3 }}
+      type: s3
+      connection:
+        region: {{ required "Region required for S3 storage provider" .region }}
+        disable-ssl: {{ .disableSSL }}
+        {{- if .endpoint }}
+        endpoint: {{ tpl .endpoint $ }}
+        {{- end }}
+        {{- if eq "iam" .authType }}
+        auth-type: "iam"
+        {{- else if eq "accesskey" .authType }}
+        auth-type: "accesskey"
+        access-key: {{ required "Access key required for S3 storage provider" .accessKey }}
+        secret-key: {{ required "Secret key required for S3 storage provider" .secretKey }}
+        {{- else }}
+        {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
+        {{- end }}
+      {{- end }}
+    {{- else if eq "gcs" .provider }}
+      type: stow
+        stow:
+          kind: google
+          config:
+            json: ""
+            project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
+            scopes: https://www.googleapis.com/auth/devstorage.read_write
+    {{- else }}
+    {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
+    {{- end }}
+      container: {{ required "Metadata container required" .metadataContainer }}
+    {{- end }}
+  {{- if.Values.configuration.auth.enabled }}
+  004-auth.yaml: |
+    auth:
+      appAuth:
+        selfAuthServer:
+          staticClients:
+            flytepropeller:
+              client_secret: {{ required "Internal client secret hash required when authentication is enabled" .Values.configuration.auth.internal.clientSecretHash | quote }}
+              grant_types:
+              - refresh_token
+              - client_credentials
+              id: flytepropeller
+              response_types:
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+            flyte-cli:
+              grant_types:
+              - refresh_token
+              - authorization_code
+              id: flyte-cli
+              public: true
+              redirect_uris:
+              - http://localhost:53593/callback
+              - http://localhost:12345/callback
+              response_types:
+              - code
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+            flytectl:
+              grant_types:
+              - refresh_token
+              - authorization_code
+              id: flytectl
+              public: true
+              redirect_uris:
+              - http://localhost:53593/callback
+              - http://localhost:12345/callback
+              response_types:
+              - code
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: http://localhost:53593/callback
+            scopes:
+            - offline
+            - all
+      authorizedUris:
+      {{- if .Values.ingress.host }}
+      - https://{{ tpl .Values.ingress.host . }}
+      {{- end }}
+      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.httpPort" . }}
+      userAuth:
+        openId:
+          baseUrl: {{ required "OIDC base URL required when authentication is enabled" .Values.configuration.auth.oidc.baseUrl | quote }}
+          clientId: {{ required "OIDC client ID required when authentication is enabled" .Values.configuration.auth.oidc.clientId | quote }}
+          scopes:
+          - profile
+          - openid
+    server:
+      security:
+        useAuth: true
+  {{- end }}
+  {{- if .Values.configuration.inline }}
+  010-inline-config.yaml: |
+    {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
+  {{- else if .Values.configuration.sourcePath }}
+  {{- (tpl (.Files.Glob .Values.configuration.sourcePath).AsConfig . ) | nindent 2 }}
+  {{- end }}
 {{- end }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cluster-resource-templates
-  labels: {{ include "flyte-binary.labels" . | nindent 4 }}
-data:
-{{ (.Files.Glob "cluster-resource-templates/*.yaml").AsConfig | indent 2 }}
