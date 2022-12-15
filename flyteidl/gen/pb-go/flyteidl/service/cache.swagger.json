@@ -17,8 +17,8 @@
   "paths": {
     "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "delete": {
-        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.",
-        "operationId": "EvictCache",
+        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "EvictExecutionCache",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -48,14 +48,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/serviceEvictCacheRequest"
-            }
           }
         ],
         "tags": [
@@ -65,8 +57,8 @@
     },
     "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "delete": {
-        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.",
-        "operationId": "EvictCache2",
+        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "EvictTaskExecutionCache",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -164,9 +156,14 @@
     "CacheEvictionErrorCode": {
       "type": "string",
       "enum": [
-        "UNKNOWN"
+        "INTERNAL",
+        "RESERVATION_NOT_ACQUIRED",
+        "DATABASE_UPDATE_FAILED",
+        "ARTIFACT_DELETE_FAILED",
+        "RESERVATION_NOT_RELEASED"
       ],
-      "default": "UNKNOWN"
+      "default": "INTERNAL",
+      "description": "Defines codes for distinguishing between errors encountered during cache eviction.\n\n - INTERNAL: Indicates a generic internal error occurred.\n - RESERVATION_NOT_ACQUIRED: Indicates no reservation could be acquired before deleting an artifact.\n - DATABASE_UPDATE_FAILED: Indicates updating the database entry related to the node execution failed.\n - ARTIFACT_DELETE_FAILED: Indicates deleting the artifact from datacatalog failed.\n - RESERVATION_NOT_RELEASED: Indicates the reservation previously acquired could not be released for an artifact."
     },
     "coreCacheEvictionError": {
       "type": "object",
@@ -289,19 +286,6 @@
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
-    },
-    "serviceEvictCacheRequest": {
-      "type": "object",
-      "properties": {
-        "workflow_execution_id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for."
-        },
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for."
-        }
-      }
     },
     "serviceEvictCacheResponse": {
       "type": "object",

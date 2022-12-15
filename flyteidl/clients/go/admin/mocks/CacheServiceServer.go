@@ -14,30 +14,30 @@ type CacheServiceServer struct {
 	mock.Mock
 }
 
-type CacheServiceServer_EvictCache struct {
+type CacheServiceServer_EvictExecutionCache struct {
 	*mock.Call
 }
 
-func (_m CacheServiceServer_EvictCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceServer_EvictCache {
-	return &CacheServiceServer_EvictCache{Call: _m.Call.Return(_a0, _a1)}
+func (_m CacheServiceServer_EvictExecutionCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceServer_EvictExecutionCache {
+	return &CacheServiceServer_EvictExecutionCache{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *CacheServiceServer) OnEvictCache(_a0 context.Context, _a1 *service.EvictCacheRequest) *CacheServiceServer_EvictCache {
-	c_call := _m.On("EvictCache", _a0, _a1)
-	return &CacheServiceServer_EvictCache{Call: c_call}
+func (_m *CacheServiceServer) OnEvictExecutionCache(_a0 context.Context, _a1 *service.EvictExecutionCacheRequest) *CacheServiceServer_EvictExecutionCache {
+	c_call := _m.On("EvictExecutionCache", _a0, _a1)
+	return &CacheServiceServer_EvictExecutionCache{Call: c_call}
 }
 
-func (_m *CacheServiceServer) OnEvictCacheMatch(matchers ...interface{}) *CacheServiceServer_EvictCache {
-	c_call := _m.On("EvictCache", matchers...)
-	return &CacheServiceServer_EvictCache{Call: c_call}
+func (_m *CacheServiceServer) OnEvictExecutionCacheMatch(matchers ...interface{}) *CacheServiceServer_EvictExecutionCache {
+	c_call := _m.On("EvictExecutionCache", matchers...)
+	return &CacheServiceServer_EvictExecutionCache{Call: c_call}
 }
 
-// EvictCache provides a mock function with given fields: _a0, _a1
-func (_m *CacheServiceServer) EvictCache(_a0 context.Context, _a1 *service.EvictCacheRequest) (*service.EvictCacheResponse, error) {
+// EvictExecutionCache provides a mock function with given fields: _a0, _a1
+func (_m *CacheServiceServer) EvictExecutionCache(_a0 context.Context, _a1 *service.EvictExecutionCacheRequest) (*service.EvictCacheResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 *service.EvictCacheResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictCacheRequest) *service.EvictCacheResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictExecutionCacheRequest) *service.EvictCacheResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
@@ -46,7 +46,48 @@ func (_m *CacheServiceServer) EvictCache(_a0 context.Context, _a1 *service.Evict
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictCacheRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictExecutionCacheRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type CacheServiceServer_EvictTaskExecutionCache struct {
+	*mock.Call
+}
+
+func (_m CacheServiceServer_EvictTaskExecutionCache) Return(_a0 *service.EvictCacheResponse, _a1 error) *CacheServiceServer_EvictTaskExecutionCache {
+	return &CacheServiceServer_EvictTaskExecutionCache{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *CacheServiceServer) OnEvictTaskExecutionCache(_a0 context.Context, _a1 *service.EvictTaskExecutionCacheRequest) *CacheServiceServer_EvictTaskExecutionCache {
+	c_call := _m.On("EvictTaskExecutionCache", _a0, _a1)
+	return &CacheServiceServer_EvictTaskExecutionCache{Call: c_call}
+}
+
+func (_m *CacheServiceServer) OnEvictTaskExecutionCacheMatch(matchers ...interface{}) *CacheServiceServer_EvictTaskExecutionCache {
+	c_call := _m.On("EvictTaskExecutionCache", matchers...)
+	return &CacheServiceServer_EvictTaskExecutionCache{Call: c_call}
+}
+
+// EvictTaskExecutionCache provides a mock function with given fields: _a0, _a1
+func (_m *CacheServiceServer) EvictTaskExecutionCache(_a0 context.Context, _a1 *service.EvictTaskExecutionCacheRequest) (*service.EvictCacheResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *service.EvictCacheResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.EvictTaskExecutionCacheRequest) *service.EvictCacheResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.EvictCacheResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.EvictTaskExecutionCacheRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

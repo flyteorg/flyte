@@ -44,7 +44,7 @@ struct TableStruct_flyteidl_2fservice_2fcache_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -53,18 +53,22 @@ struct TableStruct_flyteidl_2fservice_2fcache_2eproto {
 void AddDescriptors_flyteidl_2fservice_2fcache_2eproto();
 namespace flyteidl {
 namespace service {
-class EvictCacheRequest;
-class EvictCacheRequestDefaultTypeInternal;
-extern EvictCacheRequestDefaultTypeInternal _EvictCacheRequest_default_instance_;
 class EvictCacheResponse;
 class EvictCacheResponseDefaultTypeInternal;
 extern EvictCacheResponseDefaultTypeInternal _EvictCacheResponse_default_instance_;
+class EvictExecutionCacheRequest;
+class EvictExecutionCacheRequestDefaultTypeInternal;
+extern EvictExecutionCacheRequestDefaultTypeInternal _EvictExecutionCacheRequest_default_instance_;
+class EvictTaskExecutionCacheRequest;
+class EvictTaskExecutionCacheRequestDefaultTypeInternal;
+extern EvictTaskExecutionCacheRequestDefaultTypeInternal _EvictTaskExecutionCacheRequest_default_instance_;
 }  // namespace service
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
-template<> ::flyteidl::service::EvictCacheRequest* Arena::CreateMaybeMessage<::flyteidl::service::EvictCacheRequest>(Arena*);
 template<> ::flyteidl::service::EvictCacheResponse* Arena::CreateMaybeMessage<::flyteidl::service::EvictCacheResponse>(Arena*);
+template<> ::flyteidl::service::EvictExecutionCacheRequest* Arena::CreateMaybeMessage<::flyteidl::service::EvictExecutionCacheRequest>(Arena*);
+template<> ::flyteidl::service::EvictTaskExecutionCacheRequest* Arena::CreateMaybeMessage<::flyteidl::service::EvictTaskExecutionCacheRequest>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -72,25 +76,25 @@ namespace service {
 
 // ===================================================================
 
-class EvictCacheRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.service.EvictCacheRequest) */ {
+class EvictExecutionCacheRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.service.EvictExecutionCacheRequest) */ {
  public:
-  EvictCacheRequest();
-  virtual ~EvictCacheRequest();
+  EvictExecutionCacheRequest();
+  virtual ~EvictExecutionCacheRequest();
 
-  EvictCacheRequest(const EvictCacheRequest& from);
+  EvictExecutionCacheRequest(const EvictExecutionCacheRequest& from);
 
-  inline EvictCacheRequest& operator=(const EvictCacheRequest& from) {
+  inline EvictExecutionCacheRequest& operator=(const EvictExecutionCacheRequest& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  EvictCacheRequest(EvictCacheRequest&& from) noexcept
-    : EvictCacheRequest() {
+  EvictExecutionCacheRequest(EvictExecutionCacheRequest&& from) noexcept
+    : EvictExecutionCacheRequest() {
     *this = ::std::move(from);
   }
 
-  inline EvictCacheRequest& operator=(EvictCacheRequest&& from) noexcept {
+  inline EvictExecutionCacheRequest& operator=(EvictExecutionCacheRequest&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -102,40 +106,34 @@ class EvictCacheRequest final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const EvictCacheRequest& default_instance();
-
-  enum IdCase {
-    kWorkflowExecutionId = 1,
-    kTaskExecutionId = 2,
-    ID_NOT_SET = 0,
-  };
+  static const EvictExecutionCacheRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const EvictCacheRequest* internal_default_instance() {
-    return reinterpret_cast<const EvictCacheRequest*>(
-               &_EvictCacheRequest_default_instance_);
+  static inline const EvictExecutionCacheRequest* internal_default_instance() {
+    return reinterpret_cast<const EvictExecutionCacheRequest*>(
+               &_EvictExecutionCacheRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  void Swap(EvictCacheRequest* other);
-  friend void swap(EvictCacheRequest& a, EvictCacheRequest& b) {
+  void Swap(EvictExecutionCacheRequest* other);
+  friend void swap(EvictExecutionCacheRequest& a, EvictExecutionCacheRequest& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline EvictCacheRequest* New() const final {
-    return CreateMaybeMessage<EvictCacheRequest>(nullptr);
+  inline EvictExecutionCacheRequest* New() const final {
+    return CreateMaybeMessage<EvictExecutionCacheRequest>(nullptr);
   }
 
-  EvictCacheRequest* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<EvictCacheRequest>(arena);
+  EvictExecutionCacheRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EvictExecutionCacheRequest>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const EvictCacheRequest& from);
-  void MergeFrom(const EvictCacheRequest& from);
+  void CopyFrom(const EvictExecutionCacheRequest& from);
+  void MergeFrom(const EvictExecutionCacheRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -157,7 +155,7 @@ class EvictCacheRequest final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(EvictCacheRequest* other);
+  void InternalSwap(EvictExecutionCacheRequest* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -182,35 +180,128 @@ class EvictCacheRequest final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_workflow_execution_id();
   void set_allocated_workflow_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id);
 
-  // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 2;
+  // @@protoc_insertion_point(class_scope:flyteidl.service.EvictExecutionCacheRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fservice_2fcache_2eproto;
+};
+// -------------------------------------------------------------------
+
+class EvictTaskExecutionCacheRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.service.EvictTaskExecutionCacheRequest) */ {
+ public:
+  EvictTaskExecutionCacheRequest();
+  virtual ~EvictTaskExecutionCacheRequest();
+
+  EvictTaskExecutionCacheRequest(const EvictTaskExecutionCacheRequest& from);
+
+  inline EvictTaskExecutionCacheRequest& operator=(const EvictTaskExecutionCacheRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  EvictTaskExecutionCacheRequest(EvictTaskExecutionCacheRequest&& from) noexcept
+    : EvictTaskExecutionCacheRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline EvictTaskExecutionCacheRequest& operator=(EvictTaskExecutionCacheRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const EvictTaskExecutionCacheRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const EvictTaskExecutionCacheRequest* internal_default_instance() {
+    return reinterpret_cast<const EvictTaskExecutionCacheRequest*>(
+               &_EvictTaskExecutionCacheRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(EvictTaskExecutionCacheRequest* other);
+  friend void swap(EvictTaskExecutionCacheRequest& a, EvictTaskExecutionCacheRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EvictTaskExecutionCacheRequest* New() const final {
+    return CreateMaybeMessage<EvictTaskExecutionCacheRequest>(nullptr);
+  }
+
+  EvictTaskExecutionCacheRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EvictTaskExecutionCacheRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const EvictTaskExecutionCacheRequest& from);
+  void MergeFrom(const EvictTaskExecutionCacheRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EvictTaskExecutionCacheRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;
   bool has_task_execution_id() const;
   void clear_task_execution_id();
-  static const int kTaskExecutionIdFieldNumber = 2;
+  static const int kTaskExecutionIdFieldNumber = 1;
   const ::flyteidl::core::TaskExecutionIdentifier& task_execution_id() const;
   ::flyteidl::core::TaskExecutionIdentifier* release_task_execution_id();
   ::flyteidl::core::TaskExecutionIdentifier* mutable_task_execution_id();
   void set_allocated_task_execution_id(::flyteidl::core::TaskExecutionIdentifier* task_execution_id);
 
-  void clear_id();
-  IdCase id_case() const;
-  // @@protoc_insertion_point(class_scope:flyteidl.service.EvictCacheRequest)
+  // @@protoc_insertion_point(class_scope:flyteidl.service.EvictTaskExecutionCacheRequest)
  private:
   class HasBitSetters;
-  void set_has_workflow_execution_id();
-  void set_has_task_execution_id();
-
-  inline bool has_id() const;
-  inline void clear_has_id();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  union IdUnion {
-    IdUnion() {}
-    ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id_;
-    ::flyteidl::core::TaskExecutionIdentifier* task_execution_id_;
-  } id_;
+  ::flyteidl::core::TaskExecutionIdentifier* task_execution_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
   friend struct ::TableStruct_flyteidl_2fservice_2fcache_2eproto;
 };
 // -------------------------------------------------------------------
@@ -253,7 +344,7 @@ class EvictCacheResponse final :
                &_EvictCacheResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   void Swap(EvictCacheResponse* other);
   friend void swap(EvictCacheResponse& a, EvictCacheResponse& b) {
@@ -337,87 +428,102 @@ class EvictCacheResponse final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// EvictCacheRequest
+// EvictExecutionCacheRequest
 
 // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 1;
-inline bool EvictCacheRequest::has_workflow_execution_id() const {
-  return id_case() == kWorkflowExecutionId;
+inline bool EvictExecutionCacheRequest::has_workflow_execution_id() const {
+  return this != internal_default_instance() && workflow_execution_id_ != nullptr;
 }
-inline void EvictCacheRequest::set_has_workflow_execution_id() {
-  _oneof_case_[0] = kWorkflowExecutionId;
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& EvictExecutionCacheRequest::workflow_execution_id() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = workflow_execution_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.EvictExecutionCacheRequest.workflow_execution_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
 }
-inline ::flyteidl::core::WorkflowExecutionIdentifier* EvictCacheRequest::release_workflow_execution_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.service.EvictCacheRequest.workflow_execution_id)
-  if (has_workflow_execution_id()) {
-    clear_has_id();
-      ::flyteidl::core::WorkflowExecutionIdentifier* temp = id_.workflow_execution_id_;
-    id_.workflow_execution_id_ = nullptr;
-    return temp;
+inline ::flyteidl::core::WorkflowExecutionIdentifier* EvictExecutionCacheRequest::release_workflow_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.EvictExecutionCacheRequest.workflow_execution_id)
+  
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = workflow_execution_id_;
+  workflow_execution_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* EvictExecutionCacheRequest::mutable_workflow_execution_id() {
+  
+  if (workflow_execution_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    workflow_execution_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.EvictExecutionCacheRequest.workflow_execution_id)
+  return workflow_execution_id_;
+}
+inline void EvictExecutionCacheRequest::set_allocated_workflow_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(workflow_execution_id_);
+  }
+  if (workflow_execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      workflow_execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, workflow_execution_id, submessage_arena);
+    }
+    
   } else {
-    return nullptr;
+    
   }
-}
-inline const ::flyteidl::core::WorkflowExecutionIdentifier& EvictCacheRequest::workflow_execution_id() const {
-  // @@protoc_insertion_point(field_get:flyteidl.service.EvictCacheRequest.workflow_execution_id)
-  return has_workflow_execution_id()
-      ? *id_.workflow_execution_id_
-      : *reinterpret_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(&::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
-}
-inline ::flyteidl::core::WorkflowExecutionIdentifier* EvictCacheRequest::mutable_workflow_execution_id() {
-  if (!has_workflow_execution_id()) {
-    clear_id();
-    set_has_workflow_execution_id();
-    id_.workflow_execution_id_ = CreateMaybeMessage< ::flyteidl::core::WorkflowExecutionIdentifier >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.service.EvictCacheRequest.workflow_execution_id)
-  return id_.workflow_execution_id_;
+  workflow_execution_id_ = workflow_execution_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.EvictExecutionCacheRequest.workflow_execution_id)
 }
 
-// .flyteidl.core.TaskExecutionIdentifier task_execution_id = 2;
-inline bool EvictCacheRequest::has_task_execution_id() const {
-  return id_case() == kTaskExecutionId;
+// -------------------------------------------------------------------
+
+// EvictTaskExecutionCacheRequest
+
+// .flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;
+inline bool EvictTaskExecutionCacheRequest::has_task_execution_id() const {
+  return this != internal_default_instance() && task_execution_id_ != nullptr;
 }
-inline void EvictCacheRequest::set_has_task_execution_id() {
-  _oneof_case_[0] = kTaskExecutionId;
+inline const ::flyteidl::core::TaskExecutionIdentifier& EvictTaskExecutionCacheRequest::task_execution_id() const {
+  const ::flyteidl::core::TaskExecutionIdentifier* p = task_execution_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.EvictTaskExecutionCacheRequest.task_execution_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TaskExecutionIdentifier*>(
+      &::flyteidl::core::_TaskExecutionIdentifier_default_instance_);
 }
-inline ::flyteidl::core::TaskExecutionIdentifier* EvictCacheRequest::release_task_execution_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.service.EvictCacheRequest.task_execution_id)
-  if (has_task_execution_id()) {
-    clear_has_id();
-      ::flyteidl::core::TaskExecutionIdentifier* temp = id_.task_execution_id_;
-    id_.task_execution_id_ = nullptr;
-    return temp;
+inline ::flyteidl::core::TaskExecutionIdentifier* EvictTaskExecutionCacheRequest::release_task_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.EvictTaskExecutionCacheRequest.task_execution_id)
+  
+  ::flyteidl::core::TaskExecutionIdentifier* temp = task_execution_id_;
+  task_execution_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::TaskExecutionIdentifier* EvictTaskExecutionCacheRequest::mutable_task_execution_id() {
+  
+  if (task_execution_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::TaskExecutionIdentifier>(GetArenaNoVirtual());
+    task_execution_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.EvictTaskExecutionCacheRequest.task_execution_id)
+  return task_execution_id_;
+}
+inline void EvictTaskExecutionCacheRequest::set_allocated_task_execution_id(::flyteidl::core::TaskExecutionIdentifier* task_execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(task_execution_id_);
+  }
+  if (task_execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      task_execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, task_execution_id, submessage_arena);
+    }
+    
   } else {
-    return nullptr;
+    
   }
-}
-inline const ::flyteidl::core::TaskExecutionIdentifier& EvictCacheRequest::task_execution_id() const {
-  // @@protoc_insertion_point(field_get:flyteidl.service.EvictCacheRequest.task_execution_id)
-  return has_task_execution_id()
-      ? *id_.task_execution_id_
-      : *reinterpret_cast< ::flyteidl::core::TaskExecutionIdentifier*>(&::flyteidl::core::_TaskExecutionIdentifier_default_instance_);
-}
-inline ::flyteidl::core::TaskExecutionIdentifier* EvictCacheRequest::mutable_task_execution_id() {
-  if (!has_task_execution_id()) {
-    clear_id();
-    set_has_task_execution_id();
-    id_.task_execution_id_ = CreateMaybeMessage< ::flyteidl::core::TaskExecutionIdentifier >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.service.EvictCacheRequest.task_execution_id)
-  return id_.task_execution_id_;
+  task_execution_id_ = task_execution_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.EvictTaskExecutionCacheRequest.task_execution_id)
 }
 
-inline bool EvictCacheRequest::has_id() const {
-  return id_case() != ID_NOT_SET;
-}
-inline void EvictCacheRequest::clear_has_id() {
-  _oneof_case_[0] = ID_NOT_SET;
-}
-inline EvictCacheRequest::IdCase EvictCacheRequest::id_case() const {
-  return EvictCacheRequest::IdCase(_oneof_case_[0]);
-}
 // -------------------------------------------------------------------
 
 // EvictCacheResponse
@@ -470,6 +576,8 @@ inline void EvictCacheResponse::set_allocated_errors(::flyteidl::core::CacheEvic
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

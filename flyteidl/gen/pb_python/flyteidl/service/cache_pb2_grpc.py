@@ -15,9 +15,14 @@ class CacheServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.EvictCache = channel.unary_unary(
-                '/flyteidl.service.CacheService/EvictCache',
-                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
+        self.EvictExecutionCache = channel.unary_unary(
+                '/flyteidl.service.CacheService/EvictExecutionCache',
+                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
+                )
+        self.EvictTaskExecutionCache = channel.unary_unary(
+                '/flyteidl.service.CacheService/EvictTaskExecutionCache',
+                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
                 )
 
@@ -26,8 +31,15 @@ class CacheServiceServicer(object):
     """CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
     """
 
-    def EvictCache(self, request, context):
-        """Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
+    def EvictExecutionCache(self, request, context):
+        """Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def EvictTaskExecutionCache(self, request, context):
+        """Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -36,9 +48,14 @@ class CacheServiceServicer(object):
 
 def add_CacheServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'EvictCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.EvictCache,
-                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.FromString,
+            'EvictExecutionCache': grpc.unary_unary_rpc_method_handler(
+                    servicer.EvictExecutionCache,
+                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.FromString,
+                    response_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.SerializeToString,
+            ),
+            'EvictTaskExecutionCache': grpc.unary_unary_rpc_method_handler(
+                    servicer.EvictTaskExecutionCache,
+                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.FromString,
                     response_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.SerializeToString,
             ),
     }
@@ -53,7 +70,7 @@ class CacheService(object):
     """
 
     @staticmethod
-    def EvictCache(request,
+    def EvictExecutionCache(request,
             target,
             options=(),
             channel_credentials=None,
@@ -63,8 +80,25 @@ class CacheService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictCache',
-            flyteidl_dot_service_dot_cache__pb2.EvictCacheRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictExecutionCache',
+            flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
+            flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def EvictTaskExecutionCache(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictTaskExecutionCache',
+            flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.SerializeToString,
             flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

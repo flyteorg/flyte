@@ -26,86 +26,84 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type EvictCacheRequest struct {
-	// Identifier of resource cached data should be evicted for.
-	//
-	// Types that are valid to be assigned to Id:
-	//	*EvictCacheRequest_WorkflowExecutionId
-	//	*EvictCacheRequest_TaskExecutionId
-	Id                   isEvictCacheRequest_Id `protobuf_oneof:"id"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+type EvictExecutionCacheRequest struct {
+	// Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for.
+	WorkflowExecutionId  *core.WorkflowExecutionIdentifier `protobuf:"bytes,1,opt,name=workflow_execution_id,json=workflowExecutionId,proto3" json:"workflow_execution_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
+	XXX_unrecognized     []byte                            `json:"-"`
+	XXX_sizecache        int32                             `json:"-"`
 }
 
-func (m *EvictCacheRequest) Reset()         { *m = EvictCacheRequest{} }
-func (m *EvictCacheRequest) String() string { return proto.CompactTextString(m) }
-func (*EvictCacheRequest) ProtoMessage()    {}
-func (*EvictCacheRequest) Descriptor() ([]byte, []int) {
+func (m *EvictExecutionCacheRequest) Reset()         { *m = EvictExecutionCacheRequest{} }
+func (m *EvictExecutionCacheRequest) String() string { return proto.CompactTextString(m) }
+func (*EvictExecutionCacheRequest) ProtoMessage()    {}
+func (*EvictExecutionCacheRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c5ff5da69b96fa44, []int{0}
 }
 
-func (m *EvictCacheRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EvictCacheRequest.Unmarshal(m, b)
+func (m *EvictExecutionCacheRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EvictExecutionCacheRequest.Unmarshal(m, b)
 }
-func (m *EvictCacheRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EvictCacheRequest.Marshal(b, m, deterministic)
+func (m *EvictExecutionCacheRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EvictExecutionCacheRequest.Marshal(b, m, deterministic)
 }
-func (m *EvictCacheRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EvictCacheRequest.Merge(m, src)
+func (m *EvictExecutionCacheRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EvictExecutionCacheRequest.Merge(m, src)
 }
-func (m *EvictCacheRequest) XXX_Size() int {
-	return xxx_messageInfo_EvictCacheRequest.Size(m)
+func (m *EvictExecutionCacheRequest) XXX_Size() int {
+	return xxx_messageInfo_EvictExecutionCacheRequest.Size(m)
 }
-func (m *EvictCacheRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_EvictCacheRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EvictCacheRequest proto.InternalMessageInfo
-
-type isEvictCacheRequest_Id interface {
-	isEvictCacheRequest_Id()
+func (m *EvictExecutionCacheRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_EvictExecutionCacheRequest.DiscardUnknown(m)
 }
 
-type EvictCacheRequest_WorkflowExecutionId struct {
-	WorkflowExecutionId *core.WorkflowExecutionIdentifier `protobuf:"bytes,1,opt,name=workflow_execution_id,json=workflowExecutionId,proto3,oneof"`
-}
+var xxx_messageInfo_EvictExecutionCacheRequest proto.InternalMessageInfo
 
-type EvictCacheRequest_TaskExecutionId struct {
-	TaskExecutionId *core.TaskExecutionIdentifier `protobuf:"bytes,2,opt,name=task_execution_id,json=taskExecutionId,proto3,oneof"`
-}
-
-func (*EvictCacheRequest_WorkflowExecutionId) isEvictCacheRequest_Id() {}
-
-func (*EvictCacheRequest_TaskExecutionId) isEvictCacheRequest_Id() {}
-
-func (m *EvictCacheRequest) GetId() isEvictCacheRequest_Id {
+func (m *EvictExecutionCacheRequest) GetWorkflowExecutionId() *core.WorkflowExecutionIdentifier {
 	if m != nil {
-		return m.Id
+		return m.WorkflowExecutionId
 	}
 	return nil
 }
 
-func (m *EvictCacheRequest) GetWorkflowExecutionId() *core.WorkflowExecutionIdentifier {
-	if x, ok := m.GetId().(*EvictCacheRequest_WorkflowExecutionId); ok {
-		return x.WorkflowExecutionId
-	}
-	return nil
+type EvictTaskExecutionCacheRequest struct {
+	// Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for.
+	TaskExecutionId      *core.TaskExecutionIdentifier `protobuf:"bytes,1,opt,name=task_execution_id,json=taskExecutionId,proto3" json:"task_execution_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
+	XXX_unrecognized     []byte                        `json:"-"`
+	XXX_sizecache        int32                         `json:"-"`
 }
 
-func (m *EvictCacheRequest) GetTaskExecutionId() *core.TaskExecutionIdentifier {
-	if x, ok := m.GetId().(*EvictCacheRequest_TaskExecutionId); ok {
-		return x.TaskExecutionId
-	}
-	return nil
+func (m *EvictTaskExecutionCacheRequest) Reset()         { *m = EvictTaskExecutionCacheRequest{} }
+func (m *EvictTaskExecutionCacheRequest) String() string { return proto.CompactTextString(m) }
+func (*EvictTaskExecutionCacheRequest) ProtoMessage()    {}
+func (*EvictTaskExecutionCacheRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c5ff5da69b96fa44, []int{1}
 }
 
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*EvictCacheRequest) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*EvictCacheRequest_WorkflowExecutionId)(nil),
-		(*EvictCacheRequest_TaskExecutionId)(nil),
+func (m *EvictTaskExecutionCacheRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EvictTaskExecutionCacheRequest.Unmarshal(m, b)
+}
+func (m *EvictTaskExecutionCacheRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EvictTaskExecutionCacheRequest.Marshal(b, m, deterministic)
+}
+func (m *EvictTaskExecutionCacheRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EvictTaskExecutionCacheRequest.Merge(m, src)
+}
+func (m *EvictTaskExecutionCacheRequest) XXX_Size() int {
+	return xxx_messageInfo_EvictTaskExecutionCacheRequest.Size(m)
+}
+func (m *EvictTaskExecutionCacheRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_EvictTaskExecutionCacheRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EvictTaskExecutionCacheRequest proto.InternalMessageInfo
+
+func (m *EvictTaskExecutionCacheRequest) GetTaskExecutionId() *core.TaskExecutionIdentifier {
+	if m != nil {
+		return m.TaskExecutionId
 	}
+	return nil
 }
 
 type EvictCacheResponse struct {
@@ -120,7 +118,7 @@ func (m *EvictCacheResponse) Reset()         { *m = EvictCacheResponse{} }
 func (m *EvictCacheResponse) String() string { return proto.CompactTextString(m) }
 func (*EvictCacheResponse) ProtoMessage()    {}
 func (*EvictCacheResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c5ff5da69b96fa44, []int{1}
+	return fileDescriptor_c5ff5da69b96fa44, []int{2}
 }
 
 func (m *EvictCacheResponse) XXX_Unmarshal(b []byte) error {
@@ -149,43 +147,45 @@ func (m *EvictCacheResponse) GetErrors() *core.CacheEvictionErrorList {
 }
 
 func init() {
-	proto.RegisterType((*EvictCacheRequest)(nil), "flyteidl.service.EvictCacheRequest")
+	proto.RegisterType((*EvictExecutionCacheRequest)(nil), "flyteidl.service.EvictExecutionCacheRequest")
+	proto.RegisterType((*EvictTaskExecutionCacheRequest)(nil), "flyteidl.service.EvictTaskExecutionCacheRequest")
 	proto.RegisterType((*EvictCacheResponse)(nil), "flyteidl.service.EvictCacheResponse")
 }
 
 func init() { proto.RegisterFile("flyteidl/service/cache.proto", fileDescriptor_c5ff5da69b96fa44) }
 
 var fileDescriptor_c5ff5da69b96fa44 = []byte{
-	// 463 bytes of a gzipped FileDescriptorProto
+	// 476 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcd, 0x8a, 0x13, 0x41,
-	0x10, 0x36, 0xd9, 0xec, 0x1e, 0x5a, 0x41, 0x77, 0x44, 0x90, 0xb0, 0x88, 0xc4, 0x1f, 0x24, 0xe0,
-	0x34, 0xae, 0x07, 0x51, 0xf0, 0xb2, 0x12, 0x50, 0xf0, 0x94, 0x5d, 0x10, 0xf6, 0x12, 0x3b, 0x3d,
-	0x95, 0xd9, 0x32, 0x49, 0xd7, 0xd8, 0x5d, 0x49, 0x5c, 0x96, 0x5c, 0x3c, 0xf8, 0x02, 0x1e, 0x7c,
-	0x02, 0x05, 0xc1, 0x97, 0x11, 0x5f, 0xc1, 0x07, 0x91, 0xe9, 0xc9, 0x8c, 0x4e, 0x92, 0x59, 0x37,
-	0xd7, 0xfa, 0xbe, 0xfa, 0xea, 0xab, 0xfa, 0x66, 0x5a, 0xec, 0x0d, 0x46, 0xa7, 0x0c, 0x18, 0x8d,
-	0xa4, 0x03, 0x3b, 0x45, 0x0d, 0x52, 0x2b, 0x7d, 0x02, 0x61, 0x62, 0x89, 0x29, 0xb8, 0x96, 0xa3,
-	0xe1, 0x02, 0x6d, 0xee, 0xc5, 0x44, 0xf1, 0x08, 0xa4, 0x4a, 0x50, 0x2a, 0x63, 0x88, 0x15, 0x23,
-	0x19, 0x97, 0xf1, 0x9b, 0xcd, 0x42, 0x4d, 0x93, 0x05, 0x09, 0xd6, 0x92, 0xcd, 0xb1, 0x5b, 0x65,
-	0x0c, 0x23, 0x30, 0x8c, 0x03, 0x04, 0x9b, 0xe1, 0xad, 0x9f, 0x35, 0xb1, 0xdb, 0x99, 0xa2, 0xe6,
-	0x17, 0xa9, 0x81, 0x2e, 0xbc, 0x9f, 0x80, 0xe3, 0xe0, 0xad, 0xb8, 0x31, 0x23, 0x3b, 0x1c, 0x8c,
-	0x68, 0xd6, 0x83, 0x0f, 0xa0, 0x27, 0xe9, 0xb8, 0x1e, 0x46, 0x37, 0x6b, 0xb7, 0x6b, 0x0f, 0x2e,
-	0xef, 0xb7, 0xc3, 0xc2, 0x61, 0xaa, 0x1a, 0xbe, 0x59, 0x70, 0x3b, 0x39, 0xf5, 0x55, 0x31, 0xe6,
-	0xe5, 0xa5, 0xee, 0xf5, 0xd9, 0x2a, 0x1c, 0x1c, 0x89, 0x5d, 0x56, 0x6e, 0x58, 0x56, 0xaf, 0x7b,
-	0xf5, 0xfb, 0x4b, 0xea, 0x47, 0xca, 0x0d, 0xd7, 0x2b, 0x5f, 0xe5, 0x32, 0x74, 0xd0, 0x10, 0x75,
-	0x8c, 0x5a, 0x87, 0x22, 0xf8, 0x77, 0x25, 0x97, 0x90, 0x71, 0x10, 0x3c, 0x17, 0x3b, 0xd9, 0x65,
-	0x16, 0x4b, 0xdc, 0x5b, 0x1a, 0xe3, 0xd9, 0xbe, 0x0f, 0xc9, 0x74, 0x52, 0xe6, 0x6b, 0x74, 0xdc,
-	0x5d, 0x34, 0xed, 0x7f, 0xd9, 0x16, 0x57, 0x3c, 0xe5, 0x30, 0xcb, 0x24, 0xf8, 0xb4, 0x2d, 0xc4,
-	0xdf, 0x31, 0xc1, 0x9d, 0x70, 0x39, 0xb5, 0x70, 0xe5, 0xae, 0xcd, 0xbb, 0xe7, 0x93, 0x32, 0xa7,
-	0xad, 0x1f, 0x8d, 0x8f, 0xbf, 0x7e, 0x7f, 0xae, 0x7f, 0x6d, 0xb4, 0xd9, 0x27, 0x3e, 0x7d, 0x94,
-	0x7d, 0x1e, 0xb2, 0x38, 0x96, 0x93, 0x67, 0x6b, 0xf3, 0x49, 0x43, 0x7d, 0x07, 0x9a, 0xe7, 0x55,
-	0x78, 0x44, 0x63, 0x85, 0xa6, 0x12, 0x36, 0x6a, 0x0c, 0xf3, 0x67, 0xb5, 0xf6, 0xf1, 0xf7, 0xad,
-	0xf6, 0xb7, 0xad, 0xf2, 0xf0, 0x72, 0x5c, 0x4e, 0x9e, 0xad, 0xe4, 0x17, 0x1a, 0x8a, 0xa0, 0x5c,
-	0xa9, 0x30, 0xb7, 0x71, 0x6b, 0xe1, 0x7b, 0xe3, 0x4e, 0xbf, 0xd2, 0xc5, 0xfa, 0x7c, 0x05, 0xa3,
-	0xb5, 0x6c, 0x5f, 0xf9, 0xcf, 0x0e, 0x39, 0xe7, 0x1c, 0xb3, 0x39, 0xa5, 0xd2, 0x55, 0x4e, 0x98,
-	0x82, 0x75, 0x48, 0xeb, 0x45, 0x2c, 0xb0, 0x3d, 0xed, 0x29, 0x66, 0x18, 0x27, 0x3c, 0x3f, 0x78,
-	0x7a, 0xfc, 0x24, 0x46, 0x3e, 0x99, 0xf4, 0x43, 0x4d, 0x63, 0xe9, 0x3f, 0x30, 0xb2, 0xb1, 0x2c,
-	0x7e, 0xfc, 0x18, 0x8c, 0x4c, 0xfa, 0x0f, 0x63, 0x92, 0xcb, 0xaf, 0x4e, 0x7f, 0xc7, 0x3f, 0x02,
-	0x8f, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xf9, 0x73, 0x21, 0xfd, 0x90, 0x04, 0x00, 0x00,
+	0x10, 0x26, 0x46, 0x72, 0x68, 0x05, 0x75, 0x16, 0x51, 0x86, 0x65, 0x91, 0xa0, 0x22, 0x41, 0xa7,
+	0x75, 0x3d, 0x88, 0x07, 0x2f, 0x4a, 0x0e, 0x82, 0xa7, 0xac, 0x20, 0x78, 0x30, 0x74, 0x7a, 0x2a,
+	0xb3, 0x6d, 0x92, 0xae, 0xb1, 0xbb, 0x32, 0x71, 0xd9, 0xcd, 0xc5, 0x57, 0xf0, 0x01, 0xbc, 0x88,
+	0xe0, 0xcd, 0x77, 0xf1, 0x15, 0x04, 0x5f, 0x43, 0xa6, 0xe7, 0x07, 0x67, 0x76, 0x5a, 0x77, 0xaf,
+	0xfd, 0x7d, 0xf5, 0xd5, 0x57, 0xf5, 0x15, 0xcd, 0x76, 0xe7, 0xcb, 0x23, 0x02, 0x15, 0x2f, 0xb9,
+	0x05, 0x93, 0x29, 0x09, 0x5c, 0x0a, 0x79, 0x08, 0x51, 0x6a, 0x90, 0x30, 0xb8, 0x5a, 0xa1, 0x51,
+	0x89, 0x86, 0xbb, 0x09, 0x62, 0xb2, 0x04, 0x2e, 0x52, 0xc5, 0x85, 0xd6, 0x48, 0x82, 0x14, 0x6a,
+	0x5b, 0xf0, 0xc3, 0xb0, 0x56, 0x93, 0x68, 0x80, 0x83, 0x31, 0x68, 0x2a, 0x6c, 0xaf, 0x89, 0xa9,
+	0x18, 0x34, 0xa9, 0xb9, 0x02, 0x53, 0xe0, 0xc3, 0x13, 0x16, 0x8e, 0x33, 0x25, 0x69, 0xfc, 0x11,
+	0xe4, 0x3a, 0x17, 0x7d, 0x91, 0x1b, 0x99, 0xc0, 0x87, 0x35, 0x58, 0x0a, 0xde, 0xb1, 0xeb, 0x1b,
+	0x34, 0x8b, 0xf9, 0x12, 0x37, 0x53, 0xa8, 0x18, 0x53, 0x15, 0xdf, 0xec, 0xdd, 0xea, 0xdd, 0xbb,
+	0xb4, 0x3f, 0x8a, 0x6a, 0xa7, 0xb9, 0x7a, 0xf4, 0xa6, 0xe4, 0xd6, 0x62, 0x2f, 0xeb, 0x76, 0x93,
+	0x9d, 0xcd, 0x69, 0x70, 0x48, 0x6c, 0xcf, 0x75, 0x7f, 0x2d, 0xec, 0xa2, 0xdb, 0xc1, 0x84, 0x5d,
+	0x23, 0x61, 0x17, 0x5d, 0xdd, 0xef, 0xb6, 0xba, 0x37, 0x44, 0xfe, 0xea, 0x7c, 0x85, 0x9a, 0xc0,
+	0xf0, 0x80, 0x05, 0xae, 0x6b, 0xd9, 0xc8, 0xa6, 0xa8, 0x2d, 0x04, 0xcf, 0xd8, 0xa0, 0xd8, 0x5c,
+	0x29, 0x7f, 0xa7, 0x25, 0xef, 0xd8, 0xae, 0x4e, 0xa1, 0x1e, 0xe7, 0xcc, 0x57, 0xca, 0xd2, 0xa4,
+	0x2c, 0xda, 0xff, 0x32, 0x60, 0x97, 0x1d, 0xe5, 0xa0, 0xc8, 0x2c, 0xf8, 0xdd, 0x63, 0x3b, 0x1d,
+	0xab, 0x0d, 0xee, 0x47, 0xed, 0x78, 0x23, 0x7f, 0x02, 0xe1, 0x6d, 0x0f, 0xbb, 0xe1, 0x7d, 0x78,
+	0xf2, 0xe9, 0xe7, 0xaf, 0xcf, 0x17, 0xb2, 0x11, 0xb9, 0x0b, 0xc9, 0x1e, 0x15, 0xe7, 0xc4, 0xeb,
+	0xa5, 0x59, 0x7e, 0xdc, 0x99, 0x63, 0x7e, 0x04, 0xef, 0x41, 0xd2, 0xd6, 0x87, 0xc7, 0xb8, 0x12,
+	0x4a, 0x7b, 0x61, 0x2d, 0x56, 0xb0, 0x0d, 0xbe, 0x5e, 0x64, 0x37, 0x3c, 0x31, 0x06, 0x0f, 0x3d,
+	0xfe, 0xbd, 0x89, 0x9f, 0x71, 0xe2, 0x1f, 0x7d, 0x37, 0xf2, 0xf7, 0xfe, 0xe8, 0x5b, 0xbf, 0x39,
+	0x74, 0xf3, 0x5c, 0x2c, 0x3f, 0x3e, 0x75, 0x3f, 0x91, 0xc6, 0x18, 0x9a, 0x2f, 0x9e, 0xa5, 0x9c,
+	0xbb, 0xb4, 0xde, 0xd7, 0xb9, 0x2b, 0xdd, 0x2a, 0xcf, 0x56, 0xe7, 0x5e, 0x54, 0xdc, 0xc9, 0x76,
+	0x2f, 0xff, 0x99, 0xa1, 0xe2, 0xfc, 0xc3, 0x6c, 0x45, 0xf1, 0xba, 0xaa, 0x08, 0x19, 0x18, 0xab,
+	0xb0, 0x5b, 0xc4, 0x00, 0x99, 0xa3, 0xa9, 0x20, 0x82, 0x55, 0x4a, 0xdb, 0xe7, 0x4f, 0xdf, 0x3e,
+	0x49, 0x14, 0x1d, 0xae, 0x67, 0x91, 0xc4, 0x15, 0x77, 0x21, 0xa3, 0x49, 0x78, 0xfd, 0x41, 0x25,
+	0xa0, 0x79, 0x3a, 0x7b, 0x90, 0x20, 0x6f, 0xff, 0x8e, 0xb3, 0x81, 0xfb, 0xac, 0x1e, 0xff, 0x09,
+	0x00, 0x00, 0xff, 0xff, 0xf4, 0x3a, 0xd2, 0x67, 0x38, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -200,8 +200,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CacheServiceClient interface {
-	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
-	EvictCache(ctx context.Context, in *EvictCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error)
+	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
+	EvictExecutionCache(ctx context.Context, in *EvictExecutionCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error)
+	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
+	EvictTaskExecutionCache(ctx context.Context, in *EvictTaskExecutionCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error)
 }
 
 type cacheServiceClient struct {
@@ -212,9 +214,18 @@ func NewCacheServiceClient(cc *grpc.ClientConn) CacheServiceClient {
 	return &cacheServiceClient{cc}
 }
 
-func (c *cacheServiceClient) EvictCache(ctx context.Context, in *EvictCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error) {
+func (c *cacheServiceClient) EvictExecutionCache(ctx context.Context, in *EvictExecutionCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error) {
 	out := new(EvictCacheResponse)
-	err := c.cc.Invoke(ctx, "/flyteidl.service.CacheService/EvictCache", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/flyteidl.service.CacheService/EvictExecutionCache", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cacheServiceClient) EvictTaskExecutionCache(ctx context.Context, in *EvictTaskExecutionCacheRequest, opts ...grpc.CallOption) (*EvictCacheResponse, error) {
+	out := new(EvictCacheResponse)
+	err := c.cc.Invoke(ctx, "/flyteidl.service.CacheService/EvictTaskExecutionCache", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -223,36 +234,59 @@ func (c *cacheServiceClient) EvictCache(ctx context.Context, in *EvictCacheReque
 
 // CacheServiceServer is the server API for CacheService service.
 type CacheServiceServer interface {
-	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution` or :ref:`ref_flyteidl.admin.TaskExecution`.
-	EvictCache(context.Context, *EvictCacheRequest) (*EvictCacheResponse, error)
+	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
+	EvictExecutionCache(context.Context, *EvictExecutionCacheRequest) (*EvictCacheResponse, error)
+	// Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
+	EvictTaskExecutionCache(context.Context, *EvictTaskExecutionCacheRequest) (*EvictCacheResponse, error)
 }
 
 // UnimplementedCacheServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedCacheServiceServer struct {
 }
 
-func (*UnimplementedCacheServiceServer) EvictCache(ctx context.Context, req *EvictCacheRequest) (*EvictCacheResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EvictCache not implemented")
+func (*UnimplementedCacheServiceServer) EvictExecutionCache(ctx context.Context, req *EvictExecutionCacheRequest) (*EvictCacheResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EvictExecutionCache not implemented")
+}
+func (*UnimplementedCacheServiceServer) EvictTaskExecutionCache(ctx context.Context, req *EvictTaskExecutionCacheRequest) (*EvictCacheResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EvictTaskExecutionCache not implemented")
 }
 
 func RegisterCacheServiceServer(s *grpc.Server, srv CacheServiceServer) {
 	s.RegisterService(&_CacheService_serviceDesc, srv)
 }
 
-func _CacheService_EvictCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EvictCacheRequest)
+func _CacheService_EvictExecutionCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EvictExecutionCacheRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).EvictCache(ctx, in)
+		return srv.(CacheServiceServer).EvictExecutionCache(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/flyteidl.service.CacheService/EvictCache",
+		FullMethod: "/flyteidl.service.CacheService/EvictExecutionCache",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).EvictCache(ctx, req.(*EvictCacheRequest))
+		return srv.(CacheServiceServer).EvictExecutionCache(ctx, req.(*EvictExecutionCacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CacheService_EvictTaskExecutionCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EvictTaskExecutionCacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CacheServiceServer).EvictTaskExecutionCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flyteidl.service.CacheService/EvictTaskExecutionCache",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CacheServiceServer).EvictTaskExecutionCache(ctx, req.(*EvictTaskExecutionCacheRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -262,8 +296,12 @@ var _CacheService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "EvictCache",
-			Handler:    _CacheService_EvictCache_Handler,
+			MethodName: "EvictExecutionCache",
+			Handler:    _CacheService_EvictExecutionCache_Handler,
+		},
+		{
+			MethodName: "EvictTaskExecutionCache",
+			Handler:    _CacheService_EvictTaskExecutionCache_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
