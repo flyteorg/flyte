@@ -100,13 +100,17 @@ inline bool ContainerError_Kind_Parse(
     ContainerError_Kind_descriptor(), name, value);
 }
 enum CacheEvictionError_Code {
-  CacheEvictionError_Code_UNKNOWN = 0,
+  CacheEvictionError_Code_INTERNAL = 0,
+  CacheEvictionError_Code_RESERVATION_NOT_ACQUIRED = 1,
+  CacheEvictionError_Code_DATABASE_UPDATE_FAILED = 2,
+  CacheEvictionError_Code_ARTIFACT_DELETE_FAILED = 3,
+  CacheEvictionError_Code_RESERVATION_NOT_RELEASED = 4,
   CacheEvictionError_Code_CacheEvictionError_Code_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   CacheEvictionError_Code_CacheEvictionError_Code_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool CacheEvictionError_Code_IsValid(int value);
-const CacheEvictionError_Code CacheEvictionError_Code_Code_MIN = CacheEvictionError_Code_UNKNOWN;
-const CacheEvictionError_Code CacheEvictionError_Code_Code_MAX = CacheEvictionError_Code_UNKNOWN;
+const CacheEvictionError_Code CacheEvictionError_Code_Code_MIN = CacheEvictionError_Code_INTERNAL;
+const CacheEvictionError_Code CacheEvictionError_Code_Code_MAX = CacheEvictionError_Code_RESERVATION_NOT_RELEASED;
 const int CacheEvictionError_Code_Code_ARRAYSIZE = CacheEvictionError_Code_Code_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* CacheEvictionError_Code_descriptor();
@@ -511,8 +515,16 @@ class CacheEvictionError final :
   // nested types ----------------------------------------------------
 
   typedef CacheEvictionError_Code Code;
-  static const Code UNKNOWN =
-    CacheEvictionError_Code_UNKNOWN;
+  static const Code INTERNAL =
+    CacheEvictionError_Code_INTERNAL;
+  static const Code RESERVATION_NOT_ACQUIRED =
+    CacheEvictionError_Code_RESERVATION_NOT_ACQUIRED;
+  static const Code DATABASE_UPDATE_FAILED =
+    CacheEvictionError_Code_DATABASE_UPDATE_FAILED;
+  static const Code ARTIFACT_DELETE_FAILED =
+    CacheEvictionError_Code_ARTIFACT_DELETE_FAILED;
+  static const Code RESERVATION_NOT_RELEASED =
+    CacheEvictionError_Code_RESERVATION_NOT_RELEASED;
   static inline bool Code_IsValid(int value) {
     return CacheEvictionError_Code_IsValid(value);
   }

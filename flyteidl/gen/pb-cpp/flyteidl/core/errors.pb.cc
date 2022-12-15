@@ -179,7 +179,7 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "xecutionError.ErrorKind\",\n\004Kind\022\023\n\017NON_R"
   "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo"
   "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co"
-  "ntainerError\"\317\002\n\022CacheEvictionError\0224\n\004c"
+  "ntainerError\"\305\003\n\022CacheEvictionError\0224\n\004c"
   "ode\030\001 \001(\0162&.flyteidl.core.CacheEvictionE"
   "rror.Code\022\017\n\007message\030\002 \001(\t\022A\n\021node_execu"
   "tion_id\030\003 \001(\0132&.flyteidl.core.NodeExecut"
@@ -187,16 +187,19 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "2&.flyteidl.core.TaskExecutionIdentifier"
   "H\000\022K\n\025workflow_execution_id\030\005 \001(\0132*.flyt"
   "eidl.core.WorkflowExecutionIdentifierH\000\""
-  "\023\n\004Code\022\013\n\007UNKNOWN\020\000B\010\n\006source\"K\n\026CacheE"
-  "victionErrorList\0221\n\006errors\030\001 \003(\0132!.flyte"
-  "idl.core.CacheEvictionErrorB6Z4github.co"
-  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "\210\001\n\004Code\022\014\n\010INTERNAL\020\000\022\034\n\030RESERVATION_NO"
+  "T_ACQUIRED\020\001\022\032\n\026DATABASE_UPDATE_FAILED\020\002"
+  "\022\032\n\026ARTIFACT_DELETE_FAILED\020\003\022\034\n\030RESERVAT"
+  "ION_NOT_RELEASED\020\004B\010\n\006source\"K\n\026CacheEvi"
+  "ctionErrorList\0221\n\006errors\030\001 \003(\0132!.flyteid"
+  "l.core.CacheEvictionErrorB6Z4github.com/"
+  "flyteorg/flyteidl/gen/pb-go/flyteidl/cor"
+  "eb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ferrors_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ferrors_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto,
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 851,
+  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 969,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto() {
@@ -240,6 +243,10 @@ const ::google::protobuf::EnumDescriptor* CacheEvictionError_Code_descriptor() {
 bool CacheEvictionError_Code_IsValid(int value) {
   switch (value) {
     case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
       return true;
     default:
       return false;
@@ -247,7 +254,11 @@ bool CacheEvictionError_Code_IsValid(int value) {
 }
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const CacheEvictionError_Code CacheEvictionError::UNKNOWN;
+const CacheEvictionError_Code CacheEvictionError::INTERNAL;
+const CacheEvictionError_Code CacheEvictionError::RESERVATION_NOT_ACQUIRED;
+const CacheEvictionError_Code CacheEvictionError::DATABASE_UPDATE_FAILED;
+const CacheEvictionError_Code CacheEvictionError::ARTIFACT_DELETE_FAILED;
+const CacheEvictionError_Code CacheEvictionError::RESERVATION_NOT_RELEASED;
 const CacheEvictionError_Code CacheEvictionError::Code_MIN;
 const CacheEvictionError_Code CacheEvictionError::Code_MAX;
 const int CacheEvictionError::Code_ARRAYSIZE;

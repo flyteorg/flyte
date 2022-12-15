@@ -2067,21 +2067,97 @@ public final class Errors {
     }
 
     /**
+     * <pre>
+     * Defines codes for distinguishing between errors encountered during cache eviction.
+     * </pre>
+     *
      * Protobuf enum {@code flyteidl.core.CacheEvictionError.Code}
      */
     public enum Code
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
-       * <code>UNKNOWN = 0;</code>
+       * <pre>
+       * Indicates a generic internal error occurred.
+       * </pre>
+       *
+       * <code>INTERNAL = 0;</code>
        */
-      UNKNOWN(0),
+      INTERNAL(0),
+      /**
+       * <pre>
+       * Indicates no reservation could be acquired before deleting an artifact.
+       * </pre>
+       *
+       * <code>RESERVATION_NOT_ACQUIRED = 1;</code>
+       */
+      RESERVATION_NOT_ACQUIRED(1),
+      /**
+       * <pre>
+       * Indicates updating the database entry related to the node execution failed.
+       * </pre>
+       *
+       * <code>DATABASE_UPDATE_FAILED = 2;</code>
+       */
+      DATABASE_UPDATE_FAILED(2),
+      /**
+       * <pre>
+       * Indicates deleting the artifact from datacatalog failed.
+       * </pre>
+       *
+       * <code>ARTIFACT_DELETE_FAILED = 3;</code>
+       */
+      ARTIFACT_DELETE_FAILED(3),
+      /**
+       * <pre>
+       * Indicates the reservation previously acquired could not be released for an artifact.
+       * </pre>
+       *
+       * <code>RESERVATION_NOT_RELEASED = 4;</code>
+       */
+      RESERVATION_NOT_RELEASED(4),
       UNRECOGNIZED(-1),
       ;
 
       /**
-       * <code>UNKNOWN = 0;</code>
+       * <pre>
+       * Indicates a generic internal error occurred.
+       * </pre>
+       *
+       * <code>INTERNAL = 0;</code>
        */
-      public static final int UNKNOWN_VALUE = 0;
+      public static final int INTERNAL_VALUE = 0;
+      /**
+       * <pre>
+       * Indicates no reservation could be acquired before deleting an artifact.
+       * </pre>
+       *
+       * <code>RESERVATION_NOT_ACQUIRED = 1;</code>
+       */
+      public static final int RESERVATION_NOT_ACQUIRED_VALUE = 1;
+      /**
+       * <pre>
+       * Indicates updating the database entry related to the node execution failed.
+       * </pre>
+       *
+       * <code>DATABASE_UPDATE_FAILED = 2;</code>
+       */
+      public static final int DATABASE_UPDATE_FAILED_VALUE = 2;
+      /**
+       * <pre>
+       * Indicates deleting the artifact from datacatalog failed.
+       * </pre>
+       *
+       * <code>ARTIFACT_DELETE_FAILED = 3;</code>
+       */
+      public static final int ARTIFACT_DELETE_FAILED_VALUE = 3;
+      /**
+       * <pre>
+       * Indicates the reservation previously acquired could not be released for an artifact.
+       * </pre>
+       *
+       * <code>RESERVATION_NOT_RELEASED = 4;</code>
+       */
+      public static final int RESERVATION_NOT_RELEASED_VALUE = 4;
 
 
       public final int getNumber() {
@@ -2102,7 +2178,11 @@ public final class Errors {
 
       public static Code forNumber(int value) {
         switch (value) {
-          case 0: return UNKNOWN;
+          case 0: return INTERNAL;
+          case 1: return RESERVATION_NOT_ACQUIRED;
+          case 2: return DATABASE_UPDATE_FAILED;
+          case 3: return ARTIFACT_DELETE_FAILED;
+          case 4: return RESERVATION_NOT_RELEASED;
           default: return null;
         }
       }
@@ -2383,7 +2463,7 @@ public final class Errors {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.UNKNOWN.getNumber()) {
+      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.INTERNAL.getNumber()) {
         output.writeEnum(1, code_);
       }
       if (!getMessageBytes().isEmpty()) {
@@ -2407,7 +2487,7 @@ public final class Errors {
       if (size != -1) return size;
 
       size = 0;
-      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.UNKNOWN.getNumber()) {
+      if (code_ != flyteidl.core.Errors.CacheEvictionError.Code.INTERNAL.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, code_);
       }
@@ -4335,7 +4415,7 @@ public final class Errors {
       "xecutionError.ErrorKind\",\n\004Kind\022\023\n\017NON_R" +
       "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo" +
       "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co" +
-      "ntainerError\"\317\002\n\022CacheEvictionError\0224\n\004c" +
+      "ntainerError\"\305\003\n\022CacheEvictionError\0224\n\004c" +
       "ode\030\001 \001(\0162&.flyteidl.core.CacheEvictionE" +
       "rror.Code\022\017\n\007message\030\002 \001(\t\022A\n\021node_execu" +
       "tion_id\030\003 \001(\0132&.flyteidl.core.NodeExecut" +
@@ -4343,11 +4423,14 @@ public final class Errors {
       "2&.flyteidl.core.TaskExecutionIdentifier" +
       "H\000\022K\n\025workflow_execution_id\030\005 \001(\0132*.flyt" +
       "eidl.core.WorkflowExecutionIdentifierH\000\"" +
-      "\023\n\004Code\022\013\n\007UNKNOWN\020\000B\010\n\006source\"K\n\026CacheE" +
-      "victionErrorList\0221\n\006errors\030\001 \003(\0132!.flyte" +
-      "idl.core.CacheEvictionErrorB6Z4github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "\210\001\n\004Code\022\014\n\010INTERNAL\020\000\022\034\n\030RESERVATION_NO" +
+      "T_ACQUIRED\020\001\022\032\n\026DATABASE_UPDATE_FAILED\020\002" +
+      "\022\032\n\026ARTIFACT_DELETE_FAILED\020\003\022\034\n\030RESERVAT" +
+      "ION_NOT_RELEASED\020\004B\010\n\006source\"K\n\026CacheEvi" +
+      "ctionErrorList\0221\n\006errors\030\001 \003(\0132!.flyteid" +
+      "l.core.CacheEvictionErrorB6Z4github.com/" +
+      "flyteorg/flyteidl/gen/pb-go/flyteidl/cor" +
+      "eb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -37,8 +37,19 @@ message ErrorDocument {
 
 // Error returned if eviction of cached output fails and should be re-tried by the user.
 message CacheEvictionError {
+    // Defines codes for distinguishing between errors encountered during cache eviction.
     enum Code {
-        UNKNOWN = 0;
+        // Indicates a generic internal error occurred.
+        INTERNAL = 0;
+        // Indicates no reservation could be acquired before deleting an artifact.
+        RESERVATION_NOT_ACQUIRED = 1;
+        // Indicates updating the database entry related to the node execution failed.
+        DATABASE_UPDATE_FAILED = 2;
+        // Indicates deleting the artifact from datacatalog failed.
+        ARTIFACT_DELETE_FAILED = 3;
+        // Indicates the reservation previously acquired could not be released for an artifact.
+        RESERVATION_NOT_RELEASED = 4;
+
     }
 
     // Error code to match type of cache eviction error encountered.

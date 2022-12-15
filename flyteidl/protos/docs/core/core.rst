@@ -630,13 +630,17 @@ failure reasons to the execution engine.
 CacheEvictionError.Code
 ------------------------------------------------------------------
 
-
+Defines codes for distinguishing between errors encountered during cache eviction.
 
 .. csv-table:: Enum CacheEvictionError.Code values
    :header: "Name", "Number", "Description"
    :widths: auto
 
-   "UNKNOWN", "0", ""
+   "INTERNAL", "0", "Indicates a generic internal error occurred."
+   "RESERVATION_NOT_ACQUIRED", "1", "Indicates no reservation could be acquired before deleting an artifact."
+   "DATABASE_UPDATE_FAILED", "2", "Indicates updating the database entry related to the node execution failed."
+   "ARTIFACT_DELETE_FAILED", "3", "Indicates deleting the artifact from datacatalog failed."
+   "RESERVATION_NOT_RELEASED", "4", "Indicates the reservation previously acquired could not be released for an artifact."
 
 
 

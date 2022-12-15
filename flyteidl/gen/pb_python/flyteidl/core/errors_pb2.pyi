@@ -12,11 +12,15 @@ class CacheEvictionError(_message.Message):
     __slots__ = ["code", "message", "node_execution_id", "task_execution_id", "workflow_execution_id"]
     class Code(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
+    ARTIFACT_DELETE_FAILED: CacheEvictionError.Code
     CODE_FIELD_NUMBER: _ClassVar[int]
+    DATABASE_UPDATE_FAILED: CacheEvictionError.Code
+    INTERNAL: CacheEvictionError.Code
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     NODE_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    RESERVATION_NOT_ACQUIRED: CacheEvictionError.Code
+    RESERVATION_NOT_RELEASED: CacheEvictionError.Code
     TASK_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
-    UNKNOWN: CacheEvictionError.Code
     WORKFLOW_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
     code: CacheEvictionError.Code
     message: str
