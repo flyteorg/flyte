@@ -16,6 +16,12 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
+| configuration.auth.enabled | bool | `false` |  |
+| configuration.auth.internal.clientSecret | string | `""` |  |
+| configuration.auth.internal.clientSecretHash | string | `""` |  |
+| configuration.auth.oidc.baseUrl | string | `""` |  |
+| configuration.auth.oidc.clientId | string | `""` |  |
+| configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -54,6 +60,11 @@ Chart for basic single Flyte executable deployment
 | deployment.extraPodSpec | object | `{}` |  |
 | deployment.extraVolumeMounts | list | `[]` |  |
 | deployment.extraVolumes | list | `[]` |  |
+| deployment.genAdminAuthSecret.args | list | `[]` |  |
+| deployment.genAdminAuthSecret.command | list | `[]` |  |
+| deployment.genAdminAuthSecret.image.pullPolicy | string | `"IfNotPresent"` |  |
+| deployment.genAdminAuthSecret.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` |  |
+| deployment.genAdminAuthSecret.image.tag | string | `"v1.1.57"` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-sandbox"` |  |
 | deployment.image.tag | string | `"flytebinary_1007"` |  |
