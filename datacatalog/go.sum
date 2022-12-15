@@ -187,8 +187,8 @@ github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJm
 github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqOes/6LfM=
 github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6 h1:ekMpKRTsX2FjEIP2WCWrdOAfvg9nwoObBkJCCnksQaM=
 github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6/go.mod h1:sgOlQA2lnugarwSN8M+9gWoCZmzYNFI8gpShZrm+wmo=
-github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215152838-ded77ffa67cf h1:tKQlA5yx6BVA9W2zJl60b60nTOgZKTP8Uk9xIQfhDMA=
-github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215152838-ded77ffa67cf/go.mod h1:RpZN5PTZ4081mOvsmciE5E/Q817//fT3i/dhq2aXmCY=
+github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced h1:Dxj7o/Q5FPMH+nYKptNq2n5forXJET8MiR2hVDzTMqU=
+github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced/go.mod h1:RpZN5PTZ4081mOvsmciE5E/Q817//fT3i/dhq2aXmCY=
 github.com/blang/semver v3.5.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2yvyW5YoQ=

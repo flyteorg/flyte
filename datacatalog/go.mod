@@ -4,7 +4,7 @@ go 1.18
 
 replace (
 	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6
-	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215152838-ded77ffa67cf
+	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced
 )
 
 require (
