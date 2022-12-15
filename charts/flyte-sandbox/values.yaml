@@ -33,12 +33,42 @@ flyte-binary:
           templateUri: |-
             http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
+      remoteData:
+        region: us-east-2
+        scheme: aws
+        signedUrls:
+          durationMinutes: 3
       plugins:
+        databricks:
+          entrypointFile: dbfs:///FileStore/tables/entrypoint-4.py
+          # Databricks account
+          databricksInstance: dbaccount.cloud.databricks.com
         k8s:
           default-env-vars:
-            - FLYTE_AWS_ENDPOINT: http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000
-            - FLYTE_AWS_ACCESS_KEY_ID: minio
-            - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+            - FLYTE_AWS_ACCESS_KEY_ID: myaccesskey
+            - FLYTE_AWS_SECRET_ACCESS_KEY: mysecretkey
+      storage:
+        type: s3
+        container: "flyte-databricks"
+        stow:
+          kind: s3
+          config:
+            access_key_id: myaccesskey
+            auth_type: accesskey
+            secret_key: mysecretkey
+            disable_ssl: true
+            region: us-east-2
+      tasks:
+        task-plugins:
+          enabled-plugins:
+            - container
+            - sidecar
+            - K8S-ARRAY
+            - databricks
+          default-for-task-types:
+            - container: container
+            - container_array: K8S-ARRAY
+            - spark: databricks
   deployment:
     image:
       repository: flyte-binary

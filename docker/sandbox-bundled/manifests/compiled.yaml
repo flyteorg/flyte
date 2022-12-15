@@ -502,11 +502,40 @@ data:
       container: my-s3-bucket
   010-inline-config.yaml: |
     plugins:
+      databricks:
+        databricksInstance: dbaccount.cloud.databricks.com
+        entrypointFile: dbfs:///FileStore/tables/entrypoint-4.py
       k8s:
         default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://sandbox-minio.flyte:9000
-        - FLYTE_AWS_ACCESS_KEY_ID: minio
-        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - FLYTE_AWS_ACCESS_KEY_ID: myaccesskey
+        - FLYTE_AWS_SECRET_ACCESS_KEY: mysecretkey
+    remoteData:
+      region: us-east-2
+      scheme: aws
+      signedUrls:
+        durationMinutes: 3
+    storage:
+      container: flyte-databricks
+      stow:
+        config:
+          access_key_id: myaccesskey
+          auth_type: accesskey
+          disable_ssl: true
+          region: us-east-2
+          secret_key: mysecretkey
+        kind: s3
+      type: s3
+    tasks:
+      task-plugins:
+        default-for-task-types:
+        - container: container
+        - container_array: K8S-ARRAY
+        - spark: databricks
+        enabled-plugins:
+        - container
+        - sidecar
+        - K8S-ARRAY
+        - databricks
 kind: ConfigMap
 metadata:
   labels:
@@ -698,7 +727,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: bnhMczc1Y2pCNUVXQWtTaw==
+  haSharedSecret: bHgzOHBjOW9RSnZ1NWZEWg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1000,7 +1029,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: 933d36dc296a7cfb39a5de69e064f95d589c0a35426c30066495db78ccbfec7c
+        checksum/secret: 3787aa50353900a8ea7f42ec6c47e169c8ad50855d322c0752322a9be6bd9c30
       labels:
         app: docker-registry
         release: sandbox
@@ -1070,7 +1099,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: e78495e92688a0f30ca001222fd1c6d1ce0d61240ad5b3a2541d43fc23a79f50
-        checksum/configuration: a859e1e312b4d6480211a7cf0dff577a765c640265390ceec79bad835784e16d
+        checksum/configuration: a6bc3add593b1eb36715c86f85b56fdd33408cfd8ef3e604247cafe9b6b371ca
         checksum/db-password-secret: 72191c61f83365477982334e8b91ee0f57b040eda8afc26dc10791c12e99cc2c
       labels:
         app.kubernetes.io/instance: sandbox
