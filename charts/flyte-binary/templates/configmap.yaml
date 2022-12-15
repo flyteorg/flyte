@@ -6,17 +6,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.configuration.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.configuration.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.configuration.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.configuration.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.configuration.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.configuration.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 data:
   000-core.yaml: |
@@ -83,7 +83,7 @@ data:
         region: {{ required "Region required for S3 storage provider" .region }}
         disable-ssl: {{ .disableSSL }}
         {{- if .endpoint }}
-        endpoint: {{ include "flyte-binary.renderTemplate" ( dict "value" .endpoint "context" $ ) }}
+        endpoint: {{ tpl .endpoint $ }}
         {{- end }}
         {{- if eq "iam" .authType }}
         auth-type: "iam"
@@ -167,7 +167,7 @@ data:
             - all
       authorizedUris:
       {{- if .Values.ingress.host }}
-      - https://{{ include "flyte-binary.renderTemplate" ( dict "value" .Values.ingress.host "context" $ ) }}
+      - https://{{ tpl .Values.ingress.host . }}
       {{- end }}
       - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
       - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}
@@ -186,7 +186,7 @@ data:
   {{- end }}
   {{- if .Values.configuration.inline }}
   010-inline-config.yaml: |
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.configuration.inline "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
   {{- else if .Values.configuration.sourcePath }}
   {{- (tpl (.Files.Glob .Values.configuration.sourcePath).AsConfig . ) | nindent 2 }}
   {{- end }}

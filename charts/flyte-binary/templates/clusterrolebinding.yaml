@@ -6,17 +6,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.rbac.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.rbac.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.rbac.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.rbac.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.rbac.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.rbac.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io

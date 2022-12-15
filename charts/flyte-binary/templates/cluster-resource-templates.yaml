@@ -6,17 +6,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.clusterResourceTemplates.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.clusterResourceTemplates.labels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.clusterResourceTemplates.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.clusterResourceTemplates.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.clusterResourceTemplates.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.clusterResourceTemplates.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 data:
   {{- if .Values.clusterResourceTemplates.inline }}
