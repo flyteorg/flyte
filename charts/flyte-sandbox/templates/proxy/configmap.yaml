@@ -102,7 +102,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte
+                                          address: {{ .Release.Name }}-flyte-binary
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -116,7 +116,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte
+                                          address: {{ .Release.Name }}-flyte-binary
                                           port_value: 8089
             - name: minio
               connect_timeout: 0.25s
