@@ -583,6 +583,7 @@ Defines Auth options for users.
   cookieSetting:
     domain: ""
     sameSitePolicy: DefaultMode
+  httpProxyURL: ""
   openId:
     baseUrl: ""
     clientId: ""
@@ -1075,6 +1076,18 @@ OpenID Configuration for User Auth
   scopes:
   - openid
   - profile
+  
+
+httpProxyURL (`config.URL`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 cookieHashKeySecretName (string)
