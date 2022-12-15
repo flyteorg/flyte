@@ -65,6 +65,10 @@ func (s *DataCatalogService) UpdateArtifact(ctx context.Context, request *catalo
 	return s.ArtifactManager.UpdateArtifact(ctx, request)
 }
 
+func (s *DataCatalogService) DeleteArtifact(ctx context.Context, request *catalog.DeleteArtifactRequest) (*catalog.DeleteArtifactResponse, error) {
+	return s.ArtifactManager.DeleteArtifact(ctx, request)
+}
+
 func (s *DataCatalogService) GetOrExtendReservation(ctx context.Context, request *catalog.GetOrExtendReservationRequest) (*catalog.GetOrExtendReservationResponse, error) {
 	return s.ReservationManager.GetOrExtendReservation(ctx, request)
 }

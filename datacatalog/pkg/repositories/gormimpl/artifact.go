@@ -180,3 +180,50 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 
 	return nil
 }
+
+// Delete deletes the given artifact and its associated ArtifactData from the database.
+func (h *artifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error {
+	timer := h.repoMetrics.DeleteDuration.Start(ctx)
+	defer timer.Stop()
+
+	tx := h.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// delete artifact data from database
+	if err := tx.Where(&models.ArtifactData{ArtifactKey: key}).Delete(&models.ArtifactData{}).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	// delete actual artifact from database
+	if res := tx.Where(&models.Artifact{ArtifactKey: key}).Delete(&models.Artifact{}); res.Error != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(res.Error)
+	} else if res.RowsAffected == 0 {
+		// no rows affected --> artifact not found
+		tx.Rollback()
+		return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
+			Dataset: &datacatalog.DatasetID{
+				Project: key.DatasetProject,
+				Domain:  key.DatasetDomain,
+				Name:    key.DatasetName,
+				Version: key.DatasetVersion,
+			},
+			Id: key.ArtifactID,
+		})
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
+	return nil
+}

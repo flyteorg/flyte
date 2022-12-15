@@ -138,3 +138,35 @@ func ValidateUpdateArtifactRequest(request *datacatalog.UpdateArtifactRequest) e
 
 	return nil
 }
+
+func ValidateDeleteArtifactRequest(request *datacatalog.DeleteArtifactRequest) error {
+	if request.QueryHandle == nil {
+		return NewMissingArgumentError(fmt.Sprintf("one of %s/%s", artifactID, tagName))
+	}
+
+	switch request.QueryHandle.(type) {
+	case *datacatalog.DeleteArtifactRequest_ArtifactId:
+		if request.Dataset != nil {
+			err := ValidateDatasetID(request.Dataset)
+			if err != nil {
+				return err
+			}
+		}
+
+		if err := ValidateEmptyStringField(request.GetArtifactId(), artifactID); err != nil {
+			return err
+		}
+	case *datacatalog.DeleteArtifactRequest_TagName:
+		if err := ValidateDatasetID(request.Dataset); err != nil {
+			return err
+		}
+
+		if err := ValidateEmptyStringField(request.GetTagName(), tagName); err != nil {
+			return err
+		}
+	default:
+		return NewInvalidArgumentError("QueryHandle", "invalid type")
+	}
+
+	return nil
+}

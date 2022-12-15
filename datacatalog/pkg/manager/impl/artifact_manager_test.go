@@ -813,6 +813,93 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.Nil(t, artifactResponse)
 	})
 
+	t.Run("Artifact not found during update", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.Id &&
+					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
+					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(mockArtifactModel, nil)
+
+		dcRepo.MockArtifactRepo.On("Update", mock.Anything, mock.Anything).Return(repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
+			Dataset: expectedDataset.Id,
+			Id:      expectedArtifact.Id,
+		}))
+
+		request := &datacatalog.UpdateArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.UpdateArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+			Data: []*datacatalog.ArtifactData{
+				{
+					Name:  "data1",
+					Value: getTestStringLiteralWithValue("value11"),
+				},
+				{
+					Name:  "data3",
+					Value: getTestStringLiteralWithValue("value3"),
+				},
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.NotFound, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
+	t.Run("Artifact update failed", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.Id &&
+					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
+					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(mockArtifactModel, nil)
+
+		dcRepo.MockArtifactRepo.On("Update", mock.Anything, mock.Anything).Return(errors.NewDataCatalogError(codes.Internal, "failed"))
+
+		request := &datacatalog.UpdateArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.UpdateArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+			Data: []*datacatalog.ArtifactData{
+				{
+					Name:  "data1",
+					Value: getTestStringLiteralWithValue("value11"),
+				},
+				{
+					Name:  "data3",
+					Value: getTestStringLiteralWithValue("value3"),
+				},
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.Internal, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
 	t.Run("Missing artifact ID", func(t *testing.T) {
 		ctx := context.Background()
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
@@ -906,6 +993,246 @@ func TestUpdateArtifact(t *testing.T) {
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.UpdateArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.InvalidArgument, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+}
+
+func TestDeleteArtifact(t *testing.T) {
+	ctx := context.Background()
+	datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+	testStoragePrefix, err := datastore.ConstructReference(ctx, datastore.GetBaseContainerFQN(ctx), "test")
+	assert.NoError(t, err)
+
+	expectedDataset := getTestDataset()
+	expectedArtifact := getTestArtifact()
+	expectedTag := getTestTag()
+
+	t.Run("Delete by ID", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.Id &&
+					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
+					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(mockArtifactModel, nil)
+
+		dcRepo.MockArtifactRepo.On("Delete",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(key models.ArtifactKey) bool {
+				return key.ArtifactID == expectedArtifact.Id &&
+					key.DatasetProject == expectedArtifact.Dataset.Project &&
+					key.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					key.DatasetName == expectedArtifact.Dataset.Name &&
+					key.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(nil)
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.NoError(t, err)
+		assert.NotNil(t, artifactResponse)
+
+		// check that the datastore no longer has artifactData available
+		dataRef, err := getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data1")
+		assert.NoError(t, err)
+		var value core.Literal
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.Error(t, err)
+		assert.True(t, stdErrors.Is(err, os.ErrNotExist))
+	})
+
+	t.Run("Delete by artifact tag", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Delete",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(key models.ArtifactKey) bool {
+				return key.ArtifactID == expectedArtifact.Id &&
+					key.DatasetProject == expectedArtifact.Dataset.Project &&
+					key.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					key.DatasetName == expectedArtifact.Dataset.Name &&
+					key.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(nil)
+
+		dcRepo.MockTagRepo.On("Get", mock.Anything,
+			mock.MatchedBy(func(tag models.TagKey) bool {
+				return tag.TagName == expectedTag.TagName &&
+					tag.DatasetProject == expectedTag.DatasetProject &&
+					tag.DatasetDomain == expectedTag.DatasetDomain &&
+					tag.DatasetVersion == expectedTag.DatasetVersion &&
+					tag.DatasetName == expectedTag.DatasetName
+			})).Return(models.Tag{
+			TagKey: models.TagKey{
+				DatasetProject: expectedTag.DatasetProject,
+				DatasetDomain:  expectedTag.DatasetDomain,
+				DatasetName:    expectedTag.DatasetName,
+				DatasetVersion: expectedTag.DatasetVersion,
+				TagName:        expectedTag.TagName,
+			},
+			DatasetUUID: expectedTag.DatasetUUID,
+			Artifact:    mockArtifactModel,
+			ArtifactID:  mockArtifactModel.ArtifactID,
+		}, nil)
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_TagName{
+				TagName: expectedTag.TagName,
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.NoError(t, err)
+		assert.NotNil(t, artifactResponse)
+
+		// check that the datastore no longer has artifactData available
+		dataRef, err := getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data1")
+		assert.NoError(t, err)
+		var value core.Literal
+		err = datastore.ReadProtobuf(ctx, dataRef, &value)
+		assert.Error(t, err)
+		assert.True(t, stdErrors.Is(err, os.ErrNotExist))
+	})
+
+	t.Run("Artifact not found", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get", mock.Anything, mock.Anything).Return(models.Artifact{}, repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
+			Dataset: expectedDataset.Id,
+			Id:      expectedArtifact.Id,
+		}))
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.NotFound, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
+	t.Run("Artifact not found during delete", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.Id &&
+					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
+					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(mockArtifactModel, nil)
+		dcRepo.MockArtifactRepo.On("Delete", mock.Anything, mock.Anything).Return(repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
+			Dataset: expectedDataset.Id,
+			Id:      expectedArtifact.Id,
+		}))
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.NotFound, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
+	t.Run("Artifact delete failed", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockArtifactRepo.On("Get",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
+				return artifactKey.ArtifactID == expectedArtifact.Id &&
+					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
+					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
+					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
+					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+			})).Return(mockArtifactModel, nil)
+		dcRepo.MockArtifactRepo.On("Delete", mock.Anything, mock.Anything).Return(errors.NewDataCatalogError(codes.Internal, "failed"))
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset: expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{
+				ArtifactId: expectedArtifact.Id,
+			},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.Internal, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
+	t.Run("Missing artifact ID", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+
+		dcRepo := newMockDataCatalogRepo()
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset:     expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Equal(t, codes.InvalidArgument, status.Code(err))
+		assert.Nil(t, artifactResponse)
+	})
+
+	t.Run("Missing artifact tag", func(t *testing.T) {
+		ctx := context.Background()
+		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+
+		dcRepo := newMockDataCatalogRepo()
+
+		request := &datacatalog.DeleteArtifactRequest{
+			Dataset:     expectedDataset.Id,
+			QueryHandle: &datacatalog.DeleteArtifactRequest_TagName{},
+		}
+
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.DeleteArtifact(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))
 		assert.Nil(t, artifactResponse)

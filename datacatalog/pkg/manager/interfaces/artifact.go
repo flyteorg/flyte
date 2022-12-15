@@ -13,4 +13,5 @@ type ArtifactManager interface {
 	GetArtifact(ctx context.Context, request *idl_datacatalog.GetArtifactRequest) (*idl_datacatalog.GetArtifactResponse, error)
 	ListArtifacts(ctx context.Context, request *idl_datacatalog.ListArtifactsRequest) (*idl_datacatalog.ListArtifactsResponse, error)
 	UpdateArtifact(ctx context.Context, request *idl_datacatalog.UpdateArtifactRequest) (*idl_datacatalog.UpdateArtifactResponse, error)
+	DeleteArtifact(ctx context.Context, request *idl_datacatalog.DeleteArtifactRequest) (*idl_datacatalog.DeleteArtifactResponse, error)
 }

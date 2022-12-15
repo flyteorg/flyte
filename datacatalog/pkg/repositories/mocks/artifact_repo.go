@@ -47,6 +47,38 @@ func (_m *ArtifactRepo) Create(ctx context.Context, in models.Artifact) error {
 	return r0
 }
 
+type ArtifactRepo_Delete struct {
+	*mock.Call
+}
+
+func (_m ArtifactRepo_Delete) Return(_a0 error) *ArtifactRepo_Delete {
+	return &ArtifactRepo_Delete{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ArtifactRepo) OnDelete(ctx context.Context, key models.ArtifactKey) *ArtifactRepo_Delete {
+	c_call := _m.On("Delete", ctx, key)
+	return &ArtifactRepo_Delete{Call: c_call}
+}
+
+func (_m *ArtifactRepo) OnDeleteMatch(matchers ...interface{}) *ArtifactRepo_Delete {
+	c_call := _m.On("Delete", matchers...)
+	return &ArtifactRepo_Delete{Call: c_call}
+}
+
+// Delete provides a mock function with given fields: ctx, key
+func (_m *ArtifactRepo) Delete(ctx context.Context, key models.ArtifactKey) error {
+	ret := _m.Called(ctx, key)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.ArtifactKey) error); ok {
+		r0 = rf(ctx, key)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type ArtifactRepo_Get struct {
 	*mock.Call
 }
