@@ -3,6 +3,7 @@ package util
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
@@ -326,4 +327,148 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	}
 
 	return workflowExecConfig
+}
+
+func ListNodeExecutions(ctx context.Context, repo repoInterfaces.Repository, identifierFilters []common.InlineFilter,
+	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort,
+	mapFilters []common.MapFilter) ([]models.NodeExecution, string, error) {
+	filters, err := AddRequestFilters(requestFilters, common.NodeExecution, identifierFilters)
+	if err != nil {
+		return nil, "", err
+	}
+	var sortParameter common.SortParameter
+	if sortBy != nil {
+		sortParameter, err = common.NewSortParameter(*sortBy)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+	offset, err := validation.ValidateToken(requestToken)
+	if err != nil {
+		return nil, "", errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"invalid pagination token %s for ListNodeExecutions", requestToken)
+	}
+	listInput := repoInterfaces.ListResourceInput{
+		Limit:         int(limit),
+		Offset:        offset,
+		InlineFilters: filters,
+		SortParameter: sortParameter,
+		MapFilters:    mapFilters,
+	}
+
+	output, err := repo.NodeExecutionRepo().List(ctx, listInput)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to list node executions: %v", err)
+		return nil, "", err
+	}
+
+	var token string
+	if len(output.NodeExecutions) == int(limit) {
+		token = strconv.Itoa(offset + len(output.NodeExecutions))
+	}
+
+	return output.NodeExecutions, token, nil
+}
+
+func ListNodeExecutionsForWorkflow(ctx context.Context, repo repoInterfaces.Repository,
+	workflowExecutionID *core.WorkflowExecutionIdentifier, uniqueParentID string, requestFilters string,
+	limit uint32, requestToken string, sortBy *admin.Sort) ([]models.NodeExecution, string, error) {
+	identifierFilters, err := GetWorkflowExecutionIdentifierFilters(ctx, *workflowExecutionID)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var mapFilters []common.MapFilter
+	if len(uniqueParentID) > 0 {
+		parentNodeExecution, err := GetNodeExecutionModel(ctx, repo, &core.NodeExecutionIdentifier{
+			ExecutionId: workflowExecutionID,
+			NodeId:      uniqueParentID,
+		})
+		if err != nil {
+			return nil, "", err
+		}
+		parentIDFilter, err := common.NewSingleValueFilter(
+			common.NodeExecution, common.Equal, shared.ParentID, parentNodeExecution.ID)
+		if err != nil {
+			return nil, "", err
+		}
+		identifierFilters = append(identifierFilters, parentIDFilter)
+	} else {
+		mapFilters = []common.MapFilter{
+			common.NewMapFilter(map[string]interface{}{
+				shared.ParentTaskExecutionID: nil,
+				shared.ParentID:              nil,
+			}),
+		}
+	}
+
+	return ListNodeExecutions(ctx, repo, identifierFilters, requestFilters, limit, requestToken, sortBy, mapFilters)
+}
+
+func ListNodeExecutionsForTask(ctx context.Context, repo repoInterfaces.Repository,
+	taskExecutionID *core.TaskExecutionIdentifier, workflowExecutionID *core.WorkflowExecutionIdentifier,
+	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort) ([]models.NodeExecution, string, error) {
+	identifierFilters, err := GetWorkflowExecutionIdentifierFilters(ctx, *workflowExecutionID)
+	if err != nil {
+		return nil, "", err
+	}
+
+	parentTaskExecutionModel, err := GetTaskExecutionModel(ctx, repo, taskExecutionID)
+	if err != nil {
+		return nil, "", err
+	}
+
+	nodeIDFilter, err := common.NewSingleValueFilter(
+		common.NodeExecution, common.Equal, shared.ParentTaskExecutionID, parentTaskExecutionModel.ID)
+	if err != nil {
+		return nil, "", err
+	}
+	identifierFilters = append(identifierFilters, nodeIDFilter)
+
+	return ListNodeExecutions(ctx, repo, identifierFilters, requestFilters, limit, requestToken, sortBy, nil)
+}
+
+func ListTaskExecutions(ctx context.Context, repo repoInterfaces.Repository,
+	nodeExecutionID *core.NodeExecutionIdentifier, requestFilters string, limit uint32, requestToken string,
+	sortBy *admin.Sort) ([]models.TaskExecution, string, error) {
+	identifierFilters, err := GetNodeExecutionIdentifierFilters(ctx, *nodeExecutionID)
+	if err != nil {
+		return nil, "", err
+	}
+
+	filters, err := AddRequestFilters(requestFilters, common.TaskExecution, identifierFilters)
+	if err != nil {
+		return nil, "", err
+	}
+	var sortParameter common.SortParameter
+	if sortBy != nil {
+		sortParameter, err = common.NewSortParameter(*sortBy)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
+	offset, err := validation.ValidateToken(requestToken)
+	if err != nil {
+		return nil, "", errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"invalid pagination token %s for ListTaskExecutions", requestToken)
+	}
+
+	output, err := repo.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
+		InlineFilters: filters,
+		Offset:        offset,
+		Limit:         int(limit),
+		SortParameter: sortParameter,
+	})
+	if err != nil {
+		logger.Debugf(ctx, "Failed to list task executions: %v", err)
+		return nil, "", err
+	}
+
+	var token string
+	if len(output.TaskExecutions) == int(limit) {
+		token = strconv.Itoa(offset + len(output.TaskExecutions))
+	}
+
+	return output.TaskExecutions, token, nil
 }

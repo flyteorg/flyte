@@ -3,7 +3,6 @@ package impl
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
 
@@ -249,50 +248,18 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}
 	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
+	taskExecutions, token, err := util.ListTaskExecutions(ctx, m.db, request.NodeExecutionId, request.Filters,
+		request.Limit, request.Token, request.SortBy)
 	if err != nil {
 		return nil, err
 	}
 
-	filters, err := util.AddRequestFilters(request.Filters, common.TaskExecution, identifierFilters)
-	if err != nil {
-		return nil, err
-	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	offset, err := validation.ValidateToken(request.Token)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListTaskExecutions", request.Token)
-	}
-
-	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
-	})
-	if err != nil {
-		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",
-			request, err)
-		return nil, err
-	}
-
-	taskExecutionList, err := transformers.FromTaskExecutionModels(output.TaskExecutions)
+	taskExecutionList, err := transformers.FromTaskExecutionModels(taskExecutions)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform task execution models for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-	var token string
-	if len(taskExecutionList) == int(request.Limit) {
-		token = strconv.Itoa(offset + len(taskExecutionList))
-	}
+
 	return &admin.TaskExecutionList{
 		TaskExecutions: taskExecutionList,
 		Token:          token,
