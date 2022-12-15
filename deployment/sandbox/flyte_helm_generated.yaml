@@ -1,3 +1,103 @@
+---
+# Source: flyte/charts/contour/templates/contour/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-contour-contour
+  namespace: "flyte"
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-7.10.1
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: contour
+automountServiceAccountToken: true
+---
+# Source: flyte/charts/contour/templates/envoy/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-contour-envoy
+  namespace: "flyte"
+  labels:
+    app.kubernetes.io/name: contour
+    helm.sh/chart: contour-7.10.1
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: envoy
+automountServiceAccountToken: false
+---
+# Source: flyte/charts/flyte/templates/admin/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/charts/flyte/templates/datacatalog/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/charts/flyte/templates/flytescheduler/sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytescheduler
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytescheduler
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/charts/flyte/templates/propeller/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte/charts/flyte/templates/propeller/webhook.yaml
+# Create a Service Account for webhook
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+# Source: flyte/charts/kubernetes-dashboard/templates/serviceaccount.yaml
+# Copyright 2017 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -7862,4 +7962,3 @@ spec:
   parallelism: 1
   completions: 1
   backoffLimit: 1
->>>>>>> 8ac8aae20eb7081a0455dd883b00134af3fabee0

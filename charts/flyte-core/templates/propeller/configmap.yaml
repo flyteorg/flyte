@@ -40,9 +40,10 @@ data:
 {{- with .Values.sparkoperator.plugin_config }}
   spark.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- end }}
 {{- if .Values.databricks.enabled }}
 {{- with .Values.databricks.plugin_config }}
-  spark.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  databricks.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
