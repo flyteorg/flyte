@@ -25,8 +25,9 @@ type ServerConfig struct {
 	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
 	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
 
-	DataProxy                DataProxyConfig `json:"dataProxy" pflag:",Defines data proxy configuration."`
-	ReadHeaderTimeoutSeconds int             `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
+	DataProxy                DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
+	ReadHeaderTimeoutSeconds int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
+	KubeClientConfig         KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client"`
 }
 
 type DataProxyConfig struct {
@@ -49,6 +50,18 @@ type GrpcConfig struct {
 	Port                int  `json:"port" pflag:",On which grpc port to serve admin"`
 	ServerReflection    bool `json:"serverReflection" pflag:",Enable GRPC Server Reflection"`
 	MaxMessageSizeBytes int  `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
+}
+
+// KubeClientConfig contains the configuration used by flyteadmin to configure its internal Kubernetes Client.
+type KubeClientConfig struct {
+	// QPS indicates the maximum QPS to the master from this client.
+	// If it's zero, the created RESTClient will use DefaultQPS: 5
+	QPS int32 `json:"qps" pflag:",Max QPS to the master for requests to KubeAPI. 0 defaults to 5."`
+	// Maximum burst for throttle.
+	// If it's zero, the created RESTClient will use DefaultBurst: 10.
+	Burst int `json:"burst" pflag:",Max burst rate for throttle. 0 defaults to 10"`
+	// The maximum length of time to wait before giving up on a server request. A value of zero means no timeout.
+	Timeout config.Duration `json:"timeout" pflag:",Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout."`
 }
 
 type ServerSecurityOptions struct {
@@ -97,6 +110,11 @@ var defaultServerConfig = &ServerConfig{
 		},
 	},
 	ReadHeaderTimeoutSeconds: 32, // just shy of requestTimeoutUpperBound
+	KubeClientConfig: KubeClientConfig{
+		QPS:     100,
+		Burst:   25,
+		Timeout: config.Duration{Duration: 30 * time.Second},
+	},
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
 
