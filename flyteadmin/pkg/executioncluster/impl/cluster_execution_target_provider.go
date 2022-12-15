@@ -16,7 +16,7 @@ type clusterExecutionTargetProvider struct{}
 
 // Creates a new Execution target for a cluster based on config passed in.
 func (c *clusterExecutionTargetProvider) GetExecutionTarget(initializationErrorCounter prometheus.Counter, k8sCluster runtime.ClusterConfig) (*executioncluster.ExecutionTarget, error) {
-	kubeConf, err := flytek8s.GetRestClientConfigForCluster(k8sCluster)
+	kubeConf, err := flytek8s.GetRestClientConfig("", "", &k8sCluster)
 	if err != nil {
 		return nil, err
 	}

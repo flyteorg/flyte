@@ -3,15 +3,18 @@ package interfaces
 import (
 	"io/ioutil"
 
+	"github.com/flyteorg/flyteadmin/pkg/config"
+
 	"github.com/pkg/errors"
 )
 
 // Holds details about a cluster used for workflow execution.
 type ClusterConfig struct {
-	Name     string `json:"name"`
-	Endpoint string `json:"endpoint"`
-	Auth     Auth   `json:"auth"`
-	Enabled  bool   `json:"enabled"`
+	Name             string                   `json:"name"`
+	Endpoint         string                   `json:"endpoint"`
+	Auth             Auth                     `json:"auth"`
+	Enabled          bool                     `json:"enabled"`
+	KubeClientConfig *config.KubeClientConfig `json:"kubeClientConfig,omitempty"`
 }
 
 type Auth struct {
