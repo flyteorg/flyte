@@ -133,6 +133,20 @@ templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 
 {{/*
+Get the Secret name for Flyte admin authentication secrets.
+*/}}
+{{- define "flyte-binary.configuration.auth.adminAuthSecretName" -}}
+{{- printf "%s-admin-auth" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Secret name for Flyte authentication client secrets.
+*/}}
+{{- define "flyte-binary.configuration.auth.clientSecretName" -}}
+{{- printf "%s-client-secrets" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
 Get the Flyte cluster resource templates ConfigMap name.
 */}}
 {{- define "flyte-binary.clusterResourceTemplates.configMapName" -}}

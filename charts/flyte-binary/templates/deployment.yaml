@@ -42,6 +42,10 @@ spec:
         {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
         checksum/db-password-secret: {{ include (print $.Template.BasePath "/db-password-secret.yaml") . | sha256sum }}
         {{- end }}
+        {{- if .Values.configuration.auth.enabled }}
+        checksum/admin-auth-secret: {{ include (print $.Template.BasePath "/admin-auth-secret.yaml") . | sha256sum }}
+        checksum/auth-client-secret: {{ include (print $.Template.BasePath "/auth-client-secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.commonAnnotations }}
         {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
@@ -87,6 +91,43 @@ spec:
               done
             {{- end }}
             {{- end }}
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- if .Values.configuration.auth.enabled }}
+        - name: gen-admin-auth-secret
+          {{- with .Values.deployment.genAdminAuthSecret.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          command:
+            {{- if .Values.deployment.genAdminAuthSecret.command }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.genAdminAuthSecret.command "context" $) | nindent 12 }}
+            {{- else }}
+            - sh
+            - -ec
+            {{- end }}
+          args:
+            {{- if .Values.deployment.genAdminAuthSecret.args }}
+            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.genAdminAuthSecret.args "context" $) | nindent 12 }}
+            {{- else }}
+            - |
+              flyteadmin --config=/etc/flyte/config.d/*.yaml \
+                secrets init --localPath /tmp/admin-auth-secret
+              flyteadmin --config=/etc/flyte/config.d/*.yaml \
+                secrets create \
+                --name {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }} \
+                --fromPath /tmp/admin-auth-secret
+            {{- end }}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
           {{- end }}
@@ -168,6 +209,10 @@ spec:
           lifecycle: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.configuration.auth.enabled }}
+            - name: auth
+              mountPath: /etc/secrets
+            {{- end }}
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates
             - name: config
@@ -186,6 +231,15 @@ spec:
         {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.sidecars "context" $ ) | nindent 8 }}
         {{- end }}
       volumes:
+        {{- if .Values.configuration.auth.enabled }}
+        - name: auth
+          projected:
+            sources:
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
+        {{- end }}
         - name: cluster-resource-templates
           configMap:
             name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
