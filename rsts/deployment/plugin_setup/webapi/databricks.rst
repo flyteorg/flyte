@@ -1,7 +1,7 @@
 .. _deployment-plugin-setup-webapi-databricks:
 
 Databricks Plugin Setup
-----------------------
+-----------------------
 
 This guide gives an overview of how to set up Databricks in your Flyte deployment.
 
