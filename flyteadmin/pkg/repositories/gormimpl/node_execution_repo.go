@@ -106,6 +106,16 @@ func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.No
 	return nil
 }
 
+func (r *NodeExecutionRepo) UpdateSelected(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
+	timer := r.metrics.UpdateDuration.Start()
+	tx := r.db.Model(&nodeExecution).Select(selectedFields).Updates(nodeExecution)
+	timer.Stop()
+	if err := tx.Error; err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
+	}
+	return nil
+}
+
 func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.NodeExecutionCollectionOutput, error) {
 	// First validate input.

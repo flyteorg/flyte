@@ -13,6 +13,9 @@ type NodeExecutionRepoInterface interface {
 	Create(ctx context.Context, execution *models.NodeExecution) error
 	// Update an existing node execution in the database store with all non-empty fields in the input.
 	Update(ctx context.Context, execution *models.NodeExecution) error
+	// UpdateSelected updates the selected fields of an existing node execution in the database.
+	// This is required when updating fields to their zero values (e.g. nil) as Update will only handle non-empty fields.
+	UpdateSelected(ctx context.Context, execution *models.NodeExecution, selectedFields []string) error
 	// Get returns a matching execution if it exists.
 	Get(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
 	// GetWithChildren returns a matching execution with preloaded child node executions. This should only be called for legacy node executions
