@@ -53,6 +53,38 @@ func (_m *Client) Delete(ctx context.Context, key catalog.Key) error {
 	return r0
 }
 
+type Client_DeleteByArtifactID struct {
+	*mock.Call
+}
+
+func (_m Client_DeleteByArtifactID) Return(_a0 error) *Client_DeleteByArtifactID {
+	return &Client_DeleteByArtifactID{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Client) OnDeleteByArtifactID(ctx context.Context, datasetID *datacatalog.DatasetID, artifactID string) *Client_DeleteByArtifactID {
+	c_call := _m.On("DeleteByArtifactID", ctx, datasetID, artifactID)
+	return &Client_DeleteByArtifactID{Call: c_call}
+}
+
+func (_m *Client) OnDeleteByArtifactIDMatch(matchers ...interface{}) *Client_DeleteByArtifactID {
+	c_call := _m.On("DeleteByArtifactID", matchers...)
+	return &Client_DeleteByArtifactID{Call: c_call}
+}
+
+// DeleteByArtifactID provides a mock function with given fields: ctx, datasetID, artifactID
+func (_m *Client) DeleteByArtifactID(ctx context.Context, datasetID *datacatalog.DatasetID, artifactID string) error {
+	ret := _m.Called(ctx, datasetID, artifactID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, string) error); ok {
+		r0 = rf(ctx, datasetID, artifactID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type Client_DeleteByArtifactTag struct {
 	*mock.Call
 }
@@ -270,6 +302,38 @@ func (_m *Client) ReleaseReservation(ctx context.Context, key catalog.Key, owner
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key, string) error); ok {
 		r0 = rf(ctx, key, ownerID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Client_ReleaseReservationByArtifactTag struct {
+	*mock.Call
+}
+
+func (_m Client_ReleaseReservationByArtifactTag) Return(_a0 error) *Client_ReleaseReservationByArtifactTag {
+	return &Client_ReleaseReservationByArtifactTag{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Client) OnReleaseReservationByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID, artifactTag string, ownerID string) *Client_ReleaseReservationByArtifactTag {
+	c_call := _m.On("ReleaseReservationByArtifactTag", ctx, datasetID, artifactTag, ownerID)
+	return &Client_ReleaseReservationByArtifactTag{Call: c_call}
+}
+
+func (_m *Client) OnReleaseReservationByArtifactTagMatch(matchers ...interface{}) *Client_ReleaseReservationByArtifactTag {
+	c_call := _m.On("ReleaseReservationByArtifactTag", matchers...)
+	return &Client_ReleaseReservationByArtifactTag{Call: c_call}
+}
+
+// ReleaseReservationByArtifactTag provides a mock function with given fields: ctx, datasetID, artifactTag, ownerID
+func (_m *Client) ReleaseReservationByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID, artifactTag string, ownerID string) error {
+	ret := _m.Called(ctx, datasetID, artifactTag, ownerID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, string, string) error); ok {
+		r0 = rf(ctx, datasetID, artifactTag, ownerID)
 	} else {
 		r0 = ret.Error(0)
 	}

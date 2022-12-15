@@ -142,11 +142,17 @@ type Client interface {
 	Update(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
 	// ReleaseReservation releases an acquired reservation for the given key and owner ID.
 	ReleaseReservation(ctx context.Context, key Key, ownerID string) error
+	// ReleaseReservationByArtifactTag releases an acquired reservation for the given dataset ID, artifact tag and
+	// owner ID.
+	ReleaseReservationByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID, artifactTag string, ownerID string) error
 	// Delete removes the artifact associated with the given key and deletes its underlying data from blob storage.
 	Delete(ctx context.Context, key Key) error
 	// DeleteByArtifactTag removes the artifact associated with the given dataset ID and artifact tag and deletes its
 	// underlying data from blob storage.
 	DeleteByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID, artifactTag string) error
+	// DeleteByArtifactID removes the artifact associated with the given dataset and artifact ID and deletes its
+	// underlying data from blob storage.
+	DeleteByArtifactID(ctx context.Context, datasetID *datacatalog.DatasetID, artifactID string) error
 }
 
 func IsNotFound(err error) bool {
