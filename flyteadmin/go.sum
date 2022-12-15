@@ -222,10 +222,10 @@ github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6 h1:ekMp
 github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6/go.mod h1:sgOlQA2lnugarwSN8M+9gWoCZmzYNFI8gpShZrm+wmo=
 github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081 h1:Qxsd2LWl44bfLn75MHrPv32P1PhPZ9fajg39eHZ/a7g=
 github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081/go.mod h1:ZbZVBxEWh8Icj1AgfNKg0uPzHHGd9twa4eWcY2Yt6xE=
-github.com/blackshark-ai/flytepropeller v0.16.48-0.20221215161838-a505ae7f1062 h1:YsvNz+6O3EJ4+SmuNvaVDly28i/srudS4TVk9GxqUms=
-github.com/blackshark-ai/flytepropeller v0.16.48-0.20221215161838-a505ae7f1062/go.mod h1:8TkbXE8oinqU+FBgUWUeewr6X40GpGpVxodiKxGuXGY=
-github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215152838-ded77ffa67cf h1:tKQlA5yx6BVA9W2zJl60b60nTOgZKTP8Uk9xIQfhDMA=
-github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215152838-ded77ffa67cf/go.mod h1:RpZN5PTZ4081mOvsmciE5E/Q817//fT3i/dhq2aXmCY=
+github.com/blackshark-ai/flytepropeller v0.16.48-0.20221215182111-03a138161b7d h1:Q2TBTMMkPnnFb/U6g8K1uFQcXmFkjrRRorUfV81W5pY=
+github.com/blackshark-ai/flytepropeller v0.16.48-0.20221215182111-03a138161b7d/go.mod h1:r65OoIqz8JsXZeGs3V/LK9vZf0oeOpUWW9O1lY+ttBU=
+github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced h1:Dxj7o/Q5FPMH+nYKptNq2n5forXJET8MiR2hVDzTMqU=
+github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced/go.mod h1:RpZN5PTZ4081mOvsmciE5E/Q817//fT3i/dhq2aXmCY=
 github.com/blang/semver v3.5.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2yvyW5YoQ=
