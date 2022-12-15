@@ -35,4 +35,6 @@ const (
 	// Parent of a node execution in the node executions table
 	ParentID        = "parent_id"
 	WorkflowClosure = "workflow_closure"
+	CreatedAt       = "created_at"
+	Closure         = "closure"
 )

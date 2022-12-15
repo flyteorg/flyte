@@ -367,7 +367,7 @@ func TestCreateExecution(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 
 	// TODO: Check for offloaded inputs
 }
@@ -461,7 +461,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecution_NoAssignedName(t *testing.T) {
@@ -545,7 +545,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionValidationError(t *testing.T) {
@@ -896,7 +896,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionInterruptible(t *testing.T) {
@@ -3559,7 +3559,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestRelaunchExecution_LegacyModel(t *testing.T) {
