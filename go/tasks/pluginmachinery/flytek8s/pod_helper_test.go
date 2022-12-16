@@ -23,6 +23,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -1013,8 +1014,18 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 	})
 }
 
-func TestBuildPodWithSpec(t *testing.T) {
+func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
+
+	podSpec1, _ := MergePodSpecs(nil, nil, "foo")
+	assert.Nil(t, podSpec1)
+
+	podSpec2, _ := MergePodSpecs(&v1.PodSpec{}, nil, "foo")
+	assert.Nil(t, podSpec2)
+
+	podSpec3, _ := MergePodSpecs(nil, &v1.PodSpec{}, "foo")
+	assert.Nil(t, podSpec3)
+
 	podSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			v1.Container{
@@ -1039,10 +1050,6 @@ func TestBuildPodWithSpec(t *testing.T) {
 		},
 	}
 
-	pod, err := BuildPodWithSpec(nil, &podSpec, "foo")
-	assert.Nil(t, err)
-	assert.True(t, reflect.DeepEqual(pod.Spec, podSpec))
-
 	defaultContainerTemplate := v1.Container{
 		Name:                   defaultContainerTemplateName,
 		TerminationMessagePath: "/dev/default-termination-log",
@@ -1053,22 +1060,80 @@ func TestBuildPodWithSpec(t *testing.T) {
 		TerminationMessagePath: "/dev/primary-termination-log",
 	}
 
+	podTemplateSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			defaultContainerTemplate,
+			primaryContainerTemplate,
+		},
+		HostNetwork: true,
+		NodeSelector: map[string]string{
+			"foo": "bar",
+		},
+		SchedulerName: "defaultScheduler",
+		Tolerations: []v1.Toleration{
+			v1.Toleration{
+				Key: "foo",
+			},
+		},
+	}
+
+	mergedPodSpec, err := MergePodSpecs(&podTemplateSpec, &podSpec, "foo")
+	assert.Nil(t, err)
+
+	// validate a PodTemplate-only field
+	assert.Equal(t, podTemplateSpec.HostNetwork, mergedPodSpec.HostNetwork)
+	// validate a PodSpec-only field
+	assert.Equal(t, podSpec.Priority, mergedPodSpec.Priority)
+	// validate an overwritten PodTemplate field
+	assert.Equal(t, podSpec.SchedulerName, mergedPodSpec.SchedulerName)
+	// validate a merged map
+	assert.Equal(t, len(podTemplateSpec.NodeSelector)+len(podSpec.NodeSelector), len(mergedPodSpec.NodeSelector))
+	// validate an appended array
+	assert.Equal(t, len(podTemplateSpec.Tolerations)+len(podSpec.Tolerations), len(mergedPodSpec.Tolerations))
+
+	// validate primary container
+	primaryContainer := mergedPodSpec.Containers[0]
+	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
+	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+
+	// validate default container
+	defaultContainer := mergedPodSpec.Containers[1]
+	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
+	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
+
+}
+
+func TestBuildPodWithSpec(t *testing.T) {
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Name: "foo",
+			},
+			v1.Container{
+				Name: "bar",
+			},
+		},
+	}
+
+	pod, err := BuildPodWithSpec(nil, &podSpec, "foo")
+	assert.Nil(t, err)
+	assert.True(t, reflect.DeepEqual(pod.Spec, podSpec))
+
+	primaryContainerTemplate := v1.Container{
+		Name:                   primaryContainerTemplateName,
+		TerminationMessagePath: "/dev/primary-termination-log",
+	}
+
 	podTemplate := v1.PodTemplate{
 		Template: v1.PodTemplateSpec{
+			ObjectMeta: metav1.ObjectMeta{
+				Labels: map[string]string{
+					"fooKey": "barVal",
+				},
+			},
 			Spec: v1.PodSpec{
 				Containers: []v1.Container{
-					defaultContainerTemplate,
 					primaryContainerTemplate,
-				},
-				HostNetwork: true,
-				NodeSelector: map[string]string{
-					"foo": "bar",
-				},
-				SchedulerName: "defaultScheduler",
-				Tolerations: []v1.Toleration{
-					v1.Toleration{
-						Key: "foo",
-					},
 				},
 			},
 		},
@@ -1077,24 +1142,12 @@ func TestBuildPodWithSpec(t *testing.T) {
 	pod, err = BuildPodWithSpec(&podTemplate, &podSpec, "foo")
 	assert.Nil(t, err)
 
-	// validate a PodTemplate-only field
-	assert.Equal(t, podTemplate.Template.Spec.HostNetwork, pod.Spec.HostNetwork)
-	// validate a PodSpec-only field
-	assert.Equal(t, podSpec.Priority, pod.Spec.Priority)
-	// validate an overwritten PodTemplate field
-	assert.Equal(t, podSpec.SchedulerName, pod.Spec.SchedulerName)
-	// validate a merged map
-	assert.Equal(t, len(podTemplate.Template.Spec.NodeSelector)+len(podSpec.NodeSelector), len(pod.Spec.NodeSelector))
-	// validate an appended array
-	assert.Equal(t, len(podTemplate.Template.Spec.Tolerations)+len(podSpec.Tolerations), len(pod.Spec.Tolerations))
-
-	// validate primary container
+	// Test that template podSpec is merged
 	primaryContainer := pod.Spec.Containers[0]
 	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
 
-	// validate default container
-	defaultContainer := pod.Spec.Containers[1]
-	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
-	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
+	// Test that template object metadata is copied
+	assert.Contains(t, pod.ObjectMeta.Labels, "fooKey")
+	assert.Equal(t, pod.ObjectMeta.Labels["fooKey"], "barVal")
 }
