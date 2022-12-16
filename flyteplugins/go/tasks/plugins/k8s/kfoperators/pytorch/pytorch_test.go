@@ -69,7 +69,7 @@ func dummyPytorchCustomObj(workers int32) *plugins.DistributedPyTorchTrainingTas
 	}
 }
 
-func dummySparkTaskTemplate(id string, pytorchCustomObj *plugins.DistributedPyTorchTrainingTask) *core.TaskTemplate {
+func dummyPytorchTaskTemplate(id string, pytorchCustomObj *plugins.DistributedPyTorchTrainingTask) *core.TaskTemplate {
 
 	ptObjJSON, err := utils.MarshalToString(pytorchCustomObj)
 	if err != nil {
@@ -260,7 +260,7 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	}
 
 	ptObj := dummyPytorchCustomObj(workers)
-	taskTemplate := dummySparkTaskTemplate("the job", ptObj)
+	taskTemplate := dummyPytorchTaskTemplate("the job", ptObj)
 	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
 	if err != nil {
 		panic(err)
@@ -286,7 +286,7 @@ func TestBuildResourcePytorch(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
 	ptObj := dummyPytorchCustomObj(100)
-	taskTemplate := dummySparkTaskTemplate("the job", ptObj)
+	taskTemplate := dummyPytorchTaskTemplate("the job", ptObj)
 
 	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
 	assert.NoError(t, err)
