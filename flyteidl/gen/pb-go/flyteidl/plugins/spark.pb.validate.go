@@ -120,6 +120,20 @@ func (m *SparkJob) Validate() error {
 
 	// no validation rules for ExecutorPath
 
+	if v, ok := interface{}(m.GetDatabricksConf()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SparkJobValidationError{
+				field:  "DatabricksConf",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DatabricksToken
+
+	// no validation rules for DatabricksInstance
+
 	return nil
 }
 
