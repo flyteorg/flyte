@@ -501,6 +501,7 @@ Custom Proto for Spark Plugin.
    "sparkConf", ":ref:`ref_flyteidl.plugins.SparkJob.SparkConfEntry`", "repeated", ""
    "hadoopConf", ":ref:`ref_flyteidl.plugins.SparkJob.HadoopConfEntry`", "repeated", ""
    "executorPath", ":ref:`ref_string`", "", "Executor path for Python jobs."
+   "databricksConf", ":ref:`ref_string`", "", "databricksConf is base64 encoded string which stores databricks job configuration. Config structure can be found here. https://docs.databricks.com/dev-tools/api/2.0/jobs.html#request-structure The config is automatically encoded by flytekit, and decoded in the propeller."
 
 
 
