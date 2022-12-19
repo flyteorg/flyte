@@ -18,6 +18,8 @@ Web API Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the Snowflake Plugin.
 
+    ---
+
     .. link-button:: deployment-plugin-setup-webapi-databricks
        :type: ref
        :text: Databricks Plugin
