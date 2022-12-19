@@ -63,7 +63,7 @@ This guide gives an overview of how to set up Databricks in your Flyte deploymen
     plugin_config:
       plugins:
         databricks:
-          entrypointFile: dbfs:///FileStore/tables/entrypoint-4.py
+          entrypointFile: dbfs:///FileStore/tables/entrypoint.py
           databricksInstance: dbc-a53b7a3c-614c
 
 5. Create a Databricks account and follow the docs for creating an Access token.
