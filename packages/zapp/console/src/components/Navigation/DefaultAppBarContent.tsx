@@ -38,6 +38,7 @@ export const DefaultAppBarContent = (props: DefaultAppBarProps) => {
 
   const isFlagEnabled = useFeatureFlag(FeatureFlag.OnlyMine);
   const { adminVersion } = useAdminVersion();
+  const isGAEnabled = env.ENABLE_GA === 'true' && env.GA_TRACKING_ID !== '';
 
   const versions: VersionInfo[] = [
     {
@@ -52,7 +53,7 @@ export const DefaultAppBarContent = (props: DefaultAppBarProps) => {
     },
     {
       name: t('versionGoogleAnalytics'),
-      version: t(patternKey('gaDisable', env.DISABLE_GA)),
+      version: t(patternKey('gaDisable', isGAEnabled.toString())),
       url: 'https://github.com/flyteorg/flyteconsole#google-analytics',
     },
   ];
