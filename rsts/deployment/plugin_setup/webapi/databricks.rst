@@ -34,62 +34,7 @@ This guide gives an overview of how to set up Databricks in your Flyte deploymen
   * Make sure you have correct kubeconfig and selected the correct kubernetes context
   * make sure you have the correct flytectl config at ~/.flyte/config.yaml
 
-3. Upload an ``entrypoint.py`` to dbfs or s3. Spark driver node run this file to override the default command in the dbx job.
-
-   .. code-block:: python
-
-       # entrypoint.py
-       import os
-       import sys
-       from typing import List
-
-       import click
-       from flytekit.bin.entrypoint import fast_execute_task_cmd as _fast_execute_task_cmd
-       from flytekit.bin.entrypoint import execute_task_cmd as _execute_task_cmd
-       from flytekit.exceptions.user import FlyteUserException
-       from flytekit.tools.fast_registration import download_distribution
-
-
-       def fast_execute_task_cmd(additional_distribution: str, dest_dir: str, task_execute_cmd: List[str]):
-           if additional_distribution is not None:
-                if not dest_dir:
-                    dest_dir = os.getcwd()
-                download_distribution(additional_distribution, dest_dir)
-
-           # Insert the call to fast before the unbounded resolver args
-           cmd = []
-           for arg in task_execute_cmd:
-               if arg == "--resolver":
-                   cmd.extend(["--dynamic-addl-distro", additional_distribution, "--dynamic-dest-dir", dest_dir])
-               cmd.append(arg)
-
-           click_ctx = click.Context(click.Command("dummy"))
-           parser = _execute_task_cmd.make_parser(click_ctx)
-           args, _, _ = parser.parse_args(cmd[1:])
-           _execute_task_cmd.callback(**args)
-
-
-       def main():
-
-           args = sys.argv
-
-           click_ctx = click.Context(click.Command("dummy"))
-           if args[1] == "pyflyte-fast-execute":
-               parser = _fast_execute_task_cmd.make_parser(click_ctx)
-               args, _, _ = parser.parse_args(args[2:])
-               fast_execute_task_cmd(**args)
-           elif args[1] == "pyflyte-execute":
-               parser = _execute_task_cmd.make_parser(click_ctx)
-               args, _, _ = parser.parse_args(args[2:])
-               _execute_task_cmd.callback(**args)
-           else:
-               raise FlyteUserException(f"Unrecognized command: {args[1:]}")
-
-
-       if __name__ == '__main__':
-           main()
-
-
+3. Upload an `entrypoint.py <https://gist.github.com/pingsutw/482e7f0134414dac437500344bac5134>`__ to dbfs or s3. Spark driver node run this file to override the default command in the dbx job.
 
 4. Create a file named ``values-override.yaml`` and add the following config to it:
 
