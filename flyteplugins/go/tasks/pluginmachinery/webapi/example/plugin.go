@@ -66,10 +66,10 @@ func (p Plugin) Create(ctx context.Context, tCtx webapi.TaskExecutionContextRead
 // This API will be called asynchronously and periodically to update the set of tasks currently in progress. It's
 // acceptable if this API is blocking since it'll be called from a background go-routine.
 // Best practices:
-//  1) Instead of returning the entire response object retrieved from the WebAPI, construct a smaller object that
+//  1. Instead of returning the entire response object retrieved from the WebAPI, construct a smaller object that
 //     has enough information to construct the status/phase, error and/or output.
-//  2) This object will NOT be serialized/marshaled. It's, therefore, not a requirement to make it so.
-//  3) There is already client-side throttling in place. If the WebAPI returns a throttling error, you should return
+//  2. This object will NOT be serialized/marshaled. It's, therefore, not a requirement to make it so.
+//  3. There is already client-side throttling in place. If the WebAPI returns a throttling error, you should return
 //     it as is so that the appropriate metrics are updated and the system administrator can update throttling
 //     params accordingly.
 func (p Plugin) Get(ctx context.Context, tCtx webapi.GetContext) (latest webapi.Resource, err error) {

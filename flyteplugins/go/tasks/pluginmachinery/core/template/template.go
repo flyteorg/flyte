@@ -1,21 +1,21 @@
 // Package template exports the Render method
 // Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
 // Supported templates are:
-// - {{ .InputFile }} to receive the input file path. The protocol used will depend on the underlying system
-// 		configuration. E.g. s3://bucket/key/to/file.pb or /var/run/local.pb are both valid.
-// - {{ .OutputPrefix }} to receive the path prefix for where to store the outputs.
-// - {{ .Inputs.myInput }} to receive the actual value of the input passed. See docs on LiteralMapToTemplateArgs for how
-// 		what to expect each literal type to be serialized as.
-// - {{ .RawOutputDataPrefix }} to receive a path where the raw output data should be ideally written. It is guaranteed
-//      to be unique per retry and finally one will be saved as the output path
-// - {{ .PerRetryUniqueKey }} A key/id/str that is generated per retry and is guaranteed to be unique. Useful in query
+//   - {{ .InputFile }} to receive the input file path. The protocol used will depend on the underlying system
+//     configuration. E.g. s3://bucket/key/to/file.pb or /var/run/local.pb are both valid.
+//   - {{ .OutputPrefix }} to receive the path prefix for where to store the outputs.
+//   - {{ .Inputs.myInput }} to receive the actual value of the input passed. See docs on LiteralMapToTemplateArgs for how
+//     what to expect each literal type to be serialized as.
+//   - {{ .RawOutputDataPrefix }} to receive a path where the raw output data should be ideally written. It is guaranteed
+//     to be unique per retry and finally one will be saved as the output path
+//   - {{ .PerRetryUniqueKey }} A key/id/str that is generated per retry and is guaranteed to be unique. Useful in query
 //     manipulations
-// - {{ .TaskTemplatePath }} A path in blobstore/metadata store (e.g. s3, gcs etc) to where an offloaded version of the
+//   - {{ .TaskTemplatePath }} A path in blobstore/metadata store (e.g. s3, gcs etc) to where an offloaded version of the
 //     task template exists and can be accessed by the container / task execution environment. The template is a
 //     a serialized protobuf
-// - {{ .PrevCheckpointPrefix }} A path to the checkpoint directory for the previous attempt. If this is the first attempt
+//   - {{ .PrevCheckpointPrefix }} A path to the checkpoint directory for the previous attempt. If this is the first attempt
 //     then this is replaced by an empty string
-// - {{ .CheckpointOutputPrefix }} A Flyte aware path where the current execution should write the checkpoints.
+//   - {{ .CheckpointOutputPrefix }} A Flyte aware path where the current execution should write the checkpoints.
 package template
 
 import (

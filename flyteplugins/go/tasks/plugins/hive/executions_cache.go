@@ -150,8 +150,9 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 
 // We need some way to translate results we get from Qubole, into a plugin phase
 // NB: This function should only return plugin phases that are greater than (">") phases that represent states before
-//     the query was kicked off. That is, it will never make sense to go back to PhaseNotStarted, after we've
-//     submitted the query to Qubole.
+//
+//	the query was kicked off. That is, it will never make sense to go back to PhaseNotStarted, after we've
+//	submitted the query to Qubole.
 func QuboleStatusToExecutionPhase(s client.QuboleStatus) (ExecutionPhase, error) {
 	switch s {
 	case client.QuboleStatusDone:

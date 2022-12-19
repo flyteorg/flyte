@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v1.2.3
+	github.com/flyteorg/flyteidl v1.3.1
 	github.com/flyteorg/flytestdlib v1.0.11
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.2

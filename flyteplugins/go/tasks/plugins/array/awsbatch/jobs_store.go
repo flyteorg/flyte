@@ -320,7 +320,6 @@ type JobStore struct {
 }
 
 // Submits a new job to AWS Batch and retrieves job info. Note that submitted jobs will not have status populated.
-//
 func (s JobStore) SubmitJob(ctx context.Context, input *batch.SubmitJobInput) (jobID string, err error) {
 	name := *input.JobName
 	if item, err := s.AutoRefresh.Get(name); err == nil {

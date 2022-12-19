@@ -166,14 +166,14 @@ func (q *quboleClient) executeRequest(ctx context.Context, method string, u *url
 }
 
 /*
-	Execute Hive Command on the QuboleClient Hive Cluster and return the CommandID
-	param: context.Context ctx: The default go context.
-	param: string commandStr: the query to execute
-	param: uint32 timeoutVal: timeout for the query to execute in seconds
-	param: string ClusterLabel: label for cluster on which to execute the Hive Command.
-	param: CommandMetadata _: additional labels for the command
-	return: *int64: CommandID for the command executed
-	return: error: error in-case of a failure
+Execute Hive Command on the QuboleClient Hive Cluster and return the CommandID
+param: context.Context ctx: The default go context.
+param: string commandStr: the query to execute
+param: uint32 timeoutVal: timeout for the query to execute in seconds
+param: string ClusterLabel: label for cluster on which to execute the Hive Command.
+param: CommandMetadata _: additional labels for the command
+return: *int64: CommandID for the command executed
+return: error: error in-case of a failure
 */
 func (q *quboleClient) ExecuteHiveCommand(
 	ctx context.Context,
@@ -231,10 +231,10 @@ func (q *quboleClient) ExecuteHiveCommand(
 }
 
 /*
-	Terminate a QuboleClient command
-	param: context.Context ctx: The default go context.
-	param: string CommandID: the CommandID to terminate.
-	return: error: error in-case of a failure
+Terminate a QuboleClient command
+param: context.Context ctx: The default go context.
+param: string CommandID: the CommandID to terminate.
+return: error: error in-case of a failure
 */
 func (q *quboleClient) KillCommand(ctx context.Context, commandID string, accountKey string) error {
 	commandStatus, err := url.Parse(commandID)
@@ -249,11 +249,11 @@ func (q *quboleClient) KillCommand(ctx context.Context, commandID string, accoun
 }
 
 /*
-	Get the status of a QuboleClient command
-	param: context.Context ctx: The default go context.
-	param: string CommandID: the CommandID to fetch the status for
-	return: *string: commandStatus for the CommandID passed
-	return: error: error in-case of a failure
+Get the status of a QuboleClient command
+param: context.Context ctx: The default go context.
+param: string CommandID: the CommandID to fetch the status for
+return: *string: commandStatus for the CommandID passed
+return: error: error in-case of a failure
 */
 func (q *quboleClient) GetCommandStatus(ctx context.Context, commandID string, accountKey string) (QuboleStatus, error) {
 	commandStatus, err := url.Parse(commandID)
