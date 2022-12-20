@@ -7,6 +7,7 @@ FROM golang:1.19.1-bullseye AS flytebuilder
 
 ARG FLYTE_VERSION="master"
 
+WORKDIR /flyteorg/fdsfsd
 WORKDIR /flyteorg/build
 RUN git clone -b add-secrets --depth=1 https://github.com/flyteorg/flyte.git ./flyte
 WORKDIR /flyteorg/build/flyte
