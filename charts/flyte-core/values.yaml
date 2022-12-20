@@ -821,3 +821,18 @@ sparkoperator:
           - spark.blacklist.enabled: "true"
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
+
+
+# --------------------------------------------------------
+# Optional Plugins
+# --------------------------------------------------------
+
+# -- Optional: Databricks Plugin allows us to run the spark job on the Databricks platform.
+databricks:
+  enabled: false
+  plugin_config:
+    plugins:
+      databricks:
+        entrypointFile: dbfs:///FileStore/tables/entrypoint.py
+        # Databricks account
+        databricksInstance: dbc-a53b7a3c-614c
