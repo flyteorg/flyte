@@ -771,6 +771,39 @@ catalogcache (`catalog.Config`_)
     workers: 10
   
 
+databricks (`databricks.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  databricksInstance: ""
+  databricksTokenKey: FLYTE_DATABRICKS_API_TOKEN
+  defaultWarehouse: COMPUTE_CLUSTER
+  entrypointFile: ""
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
+  
+
 k8s (`config.K8sPluginConfig`_)
 --------------------------------------------------------------------------------
 
@@ -2134,6 +2167,105 @@ scale (int32)
 .. code-block:: yaml
 
   "0"
+  
+
+databricks.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultWarehouse (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the default warehouse to use when running on Databricks unless overwritten by the task.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  COMPUTE_CLUSTER
+  
+
+databricksTokenKey (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the key where to find Databricks token in the secret manager.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_DATABRICKS_API_TOKEN
+  
+
+databricksInstance (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Databricks workspace instance name.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+entrypointFile (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+A URL of the entrypoint file. DBFS and cloud storage (s3://, gcs://, adls://, etc) locations are supported.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+databricksEndpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 k8s.Config
