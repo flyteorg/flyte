@@ -583,6 +583,7 @@ Defines Auth options for users.
   cookieSetting:
     domain: ""
     sameSitePolicy: DefaultMode
+  httpProxyURL: ""
   openId:
     baseUrl: ""
     clientId: ""
@@ -1077,6 +1078,18 @@ OpenID Configuration for User Auth
   - profile
   
 
+httpProxyURL (`config.URL`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 cookieHashKeySecretName (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1245,8 +1258,8 @@ kafka (`interfaces.KafkaConfig`_)
 
 .. code-block:: yaml
 
-  Version: {}
   brokers: null
+  version: ""
   
 
 eventsPublisher (`interfaces.EventsPublisherConfig`_)
@@ -1332,14 +1345,14 @@ projectId (string)
 interfaces.KafkaConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Version (`sarama.KafkaVersion`_)
+version (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  {}
+  ""
   
 
 brokers ([]string)
@@ -1350,19 +1363,6 @@ brokers ([]string)
 .. code-block:: yaml
 
   null
-  
-
-sarama.KafkaVersion
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-version (array)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  '[0 0 0 0]'
   
 
 Section: cluster_resources
@@ -4329,6 +4329,20 @@ The amount of time allowed to read request headers.
   "32"
   
 
+kubeClientConfig (`config.KubeClientConfig (kubeClientConfig)`_)
+--------------------------------------------------------------------------------
+
+Configuration to control the Kubernetes client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 25
+  qps: 100
+  timeout: 30s
+  
+
 config.DataProxyConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4462,6 +4476,45 @@ The max size in bytes for incoming gRPC messages
 .. code-block:: yaml
 
   "0"
+  
+
+config.KubeClientConfig (kubeClientConfig)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+qps (int32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max QPS to the master for requests to KubeAPI. 0 defaults to 5.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+burst (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max burst rate for throttle. 0 defaults to 10
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "25"
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
   
 
 config.ServerSecurityOptions
