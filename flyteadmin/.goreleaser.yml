@@ -1,0 +1,56 @@
+project_name: flyteadmin
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: flyteadmin
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
+    binary: flyteadmin
+    goos:
+      - linux
+      - windows
+      - darwin
+  - id: flytescheduler
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/scheduler/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
+    binary: flytescheduler
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: flyteadmin-archive
+    name_template: |-
+      flyteadmin_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+      {{- end -}}
+    builds:
+      - flyteadmin
+      - flytescheduler
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
