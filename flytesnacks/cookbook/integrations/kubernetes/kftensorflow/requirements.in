@@ -1,0 +1,4 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-kftensorflow>=0.24.0
+tensorflow
+tensorflow-datasets

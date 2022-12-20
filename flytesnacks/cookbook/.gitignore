@@ -1,0 +1,16 @@
+_build/
+_pb_output/
+release-snacks/*.tgz
+.bash_history
+.cache/
+.ipython/
+.ipynb_checkpoints
+.vim/
+._rsts/
+*.zip
+auto_*/
+docs/auto/*
+docs/_rsts/
+.hypothesis
+.config/
+test.ipynb

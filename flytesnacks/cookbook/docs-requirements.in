@@ -1,0 +1,20 @@
+-r ./common/requirements-common.in
+git+https://github.com/flyteorg/furo@main
+pillow
+sphinx
+sphinx_rtd_theme
+sphinx-gallery
+sphinx-prompt
+sphinx-code-include
+sphinx-autoapi
+sphinx-copybutton
+sphinxext-remoteliteralinclude
+sphinx_fontawesome
+sphinx-panels
+sphinxcontrib-mermaid
+sphinxcontrib-yt
+sphinx-tabs<3.4.1
+astroid
+grpcio < 1.49.0
+grpcio-status < 1.49.0
+sphinx-tags

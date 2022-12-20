@@ -1,0 +1,122 @@
+{
+    "data_asset_type": "Dataset",
+    "expectation_suite_name": "movies",
+    "expectations": [
+      {
+        "expectation_type": "expect_table_row_count_to_be_between",
+        "kwargs": {
+          "min_value": 2000
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_table_column_count_to_equal",
+        "kwargs": {
+          "value": 6
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_table_columns_to_match_ordered_list",
+        "kwargs": {
+          "column_list": [
+            "id",
+            "name",
+            "release_date",
+            "country",
+            "publisher",
+            "agent"
+          ]
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "column": "release_date"
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_column_values_to_be_between",
+        "kwargs": {
+          "column": "release_date",
+          "min_value": "2015-01-01",
+          "mostly": 0.95,
+          "parse_strings_as_datetimes": true
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "column": "country"
+        },
+        "meta": {}
+      },
+      {
+        "expectation_type": "expect_column_value_lengths_to_be_between",
+        "kwargs": {
+          "column": "country",
+          "max_value": 10,
+          "min_value": 2
+        },
+        "meta": {}
+      }
+    ],
+    "meta": {
+      "BasicSuiteBuilderProfiler": {
+        "batch_kwargs": {
+          "data_asset_name": "main.movies",
+          "datasource": "my_database",
+          "schema": "main",
+          "table": "movies"
+        },
+        "created_at": 1601566174.753483,
+        "created_by": "BasicSuiteBuilderProfiler"
+      },
+      "citations": [
+        {
+          "batch_kwargs": {
+            "data_asset_name": "main.movies",
+            "datasource": "my_database",
+            "schema": "main",
+            "table": "movies"
+          },
+          "batch_markers": {
+            "ge_load_time": "20201001T152934.728018Z"
+          },
+          "batch_parameters": null,
+          "citation_date": "20201001T152934.776045Z",
+          "comment": "BasicSuiteBuilderProfiler added a citation based on the current batch."
+        }
+      ],
+      "columns": {
+        "agent": {
+          "description": ""
+        },
+        "country": {
+          "description": ""
+        },
+        "id": {
+          "description": ""
+        },
+        "name": {
+          "description": ""
+        },
+        "publisher": {
+          "description": ""
+        },
+        "release_date": {
+          "description": ""
+        }
+      },
+      "great_expectations_version": "0.12.3",
+      "notes": {
+        "content": [
+          "_To add additional notes, edit the <code>meta.notes.content</code> field in the appropriate Expectation json file._"
+        ],
+        "format": "markdown"
+      }
+    }
+  }

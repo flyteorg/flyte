@@ -1,0 +1,3 @@
+-r ../../../common/requirements-common.in
+flytekitplugins.dolt>=0.18.0
+great-expectations>=0.13.31

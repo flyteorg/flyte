@@ -1,0 +1,28 @@
+-r ./integrations/aws/sagemaker_training/requirements.in
+-r ./integrations/aws/sagemaker_pytorch/requirements.in
+-r ./integrations/external_services/hive/requirements.in
+-r ./integrations/flytekit_plugins/dolt/requirements.in
+-r ./integrations/flytekit_plugins/pandera_examples/requirements.in
+-r ./integrations/flytekit_plugins/whylogs_examples/requirements.in
+-r ./integrations/kubernetes/pod/requirements.in
+-r ./integrations/kubernetes/k8s_spark/requirements.in
+-r ./integrations/kubernetes/kfpytorch/requirements.in
+-r ./case_studies/ml_training/house_price_prediction/requirements.in
+-r ./case_studies/ml_training/mnist_classifier/requirements.in
+-r ./case_studies/ml_training/pima_diabetes/requirements.in
+
+black==22.3.0
+coverage
+flake8
+pre-commit
+flake8-black
+flake8-isort
+codespell
+isort
+mock
+pytest
+mypy
+google-cloud-bigquery
+google-cloud-bigquery-storage
+grpcio < 1.49.0
+grpcio-status < 1.49.0

@@ -1,0 +1,5 @@
+-r ../../../common/requirements-common.in
+pyspark
+flytekitplugins-spark>=1.0.0
+grpcio-status<1.49.0
+pyspark

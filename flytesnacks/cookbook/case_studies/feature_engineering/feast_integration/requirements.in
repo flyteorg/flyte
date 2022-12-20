@@ -1,0 +1,4 @@
+-r ../../../common/requirements-common.in
+scikit-learn
+numpy
+feast[aws]

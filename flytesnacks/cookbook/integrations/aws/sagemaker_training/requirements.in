@@ -1,0 +1,4 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-awssagemaker>=0.16.0
+tensorflow
+tensorflow-datasets

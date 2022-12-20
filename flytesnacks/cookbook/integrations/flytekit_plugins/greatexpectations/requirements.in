@@ -1,0 +1,2 @@
+-r ../../../common/requirements-common.in
+flytekitplugins-great_expectations>=0.22.0

@@ -1,0 +1,13 @@
+project_name: flytesnacks
+builds:
+  - skip: true
+release:
+  github:
+    owner: flyteorg
+    name: flytesnacks
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  disable: false
+  extra_files:
+    - glob: ./cookbook/release-snacks/*

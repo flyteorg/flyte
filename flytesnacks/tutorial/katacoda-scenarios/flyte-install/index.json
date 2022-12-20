@@ -1,0 +1,33 @@
+{
+  "title": "Flyte",
+  "description": "Flyte Installation",
+  "details": {
+    "steps": [{
+        "title": "Step 1",
+        "text": "step1.md"
+      },{
+        "title": "Step 2",
+        "text": "step2.md"
+      },{
+        "title": "Step 3",
+        "text": "step3.md"
+      }
+    ],
+    "finish": {
+      "text": "finish.md"
+    },
+    "intro": {
+      "code": "foreground.sh",
+      "text": "intro.md"
+    }
+  },
+  "environment": {
+    "hideintro": true,
+    "uilayout": "terminal-terminal",
+    "showdashboard": true,
+    "dashboards": [{"name": "Flyte Get Started", "href": "https://flyte.org"},{"name": "Flyte Console", "href": "https://[[HOST_SUBDOMAIN]]-30081-[[KATACODA_HOST]].environments.katacoda.com"}]
+  },
+  "backend": {
+    "imageid": "ubuntu:2004"
+  }
+}

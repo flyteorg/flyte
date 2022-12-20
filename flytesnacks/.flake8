@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 180
+extend-ignore = E203, E266, E501, W503, E741
+exclude = .svn,CVS,.bzr,.hg,.git,__pycache__,venv/*,src/*,.rst,build
+max-complexity=16

@@ -1,0 +1,3 @@
+-r ../../../common/requirements-common.in
+
+flytekitplugins-athena>=0.20.0

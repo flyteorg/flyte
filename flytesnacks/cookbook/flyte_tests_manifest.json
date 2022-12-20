@@ -1,0 +1,154 @@
+ [{
+    "name": "core",
+    "priority": "P0",
+    "path": "core",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""
+    }
+  },{
+    "name": "integrations-hive",
+    "priority": "P1",
+    "path": "integrations/external_services/hive",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-k8s-spark",
+    "priority": "P1",
+    "path": "integrations/kubernetes/k8s_spark",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-kfpytorch",
+    "priority": "P1",
+    "path": "integrations/kubernetes/kfpytorch",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-kftensorflow",
+    "priority": "P1",
+    "path": "integrations/kubernetes/kftensorflow",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-pod",
+    "priority": "P1",
+    "path": "integrations/kubernetes/pod",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-pandera_examples",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/pandera_examples",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-whylogs_examples",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/whylogs_examples",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },
+  {
+    "name": "integrations-modin_examples",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/modin_examples",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-papermilltasks",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/papermilltasks",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-greatexpectations",
+    "priority": "P1",
+    "path": "integrations/flytekit_plugins/greatexpectations",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-sagemaker-pytorch",
+    "priority": "P1",
+    "path": "integrations/aws/sagemaker_pytorch",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+    "name": "integrations-sagemaker-training",
+    "priority": "P1",
+    "path": "integrations/aws/sagemaker_training",
+    "exitCondition": {
+      "exit_success": true,
+        "exit_message": ""
+    }
+  },{
+   "name": "case-studies-house-price-prediction",
+   "priority": "P2",
+   "path": "case_studies/ml_training/house_price_prediction",
+   "exitCondition": {
+     "exit_success": true,
+     "exit_message": ""
+   }
+  },{
+   "name": "case-studies-pima-diabetes",
+   "priority": "P2",
+   "path": "case_studies/ml_training/pima_diabetes",
+   "exitCondition": {
+     "exit_success": true,
+     "exit_message": ""
+   }
+ },{
+  "name": "case-studies-mnist-classifier",
+  "priority": "P2",
+  "path": "case_studies/ml_training/mnist_classifier",
+  "exitCondition": {
+    "exit_success": true,
+    "exit_message": ""
+  }
+ },{
+    "name": "case-studies-eda",
+    "priority": "P2",
+    "path": "case_studies/feature_engineering/eda",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""
+  }
+ },{
+    "name": "case-studies-feast-integration",
+    "priority": "P2",
+    "path": "case_studies/feature_engineering/feast_integration",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""
+   }
+  },{
+    "name": "case-studies-blast",
+    "priority": "P2",
+    "path": "case_studies/bioinformatics/blast",
+    "exitCondition": {
+      "exit_success": true,
+      "exit_message": ""
+  }
+}]
