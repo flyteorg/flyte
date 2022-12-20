@@ -6,7 +6,7 @@ server:
   httpPort: 8088
   grpcPort: 8089
   grpcServerReflection: true
-  kube-config: /Users/ytong/.kube/config
+  kube-config: /Users/ytong/.flyte/state/kubeconfig
   security:
     secure: false
     useAuth: false
@@ -31,7 +31,6 @@ auth:
         - offline_access # Uncomment if OIdC supports issuing refresh tokens.
       # Replace with the client id created for Flyte.
       clientId: 0oakkheteNjCMERst5d6
-
 # Okta OIdC and OAuth2
 #auth:
 #  authorizedUris:
