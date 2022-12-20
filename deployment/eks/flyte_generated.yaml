@@ -8041,7 +8041,9 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-4fbh4bk26k
+  annotations: {}
+  labels: {}
+  name: clusterresource-template-9b9mcfhc84
   namespace: flyte
 ---
 apiVersion: v1
@@ -8086,7 +8088,9 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-fktmhdgfk8
+  annotations: {}
+  labels: {}
+  name: datacatalog-config-fbf55445k6
   namespace: flyte
 ---
 apiVersion: v1
@@ -8207,7 +8211,9 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-29g4dtt8tc
+  annotations: {}
+  labels: {}
+  name: flyte-admin-config-ghbf2bt459
   namespace: flyte
 ---
 apiVersion: v1
@@ -8377,7 +8383,9 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dtkccdkch8
+  annotations: {}
+  labels: {}
+  name: flyte-propeller-config-4k9d789g6b
   namespace: flyte
 ---
 apiVersion: v1
@@ -8417,7 +8425,9 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  name: db-pass-bthd2588cc
+  annotations: {}
+  labels: {}
+  name: db-pass-kdm4d5fcfb
   namespace: flyte
 type: Opaque
 ---
@@ -8677,14 +8687,13 @@ spec:
         runAsUser: 1001
       serviceAccountName: datacatalog
       volumes:
-      - emptyDir: {}
-        name: shared-data
+      - name: shared-data
       - configMap:
-          name: datacatalog-config-fktmhdgfk8
+          name: datacatalog-config-fbf55445k6
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-kdm4d5fcfb
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8764,7 +8773,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtkccdkch8
+          name: flyte-propeller-config-4k9d789g6b
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8911,19 +8920,17 @@ spec:
         runAsUser: 1001
       serviceAccountName: flyteadmin
       volumes:
-      - emptyDir: {}
-        name: shared-data
-      - emptyDir: {}
-        name: scratch
+      - name: shared-data
+      - name: scratch
       - configMap:
-          name: flyte-admin-config-29g4dtt8tc
+          name: flyte-admin-config-ghbf2bt459
         name: config-volume
       - configMap:
-          name: clusterresource-template-4fbh4bk26k
+          name: clusterresource-template-9b9mcfhc84
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-kdm4d5fcfb
       - name: auth
         secret:
           secretName: flyte-admin-auth
@@ -9024,7 +9031,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtkccdkch8
+          name: flyte-propeller-config-4k9d789g6b
         name: config-volume
       - name: auth
         secret:
@@ -9097,7 +9104,7 @@ spec:
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-kdm4d5fcfb
       - name: auth
         secret:
           secretName: flyte-secret-auth
@@ -9284,14 +9291,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-4fbh4bk26k
+              name: clusterresource-template-9b9mcfhc84
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-29g4dtt8tc
+              name: flyte-admin-config-ghbf2bt459
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-bthd2588cc
+              secretName: db-pass-kdm4d5fcfb
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
