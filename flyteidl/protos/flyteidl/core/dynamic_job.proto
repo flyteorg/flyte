@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "flyteidl/core/tasks.proto";
+import "flyteidl/core/workflow.proto";
+import "flyteidl/core/literals.proto";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+// Describes a set of tasks to execute and how the final outputs are produced.
+message DynamicJobSpec {
+    // A collection of nodes to execute.
+    repeated Node nodes = 1;
+
+    // An absolute number of successful completions of nodes required to mark this job as succeeded. As soon as this
+    // criteria is met, the dynamic job will be marked as successful and outputs will be computed. If this number
+    // becomes impossible to reach (e.g. number of currently running tasks + number of already succeeded tasks <
+    // min_successes) the task will be aborted immediately and marked as failed. The default value of this field, if not
+    // specified, is the count of nodes repeated field.
+    int64 min_successes = 2;
+
+    // Describes how to bind the final output of the dynamic job from the outputs of executed nodes. The referenced ids
+    // in bindings should have the generated id for the subtask.
+    repeated Binding outputs = 3;
+
+    // [Optional] A complete list of task specs referenced in nodes.
+    repeated TaskTemplate tasks = 4;
+
+    // [Optional] A complete list of task specs referenced in nodes.
+    repeated WorkflowTemplate subworkflows = 5;
+}

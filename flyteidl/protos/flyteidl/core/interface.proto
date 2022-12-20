@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/types.proto";
+import "flyteidl/core/literals.proto";
+
+// Defines a strongly typed variable.
+message Variable {
+    // Variable literal type.
+    LiteralType type = 1;
+
+    //+optional string describing input variable
+    string description = 2;
+}
+
+// A map of Variables
+message VariableMap {
+    // Defines a map of variable names to variables.
+    map<string, Variable> variables = 1;
+}
+
+// Defines strongly typed inputs and outputs.
+message TypedInterface {
+    VariableMap inputs  = 1;
+    VariableMap outputs = 2;
+}
+
+// A parameter is used as input to a launch plan and has
+// the special ability to have a default value or mark itself as required.
+message Parameter {
+    //+required Variable. Defines the type of the variable backing this parameter.
+    Variable var = 1;
+
+    //+optional
+    oneof behavior {
+        // Defines a default value that has to match the variable type defined.
+        Literal default = 2;
+
+        //+optional, is this value required to be filled.
+        bool required = 3;
+    }
+}
+
+// A map of Parameters.
+message ParameterMap {
+    // Defines a map of parameter names to parameters.
+    map<string, Parameter> parameters = 1;
+}
