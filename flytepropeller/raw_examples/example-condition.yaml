@@ -1,0 +1,104 @@
+apiVersion: flyte.lyft.com/v1alpha1
+kind: FlyteWorkflow
+metadata:
+  name: test-branch
+  namespace: default
+tasks:
+  foo:
+    id: foo
+    category: 0
+    type: container
+    metadata:
+      runtime:
+        type: 0
+        version: "1.18.0"
+        flavor: python
+      discoverable: true
+    interface:
+      inputs:
+        - name: x
+          type:
+            simple: INTEGER
+      outputs:
+        - name: "y"
+          type:
+            simple: INTEGER
+    container:
+      image: alpine
+      command: ["echo", "Hello", "{{$input}}", "{{$output}}"]
+spec:
+  id: test-branch
+  nodes:
+    start:
+      id: start
+      kind: start
+      input_bindings:
+        - var: x
+          binding:
+            scalar:
+              primitive:
+                integer: 5
+        - var: "y"
+          binding:
+            scalar:
+              primitive:
+                integer: 10
+    foo1:
+      id: foo1
+      kind: task
+      input_bindings:
+        - var: x
+          binding:
+            promise:
+              node_id: start
+              var: "y"
+      resources:
+        requests:
+          cpu: 250m
+        limits:
+          cpu: 250m
+      task_ref: foo
+    foo2:
+      id: foo2
+      kind: task
+      input_bindings:
+        - var: x
+          binding:
+            promise:
+              node_id: start
+              var: x
+      resources:
+        requests:
+          cpu: 250m
+        limits:
+          cpu: 250m
+      task_ref: foo
+    foobranch:
+      id: foobranch
+      kind: branch
+      input_bindings:
+        - var: x
+          binding:
+            promise:
+              node_id: start
+              var: x
+      branch_node:
+        if:
+          condition:
+            comparison:
+              left_value:
+                var: x
+              operator: GT
+              right_value:
+                primitive:
+                  integer: 5
+          then: foo1
+        else: foo2
+  connections:
+    start:
+      - foobranch
+      - foo1
+      - foo2
+    foobranch:
+      - foo1
+      - foo2
