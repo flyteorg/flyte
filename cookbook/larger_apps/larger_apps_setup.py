@@ -27,30 +27,31 @@ Then install `Flytekit <https://pypi.org/project/flytekit/>`__ on it:
 
 Then run ``pyflyte init <project_name>``, where ``<project_name>`` is the
 directory that will be created containing the scaffolding for a flyte-ready
-project. For this guide we're going call it ``my_flyte_project``:
+project. For this guide we're going call it ``my_project``:
 
 .. prompt:: bash (flyte)$
 
-    pyflyte init my_flyte_project
-    cd my_flyte_project
+    pyflyte init my_project
+    cd my_project
 
-The ``my_flyte_project`` directory comes with a sample workflow, which can be
-found under ``flyte/workflows/example.py``. The structure below shows the most
+The ``my_project`` directory comes with a sample workflow, which can be
+found under ``workflows/example.py``. The structure below shows the most
 important files and how a typical Flyte app should be laid out.
 
 .. dropdown:: A typical Flyte app should have these files
 
    .. code-block:: text
 
-       my_flyte_project
-       ├── Dockerfile
-       ├── docker_build_and_tag.sh
-       ├── flyte
-       │         ├── __init__.py
-       │         └── workflows
-       │             ├── __init__.py
-       │             └── example.py
-       └── requirements.txt
+     .
+     ├── Dockerfile        # Docker image
+     ├── LICENSE
+     ├── README.md
+     ├── docker_build.sh   # Docker build helper script
+     ├── requirements.txt  # Python dependencies
+     └── workflows
+         ├── __init__.py
+         ├── example.py    # Example Flyte workflows
+         └── helpers.py    # Helper functions
 
    .. note::
 
@@ -64,19 +65,19 @@ The workflow can be run locally, simply by running it as a Python script:
 
 .. prompt:: bash (flyte)$
 
-    python flyte/workflows/example.py
+    python workflows/example.py
 
 .. note::
 
    The workflow needs to be invoked after the ``if __name__ == "__main__"``
-   entrypoint at the bottom of ``flyte/workflows/example.py``.
+   entrypoint at the bottom of ``workflows/example.py``.
 
 
 Expected output:
 
 .. prompt:: text
 
-  Running my_wf() hello world
+  Running wf() hello world
 
 
 Conclusion

@@ -11,51 +11,52 @@ Modify Code and Test Locally
 
 Open ``example.py`` in your favorite editor.
 
-.. dropdown:: flyte/workflows/example.py
+.. dropdown:: workflows/example.py
 
-   .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
+   .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/simple-example/%7B%7Bcookiecutter.project_name%7D%7D/workflows/example.py
       :language: python
 
-Add ``message: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Next, update the body of
+Add ``message: str`` as an argument to both the ``wf`` and ``say_hello`` functions. Next, update the body of
 ``say_hello`` to consume that argument.
 
 .. code-block:: python
 
    @task
-   def say_hello(message: str) -> str:
-      return f"hello world, {message}"
+   def say_hello(name: str, message: str) -> str:
+      return f"hello {name}! {message}"
 
 .. code-block:: python
 
    @workflow
-   def my_wf(message: str) -> str:
-      res = say_hello(message=message)
-      return res
+   def wf(name: str, message: str) -> typing.Tuple[str, int]:
+      greeting = say_hello(name=name, message=message)
+      greeting_len = greeting_length(greeting=greeting)
+      return greeting, greeting_len
 
 Update the simple test at the bottom of the file to pass in a message, e.g.
 
 .. code-block:: python
 
-   print(f"Running my_wf(message='what a nice day it is!') {my_wf(message='what a nice day it is!')}")
+   print(f"Running wf(name='passenger', message='what a nice day it is!') {my_wf(message='what a nice day it is!')}")
 
-When you run this file locally, it should output ``hello world, what a nice day it is!``.
+When you run this file locally, it should output ``hello world! what a nice day it is!``.
 
 .. prompt:: bash (flyte)$
 
-   python flyte/workflows/example.py
+   python workflows/example.py
 
 
 .. dropdown:: Expected output
 
       .. prompt:: text
 
-         Running my_wf(message='what a nice day it is!') hello world, what a nice day it is!
+         Running wf(name='passenger', message='what a nice day it is!') hello passenger! what a nice day it is!
 
 
 Quickly Re-deploy Your Application
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To re-deploy this workflow to the sandbox Flyte cluster, you can repeat the steps covered in
+To re-deploy this workflow to the Flyte Demo Cluster, you can repeat the steps covered in
 :ref:`previous section <larger_apps_deploy>`. Flyte provides a **faster** way to iterate on your workflows. Since you have not
 updated any of the dependencies in your requirements file, it is possible to push just the code to Flyte backend without
 re-building the entire Docker container. To do so, run the following commands.
@@ -78,15 +79,15 @@ The admin provides a signed URL link to the configured bucket (S3/GCS bucket) fo
 
 .. tip::
 
-   If you're using the sandbox, this is automatically configured by flytectl.
+   If you're using the Flyte Demo cluster, this is automatically configured by flytectl.
 
    The dropdown below provides more information on the required configuration depending on your cloud infrastructure.
 
    .. dropdown:: Flytectl configuration with ``storage`` block for Fast registration
 
-      .. tabbed:: Local Flyte Sandbox
+      .. tabbed:: Flyte Demo Cluster
 
-         Automatically configured for you by ``flytectl sandbox`` command.
+         Automatically configured for you by ``flytectl demo`` command.
 
          .. code-block:: yaml
 
@@ -199,7 +200,7 @@ Monitor the execution by providing the execution name from the ``create executio
 
 .. tip::
 
-   Alternatively, visit the Flyte sandbox console at ``http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/flyte.workflows.example.my_wf``,
+   Alternatively, visit the Flyte Demo console at ``http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/workflows.example.wf``,
    click launch, and provide a ``message`` as input.
 
    .. TODO: update so that it reflects the new workflow with the message input https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/getting_started/getting_started_fastreg.gif
@@ -210,9 +211,9 @@ Recap
 
 In this guide, we:
 
-1. Setup a Flyte project with ``pyflyte init my_flyte_project`` and
+1. Setup a Flyte project with ``pyflyte init my_project`` and
    ran your workflows locally.
-2. Started a Flyte sandbox cluster and ran a Flyte workflow on a cluster.
+2. Started a Flyte Demo cluster and ran a Flyte workflow on that cluster.
 3. Iterated on a Flyte workflow and updated the workflows on the cluster.
 
 

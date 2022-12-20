@@ -28,9 +28,9 @@ We're supporting two Flyte types that should suit Great Expectations' ``Datasour
   Flyte types are added because, in Great Expectations, we have the privilege to give a non-string (Pandas/Spark DataFrame) when using a
   :py:class:`RuntimeDataConnector <greatexpectations:great_expectations.datasource.data_connector.runtime_data_connector.RuntimeDataConnector>`
   but not when using an
-  :py:class:`InferredAssetFilesystemDataConnector <great_expectations.datasource.data_connector.inferred_asset_filesystem_data_connector.InferredAssetFilesystemDataConnector>`
+  :py:class:`InferredAssetFilesystemDataConnector <greatexpectations:great_expectations.datasource.data_connector.inferred_asset_filesystem_data_connector.InferredAssetFilesystemDataConnector>`
   or a
-  :py:class:`ConfiguredAssetFilesystemDataConnector <great_expectations.datasource.data_connector.configured_asset_filesystem_data_connector.ConfiguredAssetFilesystemDataConnector>`.
+  :py:class:`ConfiguredAssetFilesystemDataConnector <greatexpectations:great_expectations.datasource.data_connector.configured_asset_filesystem_data_connector.ConfiguredAssetFilesystemDataConnector>`.
   For the latter case, with the integration of Flyte types, we can give a Pandas/Spark DataFrame or a remote URI as the dataset.
 
 The datasources can be well-integrated with the plugin using the following two modes:
@@ -44,7 +44,8 @@ The datasources can be well-integrated with the plugin using the following two m
 Data Validation Failure
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-If the data validation fails, the plugin will raise a Great Expectations' :py:obj:`ValidationError <great_expectations.exceptions.ValidationError>`.
+If the data validation fails, the plugin will raise a 
+:py:class:`GreatExpectationsValidationError <greatexpectations:great_expectations.exceptions.GreatExpectationsValidationError>`.
 
 For example, this is how the error message looks on the Flyte UI:
 
