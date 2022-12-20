@@ -1,0 +1,25 @@
+{
+    "name": "placeholder",
+    "version": "0.1.0",
+    "description": "Your description here",
+    "main": "./dist/index.js",
+    "module": "./lib/esm/index.js",
+    "types": "./lib/esm/index.d.ts",
+    "private": false,
+    "scripts": {
+        "build": "yarn build:esm && yarn build:cjs",
+        "build:esm": "tsc --module esnext --outDir lib/esm",
+        "build:cjs": "tsc",
+        "test": "NODE_ENV=test jest"
+    },
+    "peerDependencies": {
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1"
+    },
+    "devDependencies": {
+        "@types/react": "^16.9.34",
+        "@types/react-dom": "^16.9.7",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1"
+    }
+}

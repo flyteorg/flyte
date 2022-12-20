@@ -1,0 +1,80 @@
+{
+    "name": "flyteconsole",
+    "version": "1.3.5",
+    "private": true,
+    "description": "The web UI for the Flyte platform",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/flyteorg/flyteconsole"
+    },
+    "main": "index.js",
+    "workspaces": [
+        "packages/basics/**",
+        "packages/composites/**",
+        "packages/plugins/**",
+        "packages/zapp/**",
+        "script/generator/**"
+    ],
+    "scripts": {
+        "clean": "yarn workspace @flyteconsole/client-app clean",
+        "start": "yarn workspace @flyteconsole/client-app start",
+        "start:prod": "yarn workspace @flyteconsole/client-app start:prod",
+        "build:prod": "yarn workspace @flyteconsole/client-app build:prod",
+        "build:storybook": "build-storybook",
+        "generate:package": "yarn workspace @flyteconsole/generator start",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+        "storybook": "start-storybook -p 6006",
+        "test": "NODE_ENV=test jest",
+        "test:clear": "jest --clearCache",
+        "test-coverage": "NODE_ENV=test jest --coverage"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged",
+            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+        }
+    },
+    "keywords": [
+        "react",
+        "lyft"
+    ],
+    "author": "Lyft <flyte-eng@lyft.com>",
+    "license": "Apache-2.0",
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx,json}": [
+            "eslint --fix",
+            "prettier --write",
+            "git add"
+        ]
+    },
+    "dependencies": {
+        "@flyteorg/flyteidl": "^1.3.0"
+    },
+    "devDependencies": {
+        "@storybook/addon-actions": "^6.4.19",
+        "@storybook/addon-essentials": "^6.4.19",
+        "@storybook/addon-interactions": "^6.4.19",
+        "@storybook/addon-links": "^6.4.19",
+        "@storybook/builder-webpack5": "^6.4.19",
+        "@storybook/manager-webpack5": "^6.4.19",
+        "@storybook/react": "^6.4.19",
+        "@storybook/testing-library": "^0.0.9",
+        "@testing-library/jest-dom": "^5.5.0",
+        "@testing-library/react": "^10.0.3",
+        "@testing-library/react-hooks": "^7.0.2",
+        "jest": "^26.0.0",
+        "react-hot-loader": "^4.1.2",
+        "ts-jest": "^26.3.0"
+    },
+    "resolutions": {
+        "@babel/cli": "~7.16.0",
+        "@babel/core": "~7.16.12",
+        "@babel/plugin-proposal-class-properties": "~7.16.7",
+        "@babel/plugin-proposal-decorators": "~7.16.7",
+        "@babel/plugin-proposal-object-rest-spread": "~7.16.7",
+        "@babel/preset-env": "~7.16.11",
+        "@babel/preset-react": "~7.16.7",
+        "@babel/preset-typescript": "~7.16.7",
+        "minimist": "1.2.6"
+    }
+}

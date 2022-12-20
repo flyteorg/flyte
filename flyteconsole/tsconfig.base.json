@@ -1,0 +1,52 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "checkJs": false,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "removeComments": false,
+        "importHelpers": true,
+        "forceConsistentCasingInFileNames": false,
+
+        "jsx": "react",
+        "lib": ["dom", "dom.iterable", "es6", "es2021"],
+        "target": "esnext",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        // "esModuleInterop": true
+
+        "isolatedModules": true,
+        "declaration": true,
+        "declarationMap": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "useDefineForClassFields": true,
+        "useUnknownInCatchVariables": false,
+
+        // More strict rules
+        "noUncheckedIndexedAccess": false,
+        "noPropertyAccessFromIndexSignature": false,
+        "noImplicitOverride": true,
+        "noFallthroughCasesInSwitch": true,
+
+        "sourceMap": true,
+        "composite": true,
+        "baseUrl": ".",
+        "paths": {
+            "@flyteconsole/*": [
+                "./packages/basics/*/src",
+                "./packages/composites/*/src",
+                "./packages/plugins/*/src",
+                "./packages/zapp/*/src"
+            ]
+        }
+    },
+    "exclude": ["**/node_modules", "**/dist", "**/lib"]
+}

@@ -1,0 +1,10 @@
+src/generated/
+.github/
+.dist/
+dist/
+lib/
+node_modules/
+tsd/
+webpack.common.config.ts
+webpack.dev.config.ts
+webpack.prod.config.ts

@@ -1,0 +1,138 @@
+name: Flyteconsole Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - devmain
+  push:
+    branches:
+      - master
+      - devmain
+
+jobs:
+  extract_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.extract_branch.outputs.branch }}
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})"
+        id: extract_branch
+
+  unit_tests_with_coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # We need history for codecov to work correctly
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - uses: bahmutov/npm-install@v1
+      - name: Run tests and generate coverage
+        run: make test_unit_codecov
+      - uses: codecov/codecov-action@v1
+        with:
+          files: .coverage/coverage-final.json
+          fail_ci_if_error: true
+
+  lint_project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - uses: bahmutov/npm-install@v1
+      - name: Run linter
+        run: make lint
+
+  build_docker_image:
+    name: Build & Push Flyteconsole Image
+    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+    with:
+      version: v1
+      dockerfile: Dockerfile
+      push: false
+      repository: ${{ github.repository }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  release:
+    name: Generate Release
+    if: ${{ (github.event_name != 'pull_request') && (needs.extract_branch.outputs.branch == 'master') }}
+    needs: [unit_tests_with_coverage, lint_project, build_docker_image, extract_branch]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GIT_AUTHOR_NAME: "flyte bot"
+          GIT_AUTHOR_EMAIL: "admin@flyte.org"
+          GIT_COMMITTER_NAME: "flyte bot"
+          GIT_COMMITTER_EMAIL: "admin@flyte.org"
+        run: npx semantic-release
+
+  check_for_tag:
+    name: Get Release Tag
+    needs: release
+    runs-on: ubuntu-latest
+    outputs:
+      currentTag: ${{ steps.setTag.outputs.currentTag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Use the latest commit on the branch which triggered this workflow,
+          # not the commit which triggered the workflow
+          ref: ${{ github.ref }}
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Get target git ref
+        id: setTag
+        # Print any tags associated with the target ref, in reverse lexicographical
+        # order so that the first item is the highest version number. If we find
+        # a tag, update our target
+        run: |
+          CURRENT_TAG=$(git tag --sort=-refname --points-at ${{ github.ref }} | head -n 1)
+          echo $CURRENT_TAG
+          echo "::set-output name=currentTag::$CURRENT_TAG"
+
+  push_docker_image:
+    name: Push to Github Registry
+    needs: [check_for_tag]
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_for_tag.outputs.currentTag != '' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Autobump version
+        env:
+          TAG: ${{ needs.check_for_tag.outputs.currentTag }}
+        run: |
+          VERSION=${TAG:1} make update_npmversion
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: flyteorg/flyteconsole
+          image_tag: latest,${{ github.sha }},${{ needs.check_for_tag.outputs.currentTag }}
+          push_git_tag: true
+          push_image_and_stages: true
+          dockerfile: Dockerfile
+          registry: ghcr.io
+          build_extra_args: "--compress=true"

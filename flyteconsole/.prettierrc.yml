@@ -1,0 +1,12 @@
+singleQuote: true
+tabWidth: 4
+printWidth: 100
+trailingComma: "all"
+overrides:
+  - files: ["*.js", "*.jsx", "*.ts", "*.tsx"]
+    options:
+      tabWidth: 2
+  - files: ["*.yml", "*.yaml"]
+    options:
+      singleQuote: false
+      tabWidth: 2

@@ -1,0 +1,20 @@
+{
+    "name": "@flyteconsole/locale",
+    "version": "0.0.1-rc.2",
+    "description": "Flyteconsole basics locale setup",
+    "main": "./dist/index.js",
+    "module": "./lib/esm/index.js",
+    "types": "./lib/esm/index.d.ts",
+    "license": "Apache-2.0",
+    "private": false,
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "scripts": {
+        "build": "yarn build:esm && yarn build:cjs",
+        "build:esm": "tsc --module esnext --outDir lib/esm",
+        "build:cjs": "tsc",
+        "test": "NODE_ENV=test jest"
+    }
+}
