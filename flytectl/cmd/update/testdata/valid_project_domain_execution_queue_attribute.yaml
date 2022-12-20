@@ -1,0 +1,7 @@
+domain: development
+project: flytesnacks
+tags:
+  - foo
+  - bar
+  - buzz
+  - lightyear
