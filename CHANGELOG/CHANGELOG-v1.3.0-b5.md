@@ -137,7 +137,7 @@ from flytekitplugins.spark.task import Databricks
                "node_type_id": "r3.xlarge",
                "aws_attributes": {
                    "availability": "ON_DEMAND",
-                   "instance_profile_arn": "arn:aws:iam::590375264460:instance-profile/databricks-s3-role",
+                   "instance_profile_arn": "arn:aws:iam::123123123:instance-profile/databricks-s3-role",
                },
                "num_workers": 4,
            },
