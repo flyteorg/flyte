@@ -48,7 +48,7 @@ flytectl demo start --image ghcr.io/flyteorg/flyte-sandbox-bundled:sha-e240038be
           databricksInstance: dbc-abc-123.cloud.databricks.com
           entrypointFile: dbfs:///FileStore/tables/entrypoint.py
         ```
-     1. In the `k8s` section, update the `default-env-vars` section
+     2. In the `k8s` section, update the `default-env-vars` section
         ```
         - FLYTE_AWS_ACCESS_KEY_ID: AKIAYOURKEY
         - AWS_DEFAULT_REGION: us-east-2
@@ -56,13 +56,30 @@ flytectl demo start --image ghcr.io/flyteorg/flyte-sandbox-bundled:sha-e240038be
         ```
          These are the same values as in the storage section above.
 
-     1. Add in an section for data proxy
+     3. Add in an section for data proxy
         ```
         remoteData:
            region: us-east-2
            scheme: aws
            signedUrls:
              durationMinutes: 3
+        ```
+     4. Enable databricks plugin
+        ```shell
+        task-plugins:
+          default-for-task-types:
+            container: container
+            container_array: k8s-array
+            sidecar: sidecar
+            ray: ray
+            spark: databricks
+        enabled-plugins:
+          - container
+          - databricks
+          - ray
+          - sidecar
+          - k8s-array
+
         ```
 
 1. Update the Flyte deployment
@@ -86,10 +103,114 @@ You'll need to upload an [entrypoint](https://gist.github.com/pingsutw/482e7f013
 
 
 ### User Code
-
-Kevin can you add here
 1. a sample py file that has a simple spark task.
-2. pyflyte command to register the flyte workflow and task.
-3. image building command if necessary.
 
+```python
+import datetime
+import random
+from operator import add
+
+import flytekit
+from flytekit import Resources, task, workflow
+
+from flytekitplugins.spark.task import Databricks
+
+# %%
+# You can create a Spark task by adding a ``@task(task_config=Spark(...)...)`` decorator.
+# ``spark_conf`` can have configuration options that are typically used when configuring a Spark cluster.
+# To run a Spark job on Databricks platform, just add Databricks config to the task config. Databricks Config is the same as the databricks job request.
+# Refer to `Databricks job request <https://docs.databricks.com/dev-tools/api/2.0/jobs.html#request-structure>`__
+@task(
+    task_config=Databricks(
+        # this configuration is applied to the spark cluster
+        spark_conf={
+            "spark.driver.memory": "1000M",
+            "spark.executor.memory": "1000M",
+            "spark.executor.cores": "1",
+            "spark.executor.instances": "2",
+            "spark.driver.cores": "1",
+        },
+        databricks_conf={
+           "run_name": "flytekit databricks plugin example",
+           "new_cluster": {
+               "spark_version": "11.0.x-scala2.12",
+               "node_type_id": "r3.xlarge",
+               "aws_attributes": {
+                   "availability": "ON_DEMAND",
+                   "instance_profile_arn": "arn:aws:iam::590375264460:instance-profile/databricks-s3-role",
+               },
+               "num_workers": 4,
+           },
+           "timeout_seconds": 3600,
+           "max_retries": 1,
+       }
+    ),
+    limits=Resources(mem="2000M"),
+    cache_version="1",
+)
+def hello_spark(partitions: int) -> float:
+    print("Starting Spark with Partitions: {}".format(partitions))
+
+    n = 100000 * partitions
+    sess = flytekit.current_context().spark_session
+    count = (
+        sess.sparkContext.parallelize(range(1, n + 1), partitions).map(f).reduce(add)
+    )
+    pi_val = 4.0 * count / n
+    print("Pi val is :{}".format(pi_val))
+    return pi_val
+
+# Let's define a function on which the map-reduce operation is called within the Spark cluster.
+def f(_):
+    x = random.random() * 2 - 1
+    y = random.random() * 2 - 1
+    return 1 if x**2 + y**2 <= 1 else 0
+
+
+# Next, we define a regular Flyte task which will not execute on the Spark cluster.
+@task(cache_version="1")
+def print_every_time(value_to_print: float, date_triggered: datetime.datetime) -> int:
+    print("My printed value: {} @ {}".format(value_to_print, date_triggered))
+    return 1
+
+
+# This workflow shows that a spark task and any python function (or a Flyte task) can be chained together as long as they match the parameter specifications.
+@workflow
+def my_databricks_job(triggered_date: datetime.datetime) -> float:
+    """
+    Using the workflow is still as any other workflow. As image is a property of the task, the workflow does not care
+    about how the image is configured.
+    """
+    pi = hello_spark(partitions=50)
+    print_every_time(value_to_print=pi, date_triggered=triggered_date)
+    return pi
+
+
+# Workflows with spark tasks can be executed locally. Some aspects of spark, like links to :ref:`Hive <Hive>` meta stores may not work, but these are limitations of using Spark and are not introduced by Flyte.
+if __name__ == "__main__":
+    print(f"Running {__file__} main...")
+    print(
+        f"Running To run a Spark job on Databricks platform(triggered_date=datetime.datetime.now()){my_databricks_job(triggered_date=datetime.datetime.now())}"
+    )
+
+```
+2. pyflyte command to register the flyte workflow and task.
+
+```shell
+pyflyte --config ~/.flyte/config-sandbox.yaml register --image pingsutw/databricks:test databricks.py
+```
+3. Build a custom image for spark clusters
+```dockerfile
+FROM databricksruntime/standard:11.3-LTS
+
+# Install custom package
+RUN /databricks/python3/bin/pip install awscli flytekitplugins-spark==v1.3.0b5
+
+# Copy the actual code
+COPY ./ /databricks/driver
+```
+4. image building command if necessary.
+```shell
+docker build -t pingsutw/databricks:test -f Dockerfile .
+```
 
