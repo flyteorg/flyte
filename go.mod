@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/flyteorg/datacatalog v1.0.40
-	github.com/flyteorg/flyteadmin v1.1.64
+	github.com/flyteorg/flyteadmin v1.1.65
 	github.com/flyteorg/flytepropeller v1.1.55
 	github.com/flyteorg/flytestdlib v1.0.14
 	github.com/golang/glog v1.0.0
