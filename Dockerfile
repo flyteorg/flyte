@@ -7,11 +7,9 @@ FROM golang:1.19.1-bullseye AS flytebuilder
 
 ARG FLYTE_VERSION="master"
 
-WORKDIR /flyteorg/fdsfsd
 WORKDIR /flyteorg/build
-RUN git clone -b add-secrets --depth=1 https://github.com/flyteorg/flyte.git ./flyte
+RUN git clone --depth=1 https://github.com/flyteorg/flyte.git ./flyte -b $FLYTE_VERSION
 WORKDIR /flyteorg/build/flyte
-RUN go get "github.com/flyteorg/flyteadmin@move-secrets"
 RUN go mod download
 COPY --from=flyteconsole /app/dist cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
