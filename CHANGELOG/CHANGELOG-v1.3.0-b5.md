@@ -194,23 +194,24 @@ if __name__ == "__main__":
     )
 
 ```
-2. pyflyte command to register the flyte workflow and task.
-
-```shell
-pyflyte --config ~/.flyte/config-sandbox.yaml register --image pingsutw/databricks:test databricks.py
-```
-3. Build a custom image for spark clusters
+2. Build a custom image for spark clusters
 ```dockerfile
 FROM databricksruntime/standard:11.3-LTS
 ENV PATH $PATH:/databricks/python3/bin
+ENV PYTHONPATH /databricks/driver
 # Install custom package
 RUN /databricks/python3/bin/pip install awscli flytekitplugins-spark==v1.3.0b5
 
 # Copy the actual code
 COPY ./ /databricks/driver
 ```
-4. image building command if necessary.
+3. image building command if necessary.
 ```shell
 docker build -t pingsutw/databricks:test -f Dockerfile .
+```
+4. pyflyte command to register the flyte workflow and task.
+
+```shell
+pyflyte --config ~/.flyte/config-sandbox.yaml register --destination-dir . --image pingsutw/databricks:test databricks.py
 ```
 
