@@ -202,7 +202,7 @@ pyflyte --config ~/.flyte/config-sandbox.yaml register --image pingsutw/databric
 3. Build a custom image for spark clusters
 ```dockerfile
 FROM databricksruntime/standard:11.3-LTS
-
+ENV PATH $PATH:/databricks/python3/bin
 # Install custom package
 RUN /databricks/python3/bin/pip install awscli flytekitplugins-spark==v1.3.0b5
 
