@@ -18,6 +18,7 @@ A Helm chart for the Flyte local sandbox
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| docker-registry.enabled | bool | `true` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
 | docker-registry.image.repository | string | `"registry"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |
@@ -47,6 +48,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.pullPolicy | string | `"Never"` |  |
 | flyte-binary.deployment.waitForDB.image.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
+| flyte-binary.enabled | bool | `true` |  |
+| kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.image.pullPolicy | string | `"Never"` |  |
@@ -60,6 +63,7 @@ A Helm chart for the Flyte local sandbox
 | minio.auth.rootPassword | string | `"miniostorage"` |  |
 | minio.auth.rootUser | string | `"minio"` |  |
 | minio.defaultBuckets | string | `"my-s3-bucket"` |  |
+| minio.enabled | bool | `true` |  |
 | minio.extraEnvVars[0].name | string | `"MINIO_BROWSER_REDIRECT_URL"` |  |
 | minio.extraEnvVars[0].value | string | `"http://localhost:30080/minio"` |  |
 | minio.image.pullPolicy | string | `"Never"` |  |
@@ -70,6 +74,7 @@ A Helm chart for the Flyte local sandbox
 | minio.service.nodePorts.api | int | `30002` |  |
 | minio.service.type | string | `"NodePort"` |  |
 | postgresql.auth.postgresPassword | string | `"postgres"` |  |
+| postgresql.enabled | bool | `true` |  |
 | postgresql.image.pullPolicy | string | `"Never"` |  |
 | postgresql.image.repository | string | `"bitnami/postgresql"` |  |
 | postgresql.image.tag | string | `"sandbox"` |  |
@@ -78,7 +83,8 @@ A Helm chart for the Flyte local sandbox
 | postgresql.primary.service.nodePorts.postgresql | int | `30001` |  |
 | postgresql.primary.service.type | string | `"NodePort"` |  |
 | postgresql.shmVolume.enabled | bool | `false` |  |
-| sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
-| sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
-| sandbox.proxy.image.tag | string | `"sandbox"` |  |
+| proxy.enabled | bool | `true` |  |
+| proxy.image.pullPolicy | string | `"Never"` |  |
+| proxy.image.repository | string | `"envoyproxy/envoy"` |  |
+| proxy.image.tag | string | `"sandbox"` |  |
 

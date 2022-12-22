@@ -6,17 +6,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.configuration.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.configuration.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.configuration.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.configuration.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.configuration.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.configuration.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 data:
   000-core.yaml: |
@@ -83,7 +83,7 @@ data:
         region: {{ required "Region required for S3 storage provider" .region }}
         disable-ssl: {{ .disableSSL }}
         {{- if .endpoint }}
-        endpoint: {{ include "flyte-binary.renderTemplate" ( dict "value" .endpoint "context" $ ) }}
+        endpoint: {{ tpl .endpoint $ }}
         {{- end }}
         {{- if eq "iam" .authType }}
         auth-type: "iam"
@@ -97,20 +97,96 @@ data:
       {{- end }}
     {{- else if eq "gcs" .provider }}
       type: stow
-        stow:
-          kind: google
-          config:
-            json: ""
-            project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
-            scopes: https://www.googleapis.com/auth/devstorage.read_write
+      stow:
+        kind: google
+        config:
+          json: ""
+          project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
+          scopes: https://www.googleapis.com/auth/devstorage.read_write
     {{- else }}
     {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
     {{- end }}
       container: {{ required "Metadata container required" .metadataContainer }}
     {{- end }}
+  {{- if.Values.configuration.auth.enabled }}
+  004-auth.yaml: |
+    auth:
+      appAuth:
+        selfAuthServer:
+          staticClients:
+            flytepropeller:
+              client_secret: {{ required "Internal client secret hash required when authentication is enabled" .Values.configuration.auth.internal.clientSecretHash | quote }}
+              grant_types:
+              - refresh_token
+              - client_credentials
+              id: flytepropeller
+              response_types:
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+            flyte-cli:
+              grant_types:
+              - refresh_token
+              - authorization_code
+              id: flyte-cli
+              public: true
+              redirect_uris:
+              - http://localhost:53593/callback
+              - http://localhost:12345/callback
+              response_types:
+              - code
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+            flytectl:
+              grant_types:
+              - refresh_token
+              - authorization_code
+              id: flytectl
+              public: true
+              redirect_uris:
+              - http://localhost:53593/callback
+              - http://localhost:12345/callback
+              response_types:
+              - code
+              - token
+              scopes:
+              - all
+              - offline
+              - access_token
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: http://localhost:53593/callback
+            scopes:
+            - offline
+            - all
+      authorizedUris:
+      {{- if .Values.ingress.host }}
+      - https://{{ tpl .Values.ingress.host . }}
+      {{- end }}
+      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.httpPort" . }}
+      userAuth:
+        openId:
+          baseUrl: {{ required "OIDC base URL required when authentication is enabled" .Values.configuration.auth.oidc.baseUrl | quote }}
+          clientId: {{ required "OIDC client ID required when authentication is enabled" .Values.configuration.auth.oidc.clientId | quote }}
+          scopes:
+          - profile
+          - openid
+    server:
+      security:
+        useAuth: true
+  {{- end }}
   {{- if .Values.configuration.inline }}
   010-inline-config.yaml: |
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.configuration.inline "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
   {{- else if .Values.configuration.sourcePath }}
   {{- (tpl (.Files.Glob .Values.configuration.sourcePath).AsConfig . ) | nindent 2 }}
   {{- end }}

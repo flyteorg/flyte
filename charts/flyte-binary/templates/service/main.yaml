@@ -5,17 +5,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.service.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.service.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.service.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.service.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.service.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.service.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   type: {{ .Values.service.type }}
@@ -49,6 +49,6 @@ spec:
       nodePort: null
       {{- end }}
     {{- if .Values.service.extraPorts }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.service.extraPorts "context" $) | nindent 4 }}
+    {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}
     {{- end }}
   selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}

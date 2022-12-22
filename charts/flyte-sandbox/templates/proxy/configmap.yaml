@@ -1,3 +1,4 @@
+{{- if .Values.proxy.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -33,7 +34,7 @@ data:
                                               redirect:
                                                   path_redirect: "/console/"
                                             - match:
-                                                  prefix: "/console"
+                                                  prefix: "/.well-known"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -45,11 +46,19 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/healthcheck"
+                                                  prefix: "/callback"
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/v1"
+                                                  prefix: "/config"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/console"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/healthcheck"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -57,11 +66,27 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/logout"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
                                                   prefix: "/me"
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/oauth2"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/v1"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
                                                   prefix: "/flyteidl.service.AdminService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.service.AuthMetadataService"
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
@@ -76,11 +101,14 @@ data:
                                                   path: "/minio"
                                               redirect:
                                                   path_redirect: "/minio/"
-                                            - match:
-                                                  prefix: "/minio/"
+                                                  prefix: "/flyteidl.service.IdentityService"
                                               route:
-                                                  cluster: minio
-                                                  prefix_rewrite: /
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/grpc.health.v1.Health"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -90,6 +118,18 @@ data:
                                               route:
                                                   cluster: kubernetes-dashboard
                                                   prefix_rewrite: /
+                                            {{- end }}
+                                            {{- if .Values.minio.enabled }}
+                                            - match:
+                                                  path: "/minio"
+                                              redirect:
+                                                  path_redirect: "/minio/"
+                                            - match:
+                                                  prefix: "/minio/"
+                                              route:
+                                                  cluster: minio
+                                                  prefix_rewrite: /
+                                            {{- end }}
                               http_filters:
                                   - name: envoy.filters.http.router
                                     typed_config:
@@ -122,19 +162,7 @@ data:
                                       socket_address:
                                           address: {{ .Release.Name }}-flyte-binary
                                           port_value: 8089
-            - name: minio
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: minio
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: {{ .Release.Name }}-minio
-                                          port_value: 9001
+            {{- if index .Values "kubernetes-dashboard" "enabled" }}
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -148,4 +176,21 @@ data:
                                       socket_address:
                                           address: {{ .Release.Name }}-kubernetes-dashboard
                                           port_value: 80
+            {{- end }}
+            {{- if .Values.minio.enabled }}
+            - name: minio
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: minio
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: {{ .Release.Name }}-minio
+                                          port_value: 9001
+            {{- end }}
 
+{{- end }}

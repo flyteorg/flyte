@@ -1,0 +1,12 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-sandbox
+  releaseName: sandbox
+  namespace: flyte
+  valuesInline:
+    flyte-binary:
+      enabled: false
+namespace: flyte
+resources:
+- ../namespace.yaml

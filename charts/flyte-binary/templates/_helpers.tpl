@@ -62,17 +62,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Renders a value that contains template.
-*/}}
-{{- define "flyte-binary.renderTemplate" -}}
-{{- if typeIs "string" .value }}
-    {{- tpl .value .context }}
-{{- else }}
-    {{- tpl (.value | toYaml) .context }}
-{{- end }}
-{{- end -}}
-
-{{/*
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
@@ -130,6 +119,20 @@ stackdriver-template-uri: {{ required "Template URI required for stackdriver log
 templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Get the Secret name for Flyte admin authentication secrets.
+*/}}
+{{- define "flyte-binary.configuration.auth.adminAuthSecretName" -}}
+{{- printf "%s-admin-auth" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Secret name for Flyte authentication client secrets.
+*/}}
+{{- define "flyte-binary.configuration.auth.clientSecretName" -}}
+{{- printf "%s-client-secrets" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
