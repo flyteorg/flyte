@@ -17,14 +17,20 @@ flyte:
 	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
 	docker rmi flyte-binary:sandbox
 
-manifest:
+.PHONY: manifests
+manifests:
 	mkdir -p manifests
 	kustomize build \
 		--enable-helm \
-		--load-restrictor=LoadRestrictionsNone kustomize > manifests/compiled.yaml
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/complete > manifests/complete.yaml
+	kustomize build \
+		--enable-helm \
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/dev > manifests/dev.yaml
 
 .PHONY: build
-build: flyte manifest
+build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
