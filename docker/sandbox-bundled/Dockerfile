@@ -16,7 +16,7 @@ ARG TARGETARCH
 
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
-COPY manifests/ /var/lib/rancher/k3s/server/manifests/
+COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
 COPY bin/ /bin/
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
