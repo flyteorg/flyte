@@ -187,7 +187,5 @@ data:
   {{- if .Values.configuration.inline }}
   010-inline-config.yaml: |
     {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
-  {{- else if .Values.configuration.sourcePath }}
-  {{- (tpl (.Files.Glob .Values.configuration.sourcePath).AsConfig . ) | nindent 2 }}
   {{- end }}
 {{- end }}
