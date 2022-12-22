@@ -162,8 +162,7 @@ Start a Flyte demonstration environment on your local machine via:
 
 .. note::
 
-   Make sure to export the ``KUBECONFIG`` and ``FLYTECTL_CONFIG`` environment variables in your shell, replacing
-   ``<username>`` with your actual username.
+   Make sure to export the ``FLYTECTL_CONFIG`` environment variables in your shell
 
 .. dropdown:: :fa:`info-circle` What is a flyte demo environment?
     :title: text-muted
