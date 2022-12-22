@@ -62,6 +62,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		logger.Errorf(ctx, "Default Pod creation logic works for default container in the task template only.")
 		return nil, fmt.Errorf("container not specified in task template")
 	}
+
 	templateParameters := template.Parameters{
 		Task:             taskCtx.TaskReader(),
 		Inputs:           taskCtx.InputReader(),
@@ -95,7 +96,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	enableIngress := true
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
 		HeadGroupSpec: rayv1alpha1.HeadGroupSpec{
-			Template:       buildHeadPodTemplate(container),
+			Template:       buildHeadPodTemplate(container, taskCtx),
 			ServiceType:    v1.ServiceType(GetConfig().ServiceType),
 			Replicas:       &headReplicas,
 			EnableIngress:  &enableIngress,
@@ -105,7 +106,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
-		workerPodTemplate := buildWorkerPodTemplate(container)
+		workerPodTemplate := buildWorkerPodTemplate(container, taskCtx)
 
 		minReplicas := spec.Replicas
 		maxReplicas := spec.Replicas
@@ -162,7 +163,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return &rayJobObject, nil
 }
 
-func buildHeadPodTemplate(container *v1.Container) v1.PodTemplateSpec {
+func buildHeadPodTemplate(container *v1.Container, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
 	primaryContainer := &v1.Container{Name: "ray-head", Image: container.Image}
@@ -192,16 +193,20 @@ func buildHeadPodTemplate(container *v1.Container) v1.PodTemplateSpec {
 			ContainerPort: 8265,
 		},
 	}
+	pod := &v1.PodSpec{
+		Containers: []v1.Container{*primaryContainer},
+	}
+	flytek8s.UpdatePod(taskCtx.TaskExecutionMetadata(), []v1.ResourceRequirements{primaryContainer.Resources}, pod)
 
 	podTemplateSpec := v1.PodTemplateSpec{
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{*primaryContainer},
-		},
+		Spec: *pod,
 	}
+	podTemplateSpec.SetLabels(utils.UnionMaps(podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
 	return podTemplateSpec
 }
 
-func buildWorkerPodTemplate(container *v1.Container) v1.PodTemplateSpec {
+func buildWorkerPodTemplate(container *v1.Container, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L185
 	// They should always be the same, so we could hard code here.
 	initContainers := []v1.Container{
@@ -307,12 +312,17 @@ func buildWorkerPodTemplate(container *v1.Container) v1.PodTemplateSpec {
 		},
 	}
 
-	podTemplateSpec := v1.PodTemplateSpec{
-		Spec: v1.PodSpec{
-			Containers:     []v1.Container{*primaryContainer},
-			InitContainers: initContainers,
-		},
+	pod := &v1.PodSpec{
+		Containers:     []v1.Container{*primaryContainer},
+		InitContainers: initContainers,
 	}
+	flytek8s.UpdatePod(taskCtx.TaskExecutionMetadata(), []v1.ResourceRequirements{primaryContainer.Resources}, pod)
+
+	podTemplateSpec := v1.PodTemplateSpec{
+		Spec: *pod,
+	}
+	podTemplateSpec.SetLabels(utils.UnionMaps(podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
 	return podTemplateSpec
 }
 
