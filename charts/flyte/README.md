@@ -184,7 +184,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | flyte.storage | object | `{"bucketName":"my-s3-bucket","custom":{},"gcs":null,"s3":{"region":"us-east-1"},"type":"sandbox"}` | ----------------------------------------------------  STORAGE SETTINGS  |
 | flyte.storage.bucketName | string | `"my-s3-bucket"` | bucketName defines the storage bucket flyte will use. Required for all types except for sandbox. |
-| flyte.storage.custom | object | `{}` | Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings. |
+| flyte.storage.custom | object | `{}` | Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings. |
 | flyte.storage.gcs | string | `nil` | settings for storage type gcs |
 | flyte.storage.s3 | object | `{"region":"us-east-1"}` | settings for storage type s3 |
 | flyte.storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
