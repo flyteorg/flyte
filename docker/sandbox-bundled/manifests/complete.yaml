@@ -608,6 +608,13 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/flyteidl.service.SignalService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  path: "/minio"
+                                              redirect:
+                                                  path_redirect: "/minio/"
                                                   prefix: "/flyteidl.service.IdentityService"
                                               route:
                                                   cluster: flyte_grpc
@@ -730,7 +737,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: WnhVMlEzQ0JxQ3dXTXBKbA==
+  haSharedSecret: WUtkeUNET2NFcVZnOXlYSA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1032,7 +1039,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: 7b249ef6a5657ba0d198e1f5a72d57b8b47e00ce44e0aa54810c0fb8dcc300c7
+        checksum/secret: 4df2a703dcbdf587ad426129387fe8c530e908257af4a5d4555c239a7df11b39
       labels:
         app: docker-registry
         release: sandbox
