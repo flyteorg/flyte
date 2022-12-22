@@ -12,7 +12,6 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.externalConfigMap | string | `""` |  |
 | clusterResourceTemplates.inline | object | `{}` |  |
 | clusterResourceTemplates.labels | object | `{}` |  |
-| clusterResourceTemplates.sourcePath | string | `""` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
@@ -40,7 +39,6 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
-| configuration.sourcePath | string | `""` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.gcs.project | string | `"my-organization-gcp-project"` |  |
@@ -98,6 +96,7 @@ Chart for basic single Flyte executable deployment
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
+| rbac.extraRules | list | `[]` |  |
 | rbac.labels | object | `{}` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
@@ -114,4 +113,5 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
+| serviceAccount.name | string | `""` |  |
 

@@ -20,10 +20,7 @@ metadata:
     {{- end }}
 data:
   {{- if .Values.clusterResourceTemplates.inline }}
-  templates.yaml: |
-    {{- toYaml .Values.clusterResourceTemplates.inline | nindent 4 }}
-  {{- else if .Values.clusterResourceTemplates.sourcePath }}
-  {{- (.Files.Glob .Values.clusterResourceTemplates.sourcePath).AsConfig | nindent 2 }}
+  {{- toYaml .Values.clusterResourceTemplates.inline | nindent 2 }}
   {{- else }}
   {{- (.Files.Glob "defaults/cluster-resource-templates/*.yaml").AsConfig | nindent 2 }}
   {{- end }}
