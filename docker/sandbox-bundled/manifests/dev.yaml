@@ -397,18 +397,15 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
-                                                  prefix: "/flyteidl.service.SignalService"
-                                              route:
-                                                  cluster: flyte_grpc
-                                            - match:
-                                                  path: "/minio"
-                                              redirect:
-                                                  path_redirect: "/minio/"
                                                   prefix: "/flyteidl.service.IdentityService"
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
                                                   prefix: "/grpc.health.v1.Health"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
@@ -526,7 +523,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZEJQUnlFRU5SOTF3TGJmRw==
+  haSharedSecret: NUNaWmFZVlVXcEl6RW9QUw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -766,7 +763,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: dea26ceac29998299c0a27cbf1baa13968c36e29cf452e016ce186af7f6a6bfa
+        checksum/secret: 55d727dc46e370bb58937a834f4b63ec40d7aa6c04026a79b4f2ff9ee7af0e8e
       labels:
         app: docker-registry
         release: sandbox
