@@ -405,6 +405,10 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/flyteidl.service.SignalService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -519,7 +523,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: M1Y5UjRPQnBYc1BmM0l6ZQ==
+  haSharedSecret: MHk0bTNlcER1QnRXQXkyQw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -759,7 +763,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: c8bab0808954291df696906bd5d16875c021843407e016af50b956f1e9d50133
+        checksum/secret: 5c6d6f259b5f3066ef2fb403f0b5ddb90c007d6acdaa36d1683417f6130e2217
       labels:
         app: docker-registry
         release: sandbox

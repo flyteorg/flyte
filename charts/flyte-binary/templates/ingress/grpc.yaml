@@ -95,6 +95,20 @@ spec:
               number: {{ include "flyte-binary.service.grpcPort" . }}
         path: /grpc.health.v1.Health/*
         pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.SignalService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ include "flyte-binary.fullname" . }}
+            port:
+              number: {{ include "flyte-binary.service.grpcPort" . }}
+        path: /flyteidl.service.SignalService/*
+        pathType: ImplementationSpecific
     {{- if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}
     {{- end }}
