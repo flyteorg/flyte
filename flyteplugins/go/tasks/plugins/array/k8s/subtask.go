@@ -62,7 +62,7 @@ func addMetadata(stCtx SubTaskExecutionContext, cfg *Config, k8sPluginCfg *confi
 
 	pod.SetNamespace(namespace)
 	pod.SetAnnotations(utils.UnionMaps(k8sPluginCfg.DefaultAnnotations, pod.GetAnnotations(), utils.CopyMap(taskExecutionMetadata.GetAnnotations())))
-	pod.SetLabels(utils.UnionMaps(pod.GetLabels(), utils.CopyMap(taskExecutionMetadata.GetLabels()), k8sPluginCfg.DefaultLabels))
+	pod.SetLabels(utils.UnionMaps(k8sPluginCfg.DefaultLabels, pod.GetLabels(), utils.CopyMap(taskExecutionMetadata.GetLabels())))
 	pod.SetName(taskExecutionMetadata.GetTaskExecutionID().GetGeneratedName())
 
 	if !cfg.RemoteClusterConfig.Enabled {

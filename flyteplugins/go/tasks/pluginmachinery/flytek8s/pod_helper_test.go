@@ -330,7 +330,7 @@ func toK8sPodInterruptible(t *testing.T) {
 	assert.Len(t, p.Tolerations, 2)
 	assert.Equal(t, "x/flyte", p.Tolerations[1].Key)
 	assert.Equal(t, "interruptible", p.Tolerations[1].Value)
-	assert.Equal(t, 1, len(p.NodeSelector))
+	assert.Equal(t, 2, len(p.NodeSelector))
 	assert.Equal(t, "true", p.NodeSelector["x/interruptible"])
 	assert.EqualValues(
 		t,
