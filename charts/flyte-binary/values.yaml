@@ -96,8 +96,6 @@ configuration:
   externalConfigMap: ""
   # inline Specify additional configuration or overrides for Flyte, to be merged with the base configuration
   inline: {}
-  # sourcePath Specify path to directory or file containing additional configuration or overrides for Flyte, to be merged with the base configuration
-  sourcePath: ""
   # labels Add labels to created ConfigMap
   labels: {}
   # annotations Add annotations to created ConfigMap
@@ -110,8 +108,6 @@ clusterResourceTemplates:
   externalConfigMap: ""
   # inline Specify additional cluster resource templates
   inline: {}
-  # sourcePath Specify path to directory or file containing additional cluster resource templates
-  sourcePath: ""
   # labels Add labels to created ConfigMap
   labels: {}
   # annotations Add annotations to created ConfigMap
@@ -260,11 +256,15 @@ rbac:
   labels: {}
   # annotations Add annotations to RBAC resources
   annotations: {}
+  # extraRules Add additional rules to the ClusterRole
+  extraRules: []
 
 # serviceAccount Configure Flyte ServiceAccount
 serviceAccount:
   # create Create ServiceAccount for Flyte
   create: true
+  # name Name of service account
+  name: ""
   # labels Add labels to ServiceAccount
   labels: {}
   # annotations Add annotations to ServiceAccount
