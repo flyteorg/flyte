@@ -1,5 +1,29 @@
 {{- define "grpcRoutes" -}}
 # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+- path: /flyteidl.service.SignalService
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
+- path: /flyteidl.service.SignalService/*
+  pathType: ImplementationSpecific
+  backend:
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: 81
+{{- else }}
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
 - path: /flyteidl.service.AdminService
   pathType: ImplementationSpecific
   backend:

@@ -1,9 +1,0 @@
-image:
-  fqn: "flyte"
-
-database:
-  port: 30001
-
-paths:
-  # Specifying because this is mounted in by flytectl.
-  externalFlyteConfig: "/srv/flyte/flyte.yaml"

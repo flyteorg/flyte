@@ -27,15 +27,20 @@ dependencies:
   - name: docker-registry
     version: 2.2.2
     repository: https://helm.twun.io/
+    condition: docker-registry.enabled
   - name: flyte-binary
     version: 0.1.0
     repository: file://../flyte-binary
+    condition: flyte-binary.enabled
   - name: kubernetes-dashboard
     version: 5.11.0
     repository: https://kubernetes.github.io/dashboard/
+    condition: kubernetes-dashboard.enabled
   - name: minio
     version: 11.10.13
     repository: https://charts.bitnami.com/bitnami
+    condition: minio.enabled
   - name: postgresql
     version: 12.1.0
     repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

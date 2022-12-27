@@ -22,19 +22,6 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
   pip install flytekit
 
 
-.. dropdown:: :fa:`info-circle` Please read on if you're running python 3.10 on a Mac M1
-    :title: text-muted
-    :animate: fade-in-slide-down
-
-    Before proceeding, install ``grpcio`` by building it locally via:
-
-    .. prompt:: bash
-
-        pip install --no-binary :all: grpcio --ignore-installed
-
-    Visit https://github.com/flyteorg/flyte/issues/2486 for more details.
-
-
 Example: Computing Descriptive Statistics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -175,8 +162,7 @@ Start a Flyte demonstration environment on your local machine via:
 
 .. note::
 
-   Make sure to export the ``KUBECONFIG`` and ``FLYTECTL_CONFIG`` environment variables in your shell, replacing
-   ``<username>`` with your actual username.
+   Make sure to export the ``FLYTECTL_CONFIG`` environment variables in your shell
 
 .. dropdown:: :fa:`info-circle` What is a flyte demo environment?
     :title: text-muted

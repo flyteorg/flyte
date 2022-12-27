@@ -17,6 +17,15 @@ Web API Plugin Setup
     ^^^^^^^^^^^^
     Guide to setting up the Snowflake Plugin.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-webapi-databricks
+       :type: ref
+       :text: Databricks Plugin
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Databricks Plugin.
+
 
 .. toctree::
     :maxdepth: 1
@@ -24,5 +33,6 @@ Web API Plugin Setup
     :hidden:
 
     snowflake
+    databricks
 
 

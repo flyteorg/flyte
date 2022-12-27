@@ -1,3 +1,4 @@
+{{- if .Values.proxy.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: proxy
-          {{- with .Values.sandbox.proxy.image }}
+          {{- with .Values.proxy.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           {{- end }}
@@ -28,3 +29,4 @@ spec:
         - name: config
           configMap:
             name: {{ include "flyte-sandbox.proxyConfigMapName" . }}
+{{- end }}
