@@ -94,18 +94,15 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
-                                                  prefix: "/flyteidl.service.SignalService"
-                                              route:
-                                                  cluster: flyte_grpc
-                                            - match:
-                                                  path: "/minio"
-                                              redirect:
-                                                  path_redirect: "/minio/"
                                                   prefix: "/flyteidl.service.IdentityService"
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
                                                   prefix: "/grpc.health.v1.Health"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
