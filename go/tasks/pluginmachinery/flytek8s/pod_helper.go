@@ -85,7 +85,7 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	if len(podSpec.SchedulerName) == 0 {
 		podSpec.SchedulerName = config.GetK8sPluginConfig().SchedulerName
 	}
-	podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().DefaultNodeSelector)
+	podSpec.NodeSelector = utils.UnionMaps(config.GetK8sPluginConfig().DefaultNodeSelector, podSpec.NodeSelector)
 	if taskExecutionMetadata.IsInterruptible() {
 		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().InterruptibleNodeSelector)
 	}
