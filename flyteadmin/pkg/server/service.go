@@ -223,6 +223,11 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, _ *authConfig.
 		return nil, errors.Wrap(err, "error registering data proxy service")
 	}
 
+	err = service.RegisterSignalServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
+	if err != nil {
+		return nil, errors.Wrap(err, "error registering signal service")
+	}
+
 	mux.Handle("/", gwmux)
 
 	return mux, nil
