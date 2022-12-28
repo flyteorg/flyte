@@ -332,7 +332,7 @@ flyte:
     # projectId:
     # -- GCP service account key for GSA with bucket access. Leave empty if you use workload identity.
     # serviceAccountKey: ""
-    # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
+    # -- Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings.
     custom: {}
 
   # Database configuration

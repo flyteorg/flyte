@@ -379,7 +379,7 @@ storage:
   gcs:
   # -- GCP project ID. Required for storage type gcs.
   # projectId:
-  # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
+  # -- Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings.
   custom: {}
   # -- toggles multi-container storage config
   enableMultiContainer: false
