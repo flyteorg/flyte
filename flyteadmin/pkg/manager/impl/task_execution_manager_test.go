@@ -181,6 +181,15 @@ func TestCreateTaskEvent(t *testing.T) {
 	assert.True(t, createTaskCalled)
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
+
+	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetCreateCallback(
+		func(ctx context.Context, input models.TaskExecution) error {
+			return errors.New("failed to insert record into task table")
+		})
+	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
+	resp, err = taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
+	assert.NotNil(t, err)
+	assert.Nil(t, resp)
 }
 
 func TestCreateTaskEvent_Update(t *testing.T) {

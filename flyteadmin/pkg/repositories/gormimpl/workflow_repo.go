@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const workflowTableName = "workflows"
-
 // Implementation of WorkflowRepoInterface.
 type WorkflowRepo struct {
 	db               *gorm.DB
@@ -21,14 +19,24 @@ type WorkflowRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow) error {
+func (r *WorkflowRepo) Create(_ context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	err := r.db.Transaction(func(_ *gorm.DB) error {
+		if descriptionEntity != nil {
+			tx := r.db.Omit("id").Create(descriptionEntity)
+			if tx.Error != nil {
+				return r.errorTransformer.ToFlyteAdminError(tx.Error)
+			}
+		}
+		tx := r.db.Omit("id").Create(&input)
+		if tx.Error != nil {
+			return r.errorTransformer.ToFlyteAdminError(tx.Error)
+		}
+
+		return nil
+	})
 	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return nil
+	return err
 }
 
 func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {

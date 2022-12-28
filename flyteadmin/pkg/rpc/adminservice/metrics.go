@@ -95,6 +95,14 @@ type workflowEndpointMetrics struct {
 	listIds util.RequestMetrics
 }
 
+type descriptionEntityEndpointMetrics struct {
+	scope promutils.Scope
+
+	create util.RequestMetrics
+	get    util.RequestMetrics
+	list   util.RequestMetrics
+}
+
 type AdminMetrics struct {
 	Scope        promutils.Scope
 	PanicCounter prometheus.Counter
@@ -111,6 +119,7 @@ type AdminMetrics struct {
 	taskEndpointMetrics                    taskEndpointMetrics
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
+	descriptionEntityMetrics               descriptionEntityEndpointMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -203,6 +212,13 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			get:     util.NewRequestMetrics(adminScope, "get_workflow"),
 			list:    util.NewRequestMetrics(adminScope, "list_workflow"),
 			listIds: util.NewRequestMetrics(adminScope, "list_workflow_ids"),
+		},
+
+		descriptionEntityMetrics: descriptionEntityEndpointMetrics{
+			scope:  adminScope,
+			create: util.NewRequestMetrics(adminScope, "create_description_entity"),
+			get:    util.NewRequestMetrics(adminScope, "get_description_entity"),
+			list:   util.NewRequestMetrics(adminScope, "list_description_entity"),
 		},
 	}
 }

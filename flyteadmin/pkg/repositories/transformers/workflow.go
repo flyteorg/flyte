@@ -53,6 +53,7 @@ func FromWorkflowModel(workflowModel models.Workflow) (admin.Workflow, error) {
 		Closure: &admin.WorkflowClosure{
 			CreatedAt: createdAt,
 		},
+		ShortDescription: workflowModel.ShortDescription,
 	}, nil
 }
 

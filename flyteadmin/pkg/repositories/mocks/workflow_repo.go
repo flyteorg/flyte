@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
-type CreateWorkflowFunc func(input models.Workflow) error
+type CreateWorkflowFunc func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error
 type GetWorkflowFunc func(input interfaces.Identifier) (models.Workflow, error)
 type ListWorkflowFunc func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error)
 type ListIdentifiersFunc func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error)
@@ -20,9 +20,9 @@ type MockWorkflowRepo struct {
 	listIdentifiersFunc ListIdentifiersFunc
 }
 
-func (r *MockWorkflowRepo) Create(ctx context.Context, input models.Workflow) error {
+func (r *MockWorkflowRepo) Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 	if r.createFunction != nil {
-		return r.createFunction(input)
+		return r.createFunction(input, descriptionEntity)
 	}
 	return nil
 }

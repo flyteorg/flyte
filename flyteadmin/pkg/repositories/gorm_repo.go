@@ -23,6 +23,7 @@ type GormRepo struct {
 	taskExecutionRepo            interfaces.TaskExecutionRepoInterface
 	workflowRepo                 interfaces.WorkflowRepoInterface
 	resourceRepo                 interfaces.ResourceRepoInterface
+	descriptionEntityRepo        interfaces.DescriptionEntityRepoInterface
 	schedulableEntityRepo        schedulerInterfaces.SchedulableEntityRepoInterface
 	scheduleEntitiesSnapshotRepo schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
 	signalRepo                   interfaces.SignalRepoInterface
@@ -72,6 +73,10 @@ func (r *GormRepo) ResourceRepo() interfaces.ResourceRepoInterface {
 	return r.resourceRepo
 }
 
+func (r *GormRepo) DescriptionEntityRepo() interfaces.DescriptionEntityRepoInterface {
+	return r.descriptionEntityRepo
+}
+
 func (r *GormRepo) SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface {
 	return r.schedulableEntityRepo
 }
@@ -102,6 +107,7 @@ func NewGormRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope pr
 		taskExecutionRepo:            gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
 		workflowRepo:                 gormimpl.NewWorkflowRepo(db, errorTransformer, scope.NewSubScope("workflows")),
 		resourceRepo:                 gormimpl.NewResourceRepo(db, errorTransformer, scope.NewSubScope("resources")),
+		descriptionEntityRepo:        gormimpl.NewDescriptionEntityRepo(db, errorTransformer, scope.NewSubScope("description_entities")),
 		schedulableEntityRepo:        schedulerGormImpl.NewSchedulableEntityRepo(db, errorTransformer, scope.NewSubScope("schedulable_entity")),
 		scheduleEntitiesSnapshotRepo: schedulerGormImpl.NewScheduleEntitiesSnapshotRepo(db, errorTransformer, scope.NewSubScope("schedule_entities_snapshot")),
 		signalRepo:                   gormimpl.NewSignalRepo(db, errorTransformer, scope.NewSubScope("signals")),

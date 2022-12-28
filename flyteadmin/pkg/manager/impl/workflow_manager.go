@@ -202,11 +202,21 @@ func (w *WorkflowManager) CreateWorkflow(
 			finalizedRequest, remoteClosureDataRef.String(), err)
 		return nil, err
 	}
-	if err = w.db.WorkflowRepo().Create(ctx, workflowModel); err != nil {
+	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, *request.Id)
+	if err != nil {
+		logger.Errorf(ctx,
+			"Failed to transform description model [%+v] with err: %v", request.Spec.Description, err)
+		return nil, err
+	}
+	if descriptionModel != nil {
+		workflowModel.ShortDescription = descriptionModel.ShortDescription
+	}
+	if err = w.db.WorkflowRepo().Create(ctx, workflowModel, descriptionModel); err != nil {
 		logger.Infof(ctx, "Failed to create workflow model [%+v] with err %v", request.Id, err)
 		return nil, err
 	}
 	w.metrics.TypedInterfaceSizeBytes.Observe(float64(len(workflowModel.TypedInterface)))
+
 	return &admin.WorkflowCreateResponse{}, nil
 }
 

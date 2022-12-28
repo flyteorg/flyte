@@ -72,7 +72,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	var getCalledCount = 0
 	var newlyCreatedWorkflow models.Workflow
-	workflowcreateFunc := func(input models.Workflow) error {
+	workflowcreateFunc := func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 		newlyCreatedWorkflow = input
 		return nil
 	}

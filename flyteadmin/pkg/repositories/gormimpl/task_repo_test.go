@@ -29,7 +29,7 @@ func TestCreateTask(t *testing.T) {
 		},
 		Closure: []byte{1, 2},
 		Type:    pythonTestTaskType,
-	})
+	}, &models.DescriptionEntity{ShortDescription: "hello"})
 	assert.NoError(t, err)
 }
 

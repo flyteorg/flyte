@@ -34,17 +34,18 @@ import (
 
 type AdminService struct {
 	service.UnimplementedAdminServiceServer
-	TaskManager          interfaces.TaskInterface
-	WorkflowManager      interfaces.WorkflowInterface
-	LaunchPlanManager    interfaces.LaunchPlanInterface
-	ExecutionManager     interfaces.ExecutionInterface
-	NodeExecutionManager interfaces.NodeExecutionInterface
-	TaskExecutionManager interfaces.TaskExecutionInterface
-	ProjectManager       interfaces.ProjectInterface
-	ResourceManager      interfaces.ResourceInterface
-	NamedEntityManager   interfaces.NamedEntityInterface
-	VersionManager       interfaces.VersionInterface
-	Metrics              AdminMetrics
+	TaskManager              interfaces.TaskInterface
+	WorkflowManager          interfaces.WorkflowInterface
+	LaunchPlanManager        interfaces.LaunchPlanInterface
+	ExecutionManager         interfaces.ExecutionInterface
+	NodeExecutionManager     interfaces.NodeExecutionInterface
+	TaskExecutionManager     interfaces.TaskExecutionInterface
+	ProjectManager           interfaces.ProjectInterface
+	ResourceManager          interfaces.ResourceInterface
+	NamedEntityManager       interfaces.NamedEntityInterface
+	VersionManager           interfaces.VersionInterface
+	DescriptionEntityManager interfaces.DescriptionEntityInterface
+	Metrics                  AdminMetrics
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -132,6 +133,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
 		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(repo, configuration, adminScope.NewSubScope("named_entity_manager"))
+	descriptionEntityManager := manager.NewDescriptionEntityManager(repo, configuration, adminScope.NewSubScope("description_entity_manager"))
 
 	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(repo, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {
@@ -159,11 +161,12 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
 			adminScope.NewSubScope("task_manager")),
-		WorkflowManager:    workflowManager,
-		LaunchPlanManager:  launchPlanManager,
-		ExecutionManager:   executionManager,
-		NamedEntityManager: namedEntityManager,
-		VersionManager:     versionManager,
+		WorkflowManager:          workflowManager,
+		LaunchPlanManager:        launchPlanManager,
+		ExecutionManager:         executionManager,
+		NamedEntityManager:       namedEntityManager,
+		DescriptionEntityManager: descriptionEntityManager,
+		VersionManager:           versionManager,
 		NodeExecutionManager: manager.NewNodeExecutionManager(repo, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
 			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter),
 		TaskExecutionManager: manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,

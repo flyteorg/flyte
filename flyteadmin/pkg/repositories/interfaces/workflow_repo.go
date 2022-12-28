@@ -9,7 +9,7 @@ import (
 // Defines the interface for interacting with Workflow models.
 type WorkflowRepoInterface interface {
 	// Inserts a workflow model into the database store.
-	Create(ctx context.Context, input models.Workflow) error
+	Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error
 	// Returns a matching workflow if it exists.
 	Get(ctx context.Context, input Identifier) (models.Workflow, error)
 	// Returns workflow revisions matching query parameters. A limit must be provided for the results page size.

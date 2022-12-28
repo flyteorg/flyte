@@ -41,6 +41,7 @@ func GetValidTaskRequest() admin.TaskCreateRequest {
 					},
 				},
 			},
+			Description: &admin.DescriptionEntity{ShortDescription: "hello"},
 		},
 	}
 }
@@ -119,6 +120,7 @@ func GetWorkflowRequest() admin.WorkflowCreateRequest {
 					},
 				},
 			},
+			Description: &admin.DescriptionEntity{ShortDescription: "hello"},
 		},
 	}
 }

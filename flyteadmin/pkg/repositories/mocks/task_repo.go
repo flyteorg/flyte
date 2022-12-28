@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
-type CreateTaskFunc func(input models.Task) error
+type CreateTaskFunc func(input models.Task, descriptionEntity *models.DescriptionEntity) error
 type GetTaskFunc func(input interfaces.Identifier) (models.Task, error)
 type ListTaskFunc func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error)
 type ListTaskIdentifiersFunc func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error)
@@ -20,9 +20,9 @@ type MockTaskRepo struct {
 	listUniqueTaskIdsFunction ListTaskIdentifiersFunc
 }
 
-func (r *MockTaskRepo) Create(ctx context.Context, input models.Task) error {
+func (r *MockTaskRepo) Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
 	if r.createFunction != nil {
-		return r.createFunction(input)
+		return r.createFunction(input, descriptionEntity)
 	}
 	return nil
 }

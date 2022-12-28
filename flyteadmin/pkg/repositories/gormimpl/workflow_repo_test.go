@@ -29,7 +29,7 @@ func TestCreateWorkflow(t *testing.T) {
 		},
 		TypedInterface:          typedInterface,
 		RemoteClosureIdentifier: remoteSpecIdentifier,
-	})
+	}, &models.DescriptionEntity{ShortDescription: "hello"})
 	assert.NoError(t, err)
 }
 
