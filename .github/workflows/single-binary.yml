@@ -45,8 +45,10 @@ jobs:
         id: set_version
         run: |
           if [ ${{ github.event_name }} = "release" ]; then
+            echo "FLYTE_CONSOLE_VERSION=$(echo ${{ github.event.release.tag_name }})" >> $GITHUB_ENV
             echo "FLYTE_VERSION=$(echo ${{ github.event.release.tag_name }})" >> $GITHUB_ENV
           else
+            echo "FLYTE_CONSOLE_VERSION=latest" >> $GITHUB_ENV
             echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
           fi
       - name: Prepare Image Names
@@ -81,7 +83,9 @@ jobs:
           context: .
           platforms: linux/arm64
           tags: flyte-binary:sandbox
-          build-args: "FLYTE_VERSION=${{ env.FLYTE_VERSION }}"
+          build-args: |
+            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -94,7 +98,9 @@ jobs:
           context: .
           platforms: linux/amd64
           tags: flyte-binary:sandbox
-          build-args: "FLYTE_VERSION=${{ env.FLYTE_VERSION }}"
+          build-args: |
+            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -107,7 +113,9 @@ jobs:
           context: .
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_VERSION=${{ env.FLYTE_VERSION }}"
+          build-args: |
+            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
