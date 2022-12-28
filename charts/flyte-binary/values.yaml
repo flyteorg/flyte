@@ -118,9 +118,9 @@ deployment:
   # image Configure image to use for Flyte
   image:
     # repository Flyte image repository
-    repository: ghcr.io/flyteorg/flyte-sandbox
+    repository: ghcr.io/flyteorg/flyte-binary # FLYTE_IMAGE
     # tag Flyte image tag
-    tag: flytebinary_1007
+    tag: latest # FLYTE_TAG
     # pullPolicy Flyte image pull policy
     pullPolicy: IfNotPresent
   # extraEnvVars Array with extra environment variables to add to Flyte
@@ -172,14 +172,6 @@ deployment:
     args: []
   # genAdminAuthSecret Configure init container to generate secrets for internal use
   genAdminAuthSecret:
-    # image Configure image to use for gen-admin-auth-secret init container
-    image:
-      # repository Init container image repository
-      repository: cr.flyte.org/flyteorg/flyteadmin
-      # tag Init container image tag
-      tag: v1.1.57
-      # pullPolicy Init container image pull policy
-      pullPolicy: IfNotPresent
     # command Override default init container command
     command: []
     # args Override default init container args

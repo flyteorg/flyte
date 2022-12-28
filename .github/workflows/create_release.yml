@@ -40,6 +40,7 @@ jobs:
               datacatalog,
               flytescheduler,
               flytecopilot,
+              flyte-binary,
           ]
     steps:
       - name: Checkout

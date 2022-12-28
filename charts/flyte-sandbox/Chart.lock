@@ -4,7 +4,7 @@ dependencies:
   version: 2.2.2
 - name: flyte-binary
   repository: file://../flyte-binary
-  version: 0.1.0
+  version: v0.1.10
 - name: kubernetes-dashboard
   repository: https://kubernetes.github.io/dashboard/
   version: 5.11.0
@@ -14,5 +14,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.1.0
-digest: sha256:c649b0ca244081c66ef17865bf2e63429eb3c9c080b61748278a0411cda780e2
-generated: "2022-12-22T15:09:50.02147-08:00"
+digest: sha256:398b480f861351e28080997e6fc1058519e33171494e52beae6a7acf9daa54d6
+generated: "2022-12-28T10:53:15.75989-08:00"

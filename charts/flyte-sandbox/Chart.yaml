@@ -29,7 +29,7 @@ dependencies:
     repository: https://helm.twun.io/
     condition: docker-registry.enabled
   - name: flyte-binary
-    version: 0.1.0
+    version: v0.1.10
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
   - name: kubernetes-dashboard

@@ -3,6 +3,11 @@ name: Build & Push Sandbox Docker Image
 on:
   pull_request:
     paths:
+      # The flyte-binary image build is managed solely in this pipeline. Trigger
+      # the pipeline when there are any changes to the Dockerfile for this image.
+      # Ideally this image is built in a separate, standalone pipeline.
+      # TODO: Build flyte-binary image in a separate GHA pipeline
+      - Dockerfile
       - docker/**
       - charts/**
       - .github/workflows/sandbox.yml
@@ -145,14 +150,16 @@ jobs:
           else
             echo ::set-output name=flyte_version::latest
           fi
-      - name: Prepare DIND Image Names
-        id: dind-names
+      - name: Prepare Image Names
+        id: image-names
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-binary
           tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ inputs.version }}
             type=sha,format=long,
       - name: Set up QEMU
@@ -196,19 +203,18 @@ jobs:
           cache-to: type=gha,mode=max
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Build and push Image
-        if: ${{ github.event_name == 'release' }}
         uses: docker/build-push-action@v3
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          tags: ${{ steps.dind-names.outputs.tags }}
+          tags: ${{ steps.image-names.outputs.tags }}
           build-args: ""
           file: Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          push: ${{ github.event_name == 'release' }}
+          push: true
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
@@ -227,14 +233,16 @@ jobs:
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
-      - name: Prepare DIND Image Names
-        id: dind-names
+      - name: Prepare Image Names
+        id: image-names
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
           images: |
             ghcr.io/${{ github.repository_owner }}/flyte-sandbox-bundled
           tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ inputs.version }}
             type=sha,format=long,
       - name: Set up QEMU
@@ -259,7 +267,7 @@ jobs:
           context: docker/sandbox-bundled
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
-          tags: ${{ steps.dind-names.outputs.tags }}
+          tags: ${{ steps.image-names.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
