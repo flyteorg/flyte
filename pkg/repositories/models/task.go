@@ -20,4 +20,6 @@ type Task struct {
 	Digest []byte
 	// Task type (also stored in the closure put promoted as a column for filtering).
 	Type string `valid:"length(0|255)"`
+	// ShortDescription for the task.
+	ShortDescription string
 }

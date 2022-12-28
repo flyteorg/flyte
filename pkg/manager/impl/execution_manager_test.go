@@ -4085,11 +4085,11 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	var getCalledCount = 0
 	var newlyCreatedWorkflow models.Workflow
-	workflowcreateFunc := func(input models.Workflow) error {
+	workflowCreateFunc := func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 		newlyCreatedWorkflow = input
 		return nil
 	}
-	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowcreateFunc)
+	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowCreateFunc)
 
 	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		if getCalledCount <= 1 {

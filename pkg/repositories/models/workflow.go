@@ -16,4 +16,6 @@ type Workflow struct {
 	RemoteClosureIdentifier string `gorm:"not null" valid:"length(0|255)"`
 	// Hash of the compiled workflow closure
 	Digest []byte
+	// ShortDescription for the workflow.
+	ShortDescription string
 }

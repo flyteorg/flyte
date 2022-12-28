@@ -21,14 +21,30 @@ type TaskRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *TaskRepo) Create(ctx context.Context, input models.Task) error {
+func (r *TaskRepo) Create(_ context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	err := r.db.Transaction(func(_ *gorm.DB) error {
+		if descriptionEntity == nil {
+			tx := r.db.Omit("id").Create(&input)
+			if tx.Error != nil {
+				return r.errorTransformer.ToFlyteAdminError(tx.Error)
+			}
+			return nil
+		}
+		tx := r.db.Omit("id").Create(descriptionEntity)
+		if tx.Error != nil {
+			return r.errorTransformer.ToFlyteAdminError(tx.Error)
+		}
+
+		tx = r.db.Omit("id").Create(&input)
+		if tx.Error != nil {
+			return r.errorTransformer.ToFlyteAdminError(tx.Error)
+		}
+
+		return nil
+	})
 	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return nil
+	return err
 }
 
 func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
@@ -51,6 +67,7 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 			Version: input.Version,
 		})
 	}
+
 	if tx.Error != nil {
 		return models.Task{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -65,7 +82,6 @@ func (r *TaskRepo) List(
 	}
 	var tasks []models.Task
 	tx := r.db.Limit(input.Limit).Offset(input.Offset)
-
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
 	if err != nil {

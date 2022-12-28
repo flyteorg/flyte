@@ -9,7 +9,7 @@ import (
 // Defines the interface for interacting with Task models.
 type TaskRepoInterface interface {
 	// Inserts a task model into the database store.
-	Create(ctx context.Context, input models.Task) error
+	Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error
 	// Returns a matching task if it exists.
 	Get(ctx context.Context, input Identifier) (models.Task, error)
 	// Returns task revisions matching query parameters. A limit must be provided for the results page size.

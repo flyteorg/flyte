@@ -65,6 +65,7 @@ func truncateAllTablesForTestingOnly() {
 
 	TruncateExecutionEvents := fmt.Sprintf("TRUNCATE TABLE execution_events;")
 	TruncateNamedEntityMetadata := fmt.Sprintf("TRUNCATE TABLE named_entity_metadata;")
+	TruncateDescriptionEntity := fmt.Sprintf("TRUNCATE TABLE description_entities;")
 	TruncateNodeExecutions := fmt.Sprintf("TRUNCATE TABLE node_executions;")
 	TruncateNodeExecutionEvents := fmt.Sprintf("TRUNCATE TABLE node_execution_events;")
 	TruncateTaskExecutions := fmt.Sprintf("TRUNCATE TABLE task_executions;")
@@ -92,6 +93,7 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateExecutions)
 	db.Exec(TruncateExecutionEvents)
 	db.Exec(TruncateNamedEntityMetadata)
+	db.Exec(TruncateDescriptionEntity)
 	db.Exec(TruncateNodeExecutions)
 	db.Exec(TruncateNodeExecutionEvents)
 	db.Exec(TruncateTaskExecutions)

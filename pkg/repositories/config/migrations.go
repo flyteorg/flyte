@@ -14,7 +14,7 @@ import (
 var (
 	tables = []string{"execution_events", "executions", "launch_plans", "named_entity_metadata",
 		"node_execution_events", "node_executions", "projects", "resources", "schedulable_entities",
-		"schedule_entities_snapshots", "task_executions", "tasks", "workflows"}
+		"schedule_entities_snapshots", "task_executions", "tasks", "workflows", "description_entities"}
 )
 
 var Migrations = []*gormigrate.Migration{
@@ -388,6 +388,36 @@ var Migrations = []*gormigrate.Migration{
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Model(&models.Execution{}).Migrator().DropIndex(&models.Execution{}, "idx_executions_created_at")
+		},
+	},
+	// Create description entities table
+	{
+		ID: "2022-09-13-description-entities",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.DescriptionEntity{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("description_entities")
+		},
+	},
+	// Modify the tasks table, if necessary
+	{
+		ID: "2020-09-13-task-short_description",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS short_description varchar(4000)").Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE tasks DROP COLUMN IF EXISTS short_description").Error
+		},
+	},
+	// Modify the workflows table, if necessary
+	{
+		ID: "2020-09-13-workflow-short_description",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE workflows ADD COLUMN IF NOT EXISTS short_description varchar(4000)").Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE workflows DROP COLUMN IF EXISTS short_description").Error
 		},
 	},
 	// Create signals table.
