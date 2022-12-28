@@ -58,8 +58,6 @@ jobs:
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           file: docker/sandbox/Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   trigger-sandbox-lite-build:
     runs-on: ubuntu-latest
@@ -117,5 +115,3 @@ jobs:
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
           file: docker/sandbox-lite/Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max

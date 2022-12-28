@@ -87,8 +87,6 @@ jobs:
             FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
         uses: docker/build-push-action@v3
@@ -102,8 +100,6 @@ jobs:
             FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Build and push Image
         uses: docker/build-push-action@v3
@@ -117,8 +113,6 @@ jobs:
             FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
@@ -171,6 +165,4 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
