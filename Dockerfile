@@ -16,7 +16,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/r
     go build -tags console -v -o dist/flyte cmd/main.go
 
 
-FROM gcr.io/distroless/base-debian11
+FROM debian:bullseye-slim
 
-COPY --from=flytebuilder /flyteorg/build/flyte/dist/flyte /flyte
-ENTRYPOINT [ "/flyte" ]
+ARG FLYTE_VERSION="master"
+ENV FLYTE_VERSION=${FLYTE_VERSION}
+
+COPY --from=flytebuilder /flyteorg/build/flyte/dist/flyte /usr/local/bin/
+ENTRYPOINT [ "flyte" ]
