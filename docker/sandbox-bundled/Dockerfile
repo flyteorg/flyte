@@ -14,6 +14,9 @@ FROM rancher/k3s:v1.24.4-k3s1
 
 ARG TARGETARCH
 
+ARG FLYTE_SANDBOX_VERSION
+ENV FLYTE_SANDBOX_VERSION "${FLYTE_SANDBOX_VERSION}"
+
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
