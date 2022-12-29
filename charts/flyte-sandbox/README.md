@@ -40,6 +40,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.storage.providerConfig.s3.disableSSL | bool | `true` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
 | flyte-binary.configuration.storage.userDataContainer | string | `"my-s3-bucket"` |  |
 | flyte-binary.deployment.extraPodSpec.hostNetwork | bool | `true` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |

@@ -48,6 +48,7 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.endpoint | string | `""` |  |
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
+| configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.storage.userDataContainer | string | `"my-organization-flyte-container"` |  |
 | deployment.annotations | object | `{}` |  |
 | deployment.args | list | `[]` |  |
