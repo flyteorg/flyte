@@ -13,14 +13,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - .github/workflows/single-binary.yml
-      - charts/flyte-binary/**
-      - charts/flyte-sandbox/**
-      - cmd/**
-      - docker/sandbox-bundled/**
-      - Dockerfile
-      - go.*
 
 jobs:
   trigger-single-binary-build:
