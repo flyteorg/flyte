@@ -21,8 +21,6 @@ on:
       - docker/sandbox-bundled/**
       - Dockerfile
       - go.*
-  release:
-    types: [published]
 
 jobs:
   trigger-single-binary-build:
