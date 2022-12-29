@@ -495,14 +495,17 @@ data:
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/data
     storage:
-      type: s3
-      connection:
-        region: us-east-1
-        disable-ssl: true
-        endpoint: http://localhost:30002
-        auth-type: "accesskey"
-        access-key: minio
-        secret-key: miniostorage
+      type: stow
+      stow:
+        kind: s3
+        config:
+          region: us-east-1
+          disable_ssl: true
+          v2_signing: true
+          endpoint: http://localhost:30002
+          auth_type: accesskey
+          access_key_id: minio
+          secret_key: miniostorage
       container: my-s3-bucket
   010-inline-config.yaml: |
     plugins:
@@ -738,7 +741,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: TWw0WjRnTjJHekJNT3hDSQ==
+  haSharedSecret: Y2FvUHdKb1U3bENqU2o4RQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1040,7 +1043,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: 54cd610d8dd5a08c5375ae8d750da1de89177c74de718b1d4d6086b763cede19
+        checksum/secret: e852f9e87464782ba96aab43776db1b88cd2e0c14cfd9c4acdec46c6c5652ce1
       labels:
         app: docker-registry
         release: sandbox
@@ -1110,7 +1113,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: e2b58d2eaf0d0a1a949f4aec30ac4e4e46cbae8fed5b431e150116feec9d2c84
-        checksum/configuration: 9e2776c8a2f487b6dbe2f40ebef0a9462802c0c556e40ca0d3ad59fe6fb80d26
+        checksum/configuration: f43bf6c89d35eedd481af4d6552922a024b264337df298df9583000ffa78f5f2
         checksum/db-password-secret: 8ae0efad50be9c783ea14baad4edb9dcf623bc824516f5251ae2cda93396327b
       labels:
         app.kubernetes.io/instance: sandbox
