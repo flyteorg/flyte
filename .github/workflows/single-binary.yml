@@ -99,7 +99,7 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/test-prop-512' }}
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
