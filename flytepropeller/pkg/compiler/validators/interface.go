@@ -121,9 +121,14 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 	case *core.Node_GateNode:
 		gateNode := node.GetGateNode()
 		if approve := gateNode.GetApprove(); approve != nil {
+			// discover inputs / outputs from upstream bindings. output variable are identical to inputs
+			// because evaluating the approve condition copies the input LiteralMap directly to outputs.
+			inputVarsFromBindings, _ := ValidateBindings(w, node, node.GetInputs(), &core.VariableMap{Variables: map[string]*core.Variable{}},
+				false, c.EdgeDirectionUpstream, errs.NewScope())
+
 			iface = &core.TypedInterface{
-				Inputs:  &core.VariableMap{Variables: map[string]*core.Variable{}},
-				Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+				Inputs:  inputVarsFromBindings,
+				Outputs: inputVarsFromBindings,
 			}
 		} else if signal := gateNode.GetSignal(); signal != nil {
 			if signal.GetType() == nil {
