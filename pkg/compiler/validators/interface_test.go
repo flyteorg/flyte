@@ -301,6 +301,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				},
 			})
 			nodeBuilder.OnGetInterface().Return(nil)
+			nodeBuilder.OnGetInputs().Return(nil)
 
 			nodeBuilder.On("GetGateNode").Return(gateNode)
 			nodeBuilder.On("GetId").Return("node_1")
