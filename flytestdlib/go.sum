@@ -129,10 +129,10 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6 h1:ekMpKRTsX2FjEIP2WCWrdOAfvg9nwoObBkJCCnksQaM=
-github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6/go.mod h1:sgOlQA2lnugarwSN8M+9gWoCZmzYNFI8gpShZrm+wmo=
-github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081 h1:Qxsd2LWl44bfLn75MHrPv32P1PhPZ9fajg39eHZ/a7g=
-github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081/go.mod h1:ZbZVBxEWh8Icj1AgfNKg0uPzHHGd9twa4eWcY2Yt6xE=
+github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f h1:BFpozetWgkWdrOz2wDQY/2pcvm8Wx60uI4mJup+0yrg=
+github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f/go.mod h1:sgOlQA2lnugarwSN8M+9gWoCZmzYNFI8gpShZrm+wmo=
+github.com/blackshark-ai/flyteplugins v1.0.2-0.20230104150443-bda210ef6073 h1:+4NEKyFn+6Upq4DEIE0p7o0R2Ue1mXmVffTw+boGh+4=
+github.com/blackshark-ai/flyteplugins v1.0.2-0.20230104150443-bda210ef6073/go.mod h1:x+e4ongzLdwdq7Gpl7TsPxwh1yal2ndWmB9ZqcjUuz8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=

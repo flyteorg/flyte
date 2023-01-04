@@ -3,8 +3,8 @@ module github.com/flyteorg/flytestdlib
 go 1.18
 
 replace (
-	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6
-	github.com/flyteorg/flyteplugins => github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081
+	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f
+	github.com/flyteorg/flyteplugins => github.com/blackshark-ai/flyteplugins v1.0.2-0.20230104150443-bda210ef6073
 )
 
 require (
@@ -14,7 +14,7 @@ require (
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.13.0
 	github.com/fatih/structtag v1.2.0
-	github.com/flyteorg/flyteidl v1.2.3
+	github.com/flyteorg/flyteidl v1.3.1
 	github.com/flyteorg/flyteplugins v1.0.18
 	github.com/flyteorg/flytepropeller v1.1.28
 	github.com/flyteorg/stow v0.3.6
