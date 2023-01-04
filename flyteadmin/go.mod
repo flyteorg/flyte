@@ -3,10 +3,10 @@ module github.com/flyteorg/flyteadmin
 go 1.18
 
 replace (
-	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6
-	github.com/flyteorg/flyteplugins => github.com/blackshark-ai/flyteplugins v1.0.2-0.20221215151032-3ce2c1315081
-	github.com/flyteorg/flytepropeller => github.com/blackshark-ai/flytepropeller v0.16.48-0.20221215182111-03a138161b7d
-	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced
+	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f
+	github.com/flyteorg/flyteplugins => github.com/blackshark-ai/flyteplugins v1.0.2-0.20230104150443-bda210ef6073
+	github.com/flyteorg/flytepropeller => github.com/blackshark-ai/flytepropeller v0.16.48-0.20230104152227-93eb7b4cc558
+	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20230104151410-d6ec6dba8697
 )
 
 require (
@@ -20,8 +20,8 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/evanphx/json-patch v4.12.0+incompatible
-	github.com/flyteorg/flyteidl v1.2.5
-	github.com/flyteorg/flyteplugins v1.0.20
+	github.com/flyteorg/flyteidl v1.3.1
+	github.com/flyteorg/flyteplugins v1.0.26
 	github.com/flyteorg/flytepropeller v1.1.51
 	github.com/flyteorg/flytestdlib v1.0.14
 	github.com/flyteorg/stow v0.3.6
