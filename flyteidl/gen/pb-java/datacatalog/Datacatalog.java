@@ -12419,23 +12419,43 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     boolean hasDatasetId();
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     datacatalog.Datacatalog.DatasetID getDatasetId();
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetIdOrBuilder();
 
     /**
+     * <pre>
+     * The specific artifact tag for the reservation
+     * </pre>
+     *
      * <code>string tag_name = 2;</code>
      */
     java.lang.String getTagName();
     /**
+     * <pre>
+     * The specific artifact tag for the reservation
+     * </pre>
+     *
      * <code>string tag_name = 2;</code>
      */
     com.google.protobuf.ByteString
@@ -12539,18 +12559,30 @@ public final class Datacatalog {
     public static final int DATASET_ID_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.DatasetID datasetId_;
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     public boolean hasDatasetId() {
       return datasetId_ != null;
     }
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     public datacatalog.Datacatalog.DatasetID getDatasetId() {
       return datasetId_ == null ? datacatalog.Datacatalog.DatasetID.getDefaultInstance() : datasetId_;
     }
     /**
+     * <pre>
+     * The unique ID for the reserved dataset
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset_id = 1;</code>
      */
     public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetIdOrBuilder() {
@@ -12560,6 +12592,10 @@ public final class Datacatalog {
     public static final int TAG_NAME_FIELD_NUMBER = 2;
     private volatile java.lang.Object tagName_;
     /**
+     * <pre>
+     * The specific artifact tag for the reservation
+     * </pre>
+     *
      * <code>string tag_name = 2;</code>
      */
     public java.lang.String getTagName() {
@@ -12575,6 +12611,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The specific artifact tag for the reservation
+     * </pre>
+     *
      * <code>string tag_name = 2;</code>
      */
     public com.google.protobuf.ByteString
@@ -12931,12 +12971,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.DatasetID, datacatalog.Datacatalog.DatasetID.Builder, datacatalog.Datacatalog.DatasetIDOrBuilder> datasetIdBuilder_;
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public boolean hasDatasetId() {
         return datasetIdBuilder_ != null || datasetId_ != null;
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetID getDatasetId() {
@@ -12947,6 +12995,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public Builder setDatasetId(datacatalog.Datacatalog.DatasetID value) {
@@ -12963,6 +13015,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public Builder setDatasetId(
@@ -12977,6 +13033,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public Builder mergeDatasetId(datacatalog.Datacatalog.DatasetID value) {
@@ -12995,6 +13055,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public Builder clearDatasetId() {
@@ -13009,6 +13073,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetID.Builder getDatasetIdBuilder() {
@@ -13017,6 +13085,10 @@ public final class Datacatalog {
         return getDatasetIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetIdOrBuilder() {
@@ -13028,6 +13100,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reserved dataset
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset_id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -13046,6 +13122,10 @@ public final class Datacatalog {
 
       private java.lang.Object tagName_ = "";
       /**
+       * <pre>
+       * The specific artifact tag for the reservation
+       * </pre>
+       *
        * <code>string tag_name = 2;</code>
        */
       public java.lang.String getTagName() {
@@ -13061,6 +13141,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The specific artifact tag for the reservation
+       * </pre>
+       *
        * <code>string tag_name = 2;</code>
        */
       public com.google.protobuf.ByteString
@@ -13077,6 +13161,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The specific artifact tag for the reservation
+       * </pre>
+       *
        * <code>string tag_name = 2;</code>
        */
       public Builder setTagName(
@@ -13090,6 +13178,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The specific artifact tag for the reservation
+       * </pre>
+       *
        * <code>string tag_name = 2;</code>
        */
       public Builder clearTagName() {
@@ -13099,6 +13191,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The specific artifact tag for the reservation
+       * </pre>
+       *
        * <code>string tag_name = 2;</code>
        */
       public Builder setTagNameBytes(
@@ -13170,23 +13266,43 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     boolean hasReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationID getReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder();
 
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     java.lang.String getOwnerId();
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     com.google.protobuf.ByteString
@@ -13328,18 +13444,30 @@ public final class Datacatalog {
     public static final int RESERVATION_ID_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.ReservationID reservationId_;
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public boolean hasReservationId() {
       return reservationId_ != null;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationID getReservationId() {
       return reservationId_ == null ? datacatalog.Datacatalog.ReservationID.getDefaultInstance() : reservationId_;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -13349,6 +13477,10 @@ public final class Datacatalog {
     public static final int OWNER_ID_FIELD_NUMBER = 2;
     private volatile java.lang.Object ownerId_;
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public java.lang.String getOwnerId() {
@@ -13364,6 +13496,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public com.google.protobuf.ByteString
@@ -13783,12 +13919,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.ReservationID, datacatalog.Datacatalog.ReservationID.Builder, datacatalog.Datacatalog.ReservationIDOrBuilder> reservationIdBuilder_;
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public boolean hasReservationId() {
         return reservationIdBuilder_ != null || reservationId_ != null;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID getReservationId() {
@@ -13799,6 +13943,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -13815,6 +13963,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(
@@ -13829,6 +13981,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder mergeReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -13847,6 +14003,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder clearReservationId() {
@@ -13861,6 +14021,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID.Builder getReservationIdBuilder() {
@@ -13869,6 +14033,10 @@ public final class Datacatalog {
         return getReservationIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -13880,6 +14048,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -13898,6 +14070,10 @@ public final class Datacatalog {
 
       private java.lang.Object ownerId_ = "";
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public java.lang.String getOwnerId() {
@@ -13913,6 +14089,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public com.google.protobuf.ByteString
@@ -13929,6 +14109,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerId(
@@ -13942,6 +14126,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder clearOwnerId() {
@@ -13951,6 +14139,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerIdBytes(
@@ -14175,23 +14367,43 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     boolean hasReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationID getReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder();
 
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     java.lang.String getOwnerId();
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     com.google.protobuf.ByteString
@@ -14248,14 +14460,26 @@ public final class Datacatalog {
     com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
 
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     boolean hasMetadata();
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     datacatalog.Datacatalog.Metadata getMetadata();
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder();
@@ -14397,18 +14621,30 @@ public final class Datacatalog {
     public static final int RESERVATION_ID_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.ReservationID reservationId_;
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public boolean hasReservationId() {
       return reservationId_ != null;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationID getReservationId() {
       return reservationId_ == null ? datacatalog.Datacatalog.ReservationID.getDefaultInstance() : reservationId_;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -14418,6 +14654,10 @@ public final class Datacatalog {
     public static final int OWNER_ID_FIELD_NUMBER = 2;
     private volatile java.lang.Object ownerId_;
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public java.lang.String getOwnerId() {
@@ -14433,6 +14673,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public com.google.protobuf.ByteString
@@ -14518,18 +14762,30 @@ public final class Datacatalog {
     public static final int METADATA_FIELD_NUMBER = 6;
     private datacatalog.Datacatalog.Metadata metadata_;
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     public boolean hasMetadata() {
       return metadata_ != null;
     }
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     public datacatalog.Datacatalog.Metadata getMetadata() {
       return metadata_ == null ? datacatalog.Datacatalog.Metadata.getDefaultInstance() : metadata_;
     }
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 6;</code>
      */
     public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
@@ -14966,12 +15222,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.ReservationID, datacatalog.Datacatalog.ReservationID.Builder, datacatalog.Datacatalog.ReservationIDOrBuilder> reservationIdBuilder_;
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public boolean hasReservationId() {
         return reservationIdBuilder_ != null || reservationId_ != null;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID getReservationId() {
@@ -14982,6 +15246,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -14998,6 +15266,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(
@@ -15012,6 +15284,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder mergeReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -15030,6 +15306,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder clearReservationId() {
@@ -15044,6 +15324,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID.Builder getReservationIdBuilder() {
@@ -15052,6 +15336,10 @@ public final class Datacatalog {
         return getReservationIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -15063,6 +15351,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -15081,6 +15373,10 @@ public final class Datacatalog {
 
       private java.lang.Object ownerId_ = "";
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public java.lang.String getOwnerId() {
@@ -15096,6 +15392,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public com.google.protobuf.ByteString
@@ -15112,6 +15412,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerId(
@@ -15125,6 +15429,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder clearOwnerId() {
@@ -15134,6 +15442,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerIdBytes(
@@ -15458,12 +15770,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder> metadataBuilder_;
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public boolean hasMetadata() {
         return metadataBuilder_ != null || metadata_ != null;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public datacatalog.Datacatalog.Metadata getMetadata() {
@@ -15474,6 +15794,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public Builder setMetadata(datacatalog.Datacatalog.Metadata value) {
@@ -15490,6 +15814,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public Builder setMetadata(
@@ -15504,6 +15832,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public Builder mergeMetadata(datacatalog.Datacatalog.Metadata value) {
@@ -15522,6 +15854,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public Builder clearMetadata() {
@@ -15536,6 +15872,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public datacatalog.Datacatalog.Metadata.Builder getMetadataBuilder() {
@@ -15544,6 +15884,10 @@ public final class Datacatalog {
         return getMetadataFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
@@ -15555,6 +15899,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -15628,14 +15976,26 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     boolean hasReservation();
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     datacatalog.Datacatalog.Reservation getReservation();
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     datacatalog.Datacatalog.ReservationOrBuilder getReservationOrBuilder();
@@ -15731,18 +16091,30 @@ public final class Datacatalog {
     public static final int RESERVATION_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.Reservation reservation_;
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     public boolean hasReservation() {
       return reservation_ != null;
     }
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     public datacatalog.Datacatalog.Reservation getReservation() {
       return reservation_ == null ? datacatalog.Datacatalog.Reservation.getDefaultInstance() : reservation_;
     }
     /**
+     * <pre>
+     * The reservation to be acquired or extended
+     * </pre>
+     *
      * <code>.datacatalog.Reservation reservation = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationOrBuilder getReservationOrBuilder() {
@@ -16072,12 +16444,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.Reservation, datacatalog.Datacatalog.Reservation.Builder, datacatalog.Datacatalog.ReservationOrBuilder> reservationBuilder_;
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public boolean hasReservation() {
         return reservationBuilder_ != null || reservation_ != null;
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public datacatalog.Datacatalog.Reservation getReservation() {
@@ -16088,6 +16468,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public Builder setReservation(datacatalog.Datacatalog.Reservation value) {
@@ -16104,6 +16488,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public Builder setReservation(
@@ -16118,6 +16506,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public Builder mergeReservation(datacatalog.Datacatalog.Reservation value) {
@@ -16136,6 +16528,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public Builder clearReservation() {
@@ -16150,6 +16546,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public datacatalog.Datacatalog.Reservation.Builder getReservationBuilder() {
@@ -16158,6 +16558,10 @@ public final class Datacatalog {
         return getReservationFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationOrBuilder getReservationOrBuilder() {
@@ -16169,6 +16573,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The reservation to be acquired or extended
+       * </pre>
+       *
        * <code>.datacatalog.Reservation reservation = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -16242,23 +16650,43 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     boolean hasReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationID getReservationId();
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder();
 
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     java.lang.String getOwnerId();
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     com.google.protobuf.ByteString
@@ -16362,18 +16790,30 @@ public final class Datacatalog {
     public static final int RESERVATION_ID_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.ReservationID reservationId_;
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public boolean hasReservationId() {
       return reservationId_ != null;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationID getReservationId() {
       return reservationId_ == null ? datacatalog.Datacatalog.ReservationID.getDefaultInstance() : reservationId_;
     }
     /**
+     * <pre>
+     * The unique ID for the reservation
+     * </pre>
+     *
      * <code>.datacatalog.ReservationID reservation_id = 1;</code>
      */
     public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -16383,6 +16823,10 @@ public final class Datacatalog {
     public static final int OWNER_ID_FIELD_NUMBER = 2;
     private volatile java.lang.Object ownerId_;
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public java.lang.String getOwnerId() {
@@ -16398,6 +16842,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The unique ID of the owner for the reservation
+     * </pre>
+     *
      * <code>string owner_id = 2;</code>
      */
     public com.google.protobuf.ByteString
@@ -16754,12 +17202,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.ReservationID, datacatalog.Datacatalog.ReservationID.Builder, datacatalog.Datacatalog.ReservationIDOrBuilder> reservationIdBuilder_;
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public boolean hasReservationId() {
         return reservationIdBuilder_ != null || reservationId_ != null;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID getReservationId() {
@@ -16770,6 +17226,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -16786,6 +17246,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder setReservationId(
@@ -16800,6 +17264,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder mergeReservationId(datacatalog.Datacatalog.ReservationID value) {
@@ -16818,6 +17286,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public Builder clearReservationId() {
@@ -16832,6 +17304,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationID.Builder getReservationIdBuilder() {
@@ -16840,6 +17316,10 @@ public final class Datacatalog {
         return getReservationIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       public datacatalog.Datacatalog.ReservationIDOrBuilder getReservationIdOrBuilder() {
@@ -16851,6 +17331,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID for the reservation
+       * </pre>
+       *
        * <code>.datacatalog.ReservationID reservation_id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -16869,6 +17353,10 @@ public final class Datacatalog {
 
       private java.lang.Object ownerId_ = "";
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public java.lang.String getOwnerId() {
@@ -16884,6 +17372,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public com.google.protobuf.ByteString
@@ -16900,6 +17392,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerId(
@@ -16913,6 +17409,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder clearOwnerId() {
@@ -16922,6 +17422,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the owner for the reservation
+       * </pre>
+       *
        * <code>string owner_id = 2;</code>
        */
       public Builder setOwnerIdBytes(

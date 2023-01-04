@@ -203,34 +203,55 @@ message UpdateArtifactResponse {
  * ReservationID message that is composed of several string fields.
  */
 message ReservationID {
+    // The unique ID for the reserved dataset
     DatasetID dataset_id = 1;
+
+    // The specific artifact tag for the reservation
     string tag_name = 2;
 }
 
 // Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
 message GetOrExtendReservationRequest {
+    // The unique ID for the reservation
     ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
     string owner_id = 2;
-    google.protobuf.Duration heartbeat_interval = 3; // Requested reservation extension heartbeat interval
+
+    // Requested reservation extension heartbeat interval
+    google.protobuf.Duration heartbeat_interval = 3;
 }
 
 // A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 message Reservation {
+    // The unique ID for the reservation
     ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
     string owner_id = 2;
-    google.protobuf.Duration heartbeat_interval = 3; // Recommended heartbeat interval to extend reservation
-    google.protobuf.Timestamp expires_at = 4; // Expiration timestamp of this reservation
+
+    // Recommended heartbeat interval to extend reservation
+    google.protobuf.Duration heartbeat_interval = 3;
+
+    // Expiration timestamp of this reservation
+    google.protobuf.Timestamp expires_at = 4;
+
+    // Free-form metadata associated with the artifact
     Metadata metadata = 6;
 }
 
 // Response including either a newly minted reservation or the existing reservation
 message GetOrExtendReservationResponse {
+    // The reservation to be acquired or extended
     Reservation reservation = 1;
 }
 
 // Request to release reservation
 message ReleaseReservationRequest {
+    // The unique ID for the reservation
     ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
     string owner_id = 2;
 }
 
