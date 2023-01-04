@@ -20,7 +20,7 @@ In the `FlyteRemote` experience, fetched [tasks](https://github.com/flyteorg/fly
 
 ## Usage Overview
 ### Databricks
-Please refer to the documentation for setting up Databricks.
+Please refer to the [documentation](https://docs.flyte.org/en/latest/deployment/plugin_setup/webapi/databricks.html#deployment-plugin-setup-webapi-databricks) for setting up Databricks.
 Databricks is a subclass of the Spark task configuration so you'll be able to use the new class in place of the more general `Spark` configuration.
 
 ```python
@@ -96,3 +96,4 @@ r.set_signal("signal-name", "execidabc123", True)
 
 ## Looking Ahead
 In the coming release, we are focusing on...
+1. [Out of core plugin](https://unionai.atlassian.net/wiki/spaces/FLYTE/pages/47153191/Out+of+core+plugins+Prove+Value): Make backend plugin scalable and easy to author. No need of code generation, using tools that MLEs and Data Scientists are not accustomed to using.
