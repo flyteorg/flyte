@@ -3,13 +3,13 @@ module github.com/flyteorg/datacatalog
 go 1.18
 
 replace (
-	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20221215141908-3e44057796c6
-	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20221215181718-9b165563eced
+	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f
+	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20230104151410-d6ec6dba8697
 )
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7
-	github.com/flyteorg/flyteidl v1.2.3
+	github.com/flyteorg/flyteidl v1.3.1
 	github.com/flyteorg/flytestdlib v1.0.12
 	github.com/golang/glog v1.0.0
 	github.com/golang/protobuf v1.5.2
