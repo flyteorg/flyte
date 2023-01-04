@@ -894,11 +894,13 @@ func (m *UpdateArtifactResponse) GetArtifactId() string {
 //
 // ReservationID message that is composed of several string fields.
 type ReservationID struct {
-	DatasetId            *DatasetID `protobuf:"bytes,1,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
-	TagName              string     `protobuf:"bytes,2,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	// The unique ID for the reserved dataset
+	DatasetId *DatasetID `protobuf:"bytes,1,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	// The specific artifact tag for the reservation
+	TagName              string   `protobuf:"bytes,2,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *ReservationID) Reset()         { *m = ReservationID{} }
@@ -942,8 +944,11 @@ func (m *ReservationID) GetTagName() string {
 
 // Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
 type GetOrExtendReservationRequest struct {
-	ReservationId        *ReservationID     `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
-	OwnerId              string             `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	// The unique ID for the reservation
+	ReservationId *ReservationID `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
+	// The unique ID of the owner for the reservation
+	OwnerId string `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	// Requested reservation extension heartbeat interval
 	HeartbeatInterval    *duration.Duration `protobuf:"bytes,3,opt,name=heartbeat_interval,json=heartbeatInterval,proto3" json:"heartbeat_interval,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
@@ -998,14 +1003,19 @@ func (m *GetOrExtendReservationRequest) GetHeartbeatInterval() *duration.Duratio
 
 // A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 type Reservation struct {
-	ReservationId        *ReservationID       `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
-	OwnerId              string               `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
-	HeartbeatInterval    *duration.Duration   `protobuf:"bytes,3,opt,name=heartbeat_interval,json=heartbeatInterval,proto3" json:"heartbeat_interval,omitempty"`
-	ExpiresAt            *timestamp.Timestamp `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	Metadata             *Metadata            `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// The unique ID for the reservation
+	ReservationId *ReservationID `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
+	// The unique ID of the owner for the reservation
+	OwnerId string `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	// Recommended heartbeat interval to extend reservation
+	HeartbeatInterval *duration.Duration `protobuf:"bytes,3,opt,name=heartbeat_interval,json=heartbeatInterval,proto3" json:"heartbeat_interval,omitempty"`
+	// Expiration timestamp of this reservation
+	ExpiresAt *timestamp.Timestamp `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	// Free-form metadata associated with the artifact
+	Metadata             *Metadata `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *Reservation) Reset()         { *m = Reservation{} }
@@ -1070,6 +1080,7 @@ func (m *Reservation) GetMetadata() *Metadata {
 
 // Response including either a newly minted reservation or the existing reservation
 type GetOrExtendReservationResponse struct {
+	// The reservation to be acquired or extended
 	Reservation          *Reservation `protobuf:"bytes,1,opt,name=reservation,proto3" json:"reservation,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
@@ -1110,11 +1121,13 @@ func (m *GetOrExtendReservationResponse) GetReservation() *Reservation {
 
 // Request to release reservation
 type ReleaseReservationRequest struct {
-	ReservationId        *ReservationID `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
-	OwnerId              string         `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+	// The unique ID for the reservation
+	ReservationId *ReservationID `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
+	// The unique ID of the owner for the reservation
+	OwnerId              string   `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *ReleaseReservationRequest) Reset()         { *m = ReleaseReservationRequest{} }
