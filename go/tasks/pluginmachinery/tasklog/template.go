@@ -30,6 +30,7 @@ type regexValPair struct {
 
 type templateRegexes struct {
 	PodName           *regexp.Regexp
+	PodUID            *regexp.Regexp
 	Namespace         *regexp.Regexp
 	ContainerName     *regexp.Regexp
 	ContainerID       *regexp.Regexp
@@ -42,6 +43,7 @@ type templateRegexes struct {
 func mustInitTemplateRegexes() templateRegexes {
 	return templateRegexes{
 		PodName:           mustCreateRegex("podName"),
+		PodUID:            mustCreateRegex("podUID"),
 		Namespace:         mustCreateRegex("namespace"),
 		ContainerName:     mustCreateRegex("containerName"),
 		ContainerID:       mustCreateRegex("containerID"),
@@ -66,11 +68,12 @@ func replaceAll(template string, values []regexValPair) string {
 	return template
 }
 
-func (s TemplateLogPlugin) GetTaskLog(podName, namespace, containerName, containerID, logName string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
+func (s TemplateLogPlugin) GetTaskLog(podName, podUID, namespace, containerName, containerID, logName string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
 	o, err := s.GetTaskLogs(Input{
 		LogName:           logName,
 		Namespace:         namespace,
 		PodName:           podName,
+		PodUID:            podUID,
 		ContainerName:     containerName,
 		ContainerID:       containerID,
 		PodUnixStartTime:  podUnixStartTime,
@@ -102,6 +105,10 @@ func (s TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 					{
 						regex: regexes.PodName,
 						val:   input.PodName,
+					},
+					{
+						regex: regexes.PodUID,
+						val:   input.PodUID,
 					},
 					{
 						regex: regexes.Namespace,
