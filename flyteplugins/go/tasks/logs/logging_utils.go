@@ -41,6 +41,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, pod
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
 			PodName:           pod.Name,
+			PodUID:            string(pod.GetUID()),
 			Namespace:         pod.Namespace,
 			ContainerName:     pod.Spec.Containers[index].Name,
 			ContainerID:       pod.Status.ContainerStatuses[index].ContainerID,
