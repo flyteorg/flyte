@@ -17,7 +17,7 @@ In order to install Flyte, you will need access to the following:
 
 As Flyte documentation cannot keep up with the pace of changes cloud providers are making, please refer to their official documentation for each of these prerequisites.
 
-By Q2 2023, Union AI should have open-sourced a reference implementation of these requirements for the major cloud providers.
+Union AI plans to open-source a codified, reference implementation of these requirements for the major cloud providers in early 2023.
 
 ***************
 Installation
@@ -40,8 +40,46 @@ Flyte is installed via a Helm chart.
 #. Install
     .. code-block:: bash
 
-	    helm install flyte-binary $(FLYTE_BINARY_CHART_PATH) \
-		    --namespace flyte --values eks-starter.yaml
+	    helm install flyte-backend flyteorg/flyte-binary --dry-run --namespace flyte --values eks-starter.yaml
 
+    When ready to install, remove the dry run switch.
 
+Verify Installation
+===================
+The values supplied by the ``eks-starter.yaml`` file provides only the simplest installation of Flyte. The core functionality and scalability of Flyte will be there, but no plugins are included (e.g. Spark tasks will not work), there is no DNS or SSL, and there is no authentication.
 
+Port Forward Flyte service
+--------------------------
+To verify the installation therefore you'll need to port forward the Kubernetes service.
+
+    kubectl -n flyte port-forward service/flyte-binary 8088:8088 8089:8089
+
+You should be able to navigate to http://localhost:8088/console.
+
+The Flyte server operates on two different ports, one for HTTP traffic and one for gRPC traffic, which is why we port forward both.
+
+From here, you should be able to run through the getting started examples again. Save a backup copy of your existing configuration if you have one and generate a new config with ``flytectl``.
+
+    mv ~/.flyte/config.yaml ~/.flyte/bak.config.yaml
+
+    flytectl config init --host localhost:8088
+
+This will produce a file like
+
+    $ cat ~/.flyte/config.yaml
+    admin:
+    # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+    endpoint: dns:///localhost:8088
+    authType: Pkce
+    insecure: true
+    logger:
+    show-source: true
+    level: 0
+
+Test Workflow
+-------------
+Head back into your flytesnacks directory and you should be able to run ``pyflyte``, which picks up the config file from the default location that ``flytectl`` just wrote to.
+
+    pyflyte run --remote core/flyte_basics/hello_world.py my_wf
+
+TODO: Figure out the settings for console endpoint. should we add it to the values?

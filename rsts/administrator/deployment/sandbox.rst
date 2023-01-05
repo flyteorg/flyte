@@ -4,72 +4,51 @@
 Flyte Sandbox Deployment
 #########################
 
-*******************************
+*****************
+Sandboxed Flyte
+*****************
+
 What is a sandbox deployment?
-*******************************
+=============================
 
-The Flyte demo deployment is a fully standalone, sandboxed environment for running Flyte. Flyte requires a 
-
-provides a simplified way of running ``flyte-sandbox`` as a single Docker container running locally.
-
-The follow section explains how you can use each of these modes and provides more information. We **recommend** running the sandbox using flytectl locally on your workstation.
-Flyte Sandbox is not a complete representation of Flyte, many features are intentionally removed from this environment to ensure that the startup times and runtime footprints are low.
+In addition to a K8s cluster, Flyte requires some external cloud-provided resources such as a database and durable blob store. A sandboxed deployment of Flyte is merely the concept of bundling portable versions of these requirements alongside Flyte to simplify setup. For the blob store requirements, we use Minio, which offers an S3 compatible interface, and for Postgres, we use the stock Postgres Docker image and Helm chart.
 
 .. warning::
-    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`administrator` guide.
+    The sandbox deployment is not suitable for production environments. For instructions on how to create a production-ready Flyte deployment, checkout the :ref:`administrator` guide.
 
 *******************************************
 Flyte Sandbox as a Single Docker Container
 *******************************************
+Flyte provides one such sandboxed deployment in the form of a self-contained Docker image. This is mini-replica of an entire Flyte deployment, without the scalability and with minimal extensions. The idea for this environment originated from the desire of the core team to make it extremely simple for users of Flyte to try out the platform and get a feel for the user experience, without having to understand Kubernetes or dabble with configuration etc. The Flyte single container sandbox is also used by the team to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. The sandbox can be run in any environment that supports containers.
 
-:std:ref:`flytectl_sandbox` starts a local sandbox environment for Flyte. This is mini-replica of an entire Flyte deployment, without the scalability and with minimal extensions. The idea for this environment originated from the desire of the core team to make it extremely simple for users of Flyte to
-try out the platform and get a feel for the user experience, without having to understand Kubernetes or dabble with configuration etc. The Flyte single container sandbox is also used by the team to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. The sandbox can be run
-in most any environment that supports Docker containers and an Ubuntu docker base image.
+Requirements
+============
 
-Architecture and Reasons Why We Built It
-========================================
-Within the single container environment, a mini Kubernetes cluster is installed using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container Docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.
-
-In a typical Flyte installation, one needs to build Docker containers for tasks and push them to a repository from which K8s can pull.
-
-Users are free to use an external registry of course, as long as the inner k3s cluster has permissions to pull from it.
-
-The illustration below shows the architecture of flyte-sandbox in a single container. It is identical to a Flyte sandbox cluster, except that we have built one docker container, with Kubernetes and Flyte already installed.
-
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_container.png
-   :alt: Architecture of single container Flyte Sandbox
-
-
-Use the Flyte Sandbox to:
-=========================
-* Try out Flyte locally using a single Docker command or using ``flytectl sandbox``
-* Run regular integration tests for Flyte
-* Provide snapshot environments for various Flyte versions, to identify regressions
-
-********************
-Prerequisites
-********************
-
+kubectl
+-------
 Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
     brew install kubectl
 
+Docker
+------
+Ensure that Docker is installed. While Flyte can run any OCI compatible task image, using the default Kubernetes container runtime (cri-o), we on the team typically use Docker. Also the ``flytectl demo`` command does rely on Docker APIs, but as this demo environment is just one self-contained image, you can also run the image directly using another run time.
 
+Within the single container environment, a mini Kubernetes cluster is installed using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container Docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.  
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/sandbox/flyte_sandbox_single_k8s_cluster.png
-   :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
+flytectl
+--------
+``flytectl`` is a control plane CLI for Flyte. Find installation instructions for it on `https://github.com/flyteorg/flytectl`__.
 
+Running
+=======
+To launch, call ::
 
-.. _administrator-deployment-sandbox-local:
+    flytectl demo start
 
-Deploy Flyte Sandbox on Your Local Machine
-==========================================
+This comes with a Docker registry on ``localhost:30000`` so you can build images outside of the docker-in-docker container by tagging your containers with ``localhost:30000/imgname:tag`` and pushing. The local Postgres installation is also available on port ``30001`` for users who wish to dig deeper into the storage layer.
 
-You can deploy the sandbox environment on your laptop workstation to run locally.
-
-
-Recommended using ``flytectl sandbox start`` as described in :ref:`getting-started`
-
-.. prompt:: bash $
-
-        docker run --rm --privileged -p 30081:30081 -p 30084:30084 -p 30088:30088 cr.flyte.org/flyteorg/flyte-sandbox
+**************************
+Flyte Sandbox on the Cloud
+**************************
+Sometimes it's also helpful to be able to install a sandboxed environment on a cloud provider. That is, you have access to an EKS or GKE cluster, but provisioning a separate database or blob storage bucket is harder because of a lack of infrastructure support. Instructions for how to do this will be forthcoming.
