@@ -29,10 +29,7 @@ do
 done
 
 # Buf migration
-# TODO: fix stub generation via docker image. The trick of forcing the current user as a user in
-# the container (used extensively in this file) does not work.
-# docker run --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
-buf generate
+docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
 
 # Unfortunately the python protoc plugin does not add __init__.py files to the generated code
 # (as described in https://github.com/protocolbuffers/protobuf/issues/881). One of the
