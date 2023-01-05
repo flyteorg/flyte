@@ -15,7 +15,6 @@ Requirements
 Installation
 ^^^^^^^^^^^^
 
-
 Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 
 .. prompt:: bash
