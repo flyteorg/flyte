@@ -17,7 +17,7 @@ Installation
 
 .. important::
 
-    `flytekit` currently supports Python 3.7 - 3.10
+    ``flytekit`` currently supports Python 3.7 - 3.10
 
 
 Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
