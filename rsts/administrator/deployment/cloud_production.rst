@@ -26,3 +26,8 @@ Authentication
 Authentication comes stock with Flyte in the form of OAuth 2. Please see the `authentication guide <administrator-configuration-auth-setup>`__ for instructions.
 
 Authorization is not supported in Flyte. The breadth, depth, and variety of requirements we've heard for authorization schemes, and the undertaking any implementation would represent, push authorization beyond the scope of the Flyte project for the forseeable future.
+
+
+***************
+Upgrade Path
+***************
