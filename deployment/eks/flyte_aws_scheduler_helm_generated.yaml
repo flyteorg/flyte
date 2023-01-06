@@ -1046,8 +1046,6 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
-          - mountPath: /var/run/credentials
-            name: flyte-admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         - name: db-pass
@@ -1059,9 +1057,6 @@ spec:
         - configMap:
             name: flyte-clusterresourcesync-config
           name: config-volume
-        - name: flyte-admin-secrets
-          secret:
-            secretName: flyte-admin-secrets
 ---
 # Source: flyte-core/templates/console/deployment.yaml
 apiVersion: apps/v1
