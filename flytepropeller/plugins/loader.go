@@ -6,6 +6,7 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/k8s"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/hive"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/dask"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/mpi"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/pytorch"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
