@@ -19,10 +19,6 @@ Production Grade Object Store
 
 Core Flyte components such as Admin, Propeller, and DataCatalog, as well as user runtime containers rely on an Object Store to hold files. The sandbox deployment comes with a containerized Minio, which offers AWS S3 compatibility. We recommend swapping this out for `AWS S3 <https://aws.amazon.com/s3/>`__ or `GCP GCS <https://cloud.google.com/storage/>`__.
 
-Helm
-====
-Flyte uses Helm as the K8s release packaging solution for now, though you may still see some old ``kustomize`` artifacts in the repo. There are Helm charts that correspond with the deployment options below.
-
 Cluster Configuration
 =====================
 Flyte has the ability to configure K8s clusters to work with it. For example, as your Flyte user-base evolves, adding new projects is as simple as registering them through the command line ::
@@ -45,6 +41,20 @@ There are broadly three different styles of deploying a Flyte backend, with the 
   For the largest of deployments, it may be worthwhile or necessary to have multiple K8s clusters. Flyte's control plane (Admin, Console, Data Catalog) is separated from Flyte's execution engine (Propeller), which runs typically once per compute cluster. See :ref:`administrator-deployment-multicluster` for the details.
   
 Whatever the style, note that Propeller itself can be sharded as well, though typically that's not required.
+
+Helm
+====
+Flyte uses Helm as the K8s release packaging solution for now, though you may still see some old ``kustomize`` artifacts in the repo. There are Helm charts that correspond with the latter two deployment options. (Technically there is a Helm chart for the sandbox as well, but it's been tested only with the Dockerized K3s bundled container. If we expand that usage, we'll update these instructions accordingly.)
+
+* ``flyte-binary``
+  This is the chart for the middle option, the option that should suffice for most production deployments.
+* ``flyte-core``
+  This chart deploys the Flyte components separately as multiple services. See the :ref:`administrator-deployment-multicluster` for more information on how to use this.
+  This was formerly the primary recommended chart to use before we move to the flyte-binary solution.
+* ``flyte-deps``
+  This chart just has dependencies that users may find useful to install alongside Flyte.
+* ``flyte``
+  This chart depends on flyte-core, and adds in some additional dependencies as well.
 
 .. toctree::
     :maxdepth: 1

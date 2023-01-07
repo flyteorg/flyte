@@ -1,9 +1,12 @@
 .. _administrator-deployment-multicluster:
 
-
 ##################################
 Using Multiple Kubernetes Clusters
 ##################################
+
+.. warning::
+    The multicluster deployment described in this doc assumes you have deployed the ``flyte`` Helm chart, which runs the individual Flyte services separately. This is needed because in a multicluster setup, the
+    execution engine is deployed to multiple K8s clusters. This will not work with the ``flyte-binary`` Helm chart, since that chart deploys all Flyte service as one single binary, hence the name.
 
 Scaling Beyond Kubernetes
 -------------------------
@@ -11,9 +14,8 @@ Scaling Beyond Kubernetes
 .. tip::
   As described in the `Architecture Overview <https://docs.flyte.org/en/latest/concepts/architecture.html>`_, the Flyte ``Control Plane`` sends workflows off to the ``Data Plane`` for execution. The data plane fulfills these workflows by launching pods in Kubernetes.
 
-Often, the total compute needs could exceed the limits of a single Kubernetes cluster.
-To address this, you can deploy the data plane to several isolated Kubernetes clusters.
-The control plane (FlyteAdmin) can be configured to load-balance workflows across these isolated data planes, protecting you from failure in a single Kubernetes cluster increasing scalability.
+At very large companies, total compute needs could exceed the limits of a single Kubernetes cluster. To address this, you can deploy the data plane to multiple Kubernetes clusters.
+The control plane (FlyteAdmin) can be configured to load-balance workflows across these individual data planes, protecting you from failure in a single Kubernetes cluster increasing scalability.
 
 To achieve this, first, you have to create additional Kubernetes clusters.
 For now, let's assume you have three Kubernetes clusters and that you can access them all with ``kubectl``.
@@ -22,7 +24,6 @@ Let's call these clusters ``cluster1``, ``cluster2``, and ``cluster3``.
 Next, deploy **just** the data planes to these clusters.
 To do this, remove the data plane components from the **flyte** overlay, and create a new overlay containing **only** the data plane resources.
 
-
 Data Plane Deployment
 *********************
 
@@ -30,7 +31,7 @@ Data Plane Deployment
 
 .. code-block::
 
-    helm repo add flytyteorg https://flyteorg.github.io/flyte
+    helm repo add flyteorg https://flyteorg.github.io/flyte
     helm repo update
     # Get flyte-core helm chart
     helm fetch --untar --untardir . flyteorg/flyte-core

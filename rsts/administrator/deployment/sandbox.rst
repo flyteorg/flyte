@@ -38,7 +38,7 @@ Within the single container environment, a mini Kubernetes cluster is installed 
 
 flytectl
 --------
-``flytectl`` is a control plane CLI for Flyte. Find installation instructions for it on `https://github.com/flyteorg/flytectl`__.
+``flytectl`` is a control plane CLI for Flyte. Find installation instructions for it on https://github.com/flyteorg/flytectl.
 
 Running
 =======
