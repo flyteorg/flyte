@@ -1,20 +1,20 @@
 .PHONY: flyte
 flyte: FLYTE_BINARY_VERSION := latest
 flyte:
+	mkdir -p images/tar/arm64
+#	docker pull --platform linux/arm64 \
+#		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
+	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
+		flyte-binary:sandbox
+	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
+	docker rmi flyte-binary:sandbox
+
 	mkdir -p images/tar/amd64
 	docker pull --platform linux/amd64 \
 		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
 	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
 		flyte-binary:sandbox
 	docker save --output  images/tar/amd64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
-
-	mkdir -p images/tar/arm64
-	docker pull --platform linux/arm64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
 	docker rmi flyte-binary:sandbox
 
 .PHONY: manifests
