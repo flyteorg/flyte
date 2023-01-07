@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/go-test/deep"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -50,7 +50,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 	}
 
-	res, err := utils.ToK8sResourceRequirements(resources)
+	res, err := flytek8s.ToK8sResourceRequirements(resources)
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, false
