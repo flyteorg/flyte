@@ -96,4 +96,4 @@ r.set_signal("signal-name", "execidabc123", True)
 
 ## Looking Ahead
 In the coming release, we are focusing on...
-1. [Out of core plugin](https://unionai.atlassian.net/wiki/spaces/FLYTE/pages/47153191/Out+of+core+plugins+Prove+Value): Make backend plugin scalable and easy to author. No need of code generation, using tools that MLEs and Data Scientists are not accustomed to using.
+1. [Out of core plugin](https://hackmd.io/k_hMtUsGTbKl2IksC3IjkA): Make backend plugin scalable and easy to author. No need of code generation, using tools that MLEs and Data Scientists are not accustomed to using.
