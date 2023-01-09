@@ -3,7 +3,12 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
-FROM golang:1.18-alpine3.15 as builder
+FROM --platform=${BUILDPLATFORM} golang:1.18-alpine3.15 as builder
+
+ARG TARGETARCH
+ENV GOARCH "${TARGETARCH}"
+ENV GOOS linux
+
 RUN apk add git openssh-client make curl
 
 # Create the artifacts directory
