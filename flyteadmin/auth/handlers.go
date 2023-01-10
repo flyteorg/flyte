@@ -449,8 +449,18 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 	return func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
+			if info.AdditionalClaims != nil {
+				for k, v := range info.AdditionalClaims.GetFields() {
+					jsonBytes, err := v.MarshalJSON()
+					if err != nil {
+						logger.Warningf(ctx, "failed to marshal claim [%s] to json: %v", k, err)
+						continue
+					}
+					header := fmt.Sprintf("X-User-Claim-%s", strings.ReplaceAll(k, "_", "-"))
+					w.Header().Set(header, string(jsonBytes))
+				}
+			}
 			w.Header().Set("X-User-Subject", info.Subject)
-			w.Header().Set("X-User-Name", info.Name)
 		}
 		return nil
 	}
