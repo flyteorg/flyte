@@ -129,7 +129,7 @@ flyte:
       # -- Docker image for Datacatalog deployment
       repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
       # -- Docker image tag
-      tag: v1.0.40 # DATACATALOG_TAG
+      tag: v1.0.41 # DATACATALOG_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Datacatalog deployment
@@ -178,7 +178,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.1.56 # FLYTEPROPELLER_TAG
+      tag: v1.1.59 # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -223,7 +223,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v1.4.0 # FLYTECONSOLE_TAG
+      tag: v1.4.1 # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
