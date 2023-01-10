@@ -302,13 +302,18 @@ func TestUserInfoForwardResponseHander(t *testing.T) {
 	w := httptest.NewRecorder()
 	resp := service.UserInfoResponse{
 		Subject: "user-id",
+		Name:    "User Name",
 	}
 	assert.NoError(t, handler(ctx, w, &resp))
 	assert.Contains(t, w.Result().Header, "X-User-Subject")
 	assert.Equal(t, w.Result().Header["X-User-Subject"], []string{"user-id"})
 
+	assert.Contains(t, w.Result().Header, "X-User-Name")
+	assert.Equal(t, w.Result().Header["X-User-Name"], []string{"User Name"})
+
 	w = httptest.NewRecorder()
 	unrelatedResp := service.OAuth2MetadataResponse{}
 	assert.NoError(t, handler(ctx, w, &unrelatedResp))
 	assert.NotContains(t, w.Result().Header, "X-User-Subject")
+	assert.NotContains(t, w.Result().Header, "X-User-Name")
 }

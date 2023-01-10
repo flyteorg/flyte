@@ -450,6 +450,7 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			w.Header().Set("X-User-Subject", info.Subject)
+			w.Header().Set("X-User-Name", info.Name)
 		}
 		return nil
 	}
