@@ -157,7 +157,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  ContainerTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType, RawContainerTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,
@@ -176,7 +176,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  podTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType, SidecarTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType, RawContainerTaskType, SidecarTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,
