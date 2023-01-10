@@ -242,7 +242,7 @@ Permitted project operations include:
 Matchable resources
 +++++++++++++++++++
 
-A thorough background on :ref:`matchable resources <administrator-configuration-general>` explains
+A thorough background on :ref:`matchable resources <deployment-configuration-general>` explains
 their purpose and application logic. As a summary, these are used to override system level defaults for Kubernetes cluster
 resource management, default execution values, and more across different levels of specificity.
 
