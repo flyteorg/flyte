@@ -4,6 +4,8 @@
 Authenticating in Flyte
 ########################
 
+.. tags:: Authentication, Infrastructure, Advanced
+
 Flyte ships with a canonical implementation of OpenIDConnect client and OAuth2 Server, integrating seamlessly into an
 organization's existing identity provider.
 

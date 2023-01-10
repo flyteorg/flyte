@@ -3,6 +3,8 @@
 Notifications
 -------------
 
+.. tags:: Infrastructure, Advanced
+
 When a workflow completes, users can be notified by:
 
 * Email

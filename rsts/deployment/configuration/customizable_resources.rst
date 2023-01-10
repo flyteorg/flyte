@@ -4,6 +4,8 @@
 Adding New Customizable Resources
 #################################
 
+.. tags:: Infrastructure, Advanced
+
 As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values.
 Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
 

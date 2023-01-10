@@ -42,7 +42,6 @@ This section includes all documentation to deploying and administering Flyte, en
     :hidden:
 
     deployment/index
-    ideal_flow
     plugins/index
     configuration/index
     security/index

@@ -4,6 +4,8 @@
 Using Multiple Kubernetes Clusters
 ##################################
 
+.. tags:: Kubernetes, Infrastructure, Advanced
+
 .. warning::
     The multicluster deployment described in this doc assumes you have deployed the ``flyte`` Helm chart, which runs the individual Flyte services separately. This is needed because in a multicluster setup, the
     execution engine is deployed to multiple K8s clusters. This will not work with the ``flyte-binary`` Helm chart, since that chart deploys all Flyte service as one single binary, hence the name.

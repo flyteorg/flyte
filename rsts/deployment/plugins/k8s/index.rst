@@ -1,8 +1,9 @@
 .. _deployment-plugin-setup-k8s:
 
-
 K8s Operator
 -----------------------------------------
+
+.. tags:: Kubernetes, Integration, KubernetesOperator, Spark, AWS, GCP, MachineLearning, DistributedComputing, Advanced
 
 This guide gives an overview of setting up the K8s Operator backend plugin in your Flyte deployment.
 
