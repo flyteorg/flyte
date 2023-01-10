@@ -5,8 +5,12 @@ Cluster Config
 ##############
 
 .. warning::
-   
-   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for we will work on soon.
+
+   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for we will work on soon. For the most part, if you're using the ``flyte-binary`` chart, instead of specifying under a yaml file like ``cloud_events.yaml`` in :ref:`deployment-configuration-cloud-event`, you'll need to add those settings under the ``inline`` section here
+
+   .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
+      :lines: 30
+
 
 .. panels::
     :header: text-center
@@ -100,6 +104,14 @@ Cluster Config
     ^^^^^^^^^^^^
     Configure Flyte to to send events to external pub/sub systems.
 
+    ---
+
+    .. link-button:: deployment-configuration-generated
+       :type: ref
+       :text: Generated Documentation
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Generated documentation for the configuration objects for Flyte backend services.
 
 .. toctree::
     :maxdepth: 1
@@ -115,3 +127,4 @@ Cluster Config
     notifications
     performance
     cloud_event
+    generated/index

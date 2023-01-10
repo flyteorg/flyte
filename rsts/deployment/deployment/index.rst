@@ -56,6 +56,13 @@ Flyte uses Helm as the K8s release packaging solution for now, though you may st
 * ``flyte``
   This chart depends on flyte-core, and adds in some additional dependencies as well.
 
+**************************************
+Additional Community Generated Content
+**************************************
+The details of the documentation in this folder are intentionally slim with respect to specifics regarding the deployment steps. They differ quite a bit from company to company and cloud to cloud. People use different ingresses, different auth providers, different versions of the various libraries and versions. However it's still helpful to have all this deployment experience located in one place. In addition to searching and posting on Slack, there is a GitHub discussion dedicated to deploying Flyte. Feel free to submit any hints you've found helpful as a discussion, ask questions, or simply just document what worked or didn't work for you.
+
+https://github.com/flyteorg/flyte/discussions/categories/deployment-tips-tricks
+
 .. toctree::
     :maxdepth: 1
     :name: deployment options toc
@@ -65,4 +72,3 @@ Flyte uses Helm as the K8s release packaging solution for now, though you may st
     cloud_simple
     cloud_production
     multicluster
-
