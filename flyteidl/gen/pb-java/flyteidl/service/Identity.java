@@ -556,6 +556,31 @@ public final class Identity {
      */
     com.google.protobuf.ByteString
         getPictureBytes();
+
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    boolean hasAdditionalClaims();
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    com.google.protobuf.Struct getAdditionalClaims();
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    com.google.protobuf.StructOrBuilder getAdditionalClaimsOrBuilder();
   }
   /**
    * <pre>
@@ -647,6 +672,19 @@ public final class Identity {
               java.lang.String s = input.readStringRequireUtf8();
 
               picture_ = s;
+              break;
+            }
+            case 66: {
+              com.google.protobuf.Struct.Builder subBuilder = null;
+              if (additionalClaims_ != null) {
+                subBuilder = additionalClaims_.toBuilder();
+              }
+              additionalClaims_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(additionalClaims_);
+                additionalClaims_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -977,6 +1015,39 @@ public final class Identity {
       }
     }
 
+    public static final int ADDITIONAL_CLAIMS_FIELD_NUMBER = 8;
+    private com.google.protobuf.Struct additionalClaims_;
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    public boolean hasAdditionalClaims() {
+      return additionalClaims_ != null;
+    }
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    public com.google.protobuf.Struct getAdditionalClaims() {
+      return additionalClaims_ == null ? com.google.protobuf.Struct.getDefaultInstance() : additionalClaims_;
+    }
+    /**
+     * <pre>
+     * Additional claims
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct additional_claims = 8;</code>
+     */
+    public com.google.protobuf.StructOrBuilder getAdditionalClaimsOrBuilder() {
+      return getAdditionalClaims();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1012,6 +1083,9 @@ public final class Identity {
       if (!getPictureBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, picture_);
       }
+      if (additionalClaims_ != null) {
+        output.writeMessage(8, getAdditionalClaims());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1042,6 +1116,10 @@ public final class Identity {
       if (!getPictureBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, picture_);
       }
+      if (additionalClaims_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, getAdditionalClaims());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1071,6 +1149,11 @@ public final class Identity {
           .equals(other.getEmail())) return false;
       if (!getPicture()
           .equals(other.getPicture())) return false;
+      if (hasAdditionalClaims() != other.hasAdditionalClaims()) return false;
+      if (hasAdditionalClaims()) {
+        if (!getAdditionalClaims()
+            .equals(other.getAdditionalClaims())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1096,6 +1179,10 @@ public final class Identity {
       hash = (53 * hash) + getEmail().hashCode();
       hash = (37 * hash) + PICTURE_FIELD_NUMBER;
       hash = (53 * hash) + getPicture().hashCode();
+      if (hasAdditionalClaims()) {
+        hash = (37 * hash) + ADDITIONAL_CLAIMS_FIELD_NUMBER;
+        hash = (53 * hash) + getAdditionalClaims().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1247,6 +1334,12 @@ public final class Identity {
 
         picture_ = "";
 
+        if (additionalClaimsBuilder_ == null) {
+          additionalClaims_ = null;
+        } else {
+          additionalClaims_ = null;
+          additionalClaimsBuilder_ = null;
+        }
         return this;
       }
 
@@ -1280,6 +1373,11 @@ public final class Identity {
         result.familyName_ = familyName_;
         result.email_ = email_;
         result.picture_ = picture_;
+        if (additionalClaimsBuilder_ == null) {
+          result.additionalClaims_ = additionalClaims_;
+        } else {
+          result.additionalClaims_ = additionalClaimsBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -1355,6 +1453,9 @@ public final class Identity {
         if (!other.getPicture().isEmpty()) {
           picture_ = other.picture_;
           onChanged();
+        }
+        if (other.hasAdditionalClaims()) {
+          mergeAdditionalClaims(other.getAdditionalClaims());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2012,6 +2113,159 @@ public final class Identity {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.Struct additionalClaims_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> additionalClaimsBuilder_;
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public boolean hasAdditionalClaims() {
+        return additionalClaimsBuilder_ != null || additionalClaims_ != null;
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public com.google.protobuf.Struct getAdditionalClaims() {
+        if (additionalClaimsBuilder_ == null) {
+          return additionalClaims_ == null ? com.google.protobuf.Struct.getDefaultInstance() : additionalClaims_;
+        } else {
+          return additionalClaimsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public Builder setAdditionalClaims(com.google.protobuf.Struct value) {
+        if (additionalClaimsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          additionalClaims_ = value;
+          onChanged();
+        } else {
+          additionalClaimsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public Builder setAdditionalClaims(
+          com.google.protobuf.Struct.Builder builderForValue) {
+        if (additionalClaimsBuilder_ == null) {
+          additionalClaims_ = builderForValue.build();
+          onChanged();
+        } else {
+          additionalClaimsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public Builder mergeAdditionalClaims(com.google.protobuf.Struct value) {
+        if (additionalClaimsBuilder_ == null) {
+          if (additionalClaims_ != null) {
+            additionalClaims_ =
+              com.google.protobuf.Struct.newBuilder(additionalClaims_).mergeFrom(value).buildPartial();
+          } else {
+            additionalClaims_ = value;
+          }
+          onChanged();
+        } else {
+          additionalClaimsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public Builder clearAdditionalClaims() {
+        if (additionalClaimsBuilder_ == null) {
+          additionalClaims_ = null;
+          onChanged();
+        } else {
+          additionalClaims_ = null;
+          additionalClaimsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public com.google.protobuf.Struct.Builder getAdditionalClaimsBuilder() {
+        
+        onChanged();
+        return getAdditionalClaimsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      public com.google.protobuf.StructOrBuilder getAdditionalClaimsOrBuilder() {
+        if (additionalClaimsBuilder_ != null) {
+          return additionalClaimsBuilder_.getMessageOrBuilder();
+        } else {
+          return additionalClaims_ == null ?
+              com.google.protobuf.Struct.getDefaultInstance() : additionalClaims_;
+        }
+      }
+      /**
+       * <pre>
+       * Additional claims
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct additional_claims = 8;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
+          getAdditionalClaimsFieldBuilder() {
+        if (additionalClaimsBuilder_ == null) {
+          additionalClaimsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  getAdditionalClaims(),
+                  getParentForChildren(),
+                  isClean());
+          additionalClaims_ = null;
+        }
+        return additionalClaimsBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2086,15 +2340,17 @@ public final class Identity {
     java.lang.String[] descriptorData = {
       "\n\037flyteidl/service/identity.proto\022\020flyte" +
       "idl.service\032\034google/api/annotations.prot" +
-      "o\"\021\n\017UserInfoRequest\"\226\001\n\020UserInfoRespons" +
-      "e\022\017\n\007subject\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032\n\022pref" +
-      "erred_username\030\003 \001(\t\022\022\n\ngiven_name\030\004 \001(\t" +
-      "\022\023\n\013family_name\030\005 \001(\t\022\r\n\005email\030\006 \001(\t\022\017\n\007" +
-      "picture\030\007 \001(\t2q\n\017IdentityService\022^\n\010User" +
-      "Info\022!.flyteidl.service.UserInfoRequest\032" +
-      "\".flyteidl.service.UserInfoResponse\"\013\202\323\344" +
-      "\223\002\005\022\003/meB9Z7github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/serviceb\006proto3"
+      "o\032\034google/protobuf/struct.proto\"\021\n\017UserI" +
+      "nfoRequest\"\312\001\n\020UserInfoResponse\022\017\n\007subje" +
+      "ct\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032\n\022preferred_user" +
+      "name\030\003 \001(\t\022\022\n\ngiven_name\030\004 \001(\t\022\023\n\013family" +
+      "_name\030\005 \001(\t\022\r\n\005email\030\006 \001(\t\022\017\n\007picture\030\007 " +
+      "\001(\t\0222\n\021additional_claims\030\010 \001(\0132\027.google." +
+      "protobuf.Struct2q\n\017IdentityService\022^\n\010Us" +
+      "erInfo\022!.flyteidl.service.UserInfoReques" +
+      "t\032\".flyteidl.service.UserInfoResponse\"\013\202" +
+      "\323\344\223\002\005\022\003/meB9Z7github.com/flyteorg/flytei" +
+      "dl/gen/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2108,6 +2364,7 @@ public final class Identity {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
+          com.google.protobuf.StructProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_UserInfoRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -2120,13 +2377,14 @@ public final class Identity {
     internal_static_flyteidl_service_UserInfoResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_UserInfoResponse_descriptor,
-        new java.lang.String[] { "Subject", "Name", "PreferredUsername", "GivenName", "FamilyName", "Email", "Picture", });
+        new java.lang.String[] { "Subject", "Name", "PreferredUsername", "GivenName", "FamilyName", "Email", "Picture", "AdditionalClaims", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
+    com.google.protobuf.StructProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

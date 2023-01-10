@@ -19160,6 +19160,9 @@ export namespace flyteidl {
 
             /** UserInfoResponse picture */
             picture?: (string|null);
+
+            /** UserInfoResponse additionalClaims */
+            additionalClaims?: (google.protobuf.IStruct|null);
         }
 
         /** Represents a UserInfoResponse. */
@@ -19191,6 +19194,9 @@ export namespace flyteidl {
 
             /** UserInfoResponse picture. */
             public picture: string;
+
+            /** UserInfoResponse additionalClaims. */
+            public additionalClaims?: (google.protobuf.IStruct|null);
 
             /**
              * Creates a new UserInfoResponse instance using the specified properties.
