@@ -1,9 +1,9 @@
-.. _administrator-deployment-cloud-production:
+.. _deployment-deployment-cloud-production:
 
 #######################################
 Production Cloud-Based Flyte Deployment
 #######################################
-The following instructions assume you have Flyte set up as in the :ref:`administrator-deployment-cloud-simple`.
+The following instructions assume you have Flyte set up as in the :ref:`deployment-deployment-cloud-simple`.
 
 The items here describe additional setup steps to productionalize your Flyte installation. While not strictly required, many administrators will choose to incorporate these.
 
@@ -24,7 +24,7 @@ This currently assumes that you have nginx ingress. We'll be updating these in t
 ***************
 Authentication
 ***************
-Authentication comes stock with Flyte in the form of OAuth 2. Please see the `authentication guide <administrator-configuration-auth-setup>`__ for instructions.
+Authentication comes stock with Flyte in the form of OAuth 2. Please see the `authentication guide <deployment-configuration-auth-setup>`__ for instructions.
 
 Authorization is not supported in Flyte. The breadth, depth, and variety of requirements we've heard for authorization schemes, and the undertaking any implementation would represent, push authorization beyond the scope of the Flyte project for the forseeable future.
 

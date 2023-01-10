@@ -1,21 +1,16 @@
-.. _administrator:
+.. _deployment:
 
 #############
-Administrator
+Deployment
 #############
 
-*********************
-Administrator's Guide
-*********************
-
-This is the administrator's guide. Add more stuff here.
-
+This guide includes all documentation to deploying and administering Flyte, enabling and configuring plugins, authentication, performance tuning, and general articles on how to maintain Flyte as a production grade service in your company. 
 
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2
 
-    .. link-button:: administrator-deployment
+    .. link-button:: deployment-deployment
        :type: ref
        :text: Deployment Options
        :classes: btn-block stretched-link
@@ -24,7 +19,7 @@ This is the administrator's guide. Add more stuff here.
 
     ---
 
-    .. link-button:: administrator-plugin-setup
+    .. link-button:: deployment-plugin-setup
        :type: ref
        :text: Multi-cluster setup
        :classes: btn-block stretched-link
@@ -33,7 +28,7 @@ This is the administrator's guide. Add more stuff here.
 
     ---
 
-    .. link-button:: administrator-security-overview
+    .. link-button:: deployment-security-overview
        :type: ref
        :text: Security Overview
        :classes: btn-block stretched-link
@@ -43,7 +38,7 @@ This is the administrator's guide. Add more stuff here.
 
 .. toctree::
     :maxdepth: 1
-    :name: administrator guide toc
+    :name: deployment guide toc
     :hidden:
 
     deployment/index
@@ -51,4 +46,3 @@ This is the administrator's guide. Add more stuff here.
     plugins/index
     configuration/index
     security/index
-

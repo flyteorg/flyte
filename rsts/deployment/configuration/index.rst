@@ -1,4 +1,4 @@
-.. _administrator-configuration:
+.. _deployment-configuration:
 
 ##############
 Cluster Config
@@ -9,7 +9,7 @@ Cluster Config
     :header: text-center
     :column: col-lg-12 p-2
 
-    .. link-button:: administrator-configuration-auth-setup
+    .. link-button:: deployment-configuration-auth-setup
        :type: ref
        :text: Authenticating in Flyte
        :classes: btn-block stretched-link
@@ -18,7 +18,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-auth-migration
+    .. link-button:: deployment-configuration-auth-migration
        :type: ref
        :text: Migrating Your Authentication Config
        :classes: btn-block stretched-link
@@ -27,7 +27,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-auth-appendix
+    .. link-button:: deployment-configuration-auth-appendix
        :type: ref
        :text: Understanding Authentication in Detail
        :classes: btn-block stretched-link
@@ -36,7 +36,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-general
+    .. link-button:: deployment-configuration-general
        :type: ref
        :text: Configuring Custom K8s Resources
        :classes: btn-block stretched-link
@@ -45,7 +45,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-customizable-resources
+    .. link-button:: deployment-configuration-customizable-resources
        :type: ref
        :text: Adding New Customizable Resources
        :classes: btn-block stretched-link
@@ -54,7 +54,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-notifications
+    .. link-button:: deployment-configuration-notifications
        :type: ref
        :text: Notifications
        :classes: btn-block stretched-link
@@ -63,7 +63,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-cloud-event
+    .. link-button:: deployment-configuration-cloud-event
        :type: ref
        :text: External Events
        :classes: btn-block stretched-link
@@ -72,7 +72,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-monitoring
+    .. link-button:: deployment-configuration-monitoring
        :type: ref
        :text: Monitoring
        :classes: btn-block stretched-link
@@ -81,7 +81,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-performance
+    .. link-button:: deployment-configuration-performance
        :type: ref
        :text: Optimizing Performance
        :classes: btn-block stretched-link
@@ -90,7 +90,7 @@ Cluster Config
 
     ---
 
-    .. link-button:: administrator-configuration-eventing
+    .. link-button:: deployment-configuration-eventing
        :type: ref
        :text: Platform Events
        :classes: btn-block stretched-link

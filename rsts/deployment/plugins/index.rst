@@ -1,4 +1,4 @@
-.. _administrator-plugin-setup:
+.. _deployment-plugin-setup:
 
 ############
 Plugin Setup

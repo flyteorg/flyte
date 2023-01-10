@@ -1,4 +1,4 @@
-.. _administrator-security-overview:
+.. _deployment-security-overview:
 
 ###################
 Security Overview

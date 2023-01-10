@@ -1,4 +1,4 @@
-.. _administrator-deployment-multicluster:
+.. _deployment-deployment-multicluster:
 
 ##################################
 Using Multiple Kubernetes Clusters

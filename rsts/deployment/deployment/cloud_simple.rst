@@ -1,4 +1,4 @@
-.. _administrator-deployment-cloud-simple:
+.. _deployment-deployment-cloud-simple:
 
 ##################################
 Core Cloud-Based Flyte Deployment

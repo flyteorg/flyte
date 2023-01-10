@@ -1,4 +1,4 @@
-.. _administrator-configuration-auth-setup:
+.. _deployment-configuration-auth-setup:
 
 ########################
 Authenticating in Flyte
@@ -22,8 +22,8 @@ the security of the overall system.
 
 In abstract, Flyte supports OAuth2 and OpenId Connect (built on top of OAuth2) to secure the various connections:
 
-* :ref:`OpenId Connect <administrator-auth-openid-appendix>`: Used to secure user's authentication to flyteadmin service.
-* :ref:`OAuth2 <administrator-auth-oauth2-appendix>`: Used to secure communication between clients (i.e. flyte-cli, flytectl and
+* :ref:`OpenId Connect <deployment-auth-openid-appendix>`: Used to secure user's authentication to flyteadmin service.
+* :ref:`OAuth2 <deployment-auth-oauth2-appendix>`: Used to secure communication between clients (i.e. flyte-cli, flytectl and
   flytepropeller) and flyteadmin service.
 
 Identity Providers Support
@@ -474,4 +474,4 @@ This collection of RFCs may be helpful to those who wish to investigate the impl
 * `PKCE RFC 7636 <https://tools.ietf.org/html/rfc7636>`_
 * `JWT RFC 7519 <https://tools.ietf.org/html/rfc7519>`_
 
-There's also a lot more detailed information into the authentication flows in the :ref:`administrator-configuration-auth-appendix`.
+There's also a lot more detailed information into the authentication flows in the :ref:`deployment-configuration-auth-appendix`.

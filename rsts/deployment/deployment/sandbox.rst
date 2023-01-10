@@ -1,4 +1,4 @@
-.. _administrator-deployment-sandbox:
+.. _deployment-deployment-sandbox:
 
 #########################
 Flyte Sandbox Deployment
@@ -14,7 +14,7 @@ What is a sandbox deployment?
 In addition to a K8s cluster, Flyte requires some external cloud-provided resources such as a database and durable blob store. A sandboxed deployment of Flyte is merely the concept of bundling portable versions of these requirements alongside Flyte to simplify setup. For the blob store requirements, we use Minio, which offers an S3 compatible interface, and for Postgres, we use the stock Postgres Docker image and Helm chart.
 
 .. warning::
-    The sandbox deployment is not suitable for production environments. For instructions on how to create a production-ready Flyte deployment, checkout the :ref:`administrator` guide.
+    The sandbox deployment is not suitable for production environments. For instructions on how to create a production-ready Flyte deployment, checkout the :ref:`deployment` guide.
 
 *******************************************
 Flyte Sandbox as a Single Docker Container

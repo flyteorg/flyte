@@ -1,4 +1,4 @@
-.. _administrator-configuration-customizable-resources:
+.. _deployment-configuration-customizable-resources:
 
 #################################
 Adding New Customizable Resources
@@ -8,9 +8,9 @@ As a quick refresher, custom resources allow you to manage configurations for sp
 Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
 
 .. note::
-    For background on customizable resources, refer to :ref:`administrator-configuration-general`.
+    For background on customizable resources, refer to :ref:`deployment-configuration-general`.
 
-In a :ref:`multi-cluster setup <administrator-deployment-multicluster>`, an example one could think of is setting routing rules to send certain workflows to specific clusters, which demands setting up custom resources.
+In a :ref:`multi-cluster setup <deployment-deployment-multicluster>`, an example one could think of is setting routing rules to send certain workflows to specific clusters, which demands setting up custom resources.
 
 Here's how you could go about building a customizable priority designation.
 

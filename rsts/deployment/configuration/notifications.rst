@@ -1,4 +1,4 @@
-.. _administrator-configuration-notifications:
+.. _deployment-configuration-notifications:
 
 Notifications
 -------------

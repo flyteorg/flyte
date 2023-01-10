@@ -1,4 +1,4 @@
-.. _administrator-long-term:
+.. _deployment-long-term:
 
 Streamlining Your Flyte Workflows
 --------------------------------------

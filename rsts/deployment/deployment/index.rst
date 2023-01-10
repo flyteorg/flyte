@@ -1,4 +1,4 @@
-.. _administrator-deployment:
+.. _deployment-deployment:
 
 ###################
 Deployment Guide
@@ -34,11 +34,11 @@ Flyte Deployment Options
 There are broadly three different styles of deploying a Flyte backend, with the middle option below being what we recommend for a capable though not massively scalable cluster. If all your ML compute can `fit on one EKS cluster <https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html>`__ (which as of this writing is north of 13000 nodes), this is likely the option for you.
 
 * Sandboxed
-  This uses portable replacements for the blob store and database mentioned above and is not suitable for production use. This is a fantastic experimentation and testing environment for Flyte though and is what is used for our ``flytectl demo`` environment. Please see :ref:`administrator-deployment-sandbox`.
+  This uses portable replacements for the blob store and database mentioned above and is not suitable for production use. This is a fantastic experimentation and testing environment for Flyte though and is what is used for our ``flytectl demo`` environment. Please see :ref:`deployment-deployment-sandbox`.
 * Unified Flyte on one cluster
-  We recommend this for most Flyte deployments because it's the simplest. Flyte is bundled as one executable, requiring only one Deployment for itself. It runs on a single K8s cluster and but still supports the rich ecosystem of extensions and plugins Flyte offers. Refer to the :ref:`administrator-deployment-cloud-simple` page to get started.
+  We recommend this for most Flyte deployments because it's the simplest. Flyte is bundled as one executable, requiring only one Deployment for itself. It runs on a single K8s cluster and but still supports the rich ecosystem of extensions and plugins Flyte offers. Refer to the :ref:`deployment-deployment-cloud-simple` page to get started.
 * Multi-cluster
-  For the largest of deployments, it may be worthwhile or necessary to have multiple K8s clusters. Flyte's control plane (Admin, Console, Data Catalog) is separated from Flyte's execution engine (Propeller), which runs typically once per compute cluster. See :ref:`administrator-deployment-multicluster` for the details.
+  For the largest of deployments, it may be worthwhile or necessary to have multiple K8s clusters. Flyte's control plane (Admin, Console, Data Catalog) is separated from Flyte's execution engine (Propeller), which runs typically once per compute cluster. See :ref:`deployment-deployment-multicluster` for the details.
   
 Whatever the style, note that Propeller itself can be sharded as well, though typically that's not required.
 
@@ -49,7 +49,7 @@ Flyte uses Helm as the K8s release packaging solution for now, though you may st
 * ``flyte-binary``
   This is the chart for the middle option, the option that should suffice for most production deployments.
 * ``flyte-core``
-  This chart deploys the Flyte components separately as multiple services. See the :ref:`administrator-deployment-multicluster` for more information on how to use this.
+  This chart deploys the Flyte components separately as multiple services. See the :ref:`deployment-deployment-multicluster` for more information on how to use this.
   This was formerly the primary recommended chart to use before we move to the flyte-binary solution.
 * ``flyte-deps``
   This chart just has dependencies that users may find useful to install alongside Flyte.

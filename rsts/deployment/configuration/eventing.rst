@@ -1,4 +1,4 @@
-.. _administrator-configuration-eventing:
+.. _deployment-configuration-eventing:
 
 ###############
 Platform Events
@@ -7,7 +7,7 @@ Platform Events
 .. tags:: Configuration, Infrastructure, Advanced
 
 Progress of Flyte workflow and task execution is delimited by a series of events that are passed from the FlytePropeller to FlyteAdmin.
-Administrators can configure FlyteAdmin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`administrator-configuration-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
+Administrators can configure FlyteAdmin to send these events onwards to a pub/sub system like SNS/SQS as well. Note that this configuration is distinct from the configuration for notifications :ref:`deployment-configuration-notifications`. They should use separate topics/queues. These events are meant for external consumption, outside the Flyte platform, whereas the notifications pub/sub setup is entirely for Admin itself to send email/pagerduty/etc notifications.
 
 *********
 Use cases

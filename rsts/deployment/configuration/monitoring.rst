@@ -1,4 +1,4 @@
-.. _administrator-configuration-monitoring:
+.. _deployment-configuration-monitoring:
 
 Monitoring
 ----------

@@ -1,10 +1,10 @@
-.. _administrator-configuration-auth-appendix:
+.. _deployment-configuration-auth-appendix:
 
 ######################################
 Understanding Authentication in Detail
 ######################################
 
-.. _administrator-auth-openid-appendix:
+.. _deployment-auth-openid-appendix:
 
 **************
 OpenID Connect
@@ -38,7 +38,7 @@ provider.
         Browser->>+Console: /home
         Browser->>-User: Render /home
 
-.. _administrator-auth-oauth2-appendix:
+.. _deployment-auth-oauth2-appendix:
 
 ******
 OAuth2
