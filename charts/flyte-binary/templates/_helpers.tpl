@@ -103,19 +103,19 @@ Get the Flyte logging configuration.
 */}}
 {{- define "flyte-binary.configuration.logging.plugins" -}}
 {{- with .Values.configuration.logging.plugins -}}
-{{- if .kubernetes.enabled -}}
-kubernetes-enabled: true
+kubernetes-enabled: {{ .kubernetes.enabled }}
+{{- if .kubernetes.enabled }}
 kubernetes-template-uri: {{ required "Template URI required for Kubernetes logging plugin" .kubernetes.templateUri }}
-{{- end -}}
-{{- if .cloudwatch.enabled -}}
-cloudwatch-enabled: true
+{{- end }}
+cloudwatch-enabled: {{ .cloudwatch.enabled }}
+{{- if .cloudwatch.enabled }}
 cloudwatch-template-uri: {{ required "Template URI required for CloudWatch logging plugin" .cloudwatch.templateUri }}
-{{- end -}}
-{{- if .stackdriver.enabled -}}
-stackdriver-enabled: true
+{{- end }}
+stackdriver-enabled: {{ .stackdriver.enabled }}
+{{- if .stackdriver.enabled }}
 stackdriver-template-uri: {{ required "Template URI required for stackdriver logging plugin" .stackdriver.templateUri }}
-{{- end -}}
-{{- if .custom -}}
+{{- end }}
+{{- if .custom }}
 templates: {{- toYaml .custom | nindent 2 -}}
 {{- end -}}
 {{- end -}}

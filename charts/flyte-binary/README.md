@@ -1,6 +1,6 @@
 # flyte-binary
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: v0.1.10](https://img.shields.io/badge/Version-v0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 Chart for basic single Flyte executable deployment
 
@@ -48,6 +48,7 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.endpoint | string | `""` |  |
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
+| configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.storage.userDataContainer | string | `"my-organization-flyte-container"` |  |
 | deployment.annotations | object | `{}` |  |
 | deployment.args | list | `[]` |  |
@@ -60,12 +61,9 @@ Chart for basic single Flyte executable deployment
 | deployment.extraVolumes | list | `[]` |  |
 | deployment.genAdminAuthSecret.args | list | `[]` |  |
 | deployment.genAdminAuthSecret.command | list | `[]` |  |
-| deployment.genAdminAuthSecret.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.genAdminAuthSecret.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` |  |
-| deployment.genAdminAuthSecret.image.tag | string | `"v1.1.57"` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-sandbox"` |  |
-| deployment.image.tag | string | `"flytebinary_1007"` |  |
+| deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-binary"` |  |
+| deployment.image.tag | string | `"latest"` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
 | deployment.lifecycleHooks | object | `{}` |  |

@@ -23,6 +23,7 @@ flyte-binary:
       providerConfig:
         s3:
           disableSSL: true
+          v2Signing: true
           endpoint: http://localhost:30002
           authType: accesskey
           accessKey: minio

@@ -1,21 +1,19 @@
-.PHONY: flyte
-flyte: FLYTE_BINARY_VERSION := latest
-flyte:
-	mkdir -p images/tar/amd64
-	docker pull --platform linux/amd64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/amd64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
+define FLYTE_BINARY_BUILD
+mkdir -p images/tar/$(1)
 
-	mkdir -p images/tar/arm64
-	docker pull --platform linux/arm64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
+docker buildx build \
+	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--platform linux/$(1) \
+	--tag flyte-binary:sandbox \
+	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
+	../..
+
+endef
+
+.PHONY: flyte
+flyte: FLYTECONSOLE_VERSION := latest
+flyte:
+	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
 .PHONY: manifests
 manifests:

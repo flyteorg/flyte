@@ -8,7 +8,7 @@ A Helm chart for the Flyte local sandbox
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyte-binary | flyte-binary | 0.1.0 |
+| file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 11.10.13 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.1.0 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
@@ -40,6 +40,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.storage.providerConfig.s3.disableSSL | bool | `true` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
 | flyte-binary.configuration.storage.userDataContainer | string | `"my-s3-bucket"` |  |
 | flyte-binary.deployment.extraPodSpec.hostNetwork | bool | `true` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |

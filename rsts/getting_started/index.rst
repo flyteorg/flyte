@@ -20,6 +20,10 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 .. prompt:: bash
 
   pip install flytekit
+  
+.. important::
+
+    ``flytekit`` currently supports Python 3.7 - 3.10
 
 
 Example: Computing Descriptive Statistics

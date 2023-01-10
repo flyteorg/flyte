@@ -97,7 +97,7 @@ spec:
         {{- end }}
         {{- if .Values.configuration.auth.enabled }}
         - name: gen-admin-auth-secret
-          {{- with .Values.deployment.genAdminAuthSecret.image }}
+          {{- with .Values.deployment.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           {{- end }}
@@ -113,9 +113,9 @@ spec:
             {{- tpl ( .Values.deployment.genAdminAuthSecret.args | toYaml ) . | nindent 12 }}
             {{- else }}
             - |
-              flyteadmin --config=/etc/flyte/config.d/*.yaml \
+              flyte --config=/etc/flyte/config.d/*.yaml \
                 secrets init --localPath /tmp/admin-auth-secret
-              flyteadmin --config=/etc/flyte/config.d/*.yaml \
+              flyte --config=/etc/flyte/config.d/*.yaml \
                 secrets create \
                 --name {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }} \
                 --fromPath /tmp/admin-auth-secret
