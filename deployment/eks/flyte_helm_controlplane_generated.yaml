@@ -800,7 +800,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.4.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.4.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -867,7 +867,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.40"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.41"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -881,7 +881,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.40"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.41"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
