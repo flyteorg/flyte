@@ -4,6 +4,9 @@
 Cluster Config
 ##############
 
+.. warning::
+   
+   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for we will work on soon.
 
 .. panels::
     :header: text-center

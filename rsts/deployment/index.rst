@@ -4,7 +4,7 @@
 Deployment
 #############
 
-This guide includes all documentation to deploying and administering Flyte, enabling and configuring plugins, authentication, performance tuning, and general articles on how to maintain Flyte as a production grade service in your company. 
+This section includes all documentation to deploying and administering Flyte, enabling and configuring plugins, authentication, performance tuning, and general articles on how to maintain Flyte as a production grade service in your company.
 
 .. panels::
     :header: text-center

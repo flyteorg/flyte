@@ -1,4 +1,4 @@
-.. _administrator-configuration-auth-migration:
+.. _deployment-configuration-auth-migration:
 
 ####################################
 Migrating Your Authentication Config
