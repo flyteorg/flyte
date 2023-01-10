@@ -136,5 +136,5 @@ func IdentityContextFromIDTokenToken(ctx context.Context, tokenStr, clientID str
 
 	// TODO: Document why automatically specify "all" scope
 	return NewIdentityContext(idToken.Audience[0], idToken.Subject, "", idToken.IssuedAt,
-		sets.NewString(ScopeAll), userInfo, claims), nil
+		sets.NewString(ScopeAll), userInfo, claims)
 }

@@ -64,5 +64,5 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		scopes.Insert(auth.ScopeAll)
 	}
 
-	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw), nil
+	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw)
 }

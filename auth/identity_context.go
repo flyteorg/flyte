@@ -2,7 +2,10 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
@@ -79,7 +82,8 @@ func (c IdentityContext) AuthenticatedAt() time.Time {
 }
 
 // NewIdentityContext creates a new IdentityContext.
-func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Time, scopes sets.String, userInfo *service.UserInfoResponse, claims map[string]interface{}) IdentityContext {
+func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Time, scopes sets.String, userInfo *service.UserInfoResponse, claims map[string]interface{}) (
+	IdentityContext, error) {
 	// For some reason, google IdP returns a subject in the ID Token but an empty subject in the /user_info endpoint
 	if userInfo == nil {
 		userInfo = &service.UserInfoResponse{}
@@ -87,6 +91,14 @@ func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Tim
 
 	if len(userInfo.Subject) == 0 {
 		userInfo.Subject = userID
+	}
+
+	if len(claims) > 0 {
+		claimsStruct, err := utils.MarshalObjToStruct(claims)
+		if err != nil {
+			return IdentityContext{}, fmt.Errorf("failed to marshal claims [%+v] to struct: %w", claims, err)
+		}
+		userInfo.AdditionalClaims = claimsStruct
 	}
 
 	return IdentityContext{
@@ -97,7 +109,7 @@ func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Tim
 		authenticatedAt: authenticatedAt,
 		scopes:          &scopes,
 		claims:          &claims,
-	}
+	}, nil
 }
 
 // IdentityContextFromContext retrieves the authenticated identity from context.Context.
