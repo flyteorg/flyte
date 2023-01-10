@@ -32,6 +32,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "google/api/annotations.pb.h"
+#include <google/protobuf/struct.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fservice_2fidentity_2eproto
@@ -368,6 +369,15 @@ class UserInfoResponse final :
   ::std::string* release_picture();
   void set_allocated_picture(::std::string* picture);
 
+  // .google.protobuf.Struct additional_claims = 8;
+  bool has_additional_claims() const;
+  void clear_additional_claims();
+  static const int kAdditionalClaimsFieldNumber = 8;
+  const ::google::protobuf::Struct& additional_claims() const;
+  ::google::protobuf::Struct* release_additional_claims();
+  ::google::protobuf::Struct* mutable_additional_claims();
+  void set_allocated_additional_claims(::google::protobuf::Struct* additional_claims);
+
   // @@protoc_insertion_point(class_scope:flyteidl.service.UserInfoResponse)
  private:
   class HasBitSetters;
@@ -380,6 +390,7 @@ class UserInfoResponse final :
   ::google::protobuf::internal::ArenaStringPtr family_name_;
   ::google::protobuf::internal::ArenaStringPtr email_;
   ::google::protobuf::internal::ArenaStringPtr picture_;
+  ::google::protobuf::Struct* additional_claims_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fidentity_2eproto;
 };
@@ -767,6 +778,52 @@ inline void UserInfoResponse::set_allocated_picture(::std::string* picture) {
   }
   picture_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), picture);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.service.UserInfoResponse.picture)
+}
+
+// .google.protobuf.Struct additional_claims = 8;
+inline bool UserInfoResponse::has_additional_claims() const {
+  return this != internal_default_instance() && additional_claims_ != nullptr;
+}
+inline const ::google::protobuf::Struct& UserInfoResponse::additional_claims() const {
+  const ::google::protobuf::Struct* p = additional_claims_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.UserInfoResponse.additional_claims)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Struct*>(
+      &::google::protobuf::_Struct_default_instance_);
+}
+inline ::google::protobuf::Struct* UserInfoResponse::release_additional_claims() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.UserInfoResponse.additional_claims)
+  
+  ::google::protobuf::Struct* temp = additional_claims_;
+  additional_claims_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Struct* UserInfoResponse::mutable_additional_claims() {
+  
+  if (additional_claims_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Struct>(GetArenaNoVirtual());
+    additional_claims_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.UserInfoResponse.additional_claims)
+  return additional_claims_;
+}
+inline void UserInfoResponse::set_allocated_additional_claims(::google::protobuf::Struct* additional_claims) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(additional_claims_);
+  }
+  if (additional_claims) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(additional_claims)->GetArena();
+    if (message_arena != submessage_arena) {
+      additional_claims = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, additional_claims, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  additional_claims_ = additional_claims;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.UserInfoResponse.additional_claims)
 }
 
 #ifdef __GNUC__

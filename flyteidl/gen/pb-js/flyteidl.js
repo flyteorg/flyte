@@ -44528,6 +44528,7 @@
                  * @property {string|null} [familyName] UserInfoResponse familyName
                  * @property {string|null} [email] UserInfoResponse email
                  * @property {string|null} [picture] UserInfoResponse picture
+                 * @property {google.protobuf.IStruct|null} [additionalClaims] UserInfoResponse additionalClaims
                  */
     
                 /**
@@ -44602,6 +44603,14 @@
                 UserInfoResponse.prototype.picture = "";
     
                 /**
+                 * UserInfoResponse additionalClaims.
+                 * @member {google.protobuf.IStruct|null|undefined} additionalClaims
+                 * @memberof flyteidl.service.UserInfoResponse
+                 * @instance
+                 */
+                UserInfoResponse.prototype.additionalClaims = null;
+    
+                /**
                  * Creates a new UserInfoResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.UserInfoResponse
@@ -44639,6 +44648,8 @@
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.email);
                     if (message.picture != null && message.hasOwnProperty("picture"))
                         writer.uint32(/* id 7, wireType 2 =*/58).string(message.picture);
+                    if (message.additionalClaims != null && message.hasOwnProperty("additionalClaims"))
+                        $root.google.protobuf.Struct.encode(message.additionalClaims, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -44681,6 +44692,9 @@
                         case 7:
                             message.picture = reader.string();
                             break;
+                        case 8:
+                            message.additionalClaims = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -44721,6 +44735,11 @@
                     if (message.picture != null && message.hasOwnProperty("picture"))
                         if (!$util.isString(message.picture))
                             return "picture: string expected";
+                    if (message.additionalClaims != null && message.hasOwnProperty("additionalClaims")) {
+                        var error = $root.google.protobuf.Struct.verify(message.additionalClaims);
+                        if (error)
+                            return "additionalClaims." + error;
+                    }
                     return null;
                 };
     

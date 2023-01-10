@@ -4,6 +4,7 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 // import "protoc-gen-swagger/options/annotations.proto";
 
 message UserInfoRequest {}
@@ -31,6 +32,9 @@ message UserInfoResponse {
 
   // Profile picture URL
   string picture = 7;
+
+  // Additional claims
+  google.protobuf.Struct additional_claims = 8;
 }
 
 // IdentityService defines an RPC Service that interacts with user/app identities.

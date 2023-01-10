@@ -16,6 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fstruct_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto;
 namespace flyteidl {
 namespace service {
 class UserInfoRequestDefaultTypeInternal {
@@ -53,8 +54,9 @@ static void InitDefaultsUserInfoResponse_flyteidl_2fservice_2fidentity_2eproto()
   ::flyteidl::service::UserInfoResponse::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_UserInfoResponse_flyteidl_2fservice_2fidentity_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsUserInfoResponse_flyteidl_2fservice_2fidentity_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<1> scc_info_UserInfoResponse_flyteidl_2fservice_2fidentity_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsUserInfoResponse_flyteidl_2fservice_2fidentity_2eproto}, {
+      &scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fservice_2fidentity_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_UserInfoRequest_flyteidl_2fservice_2fidentity_2eproto.base);
@@ -83,6 +85,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fservice_2fidentity_2epro
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::UserInfoResponse, family_name_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::UserInfoResponse, email_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::service::UserInfoResponse, picture_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::service::UserInfoResponse, additional_claims_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::service::UserInfoRequest)},
@@ -103,28 +106,31 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_flyteidl_2fservice_2fidentity_2eproto[] =
   "\n\037flyteidl/service/identity.proto\022\020flyte"
   "idl.service\032\034google/api/annotations.prot"
-  "o\"\021\n\017UserInfoRequest\"\226\001\n\020UserInfoRespons"
-  "e\022\017\n\007subject\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032\n\022pref"
-  "erred_username\030\003 \001(\t\022\022\n\ngiven_name\030\004 \001(\t"
-  "\022\023\n\013family_name\030\005 \001(\t\022\r\n\005email\030\006 \001(\t\022\017\n\007"
-  "picture\030\007 \001(\t2q\n\017IdentityService\022^\n\010User"
-  "Info\022!.flyteidl.service.UserInfoRequest\032"
-  "\".flyteidl.service.UserInfoResponse\"\013\202\323\344"
-  "\223\002\005\022\003/meB9Z7github.com/flyteorg/flyteidl"
-  "/gen/pb-go/flyteidl/serviceb\006proto3"
+  "o\032\034google/protobuf/struct.proto\"\021\n\017UserI"
+  "nfoRequest\"\312\001\n\020UserInfoResponse\022\017\n\007subje"
+  "ct\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\032\n\022preferred_user"
+  "name\030\003 \001(\t\022\022\n\ngiven_name\030\004 \001(\t\022\023\n\013family"
+  "_name\030\005 \001(\t\022\r\n\005email\030\006 \001(\t\022\017\n\007picture\030\007 "
+  "\001(\t\0222\n\021additional_claims\030\010 \001(\0132\027.google."
+  "protobuf.Struct2q\n\017IdentityService\022^\n\010Us"
+  "erInfo\022!.flyteidl.service.UserInfoReques"
+  "t\032\".flyteidl.service.UserInfoResponse\"\013\202"
+  "\323\344\223\002\005\022\003/meB9Z7github.com/flyteorg/flytei"
+  "dl/gen/pb-go/flyteidl/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fidentity_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fidentity_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fidentity_2eproto,
-  "flyteidl/service/identity.proto", &assign_descriptors_table_flyteidl_2fservice_2fidentity_2eproto, 435,
+  "flyteidl/service/identity.proto", &assign_descriptors_table_flyteidl_2fservice_2fidentity_2eproto, 517,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fidentity_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
   {
     ::AddDescriptors_google_2fapi_2fannotations_2eproto,
+    ::AddDescriptors_google_2fprotobuf_2fstruct_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fidentity_2eproto, deps, 1);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fidentity_2eproto, deps, 2);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -344,11 +350,24 @@ void UserInfoRequest::InternalSwap(UserInfoRequest* other) {
 // ===================================================================
 
 void UserInfoResponse::InitAsDefaultInstance() {
+  ::flyteidl::service::_UserInfoResponse_default_instance_._instance.get_mutable()->additional_claims_ = const_cast< ::google::protobuf::Struct*>(
+      ::google::protobuf::Struct::internal_default_instance());
 }
 class UserInfoResponse::HasBitSetters {
  public:
+  static const ::google::protobuf::Struct& additional_claims(const UserInfoResponse* msg);
 };
 
+const ::google::protobuf::Struct&
+UserInfoResponse::HasBitSetters::additional_claims(const UserInfoResponse* msg) {
+  return *msg->additional_claims_;
+}
+void UserInfoResponse::clear_additional_claims() {
+  if (GetArenaNoVirtual() == nullptr && additional_claims_ != nullptr) {
+    delete additional_claims_;
+  }
+  additional_claims_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int UserInfoResponse::kSubjectFieldNumber;
 const int UserInfoResponse::kNameFieldNumber;
@@ -357,6 +376,7 @@ const int UserInfoResponse::kGivenNameFieldNumber;
 const int UserInfoResponse::kFamilyNameFieldNumber;
 const int UserInfoResponse::kEmailFieldNumber;
 const int UserInfoResponse::kPictureFieldNumber;
+const int UserInfoResponse::kAdditionalClaimsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UserInfoResponse::UserInfoResponse()
@@ -396,6 +416,11 @@ UserInfoResponse::UserInfoResponse(const UserInfoResponse& from)
   if (from.picture().size() > 0) {
     picture_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.picture_);
   }
+  if (from.has_additional_claims()) {
+    additional_claims_ = new ::google::protobuf::Struct(*from.additional_claims_);
+  } else {
+    additional_claims_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.service.UserInfoResponse)
 }
 
@@ -409,6 +434,7 @@ void UserInfoResponse::SharedCtor() {
   family_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   email_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   picture_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  additional_claims_ = nullptr;
 }
 
 UserInfoResponse::~UserInfoResponse() {
@@ -424,6 +450,7 @@ void UserInfoResponse::SharedDtor() {
   family_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   email_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   picture_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete additional_claims_;
 }
 
 void UserInfoResponse::SetCachedSize(int size) const {
@@ -448,6 +475,10 @@ void UserInfoResponse::Clear() {
   family_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   email_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   picture_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && additional_claims_ != nullptr) {
+    delete additional_claims_;
+  }
+  additional_claims_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -574,6 +605,19 @@ const char* UserInfoResponse::_InternalParse(const char* begin, const char* end,
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // .google.protobuf.Struct additional_claims = 8;
+      case 8: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 66) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::google::protobuf::Struct::_InternalParse;
+        object = msg->mutable_additional_claims();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -715,6 +759,17 @@ bool UserInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
+      // .google.protobuf.Struct additional_claims = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (66 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_additional_claims()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -812,6 +867,12 @@ void UserInfoResponse::SerializeWithCachedSizes(
       7, this->picture(), output);
   }
 
+  // .google.protobuf.Struct additional_claims = 8;
+  if (this->has_additional_claims()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      8, HasBitSetters::additional_claims(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -902,6 +963,13 @@ void UserInfoResponse::SerializeWithCachedSizes(
         7, this->picture(), target);
   }
 
+  // .google.protobuf.Struct additional_claims = 8;
+  if (this->has_additional_claims()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        8, HasBitSetters::additional_claims(this), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -972,6 +1040,13 @@ size_t UserInfoResponse::ByteSizeLong() const {
         this->picture());
   }
 
+  // .google.protobuf.Struct additional_claims = 8;
+  if (this->has_additional_claims()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *additional_claims_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1027,6 +1102,9 @@ void UserInfoResponse::MergeFrom(const UserInfoResponse& from) {
 
     picture_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.picture_);
   }
+  if (from.has_additional_claims()) {
+    mutable_additional_claims()->::google::protobuf::Struct::MergeFrom(from.additional_claims());
+  }
 }
 
 void UserInfoResponse::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1068,6 +1146,7 @@ void UserInfoResponse::InternalSwap(UserInfoResponse* other) {
     GetArenaNoVirtual());
   picture_.Swap(&other->picture_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(additional_claims_, other->additional_claims_);
 }
 
 ::google::protobuf::Metadata UserInfoResponse::GetMetadata() const {
