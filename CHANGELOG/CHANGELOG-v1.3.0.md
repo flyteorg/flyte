@@ -97,6 +97,11 @@ r.set_signal("signal-name", "execidabc123", True)
 ### Overwritten Cached Values on Execution
 Users can now configure workflow execution to overwrite the cache. Each task in the workflow execution, regardless of previous cache status, will execute and write cached values - overwritting previous values if necessary. This allows previously corrupted cache values to be corrected without the tedious process of incrementing the `cache_version` and re-registering Flyte workflows / tasks.
 
+
+### Support for Dask
+Users will be able to spawn [Dask](https://www.dask.org/) ephemeral clusters as part of their workflows, similar to the support for [Ray](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/ray_example/ray_example.html#sphx-glr-auto-integrations-kubernetes-ray-example-ray-example-py) and [Spark](https://docs.flyte.org/projects/cookbook/en/stable/auto/integrations/kubernetes/k8s_spark/pyspark_pi.html).
+
+
 ## Looking Ahead
 In the coming release, we are focusing on...
 1. [Out of core plugin](https://hackmd.io/k_hMtUsGTbKl2IksC3IjkA): Make backend plugin scalable and easy to author. No need of code generation, using tools that MLEs and Data Scientists are not accustomed to using.
