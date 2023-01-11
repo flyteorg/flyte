@@ -4,7 +4,8 @@
 # 1. Copy this file to ~/.flyte/config.yaml
 # 2. Replace instance of $HOME with the realpath of your home directory
 # 3. Run sandbox in development mode: `flytectl demo start --dev`
-# 4. Start Flyte locally: `POD_NAMESPACE=flyte go run cmd/main.go start --config ~/.flyte/config.yaml`
+# 4. Fetch Flyteconsole distribution: `make cmd/single/dist`
+# 4. Start Flyte locally: `POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/config.yaml`
 
 admin:
   endpoint: localhost:8089
