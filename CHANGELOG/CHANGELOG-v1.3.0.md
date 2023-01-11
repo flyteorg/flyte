@@ -94,6 +94,10 @@ r.list_signals("atc526g94gmlg4w65dth")
 r.set_signal("signal-name", "execidabc123", True)
 ```
 
+### Overwritten Cached Values on Execution
+Users can now configure workflow execution to overwrite the cache. Each task in the workflow execution, regardless of previous cache status, will execute and write cached values - overwritting previous values if necessary. This allows previously corrupted cache values to be corrected without the tedious process of incrementing the `cache_version` and re-registering Flyte workflows / tasks.
+
 ## Looking Ahead
 In the coming release, we are focusing on...
 1. [Out of core plugin](https://hackmd.io/k_hMtUsGTbKl2IksC3IjkA): Make backend plugin scalable and easy to author. No need of code generation, using tools that MLEs and Data Scientists are not accustomed to using.
+2. [Performance Observability](https://github.com/flyteorg/flyte/blob/60ba3a603ed1e4fcd47da3ed89dde422faa4d188/rfc/system/2995-performance-benchmarking.md): We have made great progress on exposing both finer-grained runtime metrics and Flytes orchestration metrics. This is important to better understand workflow evaluation performance and mitigate inefficiencies thereof.
