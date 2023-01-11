@@ -400,10 +400,3 @@ cluster_resource_manager:
 
 sparkoperator:
   enabled: false
-
-#
-# SPARKOPERATOR
-#
-
-daskoperator:
-  enabled: false

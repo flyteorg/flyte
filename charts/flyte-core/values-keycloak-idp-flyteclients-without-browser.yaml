@@ -832,8 +832,3 @@ sparkoperator:
           - spark.blacklist.enabled: "true"
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
-
-# -- Optional: Dask Plugin using the Dask Operator
-daskoperator:
-  # --- enable or disable the dask operator deployment installation
-  enabled: false

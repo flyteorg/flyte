@@ -383,10 +383,3 @@ cluster_resource_manager:
 
 sparkoperator:
   enabled: false
-
-#
-# DASKOPERATOR
-#
-
-daskoperator:
-  enabled: false
