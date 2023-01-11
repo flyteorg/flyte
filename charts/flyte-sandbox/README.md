@@ -8,7 +8,7 @@ A Helm chart for the Flyte local sandbox
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyte-binary | flyte-binary | 0.1.0 |
+| file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 11.10.13 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.1.0 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
@@ -18,6 +18,7 @@ A Helm chart for the Flyte local sandbox
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| docker-registry.enabled | bool | `true` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
 | docker-registry.image.repository | string | `"registry"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |
@@ -39,6 +40,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.storage.providerConfig.s3.disableSSL | bool | `true` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
 | flyte-binary.configuration.storage.userDataContainer | string | `"my-s3-bucket"` |  |
 | flyte-binary.deployment.extraPodSpec.hostNetwork | bool | `true` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |
@@ -47,6 +49,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.pullPolicy | string | `"Never"` |  |
 | flyte-binary.deployment.waitForDB.image.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
+| flyte-binary.enabled | bool | `true` |  |
+| kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.image.pullPolicy | string | `"Never"` |  |
@@ -60,6 +64,7 @@ A Helm chart for the Flyte local sandbox
 | minio.auth.rootPassword | string | `"miniostorage"` |  |
 | minio.auth.rootUser | string | `"minio"` |  |
 | minio.defaultBuckets | string | `"my-s3-bucket"` |  |
+| minio.enabled | bool | `true` |  |
 | minio.extraEnvVars[0].name | string | `"MINIO_BROWSER_REDIRECT_URL"` |  |
 | minio.extraEnvVars[0].value | string | `"http://localhost:30080/minio"` |  |
 | minio.image.pullPolicy | string | `"Never"` |  |
@@ -70,6 +75,7 @@ A Helm chart for the Flyte local sandbox
 | minio.service.nodePorts.api | int | `30002` |  |
 | minio.service.type | string | `"NodePort"` |  |
 | postgresql.auth.postgresPassword | string | `"postgres"` |  |
+| postgresql.enabled | bool | `true` |  |
 | postgresql.image.pullPolicy | string | `"Never"` |  |
 | postgresql.image.repository | string | `"bitnami/postgresql"` |  |
 | postgresql.image.tag | string | `"sandbox"` |  |
@@ -78,7 +84,8 @@ A Helm chart for the Flyte local sandbox
 | postgresql.primary.service.nodePorts.postgresql | int | `30001` |  |
 | postgresql.primary.service.type | string | `"NodePort"` |  |
 | postgresql.shmVolume.enabled | bool | `false` |  |
-| sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
-| sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
-| sandbox.proxy.image.tag | string | `"sandbox"` |  |
+| proxy.enabled | bool | `true` |  |
+| proxy.image.pullPolicy | string | `"Never"` |  |
+| proxy.image.repository | string | `"envoyproxy/envoy"` |  |
+| proxy.image.tag | string | `"sandbox"` |  |
 

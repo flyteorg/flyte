@@ -23,6 +23,9 @@ sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-core/README.md  > temp.txt && mv tem
 grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-deps/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
 sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-deps/README.md  > temp.txt && mv temp.txt ./charts/flyte-core/README.md
 
+grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-binary/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-binary/README.md > temp.txt && mv temp.txt ./charts/flyte-core/README.md
+
 helm dep update ./charts/flyte
 helm dep update ./charts/flyte-deps
 
@@ -54,3 +57,6 @@ sed -i "s,repository:[^P]*# FLYTEPROPELLER_IMAGE,repository: cr.flyte.org/flyteo
 
 sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot-release:${VERSION} # FLYTECOPILOT_IMAGE," ./charts/flyte/values.yaml
 sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot-release:${VERSION} # FLYTECOPILOT_IMAGE," ./charts/flyte-core/values.yaml
+
+sed -i "s,repository:[^P]*# FLYTE_IMAGE,repository: cr.flyte.org/flyteorg/flyte-binary-release # FLYTE_IMAGE," ./charts/flyte-binary/values.yaml
+sed -i "s,tag:[^P]*# FLYTE_TAG,tag: ${VERSION} # FLYTE_TAG," ./charts/flyte-binary/values.yaml

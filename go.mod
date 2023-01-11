@@ -3,9 +3,9 @@ module github.com/flyteorg/flyte
 go 1.18
 
 require (
-	github.com/flyteorg/datacatalog v1.0.40
-	github.com/flyteorg/flyteadmin v1.1.57
-	github.com/flyteorg/flytepropeller v1.1.52
+	github.com/flyteorg/datacatalog v1.0.41
+	github.com/flyteorg/flyteadmin v1.1.67
+	github.com/flyteorg/flytepropeller v1.1.59
 	github.com/flyteorg/flytestdlib v1.0.14
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
@@ -53,6 +53,7 @@ require (
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
+	github.com/bstadlbauer/dask-k8s-operator-go-client v0.1.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0 // indirect
@@ -67,12 +68,12 @@ require (
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/emicklei/go-restful v2.9.6+incompatible // indirect
+	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.2.5 // indirect
-	github.com/flyteorg/flyteplugins v1.0.20 // indirect
+	github.com/flyteorg/flyteidl v1.3.2 // indirect
+	github.com/flyteorg/flyteplugins v1.0.28 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -210,11 +211,11 @@ require (
 	k8s.io/apiextensions-apiserver v0.24.1 // indirect
 	k8s.io/apimachinery v0.24.1 // indirect
 	k8s.io/component-base v0.24.1 // indirect
-	k8s.io/klog/v2 v2.60.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42 // indirect
-	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
-	sigs.k8s.io/json v0.0.0-20220525155127-227cbc7cc124 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
+	k8s.io/klog/v2 v2.70.1 // indirect
+	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1 // indirect
+	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed // indirect
+	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 

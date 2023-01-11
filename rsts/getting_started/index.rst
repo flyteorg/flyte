@@ -20,6 +20,10 @@ Install `Flytekit <https://pypi.org/project/flytekit/>`__, Flyte's Python SDK.
 .. prompt:: bash
 
   pip install flytekit
+  
+.. important::
+
+    ``flytekit`` currently supports Python 3.7 - 3.10
 
 
 Example: Computing Descriptive Statistics
@@ -162,8 +166,7 @@ Start a Flyte demonstration environment on your local machine via:
 
 .. note::
 
-   Make sure to export the ``KUBECONFIG`` and ``FLYTECTL_CONFIG`` environment variables in your shell, replacing
-   ``<username>`` with your actual username.
+   Make sure to export the ``FLYTECTL_CONFIG`` environment variables in your shell
 
 .. dropdown:: :fa:`info-circle` What is a flyte demo environment?
     :title: text-muted

@@ -1,9 +1,9 @@
 helmGlobals:
-  chartHome: ../../../charts
+  chartHome: ../../../../charts
 helmCharts:
 - name: flyte-sandbox
   releaseName: sandbox
   namespace: flyte
 namespace: flyte
 resources:
-- namespace.yaml
+- ../namespace.yaml

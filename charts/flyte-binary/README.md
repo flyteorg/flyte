@@ -1,6 +1,6 @@
 # flyte-binary
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: v0.1.10](https://img.shields.io/badge/Version-v0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 Chart for basic single Flyte executable deployment
 
@@ -12,10 +12,15 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.externalConfigMap | string | `""` |  |
 | clusterResourceTemplates.inline | object | `{}` |  |
 | clusterResourceTemplates.labels | object | `{}` |  |
-| clusterResourceTemplates.sourcePath | string | `""` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
+| configuration.auth.enabled | bool | `false` |  |
+| configuration.auth.internal.clientSecret | string | `""` |  |
+| configuration.auth.internal.clientSecretHash | string | `""` |  |
+| configuration.auth.oidc.baseUrl | string | `""` |  |
+| configuration.auth.oidc.clientId | string | `""` |  |
+| configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -34,7 +39,6 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
-| configuration.sourcePath | string | `""` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.gcs.project | string | `"my-organization-gcp-project"` |  |
@@ -44,6 +48,7 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.endpoint | string | `""` |  |
 | configuration.storage.providerConfig.s3.region | string | `"us-east-1"` |  |
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
+| configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.storage.userDataContainer | string | `"my-organization-flyte-container"` |  |
 | deployment.annotations | object | `{}` |  |
 | deployment.args | list | `[]` |  |
@@ -54,9 +59,11 @@ Chart for basic single Flyte executable deployment
 | deployment.extraPodSpec | object | `{}` |  |
 | deployment.extraVolumeMounts | list | `[]` |  |
 | deployment.extraVolumes | list | `[]` |  |
+| deployment.genAdminAuthSecret.args | list | `[]` |  |
+| deployment.genAdminAuthSecret.command | list | `[]` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-sandbox"` |  |
-| deployment.image.tag | string | `"flytebinary_1007"` |  |
+| deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-binary"` |  |
+| deployment.image.tag | string | `"latest"` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
 | deployment.lifecycleHooks | object | `{}` |  |
@@ -78,13 +85,16 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | fullnameOverride | string | `""` |  |
-| ingress.annotations | object | `{}` |  |
+| ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
+| ingress.grpcAnnotations | object | `{}` |  |
 | ingress.host | string | `""` |  |
+| ingress.httpAnnotations | object | `{}` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |
+| rbac.extraRules | list | `[]` |  |
 | rbac.labels | object | `{}` |  |
 | service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
@@ -101,4 +111,5 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.labels | object | `{}` |  |
+| serviceAccount.name | string | `""` |  |
 

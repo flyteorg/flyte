@@ -6,17 +6,20 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.ingress.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.ingress.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.ingress.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.ingress.annotations "context" $) | nindent 4 }}
+    {{- if .Values.ingress.commonAnnotations }}
+    {{- tpl ( .Values.ingress.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.httpAnnotations }}
+    {{- tpl ( .Values.ingress.httpAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   rules:
@@ -156,6 +159,6 @@ spec:
         path: /oauth2/*
         pathType: ImplementationSpecific
     {{- if .Values.ingress.host }}
-    host: {{ include "flyte-binary.renderTemplate" ( dict "value" .Values.ingress.host "context" $ ) }}
+    host: {{ tpl .Values.ingress.host . | quote }}
     {{- end }}
 {{- end }}

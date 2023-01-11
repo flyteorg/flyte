@@ -5,17 +5,17 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.deployment.labels }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.labels "context" $) | nindent 4 }}
+    {{- tpl ( .Values.deployment.labels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
-    {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
     {{- if .Values.deployment.annotations }}
-    {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.annotations "context" $) | nindent 4 }}
+    {{- tpl ( .Values.deployment.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   replicas: 1
@@ -27,10 +27,10 @@ spec:
     metadata:
       labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
         {{- if .Values.commonLabels }}
-        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
         {{- end }}
         {{- if .Values.deployment.podLabels }}
-        {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.podLabels "context" $) | nindent 8 }}
+        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 4 }}
         {{- end }}
       annotations:
         {{- if not .Values.configuration.existingConfigmap }}
@@ -42,15 +42,19 @@ spec:
         {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
         checksum/db-password-secret: {{ include (print $.Template.BasePath "/db-password-secret.yaml") . | sha256sum }}
         {{- end }}
+        {{- if .Values.configuration.auth.enabled }}
+        checksum/admin-auth-secret: {{ include (print $.Template.BasePath "/admin-auth-secret.yaml") . | sha256sum }}
+        checksum/auth-client-secret: {{ include (print $.Template.BasePath "/auth-client-secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.commonAnnotations }}
-        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
         {{- end }}
         {{- if .Values.deployment.podAnnotations }}
-        {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.podAnnotations "context" $) | nindent 8 }}
+        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 4 }}
         {{- end }}
     spec:
       {{- if .Values.deployment.extraPodSpec }}
-      {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraPodSpec "context" $) | nindent 6 }}
+      {{- tpl ( .Values.deployment.extraPodSpec | toYaml ) . | nindent 6 }}
       {{- end }}
       {{- if .Values.deployment.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.deployment.podSecurityContext "enabled" | toYaml | nindent 12 }}
@@ -66,14 +70,14 @@ spec:
           {{- end }}
           command:
             {{- if .Values.deployment.waitForDB.command }}
-            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.waitForDB.command "context" $) | nindent 12 }}
+            {{- tpl ( .Values.deployment.waitForDB.command | toYaml ) . | nindent 12 }}
             {{- else }}
             - sh
             - -ec
             {{- end }}
           args:
             {{- if .Values.deployment.waitForDB.args }}
-            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.waitForDB.args "context" $) | nindent 12 }}
+            {{- tpl ( .Values.deployment.waitForDB.args | toYaml ) . | nindent 12 }}
             {{- else }}
             {{- with .Values.configuration.database }}
             - |
@@ -91,8 +95,45 @@ spec:
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
           {{- end }}
         {{- end }}
+        {{- if .Values.configuration.auth.enabled }}
+        - name: gen-admin-auth-secret
+          {{- with .Values.deployment.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          {{- end }}
+          command:
+            {{- if .Values.deployment.genAdminAuthSecret.command }}
+            {{- tpl ( .Values.deployment.genAdminAuthSecret.command | toYaml ) . | nindent 12 }}
+            {{- else }}
+            - sh
+            - -ec
+            {{- end }}
+          args:
+            {{- if .Values.deployment.genAdminAuthSecret.args }}
+            {{- tpl ( .Values.deployment.genAdminAuthSecret.args | toYaml ) . | nindent 12 }}
+            {{- else }}
+            - |
+              flyte --config=/etc/flyte/config.d/*.yaml \
+                secrets init --localPath /tmp/admin-auth-secret
+              flyte --config=/etc/flyte/config.d/*.yaml \
+                secrets create \
+                --name {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }} \
+                --fromPath /tmp/admin-auth-secret
+            {{- end }}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config
+              mountPath: /etc/flyte/config.d
+          {{- if .Values.deployment.resources }}
+          resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+        {{- end }}
         {{- if .Values.deployment.initContainers }}
-        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.initContainers "context" $ ) | nindent 8 }}
+        {{- tpl ( .Values.deployment.initContainers | toYaml ) . | nindent 8 }}
         {{- end }}
       {{- end }}
       containers:
@@ -102,11 +143,11 @@ spec:
           imagePullPolicy: {{ .pullPolicy | quote }}
           {{- end }}
           {{- if .Values.deployment.command }}
-          command: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.command "context" $) | nindent 12 }}
+          command: {{- tpl ( .Values.deployment.command | toYaml ) . | nindent 12 }}
           {{- end }}
           args:
             {{- if .Values.deployment.args }}
-            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.args "context" $) | nindent 12 }}
+            {{- tpl ( .Values.deployment.args | toYaml ) . | nindent 12 }}
             {{- else }}
             - start
             - --config
@@ -122,7 +163,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             {{- if .Values.deployment.extraEnvVars }}
-            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraEnvVars "context" $) | nindent 12 }}
+            {{- tpl ( .Values.deployment.extraEnvVars | toYaml ) . | nindent 12 }}
             {{- end }}
           {{- if or .Values.deployment.extraEnvVarsConfigMap .Values.deployment.extraEnvVarsSecret }}
           envFrom:
@@ -143,11 +184,11 @@ spec:
             - name: webhook
               containerPort: 9443
           {{- if .Values.deployment.startupProbe }}
-          startupProbe: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.customStartupProbe "context" $) | nindent 12 }}
+          startupProbe: {{- tpl ( .Values.deployment.customStartupProbe | toYaml ) . | nindent 12 }}
           {{- end }}
           livenessProbe:
           {{- if .Values.deployment.livenessProbe }}
-          {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.livenessProbe "context" $) | nindent 12 }}
+          {{- tpl ( .Values.deployment.livenessProbe | toYaml ) . | nindent 12 }}
           {{- else }}
             httpGet:
               path: /healthcheck
@@ -155,7 +196,7 @@ spec:
           {{- end }}
           readinessProbe:
           {{- if .Values.deployment.readinessProbe }}
-          {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.readinessProbe "context" $) | nindent 12 }}
+          {{- tpl ( .Values.deployment.readinessProbe | toYaml ) . | nindent 12 }}
           {{- else }}
             httpGet:
               path: /healthcheck
@@ -165,9 +206,13 @@ spec:
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.deployment.lifecycleHooks }}
-          lifecycle: {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.lifecycleHooks "context" $) | nindent 12 }}
+          lifecycle: {{- tpl ( .Values.deployment.lifecycleHooks | toYaml ) . | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.configuration.auth.enabled }}
+            - name: auth
+              mountPath: /etc/secrets
+            {{- end }}
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates
             - name: config
@@ -180,12 +225,21 @@ spec:
             - name: state
               mountPath: /var/run/flyte
             {{- if .Values.deployment.extraVolumeMounts }}
-            {{- include "flyte-binary.renderTemplate" (dict "value" .Values.deployment.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
         {{- if .Values.deployment.sidecars }}
-        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.sidecars "context" $ ) | nindent 8 }}
+        {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
+        {{- if .Values.configuration.auth.enabled }}
+        - name: auth
+          projected:
+            sources:
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
+        {{- end }}
         - name: cluster-resource-templates
           configMap:
             name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
@@ -200,5 +254,5 @@ spec:
         - name: state
           emptyDir: {}
         {{- if .Values.deployment.extraVolumes }}
-        {{- include "flyte-binary.renderTemplate" ( dict "value" .Values.deployment.extraVolumes "context" $ ) | nindent 8 }}
+        {{- tpl ( .Values.deployment.extraVolumes | toYaml ) . | nindent 8 }}
         {{- end }}

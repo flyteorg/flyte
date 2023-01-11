@@ -120,7 +120,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | flyte.datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| flyte.datacatalog.image.tag | string | `"v1.0.40"` | Docker image tag |
+| flyte.datacatalog.image.tag | string | `"v1.0.41"` | Docker image tag |
 | flyte.datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | flyte.datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | flyte.datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
@@ -136,7 +136,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables  e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>"  e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
 | flyte.flyteadmin.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyte.flyteadmin.image.tag | string | `"v1.1.57"` | Docker image tag |
+| flyte.flyteadmin.image.tag | string | `"v1.1.67"` | Docker image tag |
 | flyte.flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyte.flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyte.flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
@@ -151,7 +151,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyte.flyteconsole.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
-| flyte.flyteconsole.image.tag | string | `"v1.4.0"` | Docker image tag |
+| flyte.flyteconsole.image.tag | string | `"v1.4.1"` | Docker image tag |
 | flyte.flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyte.flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyte.flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
@@ -162,7 +162,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyte.flytepropeller.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flyte.flytepropeller.image.tag | string | `"v1.1.52"` | Docker image tag |
+| flyte.flytepropeller.image.tag | string | `"v1.1.59"` | Docker image tag |
 | flyte.flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flyte.flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flyte.flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
@@ -176,7 +176,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyte.flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flyte.flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flyte.flytescheduler.image.tag | string | `"v1.1.57"` | Docker image tag |
+| flyte.flytescheduler.image.tag | string | `"v1.1.67"` | Docker image tag |
 | flyte.flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flyte.flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flyte.flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
@@ -187,7 +187,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | flyte.storage | object | `{"bucketName":"my-s3-bucket","custom":{},"gcs":null,"s3":{"region":"us-east-1"},"type":"sandbox"}` | ----------------------------------------------------  STORAGE SETTINGS  |
 | flyte.storage.bucketName | string | `"my-s3-bucket"` | bucketName defines the storage bucket flyte will use. Required for all types except for sandbox. |
-| flyte.storage.custom | object | `{}` | Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings. |
+| flyte.storage.custom | object | `{}` | Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings. |
 | flyte.storage.gcs | string | `nil` | settings for storage type gcs |
 | flyte.storage.s3 | object | `{"region":"us-east-1"}` | settings for storage type s3 |
 | flyte.storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |

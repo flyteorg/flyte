@@ -27,6 +27,13 @@ spec:
                 name: flyteadmin
                 port:
                   number: 81
+            path: /flyteidl.service.SignalService/*
+            pathType: ImplementationSpecific
+          - backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
             path: /flyteidl.service.AdminService/*
             pathType: ImplementationSpecific
           - backend:

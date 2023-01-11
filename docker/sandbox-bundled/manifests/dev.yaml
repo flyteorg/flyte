@@ -9,18 +9,6 @@ metadata:
   labels:
     app.kubernetes.io/instance: sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-5.11.0
@@ -95,84 +83,6 @@ rules:
   - services/proxy
   verbs:
   - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-cluster-role
-  namespace: flyte
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - resourcequotas
-  - secrets
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - delete
-  - patch
-  - update
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-  verbs:
-  - create
-  - delete
-  - deletecollection
-  - get
-  - list
-  - patch
-  - post
-  - update
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - create
-  - get
-  - list
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -336,26 +246,6 @@ metadata:
   labels:
     app.kubernetes.io/instance: sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-cluster-role-binding
-  namespace: flyte
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: sandbox-flyte-binary-cluster-role
-subjects:
-- kind: ServiceAccount
-  name: sandbox-flyte-binary
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-5.11.0
@@ -419,107 +309,6 @@ metadata:
 ---
 apiVersion: v1
 data:
-  namespace.yaml: |
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: '{{ namespace }}'
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-cluster-resource-templates
-  namespace: flyte
----
-apiVersion: v1
-data:
-  000-core.yaml: |
-    admin:
-      endpoint: localhost:8089
-      insecure: true
-    catalog-cache:
-      endpoint: localhost:8081
-      insecure: true
-      type: datacatalog
-    cluster_resources:
-      standaloneDeployment: false
-      templatePath: /etc/flyte/cluster-resource-templates
-    logger:
-      show-source: true
-      level: 6
-    propeller:
-      create-flyteworkflow-crd: true
-    webhook:
-      certDir: /var/run/flyte/certs
-      localCert: true
-      secretName: sandbox-flyte-binary-webhook-secret
-      serviceName: sandbox-flyte-binary-webhook
-      servicePort: 443
-  001-plugins.yaml: |
-    tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
-        default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-      k8s-array:
-        logs:
-          config:
-            kubernetes-enabled: true
-            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-  002-database.yaml: |
-    database:
-      postgres:
-        username: postgres
-        passwordPath: /var/run/secrets/flyte/db-pass
-        host: 127.0.0.1
-        port: 30001
-        dbname: flyte
-        options: "sslmode=disable"
-  003-storage.yaml: |
-    propeller:
-      rawoutput-prefix: s3://my-s3-bucket/data
-    storage:
-      type: s3
-      connection:
-        region: us-east-1
-        disable-ssl: true
-        endpoint: http://localhost:30002
-        auth-type: "accesskey"
-        access-key: minio
-        secret-key: miniostorage
-      container: my-s3-bucket
-  010-inline-config.yaml: |
-    plugins:
-      k8s:
-        default-env-vars:
-        - FLYTE_AWS_ENDPOINT: http://sandbox-minio.flyte:9000
-        - FLYTE_AWS_ACCESS_KEY_ID: minio
-        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-kind: ConfigMap
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-config
-  namespace: flyte
----
-apiVersion: v1
-data:
   envoy.yaml: |
     admin:
         access_log_path: /dev/stdout
@@ -548,7 +337,7 @@ data:
                                               redirect:
                                                   path_redirect: "/console/"
                                             - match:
-                                                  prefix: "/console"
+                                                  prefix: "/.well-known"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -560,11 +349,19 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/healthcheck"
+                                                  prefix: "/callback"
                                               route:
                                                   cluster: flyte
                                             - match:
-                                                  prefix: "/v1"
+                                                  prefix: "/config"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/console"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/healthcheck"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -572,7 +369,19 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/logout"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
                                                   prefix: "/me"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/oauth2"
+                                              route:
+                                                  cluster: flyte
+                                            - match:
+                                                  prefix: "/v1"
                                               route:
                                                   cluster: flyte
                                             - match:
@@ -580,18 +389,25 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/flyteidl.service.AuthMetadataService"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
                                                   prefix: "/flyteidl.service.DataProxyService"
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
-                                                  path: "/minio"
-                                              redirect:
-                                                  path_redirect: "/minio/"
-                                            - match:
-                                                  prefix: "/minio/"
+                                                  prefix: "/flyteidl.service.IdentityService"
                                               route:
-                                                  cluster: minio
-                                                  prefix_rewrite: /
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/grpc.health.v1.Health"
+                                              route:
+                                                  cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.service.SignalService"
+                                              route:
+                                                  cluster: flyte_grpc
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -600,6 +416,15 @@ data:
                                                   prefix: "/kubernetes-dashboard/"
                                               route:
                                                   cluster: kubernetes-dashboard
+                                                  prefix_rewrite: /
+                                            - match:
+                                                  path: "/minio"
+                                              redirect:
+                                                  path_redirect: "/minio/"
+                                            - match:
+                                                  prefix: "/minio/"
+                                              route:
+                                                  cluster: minio
                                                   prefix_rewrite: /
                               http_filters:
                                   - name: envoy.filters.http.router
@@ -633,19 +458,6 @@ data:
                                       socket_address:
                                           address: sandbox-flyte-binary
                                           port_value: 8089
-            - name: minio
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              load_assignment:
-                  cluster_name: minio
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: sandbox-minio
-                                          port_value: 9001
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -659,6 +471,19 @@ data:
                                       socket_address:
                                           address: sandbox-kubernetes-dashboard
                                           port_value: 80
+            - name: minio
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: minio
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: sandbox-minio
+                                          port_value: 9001
 kind: ConfigMap
 metadata:
   labels:
@@ -698,7 +523,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: STlobkttaDVFa2U2bGdlcQ==
+  haSharedSecret: R1o3S2xMUUhjTklKdUFhOA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -710,21 +535,6 @@ metadata:
     release: sandbox
   name: sandbox-docker-registry-secret
   namespace: flyte
-type: Opaque
----
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-db-pass
-  namespace: flyte
-stringData:
-  db-pass: postgres
 type: Opaque
 ---
 apiVersion: v1
@@ -791,53 +601,6 @@ spec:
     app: docker-registry
     release: sandbox
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  selector:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/name: flyte-binary
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary-webhook
-  namespace: flyte
-spec:
-  ports:
-  - name: webhook
-    port: 443
-    targetPort: webhook
-  selector:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/name: flyte-binary
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1000,7 +763,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: b17a9119359b95b314adcf1c1cabf60554d2bc93fb7cd1a83ffd2554e6fee7cd
+        checksum/secret: 259b65b8d801f1fb4a4cf936da375c9268594733a3bc0baf9c4300aa5b6feafc
       labels:
         app: docker-registry
         release: sandbox
@@ -1046,119 +809,6 @@ spec:
         name: sandbox-docker-registry-config
       - emptyDir: {}
         name: data
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/instance: sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-0.1.0
-  name: sandbox-flyte-binary
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: sandbox
-      app.kubernetes.io/name: flyte-binary
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      annotations:
-        checksum/cluster-resource-templates: e78495e92688a0f30ca001222fd1c6d1ce0d61240ad5b3a2541d43fc23a79f50
-        checksum/configuration: a859e1e312b4d6480211a7cf0dff577a765c640265390ceec79bad835784e16d
-        checksum/db-password-secret: 72191c61f83365477982334e8b91ee0f57b040eda8afc26dc10791c12e99cc2c
-      labels:
-        app.kubernetes.io/instance: sandbox
-        app.kubernetes.io/name: flyte-binary
-    spec:
-      containers:
-      - args:
-        - start
-        - --config
-        - /etc/flyte/config.d/*.yaml
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: flyte-binary:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-        name: flyte
-        ports:
-        - containerPort: 8088
-          name: http
-        - containerPort: 8089
-          name: grpc
-        - containerPort: 9443
-          name: webhook
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-        resources:
-          limits:
-            memory: 1Gi
-          requests:
-            cpu: 1
-        volumeMounts:
-        - mountPath: /etc/flyte/cluster-resource-templates
-          name: cluster-resource-templates
-        - mountPath: /etc/flyte/config.d
-          name: config
-        - mountPath: /var/run/secrets/flyte/db-pass
-          name: db-pass
-          subPath: db-pass
-        - mountPath: /var/run/flyte
-          name: state
-      hostNetwork: true
-      initContainers:
-      - args:
-        - |
-          until pg_isready \
-            -h 127.0.0.1 \
-            -p 30001 \
-            -U postgres
-          do
-            echo waiting for database
-            sleep 0.1
-          done
-        command:
-        - sh
-        - -ec
-        image: bitnami/postgresql:sandbox
-        imagePullPolicy: Never
-        name: wait-for-db
-        resources:
-          limits:
-            memory: 1Gi
-          requests:
-            cpu: 1
-      serviceAccountName: sandbox-flyte-binary
-      volumes:
-      - configMap:
-          name: sandbox-flyte-binary-cluster-resource-templates
-        name: cluster-resource-templates
-      - configMap:
-          name: sandbox-flyte-binary-config
-        name: config
-      - name: db-pass
-        secret:
-          secretName: sandbox-flyte-binary-db-pass
-      - emptyDir: {}
-        name: state
 ---
 apiVersion: apps/v1
 kind: Deployment
