@@ -741,7 +741,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Y2FvUHdKb1U3bENqU2o4RQ==
+  haSharedSecret: ZUlpUG1DMzdZVEpQc1BGQw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -891,7 +891,7 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.0
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: sandbox-flyte-sandbox
+  name: sandbox-flyte-sandbox-proxy
   namespace: flyte
 spec:
   ports:
@@ -1043,7 +1043,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: e852f9e87464782ba96aab43776db1b88cd2e0c14cfd9c4acdec46c6c5652ce1
+        checksum/secret: cff13f32c1b7f5e2e7eb4161640ba531f0403501d00df53a73b260f4d21e0418
       labels:
         app: docker-registry
         release: sandbox

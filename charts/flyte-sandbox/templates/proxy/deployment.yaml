@@ -1,4 +1,4 @@
-{{- if .Values.proxy.enabled }}
+{{- if .Values.sandbox.proxy.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: proxy
-          {{- with .Values.proxy.image }}
+          {{- with .Values.sandbox.proxy.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           {{- end }}
