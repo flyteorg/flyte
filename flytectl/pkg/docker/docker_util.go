@@ -50,7 +50,7 @@ var (
 	}
 	StdWriterPrefixLen = 8
 	StartingBufLen     = 32*1024 + StdWriterPrefixLen + 1
-	ExtraHosts         = []string{"host.docker.internal:127.0.0.1"}
+	ExtraHosts         = []string{"host.docker.internal:host-gateway"}
 )
 
 // GetDockerClient will returns the docker client
