@@ -7,6 +7,8 @@ helmCharts:
   valuesInline:
     flyte-binary:
       enabled: false
+    sandbox:
+      dev: true
 namespace: flyte
 resources:
 - ../namespace.yaml

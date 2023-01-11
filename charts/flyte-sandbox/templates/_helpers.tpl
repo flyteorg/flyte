@@ -75,3 +75,10 @@ Name of Envoy proxy configmap
 {{- define "flyte-sandbox.proxyConfigMapName" -}}
 {{- printf "%s-proxy-config" (include "flyte-sandbox.fullname" .) -}}
 {{- end }}
+
+{{/*
+Name of development-mode Flyte headless service
+*/}}
+{{- define "flyte-sandbox.localHeadlessService" -}}
+{{- printf "%s-local" (include "flyte-sandbox.fullname" .) -}}
+{{- end }}

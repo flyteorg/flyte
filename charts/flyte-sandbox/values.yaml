@@ -112,9 +112,13 @@ postgresql:
       enabled: true
       storageClass: local-path
 
-proxy:
-  enabled: true
-  image:
-    repository: envoyproxy/envoy
-    tag: sandbox
-    pullPolicy: Never
+sandbox:
+  # dev Routes requests to an instance of Flyte running locally on a developer's
+  # development environment. This is only usable if the flyte-binary chart is disabled.
+  dev: false
+  proxy:
+    enabled: true
+    image:
+      repository: envoyproxy/envoy
+      tag: sandbox
+      pullPolicy: Never
