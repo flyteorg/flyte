@@ -43,6 +43,7 @@ start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
+			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \

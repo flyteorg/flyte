@@ -7,7 +7,7 @@ REPLACEMENTS=$(mktemp)
 trap 'rm -f ${REPLACEMENTS}' EXIT
 
 cat << EOF > ${REPLACEMENTS}
-s/%{HOST_GATEWAY_IP}%/$(ip route | awk '/default/ {print $3}')/g
+s/%{HOST_GATEWAY_IP}%/$(awk '/host.docker.internal/ {print $1}' /etc/hosts)/g
 EOF
 
 TEMPLATE=/var/lib/rancher/k3s/server/manifests-staging/complete.yaml
