@@ -10,6 +10,7 @@ A Helm chart for Flyte dependency
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | contour | 7.10.1 |
 | https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.1.15 |
+| https://helm.dask.org | daskoperator(dask-kubernetes-operator) | 2022.12.0 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
 ### SANDBOX INSTALLATION:
@@ -65,6 +66,8 @@ helm upgrade -f values.yaml flyte .
 | contour.replicaCount | int | `1` | Replicas count for Contour deployment |
 | contour.serviceAccountAnnotations | object | `{}` | Annotations for ServiceAccount attached to Contour pods |
 | contour.tolerations | list | `[]` | tolerations for Contour deployment |
+| daskoperator | object | `{"enabled":false}` | Optional: Dask Plugin using the Dask Operator |
+| daskoperator.enabled | bool | `false` | - enable or disable the dask operator deployment installation |
 | kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-insecure-login"` |  |

@@ -822,10 +822,10 @@ sparkoperator:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-
-# --------------------------------------------------------
-# Optional Plugins
-# --------------------------------------------------------
+# -- Optional: Dask Plugin using the Dask Operator
+daskoperator:
+  # --- enable or disable the dask operator deployment installation
+  enabled: false
 
 # -- Optional: Databricks Plugin allows us to run the spark job on the Databricks platform.
 databricks:
