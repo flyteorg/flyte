@@ -442,7 +442,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: sandbox-flyte-binary
+                                          address: sandbox-flyte-sandbox-local
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -456,7 +456,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: sandbox-flyte-binary
+                                          address: sandbox-flyte-sandbox-local
                                           port_value: 8089
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
@@ -523,7 +523,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: R1o3S2xMUUhjTklKdUFhOA==
+  haSharedSecret: NmpvNENzWU9nV1NibEltVw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -581,6 +581,31 @@ metadata:
 type: Opaque
 ---
 apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/instance: sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: sandbox-flyte-sandbox-local
+  namespace: flyte
+subsets:
+- addresses:
+  - ip: '%{HOST_GATEWAY_IP}%'
+  ports:
+  - name: http
+    port: 8088
+    protocol: TCP
+  - name: grpc
+    port: 8089
+    protocol: TCP
+  - name: webhook
+    port: 9443
+    protocol: TCP
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -611,7 +636,31 @@ metadata:
     app.kubernetes.io/name: flyte-sandbox
     app.kubernetes.io/version: 1.16.0
     helm.sh/chart: flyte-sandbox-0.1.0
-  name: sandbox-flyte-sandbox
+  name: sandbox-flyte-sandbox-local
+  namespace: flyte
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 8088
+    protocol: TCP
+  - name: grpc
+    port: 8089
+    protocol: TCP
+  - name: webhook
+    port: 9443
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: sandbox-flyte-sandbox-proxy
   namespace: flyte
 spec:
   ports:
@@ -763,7 +812,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 044987b193c168f87ad6b75510b710dae15de36461cb822559e13e6f3bf1789a
-        checksum/secret: 259b65b8d801f1fb4a4cf936da375c9268594733a3bc0baf9c4300aa5b6feafc
+        checksum/secret: fe51b7ebb34d9c23bdcb3b2952f608993d990821cefe5928e175c14403b01716
       labels:
         app: docker-registry
         release: sandbox

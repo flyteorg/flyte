@@ -17,6 +17,11 @@ dependencies:
     version: 1.1.15
     repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
     condition: sparkoperator.enabled
+  - name: dask-kubernetes-operator
+    alias: daskoperator
+    version: 2022.12.0
+    repository: https://helm.dask.org
+    condition: daskoperator.enabled
   - name: kubernetes-dashboard
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/

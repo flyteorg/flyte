@@ -84,8 +84,9 @@ A Helm chart for the Flyte local sandbox
 | postgresql.primary.service.nodePorts.postgresql | int | `30001` |  |
 | postgresql.primary.service.type | string | `"NodePort"` |  |
 | postgresql.shmVolume.enabled | bool | `false` |  |
-| proxy.enabled | bool | `true` |  |
-| proxy.image.pullPolicy | string | `"Never"` |  |
-| proxy.image.repository | string | `"envoyproxy/envoy"` |  |
-| proxy.image.tag | string | `"sandbox"` |  |
+| sandbox.dev | bool | `false` |  |
+| sandbox.proxy.enabled | bool | `true` |  |
+| sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
+| sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
+| sandbox.proxy.image.tag | string | `"sandbox"` |  |
 

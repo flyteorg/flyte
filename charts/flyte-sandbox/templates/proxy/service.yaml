@@ -1,8 +1,9 @@
-{{- if .Values.proxy.enabled }}
+{{- if .Values.sandbox.proxy.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "flyte-sandbox.fullname" . }}
+  name: {{ include "flyte-sandbox.fullname" . }}-proxy
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "flyte-sandbox.labels" . | nindent 4 }}
 spec:

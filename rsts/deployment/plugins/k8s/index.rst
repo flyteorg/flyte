@@ -109,6 +109,21 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
        helm install spark-operator spark-operator/spark-operator --namespace spark-operator --create-namespace
 
 
+.. tabbed:: Dask Operator
+
+  * Add Dask repository
+
+    .. code-block:: bash
+
+       helm repo add dask https://helm.dask.org
+
+  * Install Dask Operator
+
+    .. code-block:: bash
+
+       helm install dask-operator dask/dask-kubernetes-operator --namespace dask-operator --create-namespace
+
+
 4. Create a file named ``values-override.yaml`` and add the following config to it:
 
 .. tabbed:: PyTorch Operator
@@ -361,6 +376,31 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
                 container_array: k8s-array
                 spark: spark
 
+.. tabbed:: Dask Operator
+
+  * Enable dask backend plugin
+
+    .. code-block:: yaml
+
+       configmap:
+         enabled_plugins:
+           # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+           tasks:
+             # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+             task-plugins:
+               # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config).
+               # plugins
+               enabled-plugins:
+                 - container
+                 - sidecar
+                 - k8s-array
+                 - dask
+               default-for-task-types:
+                 container: container
+                 sidecar: sidecar
+                 container_array: k8s-array
+                 dask: dask
+
   .. tabbed:: AWS
 
     .. code-block:: yaml
@@ -548,6 +588,12 @@ This guide gives an overview of setting up the K8s Operator backend plugin in yo
     .. code-block:: bash
 
        flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.112/snacks-cookbook-integrations-kubernetes-k8s_spark.tar.gz --archive -p flytesnacks -d development --version latest
+
+.. tabbed:: Dask Operator
+
+    .. code-block:: bash
+
+       flytectl register files --config ~/.flyte/config.yaml https://github.com/flyteorg/flytesnacks/releases/download/v0.3.75/snacks-cookbook-integrations-kubernetes-k8s_dask.tar.gz --archive -p flytesnacks -d development --version latest
 
 
 7. Launch an execution.

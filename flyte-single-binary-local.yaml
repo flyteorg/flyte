@@ -1,0 +1,92 @@
+# This is a sample configuration file for running single-binary Flyte locally against
+# a sandbox.
+# Usage:
+# 1. Copy this file to ~/.flyte/local-dev-config.yaml`
+# 2. Replace instance of $HOME with the realpath of your home directory
+# 3. Run sandbox in development mode: `flytectl demo start --dev`
+# 4. Fetch Flyteconsole distribution: `make cmd/single/dist`
+# 4. Start Flyte locally: `POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/local-dev-config.yaml`
+
+admin:
+  endpoint: localhost:8089
+  insecure: true
+
+catalog-cache:
+  endpoint: localhost:8081
+  insecure: true
+  type: datacatalog
+
+cluster_resources:
+  standaloneDeployment: false
+  templatePath: $HOME/.flyte/cluster-resource-templates
+
+logger:
+  show-source: true
+  level: 6
+
+propeller:
+  create-flyteworkflow-crd: true
+  kube-config: $HOME/.flyte/state/kubeconfig
+  rawoutput-prefix: s3://my-s3-bucket/data
+
+server:
+  kube-config: $HOME/.flyte/state/kubeconfig
+
+webhook:
+  certDir: $HOME/.flyte/webhook-certs
+  localCert: true
+  secretName: sandbox-flyte-sandbox-webhook-secret
+  serviceName: sandbox-flyte-sandbox-local
+  servicePort: 9443
+
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - K8S-ARRAY
+    default-for-task-types:
+      - container: container
+      - container_array: K8S-ARRAY
+
+plugins:
+  logs:
+    kubernetes-enabled: true
+    kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+    cloudwatch-enabled: false
+    stackdriver-enabled: false
+  k8s:
+    default-env-vars:
+    - FLYTE_AWS_ENDPOINT: http://sandbox-minio.flyte:9000
+    - FLYTE_AWS_ACCESS_KEY_ID: minio
+    - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+  k8s-array:
+    logs:
+      config:
+        kubernetes-enabled: true
+        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        cloudwatch-enabled: false
+        stackdriver-enabled: false
+
+database:
+  postgres:
+    username: postgres
+    password: postgres
+    host: 127.0.0.1
+    port: 30001
+    dbname: flyte
+    options: "sslmode=disable"
+
+storage:
+  type: stow
+  stow:
+    kind: s3
+    config:
+      region: us-east-1
+      disable_ssl: true
+      v2_signing: true
+      endpoint: http://localhost:30002
+      auth_type: accesskey
+      access_key_id: minio
+      secret_key: miniostorage
+  container: my-s3-bucket
