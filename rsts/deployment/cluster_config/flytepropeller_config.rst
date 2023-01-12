@@ -4,8 +4,6 @@
 Flyte Propeller Configuration
 #########################################
 
-.. tags:: Configuration, Advanced
-
 - `admin <#section-admin>`_
 
 - `catalog-cache <#section-catalog-cache>`_
@@ -771,6 +769,39 @@ catalogcache (`catalog.Config`_)
     maxItems: 10000
     maxRetries: 3
     workers: 10
+  
+
+databricks (`databricks.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  databricksInstance: ""
+  databricksTokenKey: FLYTE_DATABRICKS_API_TOKEN
+  defaultWarehouse: COMPUTE_CLUSTER
+  entrypointFile: ""
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
   
 
 k8s (`config.K8sPluginConfig`_)
@@ -2138,6 +2169,105 @@ scale (int32)
   "0"
   
 
+databricks.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultWarehouse (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the default warehouse to use when running on Databricks unless overwritten by the task.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  COMPUTE_CLUSTER
+  
+
+databricksTokenKey (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the key where to find Databricks token in the secret manager.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_DATABRICKS_API_TOKEN
+  
+
+databricksInstance (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Databricks workspace instance name.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+entrypointFile (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+A URL of the entrypoint file. DBFS and cloud storage (s3://, gcs://, adls://, etc) locations are supported.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+databricksEndpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 k8s.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3173,16 +3303,16 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
   batch-size: -1
   batching-interval: 1s
   queue:
-    base-delay: 5s
-    capacity: 1000
+    base-delay: 0s
+    capacity: 10000
     max-delay: 1m0s
-    rate: 100
+    rate: 1000
     type: maxof
   sub-queue:
     base-delay: 0s
-    capacity: 1000
+    capacity: 10000
     max-delay: 0s
-    rate: 100
+    rate: 1000
     type: bucket
   type: batch
   
@@ -3532,10 +3662,10 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
 
 .. code-block:: yaml
 
-  base-delay: 5s
-  capacity: 1000
+  base-delay: 0s
+  capacity: 10000
   max-delay: 1m0s
-  rate: 100
+  rate: 1000
   type: maxof
   
 
@@ -3549,9 +3679,9 @@ SubQueue configuration, affects the way the nodes cause the top-level Work to be
 .. code-block:: yaml
 
   base-delay: 0s
-  capacity: 1000
+  capacity: 10000
   max-delay: 0s
-  rate: 100
+  rate: 1000
   type: bucket
   
 
@@ -3601,7 +3731,7 @@ base backoff delay for failure
 
 .. code-block:: yaml
 
-  5s
+  0s
   
 
 max-delay (`config.Duration`_)
@@ -3625,7 +3755,7 @@ Bucket Refill rate per second
 
 .. code-block:: yaml
 
-  "100"
+  "1000"
   
 
 capacity (int)
@@ -3637,7 +3767,7 @@ Bucket capacity as number of items
 
 .. code-block:: yaml
 
-  "1000"
+  "10000"
   
 
 config.Config (resourcemanager)

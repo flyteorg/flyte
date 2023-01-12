@@ -1,41 +1,75 @@
 ---
-# Source: flyte-binary/templates/namespace.yaml
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: flyte
-  labels: 
-    helm.sh/chart: flyte-binary-0.1.0
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.0"
-    app.kubernetes.io/managed-by: Helm
----
 # Source: flyte-binary/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyte
+  name: flyte-flyte-binary
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: flyte-binary/templates/cluster-resource-templates.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-flyte-binary-cluster-resource-templates
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  namespace.yaml: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: '{{ namespace }}'
 ---
 # Source: flyte-binary/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flyte-backend-config
-  labels: 
-    helm.sh/chart: flyte-binary-0.1.0
+  name: flyte-flyte-binary-config
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
+  annotations:
 data:
-  flyte.yaml: | 
+  000-core.yaml: |
+    admin:
+      endpoint: localhost:8089
+      insecure: true
+    catalog-cache:
+      endpoint: localhost:8081
+      insecure: true
+      type: datacatalog
+    cluster_resources:
+      standaloneDeployment: false
+      templatePath: /etc/flyte/cluster-resource-templates
+    logger:
+      show-source: true
+      level: 1
     propeller:
-      rawoutput-prefix: "s3://my-s3-bucket/data/"
       create-flyteworkflow-crd: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
+      secretName: flyte-flyte-binary-webhook-secret
+      serviceName: flyte-flyte-binary-webhook
+      servicePort: 443
+  001-plugins.yaml: |
     tasks:
       task-plugins:
         enabled-plugins:
@@ -45,280 +79,296 @@ data:
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-    database:
-      postgres:
-        port: 5432
-        username: postgres
-        host: 127.0.0.1
-        dbname: flyteadmin
-        options: "sslmode=disable"
-    storage:
-      type: minio
-      connection:
-        region: my-region
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: "http://localhost:30002"
-      cache:
-        max_size_mbs: 10
-        target_gc_percent: 100
-      container: "my-s3-bucket"
-    logger:
-      show-source: true
-      level: 1
-    admin:
-      endpoint: localhost:8089
-      insecure: true
     plugins:
-      # All k8s plugins default configuration
-      k8s:
-        inject-finalizer: true
-        default-env-vars:
-          - AWS_METADATA_SERVICE_TIMEOUT: 5
-          - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-          - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte:9000"
-          - FLYTE_AWS_ACCESS_KEY_ID: minio
-          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-      # Logging configuration
-      # Escape Helm templating because admin will template these later
       logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri:
-            "http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
+        kubernetes-enabled: false
+        cloudwatch-enabled: false
+        stackdriver-enabled: false
       k8s-array:
         logs:
           config:
-            kubernetes-enabled: true
-            kubernetes-template-uri: 
-                "http://localhost:30080/kubernetes-dashboard/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
-    cluster_resources:
-      refreshInterval: 5m
-      templatePath: "/etc/flyte/cluster-resource-templates"
-      # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
-      standaloneDeployment: false
-    catalog-cache:
-      endpoint: localhost:8081
-      insecure: true
-      type: datacatalog
-    namespace_mapping:
-      template: "{{ project }}-{{ domain }}"
+            kubernetes-enabled: false
+            cloudwatch-enabled: false
+            stackdriver-enabled: false
+  002-database.yaml: |
+    database:
+      postgres:
+        username: postgres
+        passwordPath: 
+        host: 127.0.0.1
+        port: 5432
+        dbname: flyte
+        options: "sslmode=disable"
+  003-storage.yaml: |
+    propeller:
+      rawoutput-prefix: s3://my-organization-flyte-container/data
+    storage:
+      type: stow
+      stow:
+        kind: s3
+        config:
+          region: us-east-1
+          disable_ssl: false
+          v2_signing: false
+          auth_type: iam
+      container: my-organization-flyte-container
 ---
-# Source: flyte-binary/templates/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
+# Source: flyte-binary/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: cluster-resource-templates
-  labels: 
-    helm.sh/chart: flyte-binary-0.1.0
+  name: flyte-flyte-binary-cluster-role
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
-data:
-  namespace.yaml: |
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
----
-# Source: flyte-binary/templates/rbac.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: flyte-role
+  annotations:
 rules:
-- apiGroups:
-      - ""
-  resources:
-      - namespaces
-      - resourcequotas
-      - secrets
-  verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
-- apiGroups:
-      - ""
-  resources:
-      - pods
-  verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-- apiGroups:
-      - ""
-  resources:
-      - events
-  verbs:
-      - create
-      - delete
-      - patch
-      - update
-- apiGroups:
-      - flyte.lyft.com
-  resources:
-      - flyteworkflows
-  verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - post
-      - update
-      - watch
-- apiGroups:
-      - apiextensions.k8s.io
-  resources:
-      - customresourcedefinitions
-  verbs:
-      - create
-      - get
-      - list
-- apiGroups:
-      - admissionregistration.k8s.io
-  resources:
-      - mutatingwebhookconfigurations
-  verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    - resourcequotas
+    - secrets
+    verbs:
+    - create
+    - get
+    - list
+    - patch
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - delete
+    - patch
+    - update
+  - apiGroups:
+    - flyte.lyft.com
+    resources:
+    - flyteworkflows
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - post
+    - update
+    - watch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - create
+    - get
+    - list
+  - apiGroups:
+    - admissionregistration.k8s.io
+    resources:
+    - mutatingwebhookconfigurations
+    verbs:
+    - create
+    - get
+    - list
+    - patch
+    - update
 ---
-# Source: flyte-binary/templates/rbac.yaml
+# Source: flyte-binary/templates/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyte-role-binding
+  name: flyte-flyte-binary-cluster-role-binding
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-role
+  name: flyte-flyte-binary-cluster-role
 subjects:
   - kind: ServiceAccount
-    name: flyte
-    # Have to add a namespace explicitly here so that the generated manifest has it
-    # since kubectl apply --namespace won't update it.
-    namespace: flyte
+    name: flyte-flyte-binary
+    namespace: "flyte"
 ---
-# Source: flyte-binary/templates/service.yaml
+# Source: flyte-binary/templates/service/main.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte
+  name: flyte-flyte-binary
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
 spec:
+  type: ClusterIP
   ports:
     - name: http
       port: 8088
+      targetPort: http
+      nodePort: null
     - name: grpc
       port: 8089
+      targetPort: grpc
+      nodePort: null
   selector:
-    app: flyte
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-binary/templates/service.yaml
+# Source: flyte-binary/templates/service/webhook.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyte-pod-webhook
+  name: flyte-flyte-binary-webhook
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
 spec:
+  type: ClusterIP
   ports:
     - name: webhook
       port: 443
-      targetPort: 9443
+      targetPort: webhook
   selector:
-    app: flyte
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-binary/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: flyte-flyte-binary
+  namespace: "flyte"
   labels:
-    app: flyte
-  name: flytebinary
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: flyte
+      app.kubernetes.io/name: flyte-binary
+      app.kubernetes.io/instance: flyte
   template:
     metadata:
       labels:
-        app: flyte
+        app.kubernetes.io/name: flyte-binary
+        app.kubernetes.io/instance: flyte
+      annotations:
+        checksum/configuration: d80542e06800d62b504d192eb056bf05a4ab5506815a3ec6bd34def2ea92f2ff
+        checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
-      hostNetwork: true
+      serviceAccountName: flyte-flyte-binary
       initContainers:
-      - name: wait-for-db
-        image: "postgres:15-alpine"
-        imagePullPolicy: "IfNotPresent"
-        command:
-        - sh
-        - -e
-        - -c
-        args:
-        - |
-          until pg_isready \
-            -h 127.0.0.1 \
-            -p 5432 \
-            -U postgres
-          do
-            echo waiting for database
-            sleep 0.1
-          done
+        - name: wait-for-db
+          image: "postgres:15-alpine"
+          imagePullPolicy: "IfNotPresent"
+          command:
+            - sh
+            - -ec
+          args:
+            - |
+              until pg_isready \
+                -h 127.0.0.1 \
+                -p 5432 \
+                -U postgres
+              do
+                echo waiting for database
+                sleep 0.1
+              done
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 1
       containers:
-      - name: flyte
-        image: "ghcr.io/flyteorg/flyte-sandbox:flytebinary_1007"
-        imagePullPolicy: "IfNotPresent"
-        args:
-        - start
-        - --config
-        - /etc/flyte/flyte.yaml
-        resources:
-          limits:
-            cpu: 1
-            memory: 1Gi
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        ports:
-        - containerPort: 8088
-          name: http
-        - containerPort: 8089
-          name: grpc
-        - containerPort: 9443
-          name: webhook
-        volumeMounts:
-        - mountPath: /etc/flyte/cluster-resource-templates
-          name: cluster-resource-templates
-        - mountPath: /etc/flyte/flyte.yaml
-          subPath: flyte.yaml
-          name: config
-        - mountPath: /var/run/flyte
-          name: state
-      serviceAccountName: flyte
+        - name: flyte
+          image: "ghcr.io/flyteorg/flyte-binary:latest"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - start
+            - --config
+            - /etc/flyte/config.d/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 8088
+            - name: grpc
+              containerPort: 8089
+            - name: webhook
+              containerPort: 9443
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 1
+          volumeMounts:
+            - name: cluster-resource-templates
+              mountPath: /etc/flyte/cluster-resource-templates
+            - name: config
+              mountPath: /etc/flyte/config.d
+            - name: state
+              mountPath: /var/run/flyte
       volumes:
-      - name: cluster-resource-templates
-        configMap:
-          name: cluster-resource-templates
-      - name: config
-        configMap:
-          name: flyte-backend-config
-      - name: state
-        emptyDir: {}
+        - name: cluster-resource-templates
+          configMap:
+            name: flyte-flyte-binary-cluster-resource-templates
+        - name: config
+          configMap:
+            name: flyte-flyte-binary-config
+        - name: state
+          emptyDir: {}

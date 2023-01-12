@@ -6704,7 +6704,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -6720,7 +6720,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -6733,7 +6733,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -6745,7 +6745,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -6768,7 +6768,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -6859,7 +6859,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.54"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.70"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -6868,8 +6868,6 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
-          - mountPath: /var/run/credentials
-            name: flyte-admin-secrets
       serviceAccountName: flyteadmin
       volumes:
         
@@ -6879,9 +6877,6 @@ spec:
         - configMap:
             name: flyte-clusterresourcesync-config
           name: config-volume
-        - name: flyte-admin-secrets
-          secret:
-            secretName: flyte-admin-secrets
 ---
 # Source: flyte/charts/flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
@@ -6914,7 +6909,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.4.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.4.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -6979,7 +6974,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.35"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.41"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -6992,7 +6987,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.35"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.0.41"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -7058,7 +7053,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.54"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.70"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -7073,7 +7068,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.54"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.70"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -7150,7 +7145,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.47"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -7197,7 +7192,7 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.47
+        app.kubernetes.io/version: v1.1.62
       annotations:
         configChecksum: "66eed8cb193fe41d8892fa81877986b3526748a09a463a47029b68702804815"
     spec:
@@ -7208,7 +7203,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.47"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -7231,7 +7226,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.47"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -7703,6 +7698,20 @@ spec:
                 port:
                   number: 80
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+          - path: /flyteidl.service.SignalService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.SignalService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:

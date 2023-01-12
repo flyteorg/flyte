@@ -26,6 +26,29 @@ jobs:
           CUSTOM_TAG: ${{ github.event.inputs.version }}
           RELEASE_BRANCHES: master
 
+  publish-flyte-binary-image:
+    name: Publish flyte binary image for the release version
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+
+      - name: Tag image to release version
+        run: |
+          for release in latest ${{ needs.bump-version.outputs.version }}; do
+            docker buildx imagetools create --tag "ghcr.io/flyteorg/flyte-binary-release:${release}" "ghcr.io/flyteorg/flyte-binary:sha-${{ github.sha }}"
+          done
+
   publish-flyte-component-image:
     name: Publish flyte component image for the release version
     runs-on: ubuntu-latest
@@ -69,12 +92,9 @@ jobs:
 
       - name: Tag Image to release version
         run: |
-          docker pull ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}
-          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
-          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:${{ needs.bump-version.outputs.version }}
-
-          docker tag ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }} ghcr.io/flyteorg/${{ matrix.component }}-release:latest
-          docker push ghcr.io/flyteorg/${{ matrix.component }}-release:latest
+          for release in latest ${{ needs.bump-version.outputs.version }}; do
+            docker buildx imagetools create --tag "ghcr.io/flyteorg/${{ matrix.component }}-release:${release}" "ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
+          done
 
   helm-release:
     name: Flyte helm release

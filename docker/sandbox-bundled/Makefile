@@ -1,44 +1,50 @@
+define FLYTE_BINARY_BUILD
+mkdir -p images/tar/$(1)
+
+docker buildx build \
+	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--platform linux/$(1) \
+	--tag flyte-binary:sandbox \
+	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
+	../..
+
+endef
+
 .PHONY: flyte
-flyte: FLYTE_BINARY_VERSION := mysql
+flyte: FLYTECONSOLE_VERSION := latest
 flyte:
-	mkdir -p images/tar/amd64
-	docker pull --platform linux/amd64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/amd64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
+	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
-	mkdir -p images/tar/arm64
-	docker pull --platform linux/arm64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
-
-.PHONY: manifests/compiled.yaml
-manifests/compiled.yaml:
-	mkdir -p $(dir $@)
-	kubectl kustomize \
+.PHONY: manifests
+manifests:
+	mkdir -p manifests
+	kustomize build \
 		--enable-helm \
-		--load-restrictor=LoadRestrictionsNone kustomize > $@
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/complete > manifests/complete.yaml
+	kustomize build \
+		--enable-helm \
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/dev > manifests/dev.yaml
 
 .PHONY: build
-build: flyte manifests/compiled.yaml
+build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
 		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
 		--platform linux/arm64,linux/amd64
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
-		--tag flyte-sandbox:mysql .
+		--tag flyte-sandbox:latest .
 
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:mysql
+start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
+start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
+			--add-host "host.docker.internal:host-gateway" \
+			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
 			--publish "6443" \

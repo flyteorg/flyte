@@ -11,23 +11,18 @@ TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
 
+.PHONY: cmd/single/dist
+cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
+cmd/single/dist:
+	script/get_flyteconsole_dist.sh
+
 .PHONY: compile
-compile:
-	@if [ ! -d "cmd/single/dist" ]; then\
-		docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release;\
-        	docker cp flyteconsole:/app/dist cmd/single;\
-        	docker rm -f flyteconsole;\
-        fi
+compile: cmd/single/dist
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
 	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
-linux_compile:
-	@if [ ! -d "cmd/single/dist" ]; then\
-		docker create --name flyteconsole ghcr.io/flyteorg/flyteconsole-release;\
-		docker cp flyteconsole:/app/dist cmd/single;\
-		docker rm -f flyteconsole;\
-	fi
+linux_compile: cmd/single/dist
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: update_boilerplate
