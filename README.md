@@ -170,7 +170,7 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
 - No single point of failure, and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
-- Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
+- Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Dask jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_dask/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
 - Snappy Console & Golang CLI (Flytectl)
 - Written in **Golang** and optimized for jobs that run for a long period of time.
 - [Grafana templates](https://grafana.com/orgs/flyte) (user/system observability)
@@ -187,6 +187,7 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
 - AWS Batch ArrayJobs
 - K8s Pod Arrays
 - K8s Spark (native [Pyspark](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html) and Java/Scala)
+- K8s Dask
 - AWS Athena
 - [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)
 - Presto Queries

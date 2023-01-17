@@ -1,5 +1,0 @@
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: {{ .Release.Namespace }}
-  labels: {{ include "flyte-binary.labels" . | nindent 4 }}

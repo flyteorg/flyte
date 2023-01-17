@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.1.57 # FLYTEADMIN_TAG
+    tag: v1.1.70 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -95,7 +95,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.1.57 # FLYTESCHEDULER_TAG
+    tag: v1.1.70 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -143,7 +143,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.0.40 # DATACATALOG_TAG
+    tag: v1.0.41 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -198,7 +198,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.1.52 # FLYTEPROPELLER_TAG
+    tag: v1.1.62 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -250,7 +250,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.4.0 # FLYTECONSOLE_TAG
+    tag: v1.4.1 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -379,7 +379,7 @@ storage:
   gcs:
   # -- GCP project ID. Required for storage type gcs.
   # projectId:
-  # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
+  # -- Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings.
   custom: {}
   # -- toggles multi-container storage config
   enableMultiContainer: false
@@ -821,3 +821,18 @@ sparkoperator:
           - spark.blacklist.enabled: "true"
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
+
+# -- Optional: Dask Plugin using the Dask Operator
+daskoperator:
+  # --- enable or disable the dask operator deployment installation
+  enabled: false
+
+# -- Optional: Databricks Plugin allows us to run the spark job on the Databricks platform.
+databricks:
+  enabled: false
+  plugin_config:
+    plugins:
+      databricks:
+        entrypointFile: dbfs:///FileStore/tables/entrypoint.py
+        # Databricks account
+        databricksInstance: dbc-a53b7a3c-614c

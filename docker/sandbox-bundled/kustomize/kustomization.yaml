@@ -1,7 +1,0 @@
-namespace: flyte
-helmGlobals:
-  chartHome: ../../../charts
-helmCharts:
-- name: flyte-sandbox
-  releaseName: flyte-sandbox
-  namespace: flyte

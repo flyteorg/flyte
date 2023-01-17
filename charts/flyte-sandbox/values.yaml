@@ -1,4 +1,5 @@
 docker-registry:
+  enabled: true
   image:
     repository: registry
     tag: sandbox
@@ -10,30 +11,52 @@ docker-registry:
     nodePort: 30000
 
 flyte-binary:
-  networking:
-    host: true
-  images:
-    flyte:
+  enabled: true
+  configuration:
+    database:
+      password: postgres
+      port: 30001
+    storage:
+      metadataContainer: my-s3-bucket
+      userDataContainer: my-s3-bucket
+      provider: s3
+      providerConfig:
+        s3:
+          disableSSL: true
+          v2Signing: true
+          endpoint: http://localhost:30002
+          authType: accesskey
+          accessKey: minio
+          secretKey: miniostorage
+    logging:
+      level: 6
+      plugins:
+        kubernetes:
+          enabled: true
+          templateUri: |-
+            http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+    inline:
+      plugins:
+        k8s:
+          default-env-vars:
+            - FLYTE_AWS_ENDPOINT: http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000
+            - FLYTE_AWS_ACCESS_KEY_ID: minio
+            - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+  deployment:
+    image:
       repository: flyte-binary
       tag: sandbox
       pullPolicy: Never
-    postgres:
-      repository: bitnami/postgresql
-      tag: sandbox
-      pullPolicy: Never
-  storage:
-    type: minio
-    region: my-region
-  database:
-    port: 30001
-    username: postgres
-    host: 127.0.0.1
-    dbname: flyteadmin
-    password: postgres
-  logger:
-    level: 6
+    waitForDB:
+      image:
+        repository: bitnami/postgresql
+        tag: sandbox
+        pullPolicy: Never
+    extraPodSpec:
+      hostNetwork: true
 
 kubernetes-dashboard:
+  enabled: true
   image:
     repository: kubernetesui/dashboard
     tag: sandbox
@@ -50,6 +73,7 @@ kubernetes-dashboard:
     clusterReadOnlyRole: true
 
 minio:
+  enabled: true
   image:
     repository: bitnami/minio
     tag: sandbox
@@ -70,6 +94,7 @@ minio:
     storageClass: local-path
 
 postgresql:
+  enabled: true
   image:
     repository: bitnami/postgresql
     tag: sandbox
@@ -88,7 +113,11 @@ postgresql:
       storageClass: local-path
 
 sandbox:
+  # dev Routes requests to an instance of Flyte running locally on a developer's
+  # development environment. This is only usable if the flyte-binary chart is disabled.
+  dev: false
   proxy:
+    enabled: true
     image:
       repository: envoyproxy/envoy
       tag: sandbox

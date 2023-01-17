@@ -4,7 +4,7 @@
 # https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
 propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
-  kube-config: "/etc/rancher/k3s/k3s.yaml"
+  kube-config: "/Users/ytong/.flyte/state/kubeconfig"
   create-flyteworkflow-crd: true
 webhook:
   certDir: /tmp/k8s-webhook-server/serving-certs
@@ -22,7 +22,7 @@ tasks:
       - container: container
       - container_array: K8S-ARRAY
 server:
-  kube-config: "/etc/rancher/k3s/k3s.yaml"
+  kube-config: "/Users/ytong/.flyte/state/kubeconfig"
   httpPort: 30080
   serviceHttpEndpoint: http://localhost:30080/
   grpc:
