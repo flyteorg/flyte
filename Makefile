@@ -94,9 +94,11 @@ help: ## List available commands and their usage
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
 
+# This builds the flyte binary image for whatever architecture you're on. Don't push this image to the official
+# registry because we need those to be multi-arch.
 .PHONY: build_native_flyte
 build_native_flyte: FLYTECONSOLE_VERSION := latest
 build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
-	--tag flyte-binary:sandbox .
+	--tag flyte-binary:native .
