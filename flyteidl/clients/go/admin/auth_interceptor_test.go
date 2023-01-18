@@ -13,22 +13,18 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"k8s.io/apimachinery/pkg/util/rand"
-
-	mocks2 "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/stretchr/testify/mock"
-
-	service2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/config"
-
 	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"k8s.io/apimachinery/pkg/util/rand"
+
+	"github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
+	adminMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // authMetadataServer is a fake AuthMetadataServer that takes in an AuthMetadataServer implementation (usually one
@@ -39,15 +35,15 @@ type authMetadataServer struct {
 	port        int
 	grpcServer  *grpc.Server
 	netListener net.Listener
-	impl        service2.AuthMetadataServiceServer
+	impl        service.AuthMetadataServiceServer
 	lck         *sync.RWMutex
 }
 
-func (s authMetadataServer) GetOAuth2Metadata(ctx context.Context, in *service2.OAuth2MetadataRequest) (*service2.OAuth2MetadataResponse, error) {
+func (s authMetadataServer) GetOAuth2Metadata(ctx context.Context, in *service.OAuth2MetadataRequest) (*service.OAuth2MetadataResponse, error) {
 	return s.impl.GetOAuth2Metadata(ctx, in)
 }
 
-func (s authMetadataServer) GetPublicClientConfig(ctx context.Context, in *service2.PublicClientAuthConfigRequest) (*service2.PublicClientAuthConfigResponse, error) {
+func (s authMetadataServer) GetPublicClientConfig(ctx context.Context, in *service.PublicClientAuthConfigRequest) (*service.PublicClientAuthConfigResponse, error) {
 	return s.impl.GetPublicClientConfig(ctx, in)
 }
 
@@ -84,7 +80,7 @@ func (s *authMetadataServer) Start(_ context.Context) error {
 	}
 
 	grpcS := grpc.NewServer()
-	service2.RegisterAuthMetadataServiceServer(grpcS, s)
+	service.RegisterAuthMetadataServiceServer(grpcS, s)
 	go func() {
 		_ = grpcS.Serve(lis)
 		//assert.NoError(s.t, err)
@@ -106,7 +102,7 @@ func (s *authMetadataServer) Close() {
 	s.s.Close()
 }
 
-func newAuthMetadataServer(t testing.TB, port int, impl service2.AuthMetadataServiceServer) *authMetadataServer {
+func newAuthMetadataServer(t testing.TB, port int, impl service.AuthMetadataServiceServer) *authMetadataServer {
 	return &authMetadataServer{
 		port: port,
 		t:    t,
@@ -132,13 +128,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 		}))
 
 		port := rand.IntnRange(10000, 60000)
-		m := &mocks2.AuthMetadataServiceServer{}
-		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service2.OAuth2MetadataResponse{
+		m := &adminMocks.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
 			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", port),
 			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", port),
 			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", port),
 		}, nil)
-		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service2.PublicClientAuthConfigResponse{
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
 			Scopes: []string{"all"},
 		}, nil)
 		s := newAuthMetadataServer(t, port, m)
@@ -171,7 +167,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		}))
 
 		port := rand.IntnRange(10000, 60000)
-		m := &mocks2.AuthMetadataServiceServer{}
+		m := &adminMocks.AuthMetadataServiceServer{}
 		s := newAuthMetadataServer(t, port, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
@@ -201,13 +197,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 		}))
 
 		port := rand.IntnRange(10000, 60000)
-		m := &mocks2.AuthMetadataServiceServer{}
-		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service2.OAuth2MetadataResponse{
+		m := &adminMocks.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
 			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", port),
 			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", port),
 			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", port),
 		}, nil)
-		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service2.PublicClientAuthConfigResponse{
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
 			Scopes: []string{"all"},
 		}, nil)
 
@@ -237,8 +233,8 @@ func Test_newAuthInterceptor(t *testing.T) {
 
 func TestMaterializeCredentials(t *testing.T) {
 	port := rand.IntnRange(10000, 60000)
-	t.Run("No public client config or oauth2 metadata endpoint lookup", func(t *testing.T) {
-		m := &mocks2.AuthMetadataServiceServer{}
+	t.Run("No oauth2 metadata endpoint or Public client config lookup", func(t *testing.T) {
+		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get public client config"))
 		s := newAuthMetadataServer(t, port, m)
@@ -256,12 +252,13 @@ func TestMaterializeCredentials(t *testing.T) {
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
 			Scopes:                []string{"all"},
+			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
 		}, &mocks.TokenCache{}, f)
 		assert.NoError(t, err)
 	})
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
-		m := &mocks2.AuthMetadataServiceServer{}
+		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		failedPublicClientConfigLookup := errors.New("expected err")
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, failedPublicClientConfigLookup)
