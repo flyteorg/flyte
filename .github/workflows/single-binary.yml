@@ -70,7 +70,7 @@ jobs:
           platforms: linux/arm64
           tags: flyte-binary:sandbox
           build-args: |
-            FLYTECONSOLE_VERSION=9d86b79f6237d1ceda9e6da3a1f4a958d699ce6c
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
@@ -83,7 +83,7 @@ jobs:
           platforms: linux/amd64
           tags: flyte-binary:sandbox
           build-args: |
-            FLYTECONSOLE_VERSION=9d86b79f6237d1ceda9e6da3a1f4a958d699ce6c
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
@@ -96,10 +96,10 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: |
-            FLYTECONSOLE_VERSION=9d86b79f6237d1ceda9e6da3a1f4a958d699ce6c
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: true
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
@@ -156,4 +156,4 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-          push: true
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}

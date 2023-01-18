@@ -94,3 +94,9 @@ help: ## List available commands and their usage
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
 
+.PHONY: build_native_flyte
+build_native_flyte: FLYTECONSOLE_VERSION := latest
+build_native_flyte:
+	docker build \
+	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--tag flyte-binary:sandbox .
