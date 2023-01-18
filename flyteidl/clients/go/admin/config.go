@@ -53,6 +53,8 @@ type Config struct {
 	ClientSecretLocation string   `json:"clientSecretLocation" pflag:",File containing the client secret"`
 	ClientSecretEnvVar   string   `json:"clientSecretEnvVar" pflag:",Environment variable containing the client secret"`
 	Scopes               []string `json:"scopes" pflag:",List of scopes to request"`
+	UseAudienceFromAdmin bool     `json:"useAudienceFromAdmin" pflag:",Use Audience configured from admins public endpoint config."`
+	Audience             string   `json:"audience" pflag:",Audience to use when initiating OAuth2 authorization requests."`
 
 	// There are two ways to get the token URL. If the authorization server url is provided, the client will try to use RFC 8414 to
 	// try to get the token URL. Or it can be specified directly through TokenURL config.

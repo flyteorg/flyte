@@ -64,6 +64,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clientSecretLocation"), defaultConfig.ClientSecretLocation, "File containing the client secret")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clientSecretEnvVar"), defaultConfig.ClientSecretEnvVar, "Environment variable containing the client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "scopes"), defaultConfig.Scopes, "List of scopes to request")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "useAudienceFromAdmin"), defaultConfig.UseAudienceFromAdmin, "Use Audience configured from admins public endpoint config.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "audience"), defaultConfig.Audience, "Audience to use when initiating OAuth2 authorization requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authorizationServerUrl"), defaultConfig.DeprecatedAuthorizationServerURL, "This is the URL to your IdP's authorization server. It'll default to Endpoint")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "tokenUrl"), defaultConfig.TokenURL, "OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authorizationHeader"), defaultConfig.AuthorizationHeader, "Custom metadata header to pass JWT")
