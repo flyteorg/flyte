@@ -43,6 +43,13 @@ service DataCatalog {
     // Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
     rpc DeleteArtifact (DeleteArtifactRequest) returns (DeleteArtifactResponse);
 
+    // Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+    // This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+    // will not result in an error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+    rpc DeleteArtifacts (DeleteArtifactsRequest) returns (DeleteArtifactResponse);
+
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
     // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -56,9 +63,23 @@ service DataCatalog {
     // a third task C may get the Artifact from A or B, whichever writes last.
     rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
 
+    // Attempts to get or extend reservations for multiple artifacts in a single operation.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+    // reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+    // endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+    rpc GetOrExtendReservations (GetOrExtendReservationsRequest) returns (GetOrExtendReservationsResponse);
+
     // Release the reservation when the task holding the spot fails so that the other tasks
     // can grab the spot.
     rpc ReleaseReservation (ReleaseReservationRequest) returns (ReleaseReservationResponse);
+
+    // Releases reservations for multiple artifacts in a single operation.
+    // This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+    // times will not result in error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+    // reservations.
+    rpc ReleaseReservations (ReleaseReservationsRequest) returns (ReleaseReservationResponse);
 }
 
 /*
@@ -216,6 +237,12 @@ message DeleteArtifactRequest {
     }
 }
 
+// Request message for deleting multiple Artifacts and their associated ArtifactData.
+message DeleteArtifactsRequest {
+    // List of deletion requests for artifacts to remove
+    repeated DeleteArtifactRequest artifacts = 1;
+}
+
 /*
  * Response message for deleting an Artifact.
  */
@@ -234,7 +261,7 @@ message ReservationID {
     string tag_name = 2;
 }
 
-// Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+// Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
 message GetOrExtendReservationRequest {
     // The unique ID for the reservation
     ReservationID reservation_id = 1;
@@ -244,6 +271,12 @@ message GetOrExtendReservationRequest {
 
     // Requested reservation extension heartbeat interval
     google.protobuf.Duration heartbeat_interval = 3;
+}
+
+// Request message for acquiring or extending reservations for multiple artifacts in a single operation.
+message GetOrExtendReservationsRequest {
+    // List of reservation requests for artifacts to acquire
+    repeated GetOrExtendReservationRequest reservations = 1;
 }
 
 // A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
@@ -270,6 +303,12 @@ message GetOrExtendReservationResponse {
     Reservation reservation = 1;
 }
 
+// List of reservations acquired for multiple artifacts in a single operation.
+message GetOrExtendReservationsResponse {
+    // List of (newly created or existing) reservations for artifacts requested
+    repeated Reservation reservations = 1;
+}
+
 // Request to release reservation
 message ReleaseReservationRequest {
     // The unique ID for the reservation
@@ -277,6 +316,12 @@ message ReleaseReservationRequest {
 
     // The unique ID of the owner for the reservation
     string owner_id = 2;
+}
+
+// Request message for releasing reservations for multiple artifacts in a single operation.
+message ReleaseReservationsRequest {
+    // List of reservation requests for artifacts to release
+    repeated ReleaseReservationRequest reservations = 1;
 }
 
 // Response to release reservation
