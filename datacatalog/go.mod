@@ -3,7 +3,7 @@ module github.com/flyteorg/datacatalog
 go 1.18
 
 replace (
-	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20230104143947-9cc1f12a643f
+	github.com/flyteorg/flyteidl => github.com/blackshark-ai/flyteidl v0.24.22-0.20230119104851-e9fb728f4733
 	github.com/flyteorg/flytestdlib => github.com/blackshark-ai/flytestdlib v1.0.1-0.20230104151410-d6ec6dba8697
 )
 

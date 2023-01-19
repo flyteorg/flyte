@@ -69,12 +69,24 @@ func (s *DataCatalogService) DeleteArtifact(ctx context.Context, request *catalo
 	return s.ArtifactManager.DeleteArtifact(ctx, request)
 }
 
+func (s *DataCatalogService) DeleteArtifacts(ctx context.Context, request *catalog.DeleteArtifactsRequest) (*catalog.DeleteArtifactResponse, error) {
+	return s.ArtifactManager.DeleteArtifacts(ctx, request)
+}
+
 func (s *DataCatalogService) GetOrExtendReservation(ctx context.Context, request *catalog.GetOrExtendReservationRequest) (*catalog.GetOrExtendReservationResponse, error) {
 	return s.ReservationManager.GetOrExtendReservation(ctx, request)
 }
 
+func (s *DataCatalogService) GetOrExtendReservations(ctx context.Context, request *catalog.GetOrExtendReservationsRequest) (*catalog.GetOrExtendReservationsResponse, error) {
+	return s.ReservationManager.GetOrExtendReservations(ctx, request)
+}
+
 func (s *DataCatalogService) ReleaseReservation(ctx context.Context, request *catalog.ReleaseReservationRequest) (*catalog.ReleaseReservationResponse, error) {
 	return s.ReservationManager.ReleaseReservation(ctx, request)
+}
+
+func (s *DataCatalogService) ReleaseReservations(ctx context.Context, request *catalog.ReleaseReservationsRequest) (*catalog.ReleaseReservationResponse, error) {
+	return s.ReservationManager.ReleaseReservations(ctx, request)
 }
 
 func NewDataCatalogService() *DataCatalogService {

@@ -9,12 +9,12 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
 	"github.com/flyteorg/datacatalog/pkg/repositories"
-	repo_errors "github.com/flyteorg/datacatalog/pkg/repositories/errors"
+	repoerrors "github.com/flyteorg/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
-
-	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
@@ -25,7 +25,9 @@ type reservationMetrics struct {
 	reservationReleased          labeled.Counter
 	reservationAlreadyInProgress labeled.Counter
 	acquireReservationFailure    labeled.Counter
+	acquireReservationsFailure   labeled.Counter
 	releaseReservationFailure    labeled.Counter
+	releaseReservationsFailure   labeled.Counter
 	reservationDoesNotExist      labeled.Counter
 }
 
@@ -39,7 +41,7 @@ type reservationManager struct {
 	systemMetrics                  reservationMetrics
 }
 
-// Creates a new reservation manager with the specified properties
+// NewReservationManager creates a new reservation manager with the specified properties
 func NewReservationManager(
 	repo repositories.RepositoryInterface,
 	heartbeatGracePeriodMultiplier time.Duration,
@@ -67,9 +69,19 @@ func NewReservationManager(
 			"Number of times we failed to acquire reservation",
 			reservationScope,
 		),
+		acquireReservationsFailure: labeled.NewCounter(
+			"acquire_reservations_failure",
+			"Number of times we failed to acquire multiple reservations",
+			reservationScope,
+		),
 		releaseReservationFailure: labeled.NewCounter(
 			"release_reservation_failure",
 			"Number of times we failed to release a reservation",
+			reservationScope,
+		),
+		releaseReservationsFailure: labeled.NewCounter(
+			"release_reservations_failure",
+			"Number of times we failed to release multiple reservations",
 			reservationScope,
 		),
 		reservationDoesNotExist: labeled.NewCounter(
@@ -88,9 +100,15 @@ func NewReservationManager(
 	}
 }
 
-// Attempt to acquire a reservation for the specified artifact. If there is not active reservation, successfully
-// acquire it. If you are the owner of the active reservation, extend it. If another owner, return the existing reservation.
+// GetOrExtendReservation attempts to acquire a reservation for the specified artifact. If there is no active
+// reservation, successfully acquire it. If you are the owner of the active reservation, extend it. If another owner,
+// return the existing reservation.
 func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request *datacatalog.GetOrExtendReservationRequest) (*datacatalog.GetOrExtendReservationResponse, error) {
+	if err := validators.ValidateGetOrExtendReservationRequest(request); err != nil {
+		r.systemMetrics.acquireReservationFailure.Inc(ctx)
+		return nil, err
+	}
+
 	reservationID := request.ReservationId
 
 	// Use minimum of maxHeartbeatInterval and requested heartbeat interval
@@ -108,6 +126,36 @@ func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request
 
 	return &datacatalog.GetOrExtendReservationResponse{
 		Reservation: &reservation,
+	}, nil
+}
+
+// GetOrExtendReservations attempts to get or extend reservations for multiple artifacts in a single operation.
+func (r *reservationManager) GetOrExtendReservations(ctx context.Context, request *datacatalog.GetOrExtendReservationsRequest) (*datacatalog.GetOrExtendReservationsResponse, error) {
+	if err := validators.ValidateGetOrExtendReservationsRequest(request); err != nil {
+		r.systemMetrics.acquireReservationsFailure.Inc(ctx)
+		return nil, err
+	}
+
+	var reservations []*datacatalog.Reservation
+	for _, req := range request.GetReservations() {
+		// Use minimum of maxHeartbeatInterval and requested heartbeat interval
+		heartbeatInterval := r.maxHeartbeatInterval
+		requestHeartbeatInterval := req.GetHeartbeatInterval()
+		if requestHeartbeatInterval != nil && requestHeartbeatInterval.AsDuration() < heartbeatInterval {
+			heartbeatInterval = requestHeartbeatInterval.AsDuration()
+		}
+
+		reservation, err := r.tryAcquireReservation(ctx, req.ReservationId, req.OwnerId, heartbeatInterval)
+		if err != nil {
+			r.systemMetrics.acquireReservationsFailure.Inc(ctx)
+			return nil, err
+		}
+
+		reservations = append(reservations, &reservation)
+	}
+
+	return &datacatalog.GetOrExtendReservationsResponse{
+		Reservations: reservations,
 	}, nil
 }
 
@@ -159,7 +207,7 @@ func (r *reservationManager) tryAcquireReservation(ctx context.Context, reservat
 	}
 
 	if repoErr != nil {
-		if repoErr.Error() == repo_errors.AlreadyExists {
+		if repoErr.Error() == repoerrors.AlreadyExists {
 			// Looks like someone else tried to obtain the reservation
 			// at the same time and they won. Let's find out who won.
 			rsv1, err := repo.Get(ctx, reservationKey)
@@ -189,24 +237,57 @@ func (r *reservationManager) tryAcquireReservation(ctx context.Context, reservat
 	return reservation, nil
 }
 
-// Release an active reservation with the specified owner. If one does not exist, gracefully return.
+// ReleaseReservation releases an active reservation with the specified owner. If one does not exist, gracefully return.
 func (r *reservationManager) ReleaseReservation(ctx context.Context, request *datacatalog.ReleaseReservationRequest) (*datacatalog.ReleaseReservationResponse, error) {
-	repo := r.repo.ReservationRepo()
-	reservationKey := transformers.FromReservationID(request.ReservationId)
+	if err := validators.ValidateReleaseReservationRequest(request); err != nil {
+		return nil, err
+	}
 
-	err := repo.Delete(ctx, reservationKey, request.OwnerId)
-	if err != nil {
-		if errors.IsDoesNotExistError(err) {
-			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", request.ReservationId, err)
-			r.systemMetrics.reservationDoesNotExist.Inc(ctx)
-			return &datacatalog.ReleaseReservationResponse{}, nil
-		}
-
-		logger.Errorf(ctx, "Failed to release reservation: %+v, err: %v", reservationKey, err)
+	if err := r.releaseReservation(ctx, request.ReservationId, request.OwnerId); err != nil {
 		r.systemMetrics.releaseReservationFailure.Inc(ctx)
 		return nil, err
 	}
 
-	r.systemMetrics.reservationReleased.Inc(ctx)
 	return &datacatalog.ReleaseReservationResponse{}, nil
+}
+
+// ReleaseReservations releases reservations for multiple artifacts in a single operation.
+// This is an idempotent operation, releasing reservations multiple times or trying to release an unknown reservation
+// will not result in an error being returned.
+func (r *reservationManager) ReleaseReservations(ctx context.Context, request *datacatalog.ReleaseReservationsRequest) (*datacatalog.ReleaseReservationResponse, error) {
+	if err := validators.ValidateReleaseReservationsRequest(request); err != nil {
+		return nil, err
+	}
+
+	for _, req := range request.GetReservations() {
+		if err := r.releaseReservation(ctx, req.ReservationId, req.OwnerId); err != nil {
+			r.systemMetrics.releaseReservationsFailure.Inc(ctx)
+			return nil, err
+		}
+	}
+
+	return &datacatalog.ReleaseReservationResponse{}, nil
+}
+
+// releaseReservation performs the actual reservation release operation, deleting the respective object from
+// datacatalog's database, thus freeing the associated artifact for other entities. If the specified reservation was not
+// found, no error will be returned.
+func (r *reservationManager) releaseReservation(ctx context.Context, reservationID *datacatalog.ReservationID, ownerID string) error {
+	repo := r.repo.ReservationRepo()
+	reservationKey := transformers.FromReservationID(reservationID)
+
+	err := repo.Delete(ctx, reservationKey, ownerID)
+	if err != nil {
+		if errors.IsDoesNotExistError(err) {
+			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", reservationID, err)
+			r.systemMetrics.reservationDoesNotExist.Inc(ctx)
+			return nil
+		}
+
+		logger.Errorf(ctx, "Failed to release reservation: %+v, err: %v", reservationKey, err)
+		return err
+	}
+
+	r.systemMetrics.reservationReleased.Inc(ctx)
+	return nil
 }
