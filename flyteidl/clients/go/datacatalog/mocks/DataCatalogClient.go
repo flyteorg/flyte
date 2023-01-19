@@ -208,6 +208,54 @@ func (_m *DataCatalogClient) DeleteArtifact(ctx context.Context, in *datacatalog
 	return r0, r1
 }
 
+type DataCatalogClient_DeleteArtifacts struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_DeleteArtifacts) Return(_a0 *datacatalog.DeleteArtifactResponse, _a1 error) *DataCatalogClient_DeleteArtifacts {
+	return &DataCatalogClient_DeleteArtifacts{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnDeleteArtifacts(ctx context.Context, in *datacatalog.DeleteArtifactsRequest, opts ...grpc.CallOption) *DataCatalogClient_DeleteArtifacts {
+	c_call := _m.On("DeleteArtifacts", ctx, in, opts)
+	return &DataCatalogClient_DeleteArtifacts{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnDeleteArtifactsMatch(matchers ...interface{}) *DataCatalogClient_DeleteArtifacts {
+	c_call := _m.On("DeleteArtifacts", matchers...)
+	return &DataCatalogClient_DeleteArtifacts{Call: c_call}
+}
+
+// DeleteArtifacts provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) DeleteArtifacts(ctx context.Context, in *datacatalog.DeleteArtifactsRequest, opts ...grpc.CallOption) (*datacatalog.DeleteArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.DeleteArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DeleteArtifactsRequest, ...grpc.CallOption) *datacatalog.DeleteArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.DeleteArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DeleteArtifactsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataCatalogClient_GetArtifact struct {
 	*mock.Call
 }
@@ -352,6 +400,54 @@ func (_m *DataCatalogClient) GetOrExtendReservation(ctx context.Context, in *dat
 	return r0, r1
 }
 
+type DataCatalogClient_GetOrExtendReservations struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_GetOrExtendReservations) Return(_a0 *datacatalog.GetOrExtendReservationsResponse, _a1 error) *DataCatalogClient_GetOrExtendReservations {
+	return &DataCatalogClient_GetOrExtendReservations{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnGetOrExtendReservations(ctx context.Context, in *datacatalog.GetOrExtendReservationsRequest, opts ...grpc.CallOption) *DataCatalogClient_GetOrExtendReservations {
+	c_call := _m.On("GetOrExtendReservations", ctx, in, opts)
+	return &DataCatalogClient_GetOrExtendReservations{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnGetOrExtendReservationsMatch(matchers ...interface{}) *DataCatalogClient_GetOrExtendReservations {
+	c_call := _m.On("GetOrExtendReservations", matchers...)
+	return &DataCatalogClient_GetOrExtendReservations{Call: c_call}
+}
+
+// GetOrExtendReservations provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) GetOrExtendReservations(ctx context.Context, in *datacatalog.GetOrExtendReservationsRequest, opts ...grpc.CallOption) (*datacatalog.GetOrExtendReservationsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.GetOrExtendReservationsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.GetOrExtendReservationsRequest, ...grpc.CallOption) *datacatalog.GetOrExtendReservationsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.GetOrExtendReservationsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.GetOrExtendReservationsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataCatalogClient_ListArtifacts struct {
 	*mock.Call
 }
@@ -488,6 +584,54 @@ func (_m *DataCatalogClient) ReleaseReservation(ctx context.Context, in *datacat
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.ReleaseReservationRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type DataCatalogClient_ReleaseReservations struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_ReleaseReservations) Return(_a0 *datacatalog.ReleaseReservationResponse, _a1 error) *DataCatalogClient_ReleaseReservations {
+	return &DataCatalogClient_ReleaseReservations{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnReleaseReservations(ctx context.Context, in *datacatalog.ReleaseReservationsRequest, opts ...grpc.CallOption) *DataCatalogClient_ReleaseReservations {
+	c_call := _m.On("ReleaseReservations", ctx, in, opts)
+	return &DataCatalogClient_ReleaseReservations{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnReleaseReservationsMatch(matchers ...interface{}) *DataCatalogClient_ReleaseReservations {
+	c_call := _m.On("ReleaseReservations", matchers...)
+	return &DataCatalogClient_ReleaseReservations{Call: c_call}
+}
+
+// ReleaseReservations provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) ReleaseReservations(ctx context.Context, in *datacatalog.ReleaseReservationsRequest, opts ...grpc.CallOption) (*datacatalog.ReleaseReservationResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.ReleaseReservationResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.ReleaseReservationsRequest, ...grpc.CallOption) *datacatalog.ReleaseReservationResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.ReleaseReservationResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.ReleaseReservationsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

@@ -121,6 +121,12 @@ class DeleteArtifactResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
+class DeleteArtifactsRequest(_message.Message):
+    __slots__ = ["artifacts"]
+    ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    artifacts: _containers.RepeatedCompositeFieldContainer[DeleteArtifactRequest]
+    def __init__(self, artifacts: _Optional[_Iterable[_Union[DeleteArtifactRequest, _Mapping]]] = ...) -> None: ...
+
 class FilterExpression(_message.Message):
     __slots__ = ["filters"]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
@@ -170,6 +176,18 @@ class GetOrExtendReservationResponse(_message.Message):
     RESERVATION_FIELD_NUMBER: _ClassVar[int]
     reservation: Reservation
     def __init__(self, reservation: _Optional[_Union[Reservation, _Mapping]] = ...) -> None: ...
+
+class GetOrExtendReservationsRequest(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[GetOrExtendReservationRequest]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[GetOrExtendReservationRequest, _Mapping]]] = ...) -> None: ...
+
+class GetOrExtendReservationsResponse(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[Reservation]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[Reservation, _Mapping]]] = ...) -> None: ...
 
 class KeyValuePair(_message.Message):
     __slots__ = ["key", "value"]
@@ -270,6 +288,12 @@ class ReleaseReservationRequest(_message.Message):
 class ReleaseReservationResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class ReleaseReservationsRequest(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[ReleaseReservationRequest]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[ReleaseReservationRequest, _Mapping]]] = ...) -> None: ...
 
 class Reservation(_message.Message):
     __slots__ = ["expires_at", "heartbeat_interval", "metadata", "owner_id", "reservation_id"]

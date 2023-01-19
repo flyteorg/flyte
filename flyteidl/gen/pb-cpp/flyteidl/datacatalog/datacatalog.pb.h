@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[40]
+  static const ::google::protobuf::internal::ParseTable schema[44]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -98,6 +98,9 @@ extern DeleteArtifactRequestDefaultTypeInternal _DeleteArtifactRequest_default_i
 class DeleteArtifactResponse;
 class DeleteArtifactResponseDefaultTypeInternal;
 extern DeleteArtifactResponseDefaultTypeInternal _DeleteArtifactResponse_default_instance_;
+class DeleteArtifactsRequest;
+class DeleteArtifactsRequestDefaultTypeInternal;
+extern DeleteArtifactsRequestDefaultTypeInternal _DeleteArtifactsRequest_default_instance_;
 class FilterExpression;
 class FilterExpressionDefaultTypeInternal;
 extern FilterExpressionDefaultTypeInternal _FilterExpression_default_instance_;
@@ -119,6 +122,12 @@ extern GetOrExtendReservationRequestDefaultTypeInternal _GetOrExtendReservationR
 class GetOrExtendReservationResponse;
 class GetOrExtendReservationResponseDefaultTypeInternal;
 extern GetOrExtendReservationResponseDefaultTypeInternal _GetOrExtendReservationResponse_default_instance_;
+class GetOrExtendReservationsRequest;
+class GetOrExtendReservationsRequestDefaultTypeInternal;
+extern GetOrExtendReservationsRequestDefaultTypeInternal _GetOrExtendReservationsRequest_default_instance_;
+class GetOrExtendReservationsResponse;
+class GetOrExtendReservationsResponseDefaultTypeInternal;
+extern GetOrExtendReservationsResponseDefaultTypeInternal _GetOrExtendReservationsResponse_default_instance_;
 class KeyValuePair;
 class KeyValuePairDefaultTypeInternal;
 extern KeyValuePairDefaultTypeInternal _KeyValuePair_default_instance_;
@@ -155,6 +164,9 @@ extern ReleaseReservationRequestDefaultTypeInternal _ReleaseReservationRequest_d
 class ReleaseReservationResponse;
 class ReleaseReservationResponseDefaultTypeInternal;
 extern ReleaseReservationResponseDefaultTypeInternal _ReleaseReservationResponse_default_instance_;
+class ReleaseReservationsRequest;
+class ReleaseReservationsRequestDefaultTypeInternal;
+extern ReleaseReservationsRequestDefaultTypeInternal _ReleaseReservationsRequest_default_instance_;
 class Reservation;
 class ReservationDefaultTypeInternal;
 extern ReservationDefaultTypeInternal _Reservation_default_instance_;
@@ -193,6 +205,7 @@ template<> ::datacatalog::DatasetID* Arena::CreateMaybeMessage<::datacatalog::Da
 template<> ::datacatalog::DatasetPropertyFilter* Arena::CreateMaybeMessage<::datacatalog::DatasetPropertyFilter>(Arena*);
 template<> ::datacatalog::DeleteArtifactRequest* Arena::CreateMaybeMessage<::datacatalog::DeleteArtifactRequest>(Arena*);
 template<> ::datacatalog::DeleteArtifactResponse* Arena::CreateMaybeMessage<::datacatalog::DeleteArtifactResponse>(Arena*);
+template<> ::datacatalog::DeleteArtifactsRequest* Arena::CreateMaybeMessage<::datacatalog::DeleteArtifactsRequest>(Arena*);
 template<> ::datacatalog::FilterExpression* Arena::CreateMaybeMessage<::datacatalog::FilterExpression>(Arena*);
 template<> ::datacatalog::GetArtifactRequest* Arena::CreateMaybeMessage<::datacatalog::GetArtifactRequest>(Arena*);
 template<> ::datacatalog::GetArtifactResponse* Arena::CreateMaybeMessage<::datacatalog::GetArtifactResponse>(Arena*);
@@ -200,6 +213,8 @@ template<> ::datacatalog::GetDatasetRequest* Arena::CreateMaybeMessage<::datacat
 template<> ::datacatalog::GetDatasetResponse* Arena::CreateMaybeMessage<::datacatalog::GetDatasetResponse>(Arena*);
 template<> ::datacatalog::GetOrExtendReservationRequest* Arena::CreateMaybeMessage<::datacatalog::GetOrExtendReservationRequest>(Arena*);
 template<> ::datacatalog::GetOrExtendReservationResponse* Arena::CreateMaybeMessage<::datacatalog::GetOrExtendReservationResponse>(Arena*);
+template<> ::datacatalog::GetOrExtendReservationsRequest* Arena::CreateMaybeMessage<::datacatalog::GetOrExtendReservationsRequest>(Arena*);
+template<> ::datacatalog::GetOrExtendReservationsResponse* Arena::CreateMaybeMessage<::datacatalog::GetOrExtendReservationsResponse>(Arena*);
 template<> ::datacatalog::KeyValuePair* Arena::CreateMaybeMessage<::datacatalog::KeyValuePair>(Arena*);
 template<> ::datacatalog::ListArtifactsRequest* Arena::CreateMaybeMessage<::datacatalog::ListArtifactsRequest>(Arena*);
 template<> ::datacatalog::ListArtifactsResponse* Arena::CreateMaybeMessage<::datacatalog::ListArtifactsResponse>(Arena*);
@@ -212,6 +227,7 @@ template<> ::datacatalog::Partition* Arena::CreateMaybeMessage<::datacatalog::Pa
 template<> ::datacatalog::PartitionPropertyFilter* Arena::CreateMaybeMessage<::datacatalog::PartitionPropertyFilter>(Arena*);
 template<> ::datacatalog::ReleaseReservationRequest* Arena::CreateMaybeMessage<::datacatalog::ReleaseReservationRequest>(Arena*);
 template<> ::datacatalog::ReleaseReservationResponse* Arena::CreateMaybeMessage<::datacatalog::ReleaseReservationResponse>(Arena*);
+template<> ::datacatalog::ReleaseReservationsRequest* Arena::CreateMaybeMessage<::datacatalog::ReleaseReservationsRequest>(Arena*);
 template<> ::datacatalog::Reservation* Arena::CreateMaybeMessage<::datacatalog::Reservation>(Arena*);
 template<> ::datacatalog::ReservationID* Arena::CreateMaybeMessage<::datacatalog::ReservationID>(Arena*);
 template<> ::datacatalog::SinglePropertyFilter* Arena::CreateMaybeMessage<::datacatalog::SinglePropertyFilter>(Arena*);
@@ -2457,6 +2473,124 @@ class DeleteArtifactRequest final :
 };
 // -------------------------------------------------------------------
 
+class DeleteArtifactsRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.DeleteArtifactsRequest) */ {
+ public:
+  DeleteArtifactsRequest();
+  virtual ~DeleteArtifactsRequest();
+
+  DeleteArtifactsRequest(const DeleteArtifactsRequest& from);
+
+  inline DeleteArtifactsRequest& operator=(const DeleteArtifactsRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DeleteArtifactsRequest(DeleteArtifactsRequest&& from) noexcept
+    : DeleteArtifactsRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline DeleteArtifactsRequest& operator=(DeleteArtifactsRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DeleteArtifactsRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DeleteArtifactsRequest* internal_default_instance() {
+    return reinterpret_cast<const DeleteArtifactsRequest*>(
+               &_DeleteArtifactsRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    17;
+
+  void Swap(DeleteArtifactsRequest* other);
+  friend void swap(DeleteArtifactsRequest& a, DeleteArtifactsRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DeleteArtifactsRequest* New() const final {
+    return CreateMaybeMessage<DeleteArtifactsRequest>(nullptr);
+  }
+
+  DeleteArtifactsRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DeleteArtifactsRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DeleteArtifactsRequest& from);
+  void MergeFrom(const DeleteArtifactsRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DeleteArtifactsRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .datacatalog.DeleteArtifactRequest artifacts = 1;
+  int artifacts_size() const;
+  void clear_artifacts();
+  static const int kArtifactsFieldNumber = 1;
+  ::datacatalog::DeleteArtifactRequest* mutable_artifacts(int index);
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::DeleteArtifactRequest >*
+      mutable_artifacts();
+  const ::datacatalog::DeleteArtifactRequest& artifacts(int index) const;
+  ::datacatalog::DeleteArtifactRequest* add_artifacts();
+  const ::google::protobuf::RepeatedPtrField< ::datacatalog::DeleteArtifactRequest >&
+      artifacts() const;
+
+  // @@protoc_insertion_point(class_scope:datacatalog.DeleteArtifactsRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::DeleteArtifactRequest > artifacts_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
 class DeleteArtifactResponse final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.DeleteArtifactResponse) */ {
  public:
@@ -2495,7 +2629,7 @@ class DeleteArtifactResponse final :
                &_DeleteArtifactResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(DeleteArtifactResponse* other);
   friend void swap(DeleteArtifactResponse& a, DeleteArtifactResponse& b) {
@@ -2600,7 +2734,7 @@ class ReservationID final :
                &_ReservationID_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(ReservationID* other);
   friend void swap(ReservationID& a, ReservationID& b) {
@@ -2730,7 +2864,7 @@ class GetOrExtendReservationRequest final :
                &_GetOrExtendReservationRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(GetOrExtendReservationRequest* other);
   friend void swap(GetOrExtendReservationRequest& a, GetOrExtendReservationRequest& b) {
@@ -2832,6 +2966,124 @@ class GetOrExtendReservationRequest final :
 };
 // -------------------------------------------------------------------
 
+class GetOrExtendReservationsRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.GetOrExtendReservationsRequest) */ {
+ public:
+  GetOrExtendReservationsRequest();
+  virtual ~GetOrExtendReservationsRequest();
+
+  GetOrExtendReservationsRequest(const GetOrExtendReservationsRequest& from);
+
+  inline GetOrExtendReservationsRequest& operator=(const GetOrExtendReservationsRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GetOrExtendReservationsRequest(GetOrExtendReservationsRequest&& from) noexcept
+    : GetOrExtendReservationsRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline GetOrExtendReservationsRequest& operator=(GetOrExtendReservationsRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GetOrExtendReservationsRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GetOrExtendReservationsRequest* internal_default_instance() {
+    return reinterpret_cast<const GetOrExtendReservationsRequest*>(
+               &_GetOrExtendReservationsRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    21;
+
+  void Swap(GetOrExtendReservationsRequest* other);
+  friend void swap(GetOrExtendReservationsRequest& a, GetOrExtendReservationsRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetOrExtendReservationsRequest* New() const final {
+    return CreateMaybeMessage<GetOrExtendReservationsRequest>(nullptr);
+  }
+
+  GetOrExtendReservationsRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GetOrExtendReservationsRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GetOrExtendReservationsRequest& from);
+  void MergeFrom(const GetOrExtendReservationsRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetOrExtendReservationsRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .datacatalog.GetOrExtendReservationRequest reservations = 1;
+  int reservations_size() const;
+  void clear_reservations();
+  static const int kReservationsFieldNumber = 1;
+  ::datacatalog::GetOrExtendReservationRequest* mutable_reservations(int index);
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::GetOrExtendReservationRequest >*
+      mutable_reservations();
+  const ::datacatalog::GetOrExtendReservationRequest& reservations(int index) const;
+  ::datacatalog::GetOrExtendReservationRequest* add_reservations();
+  const ::google::protobuf::RepeatedPtrField< ::datacatalog::GetOrExtendReservationRequest >&
+      reservations() const;
+
+  // @@protoc_insertion_point(class_scope:datacatalog.GetOrExtendReservationsRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::GetOrExtendReservationRequest > reservations_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Reservation final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.Reservation) */ {
  public:
@@ -2870,7 +3122,7 @@ class Reservation final :
                &_Reservation_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   void Swap(Reservation* other);
   friend void swap(Reservation& a, Reservation& b) {
@@ -3030,7 +3282,7 @@ class GetOrExtendReservationResponse final :
                &_GetOrExtendReservationResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    23;
 
   void Swap(GetOrExtendReservationResponse* other);
   friend void swap(GetOrExtendReservationResponse& a, GetOrExtendReservationResponse& b) {
@@ -3107,6 +3359,124 @@ class GetOrExtendReservationResponse final :
 };
 // -------------------------------------------------------------------
 
+class GetOrExtendReservationsResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.GetOrExtendReservationsResponse) */ {
+ public:
+  GetOrExtendReservationsResponse();
+  virtual ~GetOrExtendReservationsResponse();
+
+  GetOrExtendReservationsResponse(const GetOrExtendReservationsResponse& from);
+
+  inline GetOrExtendReservationsResponse& operator=(const GetOrExtendReservationsResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GetOrExtendReservationsResponse(GetOrExtendReservationsResponse&& from) noexcept
+    : GetOrExtendReservationsResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline GetOrExtendReservationsResponse& operator=(GetOrExtendReservationsResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GetOrExtendReservationsResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GetOrExtendReservationsResponse* internal_default_instance() {
+    return reinterpret_cast<const GetOrExtendReservationsResponse*>(
+               &_GetOrExtendReservationsResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    24;
+
+  void Swap(GetOrExtendReservationsResponse* other);
+  friend void swap(GetOrExtendReservationsResponse& a, GetOrExtendReservationsResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetOrExtendReservationsResponse* New() const final {
+    return CreateMaybeMessage<GetOrExtendReservationsResponse>(nullptr);
+  }
+
+  GetOrExtendReservationsResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GetOrExtendReservationsResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GetOrExtendReservationsResponse& from);
+  void MergeFrom(const GetOrExtendReservationsResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetOrExtendReservationsResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .datacatalog.Reservation reservations = 1;
+  int reservations_size() const;
+  void clear_reservations();
+  static const int kReservationsFieldNumber = 1;
+  ::datacatalog::Reservation* mutable_reservations(int index);
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::Reservation >*
+      mutable_reservations();
+  const ::datacatalog::Reservation& reservations(int index) const;
+  ::datacatalog::Reservation* add_reservations();
+  const ::google::protobuf::RepeatedPtrField< ::datacatalog::Reservation >&
+      reservations() const;
+
+  // @@protoc_insertion_point(class_scope:datacatalog.GetOrExtendReservationsResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::Reservation > reservations_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ReleaseReservationRequest final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.ReleaseReservationRequest) */ {
  public:
@@ -3145,7 +3515,7 @@ class ReleaseReservationRequest final :
                &_ReleaseReservationRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    25;
 
   void Swap(ReleaseReservationRequest* other);
   friend void swap(ReleaseReservationRequest& a, ReleaseReservationRequest& b) {
@@ -3237,6 +3607,124 @@ class ReleaseReservationRequest final :
 };
 // -------------------------------------------------------------------
 
+class ReleaseReservationsRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.ReleaseReservationsRequest) */ {
+ public:
+  ReleaseReservationsRequest();
+  virtual ~ReleaseReservationsRequest();
+
+  ReleaseReservationsRequest(const ReleaseReservationsRequest& from);
+
+  inline ReleaseReservationsRequest& operator=(const ReleaseReservationsRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ReleaseReservationsRequest(ReleaseReservationsRequest&& from) noexcept
+    : ReleaseReservationsRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ReleaseReservationsRequest& operator=(ReleaseReservationsRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ReleaseReservationsRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ReleaseReservationsRequest* internal_default_instance() {
+    return reinterpret_cast<const ReleaseReservationsRequest*>(
+               &_ReleaseReservationsRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    26;
+
+  void Swap(ReleaseReservationsRequest* other);
+  friend void swap(ReleaseReservationsRequest& a, ReleaseReservationsRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ReleaseReservationsRequest* New() const final {
+    return CreateMaybeMessage<ReleaseReservationsRequest>(nullptr);
+  }
+
+  ReleaseReservationsRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ReleaseReservationsRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ReleaseReservationsRequest& from);
+  void MergeFrom(const ReleaseReservationsRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ReleaseReservationsRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .datacatalog.ReleaseReservationRequest reservations = 1;
+  int reservations_size() const;
+  void clear_reservations();
+  static const int kReservationsFieldNumber = 1;
+  ::datacatalog::ReleaseReservationRequest* mutable_reservations(int index);
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::ReleaseReservationRequest >*
+      mutable_reservations();
+  const ::datacatalog::ReleaseReservationRequest& reservations(int index) const;
+  ::datacatalog::ReleaseReservationRequest* add_reservations();
+  const ::google::protobuf::RepeatedPtrField< ::datacatalog::ReleaseReservationRequest >&
+      reservations() const;
+
+  // @@protoc_insertion_point(class_scope:datacatalog.ReleaseReservationsRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::datacatalog::ReleaseReservationRequest > reservations_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ReleaseReservationResponse final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:datacatalog.ReleaseReservationResponse) */ {
  public:
@@ -3275,7 +3763,7 @@ class ReleaseReservationResponse final :
                &_ReleaseReservationResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    27;
 
   void Swap(ReleaseReservationResponse* other);
   friend void swap(ReleaseReservationResponse& a, ReleaseReservationResponse& b) {
@@ -3380,7 +3868,7 @@ class Dataset final :
                &_Dataset_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    28;
 
   void Swap(Dataset* other);
   friend void swap(Dataset& a, Dataset& b) {
@@ -3528,7 +4016,7 @@ class Partition final :
                &_Partition_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    29;
 
   void Swap(Partition* other);
   friend void swap(Partition& a, Partition& b) {
@@ -3663,7 +4151,7 @@ class DatasetID final :
                &_DatasetID_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    26;
+    30;
 
   void Swap(DatasetID* other);
   friend void swap(DatasetID& a, DatasetID& b) {
@@ -3843,7 +4331,7 @@ class Artifact final :
                &_Artifact_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    31;
 
   void Swap(Artifact* other);
   friend void swap(Artifact& a, Artifact& b) {
@@ -4032,7 +4520,7 @@ class ArtifactData final :
                &_ArtifactData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    32;
 
   void Swap(ArtifactData* other);
   friend void swap(ArtifactData& a, ArtifactData& b) {
@@ -4162,7 +4650,7 @@ class Tag final :
                &_Tag_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    33;
 
   void Swap(Tag* other);
   friend void swap(Tag& a, Tag& b) {
@@ -4331,7 +4819,7 @@ class Metadata final :
                &_Metadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    31;
+    35;
 
   void Swap(Metadata* other);
   friend void swap(Metadata& a, Metadata& b) {
@@ -4452,7 +4940,7 @@ class FilterExpression final :
                &_FilterExpression_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    32;
+    36;
 
   void Swap(FilterExpression* other);
   friend void swap(FilterExpression& a, FilterExpression& b) {
@@ -4578,7 +5066,7 @@ class SinglePropertyFilter final :
                &_SinglePropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    33;
+    37;
 
   void Swap(SinglePropertyFilter* other);
   friend void swap(SinglePropertyFilter& a, SinglePropertyFilter& b) {
@@ -4773,7 +5261,7 @@ class ArtifactPropertyFilter final :
                &_ArtifactPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    34;
+    38;
 
   void Swap(ArtifactPropertyFilter* other);
   friend void swap(ArtifactPropertyFilter& a, ArtifactPropertyFilter& b) {
@@ -4912,7 +5400,7 @@ class TagPropertyFilter final :
                &_TagPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    35;
+    39;
 
   void Swap(TagPropertyFilter* other);
   friend void swap(TagPropertyFilter& a, TagPropertyFilter& b) {
@@ -5051,7 +5539,7 @@ class PartitionPropertyFilter final :
                &_PartitionPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    36;
+    40;
 
   void Swap(PartitionPropertyFilter* other);
   friend void swap(PartitionPropertyFilter& a, PartitionPropertyFilter& b) {
@@ -5177,7 +5665,7 @@ class KeyValuePair final :
                &_KeyValuePair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    37;
+    41;
 
   void Swap(KeyValuePair* other);
   friend void swap(KeyValuePair& a, KeyValuePair& b) {
@@ -5320,7 +5808,7 @@ class DatasetPropertyFilter final :
                &_DatasetPropertyFilter_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    38;
+    42;
 
   void Swap(DatasetPropertyFilter* other);
   friend void swap(DatasetPropertyFilter& a, DatasetPropertyFilter& b) {
@@ -5511,7 +5999,7 @@ class PaginationOptions final :
                &_PaginationOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    43;
 
   void Swap(PaginationOptions* other);
   friend void swap(PaginationOptions& a, PaginationOptions& b) {
@@ -7281,6 +7769,40 @@ inline DeleteArtifactRequest::QueryHandleCase DeleteArtifactRequest::query_handl
 }
 // -------------------------------------------------------------------
 
+// DeleteArtifactsRequest
+
+// repeated .datacatalog.DeleteArtifactRequest artifacts = 1;
+inline int DeleteArtifactsRequest::artifacts_size() const {
+  return artifacts_.size();
+}
+inline void DeleteArtifactsRequest::clear_artifacts() {
+  artifacts_.Clear();
+}
+inline ::datacatalog::DeleteArtifactRequest* DeleteArtifactsRequest::mutable_artifacts(int index) {
+  // @@protoc_insertion_point(field_mutable:datacatalog.DeleteArtifactsRequest.artifacts)
+  return artifacts_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::datacatalog::DeleteArtifactRequest >*
+DeleteArtifactsRequest::mutable_artifacts() {
+  // @@protoc_insertion_point(field_mutable_list:datacatalog.DeleteArtifactsRequest.artifacts)
+  return &artifacts_;
+}
+inline const ::datacatalog::DeleteArtifactRequest& DeleteArtifactsRequest::artifacts(int index) const {
+  // @@protoc_insertion_point(field_get:datacatalog.DeleteArtifactsRequest.artifacts)
+  return artifacts_.Get(index);
+}
+inline ::datacatalog::DeleteArtifactRequest* DeleteArtifactsRequest::add_artifacts() {
+  // @@protoc_insertion_point(field_add:datacatalog.DeleteArtifactsRequest.artifacts)
+  return artifacts_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::DeleteArtifactRequest >&
+DeleteArtifactsRequest::artifacts() const {
+  // @@protoc_insertion_point(field_list:datacatalog.DeleteArtifactsRequest.artifacts)
+  return artifacts_;
+}
+
+// -------------------------------------------------------------------
+
 // DeleteArtifactResponse
 
 // -------------------------------------------------------------------
@@ -7543,6 +8065,40 @@ inline void GetOrExtendReservationRequest::set_allocated_heartbeat_interval(::go
   }
   heartbeat_interval_ = heartbeat_interval;
   // @@protoc_insertion_point(field_set_allocated:datacatalog.GetOrExtendReservationRequest.heartbeat_interval)
+}
+
+// -------------------------------------------------------------------
+
+// GetOrExtendReservationsRequest
+
+// repeated .datacatalog.GetOrExtendReservationRequest reservations = 1;
+inline int GetOrExtendReservationsRequest::reservations_size() const {
+  return reservations_.size();
+}
+inline void GetOrExtendReservationsRequest::clear_reservations() {
+  reservations_.Clear();
+}
+inline ::datacatalog::GetOrExtendReservationRequest* GetOrExtendReservationsRequest::mutable_reservations(int index) {
+  // @@protoc_insertion_point(field_mutable:datacatalog.GetOrExtendReservationsRequest.reservations)
+  return reservations_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::datacatalog::GetOrExtendReservationRequest >*
+GetOrExtendReservationsRequest::mutable_reservations() {
+  // @@protoc_insertion_point(field_mutable_list:datacatalog.GetOrExtendReservationsRequest.reservations)
+  return &reservations_;
+}
+inline const ::datacatalog::GetOrExtendReservationRequest& GetOrExtendReservationsRequest::reservations(int index) const {
+  // @@protoc_insertion_point(field_get:datacatalog.GetOrExtendReservationsRequest.reservations)
+  return reservations_.Get(index);
+}
+inline ::datacatalog::GetOrExtendReservationRequest* GetOrExtendReservationsRequest::add_reservations() {
+  // @@protoc_insertion_point(field_add:datacatalog.GetOrExtendReservationsRequest.reservations)
+  return reservations_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::GetOrExtendReservationRequest >&
+GetOrExtendReservationsRequest::reservations() const {
+  // @@protoc_insertion_point(field_list:datacatalog.GetOrExtendReservationsRequest.reservations)
+  return reservations_;
 }
 
 // -------------------------------------------------------------------
@@ -7853,6 +8409,40 @@ inline void GetOrExtendReservationResponse::set_allocated_reservation(::datacata
 
 // -------------------------------------------------------------------
 
+// GetOrExtendReservationsResponse
+
+// repeated .datacatalog.Reservation reservations = 1;
+inline int GetOrExtendReservationsResponse::reservations_size() const {
+  return reservations_.size();
+}
+inline void GetOrExtendReservationsResponse::clear_reservations() {
+  reservations_.Clear();
+}
+inline ::datacatalog::Reservation* GetOrExtendReservationsResponse::mutable_reservations(int index) {
+  // @@protoc_insertion_point(field_mutable:datacatalog.GetOrExtendReservationsResponse.reservations)
+  return reservations_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::datacatalog::Reservation >*
+GetOrExtendReservationsResponse::mutable_reservations() {
+  // @@protoc_insertion_point(field_mutable_list:datacatalog.GetOrExtendReservationsResponse.reservations)
+  return &reservations_;
+}
+inline const ::datacatalog::Reservation& GetOrExtendReservationsResponse::reservations(int index) const {
+  // @@protoc_insertion_point(field_get:datacatalog.GetOrExtendReservationsResponse.reservations)
+  return reservations_.Get(index);
+}
+inline ::datacatalog::Reservation* GetOrExtendReservationsResponse::add_reservations() {
+  // @@protoc_insertion_point(field_add:datacatalog.GetOrExtendReservationsResponse.reservations)
+  return reservations_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::Reservation >&
+GetOrExtendReservationsResponse::reservations() const {
+  // @@protoc_insertion_point(field_list:datacatalog.GetOrExtendReservationsResponse.reservations)
+  return reservations_;
+}
+
+// -------------------------------------------------------------------
+
 // ReleaseReservationRequest
 
 // .datacatalog.ReservationID reservation_id = 1;
@@ -7957,6 +8547,40 @@ inline void ReleaseReservationRequest::set_allocated_owner_id(::std::string* own
   }
   owner_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), owner_id);
   // @@protoc_insertion_point(field_set_allocated:datacatalog.ReleaseReservationRequest.owner_id)
+}
+
+// -------------------------------------------------------------------
+
+// ReleaseReservationsRequest
+
+// repeated .datacatalog.ReleaseReservationRequest reservations = 1;
+inline int ReleaseReservationsRequest::reservations_size() const {
+  return reservations_.size();
+}
+inline void ReleaseReservationsRequest::clear_reservations() {
+  reservations_.Clear();
+}
+inline ::datacatalog::ReleaseReservationRequest* ReleaseReservationsRequest::mutable_reservations(int index) {
+  // @@protoc_insertion_point(field_mutable:datacatalog.ReleaseReservationsRequest.reservations)
+  return reservations_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::datacatalog::ReleaseReservationRequest >*
+ReleaseReservationsRequest::mutable_reservations() {
+  // @@protoc_insertion_point(field_mutable_list:datacatalog.ReleaseReservationsRequest.reservations)
+  return &reservations_;
+}
+inline const ::datacatalog::ReleaseReservationRequest& ReleaseReservationsRequest::reservations(int index) const {
+  // @@protoc_insertion_point(field_get:datacatalog.ReleaseReservationsRequest.reservations)
+  return reservations_.Get(index);
+}
+inline ::datacatalog::ReleaseReservationRequest* ReleaseReservationsRequest::add_reservations() {
+  // @@protoc_insertion_point(field_add:datacatalog.ReleaseReservationsRequest.reservations)
+  return reservations_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::ReleaseReservationRequest >&
+ReleaseReservationsRequest::reservations() const {
+  // @@protoc_insertion_point(field_list:datacatalog.ReleaseReservationsRequest.reservations)
+  return reservations_;
 }
 
 // -------------------------------------------------------------------
@@ -10181,6 +10805,14 @@ inline void PaginationOptions::set_sortorder(::datacatalog::PaginationOptions_So
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

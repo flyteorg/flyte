@@ -125,6 +125,18 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>> PrepareAsyncDeleteArtifact(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>>(PrepareAsyncDeleteArtifactRaw(context, request, cq));
     }
+    // Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+    // This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+    // will not result in an error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+    virtual ::grpc::Status DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::datacatalog::DeleteArtifactResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>> AsyncDeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>>(AsyncDeleteArtifactsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>> PrepareAsyncDeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>>(PrepareAsyncDeleteArtifactsRaw(context, request, cq));
+    }
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
     // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -143,6 +155,17 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationResponse>> PrepareAsyncGetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationResponse>>(PrepareAsyncGetOrExtendReservationRaw(context, request, cq));
     }
+    // Attempts to get or extend reservations for multiple artifacts in a single operation.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+    // reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+    // endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+    virtual ::grpc::Status GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::datacatalog::GetOrExtendReservationsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>> AsyncGetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>>(AsyncGetOrExtendReservationsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>> PrepareAsyncGetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>>(PrepareAsyncGetOrExtendReservationsRaw(context, request, cq));
+    }
     // Release the reservation when the task holding the spot fails so that the other tasks
     // can grab the spot.
     virtual ::grpc::Status ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::datacatalog::ReleaseReservationResponse* response) = 0;
@@ -151,6 +174,19 @@ class DataCatalog final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>> PrepareAsyncReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>>(PrepareAsyncReleaseReservationRaw(context, request, cq));
+    }
+    // Releases reservations for multiple artifacts in a single operation.
+    // This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+    // times will not result in error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+    // reservations.
+    virtual ::grpc::Status ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::datacatalog::ReleaseReservationResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>> AsyncReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>>(AsyncReleaseReservationsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>> PrepareAsyncReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>>(PrepareAsyncReleaseReservationsRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
@@ -202,6 +238,15 @@ class DataCatalog final {
       virtual void DeleteArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteArtifact(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void DeleteArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+      // This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+      // will not result in an error.
+      // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+      // artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+      virtual void DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void DeleteArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void DeleteArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
       // (ie. another entity owns the reservation) then that reservation is retrieved.
       // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -217,12 +262,30 @@ class DataCatalog final {
       virtual void GetOrExtendReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest* request, ::datacatalog::GetOrExtendReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetOrExtendReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Attempts to get or extend reservations for multiple artifacts in a single operation.
+      // The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+      // reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+      // endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+      virtual void GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetOrExtendReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetOrExtendReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Release the reservation when the task holding the spot fails so that the other tasks
       // can grab the spot.
       virtual void ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ReleaseReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ReleaseReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Releases reservations for multiple artifacts in a single operation.
+      // This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+      // times will not result in error.
+      // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+      // artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+      // reservations.
+      virtual void ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReleaseReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ReleaseReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -244,10 +307,16 @@ class DataCatalog final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::UpdateArtifactResponse>* PrepareAsyncUpdateArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>* AsyncDeleteArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>* PrepareAsyncDeleteArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>* AsyncDeleteArtifactsRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::DeleteArtifactResponse>* PrepareAsyncDeleteArtifactsRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationResponse>* AsyncGetOrExtendReservationRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationResponse>* PrepareAsyncGetOrExtendReservationRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>* AsyncGetOrExtendReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetOrExtendReservationsResponse>* PrepareAsyncGetOrExtendReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>* AsyncReleaseReservationRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>* PrepareAsyncReleaseReservationRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>* AsyncReleaseReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ReleaseReservationResponse>* PrepareAsyncReleaseReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -315,6 +384,13 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>> PrepareAsyncDeleteArtifact(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>>(PrepareAsyncDeleteArtifactRaw(context, request, cq));
     }
+    ::grpc::Status DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::datacatalog::DeleteArtifactResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>> AsyncDeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>>(AsyncDeleteArtifactsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>> PrepareAsyncDeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>>(PrepareAsyncDeleteArtifactsRaw(context, request, cq));
+    }
     ::grpc::Status GetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::datacatalog::GetOrExtendReservationResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>> AsyncGetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>>(AsyncGetOrExtendReservationRaw(context, request, cq));
@@ -322,12 +398,26 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>> PrepareAsyncGetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>>(PrepareAsyncGetOrExtendReservationRaw(context, request, cq));
     }
+    ::grpc::Status GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::datacatalog::GetOrExtendReservationsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>> AsyncGetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>>(AsyncGetOrExtendReservationsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>> PrepareAsyncGetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>>(PrepareAsyncGetOrExtendReservationsRaw(context, request, cq));
+    }
     ::grpc::Status ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::datacatalog::ReleaseReservationResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>> AsyncReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>>(AsyncReleaseReservationRaw(context, request, cq));
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>> PrepareAsyncReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>>(PrepareAsyncReleaseReservationRaw(context, request, cq));
+    }
+    ::grpc::Status ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::datacatalog::ReleaseReservationResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>> AsyncReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>>(AsyncReleaseReservationsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>> PrepareAsyncReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>>(PrepareAsyncReleaseReservationsRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
@@ -368,14 +458,26 @@ class DataCatalog final {
       void DeleteArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) override;
       void DeleteArtifact(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void DeleteArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) override;
+      void DeleteArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, std::function<void(::grpc::Status)>) override;
+      void DeleteArtifacts(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void DeleteArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest* request, ::datacatalog::GetOrExtendReservationResponse* response, std::function<void(::grpc::Status)>) override;
       void GetOrExtendReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationResponse* response, std::function<void(::grpc::Status)>) override;
       void GetOrExtendReservation(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest* request, ::datacatalog::GetOrExtendReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetOrExtendReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetOrExtendReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetOrExtendReservations(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetOrExtendReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetOrExtendReservationsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) override;
       void ReleaseReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) override;
       void ReleaseReservation(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void ReleaseReservation(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) override;
+      void ReleaseReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, std::function<void(::grpc::Status)>) override;
+      void ReleaseReservations(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ReleaseReservations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -405,10 +507,16 @@ class DataCatalog final {
     ::grpc::ClientAsyncResponseReader< ::datacatalog::UpdateArtifactResponse>* PrepareAsyncUpdateArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::UpdateArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>* AsyncDeleteArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>* PrepareAsyncDeleteArtifactRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>* AsyncDeleteArtifactsRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::DeleteArtifactResponse>* PrepareAsyncDeleteArtifactsRaw(::grpc::ClientContext* context, const ::datacatalog::DeleteArtifactsRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>* AsyncGetOrExtendReservationRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationResponse>* PrepareAsyncGetOrExtendReservationRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>* AsyncGetOrExtendReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::GetOrExtendReservationsResponse>* PrepareAsyncGetOrExtendReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::GetOrExtendReservationsRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>* AsyncReleaseReservationRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>* PrepareAsyncReleaseReservationRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>* AsyncReleaseReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::datacatalog::ReleaseReservationResponse>* PrepareAsyncReleaseReservationsRaw(::grpc::ClientContext* context, const ::datacatalog::ReleaseReservationsRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateDataset_;
     const ::grpc::internal::RpcMethod rpcmethod_GetDataset_;
     const ::grpc::internal::RpcMethod rpcmethod_CreateArtifact_;
@@ -418,8 +526,11 @@ class DataCatalog final {
     const ::grpc::internal::RpcMethod rpcmethod_ListDatasets_;
     const ::grpc::internal::RpcMethod rpcmethod_UpdateArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_DeleteArtifact_;
+    const ::grpc::internal::RpcMethod rpcmethod_DeleteArtifacts_;
     const ::grpc::internal::RpcMethod rpcmethod_GetOrExtendReservation_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetOrExtendReservations_;
     const ::grpc::internal::RpcMethod rpcmethod_ReleaseReservation_;
+    const ::grpc::internal::RpcMethod rpcmethod_ReleaseReservations_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -447,6 +558,12 @@ class DataCatalog final {
     virtual ::grpc::Status UpdateArtifact(::grpc::ServerContext* context, const ::datacatalog::UpdateArtifactRequest* request, ::datacatalog::UpdateArtifactResponse* response);
     // Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
     virtual ::grpc::Status DeleteArtifact(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactRequest* request, ::datacatalog::DeleteArtifactResponse* response);
+    // Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+    // This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+    // will not result in an error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+    virtual ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response);
     // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
     // (ie. another entity owns the reservation) then that reservation is retrieved.
     // Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -459,9 +576,21 @@ class DataCatalog final {
     // task B may take over the reservation, resulting in two tasks A and B running in parallel. So
     // a third task C may get the Artifact from A or B, whichever writes last.
     virtual ::grpc::Status GetOrExtendReservation(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationRequest* request, ::datacatalog::GetOrExtendReservationResponse* response);
+    // Attempts to get or extend reservations for multiple artifacts in a single operation.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+    // reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+    // endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+    virtual ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response);
     // Release the reservation when the task holding the spot fails so that the other tasks
     // can grab the spot.
     virtual ::grpc::Status ReleaseReservation(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response);
+    // Releases reservations for multiple artifacts in a single operation.
+    // This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+    // times will not result in error.
+    // The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+    // artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+    // reservations.
+    virtual ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateDataset : public BaseClass {
@@ -644,12 +773,32 @@ class DataCatalog final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_DeleteArtifacts() {
+      ::grpc::Service::MarkMethodAsync(9);
+    }
+    ~WithAsyncMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestDeleteArtifacts(::grpc::ServerContext* context, ::datacatalog::DeleteArtifactsRequest* request, ::grpc::ServerAsyncResponseWriter< ::datacatalog::DeleteArtifactResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetOrExtendReservation() {
-      ::grpc::Service::MarkMethodAsync(9);
+      ::grpc::Service::MarkMethodAsync(10);
     }
     ~WithAsyncMethod_GetOrExtendReservation() override {
       BaseClassMustBeDerivedFromService(this);
@@ -660,7 +809,27 @@ class DataCatalog final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetOrExtendReservation(::grpc::ServerContext* context, ::datacatalog::GetOrExtendReservationRequest* request, ::grpc::ServerAsyncResponseWriter< ::datacatalog::GetOrExtendReservationResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_GetOrExtendReservations() {
+      ::grpc::Service::MarkMethodAsync(11);
+    }
+    ~WithAsyncMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetOrExtendReservations(::grpc::ServerContext* context, ::datacatalog::GetOrExtendReservationsRequest* request, ::grpc::ServerAsyncResponseWriter< ::datacatalog::GetOrExtendReservationsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -669,7 +838,7 @@ class DataCatalog final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ReleaseReservation() {
-      ::grpc::Service::MarkMethodAsync(10);
+      ::grpc::Service::MarkMethodAsync(12);
     }
     ~WithAsyncMethod_ReleaseReservation() override {
       BaseClassMustBeDerivedFromService(this);
@@ -680,10 +849,30 @@ class DataCatalog final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestReleaseReservation(::grpc::ServerContext* context, ::datacatalog::ReleaseReservationRequest* request, ::grpc::ServerAsyncResponseWriter< ::datacatalog::ReleaseReservationResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateDataset<WithAsyncMethod_GetDataset<WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_AddTag<WithAsyncMethod_ListArtifacts<WithAsyncMethod_ListDatasets<WithAsyncMethod_UpdateArtifact<WithAsyncMethod_DeleteArtifact<WithAsyncMethod_GetOrExtendReservation<WithAsyncMethod_ReleaseReservation<Service > > > > > > > > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_ReleaseReservations() {
+      ::grpc::Service::MarkMethodAsync(13);
+    }
+    ~WithAsyncMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReleaseReservations(::grpc::ServerContext* context, ::datacatalog::ReleaseReservationsRequest* request, ::grpc::ServerAsyncResponseWriter< ::datacatalog::ReleaseReservationResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_CreateDataset<WithAsyncMethod_GetDataset<WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_AddTag<WithAsyncMethod_ListArtifacts<WithAsyncMethod_ListDatasets<WithAsyncMethod_UpdateArtifact<WithAsyncMethod_DeleteArtifact<WithAsyncMethod_DeleteArtifacts<WithAsyncMethod_GetOrExtendReservation<WithAsyncMethod_GetOrExtendReservations<WithAsyncMethod_ReleaseReservation<WithAsyncMethod_ReleaseReservations<Service > > > > > > > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateDataset : public BaseClass {
    private:
@@ -964,12 +1153,43 @@ class DataCatalog final {
     virtual void DeleteArtifact(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithCallbackMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_DeleteArtifacts() {
+      ::grpc::Service::experimental().MarkMethodCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::datacatalog::DeleteArtifactsRequest, ::datacatalog::DeleteArtifactResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::datacatalog::DeleteArtifactsRequest* request,
+                 ::datacatalog::DeleteArtifactResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->DeleteArtifacts(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_DeleteArtifacts(
+        ::grpc::experimental::MessageAllocator< ::datacatalog::DeleteArtifactsRequest, ::datacatalog::DeleteArtifactResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::datacatalog::DeleteArtifactsRequest, ::datacatalog::DeleteArtifactResponse>*>(
+          ::grpc::Service::experimental().GetHandler(9))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithCallbackMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetOrExtendReservation() {
-      ::grpc::Service::experimental().MarkMethodCallback(9,
+      ::grpc::Service::experimental().MarkMethodCallback(10,
         new ::grpc::internal::CallbackUnaryHandler< ::datacatalog::GetOrExtendReservationRequest, ::datacatalog::GetOrExtendReservationResponse>(
           [this](::grpc::ServerContext* context,
                  const ::datacatalog::GetOrExtendReservationRequest* request,
@@ -981,7 +1201,7 @@ class DataCatalog final {
     void SetMessageAllocatorFor_GetOrExtendReservation(
         ::grpc::experimental::MessageAllocator< ::datacatalog::GetOrExtendReservationRequest, ::datacatalog::GetOrExtendReservationResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::datacatalog::GetOrExtendReservationRequest, ::datacatalog::GetOrExtendReservationResponse>*>(
-          ::grpc::Service::experimental().GetHandler(9))
+          ::grpc::Service::experimental().GetHandler(10))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetOrExtendReservation() override {
@@ -995,12 +1215,43 @@ class DataCatalog final {
     virtual void GetOrExtendReservation(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationRequest* request, ::datacatalog::GetOrExtendReservationResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetOrExtendReservations() {
+      ::grpc::Service::experimental().MarkMethodCallback(11,
+        new ::grpc::internal::CallbackUnaryHandler< ::datacatalog::GetOrExtendReservationsRequest, ::datacatalog::GetOrExtendReservationsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::datacatalog::GetOrExtendReservationsRequest* request,
+                 ::datacatalog::GetOrExtendReservationsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetOrExtendReservations(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetOrExtendReservations(
+        ::grpc::experimental::MessageAllocator< ::datacatalog::GetOrExtendReservationsRequest, ::datacatalog::GetOrExtendReservationsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::datacatalog::GetOrExtendReservationsRequest, ::datacatalog::GetOrExtendReservationsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(11))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithCallbackMethod_ReleaseReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ReleaseReservation() {
-      ::grpc::Service::experimental().MarkMethodCallback(10,
+      ::grpc::Service::experimental().MarkMethodCallback(12,
         new ::grpc::internal::CallbackUnaryHandler< ::datacatalog::ReleaseReservationRequest, ::datacatalog::ReleaseReservationResponse>(
           [this](::grpc::ServerContext* context,
                  const ::datacatalog::ReleaseReservationRequest* request,
@@ -1012,7 +1263,7 @@ class DataCatalog final {
     void SetMessageAllocatorFor_ReleaseReservation(
         ::grpc::experimental::MessageAllocator< ::datacatalog::ReleaseReservationRequest, ::datacatalog::ReleaseReservationResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::datacatalog::ReleaseReservationRequest, ::datacatalog::ReleaseReservationResponse>*>(
-          ::grpc::Service::experimental().GetHandler(10))
+          ::grpc::Service::experimental().GetHandler(12))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ReleaseReservation() override {
@@ -1025,7 +1276,38 @@ class DataCatalog final {
     }
     virtual void ReleaseReservation(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateDataset<ExperimentalWithCallbackMethod_GetDataset<ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_ListArtifacts<ExperimentalWithCallbackMethod_ListDatasets<ExperimentalWithCallbackMethod_UpdateArtifact<ExperimentalWithCallbackMethod_DeleteArtifact<ExperimentalWithCallbackMethod_GetOrExtendReservation<ExperimentalWithCallbackMethod_ReleaseReservation<Service > > > > > > > > > > > ExperimentalCallbackService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ReleaseReservations() {
+      ::grpc::Service::experimental().MarkMethodCallback(13,
+        new ::grpc::internal::CallbackUnaryHandler< ::datacatalog::ReleaseReservationsRequest, ::datacatalog::ReleaseReservationResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::datacatalog::ReleaseReservationsRequest* request,
+                 ::datacatalog::ReleaseReservationResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ReleaseReservations(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ReleaseReservations(
+        ::grpc::experimental::MessageAllocator< ::datacatalog::ReleaseReservationsRequest, ::datacatalog::ReleaseReservationResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::datacatalog::ReleaseReservationsRequest, ::datacatalog::ReleaseReservationResponse>*>(
+          ::grpc::Service::experimental().GetHandler(13))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_CreateDataset<ExperimentalWithCallbackMethod_GetDataset<ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_ListArtifacts<ExperimentalWithCallbackMethod_ListDatasets<ExperimentalWithCallbackMethod_UpdateArtifact<ExperimentalWithCallbackMethod_DeleteArtifact<ExperimentalWithCallbackMethod_DeleteArtifacts<ExperimentalWithCallbackMethod_GetOrExtendReservation<ExperimentalWithCallbackMethod_GetOrExtendReservations<ExperimentalWithCallbackMethod_ReleaseReservation<ExperimentalWithCallbackMethod_ReleaseReservations<Service > > > > > > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateDataset : public BaseClass {
    private:
@@ -1180,12 +1462,29 @@ class DataCatalog final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_DeleteArtifacts() {
+      ::grpc::Service::MarkMethodGeneric(9);
+    }
+    ~WithGenericMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetOrExtendReservation() {
-      ::grpc::Service::MarkMethodGeneric(9);
+      ::grpc::Service::MarkMethodGeneric(10);
     }
     ~WithGenericMethod_GetOrExtendReservation() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1197,18 +1496,52 @@ class DataCatalog final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetOrExtendReservations() {
+      ::grpc::Service::MarkMethodGeneric(11);
+    }
+    ~WithGenericMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_ReleaseReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ReleaseReservation() {
-      ::grpc::Service::MarkMethodGeneric(10);
+      ::grpc::Service::MarkMethodGeneric(12);
     }
     ~WithGenericMethod_ReleaseReservation() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
     ::grpc::Status ReleaseReservation(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_ReleaseReservations() {
+      ::grpc::Service::MarkMethodGeneric(13);
+    }
+    ~WithGenericMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1394,12 +1727,32 @@ class DataCatalog final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_DeleteArtifacts() {
+      ::grpc::Service::MarkMethodRaw(9);
+    }
+    ~WithRawMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestDeleteArtifacts(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetOrExtendReservation() {
-      ::grpc::Service::MarkMethodRaw(9);
+      ::grpc::Service::MarkMethodRaw(10);
     }
     ~WithRawMethod_GetOrExtendReservation() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1410,7 +1763,27 @@ class DataCatalog final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetOrExtendReservation(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_GetOrExtendReservations() {
+      ::grpc::Service::MarkMethodRaw(11);
+    }
+    ~WithRawMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetOrExtendReservations(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1419,7 +1792,7 @@ class DataCatalog final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ReleaseReservation() {
-      ::grpc::Service::MarkMethodRaw(10);
+      ::grpc::Service::MarkMethodRaw(12);
     }
     ~WithRawMethod_ReleaseReservation() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1430,7 +1803,27 @@ class DataCatalog final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestReleaseReservation(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_ReleaseReservations() {
+      ::grpc::Service::MarkMethodRaw(13);
+    }
+    ~WithRawMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReleaseReservations(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1659,12 +2052,37 @@ class DataCatalog final {
     virtual void DeleteArtifact(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_DeleteArtifacts() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->DeleteArtifacts(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void DeleteArtifacts(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetOrExtendReservation() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(9,
+      ::grpc::Service::experimental().MarkMethodRawCallback(10,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1684,12 +2102,37 @@ class DataCatalog final {
     virtual void GetOrExtendReservation(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetOrExtendReservations() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(11,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetOrExtendReservations(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetOrExtendReservations(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_ReleaseReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ReleaseReservation() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(10,
+      ::grpc::Service::experimental().MarkMethodRawCallback(12,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1707,6 +2150,31 @@ class DataCatalog final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual void ReleaseReservation(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ReleaseReservations() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(13,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ReleaseReservations(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ReleaseReservations(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_CreateDataset : public BaseClass {
@@ -1889,12 +2357,32 @@ class DataCatalog final {
     virtual ::grpc::Status StreamedDeleteArtifact(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::DeleteArtifactRequest,::datacatalog::DeleteArtifactResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_DeleteArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_DeleteArtifacts() {
+      ::grpc::Service::MarkMethodStreamed(9,
+        new ::grpc::internal::StreamedUnaryHandler< ::datacatalog::DeleteArtifactsRequest, ::datacatalog::DeleteArtifactResponse>(std::bind(&WithStreamedUnaryMethod_DeleteArtifacts<BaseClass>::StreamedDeleteArtifacts, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_DeleteArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status DeleteArtifacts(::grpc::ServerContext* context, const ::datacatalog::DeleteArtifactsRequest* request, ::datacatalog::DeleteArtifactResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedDeleteArtifacts(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::DeleteArtifactsRequest,::datacatalog::DeleteArtifactResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_GetOrExtendReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetOrExtendReservation() {
-      ::grpc::Service::MarkMethodStreamed(9,
+      ::grpc::Service::MarkMethodStreamed(10,
         new ::grpc::internal::StreamedUnaryHandler< ::datacatalog::GetOrExtendReservationRequest, ::datacatalog::GetOrExtendReservationResponse>(std::bind(&WithStreamedUnaryMethod_GetOrExtendReservation<BaseClass>::StreamedGetOrExtendReservation, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetOrExtendReservation() override {
@@ -1909,12 +2397,32 @@ class DataCatalog final {
     virtual ::grpc::Status StreamedGetOrExtendReservation(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::GetOrExtendReservationRequest,::datacatalog::GetOrExtendReservationResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_GetOrExtendReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetOrExtendReservations() {
+      ::grpc::Service::MarkMethodStreamed(11,
+        new ::grpc::internal::StreamedUnaryHandler< ::datacatalog::GetOrExtendReservationsRequest, ::datacatalog::GetOrExtendReservationsResponse>(std::bind(&WithStreamedUnaryMethod_GetOrExtendReservations<BaseClass>::StreamedGetOrExtendReservations, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetOrExtendReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetOrExtendReservations(::grpc::ServerContext* context, const ::datacatalog::GetOrExtendReservationsRequest* request, ::datacatalog::GetOrExtendReservationsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetOrExtendReservations(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::GetOrExtendReservationsRequest,::datacatalog::GetOrExtendReservationsResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_ReleaseReservation : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ReleaseReservation() {
-      ::grpc::Service::MarkMethodStreamed(10,
+      ::grpc::Service::MarkMethodStreamed(12,
         new ::grpc::internal::StreamedUnaryHandler< ::datacatalog::ReleaseReservationRequest, ::datacatalog::ReleaseReservationResponse>(std::bind(&WithStreamedUnaryMethod_ReleaseReservation<BaseClass>::StreamedReleaseReservation, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ReleaseReservation() override {
@@ -1928,9 +2436,29 @@ class DataCatalog final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedReleaseReservation(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::ReleaseReservationRequest,::datacatalog::ReleaseReservationResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateDataset<WithStreamedUnaryMethod_GetDataset<WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_ListArtifacts<WithStreamedUnaryMethod_ListDatasets<WithStreamedUnaryMethod_UpdateArtifact<WithStreamedUnaryMethod_DeleteArtifact<WithStreamedUnaryMethod_GetOrExtendReservation<WithStreamedUnaryMethod_ReleaseReservation<Service > > > > > > > > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ReleaseReservations : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_ReleaseReservations() {
+      ::grpc::Service::MarkMethodStreamed(13,
+        new ::grpc::internal::StreamedUnaryHandler< ::datacatalog::ReleaseReservationsRequest, ::datacatalog::ReleaseReservationResponse>(std::bind(&WithStreamedUnaryMethod_ReleaseReservations<BaseClass>::StreamedReleaseReservations, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_ReleaseReservations() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ReleaseReservations(::grpc::ServerContext* context, const ::datacatalog::ReleaseReservationsRequest* request, ::datacatalog::ReleaseReservationResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedReleaseReservations(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::datacatalog::ReleaseReservationsRequest,::datacatalog::ReleaseReservationResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_CreateDataset<WithStreamedUnaryMethod_GetDataset<WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_ListArtifacts<WithStreamedUnaryMethod_ListDatasets<WithStreamedUnaryMethod_UpdateArtifact<WithStreamedUnaryMethod_DeleteArtifact<WithStreamedUnaryMethod_DeleteArtifacts<WithStreamedUnaryMethod_GetOrExtendReservation<WithStreamedUnaryMethod_GetOrExtendReservations<WithStreamedUnaryMethod_ReleaseReservation<WithStreamedUnaryMethod_ReleaseReservations<Service > > > > > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateDataset<WithStreamedUnaryMethod_GetDataset<WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_ListArtifacts<WithStreamedUnaryMethod_ListDatasets<WithStreamedUnaryMethod_UpdateArtifact<WithStreamedUnaryMethod_DeleteArtifact<WithStreamedUnaryMethod_GetOrExtendReservation<WithStreamedUnaryMethod_ReleaseReservation<Service > > > > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateDataset<WithStreamedUnaryMethod_GetDataset<WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_ListArtifacts<WithStreamedUnaryMethod_ListDatasets<WithStreamedUnaryMethod_UpdateArtifact<WithStreamedUnaryMethod_DeleteArtifact<WithStreamedUnaryMethod_DeleteArtifacts<WithStreamedUnaryMethod_GetOrExtendReservation<WithStreamedUnaryMethod_GetOrExtendReservations<WithStreamedUnaryMethod_ReleaseReservation<WithStreamedUnaryMethod_ReleaseReservations<Service > > > > > > > > > > > > > > StreamedService;
 };
 
 }  // namespace datacatalog
