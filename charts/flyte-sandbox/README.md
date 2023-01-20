@@ -25,11 +25,13 @@ A Helm chart for the Flyte local sandbox
 | docker-registry.persistence.enabled | bool | `false` |  |
 | docker-registry.service.nodePort | int | `30000` |  |
 | docker-registry.service.type | string | `"NodePort"` |  |
+| flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
 | flyte-binary.configuration.database.port | int | `30001` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
+| flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.logging.level | int | `6` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.templateUri | string | `"http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"` |  |
@@ -50,6 +52,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
 | flyte-binary.enabled | bool | `true` |  |
+| flyte-binary.nameOverride | string | `"flyte-sandbox"` |  |
 | kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |

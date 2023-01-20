@@ -62,6 +62,20 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Name of inline ConfigMap containing additional configuration or overrides for Flyte
+*/}}
+{{- define "flyte-sandbox.configuration.inlineConfigMap" -}}
+{{- printf "%s-extra-config" (include "flyte-sandbox.fullname" .) -}}
+{{- end }}
+
+{{/*
+Name of inline ConfigMap containing additional cluster resource templates
+*/}}
+{{- define "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" -}}
+{{- printf "%s-extra-cluster-resource-templates" (include "flyte-sandbox.fullname" .) -}}
+{{- end }}
+
+{{/*
 Selector labels for Envoy proxy
 */}}
 {{- define "flyte-sandbox.proxySelectorLabels" -}}
