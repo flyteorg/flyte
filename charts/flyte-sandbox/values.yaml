@@ -11,6 +11,7 @@ docker-registry:
     nodePort: 30000
 
 flyte-binary:
+  nameOverride: flyte-sandbox
   enabled: true
   configuration:
     database:
@@ -42,6 +43,9 @@ flyte-binary:
             - FLYTE_AWS_ENDPOINT: http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    inlineConfigMap: '{{ template "flyte-sandbox.configuration.inlineConfigMap" . }}'
+  clusterResourceTemplates:
+    inlineConfigMap: '{{ template "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'
   deployment:
     image:
       repository: flyte-binary
