@@ -74,5 +74,11 @@ console:
 
 .PHONY: test
 test: export FLYTECTL_CONFIG := test/config.yaml
-test: .venv
+test: export KUBECONFIG := .kube/kubeconfig
+test: .venv kubeconfig
 	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
+	kubectl create secret generic user-info \
+		--namespace flytesnacks-development \
+		--from-literal=user_secret=sosecret \
+		--dry-run=client --output yaml | kubectl apply --filename -
+	. .venv/bin/activate && pyflyte run --remote test/secrets_wf.py wf
