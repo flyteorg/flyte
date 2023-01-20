@@ -513,14 +513,12 @@ metadata:
   namespace: flyte
 ---
 apiVersion: v1
-data: null
 kind: ConfigMap
 metadata:
   name: flyte-sandbox-extra-cluster-resource-templates
   namespace: flyte
 ---
 apiVersion: v1
-data: null
 kind: ConfigMap
 metadata:
   name: flyte-sandbox-extra-config
@@ -744,7 +742,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SFJnN1ZYWkRLa1pMd0k0Mw==
+  haSharedSecret: UklpNUJaNzNKUWR6RTVHMA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1178,7 +1176,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a0d6b1662ce9315f6a73cc3a7f38f2db98856ac25bcb1602a951ee4b21e136a9
+        checksum/secret: 737734b1035d342fc2495cf2d0f37559022e612e0d53ccb3a69e6f25f2e9b101
       labels:
         app: docker-registry
         release: flyte-sandbox
