@@ -35,8 +35,8 @@ server:
 webhook:
   certDir: $HOME/.flyte/webhook-certs
   localCert: true
-  secretName: sandbox-flyte-sandbox-webhook-secret
-  serviceName: sandbox-flyte-sandbox-local
+  secretName: flyte-sandbox-webhook-secret
+  serviceName: flyte-sandbox-local
   servicePort: 9443
 
 tasks:
@@ -57,7 +57,7 @@ plugins:
     stackdriver-enabled: false
   k8s:
     default-env-vars:
-    - FLYTE_AWS_ENDPOINT: http://sandbox-minio.flyte:9000
+    - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
     - FLYTE_AWS_ACCESS_KEY_ID: minio
     - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   k8s-array:
