@@ -27,6 +27,11 @@ manifests:
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
 
+
+.PHONY: manifests-gpu
+manifests-gpu: manifests
+	cat kustomize/gpu-operator.yaml >> manifests/complete.yaml
+
 .PHONY: build
 build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
@@ -36,6 +41,16 @@ build: flyte manifests
 		--platform linux/arm64,linux/amd64
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
+
+.PHONY: build-gpu
+build-gpu: flyte manifests-gpu
+	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
+                docker buildx create --name flyte-sandbox \
+                --driver docker-container --driver-opt image=moby/buildkit:master \
+                --buildkitd-flags '--allow-insecure-entitlement security.insecure' 
+	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
+                --tag flyte-sandbox-gpu:latest -f Dockerfile.gpu .
+
 
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
