@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytestdlib/database"
 	stdlibLogger "github.com/flyteorg/flytestdlib/logger"
-
-	"gorm.io/gorm/logger"
-
 	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/flyteorg/flytestdlib/database"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const (
@@ -70,12 +68,26 @@ func (p *PostgresConfigProvider) GetDBConfig() database.DbConfig {
 // Opens a connection to the database specified in the config.
 // You must call CloseDbConnection at the end of your session!
 func OpenDbConnection(ctx context.Context, config DbConnectionConfigProvider) (*gorm.DB, error) {
+	dbConfig := config.GetDBConfig()
+
 	db, err := gorm.Open(config.GetDialector(), &gorm.Config{
 		Logger:                                   database.GetGormLogger(ctx, stdlibLogger.GetConfig()),
-		DisableForeignKeyConstraintWhenMigrating: !config.GetDBConfig().EnableForeignKeyConstraintWhenMigrating,
+		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+
+	return db, setupDbConnectionPool(db, &dbConfig)
+}
+
+func setupDbConnectionPool(gormDb *gorm.DB, dbConfig *database.DbConfig) error {
+	genericDb, err := gormDb.DB()
+	if err != nil {
+		return err
+	}
+	genericDb.SetConnMaxLifetime(dbConfig.ConnMaxLifeTime.Duration)
+	genericDb.SetMaxIdleConns(dbConfig.MaxIdleConnections)
+	genericDb.SetMaxOpenConns(dbConfig.MaxOpenConnections)
+	return nil
 }
