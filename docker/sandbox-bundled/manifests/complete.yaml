@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 ---
@@ -35,7 +35,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-11.10.13
+    helm.sh/chart: minio-12.1.1
   name: flyte-sandbox-minio
   namespace: flyte
 secrets:
@@ -49,7 +49,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 rules:
@@ -182,7 +182,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard-readonly
 rules:
 - apiGroups:
@@ -318,7 +318,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 roleRef:
@@ -358,7 +358,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -721,7 +721,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-settings
   namespace: flyte
 ---
@@ -742,7 +742,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UklpNUJaNzNKUWR6RTVHMA==
+  haSharedSecret: aGNJd3hYRFRSY2t0OEc3Yg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -764,14 +764,13 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard-certs
   namespace: flyte
 type: Opaque
 ---
 apiVersion: v1
 data:
-  key.json: ""
   root-password: bWluaW9zdG9yYWdl
   root-user: bWluaW8=
 kind: Secret
@@ -780,7 +779,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-11.10.13
+    helm.sh/chart: minio-12.1.1
   name: flyte-sandbox-minio
   namespace: flyte
 type: Opaque
@@ -794,7 +793,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.0
+    helm.sh/chart: postgresql-12.1.9
   name: flyte-sandbox-postgresql
   namespace: flyte
 type: Opaque
@@ -807,7 +806,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-csrf
   namespace: flyte
 type: Opaque
@@ -820,7 +819,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: kubernetes-dashboard-key-holder
   namespace: flyte
 type: Opaque
@@ -882,7 +881,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
     kubernetes.io/cluster-service: "true"
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
@@ -904,7 +903,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-11.10.13
+    helm.sh/chart: minio-12.1.1
   name: flyte-sandbox-minio
   namespace: flyte
 spec:
@@ -930,7 +929,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.0
+    helm.sh/chart: postgresql-12.1.9
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
@@ -955,7 +954,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.0
+    helm.sh/chart: postgresql-12.1.9
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   name: flyte-sandbox-postgresql-hl
   namespace: flyte
@@ -1017,22 +1016,84 @@ spec:
   type: ClusterIP
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-db-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /var/lib/flyte/storage/db
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /var/lib/flyte/storage/minio
+  storageClassName: manual
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: minio
-    helm.sh/chart: minio-11.10.13
-  name: flyte-sandbox-minio
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-db-storage
   namespace: flyte
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 8Gi
-  storageClassName: local-path
+      storage: 1Gi
+  storageClassName: manual
+  volumeName: flyte-sandbox-db-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-minio-storage
+  namespace: flyte
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  volumeName: flyte-sandbox-minio-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1176,7 +1237,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 737734b1035d342fc2495cf2d0f37559022e612e0d53ccb3a69e6f25f2e9b101
+        checksum/secret: d6eaa322e1ac5f4f81c86cc8035e367c69ec0916ce42c289b417f8fb292495b8
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1232,7 +1293,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
-    helm.sh/chart: kubernetes-dashboard-5.11.0
+    helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 spec:
@@ -1256,7 +1317,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kubernetes-dashboard
         app.kubernetes.io/version: 2.7.0
-        helm.sh/chart: kubernetes-dashboard-5.11.0
+        helm.sh/chart: kubernetes-dashboard-6.0.0
     spec:
       containers:
       - args:
@@ -1313,7 +1374,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-11.10.13
+    helm.sh/chart: minio-12.1.1
   name: flyte-sandbox-minio
   namespace: flyte
 spec:
@@ -1326,12 +1387,12 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/credentials-secret: 27f69358d205d946afcd1ede6f1fb57d3ad03d2fe1f62e87ef2404b7c5096fd0
+        checksum/credentials-secret: c199ac45f9d95d97966921c814d6c8b38cbf7416458e19cbe6d001a04c264448
       labels:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: minio
-        helm.sh/chart: minio-11.10.13
+        helm.sh/chart: minio-12.1.1
     spec:
       affinity:
         nodeAffinity: null
@@ -1343,8 +1404,6 @@ spec:
                 matchLabels:
                   app.kubernetes.io/instance: flyte-sandbox
                   app.kubernetes.io/name: minio
-              namespaces:
-              - flyte
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
@@ -1413,13 +1472,30 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+      initContainers:
+      - command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 1001:1001 /data
+        image: docker.io/bitnami/bitnami-shell:sandbox
+        imagePullPolicy: Never
+        name: volume-permissions
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: data
       securityContext:
         fsGroup: 1001
       serviceAccountName: flyte-sandbox-minio
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: flyte-sandbox-minio
+          claimName: flyte-sandbox-minio-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1469,7 +1545,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.0
+    helm.sh/chart: postgresql-12.1.9
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
@@ -1488,7 +1564,7 @@ spec:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-12.1.0
+        helm.sh/chart: postgresql-12.1.9
       name: flyte-sandbox-postgresql
     spec:
       affinity:
@@ -1502,8 +1578,6 @@ spec:
                   app.kubernetes.io/component: primary
                   app.kubernetes.io/instance: flyte-sandbox
                   app.kubernetes.io/name: postgresql
-              namespaces:
-              - flyte
               topologyKey: kubernetes.io/hostname
             weight: 1
       containers:
@@ -1580,21 +1654,34 @@ spec:
           name: data
       hostIPC: false
       hostNetwork: false
-      initContainers: null
+      initContainers:
+      - command:
+        - /bin/sh
+        - -ec
+        - |
+          chown 1001:1001 /bitnami/postgresql
+          mkdir -p /bitnami/postgresql/data
+          chmod 700 /bitnami/postgresql/data
+          find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
+            xargs -r chown -R 1001:1001
+        image: docker.io/bitnami/bitnami-shell:sandbox
+        imagePullPolicy: Never
+        name: init-chmod-data
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /bitnami/postgresql
+          name: data
       securityContext:
         fsGroup: 1001
       serviceAccountName: default
-      volumes: null
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: flyte-sandbox-db-storage
   updateStrategy:
     rollingUpdate: {}
     type: RollingUpdate
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 8Gi
-      storageClassName: local-path

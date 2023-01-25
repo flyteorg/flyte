@@ -41,12 +41,15 @@ build: flyte manifests
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
 start: FLYTE_DEV := False
 start:
+	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
+		docker volume create flyte-sandbox
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
+			--volume flyte-sandbox:/var/lib/flyte \
 			--publish "6443" \
 			--publish "30000:30000" \
 			--publish "30001:30001" \
