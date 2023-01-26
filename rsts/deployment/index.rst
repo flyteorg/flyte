@@ -4,7 +4,10 @@
 Deployment
 #############
 
-This section includes all documentation to deploying and administering Flyte, enabling and configuring plugins, authentication, performance tuning, and general articles on how to maintain Flyte as a production grade service in your company.
+These *Deployment Guides* are primarily for platform and devops engineers to learn how to deploy and administer Flyte.
+
+The sections below walk through how to create a Flyte cluster and cover topics related to enabling and configuring
+plugins, authentication, performance tuning, and maintaining Flyte as a production-grade service.
 
 .. panels::
     :header: text-center
@@ -12,19 +15,29 @@ This section includes all documentation to deploying and administering Flyte, en
 
     .. link-button:: deployment-deployment
        :type: ref
-       :text: Deployment Options
+       :text: Deployment Paths
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Stages of Flyte deployment from the most basic to a fully-featured, multi-cluster production system.
+    Walkthroughs for deploying Flyte, from the most basic to a fully-featured, multi-cluster production system.
 
     ---
 
     .. link-button:: deployment-plugin-setup
        :type: ref
-       :text: Multi-cluster setup
+       :text: Plugin Setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    How to set up plugins in your Flyte deployment.
+    Learn how to enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API
+    services.
+
+    ---
+
+    .. link-button:: deployment-configuration
+       :type: ref
+       :text: Cluster Configuration
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    How to configure the various components of your cluster.
 
     ---
 

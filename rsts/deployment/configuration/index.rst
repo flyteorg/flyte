@@ -4,12 +4,18 @@
 Cluster Config
 ##############
 
-.. warning::
+.. important::
 
-   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for we will work on soon. For the most part, if you're using the ``flyte-binary`` chart, instead of specifying under a yaml file like ``cloud_events.yaml`` in :ref:`deployment-configuration-cloud-event`, you'll need to add those settings under the ``inline`` section here
+   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration
+   changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for which we will
+   work on soon. For the most part, if you're using the ``flyte-binary`` chart, instead of specifying under a yaml file
+   like ``cloud_events.yaml`` in :ref:`deployment-configuration-cloud-event`, you'll need to add those settings under
+   the ``inline`` section here:
 
    .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-      :lines: 30
+      :language: yaml
+      :lines: 30-41
+      :caption: charts/flyte-binary/eks-production.yaml
 
 
 .. panels::
