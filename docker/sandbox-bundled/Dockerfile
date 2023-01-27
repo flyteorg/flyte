@@ -22,5 +22,7 @@ COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
 COPY bin/ /bin/
 
+VOLUME /var/lib/flyte
+
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
 CMD [ "server", "--disable=traefik", "--disable=servicelb" ]

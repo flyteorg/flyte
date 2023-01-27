@@ -9,10 +9,10 @@ A Helm chart for the Flyte local sandbox
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../flyte-binary | flyte-binary | v0.1.10 |
-| https://charts.bitnami.com/bitnami | minio | 11.10.13 |
-| https://charts.bitnami.com/bitnami | postgresql | 12.1.0 |
+| https://charts.bitnami.com/bitnami | minio | 12.1.1 |
+| https://charts.bitnami.com/bitnami | postgresql | 12.1.9 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
-| https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 5.11.0 |
+| https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 
 ## Values
 
@@ -20,7 +20,6 @@ A Helm chart for the Flyte local sandbox
 |-----|------|---------|-------------|
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
-| docker-registry.image.repository | string | `"registry"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |
 | docker-registry.persistence.enabled | bool | `false` |  |
 | docker-registry.service.nodePort | int | `30000` |  |
@@ -28,7 +27,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
 | flyte-binary.configuration.database.port | int | `30001` |  |
-| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
@@ -57,7 +56,6 @@ A Helm chart for the Flyte local sandbox
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.image.pullPolicy | string | `"Never"` |  |
-| kubernetes-dashboard.image.repository | string | `"kubernetesui/dashboard"` |  |
 | kubernetes-dashboard.image.tag | string | `"sandbox"` |  |
 | kubernetes-dashboard.protocolHttp | bool | `true` |  |
 | kubernetes-dashboard.rbac.clusterReadOnlyRole | bool | `true` |  |
@@ -71,22 +69,26 @@ A Helm chart for the Flyte local sandbox
 | minio.extraEnvVars[0].name | string | `"MINIO_BROWSER_REDIRECT_URL"` |  |
 | minio.extraEnvVars[0].value | string | `"http://localhost:30080/minio"` |  |
 | minio.image.pullPolicy | string | `"Never"` |  |
-| minio.image.repository | string | `"bitnami/minio"` |  |
 | minio.image.tag | string | `"sandbox"` |  |
 | minio.persistence.enabled | bool | `true` |  |
-| minio.persistence.storageClass | string | `"local-path"` |  |
+| minio.persistence.existingClaim | string | `"{{ include \"flyte-sandbox.persistence.minioVolumeName\" . }}"` |  |
 | minio.service.nodePorts.api | int | `30002` |  |
 | minio.service.type | string | `"NodePort"` |  |
+| minio.volumePermissions.enabled | bool | `true` |  |
+| minio.volumePermissions.image.pullPolicy | string | `"Never"` |  |
+| minio.volumePermissions.image.tag | string | `"sandbox"` |  |
 | postgresql.auth.postgresPassword | string | `"postgres"` |  |
 | postgresql.enabled | bool | `true` |  |
 | postgresql.image.pullPolicy | string | `"Never"` |  |
-| postgresql.image.repository | string | `"bitnami/postgresql"` |  |
 | postgresql.image.tag | string | `"sandbox"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
-| postgresql.primary.persistence.storageClass | string | `"local-path"` |  |
+| postgresql.primary.persistence.existingClaim | string | `"{{ include \"flyte-sandbox.persistence.dbVolumeName\" . }}"` |  |
 | postgresql.primary.service.nodePorts.postgresql | int | `30001` |  |
 | postgresql.primary.service.type | string | `"NodePort"` |  |
 | postgresql.shmVolume.enabled | bool | `false` |  |
+| postgresql.volumePermissions.enabled | bool | `true` |  |
+| postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
+| postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
 | sandbox.dev | bool | `false` |  |
 | sandbox.proxy.enabled | bool | `true` |  |
 | sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
