@@ -22,7 +22,7 @@ To view the UI, run the following command:
 
 .. prompt:: bash $
 
-   flytectl sandbox start
+   flytectl demo start
 
 Once sandbox setup is complete, a ready-to-explore message is shown:
 

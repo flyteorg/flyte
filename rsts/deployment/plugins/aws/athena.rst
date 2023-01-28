@@ -5,18 +5,25 @@ Athena Plugin Setup
 
 This guide gives an overview of how to set up Athena in your Flyte deployment. Athena plugin needs Flyte deployment in AWS cloud; sandbox/GCP/Azure wouldn't work.
 
-1. Setup the AWS Flyte cluster
+Setup the AWS Flyte cluster
+===========================
 
-.. tabbed:: AWS cluster setup
+.. tabs::
 
-  * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__
-  * Make sure you have correct kubeconfig and selected the correct kubernetes context
-  * make sure you have the correct FlyteCTL config at ~/.flyte/config.yaml
+   .. tab:: AWS cluster setup
+
+     * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__
+     * Make sure you have correct kubeconfig and selected the correct kubernetes context
+     * make sure you have the correct FlyteCTL config at ~/.flyte/config.yaml
 
 
-2. Create a file named ``values-override.yaml`` and add the following config to it. Please make sure that the propeller has the correct service account for Athena.
+Specify Plugin Configuration
+======================================
 
-.. code-block::
+Create a file named ``values-override.yaml`` and add the following config to it.
+Please make sure that the propeller has the correct service account for Athena.
+
+.. code-block:: yaml
 
     configmap:
       enabled_plugins:
@@ -37,40 +44,50 @@ This guide gives an overview of how to set up Athena in your Flyte deployment. A
               container_array: k8s-array
               athena: athena
 
+Upgrade the Flyte Helm release
+==============================
 
-3. Upgrade the Flyte Helm release.
+.. prompt:: bash $
 
-.. code-block:: bash
-
-  helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
+   helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
 
 
-4. Register the Athena plugin example.
+Register the Athena plugin example
+==================================
 
 .. code-block:: bash
 
   flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development
 
 
-5. Launch an execution
+Launch an execution
+===================
 
-.. tabbed:: Flyte Console
+.. tabs::
 
-  * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
-  * Click on `Launch` to open up the launch form.
-  * Submit the form.
-
-.. tabbed:: FlyteCTL
-
-  * Retrieve an execution form in the form of a YAML file:
-
-    .. code-block:: bash
-
-       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development athena.athena.full_hive_demo_wf  --latest --execFile exec_spec.yaml
-
-
-  * Launch! 🚀
-
-    .. code-block:: bash
-
-       flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
+   .. tab:: Flyte Console
+   
+     * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
+     * Click on `Launch` to open up the launch form.
+     * Submit the form.
+   
+   .. tab:: Flytectl
+   
+     Retrieve an execution form in the form of a YAML file:
+   
+     .. prompt:: bash $
+   
+        flytectl get launchplan \
+            --config ~/.flyte/flytectl.yaml \
+            --project flytesnacks \
+            --domain development \
+            athena.athena.full_athena_wf 
+            --latest \
+            --execFile exec_spec.yaml
+      
+     Launch! 🚀
+   
+     .. prompt:: bash $
+   
+        flytectl --config ~/.flyte/flytectl.yaml create execution \
+            -p <project> -d <domain> --execFile ./exec_spec.yaml

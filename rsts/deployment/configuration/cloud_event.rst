@@ -41,68 +41,75 @@ Configuration
 
 To turn on, add the following to your FlyteAdmin:
 
-.. tabbed:: AWS SNS
+.. tabs::
 
-    .. code:: yaml
-
-      cloud_events.yaml: |
-        cloudEvents:
-          enable: true
-          aws:
-            region: us-east-2
-          eventsPublisher:
-            eventTypes:
-            - all # or node, task, workflow
-            topicName: arn:aws:sns:us-east-2:123456:123-my-topic
-          type: aws
-
-.. tabbed:: GCP Pub/Sub
-
-    .. code:: yaml
-
-      cloud_events.yaml: |
-        cloudEvents:
-          enable: true
-          gcp:
-            region: us-east-2
-          eventsPublisher:
-            eventTypes:
-            - all # or node, task, workflow
-            topicName: my-topic
-          type: gcp
-
-.. tabbed:: Apache Kafka
-
-    .. code:: yaml
-
-      cloud_events.yaml: |
-        cloudEvents:
-          enable: true
-          kafka:
-            brokers: 127.0.0.1:9092
-          eventsPublisher:
-            eventTypes:
-            - all
-            topicName: myTopic
-          type: kafka
+   .. tab:: AWS SNS
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             aws:
+               region: us-east-2
+             eventsPublisher:
+               eventTypes:
+               - all # or node, task, workflow
+               topicName: arn:aws:sns:us-east-2:123456:123-my-topic
+             type: aws
+   
+   .. tab:: GCP Pub/Sub
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             gcp:
+               region: us-east-2
+             eventsPublisher:
+               eventTypes:
+               - all # or node, task, workflow
+               topicName: my-topic
+             type: gcp
+   
+   .. tab:: Apache Kafka
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             kafka:
+               brokers: 127.0.0.1:9092
+             eventsPublisher:
+               eventTypes:
+               - all
+               topicName: myTopic
+             type: kafka
 
 Helm
 ======
-There should already be a section for this in the ``values.yaml`` file. Update the settings under the ``cloud_events`` key and turn ``enable`` to ``true``. The same flag is used for Helm as for Admin itself.
+There should already be a section for this in the ``values.yaml`` file. Update
+the settings under the ``cloud_events`` key and turn ``enable`` to ``true``.
+The same flag is used for Helm as for Admin itself.
 
 *****
 Usage
 *****
 
-The events are emitted in cloud Event format, and the data in the cloud evnet will be base64 encoded binary representation of the following IDL messages:
+The events are emitted in cloud Event format, and the data in the cloud event
+will be base64 encoded binary representation of the following IDL messages:
 
 * ``admin_event_pb2.TaskExecutionEventRequest``
 * ``admin_event_pb2.NodeExecutionEventRequest``
 * ``admin_event_pb2.WorkflowExecutionEventRequest``
 
-Which of these three events is being sent can be distinguished by the subject line of the message, which will be one of the three strings above.
+Which of these three events is being sent can be distinguished by the subject
+line of the message, which will be one of the three strings above.
 
-Note that these message wrap the underlying event messages :std:doc:`found here <flyteidl:protos/docs/event/event>`.
+Note that these message wrap the underlying event messages
+:std:doc:`found here <flyteidl:protos/docs/event/event>`.
 
 CloudEvent Spec
 ===============

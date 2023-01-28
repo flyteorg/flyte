@@ -24,9 +24,9 @@ Set up the cluster
    
       .. prompt:: bash $
    
-         flytectl sandbox start
+         flytectl demo start
    
-      Generate flytectl sandbox config:
+      Generate flytectl config:
    
       .. prompt:: bash $
    
@@ -131,7 +131,7 @@ Install the K8S Operator
        helm install dask-operator dask/dask-kubernetes-operator --namespace dask-operator --create-namespace
 
 
-Update ``values-override.yaml``
+Specify Plugin Configuration
 ===============================
 
 Create a file named ``values-override.yaml`` and add the following config to it:

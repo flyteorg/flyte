@@ -37,6 +37,12 @@
    :hidden:
 
    deployment/index
+   deployment/deployment/index
+   deployment/plugins/index
+   deployment/configuration/index
+   deployment/configuration/generated/index
+   deployment/security/index
+
 
 .. toctree::
    :caption: Community

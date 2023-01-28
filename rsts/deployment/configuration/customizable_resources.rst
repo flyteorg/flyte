@@ -112,6 +112,7 @@ How does a Flyte plugin request for resources?
 The Flyte plugin registers the resource and the desired quota of every resource with the **ResourceRegistrar** when setting up FlytePropeller. When a plugin is invoked, FlytePropeller provides a proxy for the plugin. This proxy facilitates the plugin's view of the resource pool by controlling operations to allocate and deallocate resources.
 
 .. dropdown:: :fa:`info-circle` Enabling Redis instance
+   :title: text-muted
    :animate: fade-in-slide-down
 
    The ResourceManager can use a Redis instance as an external store to track and manage resource pool allocation. By default, it is disabled, and can be enabled with:
@@ -131,7 +132,7 @@ Once the setup is complete, FlytePropeller builds a ResourceManager based on the
 
 During runtime, the ResourceManager:
 
-#. Allocates tokens to the plugin;
+#. Allocates tokens to the plugin.
 #. Releases tokens once the task is completed.
 
 How are resources allocated?
@@ -150,24 +151,32 @@ In this manner, Flyte plugins intelligently throttle resource usage during paral
 
 Example
 ^^^^^^^^
-Let’s take an example to understand resource allocation and deallocation when a plugin requests resources. 
+Let's take an example to understand resource allocation and deallocation when a plugin requests resources. 
 
 Flyte has a built-in `Qubole <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/plugins/plugins.html#qubolehivejob>`__ plugin. This plugin allows Flyte tasks to send Hive commands to Qubole. In the plugin, a single Qubole cluster is considered a resource, and sending a single Hive command to a Qubole cluster consumes a token of the corresponding resource. 
 The resource is allocated when the status is **“AllocationGranted”**. Qubole plugin calls:
 
-``status, err := AllocateResource(ctx, <cluster name>, <token string>, <constraint spec>)``, 
+.. code-block:: go
+   
+   status, err := AllocateResource(ctx, <cluster name>, <token string>, <constraint spec>)
 
-wherein the placeholders are occupied by:
+Wherein the placeholders are occupied by:
 
-``status, err := AllocateResource(ctx, "default_cluster", "flkgiwd13-akjdoe-0", ResourceConstraintsSpec{})``
+.. code-block:: go
+   
+   status, err := AllocateResource(ctx, "default_cluster", "flkgiwd13-akjdoe-0", ResourceConstraintsSpec{})
 
 The resource is deallocated when the Hive command completes its execution and the corresponding token is released. The plugin calls:
 
-``status, err := AllocateResource(ctx, <cluster name>, <token string>, <constraint spec>)``, 
+.. code-block:: go
+   
+   status, err := AllocateResource(ctx, <cluster name>, <token string>, <constraint spec>)
 
-wherein the placeholders are occupied by:
+Wherein the placeholders are occupied by:
 
-``err := ReleaseResource(ctx, "default_cluster", "flkgiwd13-akjdoe-0")``
+.. code-block:: go
+
+   err := ReleaseResource(ctx, "default_cluster", "flkgiwd13-akjdoe-0")
 
 Below is an example interface that shows allocation and deallocation of resources.
 
@@ -188,6 +197,6 @@ How can you force ResourceManager to force runtime quota allocation constraints?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Runtime quota allocation constraints can be achieved using ResourceConstraintsSpec. It is a contact that a plugin can specify at different project and namespace levels.
 
-Let’s take an example to understand it.
+Let's take an example to understand it.
 
 You can set ResourceConstraintsSpec to ``nil`` objects, which means there would be no allocation constraints at the respective project and namespace level. When ResourceConstraintsSpec specifies ``nil`` ProjectScopeResourceConstraint, and a non-nil NamespaceScopeResourceConstraint, it suggests no constraints specified at any project or namespace level.

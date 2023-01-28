@@ -5,38 +5,52 @@ Databricks Plugin Setup
 
 This guide gives an overview of how to set up Databricks in your Flyte deployment.
 
-1. Add Flyte chart repo to Helm
+Add Flyte chart repo to Helm
 
-.. code-block::
+.. prompt:: bash $
 
- helm repo add flyteorg https://flyteorg.github.io/flyte
+   helm repo add flyteorg https://flyteorg.github.io/flyte
 
 
-2. Setup the cluster
+Setup the Cluster
+=================
 
-.. tabbed:: Sandbox
+.. tabs::
 
-  * Start the sandbox cluster
+   .. tab:: Sandbox
 
-    .. code-block:: bash
+      Start the sandbox cluster
+   
+      .. prompt:: bash $
+   
+         flytectl demo start
+   
+      Generate flytectl config
+   
+      .. prompt:: bash $
+   
+         flytectl config init
+   
+   .. tab:: AWS/GCP
 
-       flytectl sandbox start
+      Follow the :ref:`deployment-deployment-cloud-simple` or
+      :ref:`deployment-deployment-multicluster` guide to set up your cluster.
+      After following these guides, make sure you have:
 
-  * Generate Flytectl sandbox config
+      * The correct kubeconfig and selected the correct kubernetes context
+      * The correct flytectl config at ``~/.flyte/config.yaml``
 
-    .. code-block:: bash
+..  TODO: move this entrypoint.py script to an official Flyte repo
 
-       flytectl config init
+Upload an `entrypoint.py <https://gist.github.com/pingsutw/482e7f0134414dac437500344bac5134>`__
+to dbfs or s3. Spark driver node run this file to override the default command
+in the dbx job.
 
-.. tabbed:: AWS/GCP
 
-  * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__ / `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__
-  * Make sure you have correct kubeconfig and selected the correct kubernetes context
-  * make sure you have the correct flytectl config at ~/.flyte/config.yaml
+Specify Plugin Configuration
+============================
 
-3. Upload an `entrypoint.py <https://gist.github.com/pingsutw/482e7f0134414dac437500344bac5134>`__ to dbfs or s3. Spark driver node run this file to override the default command in the dbx job.
-
-4. Create a file named ``values-override.yaml`` and add the following config to it:
+Create a file named ``values-override.yaml`` and add the following config to it:
 
 .. code-block:: yaml
 
@@ -66,20 +80,23 @@ This guide gives an overview of how to set up Databricks in your Flyte deploymen
           entrypointFile: dbfs:///FileStore/tables/entrypoint.py
           databricksInstance: dbc-a53b7a3c-614c
 
-5. Create a Databricks account and follow the docs for creating an Access token.
+Get an API Token
+================
 
-6. Create a `Instance Profile <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`_ for the Spark cluster, it allows the spark job to access your data in the s3 bucket.
+Create a `Databricks account <https://www.databricks.com/>`__ and follow the
+docs for creating an `access token <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-access-tokens>`__.
 
-7. Add Databricks access token to FlytePropeller.
+Then, create a `Instance Profile <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`_
+for the Spark cluster, it allows the spark job to access your data in the s3
+bucket.
 
-.. note::
-        Refer to the `access token <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-access-tokens>`__ to understand setting up the Databricks access token.
+Add the Databricks access token to FlytePropeller:
 
 .. code-block:: bash
 
-    kubectl edit secret -n flyte flyte-secret-auth
+   kubectl edit secret -n flyte flyte-secret-auth
 
-The configuration will look as follows:
+The configuration should look as follows:
 
 .. code-block:: yaml
 
@@ -94,9 +111,10 @@ The configuration will look as follows:
         meta.helm.sh/release-namespace: flyte
     ...
 
-Replace ``<ACCESS_TOKEN>`` with your access token.
+Where you need to replace ``<ACCESS_TOKEN>`` with your access token.
 
-8. Upgrade the Flyte Helm release.
+Upgrade the Flyte Helm release
+==============================
 
 .. code-block:: bash
 

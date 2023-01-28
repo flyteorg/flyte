@@ -34,15 +34,15 @@ Signs of slowdown
      - Dashboard
      - Alerting factor
      - Effect
-   * - flyte:propeller:all:free_workers_count
+   * - ``flyte:propeller:all:free_workers_count``
      - Flyte Propeller Dashboard
      - Number of free-workers in all FlytePropeller instances are very low.
      - This will increase overall latency for Each workflow propagation
-   * - sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)
+   * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
      - Flyte Propeller Dashboard
      - Round Latency for Each workflow increases
      - Flyte propeller is taking more time to process each workflow
-   * - sum(rate(flyte:propeller:all:main_depth[5m]))
+   * - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
      - Flyte Propeller Dashboard
      - Workflows take longer to start or slow
      - The processing queue depth is long and is taking long to drain
@@ -67,43 +67,43 @@ Let us first look at various config properties that can be set and would impact 
      - Section
      - Rule of thumb
      - Description
-   * - workers
+   * - ``workers``
      - propeller
      - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context swtiching. A number usually < 500 - 800 with 4-8 cpu cores works fine.
      - Number of `logical threads` workers, that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses go-routines, it can run way  more than number of physical cores.
-   * - workflow-reeval-duration
+   * - ``workflow-reeval-duration``
      - propeller
      - lower the number - lower latency, lower throughput (low throughput is because the same workflow will be evaluated more times)
      - frequency at which, given no external signal, a workflow should be re-evaluated by Flyte propellers reval loop
-   * - downstream-eval-duration
+   * - ``downstream-eval-duration``
      - propeller
      - lower the number - lower latency and lower throughput (low throughput is because the same workflow will be evaluated more times)
      - This indicates how often are external events like pods completion etc recorded.
-   * - max-streak-length
+   * - ``max-streak-length``
      - propeller
      - higher the number lower the latency for end to end workflow, especially for cached workflows
      - number of consecutive rounds to try with one workflow - prioritize a hot workflow over others.
-   * - kube-client-config
+   * - ``kube-client-config``
      - propeller
      - This is how you can control the number of requests ceiling that FlytePropeller can initiate to KubeAPI. This is usual the #1 bottle neck
      - this configures the kubernetes client used by FlytePropeller
-   * - workflowStore.policy
+   * - ``workflowStore.policy``
      - propeller
      - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots
      - Use this to configure how FlytePropeller should evaluate workflows, the default is usually a good choice
-   * - storage.cache
+   * - ``storage.cache``
      - propeller
      - This config is used to configure the write-through cache used by FlytePropeller on top of the metastore
      - FlytePropeller uses the configure blob-store (can be changed to something more performant in the future) to optimize read and write latency, for all metadata IO operations. Metadata refers to the input and output pointers
-   * - admin-launcher.tps, admin-launcher.cacheSize, admin-launcher.workers
+   * - ``admin-launcher.tps``, ``admin-launcher.cacheSize``, ``admin-launcher.workers``
      - propeller
      - This config is used to configure the max rate and launch-plans that FlytePropeller can launch against FlyteAdmin
      - It is essential to limit the number of writes from FlytePropeller to flyteadmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
-   * - tasks.backoff.max-duration
+   * - ``tasks.backoff.max-duration``
      - propeller
      - This config is used to configure the maximum back-off interval incase of resource-quota errors
      - FlytePropeller will automatically back-off when k8s or other services request it to slowdown or when desired quotas are met.
-   * - max-parallelism
+   * - ``max-parallelism``
      - admin, per workflow, per execution
      - Refer to examples and documentation below
      - docs below

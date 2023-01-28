@@ -9,21 +9,31 @@ Security Overview
 Here we cover the security aspects of running your flyte deployments. In the current state, we will cover the user
 used for running the flyte services, and go through why we do this and not run them as a root user.
 
-*****************
-Why non-root user
-*****************
-Flyte uses docker for container packaging, and by default, its containers run as root. This gives full
-permissions to the system but may not be suitable for production deployments where a security breach could comprise your
-application deployments.
-It's considered to be a best practice for security because running in a constrained permission environment will prevent any
-malicious code from utilizing the full permissions of the host `Ref <https://kubernetes.io/blog/2018/07/18/11-ways-not-to-get-hacked/#8-run-containers-as-a-non-root-user>`__
-Also, in certain container platforms like `OpenShift <https://engineering.bitnami.com/articles/running-non-root-containers-on-openshift.html>`__, running non-root containers is mandatory.
+************************
+Using the Non-root User
+************************
 
+It's considered to be a best practice to use a non-root user for security because
+running in a constrained permission environment will prevent any malicious code
+from utilizing the full permissions of the host `Ref <https://kubernetes.io/blog/2018/07/18/11-ways-not-to-get-hacked/#8-run-containers-as-a-non-root-user>`__
+Moreover, in certain container platforms like `OpenShift <https://engineering.bitnami.com/articles/running-non-root-containers-on-openshift.html>`__,
+running non-root containers is mandatory.
+
+Flyte uses OCI-compatible container technology like Docker for container packaging,
+and by default, its containers run as root. This gives full permissions to the
+system but may not be suitable for production deployments where a security breach
+could comprise your application deployments.
+
+.. important::
+
+   As a Flyte administrator, it's up to you a to enforce whatever policy complies
+   with the conventions and regulations of your industry/application.
 
 *******
 Changes
 *******
-A new user group and user have been added to the Docker files for all the flyte components
+
+A new user group and user have been added to the Docker files for all the Flyte components:
 `Flyteadmin <https://github.com/flyteorg/flyteadmin/blob/master/Dockerfile>`__,
 `Flytepropeller <https://github.com/flyteorg/flytepropeller/blob/master/Dockerfile>`__,
 `Datacatalog <https://github.com/flyteorg/datacatalog/blob/master/Dockerfile>`__,
@@ -64,52 +74,59 @@ There are two options to fix this:
 ********************************************************
 Running flyteadmin and flyteconsole on different domains
 ********************************************************
-In some cases when flyteadmin and flyteconsole are running on different domains then you would need to allow the flyteadmin's domain to allow cross origin request from the flyteconsole's domain
-This can be done by changing the flyteadmin config in the following manner
 
-#. <flyte-admin-domain> is the domain which will be get request
-#. <flyte-console-domain> is the domain which will be sending the request as the originator
-#. <flyteconsole-ns> k8s namespace where your flyteconsole pod is running.
-#. <flyteadmin-ns> k8s namespace where your flyteadmin pod is running.
-#. Modify the flyteconsole deployment to use <flyte-admin-domain> as follows.
+In some cases when flyteadmin and flyteconsole are running on different domains,
+you'll would need to allow the flyteadmin's domain to allow cross origin request
+from the flyteconsole's domain. Here are all the domains/namespaces to keep in
+mind:
 
-   .. prompt:: bash
+- ``<flyte-admin-domain>``: the domain which will get the request.
+- ``<flyte-console-domain>``: the domain which will be sending the request as the originator.
+- ``<flyteconsole-ns>``: the k8s namespace where your flyteconsole pod is running.
+- ``<flyteadmin-ns>``: the k8s namespace where your flyteadmin pod is running.
 
-      kubectl edit deployment flyteconsole -n <flyteconsole-ns>
+Modify FlyteAdmin Config
+========================
 
-   .. code-block::
+To modify the FlyteConsole deployment to use ``<flyte-admin-domain>``, do the following:
 
-      - env:
-        - name: ENABLE_GA
-          value: "true"
-        - name: GA_TRACKING_ID
-          value: G-0123456789
-        - name: ADMIN_API_URL
-          value: https://<flyte-admin-domain>
+.. prompt:: bash $
 
-#. And then rollout flyteconsole
+   kubectl edit deployment flyteconsole -n <flyteconsole-ns>
 
-   .. prompt:: bash
+.. code-block:: yaml
 
-      kubectl rollout restart deployment/flyteconsole -n <flyteconsole-ns>
+   - env:
+     - name: ENABLE_GA
+       value: "true"
+     - name: GA_TRACKING_ID
+       value: G-0123456789
+     - name: ADMIN_API_URL
+       value: https://<flyte-admin-domain>
 
-#. Modify the flyte-admin-config as follow
+Rollout FlyteConsole
 
-   .. prompt:: bash
+.. prompt:: bash $
 
-      kubectl edit configmap flyte-admin-config -n <flyteadmin-ns>
+   kubectl rollout restart deployment/flyteconsole -n <flyteconsole-ns>
 
-   .. code-block::
+Modify the flyte-admin-config as follows:
 
-             security:
-               allowCors: true
-               ......
-               allowedOrigins:
-               - 'https://<flyte-console-domain>'
-               ......
+.. prompt:: bash $
 
-#. And then rollout admin
+   kubectl edit configmap flyte-admin-config -n <flyteadmin-ns>
 
-   .. prompt:: bash
+.. code-block:: yaml
+
+   security:
+     allowCors: true
+     ......
+     allowedOrigins:
+     - 'https://<flyte-console-domain>'
+     ......
+
+Finally, rollout FlyteAdmin
+
+   .. prompt:: bash $
 
       kubectl rollout restart deployment/flyteadmin -n <flyteadmin-ns>

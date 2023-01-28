@@ -27,8 +27,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
        :text: Plugin Setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Learn how to enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API
-    services.
+    Enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API services.
 
     ---
 
@@ -41,20 +40,18 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     ---
 
+    .. link-button:: deployment-configuration-generated
+       :type: ref
+       :text: Configuration Reference
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Reference docs for configuration settings for Flyte's backend services.
+
+    ---
+
     .. link-button:: deployment-security-overview
        :type: ref
        :text: Security Overview
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Read for comments on security in Flyte.
-
-
-.. toctree::
-    :maxdepth: 1
-    :name: deployment guide toc
-    :hidden:
-
-    deployment/index
-    plugins/index
-    configuration/index
-    security/index

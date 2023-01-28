@@ -7,7 +7,7 @@ Single Cluster Production-grade Cloud Deployment
 .. tags:: Kubernetes, Infrastructure, Advanced
 
 The following guide assumes you've successfully set up a
-:ref:` Single Cluster Simple Cloud Deployment <deployment-deployment-cloud-simple>`.
+:ref:`Single Cluster Simple Cloud Deployment <deployment-deployment-cloud-simple>`.
 
 This guide describes additional setup steps to productionize your Flyte
 deployment. While not strictly required, we recommend that you incorporate these

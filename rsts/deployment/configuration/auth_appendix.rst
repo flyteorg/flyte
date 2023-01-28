@@ -1,7 +1,7 @@
 .. _deployment-configuration-auth-appendix:
 
 ######################################
-Understanding Authentication in Detail
+Understanding Authentication
 ######################################
 
 .. tags:: Authentication, Design, Advanced

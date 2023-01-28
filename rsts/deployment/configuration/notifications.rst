@@ -5,11 +5,8 @@ Notifications
 
 .. tags:: Infrastructure, Advanced
 
-When a workflow completes, users can be notified by:
-
-* Email
-* `Pagerduty <https://support.pagerduty.com/docs/email-integration-guide#integrating-with-a-pagerduty-service>`__
-* `Slack <https://slack.com/help/articles/206819278-Send-emails-to-Slack>`__
+When a workflow completes, users can be notified by email,  `Pagerduty <https://support.pagerduty.com/docs/email-integration-guide#integrating-with-a-pagerduty-service>`__,
+or `Slack <https://slack.com/help/articles/206819278-Send-emails-to-Slack>`__.
 
 The content of these notifications is configurable at the platform level.
 
@@ -78,43 +75,61 @@ In order to actually publish notifications, you'll need a `verified SES email ad
 
 The role you use to run FlyteAdmin must have permissions to read and write to your SNS topic and SQS queue.
 
-Let's look at the following config section and explain what each value represents: ::
+Let's look at the following config section and explain what each value represents:
+
+.. code-block:: yaml
 
   notifications:
+    # Because AWS is the only cloud back-end supported for executing scheduled
+    # workflows in this case, only ``"aws"`` is a valid value. By default, the
+    #no-op executor is used.
     type: "aws"
+
+    # This specifies which region AWS clients will use when creating SNS and SQS clients.
     region: "us-east-1"
+
+    # This handles pushing notification events to your SNS topic.
     publisher:
+
+      # This is the arn of your SNS topic.
       topicName: "arn:aws:sns:us-east-1:{{ YOUR ACCOUNT ID }}:{{ YOUR TOPIC }}"
+
+    # This handles the recording notification events and enqueueing them to be
+    # processed asynchronously.
     processor:
+
+      # This is the name of the SQS queue which will capture pending notification events.
       queueName: "{{ YOUR QUEUE NAME }}"
+
+      # Your AWS `account id, see: https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId
       accountId: "{{ YOUR ACCOUNT ID }}"
+
+    # This section encloses config details for sending and formatting emails
+    # used as notifications.
     emailer:
+
+      # Configurable subject line used in notification emails.
       subject: "Notice: Execution \"{{ workflow.name }}\" has {{ phase }} in \"{{ domain }}\"."
+
+      # Your verified SES email sender.
       sender:  "flyte-notifications@company.com"
+
+      # Configurable email body used in notifications.
       body: >
         Execution \"{{ workflow.name }} [{{ name }}]\" has {{ phase }} in \"{{ domain }}\". View details at
         <a href=\http://flyte.company.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
         http://flyte.company.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
 
-* **type**: Because AWS is the only cloud back-end supported for executing scheduled workflows in this case, only ``"aws"`` is a valid value. By default, the no-op executor is used.
-* **region**: This specifies which region AWS clients will use when creating SNS and SQS clients.
-* **publisher**: This handles pushing notification events to your SNS topic.
-    * **topicName**: This is the arn of your SNS topic.
-* **processor**: This handles the recording notification events and enqueueing them to be processed asynchronously.
-    * **queueName**: This is the name of the SQS queue which will capture pending notification events.
-    * **accountId**: Your AWS `account id <https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId>`_
-* **emailer**: This section encloses config details for sending and formatting emails used as notifications.
-    * **subject**: Configurable subject line used in notification emails.
-    * **sender**: Your verified SES email sender.
-    * **body**: Configurable email body used in notifications.
-
-The full set of parameters which can be used for email templating are checked into `code <https://github.com/flyteorg/flyteadmin/blob/a84223dab00dfa52d8ba1ed2d057e77b6c6ab6a7/pkg/async/notifications/email.go#L18,L30>`_.
+The full set of parameters which can be used for email templating are checked
+into `code <https://github.com/flyteorg/flyteadmin/blob/a84223dab00dfa52d8ba1ed2d057e77b6c6ab6a7/pkg/async/notifications/email.go#L18,L30>`_.
 
 .. _admin-config-example:
 
 Example config
 ==============
 
-.. rli:: https://raw.githubusercontent.com/flyteorg/flyteadmin/master/flyteadmin_config.yaml
-   :lines: 66-80
+You can find the full configuration file `here <https://github.com/flyteorg/flyteadmin/blob/master/flyteadmin_config.yaml>`__.
 
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyteadmin/master/flyteadmin_config.yaml
+   :caption: flyteadmin/flyteadmin_config.yaml
+   :lines: 91-105

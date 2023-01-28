@@ -5,39 +5,48 @@ Snowflake Plugin Setup
 
 This guide gives an overview of how to set up Snowflake in your Flyte deployment.
 
-1. Add Flyte chart repo to Helm
+Add Flyte Chart Repo to Helm
+============================
 
 .. code-block::
 
- helm repo add flyteorg https://flyteorg.github.io/flyte
+   helm repo add flyteorg https://flyteorg.github.io/flyte
 
 
-2. Setup the cluster
+Setup the Cluster
+=================
 
-.. tabbed:: Sandbox
+.. tabs::
 
-  * Start the sandbox cluster
+   .. tab:: Sandbox
 
-    .. code-block:: bash
+      Start the sandbox cluster
+   
+      .. prompt:: bash $
+   
+         flytectl demo start
+   
+      Generate flytectl config
+   
+      .. prompt:: bash $
+   
+         flytectl config init
+   
+   .. tab:: AWS/GCP
 
-       flytectl sandbox start
+      Follow the :ref:`deployment-deployment-cloud-simple` or
+      :ref:`deployment-deployment-multicluster` guide to set up your cluster.
+      After following these guides, make sure you have:
 
-  * Generate Flytectl sandbox config
+      * The correct kubeconfig and selected the correct kubernetes context
+      * The correct flytectl config at ``~/.flyte/config.yaml``
 
-    .. code-block:: bash
+Specify Plugin Configuration
+============================
 
-       flytectl config init
+Create a file named ``values-override.yaml`` and add the following config to it:
 
-.. tabbed:: AWS/GCP
-
-  * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__ / `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__
-  * Make sure you have correct kubeconfig and selected the correct kubernetes context
-  * make sure you have the correct flytectl config at ~/.flyte/config.yaml
-
-
-3. Create a file named ``values-override.yaml`` and add the following config to it:
-
-.. code-block::
+.. code-block:: yaml
 
     configmap:
       enabled_plugins:
@@ -58,14 +67,18 @@ This guide gives an overview of how to set up Snowflake in your Flyte deployment
               container_array: k8s-array
               snowflake: snowflake
 
-4. Create a trial Snowflake account and follow the docs for creating an API key.
+Get an API Token
+================
 
-5. Add snowflake JWT token to FlytePropeller.
+Next, create a trial Snowflake account and follow the docs for creating an API
+key. Add the snowflake JWT token to FlytePropeller.
 
 .. note::
-        Refer to the `Snowflake docs <https://docs.snowflake.com/en/developer-guide/sql-api/guide.html#using-key-pair-authentication>`__ to understand setting up the Snowflake JWT token.
+   
+   Refer to the `Snowflake docs <https://docs.snowflake.com/en/developer-guide/sql-api/guide.html#using-key-pair-authentication>`__
+   to understand setting up the Snowflake JWT token.
 
-.. code-block:: bash
+.. prompt:: bash $
 
     kubectl edit secret -n flyte flyte-secret-auth
 
@@ -86,37 +99,50 @@ The configuration will look as follows:
 
 Replace ``<JWT_TOKEN>`` with your JWT token.
 
-6. Upgrade the Flyte Helm release.
+Upgrade the Flyte Helm release
+==============================
 
-.. code-block:: bash
+.. prompt:: bash $
 
-    helm upgrade -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml flyteorg/flyte-core
+   helm upgrade -n flyte -f https://raw.githubusercontent.com/flyteorg/flyte/master/charts/flyte-core/values-sandbox.yaml -f values-override.yaml flyteorg/flyte-core
 
-7. Register the Snowflake plugin example.
+Register the Snowflake plugin example
+=====================================
 
-.. code-block:: bash
+.. prompt:: bash $
 
-  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
+   flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-external_services-snowflake.tar.gz --archive -p flytesnacks -d development
 
 
-8.  Launch an execution
+Launch an execution
+===================
 
-.. tabbed:: Flyte Console
+.. tabs::
 
-  * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
-  * Click on `Launch` to open up the launch form.
-  * Submit the form.
-
-.. tabbed:: Flytectl
-
-  * Retrieve an execution form in the form of a yaml file:
-
-    .. code-block:: bash
-
-       flytectl get launchplan --config ~/.flyte/flytectl.yaml --project flytesnacks --domain development snowflake.workflows.example.snowflake_wf  --latest --execFile exec_spec.yaml --config ~/.flyte/flytectl.yaml
-
-  * Launch! 🚀
-
-    .. code-block:: bash
-
-       flytectl --config ~/.flyte/flytectl.yaml create execution -p <project> -d <domain> --execFile ~/exec_spec.yaml
+   .. tab:: Flyte Console
+   
+     * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
+     * Click on `Launch` to open up the launch form.
+     * Submit the form.
+   
+   .. tab:: Flytectl
+   
+      Retrieve an execution form in the form of a yaml file:
+   
+      .. prompt:: bash $
+   
+         flytectl get launchplan --config ~/.flyte/flytectl.yaml \
+             --project flytesnacks \
+             --domain development \
+             snowflake.workflows.example.snowflake_wf \
+             --latest \
+             --execFile exec_spec.yaml
+   
+      Launch! 🚀
+   
+      .. prompt:: bash $
+   
+         flytectl --config ~/.flyte/flytectl.yaml create execution \
+             -p flytesnacks \
+             -d development \
+             --execFile ~/exec_spec.yaml

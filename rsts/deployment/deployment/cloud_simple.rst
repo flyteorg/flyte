@@ -114,3 +114,11 @@ hello world example:
    git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks/cookbook
    pyflyte run --remote core/flyte_basics/hello_world.py my_wf
+
+*************
+What's Next?
+*************
+
+Congratulations ⭐️! Now that you have a Flyte cluster up and running on the cloud,
+you can productionize it by following the :ref:`deployment-deployment-cloud-production`
+guide.

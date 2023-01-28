@@ -1,16 +1,20 @@
 .. _deployment-configuration:
 
-##############
-Cluster Config
-##############
+######################
+Configuration
+######################
+
+This section will cover how to configure your Flyte cluster for features like
+authentication, monitoring, and notifications.
 
 .. important::
 
-   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts. The configuration
-   changes discussed will closely mirror the ``flyte-binary`` Helm chart, the specific documentation for which we will
-   work on soon. For the most part, if you're using the ``flyte-binary`` chart, instead of specifying under a yaml file
-   like ``cloud_events.yaml`` in :ref:`deployment-configuration-cloud-event`, you'll need to add those settings under
-   the ``inline`` section here:
+   The configuration instructions in this section are for the ``flyte`` and ``flyte-core`` Helm charts, which is for
+   the :ref:`multi-cluster setup <deployment-deployment-multicluster>`.
+
+   If you're using the ``flyte-binary`` chart for the  :ref:`single cluster setup <deployment-deployment-cloud-simple>`,
+   instead of specifying configuration under a yaml file like ``cloud_events.yaml`` in :ref:`deployment-configuration-cloud-event`,
+   you'll need to add the configuration settings under the ``inline`` section in the `eks-production.yaml` file:
 
    .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
       :language: yaml
@@ -54,7 +58,7 @@ Cluster Config
        :text: Configuring Custom K8s Resources
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    How to use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific resource quotas (say, to limit the number of CPUs/GPUs/mem per tenant).
+    Use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific CPU/GPU/memory resource quotas.
 
     ---
 
@@ -63,7 +67,7 @@ Cluster Config
        :text: Adding New Customizable Resources
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Creating new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
+    Create new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
 
     ---
 
@@ -110,15 +114,6 @@ Cluster Config
     ^^^^^^^^^^^^
     Configure Flyte to to send events to external pub/sub systems.
 
-    ---
-
-    .. link-button:: deployment-configuration-generated
-       :type: ref
-       :text: Generated Documentation
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Generated documentation for the configuration objects for Flyte backend services.
-
 .. toctree::
     :maxdepth: 1
     :name: Cluster Config
@@ -133,4 +128,3 @@ Cluster Config
     notifications
     performance
     cloud_event
-    generated/index

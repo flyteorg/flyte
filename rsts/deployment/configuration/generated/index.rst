@@ -1,8 +1,10 @@
 .. _deployment-configuration-generated:
 
-#####################################
-Generated Configuration Documentation
-#####################################
+#########################
+Configuration Reference
+#########################
+
+This section documents the configuration settings for Flyte's backend services.
 
 .. panels::
    :header: text-center
@@ -13,16 +15,16 @@ Generated Configuration Documentation
       :text: Flyte Scheduler
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
-   The scheduler that comes bundled with Flyte for scheduled workflows.
+   The Flyte workflow scheduler service.
 
    ---
 
    .. link-button:: flytedatacatalog-config-specification
       :type: ref
-      :text: Optimizing Performance
+      :text: Data Catalog
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
-   Flyte Data Memoization (datacatalog) service.
+   The Flyte Data Memoization (datacatalog) service.
 
    ---
 

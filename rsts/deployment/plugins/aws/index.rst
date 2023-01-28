@@ -6,6 +6,8 @@ AWS Plugins Setup
 
 .. tags:: AWS, Integration, MachineLearning, Data, Advanced
 
+Learn how to set up AWS plugins for Flyte.
+
 .. panels::
     :header: text-center
     :column: col-lg-12 p-2
