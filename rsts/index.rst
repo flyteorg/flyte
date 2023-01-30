@@ -4,21 +4,13 @@
    :titlesonly:
    :hidden:
 
-   |plane| Getting Started <getting_started/index>
+   |plane| Getting Started <https://docs.flyte.org/projects/cookbook/en/latest/index.html>
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
-
-.. toctree::
-   :caption: Getting Started
-   :maxdepth: -1
-   :name: gettingstarted
-   :hidden:
-
-   getting_started/index
 
 .. toctree::
    :caption: Concepts
@@ -288,7 +280,7 @@ Next Steps
 
 Whether you want to write Flyte workflows, deploy the Flyte platform to your K8s cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
 
-* :ref:`Get Started <getting-started>`
+* :ref:`Get Started <cookbook:getting_started_index>`
 * :ref:`Main Concepts <divedeep>`
 * :ref:`Extend Flyte <cookbook:plugins_extend>`
 * :ref:`Join the Community <community>`
