@@ -1,0 +1,103 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+
+FLYTE_MANIFEST_PATH=/var/lib/rancher/k3s/server/manifests/flyte.yaml
+
+# Generate template variables to be substituted into manifests
+REPLACEMENTS="$(mktemp)"
+trap 'rm -f ${REPLACEMENTS}' EXIT
+
+cat << EOF > ${REPLACEMENTS}
+s/%{HOST_GATEWAY_IP}%/$(awk '/host.docker.internal/ {print $1}' /etc/hosts)/g
+EOF
+
+# Create the destination directory if it does not already exist
+mkdir -p "$(dirname ${FLYTE_MANIFEST_PATH})"
+
+############
+# Dev mode #
+############
+if [ "${FLYTE_DEV:-}" = "True" ]; then
+  sed -f ${REPLACEMENTS} /var/lib/rancher/k3s/server/manifests-staging/dev.yaml > ${FLYTE_MANIFEST_PATH}
+  exit 0
+fi
+
+###############
+# Normal mode #
+###############
+(
+  export FLYTE_COMPLETE_TEMPLATE_PATH=/var/lib/rancher/k3s/server/manifests-staging/complete.yaml
+  export FLYTE_CONFIG_DIR=/var/lib/flyte/config
+  export FLYTE_CONFIG_PATH="${FLYTE_CONFIG_DIR}/config.yaml"
+  export FLYTE_CONFIG_CONFIGMAP=flyte-sandbox-extra-config
+  export FLYTE_CLUSTER_RESOURCE_TEMPLATES_DIR="${FLYTE_CONFIG_DIR}/cluster-resource-templates"
+  export FLYTE_CLUSTER_RESOURCE_TEMPLATES_CONFIGMAP=flyte-sandbox-extra-cluster-resource-templates
+  export FLYTE_NAMESPACE="$(yq 'select(.kind == "Deployment" and .metadata.name == "flyte-sandbox") | .metadata.namespace' ${FLYTE_COMPLETE_TEMPLATE_PATH})"
+
+  # Create a working directory for the ephemeral kustomize module
+  WORKDIR="$(mktemp -d)"
+  trap 'rm -rf ${WORKDIR}' EXIT
+  cd ${WORKDIR}
+  PARTS="${WORKDIR}/parts"
+  PATCHES="${WORKDIR}/patches"
+  mkdir ${PARTS} ${PATCHES}
+
+  # Create base module
+  yq --null-input '
+  .resources = [env(FLYTE_COMPLETE_TEMPLATE_PATH)]
+  ' >> ${PARTS}/base.yaml
+
+  # Base deployment patch
+  yq '
+  select(.kind == "Deployment" and .metadata.name == "flyte-sandbox") |
+  pick(["apiVersion", "kind", "metadata"]) |
+  .metadata |= pick(["name", "namespace"])
+  ' ${FLYTE_COMPLETE_TEMPLATE_PATH} > ${PATCHES}/base.yaml
+
+  # Load extra configuration if available
+  if [ -f ${FLYTE_CONFIG_PATH} ]; then
+    yq --null-input '
+    {} as $obj |
+    $obj.name = env(FLYTE_CONFIG_CONFIGMAP) |
+    $obj.namespace = env(FLYTE_NAMESPACE) |
+    $obj.behavior = "replace" |
+    $obj.files = ["999-extra-config.yaml=" + env(FLYTE_CONFIG_PATH)] |
+    .configMapGenerator = [$obj]
+    ' > ${PARTS}/extra-config.yaml
+
+    # Add checksum annotation
+    sha256sum ${FLYTE_CONFIG_PATH} | awk '{print $1}' | yq '
+    {"spec": {"template": {"metadata": {"annotations": {"checksum/extra-configuration": .}}}}}
+    ' > ${PATCHES}/checksum-extra-configuration.yaml
+  fi
+
+  # Load extra cluster resource templates if available
+  if [ -d ${FLYTE_CLUSTER_RESOURCE_TEMPLATES_DIR} ]; then
+    find ${FLYTE_CLUSTER_RESOURCE_TEMPLATES_DIR} -type f -name "*.yaml" | \
+    yq '
+    {} as $obj |
+    $obj.name = env(FLYTE_CLUSTER_RESOURCE_TEMPLATES_CONFIGMAP) |
+    $obj.namespace = env(FLYTE_NAMESPACE) |
+    $obj.behavior = "replace" |
+    $obj.files = split(" ") |
+    {"configMapGenerator": [$obj]}
+    ' > ${PARTS}/extra-cluster-resource-templates.yaml
+
+    # Add checksum annotation
+    find ${FLYTE_CLUSTER_RESOURCE_TEMPLATES_DIR} -type f -name "*.yaml" -exec sha256sum {} \; | sort | sha256sum | awk '{print $1}' | yq '
+    {"spec": {"template": {"metadata": {"annotations": {"checksum/extra-cluster-resource-templates": .}}}}}
+    ' > ${PATCHES}/checksum-extra-cluster-resource-templates.yaml
+  fi
+
+  # Construct inline patches for deployment
+  yq ea '
+  . as $item ireduce ({}; . *+d $item ) |
+  {"patchesStrategicMerge": [(. | to_yaml)]}
+  ' ${PATCHES}/*.yaml > ${PARTS}/patch-annotations.yaml
+
+  # Merge all parts
+  yq ea '. as $item ireduce ({}; . *+ $item )' ${PARTS}/*.yaml > kustomization.yaml
+  kubectl kustomize --load-restrictor=LoadRestrictionsNone .
+) | sed -f ${REPLACEMENTS} > ${FLYTE_MANIFEST_PATH}

@@ -1,4 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
+FROM mikefarah/yq:4 AS yq
+
 
 FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
 
@@ -17,12 +19,15 @@ ARG TARGETARCH
 ARG FLYTE_SANDBOX_VERSION
 ENV FLYTE_SANDBOX_VERSION "${FLYTE_SANDBOX_VERSION}"
 
+# Install yq
+COPY --from=yq /usr/bin/yq /bin/
+
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
 COPY bin/ /bin/
 
-VOLUME /var/lib/flyte
+VOLUME /var/lib/flyte/storage
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
 CMD [ "server", "--disable=traefik", "--disable=servicelb" ]
