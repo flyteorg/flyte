@@ -918,6 +918,20 @@ class TaskMetadata final :
   ::std::string* release_deprecated_error_message();
   void set_allocated_deprecated_error_message(::std::string* deprecated_error_message);
 
+  // string pod_template_name = 12;
+  void clear_pod_template_name();
+  static const int kPodTemplateNameFieldNumber = 12;
+  const ::std::string& pod_template_name() const;
+  void set_pod_template_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_pod_template_name(::std::string&& value);
+  #endif
+  void set_pod_template_name(const char* value);
+  void set_pod_template_name(const char* value, size_t size);
+  ::std::string* mutable_pod_template_name();
+  ::std::string* release_pod_template_name();
+  void set_allocated_pod_template_name(::std::string* pod_template_name);
+
   // .flyteidl.core.RuntimeMetadata runtime = 2;
   bool has_runtime() const;
   void clear_runtime();
@@ -991,6 +1005,7 @@ class TaskMetadata final :
       0 > tags_;
   ::google::protobuf::internal::ArenaStringPtr discovery_version_;
   ::google::protobuf::internal::ArenaStringPtr deprecated_error_message_;
+  ::google::protobuf::internal::ArenaStringPtr pod_template_name_;
   ::flyteidl::core::RuntimeMetadata* runtime_;
   ::google::protobuf::Duration* timeout_;
   ::flyteidl::core::RetryStrategy* retries_;
@@ -3084,6 +3099,59 @@ inline ::google::protobuf::Map< ::std::string, ::std::string >*
 TaskMetadata::mutable_tags() {
   // @@protoc_insertion_point(field_mutable_map:flyteidl.core.TaskMetadata.tags)
   return tags_.MutableMap();
+}
+
+// string pod_template_name = 12;
+inline void TaskMetadata::clear_pod_template_name() {
+  pod_template_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& TaskMetadata::pod_template_name() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.pod_template_name)
+  return pod_template_name_.GetNoArena();
+}
+inline void TaskMetadata::set_pod_template_name(const ::std::string& value) {
+  
+  pod_template_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.pod_template_name)
+}
+#if LANG_CXX11
+inline void TaskMetadata::set_pod_template_name(::std::string&& value) {
+  
+  pod_template_name_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.TaskMetadata.pod_template_name)
+}
+#endif
+inline void TaskMetadata::set_pod_template_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  pod_template_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.TaskMetadata.pod_template_name)
+}
+inline void TaskMetadata::set_pod_template_name(const char* value, size_t size) {
+  
+  pod_template_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.TaskMetadata.pod_template_name)
+}
+inline ::std::string* TaskMetadata::mutable_pod_template_name() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.TaskMetadata.pod_template_name)
+  return pod_template_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* TaskMetadata::release_pod_template_name() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.TaskMetadata.pod_template_name)
+  
+  return pod_template_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void TaskMetadata::set_allocated_pod_template_name(::std::string* pod_template_name) {
+  if (pod_template_name != nullptr) {
+    
+  } else {
+    
+  }
+  pod_template_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), pod_template_name);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskMetadata.pod_template_name)
 }
 
 inline bool TaskMetadata::has_interruptible_value() const {

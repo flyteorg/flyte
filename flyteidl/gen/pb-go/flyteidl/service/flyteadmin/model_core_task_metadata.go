@@ -27,4 +27,6 @@ type CoreTaskMetadata struct {
 	// Indicates whether the task will generate a Deck URI when it finishes executing.
 	GeneratesDeck bool `json:"generates_deck,omitempty"`
 	Tags map[string]string `json:"tags,omitempty"`
+	// pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied identically as, the default PodTemplate configured in FlytePropeller.
+	PodTemplateName string `json:"pod_template_name,omitempty"`
 }

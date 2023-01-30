@@ -6759,6 +6759,10 @@
             "type": "string"
           },
           "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+        },
+        "pod_template_name": {
+          "type": "string",
+          "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
         }
       },
       "title": "Task Metadata"

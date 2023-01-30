@@ -101,6 +101,11 @@ message TaskMetadata {
 
     // Arbitrary tags that allow users and the platform to store small but arbitrary labels
     map<string, string> tags = 11;
+
+    // pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+    // task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+    // identically as, the default PodTemplate configured in FlytePropeller.
+    string pod_template_name = 12;
 }
 
 // A Task structure that uniquely identifies a task in the system
