@@ -251,6 +251,8 @@ func (m *TaskMetadata) Validate() error {
 
 	// no validation rules for Tags
 
+	// no validation rules for PodTemplateName
+
 	switch m.InterruptibleValue.(type) {
 
 	case *TaskMetadata_Interruptible:

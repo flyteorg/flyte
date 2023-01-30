@@ -12048,6 +12048,7 @@
                  * @property {boolean|null} [cacheSerializable] TaskMetadata cacheSerializable
                  * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
+                 * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
                  */
     
                 /**
@@ -12146,6 +12147,14 @@
                  */
                 TaskMetadata.prototype.tags = $util.emptyObject;
     
+                /**
+                 * TaskMetadata podTemplateName.
+                 * @member {string} podTemplateName
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.podTemplateName = "";
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -12205,6 +12214,8 @@
                     if (message.tags != null && message.hasOwnProperty("tags"))
                         for (var keys = Object.keys(message.tags), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
+                    if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
+                        writer.uint32(/* id 12, wireType 2 =*/98).string(message.podTemplateName);
                     return writer;
                 };
     
@@ -12260,6 +12271,9 @@
                             key = reader.string();
                             reader.pos++;
                             message.tags[key] = reader.string();
+                            break;
+                        case 12:
+                            message.podTemplateName = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12324,6 +12338,9 @@
                             if (!$util.isString(message.tags[key[i]]))
                                 return "tags: string{k:string} expected";
                     }
+                    if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
+                        if (!$util.isString(message.podTemplateName))
+                            return "podTemplateName: string expected";
                     return null;
                 };
     

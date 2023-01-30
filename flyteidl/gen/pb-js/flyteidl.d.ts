@@ -5104,6 +5104,9 @@ export namespace flyteidl {
 
             /** TaskMetadata tags */
             tags?: ({ [k: string]: string }|null);
+
+            /** TaskMetadata podTemplateName */
+            podTemplateName?: (string|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -5144,6 +5147,9 @@ export namespace flyteidl {
 
             /** TaskMetadata tags. */
             public tags: { [k: string]: string };
+
+            /** TaskMetadata podTemplateName. */
+            public podTemplateName: string;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
