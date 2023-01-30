@@ -64,7 +64,7 @@ Flytectl requires CA-certified SSL cert for OAuth to work. Using a self-signed c
 
 .. code-block::
     
-    certificate is not standards compliant.
+   certificate is not standards compliant.
 
 There are two options to fix this:
 
@@ -127,6 +127,6 @@ Modify the flyte-admin-config as follows:
 
 Finally, rollout FlyteAdmin
 
-   .. prompt:: bash $
+.. prompt:: bash $
 
-      kubectl rollout restart deployment/flyteadmin -n <flyteadmin-ns>
+   kubectl rollout restart deployment/flyteadmin -n <flyteadmin-ns>

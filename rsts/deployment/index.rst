@@ -15,7 +15,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-deployment
        :type: ref
-       :text: Deployment Paths
+       :text: 🛣 Deployment Paths
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Walkthroughs for deploying Flyte, from the most basic to a fully-featured, multi-cluster production system.
@@ -24,7 +24,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-plugin-setup
        :type: ref
-       :text: Plugin Setup
+       :text: 🔌 Plugin Setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API services.
@@ -33,7 +33,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-configuration
        :type: ref
-       :text: Cluster Configuration
+       :text: 🎛 Cluster Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     How to configure the various components of your cluster.
@@ -42,7 +42,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-configuration-generated
        :type: ref
-       :text: Configuration Reference
+       :text: 📖 Configuration Reference
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Reference docs for configuration settings for Flyte's backend services.
@@ -51,7 +51,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-security-overview
        :type: ref
-       :text: Security Overview
+       :text: 🔒 Security Overview
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Read for comments on security in Flyte.
