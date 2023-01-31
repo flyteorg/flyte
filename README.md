@@ -53,7 +53,7 @@ Code. Ship. Scale.
 <h3 align="center">
   <a href="https://flyte.org">Home Page</a>
   <span> · </span>
-  <a href="https://docs.flyte.org/en/latest/getting_started/index.html">Quickstart</a>
+  <a href="https://docs.flyte.org/projects/cookbook/en/latest/index.html">Quickstart</a>
   <span> · </span>
   <a href="https://docs.flyte.org/">Documentation</a>
   <span> · </span>
@@ -145,7 +145,7 @@ Live roadmap for the project can be found @[Github Live Roadmap](https://github.
   - Making it easy to stitch together workflows from different teams and domain experts and share them across teams
   - Comparing results of training workflows over time and across pipelines
   - Simplifying the complexity of multi-step, multi-owner workflows
-- **[Get Started quickly](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
+- **[Get Started quickly](https://docs.flyte.org/projects/cookbook/en/latest/index.html)** -- start locally and scale to the cloud instantly
 - **gRPC / REST** interface to define and execute tasks and workflows
 - **Typesafe** construction of pipelines -- each task has an interface characterized by its input and output, so illegal construction of pipelines fails during declaration, rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.

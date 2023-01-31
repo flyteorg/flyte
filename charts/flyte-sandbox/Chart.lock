@@ -7,12 +7,12 @@ dependencies:
   version: v0.1.10
 - name: kubernetes-dashboard
   repository: https://kubernetes.github.io/dashboard/
-  version: 5.11.0
+  version: 6.0.0
 - name: minio
   repository: https://charts.bitnami.com/bitnami
-  version: 11.10.13
+  version: 12.1.1
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 12.1.0
-digest: sha256:398b480f861351e28080997e6fc1058519e33171494e52beae6a7acf9daa54d6
-generated: "2022-12-28T21:05:49.8877-08:00"
+  version: 12.1.9
+digest: sha256:e7155e540bbdb98f690eb12e2bd301a19d8b36833336f6991410cb44d8d9bb5e
+generated: "2023-01-24T21:51:30.908465-08:00"

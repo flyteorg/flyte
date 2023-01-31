@@ -11,6 +11,7 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.annotations | object | `{}` |  |
 | clusterResourceTemplates.externalConfigMap | string | `""` |  |
 | clusterResourceTemplates.inline | object | `{}` |  |
+| clusterResourceTemplates.inlineConfigMap | string | `""` |  |
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
@@ -30,6 +31,7 @@ Chart for basic single Flyte executable deployment
 | configuration.database.username | string | `"postgres"` |  |
 | configuration.externalConfigMap | string | `""` |  |
 | configuration.inline | object | `{}` |  |
+| configuration.inlineConfigMap | string | `""` |  |
 | configuration.labels | object | `{}` |  |
 | configuration.logging.level | int | `1` |  |
 | configuration.logging.plugins.cloudwatch.enabled | bool | `false` |  |

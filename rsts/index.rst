@@ -4,21 +4,13 @@
    :titlesonly:
    :hidden:
 
-   |plane| Getting Started <getting_started/index>
+   |plane| Getting Started <https://docs.flyte.org/projects/cookbook/en/latest/index.html>
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |rocket| Deployment and Administration <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
-
-.. toctree::
-   :caption: Getting Started
-   :maxdepth: -1
-   :name: gettingstarted
-   :hidden:
-
-   getting_started/index
 
 .. toctree::
    :caption: Concepts
