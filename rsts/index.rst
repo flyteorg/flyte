@@ -65,15 +65,28 @@ Production-grade Data and ML Workflows Made Easy
     :target: https://lfaidata.foundation/projects/flyte/
     :alt: Linux Foundation
 
-.. image:: https://img.shields.io/github/stars/flyteorg/flyte?color=green&label=github&logo=github&style=for-the-badge
+.. image:: https://img.shields.io/github/stars/flyteorg/flyte?label=github&logo=github&style=for-the-badge
    :target: https://github.com/flyteorg/flyte
    :alt: GitHub Repo stars
 
-.. image:: https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge&color=green
+.. image:: https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge&color=blue
    :target: https://github.com/flyteorg/flyte/releases/latest
    :alt: Flyte Release
 
+.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge
+   :target: https://github.com/flyteorg/flyte/actions/workflows/tests.yml
+   :alt: GitHub Test Status
+
+.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge
+   :target: https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml
+   :alt: GitHub Sandbox Status
+
+.. image:: https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=for-the-badge
+    :target: https://github.com/flyteorg/flyte/milestones?state=closed
+    :alt: Completed Milestones
+
 .. image:: https://img.shields.io/pypi/dm/flytekit?color=blue&label=flytekit%20downloads&style=for-the-badge&logo=pypi&logoColor=white
+   :target: https://github.com/flyteorg/flytekit
    :alt: Flytekit Downloads
 
 .. image:: https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack
@@ -84,13 +97,13 @@ Production-grade Data and ML Workflows Made Easy
     :target: http://www.apache.org/licenses/LICENSE-2.0.html
     :alt: License
 
-`Flyte Tags <_tags/tagsindex.html>`__
-
 .. raw:: html
 
    <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;">
    Highly scalable and flexible workflow orchestration for prototyping and production
    </p>
+
+`Flyte Tags <_tags/tagsindex.html>`__
 
 `Flyte <https://github.com/flyteorg/flyte>`__ is an open-source, Kubernetes-native
 workflow orchestrator implemented in `Go <https://go.dev/>`__. It enables highly
