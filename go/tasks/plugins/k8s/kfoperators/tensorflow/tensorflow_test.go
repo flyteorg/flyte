@@ -70,7 +70,7 @@ func dummyTensorFlowCustomObj(workers int32, psReplicas int32, chiefReplicas int
 	}
 }
 
-func dummySparkTaskTemplate(id string, tensorflowCustomObj *plugins.DistributedTensorflowTrainingTask) *core.TaskTemplate {
+func dummyTensorFlowTaskTemplate(id string, tensorflowCustomObj *plugins.DistributedTensorflowTrainingTask) *core.TaskTemplate {
 
 	tfObjJSON, err := utils.MarshalToString(tensorflowCustomObj)
 	if err != nil {
@@ -251,7 +251,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 	}
 
 	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)
-	taskTemplate := dummySparkTaskTemplate("the job", tfObj)
+	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
 	if err != nil {
 		panic(err)
@@ -277,7 +277,7 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
 	tfObj := dummyTensorFlowCustomObj(100, 50, 1)
-	taskTemplate := dummySparkTaskTemplate("the job", tfObj)
+	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 
 	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
 	assert.NoError(t, err)
@@ -370,4 +370,53 @@ func TestGetProperties(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, tensorflowResourceHandler.GetProperties())
+}
+
+func TestReplicaCounts(t *testing.T) {
+	for _, test := range []struct {
+		name               string
+		chiefReplicaCount  int32
+		psReplicaCount     int32
+		workerReplicaCount int32
+		expectError        bool
+		contains           []commonOp.ReplicaType
+		notContains        []commonOp.ReplicaType
+	}{
+		{"NoWorkers", 1, 1, 0, true, nil, nil},
+		{"NoChiefOrPS", 0, 0, 1, true, nil, nil},
+		{"SingleChief", 1, 0, 1, false,
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeWorker},
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS}},
+		{"SinglePS", 0, 1, 1, false,
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker},
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+			tfObj := dummyTensorFlowCustomObj(test.workerReplicaCount, test.psReplicaCount, test.chiefReplicaCount)
+			taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
+
+			resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+			if test.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, resource)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.NotNil(t, resource)
+
+			job, ok := resource.(*kubeflowv1.TFJob)
+			assert.True(t, ok)
+
+			assert.Len(t, job.Spec.TFReplicaSpecs, len(test.contains))
+			for _, replicaType := range test.contains {
+				assert.Contains(t, job.Spec.TFReplicaSpecs, replicaType)
+			}
+			for _, replicaType := range test.notContains {
+				assert.NotContains(t, job.Spec.TFReplicaSpecs, replicaType)
+			}
+		})
+	}
 }
