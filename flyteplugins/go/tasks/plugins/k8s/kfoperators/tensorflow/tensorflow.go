@@ -2,26 +2,27 @@ package tensorflow
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
+
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type tensorflowOperatorResourceHandler struct {
@@ -85,32 +86,36 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	psReplicas := tensorflowTaskExtraArgs.GetPsReplicas()
 	chiefReplicas := tensorflowTaskExtraArgs.GetChiefReplicas()
 
+	if workers == 0 {
+		return nil, fmt.Errorf("number of worker should be more then 0")
+	}
+	if psReplicas == 0 && chiefReplicas == 0 {
+		return nil, fmt.Errorf("either number of chief or parameter servers needs to be be more then 0")
+	}
+
 	jobSpec := kubeflowv1.TFJobSpec{
-		TFReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.TFJobReplicaTypePS: {
-				Replicas: &psReplicas,
+		TFReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{},
+	}
+
+	for _, t := range []struct {
+		podSpec     v1.PodSpec
+		replicaNum  *int32
+		replicaType commonOp.ReplicaType
+	}{
+		{*podSpec, &workers, kubeflowv1.TFJobReplicaTypeWorker},
+		{*podSpec, &psReplicas, kubeflowv1.TFJobReplicaTypePS},
+		{*podSpec, &chiefReplicas, kubeflowv1.TFJobReplicaTypeChief},
+	} {
+		if *t.replicaNum > 0 {
+			jobSpec.TFReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
+				Replicas: t.replicaNum,
 				Template: v1.PodTemplateSpec{
 					ObjectMeta: objectMeta,
-					Spec:       *podSpec,
+					Spec:       t.podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,
-			},
-			kubeflowv1.TFJobReplicaTypeChief: {
-				Replicas: &chiefReplicas,
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: objectMeta,
-					Spec:       *podSpec,
-				},
-				RestartPolicy: commonOp.RestartPolicyNever,
-			},
-			kubeflowv1.TFJobReplicaTypeWorker: {
-				Replicas: &workers,
-				Template: v1.PodTemplateSpec{
-					Spec: *podSpec,
-				},
-				RestartPolicy: commonOp.RestartPolicyNever,
-			},
-		},
+			}
+		}
 	}
 
 	job := &kubeflowv1.TFJob{

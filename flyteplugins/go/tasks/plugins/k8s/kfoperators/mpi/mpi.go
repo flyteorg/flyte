@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
-	commonKf "github.com/kubeflow/common/pkg/apis/common/v1"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -92,32 +92,35 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	}
 
 	if workers == 0 {
-		return nil, fmt.Errorf("number of worker should be more then 1 ")
+		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 	if launcherReplicas == 0 {
-		return nil, fmt.Errorf("number of launch worker should be more then 1")
+		return nil, fmt.Errorf("number of launch worker should be more then 0")
 	}
 
 	jobSpec := kubeflowv1.MPIJobSpec{
-		SlotsPerWorker: &slots,
-		MPIReplicaSpecs: map[commonKf.ReplicaType]*commonKf.ReplicaSpec{
-			kubeflowv1.MPIJobReplicaTypeLauncher: {
-				Replicas: &launcherReplicas,
+		SlotsPerWorker:  &slots,
+		MPIReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{},
+	}
+
+	for _, t := range []struct {
+		podSpec     v1.PodSpec
+		replicaNum  *int32
+		replicaType commonOp.ReplicaType
+	}{
+		{*podSpec, &launcherReplicas, kubeflowv1.MPIJobReplicaTypeLauncher},
+		{*workersPodSpec, &workers, kubeflowv1.MPIJobReplicaTypeWorker},
+	} {
+		if *t.replicaNum > 0 {
+			jobSpec.MPIReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
+				Replicas: t.replicaNum,
 				Template: v1.PodTemplateSpec{
 					ObjectMeta: objectMeta,
-					Spec:       *podSpec,
+					Spec:       t.podSpec,
 				},
-				RestartPolicy: commonKf.RestartPolicyNever,
-			},
-			kubeflowv1.MPIJobReplicaTypeWorker: {
-				Replicas: &workers,
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: objectMeta,
-					Spec:       *workersPodSpec,
-				},
-				RestartPolicy: commonKf.RestartPolicyNever,
-			},
-		},
+				RestartPolicy: commonOp.RestartPolicyNever,
+			}
+		}
 	}
 
 	job := &kubeflowv1.MPIJob{

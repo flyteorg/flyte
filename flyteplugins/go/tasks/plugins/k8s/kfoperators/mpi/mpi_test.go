@@ -6,29 +6,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
-	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/stretchr/testify/mock"
-
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-
-	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+
+	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
+
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -384,4 +383,47 @@ func TestGetProperties(t *testing.T) {
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, mpiResourceHandler.GetProperties())
+}
+
+func TestReplicaCounts(t *testing.T) {
+	for _, test := range []struct {
+		name                 string
+		launcherReplicaCount int32
+		workerReplicaCount   int32
+		expectError          bool
+		contains             []mpiOp.ReplicaType
+		notContains          []mpiOp.ReplicaType
+	}{
+		{"NoWorkers", 0, 1, true, nil, nil},
+		{"NoLaunchers", 1, 0, true, nil, nil},
+		{"Works", 1, 1, false, []mpiOp.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []mpiOp.ReplicaType{}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			mpiResourceHandler := mpiOperatorResourceHandler{}
+
+			mpiObj := dummyMPICustomObj(test.workerReplicaCount, test.launcherReplicaCount, 1)
+			taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
+
+			resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+			if test.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, resource)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.NotNil(t, resource)
+
+			job, ok := resource.(*kubeflowv1.MPIJob)
+			assert.True(t, ok)
+
+			assert.Len(t, job.Spec.MPIReplicaSpecs, len(test.contains))
+			for _, replicaType := range test.contains {
+				assert.Contains(t, job.Spec.MPIReplicaSpecs, replicaType)
+			}
+			for _, replicaType := range test.notContains {
+				assert.NotContains(t, job.Spec.MPIReplicaSpecs, replicaType)
+			}
+		})
+	}
 }

@@ -374,3 +374,44 @@ func TestGetProperties(t *testing.T) {
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
 }
+
+func TestReplicaCounts(t *testing.T) {
+	for _, test := range []struct {
+		name               string
+		workerReplicaCount int32
+		expectError        bool
+		contains           []commonOp.ReplicaType
+		notContains        []commonOp.ReplicaType
+	}{
+		{"NoWorkers", 0, true, nil, nil},
+		{"Works", 1, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster, kubeflowv1.PyTorchJobReplicaTypeWorker}, []commonOp.ReplicaType{}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+			ptObj := dummyPytorchCustomObj(test.workerReplicaCount)
+			taskTemplate := dummyPytorchTaskTemplate("the job", ptObj)
+
+			resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+			if test.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, resource)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.NotNil(t, resource)
+
+			job, ok := resource.(*kubeflowv1.PyTorchJob)
+			assert.True(t, ok)
+
+			assert.Len(t, job.Spec.PyTorchReplicaSpecs, len(test.contains))
+			for _, replicaType := range test.contains {
+				assert.Contains(t, job.Spec.PyTorchReplicaSpecs, replicaType)
+			}
+			for _, replicaType := range test.notContains {
+				assert.NotContains(t, job.Spec.PyTorchReplicaSpecs, replicaType)
+			}
+		})
+	}
+}
