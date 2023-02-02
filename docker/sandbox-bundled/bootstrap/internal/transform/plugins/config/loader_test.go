@@ -11,14 +11,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLoader(t *testing.T) {
+func TestLoaderHappy(t *testing.T) {
 	// Initialize config loader
 	cOpts := LoaderOpts{
 		ConfigurationConfigMapName:            "test-config",
 		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
 		DeploymentName:                        "test-deployment",
 		Namespace:                             "test",
-		DirPath:                               filepath.Join("testdata", "config"),
+		DirPath:                               filepath.Join("testdata", "happy"),
 	}
 	c, err := NewLoader(&cOpts)
 	if err != nil {
@@ -106,4 +106,64 @@ spec:
 `, hex.EncodeToString(clusterResourceTemplatesChecksum), hex.EncodeToString(configurationChecksum)),
 		"YAML strings should match",
 	)
+}
+
+func TestLoaderEmptyDir(t *testing.T) {
+	// Initialize config loader
+	cOpts := LoaderOpts{
+		ConfigurationConfigMapName:            "test-config",
+		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
+		DeploymentName:                        "test-deployment",
+		Namespace:                             "test",
+		DirPath:                               filepath.Join("testdata", "emptydir"),
+	}
+	c, err := NewLoader(&cOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Nil(t, c.configuration)
+	assert.Nil(t, c.clusterResourceTemplates)
+
+	// Read in base manifest
+	base, err := os.ReadFile(filepath.Join("testdata", "base.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Apply transform
+	rendered, err := c.Transform(base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, base, rendered, "YAML strings should match")
+}
+
+func TestLoaderEmptyFiles(t *testing.T) {
+	// Initialize config loader
+	cOpts := LoaderOpts{
+		ConfigurationConfigMapName:            "test-config",
+		ClusterResourceTemplatesConfigMapName: "test-cluster-resource-templates",
+		DeploymentName:                        "test-deployment",
+		Namespace:                             "test",
+		DirPath:                               filepath.Join("testdata", "emptyfile"),
+	}
+	c, err := NewLoader(&cOpts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Nil(t, c.configuration)
+	assert.Nil(t, c.clusterResourceTemplates)
+
+	// Read in base manifest
+	base, err := os.ReadFile(filepath.Join("testdata", "base.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Apply transform
+	rendered, err := c.Transform(base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, base, rendered, "YAML strings should match")
 }

@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/hex"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -12,6 +13,17 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/kustomize/api/types"
 )
+
+type ClusterResourceTemplatesNotFound struct {
+	dirPath string
+}
+
+func (e *ClusterResourceTemplatesNotFound) Error() string {
+	return fmt.Sprintf(
+		"cluster resource templates directory not found or is empty: %s",
+		e.dirPath,
+	)
+}
 
 type ClusterResourceTemplates struct {
 	ConfigMapName  string
@@ -25,16 +37,23 @@ func NewClusterResourceTemplates(
 ) (*ClusterResourceTemplates, error) {
 	// Check that the directory is accessible
 	_, err := os.Stat(dirPath)
-	if err != nil {
+	if os.IsNotExist(err) {
+		return nil, &ClusterResourceTemplatesNotFound{dirPath}
+	} else if err != nil {
 		return nil, err
 	}
+
 	// Walk directory and collect templates
 	var paths []string
 	err = filepath.WalkDir(dirPath, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		if filepath.Ext(p) == ".yaml" {
+		info, err := os.Stat(p)
+		if err != nil {
+			return err
+		}
+		if info.Size() > 0 && filepath.Ext(p) == ".yaml" {
 			paths = append(paths, p)
 		}
 		return nil
@@ -42,6 +61,12 @@ func NewClusterResourceTemplates(
 	if err != nil {
 		return nil, err
 	}
+
+	// Handle case where no templates were found
+	if len(paths) == 0 {
+		return nil, &ClusterResourceTemplatesNotFound{dirPath}
+	}
+
 	return &ClusterResourceTemplates{
 		ConfigMapName:  configMapName,
 		DeploymentName: deploymentName,

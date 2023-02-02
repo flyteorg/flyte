@@ -12,6 +12,14 @@ import (
 	"sigs.k8s.io/kustomize/api/types"
 )
 
+type ConfigurationNotFound struct {
+	path string
+}
+
+func (e *ConfigurationNotFound) Error() string {
+	return fmt.Sprintf("configuration file not found or is empty: %s", e.path)
+}
+
 type Configuration struct {
 	ConfigMapName  string
 	DeploymentName string
@@ -22,11 +30,15 @@ type Configuration struct {
 func NewConfiguration(
 	configMapName, deploymentName, namespace, path string,
 ) (*Configuration, error) {
-	// Check that the file is accessible
-	_, err := os.Stat(path)
+	// Check that the file is accessible and not empty
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) || info.Size() == 0 {
+		return nil, &ConfigurationNotFound{path}
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	return &Configuration{
 		ConfigMapName:  configMapName,
 		DeploymentName: deploymentName,

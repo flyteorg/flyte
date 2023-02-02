@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -39,7 +40,8 @@ func NewLoader(opts *LoaderOpts) (*Loader, error) {
 		opts.Namespace,
 		filepath.Join(absDirPath, "config.yaml"),
 	)
-	if err != nil && !os.IsNotExist(err) {
+	var configurationNotFound *ConfigurationNotFound
+	if err != nil && !errors.As(err, &configurationNotFound) {
 		return nil, err
 	}
 
@@ -50,7 +52,8 @@ func NewLoader(opts *LoaderOpts) (*Loader, error) {
 		opts.Namespace,
 		filepath.Join(absDirPath, "cluster-resource-templates"),
 	)
-	if err != nil && !os.IsNotExist(err) {
+	var clusterResourceTemplatesNotFound *ClusterResourceTemplatesNotFound
+	if err != nil && !errors.As(err, &clusterResourceTemplatesNotFound) {
 		return nil, err
 	}
 
@@ -58,6 +61,11 @@ func NewLoader(opts *LoaderOpts) (*Loader, error) {
 }
 
 func (cl *Loader) Transform(data []byte) ([]byte, error) {
+	// Nothing to do, short circuit,
+	if cl.configuration == nil && cl.clusterResourceTemplates == nil {
+		return data, nil
+	}
+
 	// Create a temporary directory to serve as the root of the ephemeral kustomize
 	// module
 	workDir, err := os.MkdirTemp("", "")
