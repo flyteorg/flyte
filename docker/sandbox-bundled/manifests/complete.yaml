@@ -542,6 +542,8 @@ data:
                               "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
                               stat_prefix: ingress_http
                               codec_type: AUTO
+                              upgrade_configs:
+                                  - upgrade_type: websocket
                               route_config:
                                   name: local_route
                                   virtual_hosts:
@@ -742,7 +744,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aGNJd3hYRFRSY2t0OEc3Yg==
+  haSharedSecret: YjlYVGhBWXQ5Zk9MUzRyMA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1237,7 +1239,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d6eaa322e1ac5f4f81c86cc8035e367c69ec0916ce42c289b417f8fb292495b8
+        checksum/secret: e1681194373cff9a8cf3225939264458a99cd9c31295e5acc63090a8311d3c70
       labels:
         app: docker-registry
         release: flyte-sandbox
