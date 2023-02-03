@@ -54,10 +54,16 @@ spec:
         - containerPort: 8088
         - containerPort: 8089
         - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
-        resources: {{ toYaml .Values.datacatalog.resources | nindent 10 }}
+        resources: {{- toYaml .Values.datacatalog.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        {{- with .Values.datacatalog.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.datacatalog.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
       serviceAccountName: {{ template "datacatalog.name" . }}
       volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
       - emptyDir: {}
@@ -65,6 +71,9 @@ spec:
       - configMap:
           name: datacatalog-config
         name: config-volume
+      {{- with .Values.datacatalog.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- with .Values.datacatalog.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
