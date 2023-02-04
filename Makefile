@@ -2,7 +2,7 @@ export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
 
 define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose
+pip-compile $(1) --upgrade --verbose --resolver=backtracking
 endef
 
 GIT_VERSION := $(shell git describe --always --tags)
