@@ -3,87 +3,134 @@ package pod
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginserrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+
+	"github.com/flyteorg/flytestdlib/logger"
 
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
-	podTaskType         = "pod"
-	PrimaryContainerKey = "primary_container_name"
+	ContainerTaskType    = "container"
+	podTaskType          = "pod"
+	pythonTaskType       = "python-task"
+	rawContainerTaskType = "raw-container"
+	SidecarTaskType      = "sidecar"
 )
 
-var (
-	DefaultPodPlugin = plugin{
-		defaultPodBuilder: containerPodBuilder{},
-		podBuilders: map[string]podBuilder{
-			SidecarTaskType: sidecarPodBuilder{},
-		},
-	}
-)
-
-type podBuilder interface {
-	buildPodSpec(ctx context.Context, task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error)
-	getPrimaryContainerName(task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) (string, error)
-	updatePodMetadata(ctx context.Context, pod *v1.Pod, task *core.TaskTemplate, taskCtx pluginsCore.TaskExecutionContext) error
+// Why, you might wonder do we recreate the generated go struct generated from the plugins.SidecarJob proto? Because
+// although we unmarshal the task custom json, the PodSpec itself is not generated from a proto definition,
+// but a proper go struct defined in k8s libraries. Therefore we only unmarshal the sidecar as a json, rather than jsonpb.
+type sidecarJob struct {
+	PodSpec              *v1.PodSpec
+	PrimaryContainerName string
+	Annotations          map[string]string
+	Labels               map[string]string
 }
+
+var DefaultPodPlugin = plugin{}
 
 type plugin struct {
-	defaultPodBuilder podBuilder
-	podBuilders       map[string]podBuilder
 }
 
-func (plugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (
-	client.Object, error) {
+func (plugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	return flytek8s.BuildIdentityPod(), nil
 }
 
 func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
-	// read TaskTemplate
-	task, err := taskCtx.TaskReader().Read(ctx)
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification,
-			"TaskSpecification cannot be read, Err: [%v]", err.Error())
+		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
+		return nil, err
 	}
 
-	// initialize PodBuilder
-	builder, exists := p.podBuilders[task.Type]
-	if !exists {
-		builder = p.defaultPodBuilder
+	var podSpec *v1.PodSpec
+	objectMeta := &metav1.ObjectMeta{
+		Annotations: make(map[string]string),
+		Labels:      make(map[string]string),
+	}
+	primaryContainerName := ""
+
+	if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 0 {
+		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
+		sidecarJob := sidecarJob{}
+		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
+		if err != nil {
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		if sidecarJob.PodSpec == nil {
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, nil PodSpec [%v]", taskTemplate.GetCustom())
+		}
+
+		podSpec = sidecarJob.PodSpec
+
+		// get primary container name
+		primaryContainerName = sidecarJob.PrimaryContainerName
+
+		// update annotations and labels
+		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, sidecarJob.Annotations)
+		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
+	} else if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 1 {
+		// handles pod tasks that marshal the pod spec to the task custom.
+		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
+		if err != nil {
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
+				"Unable to unmarshal task custom [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		// get primary container name
+		if len(taskTemplate.GetConfig()) == 0 {
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
+				"invalid TaskSpecification, config needs to be non-empty and include missing [%s] key", flytek8s.PrimaryContainerKey)
+		}
+
+		var ok bool
+		if primaryContainerName, ok = taskTemplate.GetConfig()[flytek8s.PrimaryContainerKey]; !ok {
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
+				"invalid TaskSpecification, config missing [%s] key in [%v]", flytek8s.PrimaryContainerKey, taskTemplate.GetConfig())
+		}
+
+		// update annotations and labels
+		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().Metadata != nil {
+			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().Metadata.Annotations)
+			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().Metadata.Labels)
+		}
+	} else {
+		// handles both container / pod tasks that use the TaskTemplate Container and K8sPod fields
+		var err error
+		podSpec, objectMeta, primaryContainerName, err = flytek8s.BuildRawPod(ctx, taskCtx)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	podSpec, err := builder.buildPodSpec(ctx, task, taskCtx)
+	// update podSpec and objectMeta with Flyte customizations
+	podSpec, objectMeta, err = flytek8s.ApplyFlytePodConfiguration(ctx, taskCtx, podSpec, objectMeta, primaryContainerName)
 	if err != nil {
 		return nil, err
+	}
+
+	// set primary container name if this is executed as a sidecar
+	if taskTemplate.Type == SidecarTaskType {
+		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
 	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
-	podTemplate := flytek8s.DefaultPodTemplateStore.LoadOrDefault(taskCtx.TaskExecutionMetadata().GetNamespace())
-	primaryContainerName, err := builder.getPrimaryContainerName(task, taskCtx)
-	if err != nil {
-		return nil, err
-	}
-
-	pod, err := flytek8s.BuildPodWithSpec(podTemplate, podSpec, primaryContainerName)
-	if err != nil {
-		return nil, err
-	}
-
-	// update pod metadata
-	if err = builder.updatePodMetadata(ctx, pod, task, taskCtx); err != nil {
-		return nil, err
-	}
+	pod := flytek8s.BuildIdentityPod()
+	pod.ObjectMeta = *objectMeta
+	pod.Spec = *podSpec
 
 	return pod, nil
 }
@@ -126,7 +173,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		return pluginsCore.PhaseInfoUndefined, nil
 	}
 
-	primaryContainerName, exists := r.GetAnnotations()[PrimaryContainerKey]
+	primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
 	if !exists {
 		// if the primary container annotation dos not exist, then the task requires all containers
 		// to succeed to declare success. therefore, if the pod is not in one of the above states we
@@ -157,7 +204,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  ContainerTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType, RawContainerTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, pythonTaskType, rawContainerTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,
@@ -176,7 +223,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  podTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, PythonTaskType, RawContainerTaskType, SidecarTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, pythonTaskType, rawContainerTaskType, SidecarTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,

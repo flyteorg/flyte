@@ -335,25 +335,44 @@ func TestMergeResources_PartialResourceKeys(t *testing.T) {
 }
 
 func TestToK8sContainer(t *testing.T) {
-	taskContainer := &core.Container{
-		Image: "myimage",
-		Args: []string{
-			"arg1",
-			"arg2",
-			"arg3",
-		},
-		Command: []string{
-			"com1",
-			"com2",
-			"com3",
-		},
-		Env: []*core.KeyValuePair{
-			{
-				Key:   "k",
-				Value: "v",
+	taskTemplate := &core.TaskTemplate{
+		Type: "test",
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image: "myimage",
+				Args: []string{
+					"arg1",
+					"arg2",
+					"arg3",
+				},
+				Command: []string{
+					"com1",
+					"com2",
+					"com3",
+				},
+				Env: []*core.KeyValuePair{
+					{
+						Key:   "k",
+						Value: "v",
+					},
+				},
 			},
 		},
 	}
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
+
+	inputReader := &mocks2.InputReader{}
+	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+
+	outputWriter := &mocks2.OutputWriter{}
+	outputWriter.OnGetOutputPrefixPath().Return("")
+	outputWriter.OnGetRawOutputPrefix().Return("")
+	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskOverrides := mocks.TaskOverrides{}
@@ -364,12 +383,16 @@ func TestToK8sContainer(t *testing.T) {
 	})
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockTaskOverrides)
 	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{})
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
 	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
+	mockTaskExecMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
-	templateParameters := template.Parameters{
-		TaskExecMetadata: &mockTaskExecMetadata,
-	}
+	tCtx := &mocks.TaskExecutionContext{}
+	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
+	tCtx.OnInputReader().Return(inputReader)
+	tCtx.OnTaskReader().Return(taskReader)
+	tCtx.OnOutputWriter().Return(outputWriter)
 
 	cfg := config.GetK8sPluginConfig()
 	allow := false
@@ -378,7 +401,7 @@ func TestToK8sContainer(t *testing.T) {
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(cfg))
 
-	container, err := ToK8sContainer(context.TODO(), taskContainer, nil, templateParameters)
+	container, err := ToK8sContainer(context.TODO(), tCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, container.Image, "myimage")
 	assert.EqualValues(t, []string{

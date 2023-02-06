@@ -9,25 +9,24 @@ import (
 	"testing"
 	"time"
 
-	config1 "github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/viper"
-
-	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+
+	config1 "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements) pluginsCore.TaskExecutionMetadata {
@@ -35,7 +34,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements) pluginsCore.
 	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
 	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
 	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.On("GetOwnerReference").Return(metaV1.OwnerReference{
+	taskExecutionMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
@@ -325,7 +324,7 @@ func toK8sPodInterruptible(t *testing.T) {
 		},
 	})
 
-	p, err := ToK8sPodSpec(ctx, x)
+	p, _, err := ToK8sPodSpec(ctx, x)
 	assert.NoError(t, err)
 	assert.Len(t, p.Tolerations, 2)
 	assert.Equal(t, "x/flyte", p.Tolerations[1].Key)
@@ -392,7 +391,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 1)
 	})
@@ -409,7 +408,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 0)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
@@ -436,7 +435,7 @@ func TestToK8sPod(t *testing.T) {
 			DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		}))
 
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(p.NodeSelector))
 		assert.Equal(t, "myScheduler", p.SchedulerName)
@@ -453,7 +452,7 @@ func TestToK8sPod(t *testing.T) {
 		}))
 
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.SecurityContext)
 		assert.Equal(t, *p.SecurityContext.RunAsGroup, v)
@@ -465,7 +464,7 @@ func TestToK8sPod(t *testing.T) {
 			EnableHostNetworkingPod: &enabled,
 		}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.True(t, p.HostNetwork)
 	})
@@ -476,7 +475,7 @@ func TestToK8sPod(t *testing.T) {
 			EnableHostNetworkingPod: &enabled,
 		}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
 	})
@@ -484,7 +483,7 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("skipSettingHostNetwork", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
 	})
@@ -518,7 +517,7 @@ func TestToK8sPod(t *testing.T) {
 		}))
 
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, err := ToK8sPodSpec(ctx, x)
+		p, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.DNSConfig)
 		assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, p.DNSConfig.Nameservers)
@@ -756,7 +755,7 @@ func TestDemystifyPending(t *testing.T) {
 
 	t.Run("CreateContainerErrorWithinGracePeriod", func(t *testing.T) {
 		s2 := *s.DeepCopy()
-		s2.Conditions[0].LastTransitionTime = metaV1.Now()
+		s2.Conditions[0].LastTransitionTime = metav1.Now()
 		s2.ContainerStatuses = []v1.ContainerStatus{
 			{
 				Ready: false,
@@ -775,7 +774,7 @@ func TestDemystifyPending(t *testing.T) {
 
 	t.Run("CreateContainerErrorOutsideGracePeriod", func(t *testing.T) {
 		s2 := *s.DeepCopy()
-		s2.Conditions[0].LastTransitionTime.Time = metaV1.Now().Add(-config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration)
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration)
 		s2.ContainerStatuses = []v1.ContainerStatus{
 			{
 				Ready: false,
@@ -968,7 +967,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
 					Running: &v1.ContainerStateRunning{
-						StartedAt: metaV1.Now(),
+						StartedAt: metav1.Now(),
 					},
 				},
 			},
@@ -1014,16 +1013,232 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 	})
 }
 
+func TestGetPodTemplate(t *testing.T) {
+	ctx := context.TODO()
+
+	podTemplate := v1.PodTemplate{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "foo",
+			Namespace: "bar",
+		},
+	}
+
+	t.Run("PodTemplateDoesNotExist", func(t *testing.T) {
+		// initialize TaskExecutionContext
+		task := &core.TaskTemplate{
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		// initialize PodTemplateStore
+		store := NewPodTemplateStore()
+		store.SetDefaultNamespace(podTemplate.Namespace)
+
+		// validate base PodTemplate
+		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		assert.Nil(t, err)
+		assert.Nil(t, basePodTemplate)
+	})
+
+	t.Run("PodTemplateFromTaskTemplateNameExists", func(t *testing.T) {
+		// initialize TaskExecutionContext
+		task := &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				PodTemplateName: "foo",
+			},
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		// initialize PodTemplateStore
+		store := NewPodTemplateStore()
+		store.SetDefaultNamespace(podTemplate.Namespace)
+		store.Store(&podTemplate)
+
+		// validate base PodTemplate
+		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		assert.Nil(t, err)
+		assert.True(t, reflect.DeepEqual(podTemplate, *basePodTemplate))
+	})
+
+	t.Run("PodTemplateFromTaskTemplateNameDoesNotExist", func(t *testing.T) {
+		// initialize TaskExecutionContext
+		task := &core.TaskTemplate{
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				PodTemplateName: "foo",
+			},
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		// initialize PodTemplateStore
+		store := NewPodTemplateStore()
+		store.SetDefaultNamespace(podTemplate.Namespace)
+
+		// validate base PodTemplate
+		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		assert.NotNil(t, err)
+		assert.Nil(t, basePodTemplate)
+	})
+
+	t.Run("PodTemplateFromDefaultPodTemplate", func(t *testing.T) {
+		// set default PodTemplate name configuration
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			DefaultPodTemplateName: "foo",
+		}))
+
+		// initialize TaskExecutionContext
+		task := &core.TaskTemplate{
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		// initialize PodTemplateStore
+		store := NewPodTemplateStore()
+		store.SetDefaultNamespace(podTemplate.Namespace)
+		store.Store(&podTemplate)
+
+		// validate base PodTemplate
+		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		assert.Nil(t, err)
+		assert.True(t, reflect.DeepEqual(podTemplate, *basePodTemplate))
+	})
+}
+
+func TestMergeWithBasePodTemplate(t *testing.T) {
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Name: "foo",
+			},
+			v1.Container{
+				Name: "bar",
+			},
+		},
+	}
+
+	objectMeta := metav1.ObjectMeta{
+		Labels: map[string]string{
+			"fooKey": "barValue",
+		},
+	}
+
+	t.Run("BasePodTemplateDoesNotExist", func(t *testing.T) {
+		task := &core.TaskTemplate{
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		assert.Nil(t, err)
+		assert.True(t, reflect.DeepEqual(podSpec, *resultPodSpec))
+		assert.True(t, reflect.DeepEqual(objectMeta, *resultObjectMeta))
+	})
+
+	t.Run("BasePodTemplateExists", func(t *testing.T) {
+		primaryContainerTemplate := v1.Container{
+			Name:                   primaryContainerTemplateName,
+			TerminationMessagePath: "/dev/primary-termination-log",
+		}
+
+		podTemplate := v1.PodTemplate{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "fooTemplate",
+				Namespace: "test-namespace",
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"fooKey": "bazValue",
+						"barKey": "bazValue",
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						primaryContainerTemplate,
+					},
+				},
+			},
+		}
+
+		DefaultPodTemplateStore.Store(&podTemplate)
+
+		task := &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				PodTemplateName: "fooTemplate",
+			},
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Command: []string{"command"},
+					Args:    []string{"{{.Input}}"},
+				},
+			},
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		tCtx := &pluginsCoreMock.TaskExecutionContext{}
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}))
+		tCtx.OnTaskReader().Return(taskReader)
+
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		assert.Nil(t, err)
+
+		// test that template podSpec is merged
+		primaryContainer := resultPodSpec.Containers[0]
+		assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
+		assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+
+		// test that template object metadata is copied
+		assert.Contains(t, resultObjectMeta.Labels, "fooKey")
+		assert.Equal(t, resultObjectMeta.Labels["fooKey"], "barValue")
+		assert.Contains(t, resultObjectMeta.Labels, "barKey")
+		assert.Equal(t, resultObjectMeta.Labels["barKey"], "bazValue")
+	})
+}
+
 func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
 
-	podSpec1, _ := MergePodSpecs(nil, nil, "foo")
+	podSpec1, _ := mergePodSpecs(nil, nil, "foo")
 	assert.Nil(t, podSpec1)
 
-	podSpec2, _ := MergePodSpecs(&v1.PodSpec{}, nil, "foo")
+	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo")
 	assert.Nil(t, podSpec2)
 
-	podSpec3, _ := MergePodSpecs(nil, &v1.PodSpec{}, "foo")
+	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo")
 	assert.Nil(t, podSpec3)
 
 	podSpec := v1.PodSpec{
@@ -1077,7 +1292,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := MergePodSpecs(&podTemplateSpec, &podSpec, "foo")
+	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "foo")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -1100,54 +1315,4 @@ func TestMergePodSpecs(t *testing.T) {
 	defaultContainer := mergedPodSpec.Containers[1]
 	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
 	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
-
-}
-
-func TestBuildPodWithSpec(t *testing.T) {
-	podSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			v1.Container{
-				Name: "foo",
-			},
-			v1.Container{
-				Name: "bar",
-			},
-		},
-	}
-
-	pod, err := BuildPodWithSpec(nil, &podSpec, "foo")
-	assert.Nil(t, err)
-	assert.True(t, reflect.DeepEqual(pod.Spec, podSpec))
-
-	primaryContainerTemplate := v1.Container{
-		Name:                   primaryContainerTemplateName,
-		TerminationMessagePath: "/dev/primary-termination-log",
-	}
-
-	podTemplate := v1.PodTemplate{
-		Template: v1.PodTemplateSpec{
-			ObjectMeta: metav1.ObjectMeta{
-				Labels: map[string]string{
-					"fooKey": "barVal",
-				},
-			},
-			Spec: v1.PodSpec{
-				Containers: []v1.Container{
-					primaryContainerTemplate,
-				},
-			},
-		},
-	}
-
-	pod, err = BuildPodWithSpec(&podTemplate, &podSpec, "foo")
-	assert.Nil(t, err)
-
-	// Test that template podSpec is merged
-	primaryContainer := pod.Spec.Containers[0]
-	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
-	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
-
-	// Test that template object metadata is copied
-	assert.Contains(t, pod.ObjectMeta.Labels, "fooKey")
-	assert.Equal(t, pod.ObjectMeta.Labels["fooKey"], "barVal")
 }

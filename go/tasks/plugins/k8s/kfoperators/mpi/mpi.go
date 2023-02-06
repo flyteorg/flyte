@@ -62,25 +62,11 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
 	slots := mpiTaskExtraArgs.GetSlots()
 
-	podSpec, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	podSpec, objectMeta, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
-
 	common.OverrideDefaultContainerName(taskCtx, podSpec, kubeflowv1.MPIJobDefaultContainerName)
-
-	podTemplate := flytek8s.DefaultPodTemplateStore.LoadOrDefault(taskCtx.TaskExecutionMetadata().GetNamespace())
-
-	objectMeta := metav1.ObjectMeta{}
-
-	if podTemplate != nil {
-		mergedPodSpec, err := flytek8s.MergePodSpecs(&podTemplate.Template.Spec, podSpec, kubeflowv1.MPIJobDefaultContainerName)
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to merge default pod template: [%v]", err.Error())
-		}
-		podSpec = mergedPodSpec
-		objectMeta = podTemplate.Template.ObjectMeta
-	}
 
 	// workersPodSpec is deepCopy of podSpec submitted by flyte
 	// WorkerPodSpec doesn't need any Argument & command. It will be trigger from launcher pod
@@ -115,7 +101,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			jobSpec.MPIReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
 				Replicas: t.replicaNum,
 				Template: v1.PodTemplateSpec{
-					ObjectMeta: objectMeta,
+					ObjectMeta: *objectMeta,
 					Spec:       t.podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,

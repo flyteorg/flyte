@@ -40,7 +40,7 @@ func TestPodTemplateStore(t *testing.T) {
 	kubeClient := fake.NewSimpleClientset()
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(kubeClient, 30*time.Second)
 
-	updateHandler := GetPodTemplateUpdatesHandler(&store, podTemplate.Name)
+	updateHandler := GetPodTemplateUpdatesHandler(&store)
 	informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(updateHandler)
 	go informerFactory.Start(ctx.Done())
 
@@ -49,7 +49,7 @@ func TestPodTemplateStore(t *testing.T) {
 	assert.NoError(t, err)
 
 	time.Sleep(50 * time.Millisecond)
-	createPodTemplate := store.LoadOrDefault(podTemplate.Namespace)
+	createPodTemplate := store.LoadOrDefault(podTemplate.Namespace, podTemplate.Name)
 	assert.NotNil(t, createPodTemplate)
 	assert.True(t, reflect.DeepEqual(podTemplate, createPodTemplate))
 
@@ -57,16 +57,23 @@ func TestPodTemplateStore(t *testing.T) {
 	newNamespacePodTemplate := podTemplate.DeepCopy()
 	newNamespacePodTemplate.Namespace = "foo"
 
-	nonDefaultPodTemplate := store.LoadOrDefault(newNamespacePodTemplate.Namespace)
-	assert.NotNil(t, nonDefaultPodTemplate)
-	assert.True(t, reflect.DeepEqual(podTemplate, nonDefaultPodTemplate))
+	nonDefaultNamespacePodTemplate := store.LoadOrDefault(newNamespacePodTemplate.Namespace, newNamespacePodTemplate.Name)
+	assert.NotNil(t, nonDefaultNamespacePodTemplate)
+	assert.True(t, reflect.DeepEqual(podTemplate, nonDefaultNamespacePodTemplate))
+
+	// non-default name podTemplate does not exist
+	newNamePodTemplate := podTemplate.DeepCopy()
+	newNamePodTemplate.Name = "foo"
+
+	nonDefaultNamePodTemplate := store.LoadOrDefault(newNamePodTemplate.Namespace, newNamePodTemplate.Name)
+	assert.Nil(t, nonDefaultNamePodTemplate)
 
 	// non-default namespace podTemplate exists
 	_, err = kubeClient.CoreV1().PodTemplates(newNamespacePodTemplate.Namespace).Create(ctx, newNamespacePodTemplate, metav1.CreateOptions{})
 	assert.NoError(t, err)
 
 	time.Sleep(50 * time.Millisecond)
-	createNewNamespacePodTemplate := store.LoadOrDefault(newNamespacePodTemplate.Namespace)
+	createNewNamespacePodTemplate := store.LoadOrDefault(newNamespacePodTemplate.Namespace, newNamespacePodTemplate.Name)
 	assert.NotNil(t, createNewNamespacePodTemplate)
 	assert.True(t, reflect.DeepEqual(newNamespacePodTemplate, createNewNamespacePodTemplate))
 
@@ -77,7 +84,7 @@ func TestPodTemplateStore(t *testing.T) {
 	assert.NoError(t, err)
 
 	time.Sleep(50 * time.Millisecond)
-	updatePodTemplate := store.LoadOrDefault(podTemplate.Namespace)
+	updatePodTemplate := store.LoadOrDefault(podTemplate.Namespace, podTemplate.Name)
 	assert.NotNil(t, updatePodTemplate)
 	assert.True(t, reflect.DeepEqual(updatedPodTemplate, updatePodTemplate))
 
@@ -86,6 +93,6 @@ func TestPodTemplateStore(t *testing.T) {
 	assert.NoError(t, err)
 
 	time.Sleep(50 * time.Millisecond)
-	deletePodTemplate := store.LoadOrDefault(podTemplate.Namespace)
+	deletePodTemplate := store.LoadOrDefault(podTemplate.Namespace, podTemplate.Name)
 	assert.Nil(t, deletePodTemplate)
 }
