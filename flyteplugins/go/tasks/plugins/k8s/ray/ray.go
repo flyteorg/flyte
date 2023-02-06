@@ -7,9 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
@@ -58,24 +55,9 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		return nil, errors.Errorf(errors.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
 
-	if taskTemplate.GetContainer() == nil {
-		logger.Errorf(ctx, "Default Pod creation logic works for default container in the task template only.")
-		return nil, fmt.Errorf("container not specified in task template")
-	}
-
-	templateParameters := template.Parameters{
-		Task:             taskCtx.TaskReader(),
-		Inputs:           taskCtx.InputReader(),
-		OutputPath:       taskCtx.OutputWriter(),
-		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
-	}
-	container, err := flytek8s.ToK8sContainer(ctx, taskTemplate.GetContainer(), taskTemplate.Interface, templateParameters)
+	container, err := flytek8s.ToK8sContainer(ctx, taskCtx)
 	if err != nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "Unable to create container spec: [%v]", err.Error())
-	}
-	err = flytek8s.AddFlyteCustomizationsToContainer(ctx, templateParameters, flytek8s.ResourceCustomizationModeAssignResources, container)
-	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification, "Unable to update container resource and command: [%v]", err.Error())
 	}
 
 	headReplicas := int32(1)

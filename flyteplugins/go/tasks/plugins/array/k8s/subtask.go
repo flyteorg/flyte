@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
@@ -323,7 +324,7 @@ func getSubtaskPhaseInfo(ctx context.Context, stCtx SubTaskExecutionContext, cfg
 
 // getTaskContainerIndex returns the index of the primary container in a k8s pod.
 func getTaskContainerIndex(pod *v1.Pod) (int, error) {
-	primaryContainerName, ok := pod.Annotations[podPlugin.PrimaryContainerKey]
+	primaryContainerName, ok := pod.Annotations[flytek8s.PrimaryContainerKey]
 	// For tasks with a Container target, we only ever build one container as part of the pod
 	if !ok {
 		if len(pod.Spec.Containers) == 1 {

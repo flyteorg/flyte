@@ -3,18 +3,19 @@ package flytek8s
 import (
 	"context"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginscore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+
 	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"k8s.io/apimachinery/pkg/util/validation"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/rand"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 const resourceGPU = "gpu"
@@ -193,22 +194,16 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	return resources
 }
 
-// ToK8sContainer transforms a task template target of type core.Container into a bare-bones kubernetes container, which
-// can be further modified with flyte-specific customizations specified by various static and run-time attributes.
-func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *core.TypedInterface, parameters template.Parameters) (*v1.Container, error) {
-	// Perform preliminary validations
-	if parameters.TaskExecMetadata.GetOverrides() == nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification, "platform/compiler error, overrides not set for task")
-	}
-	if parameters.TaskExecMetadata.GetOverrides() == nil || parameters.TaskExecMetadata.GetOverrides().GetResources() == nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification, "resource requirements not found for container task, required!")
-	}
+// BuildRawContainer constructs a Container based on the definition passed by the taskContainer and
+// TaskExecutionMetadata.
+func BuildRawContainer(ctx context.Context, taskContainer *core.Container, taskExecMetadata pluginscore.TaskExecutionMetadata) (*v1.Container, error) {
 	// Make the container name the same as the pod name, unless it violates K8s naming conventions
 	// Container names are subject to the DNS-1123 standard
-	containerName := parameters.TaskExecMetadata.GetTaskExecutionID().GetGeneratedName()
+	containerName := taskExecMetadata.GetTaskExecutionID().GetGeneratedName()
 	if errs := validation.IsDNS1123Label(containerName); len(errs) > 0 {
 		containerName = rand.String(4)
 	}
+
 	container := &v1.Container{
 		Name:                     containerName,
 		Image:                    taskContainer.GetImage(),
@@ -217,12 +212,49 @@ func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *c
 		Env:                      ToK8sEnvVar(taskContainer.GetEnv()),
 		TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 	}
-	if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot, container, iFace, taskContainer.DataConfig); err != nil {
+
+	return container, nil
+}
+
+// ToK8sContainer builds a Container based on the definition passed by the TaskExecutionContext. This involves applying
+// all Flyte configuration including k8s plugins and resource requests.
+func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) (*v1.Container, error) {
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Warnf(ctx, "failed to read task information when trying to construct container, err: %s", err.Error())
 		return nil, err
 	}
+
+	// validate arguments
+	if taskTemplate.GetContainer() == nil {
+		return nil, errors.Errorf(errors.BadTaskSpecification, "unable to create container with no definition in TaskTemplate")
+	}
+	if tCtx.TaskExecutionMetadata().GetOverrides() == nil || tCtx.TaskExecutionMetadata().GetOverrides().GetResources() == nil {
+		return nil, errors.Errorf(errors.BadTaskSpecification, "resource requirements not found for container task, required!")
+	}
+
+	// build raw container
+	container, err := BuildRawContainer(ctx, taskTemplate.GetContainer(), tCtx.TaskExecutionMetadata())
+	if err != nil {
+		return nil, err
+	}
+
 	if container.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
 		container.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
 	}
+
+	// add flyte resource customizations to the container
+	templateParameters := template.Parameters{
+		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:           tCtx.InputReader(),
+		OutputPath:       tCtx.OutputWriter(),
+		Task:             tCtx.TaskReader(),
+	}
+
+	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeAssignResources, container); err != nil {
+		return nil, err
+	}
+
 	return container, nil
 }
 

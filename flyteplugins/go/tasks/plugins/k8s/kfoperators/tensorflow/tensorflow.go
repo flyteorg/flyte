@@ -62,25 +62,11 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 	}
 
-	podSpec, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	podSpec, objectMeta, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
-
 	common.OverrideDefaultContainerName(taskCtx, podSpec, kubeflowv1.TFJobDefaultContainerName)
-
-	podTemplate := flytek8s.DefaultPodTemplateStore.LoadOrDefault(taskCtx.TaskExecutionMetadata().GetNamespace())
-
-	objectMeta := metav1.ObjectMeta{}
-
-	if podTemplate != nil {
-		mergedPodSpec, err := flytek8s.MergePodSpecs(&podTemplate.Template.Spec, podSpec, kubeflowv1.TFJobDefaultContainerName)
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to merge default pod template: [%v]", err.Error())
-		}
-		podSpec = mergedPodSpec
-		objectMeta = podTemplate.Template.ObjectMeta
-	}
 
 	workers := tensorflowTaskExtraArgs.GetWorkers()
 	psReplicas := tensorflowTaskExtraArgs.GetPsReplicas()
@@ -110,7 +96,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			jobSpec.TFReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
 				Replicas: t.replicaNum,
 				Template: v1.PodTemplateSpec{
-					ObjectMeta: objectMeta,
+					ObjectMeta: *objectMeta,
 					Spec:       t.podSpec,
 				},
 				RestartPolicy: commonOp.RestartPolicyNever,
