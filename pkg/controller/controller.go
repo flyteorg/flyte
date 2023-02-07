@@ -131,7 +131,7 @@ func (c *Controller) run(ctx context.Context) error {
 }
 
 // Called from leader elector -if configured- to start running as the leader.
-func (c *Controller) onStartedLeading(ctx context.Context) {
+func (c *Controller) onStartedLeading(_ context.Context) {
 	ctx, cancelNow := context.WithCancel(context.Background())
 	logger.Infof(ctx, "Acquired leader lease.")
 	go func() {
@@ -460,7 +460,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	// Set up an event handler for when FlyteWorkflow resources change
 	flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
 
-	updateHandler := flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateName)
+	updateHandler := flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore)
 	podTemplateInformer.Informer().AddEventHandler(updateHandler)
 	return controller, nil
 }

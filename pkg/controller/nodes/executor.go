@@ -6,14 +6,14 @@
 // to the respective node handlers
 //
 // Available node handlers are
-// - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
-//         is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
-//          is purely a meta-workflow and can run other workflows
-// - SubWorkflow: This is one of the most important handlers. It can execute Workflows that are nested inside a workflow
-// - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
-//                        file. Every Task is actually executed through the DynamicTaskHandler
-// - Branch Handler: This handler is used to execute branches
-// - Start & End Node handler: these are nominal handlers for the start and end node and do no really carry a lot of logic
+//   - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
+//     is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
+//     is purely a meta-workflow and can run other workflows
+//   - SubWorkflow: This is one of the most important handlers. It can execute Workflows that are nested inside a workflow
+//   - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
+//     file. Every Task is actually executed through the DynamicTaskHandler
+//   - Branch Handler: This handler is used to execute branches
+//   - Start & End Node handler: these are nominal handlers for the start and end node and do no really carry a lot of logic
 package nodes
 
 import (

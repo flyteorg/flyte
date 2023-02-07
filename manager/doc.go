@@ -16,7 +16,7 @@ FlytePropeller Manager is configured at the root of the FlytePropeller configurt
 
 FlytePropeller Manager handles dynamic updates to both the k8s PodTemplate and shard configuration. The k8s PodTemplate resource has an associated resource version which uniquely identifies changes. Additionally, shard configuration modifications may be tracked using a simple hash. Flyte stores these values as annotations on managed FlytePropeller instances. Therefore, if either of there values change the FlytePropeller Manager instance will detect it and perform the necessary deployment updates.
 
-Shard Strategies
+# Shard Strategies
 
 Flyte defines a variety of Shard Strategies for configuring how FlyteWorkflows are sharded. These options may include the shard type (ex. hash, project, or domain) along with the number of shards or the distribution of project / domain IDs over shards.
 

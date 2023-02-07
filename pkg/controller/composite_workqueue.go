@@ -14,10 +14,10 @@ import (
 )
 
 // A CompositeWorkQueue can be used in cases where the work is enqueued by two sources. It can be enqueued by either
-// 1. Informer for the Primary Object itself. In case of FlytePropeller, this is the workflow object
-// 2. Informer or any other process that enqueues the top-level object for re-evaluation in response to one of the
-//    sub-objects being ready. In the case of FlytePropeller this is the "Node/Task" updates, will re-enqueue the workflow
-//    to be re-evaluated
+//  1. Informer for the Primary Object itself. In case of FlytePropeller, this is the workflow object
+//  2. Informer or any other process that enqueues the top-level object for re-evaluation in response to one of the
+//     sub-objects being ready. In the case of FlytePropeller this is the "Node/Task" updates, will re-enqueue the workflow
+//     to be re-evaluated
 type CompositeWorkQueue interface {
 	workqueue.RateLimitingInterface
 	// Specialized interface that should be called to start the migration of work from SubQueue to primaryQueue
