@@ -37,18 +37,20 @@ type ResourceRegistrar interface {
 
 // ResourceManager Interface
 // 1. Terms and definitions
+//
 //   - Resource: resource is an abstraction of anything that has a limited quota of units and can be claimed in a
 //     single unit or multiple units at once. At Flyte's current state, a resource means a logical
 //     separation (e.g., a cluster) of an external service that allows a limited number of outstanding
 //     requests to be sent to.
+//
 //   - Token: Flyte uses a token to serve as the placeholder to represent a unit of resource. Flyte resource manager
 //     manages resources by managing the tokens of the resources.
 //
-//  2. Description
+//     2. Description
 //     ResourceManager provides a task-type-specific pooling system for Flyte Tasks. Plugin writers can optionally
 //     request for resources in their tasks, in single quantity.
 //
-//  3. Usage
+//     3. Usage
 //     A Flyte plugin registers the resources and the desired quota of each resource with ResourceRegistrar at the
 //     setup time of Flyte Propeller. At the end of the setup time, Flyte Propeller builds a ResourceManager based on
 //     these registration requests.
@@ -63,7 +65,7 @@ type ResourceRegistrar interface {
 //     the resource manager to release the token by calling ResourceManager's ReleaseResource(), and the token will be
 //     erased from the corresponding pool.
 //
-//  4. Example
+//     4. Example
 //     Flyte has a built-on Qubole plugin that allows Flyte tasks to send out Hive commands to Qubole.
 //     In the plugin, a single Qubole cluster is a resource, and sending out a single Hive command to a Qubole cluster consumes
 //     a token of the corresponding resource. The resource allocation is achieved by the Qubole plugin calling
