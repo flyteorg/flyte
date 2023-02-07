@@ -1,11 +1,11 @@
 module github.com/flyteorg/datacatalog
 
-go 1.18
+go 1.19
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7
-	github.com/flyteorg/flyteidl v1.2.3
-	github.com/flyteorg/flytestdlib v1.0.11
+	github.com/flyteorg/flyteidl v1.3.6
+	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/golang/glog v1.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/jackc/pgconn v1.10.1
