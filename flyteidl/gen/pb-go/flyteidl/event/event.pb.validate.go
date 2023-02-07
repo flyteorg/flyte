@@ -206,8 +206,6 @@ func (m *NodeExecutionEvent) Validate() error {
 		}
 	}
 
-	// no validation rules for InputUri
-
 	if v, ok := interface{}(m.GetParentTaskMetadata()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return NodeExecutionEventValidationError{
@@ -241,6 +239,25 @@ func (m *NodeExecutionEvent) Validate() error {
 	// no validation rules for IsDynamic
 
 	// no validation rules for DeckUri
+
+	switch m.InputValue.(type) {
+
+	case *NodeExecutionEvent_InputUri:
+		// no validation rules for InputUri
+
+	case *NodeExecutionEvent_InputData:
+
+		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "InputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	switch m.OutputResult.(type) {
 
@@ -823,8 +840,6 @@ func (m *TaskExecutionEvent) Validate() error {
 		}
 	}
 
-	// no validation rules for InputUri
-
 	if v, ok := interface{}(m.GetCustomInfo()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TaskExecutionEventValidationError{
@@ -852,6 +867,25 @@ func (m *TaskExecutionEvent) Validate() error {
 	}
 
 	// no validation rules for EventVersion
+
+	switch m.InputValue.(type) {
+
+	case *TaskExecutionEvent_InputUri:
+		// no validation rules for InputUri
+
+	case *TaskExecutionEvent_InputData:
+
+		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  "InputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	switch m.OutputResult.(type) {
 

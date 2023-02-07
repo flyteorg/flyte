@@ -45,6 +45,7 @@ class EventNodeExecutionEvent(object):
         'phase': 'CoreNodeExecutionPhase',
         'occurred_at': 'datetime',
         'input_uri': 'str',
+        'input_data': 'CoreLiteralMap',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'output_data': 'CoreLiteralMap',
@@ -67,6 +68,7 @@ class EventNodeExecutionEvent(object):
         'phase': 'phase',
         'occurred_at': 'occurred_at',
         'input_uri': 'input_uri',
+        'input_data': 'input_data',
         'output_uri': 'output_uri',
         'error': 'error',
         'output_data': 'output_data',
@@ -83,7 +85,7 @@ class EventNodeExecutionEvent(object):
         'deck_uri': 'deck_uri'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -91,6 +93,7 @@ class EventNodeExecutionEvent(object):
         self._phase = None
         self._occurred_at = None
         self._input_uri = None
+        self._input_data = None
         self._output_uri = None
         self._error = None
         self._output_data = None
@@ -117,6 +120,8 @@ class EventNodeExecutionEvent(object):
             self.occurred_at = occurred_at
         if input_uri is not None:
             self.input_uri = input_uri
+        if input_data is not None:
+            self.input_data = input_data
         if output_uri is not None:
             self.output_uri = output_uri
         if error is not None:
@@ -252,6 +257,29 @@ class EventNodeExecutionEvent(object):
         """
 
         self._input_uri = input_uri
+
+    @property
+    def input_data(self):
+        """Gets the input_data of this EventNodeExecutionEvent.  # noqa: E501
+
+        Raw input data consumed by this node execution.  # noqa: E501
+
+        :return: The input_data of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._input_data
+
+    @input_data.setter
+    def input_data(self, input_data):
+        """Sets the input_data of this EventNodeExecutionEvent.
+
+        Raw input data consumed by this node execution.  # noqa: E501
+
+        :param input_data: The input_data of this EventNodeExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._input_data = input_data
 
     @property
     def output_uri(self):

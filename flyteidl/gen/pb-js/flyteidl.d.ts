@@ -6540,6 +6540,9 @@ export namespace flyteidl {
             /** NodeExecutionEvent inputUri */
             inputUri?: (string|null);
 
+            /** NodeExecutionEvent inputData */
+            inputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent outputUri */
             outputUri?: (string|null);
 
@@ -6607,6 +6610,9 @@ export namespace flyteidl {
             /** NodeExecutionEvent inputUri. */
             public inputUri: string;
 
+            /** NodeExecutionEvent inputData. */
+            public inputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent outputUri. */
             public outputUri: string;
 
@@ -6648,6 +6654,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent deckUri. */
             public deckUri: string;
+
+            /** NodeExecutionEvent inputValue. */
+            public inputValue?: ("inputUri"|"inputData");
 
             /** NodeExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");
@@ -7005,6 +7014,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent inputUri */
             inputUri?: (string|null);
 
+            /** TaskExecutionEvent inputData */
+            inputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent outputUri */
             outputUri?: (string|null);
 
@@ -7066,6 +7078,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent inputUri. */
             public inputUri: string;
 
+            /** TaskExecutionEvent inputData. */
+            public inputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent outputUri. */
             public outputUri: string;
 
@@ -7092,6 +7107,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent eventVersion. */
             public eventVersion: number;
+
+            /** TaskExecutionEvent inputValue. */
+            public inputValue?: ("inputUri"|"inputData");
 
             /** TaskExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");

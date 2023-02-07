@@ -7115,6 +7115,10 @@
         "input_uri": {
           "type": "string"
         },
+        "input_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw input data consumed by this node execution."
+        },
         "output_uri": {
           "type": "string",
           "description": "URL to the output of the execution, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
@@ -7243,6 +7247,10 @@
         "input_uri": {
           "type": "string",
           "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw input data consumed by this task execution."
         },
         "output_uri": {
           "type": "string",

@@ -15682,6 +15682,7 @@
                  * @property {flyteidl.core.NodeExecution.Phase|null} [phase] NodeExecutionEvent phase
                  * @property {google.protobuf.ITimestamp|null} [occurredAt] NodeExecutionEvent occurredAt
                  * @property {string|null} [inputUri] NodeExecutionEvent inputUri
+                 * @property {flyteidl.core.ILiteralMap|null} [inputData] NodeExecutionEvent inputData
                  * @property {string|null} [outputUri] NodeExecutionEvent outputUri
                  * @property {flyteidl.core.IExecutionError|null} [error] NodeExecutionEvent error
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] NodeExecutionEvent outputData
@@ -15752,6 +15753,14 @@
                  * @instance
                  */
                 NodeExecutionEvent.prototype.inputUri = "";
+    
+                /**
+                 * NodeExecutionEvent inputData.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputData
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.inputData = null;
     
                 /**
                  * NodeExecutionEvent outputUri.
@@ -15869,6 +15878,17 @@
                 var $oneOfFields;
     
                 /**
+                 * NodeExecutionEvent inputValue.
+                 * @member {"inputUri"|"inputData"|undefined} inputValue
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                Object.defineProperty(NodeExecutionEvent.prototype, "inputValue", {
+                    get: $util.oneOfGetter($oneOfFields = ["inputUri", "inputData"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
                  * NodeExecutionEvent outputResult.
                  * @member {"outputUri"|"error"|"outputData"|undefined} outputResult
                  * @memberof flyteidl.event.NodeExecutionEvent
@@ -15952,6 +15972,8 @@
                         writer.uint32(/* id 18, wireType 0 =*/144).bool(message.isDynamic);
                     if (message.deckUri != null && message.hasOwnProperty("deckUri"))
                         writer.uint32(/* id 19, wireType 2 =*/154).string(message.deckUri);
+                    if (message.inputData != null && message.hasOwnProperty("inputData"))
+                        $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
                     return writer;
                 };
     
@@ -15987,6 +16009,9 @@
                             break;
                         case 5:
                             message.inputUri = reader.string();
+                            break;
+                        case 20:
+                            message.inputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
                         case 6:
                             message.outputUri = reader.string();
@@ -16080,9 +16105,21 @@
                         if (error)
                             return "occurredAt." + error;
                     }
-                    if (message.inputUri != null && message.hasOwnProperty("inputUri"))
+                    if (message.inputUri != null && message.hasOwnProperty("inputUri")) {
+                        properties.inputValue = 1;
                         if (!$util.isString(message.inputUri))
                             return "inputUri: string expected";
+                    }
+                    if (message.inputData != null && message.hasOwnProperty("inputData")) {
+                        if (properties.inputValue === 1)
+                            return "inputValue: multiple values";
+                        properties.inputValue = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralMap.verify(message.inputData);
+                            if (error)
+                                return "inputData." + error;
+                        }
+                    }
                     if (message.outputUri != null && message.hasOwnProperty("outputUri")) {
                         properties.outputResult = 1;
                         if (!$util.isString(message.outputUri))
@@ -16842,6 +16879,7 @@
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] TaskExecutionEvent logs
                  * @property {google.protobuf.ITimestamp|null} [occurredAt] TaskExecutionEvent occurredAt
                  * @property {string|null} [inputUri] TaskExecutionEvent inputUri
+                 * @property {flyteidl.core.ILiteralMap|null} [inputData] TaskExecutionEvent inputData
                  * @property {string|null} [outputUri] TaskExecutionEvent outputUri
                  * @property {flyteidl.core.IExecutionError|null} [error] TaskExecutionEvent error
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] TaskExecutionEvent outputData
@@ -16934,6 +16972,14 @@
                 TaskExecutionEvent.prototype.inputUri = "";
     
                 /**
+                 * TaskExecutionEvent inputData.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputData
+                 * @memberof flyteidl.event.TaskExecutionEvent
+                 * @instance
+                 */
+                TaskExecutionEvent.prototype.inputData = null;
+    
+                /**
                  * TaskExecutionEvent outputUri.
                  * @member {string} outputUri
                  * @memberof flyteidl.event.TaskExecutionEvent
@@ -17009,6 +17055,17 @@
                 var $oneOfFields;
     
                 /**
+                 * TaskExecutionEvent inputValue.
+                 * @member {"inputUri"|"inputData"|undefined} inputValue
+                 * @memberof flyteidl.event.TaskExecutionEvent
+                 * @instance
+                 */
+                Object.defineProperty(TaskExecutionEvent.prototype, "inputValue", {
+                    get: $util.oneOfGetter($oneOfFields = ["inputUri", "inputData"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
                  * TaskExecutionEvent outputResult.
                  * @member {"outputUri"|"error"|"outputData"|undefined} outputResult
                  * @memberof flyteidl.event.TaskExecutionEvent
@@ -17078,6 +17135,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                     if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
                         writer.uint32(/* id 18, wireType 0 =*/144).int32(message.eventVersion);
+                    if (message.inputData != null && message.hasOwnProperty("inputData"))
+                        $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                     return writer;
                 };
     
@@ -17124,6 +17183,9 @@
                             break;
                         case 8:
                             message.inputUri = reader.string();
+                            break;
+                        case 19:
+                            message.inputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
                         case 9:
                             message.outputUri = reader.string();
@@ -17216,9 +17278,21 @@
                         if (error)
                             return "occurredAt." + error;
                     }
-                    if (message.inputUri != null && message.hasOwnProperty("inputUri"))
+                    if (message.inputUri != null && message.hasOwnProperty("inputUri")) {
+                        properties.inputValue = 1;
                         if (!$util.isString(message.inputUri))
                             return "inputUri: string expected";
+                    }
+                    if (message.inputData != null && message.hasOwnProperty("inputData")) {
+                        if (properties.inputValue === 1)
+                            return "inputValue: multiple values";
+                        properties.inputValue = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralMap.verify(message.inputData);
+                            if (error)
+                                return "inputData." + error;
+                        }
+                    }
                     if (message.outputUri != null && message.hasOwnProperty("outputUri")) {
                         properties.outputResult = 1;
                         if (!$util.isString(message.outputUri))
