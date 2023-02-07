@@ -60,10 +60,10 @@ flyte-binary:
   rbac:
     # This is strictly NOT RECOMMENDED in production clusters, and is only for use
     # within local Flyte sandboxes.
-    # When using cluster resource templates to create additional roles/clusterroles,
+    # When using cluster resource templates to create additional namespaced roles,
     # Flyte is required to have a superset of those permissions. To simplify
-    # experimenting with new backend plugins without the overhead of stringently
-    # managing RBAC permissions in local Flyte sandboxes, we add the following:
+    # experimenting with new backend plugins that require additional roles be created
+    # with cluster resource templates (e.g. Spark), we add the following:
     extraRules:
       - apiGroups:
         - '*'
