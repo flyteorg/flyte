@@ -7,7 +7,7 @@ import (
 	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
 )
 
-type flyteTask = core.TaskTemplate
+type flyteTask = core.TaskTemplate //nolint:unused
 type flyteWorkflow = core.CompiledWorkflow
 type flyteNode = core.Node
 
