@@ -371,6 +371,12 @@ class NodeExecutionEvent final :
   }
   static const NodeExecutionEvent& default_instance();
 
+  enum InputValueCase {
+    kInputUri = 5,
+    kInputData = 20,
+    INPUT_VALUE_NOT_SET = 0,
+  };
+
   enum OutputResultCase {
     kOutputUri = 6,
     kError = 7,
@@ -460,20 +466,6 @@ class NodeExecutionEvent final :
   ::std::string* mutable_producer_id();
   ::std::string* release_producer_id();
   void set_allocated_producer_id(::std::string* producer_id);
-
-  // string input_uri = 5;
-  void clear_input_uri();
-  static const int kInputUriFieldNumber = 5;
-  const ::std::string& input_uri() const;
-  void set_input_uri(const ::std::string& value);
-  #if LANG_CXX11
-  void set_input_uri(::std::string&& value);
-  #endif
-  void set_input_uri(const char* value);
-  void set_input_uri(const char* value, size_t size);
-  ::std::string* mutable_input_uri();
-  ::std::string* release_input_uri();
-  void set_allocated_input_uri(::std::string* input_uri);
 
   // string retry_group = 11;
   void clear_retry_group();
@@ -591,6 +583,32 @@ class NodeExecutionEvent final :
   bool is_dynamic() const;
   void set_is_dynamic(bool value);
 
+  // string input_uri = 5;
+  private:
+  bool has_input_uri() const;
+  public:
+  void clear_input_uri();
+  static const int kInputUriFieldNumber = 5;
+  const ::std::string& input_uri() const;
+  void set_input_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_input_uri(::std::string&& value);
+  #endif
+  void set_input_uri(const char* value);
+  void set_input_uri(const char* value, size_t size);
+  ::std::string* mutable_input_uri();
+  ::std::string* release_input_uri();
+  void set_allocated_input_uri(::std::string* input_uri);
+
+  // .flyteidl.core.LiteralMap input_data = 20;
+  bool has_input_data() const;
+  void clear_input_data();
+  static const int kInputDataFieldNumber = 20;
+  const ::flyteidl::core::LiteralMap& input_data() const;
+  ::flyteidl::core::LiteralMap* release_input_data();
+  ::flyteidl::core::LiteralMap* mutable_input_data();
+  void set_allocated_input_data(::flyteidl::core::LiteralMap* input_data);
+
   // string output_uri = 6;
   private:
   bool has_output_uri() const;
@@ -644,6 +662,8 @@ class NodeExecutionEvent final :
   ::flyteidl::event::TaskNodeMetadata* mutable_task_node_metadata();
   void set_allocated_task_node_metadata(::flyteidl::event::TaskNodeMetadata* task_node_metadata);
 
+  void clear_input_value();
+  InputValueCase input_value_case() const;
   void clear_output_result();
   OutputResultCase output_result_case() const;
   void clear_target_metadata();
@@ -651,11 +671,16 @@ class NodeExecutionEvent final :
   // @@protoc_insertion_point(class_scope:flyteidl.event.NodeExecutionEvent)
  private:
   class HasBitSetters;
+  void set_has_input_uri();
+  void set_has_input_data();
   void set_has_output_uri();
   void set_has_error();
   void set_has_output_data();
   void set_has_workflow_node_metadata();
   void set_has_task_node_metadata();
+
+  inline bool has_input_value() const;
+  inline void clear_has_input_value();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -665,7 +690,6 @@ class NodeExecutionEvent final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr producer_id_;
-  ::google::protobuf::internal::ArenaStringPtr input_uri_;
   ::google::protobuf::internal::ArenaStringPtr retry_group_;
   ::google::protobuf::internal::ArenaStringPtr spec_node_id_;
   ::google::protobuf::internal::ArenaStringPtr node_name_;
@@ -678,6 +702,11 @@ class NodeExecutionEvent final :
   ::google::protobuf::int32 event_version_;
   bool is_parent_;
   bool is_dynamic_;
+  union InputValueUnion {
+    InputValueUnion() {}
+    ::google::protobuf::internal::ArenaStringPtr input_uri_;
+    ::flyteidl::core::LiteralMap* input_data_;
+  } input_value_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
@@ -690,7 +719,7 @@ class NodeExecutionEvent final :
     ::flyteidl::event::TaskNodeMetadata* task_node_metadata_;
   } target_metadata_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[2];
+  ::google::protobuf::uint32 _oneof_case_[3];
 
   friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
 };
@@ -1357,6 +1386,12 @@ class TaskExecutionEvent final :
   }
   static const TaskExecutionEvent& default_instance();
 
+  enum InputValueCase {
+    kInputUri = 8,
+    kInputData = 19,
+    INPUT_VALUE_NOT_SET = 0,
+  };
+
   enum OutputResultCase {
     kOutputUri = 9,
     kError = 10,
@@ -1452,20 +1487,6 @@ class TaskExecutionEvent final :
   ::std::string* mutable_producer_id();
   ::std::string* release_producer_id();
   void set_allocated_producer_id(::std::string* producer_id);
-
-  // string input_uri = 8;
-  void clear_input_uri();
-  static const int kInputUriFieldNumber = 8;
-  const ::std::string& input_uri() const;
-  void set_input_uri(const ::std::string& value);
-  #if LANG_CXX11
-  void set_input_uri(::std::string&& value);
-  #endif
-  void set_input_uri(const char* value);
-  void set_input_uri(const char* value, size_t size);
-  ::std::string* mutable_input_uri();
-  ::std::string* release_input_uri();
-  void set_allocated_input_uri(::std::string* input_uri);
 
   // string reason = 13;
   void clear_reason();
@@ -1564,6 +1585,32 @@ class TaskExecutionEvent final :
   ::google::protobuf::int32 event_version() const;
   void set_event_version(::google::protobuf::int32 value);
 
+  // string input_uri = 8;
+  private:
+  bool has_input_uri() const;
+  public:
+  void clear_input_uri();
+  static const int kInputUriFieldNumber = 8;
+  const ::std::string& input_uri() const;
+  void set_input_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_input_uri(::std::string&& value);
+  #endif
+  void set_input_uri(const char* value);
+  void set_input_uri(const char* value, size_t size);
+  ::std::string* mutable_input_uri();
+  ::std::string* release_input_uri();
+  void set_allocated_input_uri(::std::string* input_uri);
+
+  // .flyteidl.core.LiteralMap input_data = 19;
+  bool has_input_data() const;
+  void clear_input_data();
+  static const int kInputDataFieldNumber = 19;
+  const ::flyteidl::core::LiteralMap& input_data() const;
+  ::flyteidl::core::LiteralMap* release_input_data();
+  ::flyteidl::core::LiteralMap* mutable_input_data();
+  void set_allocated_input_data(::flyteidl::core::LiteralMap* input_data);
+
   // string output_uri = 9;
   private:
   bool has_output_uri() const;
@@ -1599,14 +1646,21 @@ class TaskExecutionEvent final :
   ::flyteidl::core::LiteralMap* mutable_output_data();
   void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
 
+  void clear_input_value();
+  InputValueCase input_value_case() const;
   void clear_output_result();
   OutputResultCase output_result_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.event.TaskExecutionEvent)
  private:
   class HasBitSetters;
+  void set_has_input_uri();
+  void set_has_input_data();
   void set_has_output_uri();
   void set_has_error();
   void set_has_output_data();
+
+  inline bool has_input_value() const;
+  inline void clear_has_input_value();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -1614,7 +1668,6 @@ class TaskExecutionEvent final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > logs_;
   ::google::protobuf::internal::ArenaStringPtr producer_id_;
-  ::google::protobuf::internal::ArenaStringPtr input_uri_;
   ::google::protobuf::internal::ArenaStringPtr reason_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
   ::flyteidl::core::Identifier* task_id_;
@@ -1626,6 +1679,11 @@ class TaskExecutionEvent final :
   int phase_;
   ::google::protobuf::uint32 phase_version_;
   ::google::protobuf::int32 event_version_;
+  union InputValueUnion {
+    InputValueUnion() {}
+    ::google::protobuf::internal::ArenaStringPtr input_uri_;
+    ::flyteidl::core::LiteralMap* input_data_;
+  } input_value_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
@@ -1633,7 +1691,7 @@ class TaskExecutionEvent final :
     ::flyteidl::core::LiteralMap* output_data_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
+  ::google::protobuf::uint32 _oneof_case_[2];
 
   friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
 };
@@ -2630,56 +2688,130 @@ inline void NodeExecutionEvent::set_allocated_occurred_at(::google::protobuf::Ti
 }
 
 // string input_uri = 5;
+inline bool NodeExecutionEvent::has_input_uri() const {
+  return input_value_case() == kInputUri;
+}
+inline void NodeExecutionEvent::set_has_input_uri() {
+  _oneof_case_[0] = kInputUri;
+}
 inline void NodeExecutionEvent::clear_input_uri() {
-  input_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_input_uri()) {
+    input_value_.input_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_input_value();
+  }
 }
 inline const ::std::string& NodeExecutionEvent::input_uri() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.input_uri)
-  return input_uri_.GetNoArena();
+  if (has_input_uri()) {
+    return input_value_.input_uri_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
 }
 inline void NodeExecutionEvent::set_input_uri(const ::std::string& value) {
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.input_uri)
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.input_uri)
 }
 #if LANG_CXX11
 inline void NodeExecutionEvent::set_input_uri(::std::string&& value) {
-  
-  input_uri_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.input_uri)
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.NodeExecutionEvent.input_uri)
 }
 #endif
 inline void NodeExecutionEvent::set_input_uri(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
   // @@protoc_insertion_point(field_set_char:flyteidl.event.NodeExecutionEvent.input_uri)
 }
 inline void NodeExecutionEvent::set_input_uri(const char* value, size_t size) {
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:flyteidl.event.NodeExecutionEvent.input_uri)
 }
 inline ::std::string* NodeExecutionEvent::mutable_input_uri() {
-  
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.input_uri)
-  return input_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return input_value_.input_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* NodeExecutionEvent::release_input_uri() {
   // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.input_uri)
-  
-  return input_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_input_uri()) {
+    clear_has_input_value();
+    return input_value_.input_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
 }
 inline void NodeExecutionEvent::set_allocated_input_uri(::std::string* input_uri) {
-  if (input_uri != nullptr) {
-    
-  } else {
-    
+  if (has_input_value()) {
+    clear_input_value();
   }
-  input_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), input_uri);
+  if (input_uri != nullptr) {
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(input_uri);
+  }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.input_uri)
+}
+
+// .flyteidl.core.LiteralMap input_data = 20;
+inline bool NodeExecutionEvent::has_input_data() const {
+  return input_value_case() == kInputData;
+}
+inline void NodeExecutionEvent::set_has_input_data() {
+  _oneof_case_[0] = kInputData;
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.input_data)
+  if (has_input_data()) {
+    clear_has_input_value();
+      ::flyteidl::core::LiteralMap* temp = input_value_.input_data_;
+    input_value_.input_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& NodeExecutionEvent::input_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.input_data)
+  return has_input_data()
+      ? *input_value_.input_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::mutable_input_data() {
+  if (!has_input_data()) {
+    clear_input_value();
+    set_has_input_data();
+    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.input_data)
+  return input_value_.input_data_;
 }
 
 // string output_uri = 6;
@@ -2687,7 +2819,7 @@ inline bool NodeExecutionEvent::has_output_uri() const {
   return output_result_case() == kOutputUri;
 }
 inline void NodeExecutionEvent::set_has_output_uri() {
-  _oneof_case_[0] = kOutputUri;
+  _oneof_case_[1] = kOutputUri;
 }
 inline void NodeExecutionEvent::clear_output_uri() {
   if (has_output_uri()) {
@@ -2779,7 +2911,7 @@ inline bool NodeExecutionEvent::has_error() const {
   return output_result_case() == kError;
 }
 inline void NodeExecutionEvent::set_has_error() {
-  _oneof_case_[0] = kError;
+  _oneof_case_[1] = kError;
 }
 inline ::flyteidl::core::ExecutionError* NodeExecutionEvent::release_error() {
   // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.error)
@@ -2814,7 +2946,7 @@ inline bool NodeExecutionEvent::has_output_data() const {
   return output_result_case() == kOutputData;
 }
 inline void NodeExecutionEvent::set_has_output_data() {
-  _oneof_case_[0] = kOutputData;
+  _oneof_case_[1] = kOutputData;
 }
 inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_output_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.output_data)
@@ -2849,7 +2981,7 @@ inline bool NodeExecutionEvent::has_workflow_node_metadata() const {
   return target_metadata_case() == kWorkflowNodeMetadata;
 }
 inline void NodeExecutionEvent::set_has_workflow_node_metadata() {
-  _oneof_case_[1] = kWorkflowNodeMetadata;
+  _oneof_case_[2] = kWorkflowNodeMetadata;
 }
 inline void NodeExecutionEvent::clear_workflow_node_metadata() {
   if (has_workflow_node_metadata()) {
@@ -2890,7 +3022,7 @@ inline bool NodeExecutionEvent::has_task_node_metadata() const {
   return target_metadata_case() == kTaskNodeMetadata;
 }
 inline void NodeExecutionEvent::set_has_task_node_metadata() {
-  _oneof_case_[1] = kTaskNodeMetadata;
+  _oneof_case_[2] = kTaskNodeMetadata;
 }
 inline void NodeExecutionEvent::clear_task_node_metadata() {
   if (has_task_node_metadata()) {
@@ -3282,23 +3414,32 @@ inline void NodeExecutionEvent::set_allocated_deck_uri(::std::string* deck_uri) 
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.deck_uri)
 }
 
+inline bool NodeExecutionEvent::has_input_value() const {
+  return input_value_case() != INPUT_VALUE_NOT_SET;
+}
+inline void NodeExecutionEvent::clear_has_input_value() {
+  _oneof_case_[0] = INPUT_VALUE_NOT_SET;
+}
 inline bool NodeExecutionEvent::has_output_result() const {
   return output_result_case() != OUTPUT_RESULT_NOT_SET;
 }
 inline void NodeExecutionEvent::clear_has_output_result() {
-  _oneof_case_[0] = OUTPUT_RESULT_NOT_SET;
+  _oneof_case_[1] = OUTPUT_RESULT_NOT_SET;
 }
 inline bool NodeExecutionEvent::has_target_metadata() const {
   return target_metadata_case() != TARGET_METADATA_NOT_SET;
 }
 inline void NodeExecutionEvent::clear_has_target_metadata() {
-  _oneof_case_[1] = TARGET_METADATA_NOT_SET;
+  _oneof_case_[2] = TARGET_METADATA_NOT_SET;
+}
+inline NodeExecutionEvent::InputValueCase NodeExecutionEvent::input_value_case() const {
+  return NodeExecutionEvent::InputValueCase(_oneof_case_[0]);
 }
 inline NodeExecutionEvent::OutputResultCase NodeExecutionEvent::output_result_case() const {
-  return NodeExecutionEvent::OutputResultCase(_oneof_case_[0]);
+  return NodeExecutionEvent::OutputResultCase(_oneof_case_[1]);
 }
 inline NodeExecutionEvent::TargetMetadataCase NodeExecutionEvent::target_metadata_case() const {
-  return NodeExecutionEvent::TargetMetadataCase(_oneof_case_[1]);
+  return NodeExecutionEvent::TargetMetadataCase(_oneof_case_[2]);
 }
 // -------------------------------------------------------------------
 
@@ -3979,56 +4120,130 @@ inline void TaskExecutionEvent::set_allocated_occurred_at(::google::protobuf::Ti
 }
 
 // string input_uri = 8;
+inline bool TaskExecutionEvent::has_input_uri() const {
+  return input_value_case() == kInputUri;
+}
+inline void TaskExecutionEvent::set_has_input_uri() {
+  _oneof_case_[0] = kInputUri;
+}
 inline void TaskExecutionEvent::clear_input_uri() {
-  input_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_input_uri()) {
+    input_value_.input_uri_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_input_value();
+  }
 }
 inline const ::std::string& TaskExecutionEvent::input_uri() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.input_uri)
-  return input_uri_.GetNoArena();
+  if (has_input_uri()) {
+    return input_value_.input_uri_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
 }
 inline void TaskExecutionEvent::set_input_uri(const ::std::string& value) {
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.input_uri)
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.input_uri)
 }
 #if LANG_CXX11
 inline void TaskExecutionEvent::set_input_uri(::std::string&& value) {
-  
-  input_uri_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.input_uri)
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.TaskExecutionEvent.input_uri)
 }
 #endif
 inline void TaskExecutionEvent::set_input_uri(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
   // @@protoc_insertion_point(field_set_char:flyteidl.event.TaskExecutionEvent.input_uri)
 }
 inline void TaskExecutionEvent::set_input_uri(const char* value, size_t size) {
-  
-  input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  input_value_.input_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:flyteidl.event.TaskExecutionEvent.input_uri)
 }
 inline ::std::string* TaskExecutionEvent::mutable_input_uri() {
-  
+  if (!has_input_uri()) {
+    clear_input_value();
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.input_uri)
-  return input_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return input_value_.input_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* TaskExecutionEvent::release_input_uri() {
   // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.input_uri)
-  
-  return input_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_input_uri()) {
+    clear_has_input_value();
+    return input_value_.input_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
 }
 inline void TaskExecutionEvent::set_allocated_input_uri(::std::string* input_uri) {
-  if (input_uri != nullptr) {
-    
-  } else {
-    
+  if (has_input_value()) {
+    clear_input_value();
   }
-  input_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), input_uri);
+  if (input_uri != nullptr) {
+    set_has_input_uri();
+    input_value_.input_uri_.UnsafeSetDefault(input_uri);
+  }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskExecutionEvent.input_uri)
+}
+
+// .flyteidl.core.LiteralMap input_data = 19;
+inline bool TaskExecutionEvent::has_input_data() const {
+  return input_value_case() == kInputData;
+}
+inline void TaskExecutionEvent::set_has_input_data() {
+  _oneof_case_[0] = kInputData;
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.input_data)
+  if (has_input_data()) {
+    clear_has_input_value();
+      ::flyteidl::core::LiteralMap* temp = input_value_.input_data_;
+    input_value_.input_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& TaskExecutionEvent::input_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.input_data)
+  return has_input_data()
+      ? *input_value_.input_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::mutable_input_data() {
+  if (!has_input_data()) {
+    clear_input_value();
+    set_has_input_data();
+    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.input_data)
+  return input_value_.input_data_;
 }
 
 // string output_uri = 9;
@@ -4036,7 +4251,7 @@ inline bool TaskExecutionEvent::has_output_uri() const {
   return output_result_case() == kOutputUri;
 }
 inline void TaskExecutionEvent::set_has_output_uri() {
-  _oneof_case_[0] = kOutputUri;
+  _oneof_case_[1] = kOutputUri;
 }
 inline void TaskExecutionEvent::clear_output_uri() {
   if (has_output_uri()) {
@@ -4128,7 +4343,7 @@ inline bool TaskExecutionEvent::has_error() const {
   return output_result_case() == kError;
 }
 inline void TaskExecutionEvent::set_has_error() {
-  _oneof_case_[0] = kError;
+  _oneof_case_[1] = kError;
 }
 inline ::flyteidl::core::ExecutionError* TaskExecutionEvent::release_error() {
   // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.error)
@@ -4163,7 +4378,7 @@ inline bool TaskExecutionEvent::has_output_data() const {
   return output_result_case() == kOutputData;
 }
 inline void TaskExecutionEvent::set_has_output_data() {
-  _oneof_case_[0] = kOutputData;
+  _oneof_case_[1] = kOutputData;
 }
 inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_output_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.output_data)
@@ -4424,14 +4639,23 @@ inline void TaskExecutionEvent::set_event_version(::google::protobuf::int32 valu
   // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.event_version)
 }
 
+inline bool TaskExecutionEvent::has_input_value() const {
+  return input_value_case() != INPUT_VALUE_NOT_SET;
+}
+inline void TaskExecutionEvent::clear_has_input_value() {
+  _oneof_case_[0] = INPUT_VALUE_NOT_SET;
+}
 inline bool TaskExecutionEvent::has_output_result() const {
   return output_result_case() != OUTPUT_RESULT_NOT_SET;
 }
 inline void TaskExecutionEvent::clear_has_output_result() {
-  _oneof_case_[0] = OUTPUT_RESULT_NOT_SET;
+  _oneof_case_[1] = OUTPUT_RESULT_NOT_SET;
+}
+inline TaskExecutionEvent::InputValueCase TaskExecutionEvent::input_value_case() const {
+  return TaskExecutionEvent::InputValueCase(_oneof_case_[0]);
 }
 inline TaskExecutionEvent::OutputResultCase TaskExecutionEvent::output_result_case() const {
-  return TaskExecutionEvent::OutputResultCase(_oneof_case_[0]);
+  return TaskExecutionEvent::OutputResultCase(_oneof_case_[1]);
 }
 // -------------------------------------------------------------------
 

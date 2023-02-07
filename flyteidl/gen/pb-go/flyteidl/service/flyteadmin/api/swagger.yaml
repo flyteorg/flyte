@@ -58455,6 +58455,9 @@ definitions:
           \ it is generated\nby the executor of the node."
       input_uri:
         type: "string"
+      input_data:
+        description: "Raw input data consumed by this node execution."
+        $ref: "#/definitions/coreLiteralMap"
       output_uri:
         type: "string"
         description: "URL to the output of the execution, it encodes all the information\n\
@@ -58567,6 +58570,9 @@ definitions:
         type: "string"
         description: "URI of the input file, it encodes all the information\nincluding\
           \ Cloud source provider. ie., s3://..."
+      input_data:
+        description: "Raw input data consumed by this task execution."
+        $ref: "#/definitions/coreLiteralMap"
       output_uri:
         type: "string"
         description: "URI to the output of the execution, it will be in a format that\

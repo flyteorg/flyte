@@ -51,7 +51,12 @@ message NodeExecutionEvent {
     // by the executor of the node.
     google.protobuf.Timestamp occurred_at = 4;
 
-    string input_uri = 5;
+    oneof input_value {
+        string input_uri = 5;
+
+        // Raw input data consumed by this node execution.
+        core.LiteralMap input_data = 20;
+    }
 
     oneof output_result {
         // URL to the output of the execution, it encodes all the information
@@ -165,9 +170,15 @@ message TaskExecutionEvent {
     // by the executor of the task.
     google.protobuf.Timestamp occurred_at = 7;
 
-    // URI of the input file, it encodes all the information
-    // including Cloud source provider. ie., s3://...
-    string input_uri = 8;
+
+    oneof input_value {
+      // URI of the input file, it encodes all the information
+      // including Cloud source provider. ie., s3://...
+      string input_uri = 8;
+
+      // Raw input data consumed by this task execution.
+      core.LiteralMap input_data = 19;
+    }
 
     oneof output_result {
         // URI to the output of the execution, it will be in a format that encodes all the information

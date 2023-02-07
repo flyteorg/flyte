@@ -48,6 +48,7 @@ class EventTaskExecutionEvent(object):
         'logs': 'list[CoreTaskLog]',
         'occurred_at': 'datetime',
         'input_uri': 'str',
+        'input_data': 'CoreLiteralMap',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'output_data': 'CoreLiteralMap',
@@ -68,6 +69,7 @@ class EventTaskExecutionEvent(object):
         'logs': 'logs',
         'occurred_at': 'occurred_at',
         'input_uri': 'input_uri',
+        'input_data': 'input_data',
         'output_uri': 'output_uri',
         'error': 'error',
         'output_data': 'output_data',
@@ -79,7 +81,7 @@ class EventTaskExecutionEvent(object):
         'event_version': 'event_version'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -90,6 +92,7 @@ class EventTaskExecutionEvent(object):
         self._logs = None
         self._occurred_at = None
         self._input_uri = None
+        self._input_data = None
         self._output_uri = None
         self._error = None
         self._output_data = None
@@ -117,6 +120,8 @@ class EventTaskExecutionEvent(object):
             self.occurred_at = occurred_at
         if input_uri is not None:
             self.input_uri = input_uri
+        if input_data is not None:
+            self.input_data = input_data
         if output_uri is not None:
             self.output_uri = output_uri
         if error is not None:
@@ -309,6 +314,29 @@ class EventTaskExecutionEvent(object):
         """
 
         self._input_uri = input_uri
+
+    @property
+    def input_data(self):
+        """Gets the input_data of this EventTaskExecutionEvent.  # noqa: E501
+
+        Raw input data consumed by this task execution.  # noqa: E501
+
+        :return: The input_data of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._input_data
+
+    @input_data.setter
+    def input_data(self, input_data):
+        """Sets the input_data of this EventTaskExecutionEvent.
+
+        Raw input data consumed by this task execution.  # noqa: E501
+
+        :param input_data: The input_data of this EventTaskExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._input_data = input_data
 
     @property
     def output_uri(self):

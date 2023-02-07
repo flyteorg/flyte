@@ -26,6 +26,8 @@ type EventTaskExecutionEvent struct {
 	OccurredAt time.Time `json:"occurred_at,omitempty"`
 	// URI of the input file, it encodes all the information including Cloud source provider. ie., s3://...
 	InputUri string `json:"input_uri,omitempty"`
+	// Raw input data consumed by this task execution.
+	InputData *CoreLiteralMap `json:"input_data,omitempty"`
 	// URI to the output of the execution, it will be in a format that encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
