@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyteadmin
 
-go 1.18
+go 1.19
 
 require (
 	cloud.google.com/go/iam v0.3.0
