@@ -12,7 +12,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '1.18'
+          go-version: '1.19'
       - name: Unit Tests
         run: make install && make test_unit_codecov
       - name: Push CodeCov
@@ -30,6 +30,6 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.18'
+          go-version: '1.19'
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate

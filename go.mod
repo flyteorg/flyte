@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyteplugins
 
-go 1.18
+go 1.19
 
 require (
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20200723154620-6f35a1152625
@@ -12,8 +12,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/bstadlbauer/dask-k8s-operator-go-client v0.1.0
 	github.com/coocood/freecache v1.1.1
-	github.com/flyteorg/flyteidl v1.3.5
-	github.com/flyteorg/flytestdlib v1.0.11
+	github.com/flyteorg/flyteidl v1.3.6
+	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.2
 	github.com/hashicorp/golang-lru v0.5.4

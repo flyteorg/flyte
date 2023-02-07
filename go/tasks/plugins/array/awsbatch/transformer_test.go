@@ -233,14 +233,14 @@ func Test_getEnvVarsForTask(t *testing.T) {
 		"MyKey": "MyVal",
 	})
 
-	assert.Equal(t, []v12.EnvVar{
-		{
-			Name:  "MyKey",
-			Value: "MyVal",
-		},
-		{
-			Name:  "FLYTE_FAIL_ON_ERROR",
-			Value: "true",
-		},
-	}, envVars)
+	expected := map[string]string{
+		"FLYTE_FAIL_ON_ERROR": "true",
+		"MyKey":               "MyVal",
+	}
+
+	assert.Len(t, envVars, len(expected))
+	for _, envVar := range envVars {
+		assert.Contains(t, expected, envVar.Name)
+		assert.Equal(t, expected[envVar.Name], envVar.Value)
+	}
 }
