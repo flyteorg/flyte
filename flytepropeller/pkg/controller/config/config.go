@@ -1,33 +1,36 @@
-// Package config contains the core configuration for FlytePropeller. This configuration can be added under the ``propeller`` section.
-//  Example config:
+// Package config contains the core configuration for FlytePropeller. This configuration can be added under the “propeller“ section.
+//
+//	Example config:
+//
 // ----------------
-//  propeller:
-//     rawoutput-prefix: s3://my-container/test/
-//     metadata-prefix: metadata/propeller/sandbox
-//     workers: 4
-//     workflow-reeval-duration: 10s
-//     downstream-eval-duration: 5s
-//     limit-namespace: "all"
-//     prof-port: 11254
-//     metrics-prefix: flyte
-//     enable-admin-launcher: true
-//     max-ttl-hours: 1
-//     gc-interval: 500m
-//     queue:
-//       type: batch
-//       queue:
-//         type: bucket
-//         rate: 1000
-//         capacity: 10000
-//       sub-queue:
-//         type: bucket
-//         rate: 1000
-//         capacity: 10000
-//     # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
-//     kube-config: "$HOME/kubeconfig/k3s/k3s.yaml"
-//     publish-k8s-events: true
-//     workflowStore:
-//       policy: "ResourceVersionCache"
+//
+//	propeller:
+//	   rawoutput-prefix: s3://my-container/test/
+//	   metadata-prefix: metadata/propeller/sandbox
+//	   workers: 4
+//	   workflow-reeval-duration: 10s
+//	   downstream-eval-duration: 5s
+//	   limit-namespace: "all"
+//	   prof-port: 11254
+//	   metrics-prefix: flyte
+//	   enable-admin-launcher: true
+//	   max-ttl-hours: 1
+//	   gc-interval: 500m
+//	   queue:
+//	     type: batch
+//	     queue:
+//	       type: bucket
+//	       rate: 1000
+//	       capacity: 10000
+//	     sub-queue:
+//	       type: bucket
+//	       rate: 1000
+//	       capacity: 10000
+//	   # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
+//	   kube-config: "$HOME/kubeconfig/k3s/k3s.yaml"
+//	   publish-k8s-events: true
+//	   workflowStore:
+//	     policy: "ResourceVersionCache"
 package config
 
 import (
