@@ -57,6 +57,20 @@ flyte-binary:
         pullPolicy: Never
     extraPodSpec:
       hostNetwork: true
+  rbac:
+    # This is strictly NOT RECOMMENDED in production clusters, and is only for use
+    # within local Flyte sandboxes.
+    # When using cluster resource templates to create additional roles/clusterroles,
+    # Flyte is required to have a superset of those permissions. To simplify
+    # experimenting with new backend plugins without the overhead of stringently
+    # managing RBAC permissions in local Flyte sandboxes, we add the following:
+    extraRules:
+      - apiGroups:
+        - '*'
+        resources:
+        - '*'
+        verbs:
+        - '*'
 
 kubernetes-dashboard:
   enabled: true
