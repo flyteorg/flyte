@@ -13,7 +13,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.18'
+          go-version: '1.19'
       - name: Unit Tests
         run: make mod_download && make test_unit_codecov
       - name: Push CodeCov
@@ -28,7 +28,7 @@ jobs:
     name: Lint
     uses: flyteorg/flytetools/.github/workflows/lint.yml@master
     with:
-      go-version: '1.18'
+      go-version: '1.19'
   test-generate-integrity:
     name: Ensure go generate has run
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.18'
+          go-version: '1.19'
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate
 
