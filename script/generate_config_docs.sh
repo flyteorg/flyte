@@ -5,7 +5,7 @@ set -e
 echo "Generating Flyte Configuration Documents"
 CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 ROOT_DIR=${CUR_DIR}/..
-OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/cluster_config
+OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/configuration/generated
 GOBIN=${GOPATH:-~/go}/bin
 
 # The version should same as https://github.com/flyteorg/flyte/blob/6b92b72f508d0603fa44153a4e30cf81be76adfd/script/release.sh#L5-L8
