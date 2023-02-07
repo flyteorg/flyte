@@ -70,6 +70,8 @@ by clicking on a label and then all executions are filtered by that label.
  - “group” will group everything
  - “experiment” will also group everything with higher priority. 
  - “name” will override the execution id with the name?
+ 
+![Grouping / Filtering UX](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/rfc/tags/labels-filter.png)
 
 
 ### Support for descriptions
@@ -90,7 +92,7 @@ pyflyte run --remote --labels k:v --labels k1:v1 --description README.md test.py
  
 It should be possible to add a description for an execution in the UI, after
 the execution has been created.
-
+![UI Descriptions](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/rfc/tags/description-edit.png)
 
 ## 4 Metrics & Dashboards
 NA
