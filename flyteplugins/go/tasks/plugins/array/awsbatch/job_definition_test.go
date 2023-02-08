@@ -79,7 +79,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
-		})
+		}, 0)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, nextState)
@@ -95,7 +95,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
-		})
+		}, 0)
 		assert.NoError(t, err)
 		assert.NotNil(t, nextState)
 		assert.Equal(t, "their-arn", nextState.JobDefinitionArn)
@@ -152,7 +152,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
-		})
+		}, 0)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, nextState)
@@ -168,7 +168,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
-		})
+		}, 0)
 		assert.NoError(t, err)
 		assert.NotNil(t, nextState)
 		assert.Equal(t, "their-arn", nextState.JobDefinitionArn)

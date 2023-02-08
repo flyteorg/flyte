@@ -97,7 +97,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
-		assert.Equal(t, uint32(12), phaseInfo.Version())
+		assert.Equal(t, uint32(8), phaseInfo.Version())
 	})
 
 	t.Run("write to discovery", func(t *testing.T) {
@@ -116,7 +116,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
-		assert.Equal(t, uint32(14), phaseInfo.Version())
+		assert.Equal(t, uint32(8), phaseInfo.Version())
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -304,11 +304,11 @@ func TestSummaryToPhase(t *testing.T) {
 			},
 		},
 		{
-			"FailOnToManyPermanentFailures",
+			"FailOnTooManyPermanentFailures",
 			PhaseWriteToDiscoveryThenFail,
 			map[core.Phase]int64{
 				core.PhasePermanentFailure: 1,
-				core.PhaseUndefined:        9,
+				core.PhaseSuccess:          9,
 			},
 		},
 		{

@@ -62,6 +62,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	}
 
 	var err error
+	var externalResources []*core.ExternalResource
 
 	p, version := pluginState.GetPhase()
 	logger.Infof(ctx, "Entering handle with phase [%v]", p)
@@ -71,28 +72,28 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		pluginState.State, err = array.DetermineDiscoverability(ctx, tCtx, pluginConfig.MaxArrayJobSize, pluginState.State)
 
 	case arrayCore.PhasePreLaunch:
-		pluginState, err = EnsureJobDefinition(ctx, tCtx, pluginConfig, e.jobStore.Client, e.jobDefinitionCache, pluginState)
+		pluginState, err = EnsureJobDefinition(ctx, tCtx, pluginConfig, e.jobStore.Client, e.jobDefinitionCache, pluginState, version+1)
 
 	case arrayCore.PhaseWaitingForResources:
 		fallthrough
 
 	case arrayCore.PhaseLaunch:
-		pluginState, err = LaunchSubTasks(ctx, tCtx, e.jobStore, pluginConfig, pluginState, e.metrics)
+		pluginState, err = LaunchSubTasks(ctx, tCtx, e.jobStore, pluginConfig, pluginState, e.metrics, version+1)
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
 		pluginState, err = CheckSubTasksState(ctx, tCtx, e.jobStore, pluginConfig, pluginState, e.metrics)
 
 	case arrayCore.PhaseAssembleFinalOutput:
-		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.outputAssembler, tCtx, arrayCore.PhaseSuccess, version, pluginState.State)
+		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.outputAssembler, tCtx, arrayCore.PhaseSuccess, version+1, pluginState.State)
 
 	case arrayCore.PhaseWriteToDiscoveryThenFail:
-		pluginState.State, err = array.WriteToDiscovery(ctx, tCtx, pluginState.State, arrayCore.PhaseAssembleFinalError, version)
+		pluginState.State, externalResources, err = array.WriteToDiscovery(ctx, tCtx, pluginState.State, arrayCore.PhaseAssembleFinalError, version+1)
 
 	case arrayCore.PhaseWriteToDiscovery:
-		pluginState.State, err = array.WriteToDiscovery(ctx, tCtx, pluginState.State, arrayCore.PhaseAssembleFinalOutput, version)
+		pluginState.State, externalResources, err = array.WriteToDiscovery(ctx, tCtx, pluginState.State, arrayCore.PhaseAssembleFinalOutput, version+1)
 
 	case arrayCore.PhaseAssembleFinalError:
-		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.errorAssembler, tCtx, arrayCore.PhaseRetryableFailure, version, pluginState.State)
+		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.errorAssembler, tCtx, arrayCore.PhaseRetryableFailure, version+1, pluginState.State)
 	}
 
 	if err != nil {
@@ -105,9 +106,10 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	// Always attempt to augment phase with task logs.
 	var logLinks []*idlCore.TaskLog
-	var externalResources []*core.ExternalResource
 
-	if p == arrayCore.PhasePreLaunch {
+	nextPhase, _ := pluginState.GetPhase()
+	if p == arrayCore.PhaseStart && nextPhase != arrayCore.PhaseStart {
+		// if transitioning from PhaseStart to another phase then cache lookups have completed
 		externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, pluginState.State,
 			func(tCtx core.TaskExecutionContext, childIndex int) string {
 				// subTaskIDs for the the aws_batch are generated based on the job ID, therefore
@@ -115,7 +117,8 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 				return ""
 			},
 		)
-	} else if p != arrayCore.PhaseStart {
+	} else if p != arrayCore.PhaseStart && p != arrayCore.PhaseWriteToDiscovery && p != arrayCore.PhaseWriteToDiscoveryThenFail {
+		// if externalResources is not otherwise being populated then attempt to get task log links
 		logLinks, externalResources, err = GetTaskLinks(ctx, tCtx.TaskExecutionMetadata(), e.jobStore, pluginState)
 	}
 

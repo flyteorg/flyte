@@ -167,7 +167,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 
 		parentState = parentState.SetPhase(phase, version).SetReason("Task is still running")
 	} else {
-		parentState = parentState.SetPhase(phase, version)
+		parentState = parentState.SetPhase(phase, version+1)
 	}
 
 	p, v := parentState.GetPhase()

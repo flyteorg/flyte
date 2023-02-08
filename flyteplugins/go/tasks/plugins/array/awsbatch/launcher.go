@@ -17,7 +17,7 @@ import (
 )
 
 func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchClient Client, pluginConfig *config.Config,
-	currentState *State, metrics ExecutorMetrics) (nextState *State, err error) {
+	currentState *State, metrics ExecutorMetrics, terminalVersion uint32) (nextState *State, err error) {
 	size := currentState.GetExecutionArraySize()
 
 	jobDefinition := currentState.GetJobDefinitionArn()
@@ -56,7 +56,7 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 	}
 
 	parentState := currentState.
-		SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, 0).
+		SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, terminalVersion).
 		SetArrayStatus(arraystatus.ArrayStatus{
 			Summary: arraystatus.ArraySummary{
 				core.PhaseQueued: int64(size),
