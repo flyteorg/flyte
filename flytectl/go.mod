@@ -1,6 +1,6 @@
 module github.com/flyteorg/flytectl
 
-go 1.18
+go 1.19
 
 require (
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
