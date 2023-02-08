@@ -40,7 +40,7 @@ func containerImageRepository(containerImage string) string {
 }
 
 func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionContext, cfg *config.Config, client Client,
-	definitionCache definition.Cache, currentState *State) (nextState *State, err error) {
+	definitionCache definition.Cache, currentState *State, terminalVersion uint32) (nextState *State, err error) {
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -65,7 +65,7 @@ func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionConte
 			containerImage, role, platformCapabilities, existingArn)
 
 		nextState = currentState.SetJobDefinitionArn(existingArn)
-		nextState.State = nextState.SetPhase(arrayCore.PhaseLaunch, 0).SetReason("AWS job definition already exist.")
+		nextState.State = nextState.SetPhase(arrayCore.PhaseLaunch, terminalVersion).SetReason("AWS job definition already exist.")
 		return nextState, nil
 	}
 
@@ -83,7 +83,7 @@ func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionConte
 	}
 
 	nextState = currentState.SetJobDefinitionArn(arn)
-	nextState.State = nextState.SetPhase(arrayCore.PhaseLaunch, 0).SetReason("Created AWS job definition")
+	nextState.State = nextState.SetPhase(arrayCore.PhaseLaunch, terminalVersion).SetReason("Created AWS job definition")
 
 	return nextState, nil
 }

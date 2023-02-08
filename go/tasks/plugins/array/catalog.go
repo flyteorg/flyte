@@ -6,6 +6,7 @@ import (
 	"math"
 	"strconv"
 
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
@@ -19,8 +20,6 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const AwsBatchTaskType = "aws-batch"
@@ -212,19 +211,20 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	return state, nil
 }
 
-func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State, phaseOnSuccess arrayCore.Phase, versionOnSuccess uint32) (*arrayCore.State, error) {
+func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state *arrayCore.State, phaseOnSuccess arrayCore.Phase, versionOnSuccess uint32) (*arrayCore.State, []*core.ExternalResource, error) {
+	var externalResources []*core.ExternalResource
 
 	// Check that the taskTemplate is valid
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return state, err
+		return state, externalResources, err
 	} else if taskTemplate == nil {
-		return state, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+		return state, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
 	if tMeta := taskTemplate.Metadata; tMeta == nil || !tMeta.Discoverable {
 		logger.Debugf(ctx, "Task is not marked as discoverable. Moving to [%v] phase.", phaseOnSuccess)
-		return state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Task is not discoverable."), nil
+		return state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Task is not discoverable."), externalResources, nil
 	}
 
 	var inputReaders []io.InputReader
@@ -233,12 +233,12 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		// input readers
 		inputReaders, err = ConstructRemoteFileInputReaders(ctx, tCtx.DataStore(), tCtx.InputReader().GetInputPrefixPath(), arrayJobSize)
 		if err != nil {
-			return nil, err
+			return nil, externalResources, err
 		}
 	} else {
 		inputs, err := tCtx.InputReader().Get(ctx)
 		if err != nil {
-			return state, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
+			return state, externalResources, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
 		}
 
 		var literalCollection *idlCore.LiteralCollection
@@ -257,18 +257,21 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	// output reader
 	outputReaders, err := ConstructOutputReaders(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), arrayJobSize)
 	if err != nil {
-		return nil, err
+		return nil, externalResources, err
 	}
 
 	iface := *taskTemplate.Interface
 	iface.Outputs = makeSingularTaskInterface(iface.Outputs)
 
 	// Do not cache failed tasks. Retrieve the final phase from array status and unset the non-successful ones.
+
 	tasksToCache := state.GetIndexesToCache().DeepCopy()
 	for idx, phaseIdx := range state.ArrayStatus.Detailed.GetItems() {
 		phase := core.Phases[phaseIdx]
 		if !phase.IsSuccess() {
-			tasksToCache.Clear(uint(idx))
+			// tasksToCache is built on the originalArraySize and ArrayStatus.Detailed is the executionArraySize
+			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
+			tasksToCache.Clear(uint(originalIdx))
 		}
 	}
 
@@ -278,24 +281,42 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		iface, &tasksToCache, inputReaders, outputReaders)
 
 	if err != nil {
-		return nil, err
+		return nil, externalResources, err
 	}
 
 	if len(catalogWriterItems) == 0 {
 		state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("No outputs need to be cached.")
-		return state, nil
+		return state, externalResources, nil
 	}
 
 	allWritten, err := WriteToCatalog(ctx, tCtx.TaskRefreshIndicator(), tCtx.Catalog(), catalogWriterItems)
 	if err != nil {
-		return nil, err
+		return nil, externalResources, err
 	}
 
 	if allWritten {
 		state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Finished writing catalog cache.")
+
+		// set CACHE_POPULATED CacheStatus on all cached subtasks
+		externalResources = make([]*core.ExternalResource, 0)
+		for idx, phaseIdx := range state.ArrayStatus.Detailed.GetItems() {
+			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
+			if !tasksToCache.IsSet(uint(originalIdx)) {
+				continue
+			}
+
+			externalResources = append(externalResources,
+				&core.ExternalResource{
+					CacheStatus:  idlCore.CatalogCacheStatus_CACHE_POPULATED,
+					Index:        uint32(originalIdx),
+					RetryAttempt: uint32(state.RetryAttempts.GetItem(idx)),
+					Phase:        core.Phases[phaseIdx],
+				},
+			)
+		}
 	}
 
-	return state, nil
+	return state, externalResources, nil
 }
 
 func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogClient catalog.AsyncClient,
