@@ -173,6 +173,12 @@ rules:
   - list
   - patch
   - update
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -744,7 +750,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: YjlYVGhBWXQ5Zk9MUzRyMA==
+  haSharedSecret: SUdJSnFtSFFLeVFYaXZOdg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1239,7 +1245,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e1681194373cff9a8cf3225939264458a99cd9c31295e5acc63090a8311d3c70
+        checksum/secret: 7e8c8bcd08e450301a677b157c349f1d64b5b987ba0580368791b9c6d2cf245f
       labels:
         app: docker-registry
         release: flyte-sandbox

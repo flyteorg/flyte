@@ -52,6 +52,9 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
 | flyte-binary.enabled | bool | `true` |  |
 | flyte-binary.nameOverride | string | `"flyte-sandbox"` |  |
+| flyte-binary.rbac.extraRules[0].apiGroups[0] | string | `"*"` |  |
+| flyte-binary.rbac.extraRules[0].resources[0] | string | `"*"` |  |
+| flyte-binary.rbac.extraRules[0].verbs[0] | string | `"*"` |  |
 | kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |

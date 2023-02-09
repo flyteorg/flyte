@@ -49,7 +49,8 @@ start:
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
-			--volume flyte-sandbox:/var/lib/flyte \
+			--volume $(HOME)/.flyte/sandbox:/var/lib/flyte/config \
+			--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443" \
 			--publish "30000:30000" \
 			--publish "30001:30001" \
@@ -77,7 +78,6 @@ console:
 
 .PHONY: test
 test: export FLYTECTL_CONFIG := test/config.yaml
-test: export KUBECONFIG := .kube/kubeconfig
 test: .venv kubeconfig
 	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
 	kubectl create secret generic user-info \
