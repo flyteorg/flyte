@@ -4,6 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 
@@ -92,6 +97,9 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		PluginID:              containerPluginIdentifier,
 		ResourcePoolInfo:      resourcePoolInfo,
 		ClusterID:             testClusterID,
+		EventConfig: &config.EventConfig{
+			RawOutputPolicy: config.RawOutputPolicyReference,
+		},
 	})
 	assert.NoError(t, err)
 	assert.Nil(t, tev.Logs)
@@ -100,7 +108,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, np, tev.OccurredAt)
 	assert.Equal(t, tkID, tev.TaskId)
 	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
-	assert.Equal(t, inputPath, tev.InputUri)
+	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Nil(t, tev.OutputResult)
 	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 	assert.Equal(t, containerTaskType, tev.TaskType)
@@ -129,6 +137,9 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		PluginID:              containerPluginIdentifier,
 		ResourcePoolInfo:      resourcePoolInfo,
 		ClusterID:             testClusterID,
+		EventConfig: &config.EventConfig{
+			RawOutputPolicy: config.RawOutputPolicyReference,
+		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, core.TaskExecution_RUNNING, tev.Phase)
@@ -138,7 +149,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, np, tev.OccurredAt)
 	assert.Equal(t, tkID, tev.TaskId)
 	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
-	assert.Equal(t, inputPath, tev.InputUri)
+	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Nil(t, tev.OutputResult)
 	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 	assert.Equal(t, containerTaskType, tev.TaskType)
@@ -164,6 +175,9 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		PluginID:              containerPluginIdentifier,
 		ResourcePoolInfo:      resourcePoolInfo,
 		ClusterID:             testClusterID,
+		EventConfig: &config.EventConfig{
+			RawOutputPolicy: config.RawOutputPolicyReference,
+		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, core.TaskExecution_SUCCEEDED, tev.Phase)
@@ -175,7 +189,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, tkID, tev.TaskId)
 	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
 	assert.NotNil(t, tev.OutputResult)
-	assert.Equal(t, inputPath, tev.InputUri)
+	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Equal(t, outputPath, tev.GetOutputUri())
 	assert.Empty(t, event.TaskExecutionMetadata_DEFAULT, tev.Metadata.InstanceClass)
 	assert.Equal(t, containerTaskType, tev.TaskType)
@@ -183,6 +197,32 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
 	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
 	assert.Equal(t, testClusterID, tev.ProducerId)
+
+	t.Run("inline event policy", func(t *testing.T) {
+		inputs := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("bar"),
+			},
+		}
+		tev, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+			TaskExecContext:       tCtx,
+			InputReader:           in,
+			Inputs:                inputs,
+			OutputWriter:          out,
+			Info:                  pluginCore.PhaseInfoQueued(n, 1, "z"),
+			NodeExecutionMetadata: &nodeExecutionMetadata,
+			ExecContext:           mockExecContext,
+			TaskType:              containerTaskType,
+			PluginID:              containerPluginIdentifier,
+			ResourcePoolInfo:      resourcePoolInfo,
+			ClusterID:             testClusterID,
+			EventConfig: &config.EventConfig{
+				RawOutputPolicy: config.RawOutputPolicyInline,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(inputs, tev.GetInputData()))
+	})
 }
 
 func TestToTransitionType(t *testing.T) {
@@ -251,6 +291,9 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 		PluginID:              containerPluginIdentifier,
 		ResourcePoolInfo:      resourcePoolInfo,
 		ClusterID:             testClusterID,
+		EventConfig: &config.EventConfig{
+			RawOutputPolicy: config.RawOutputPolicyReference,
+		},
 	})
 	assert.NoError(t, err)
 	expectedNodeID := &core.NodeExecutionIdentifier{
@@ -262,7 +305,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	assert.Equal(t, np, tev.OccurredAt)
 	assert.Equal(t, tkID, tev.TaskId)
 	assert.Equal(t, expectedNodeID, tev.ParentNodeExecutionId)
-	assert.Equal(t, inputPath, tev.InputUri)
+	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Nil(t, tev.OutputResult)
 	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 	assert.Equal(t, containerTaskType, tev.TaskType)
@@ -291,6 +334,9 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 		PluginID:              containerPluginIdentifier,
 		ResourcePoolInfo:      resourcePoolInfo,
 		ClusterID:             testClusterID,
+		EventConfig: &config.EventConfig{
+			RawOutputPolicy: config.RawOutputPolicyReference,
+		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, core.TaskExecution_RUNNING, tev.Phase)
@@ -300,7 +346,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	assert.Equal(t, np, tev.OccurredAt)
 	assert.Equal(t, tkID, tev.TaskId)
 	assert.Equal(t, expectedNodeID, tev.ParentNodeExecutionId)
-	assert.Equal(t, inputPath, tev.InputUri)
+	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Nil(t, tev.OutputResult)
 	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 	assert.Equal(t, containerTaskType, tev.TaskType)
