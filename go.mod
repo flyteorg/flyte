@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte
 
-go 1.18
+go 1.19
 
 require (
 	github.com/flyteorg/datacatalog v1.0.41
