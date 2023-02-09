@@ -64,7 +64,9 @@ var request = admin.NodeExecutionEventRequest{
 		},
 		OccurredAt: occurredAtProto,
 		Phase:      core.NodeExecution_RUNNING,
-		InputUri:   "input uri",
+		InputValue: &event.NodeExecutionEvent_InputUri{
+			InputUri: "input uri",
+		},
 		TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
 			TaskNodeMetadata: &event.TaskNodeMetadata{
 				DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
@@ -394,7 +396,9 @@ func TestCreateNodeEvent_FirstEventIsTerminal(t *testing.T) {
 			},
 			OccurredAt: occurredAtProto,
 			Phase:      core.NodeExecution_SUCCEEDED,
-			InputUri:   "input uri",
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: "input uri",
+			},
 		},
 	}
 	mockDbEventWriter := &eventWriterMocks.NodeExecutionEventWriter{}

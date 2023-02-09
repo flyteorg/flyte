@@ -3,6 +3,8 @@ package transformers
 import (
 	"context"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/storage"
 
@@ -110,8 +112,7 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 				Name:    input.Request.Event.Id.ExecutionId.Name,
 			},
 		},
-		Phase:    input.Request.Event.Phase.String(),
-		InputURI: input.Request.Event.InputUri,
+		Phase: input.Request.Event.Phase.String(),
 	}
 
 	closure := admin.NodeExecutionClosure{
@@ -125,6 +126,10 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 		SpecNodeId:   input.Request.Event.SpecNodeId,
 		IsParentNode: input.Request.Event.IsParent,
 		IsDynamic:    input.Request.Event.IsDynamic,
+	}
+	err := handleNodeExecutionInputs(ctx, nodeExecution, input.Request, input.StorageClient)
+	if err != nil {
+		return nil, err
 	}
 
 	if input.Request.Event.Phase == core.NodeExecution_RUNNING {
@@ -178,8 +183,12 @@ func UpdateNodeExecutionModel(
 	ctx context.Context, request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
 	targetExecution *core.WorkflowExecutionIdentifier, dynamicWorkflowRemoteClosure string,
 	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	err := handleNodeExecutionInputs(ctx, nodeExecutionModel, request, storageClient)
+	if err != nil {
+		return err
+	}
 	var nodeExecutionClosure admin.NodeExecutionClosure
-	err := proto.Unmarshal(nodeExecutionModel.Closure, &nodeExecutionClosure)
+	err = proto.Unmarshal(nodeExecutionModel.Closure, &nodeExecutionClosure)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to unmarshal node execution closure with error: %+v", err)
@@ -316,4 +325,32 @@ func GetNodeExecutionInternalData(internalData []byte) (*genModel.NodeExecutionI
 		}
 	}
 	return &nodeExecutionInternalData, nil
+}
+
+func handleNodeExecutionInputs(ctx context.Context,
+	nodeExecutionModel *models.NodeExecution,
+	request *admin.NodeExecutionEventRequest,
+	storageClient *storage.DataStore) error {
+	if len(nodeExecutionModel.InputURI) > 0 {
+		// Inputs are static over the duration of the node execution, no need to update them when they're already set
+		return nil
+	}
+	switch request.Event.GetInputValue().(type) {
+	case *event.NodeExecutionEvent_InputUri:
+		logger.Debugf(ctx, "saving node execution input URI [%s]", request.Event.GetInputUri())
+		nodeExecutionModel.InputURI = request.Event.GetInputUri()
+	case *event.NodeExecutionEvent_InputData:
+		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetInputData(),
+			request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
+			request.Event.Id.NodeId, InputsObjectSuffix)
+		if err != nil {
+			return err
+		}
+		logger.Debugf(ctx, "offloaded node execution inputs to [%s]", uri)
+		nodeExecutionModel.InputURI = uri.String()
+	default:
+		logger.Debugf(ctx, "request contained no input data")
+
+	}
+	return nil
 }

@@ -66,7 +66,9 @@ var nodeRequest = &admin.NodeExecutionEventRequest{
 		Id:         &nodeExecutionID,
 		OccurredAt: occurredAtProto,
 		Phase:      core.NodeExecution_RUNNING,
-		InputUri:   "input uri",
+		InputValue: &event.NodeExecutionEvent_InputUri{
+			InputUri: "input uri",
+		},
 	},
 }
 
