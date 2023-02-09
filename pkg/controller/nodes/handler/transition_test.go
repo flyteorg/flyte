@@ -3,6 +3,8 @@ package handler
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +15,7 @@ func AsPointer[T any](val T) *T {
 
 func TestDoTransition(t *testing.T) {
 	t.Run("ephemeral", func(t *testing.T) {
-		tr := DoTransition(TransitionTypeEphemeral, PhaseInfoQueued("queued"))
+		tr := DoTransition(TransitionTypeEphemeral, PhaseInfoQueued("queued", &core.LiteralMap{}))
 		assert.Equal(t, TransitionTypeEphemeral, tr.Type())
 		assert.Equal(t, EPhaseQueued, tr.Info().p)
 	})
@@ -30,7 +32,7 @@ func TestDoTransition(t *testing.T) {
 }
 
 func TestTransition_WithInfo(t *testing.T) {
-	tr := DoTransition(TransitionTypeEphemeral, PhaseInfoQueued("queued"))
+	tr := DoTransition(TransitionTypeEphemeral, PhaseInfoQueued("queued", &core.LiteralMap{}))
 	assert.Equal(t, EPhaseQueued, tr.info.p)
 	tr = tr.WithInfo(PhaseInfoSuccess(&ExecutionInfo{}))
 	assert.Equal(t, EPhaseSuccess, tr.info.p)

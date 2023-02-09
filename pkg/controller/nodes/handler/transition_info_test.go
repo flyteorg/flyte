@@ -3,12 +3,15 @@ package handler
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPhaseInfoQueued(t *testing.T) {
-	p := PhaseInfoQueued("Queued")
+	p := PhaseInfoQueued("Queued", &core.LiteralMap{})
 	assert.Equal(t, EPhaseQueued, p.p)
 }
 
@@ -59,11 +62,17 @@ func TestPhaseInfo(t *testing.T) {
 	})
 
 	t.Run("queued", func(t *testing.T) {
-		p := PhaseInfoQueued("reason")
+		inputs := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("bar"),
+			},
+		}
+		p := PhaseInfoQueued("reason", inputs)
 		assert.Equal(t, EPhaseQueued, p.GetPhase())
 		assert.Nil(t, p.GetErr())
 		assert.NotNil(t, p.GetOccurredAt())
 		assert.Equal(t, "reason", p.GetReason())
+		assert.True(t, proto.Equal(p.info.Inputs, inputs))
 	})
 
 	t.Run("running", func(t *testing.T) {

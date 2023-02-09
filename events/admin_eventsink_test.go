@@ -41,10 +41,12 @@ var (
 				Name:    "n",
 			},
 		},
-		Phase:        core.NodeExecution_FAILED,
-		OccurredAt:   ptypes.TimestampNow(),
-		ProducerId:   "",
-		InputUri:     "input-uri",
+		Phase:      core.NodeExecution_FAILED,
+		OccurredAt: ptypes.TimestampNow(),
+		ProducerId: "",
+		InputValue: &event.NodeExecutionEvent_InputUri{
+			InputUri: "input-uri",
+		},
 		DeckUri:      deckURI,
 		OutputResult: &event.NodeExecutionEvent_OutputUri{OutputUri: ""},
 	}
@@ -200,10 +202,12 @@ func TestIDFromMessage(t *testing.T) {
 				Name:    "n",
 			},
 		},
-		Phase:        core.NodeExecution_FAILED,
-		OccurredAt:   ptypes.TimestampNow(),
-		ProducerId:   "",
-		InputUri:     "input-uri",
+		Phase:      core.NodeExecution_FAILED,
+		OccurredAt: ptypes.TimestampNow(),
+		ProducerId: "",
+		InputValue: &event.NodeExecutionEvent_InputUri{
+			InputUri: "input-uri",
+		},
 		OutputResult: &event.NodeExecutionEvent_OutputUri{OutputUri: ""},
 		RetryGroup:   "1",
 	}
