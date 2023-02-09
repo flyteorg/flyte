@@ -75,10 +75,12 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
   additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
   additionalVolumeMounts: []
-  # -- Appends additional containers to the containers list. May include template values.
-  additionalContainers: {}
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
@@ -128,6 +130,12 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Sets priorityClassName for flyte scheduler pod(s).
   priorityClassName: ""
 
@@ -179,6 +187,12 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
@@ -232,6 +246,12 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
   # -- Defines the cluster name used in events sent to Admin
