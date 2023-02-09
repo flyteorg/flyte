@@ -16,7 +16,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
@@ -24,17 +26,20 @@ import (
 )
 
 var (
-	FlyteStateDir           = f.FilePathJoin(f.UserHomeDir(), ".flyte", "state")
-	Kubeconfig              = f.FilePathJoin(FlyteStateDir, "kubeconfig")
-	SandboxKubeconfig       = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
-	SuccessMessage          = "Deploying Flyte..."
-	FlyteSandboxClusterName = "flyte-sandbox"
-	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
-	Source                  = "/root"
-	StateDirMountDest       = "/srv/flyte"
-	K3sDir                  = "/etc/rancher/"
-	Client                  Docker
-	Volumes                 = []mount.Mount{
+	FlyteSandboxConfigDir          = f.FilePathJoin(f.UserHomeDir(), ".flyte", "sandbox")
+	Kubeconfig                     = f.FilePathJoin(FlyteSandboxConfigDir, "kubeconfig")
+	SandboxKubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
+	SuccessMessage                 = "Deploying Flyte..."
+	FlyteSandboxClusterName        = "flyte-sandbox"
+	FlyteSandboxVolumeName         = "flyte-sandbox"
+	FlyteSandboxInternalDir        = "/var/lib/flyte"
+	FlyteSandboxInternalConfigDir  = f.FilePathJoin(FlyteSandboxInternalDir, "config")
+	FlyteSandboxInternalStorageDir = f.FilePathJoin(FlyteSandboxInternalDir, "storage")
+	Environment                    = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
+	Source                         = "/root"
+	K3sDir                         = "/etc/rancher/"
+	Client                         Docker
+	Volumes                        = []mount.Mount{
 		{
 			Type:   mount.TypeBind,
 			Source: f.FilePathJoin(f.UserHomeDir(), ".flyte"),
@@ -44,7 +49,7 @@ var (
 	ExecConfig = types.ExecConfig{
 		AttachStderr: true,
 		Tty:          true,
-		WorkingDir:   Source,
+		WorkingDir:   "/",
 		AttachStdout: true,
 		Cmd:          []string{},
 	}
@@ -75,7 +80,7 @@ func GetSandbox(ctx context.Context, cli Docker) (*types.Container, error) {
 		return nil, err
 	}
 	for _, v := range containers {
-		if strings.Contains(v.Names[0], FlyteSandboxClusterName) {
+		if strings.TrimLeft(v.Names[0], "/") == FlyteSandboxClusterName {
 			return &v, nil
 		}
 	}
@@ -338,4 +343,38 @@ func InspectExecResp(ctx context.Context, cli Docker, containerID string) error 
 		return err
 	}
 	return nil
+}
+
+func PrintCreateVolume(name string) {
+	fmt.Printf("%v Run the following command to create a volume\n", emoji.Sparkle)
+	fmt.Printf("	docker volume create %v\n", name)
+}
+
+func GetOrCreateVolume(
+	ctx context.Context, cli Docker, volumeName string, dryRun bool,
+) (*types.Volume, error) {
+	if dryRun {
+		PrintCreateVolume(volumeName)
+		return nil, nil
+	}
+
+	resp, err := cli.VolumeList(ctx, filters.NewArgs(
+		filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", volumeName)},
+	))
+	if err != nil {
+		return nil, err
+	}
+	switch len(resp.Volumes) {
+	case 0:
+		v, err := cli.VolumeCreate(ctx, volume.VolumeCreateBody{Name: volumeName})
+		if err != nil {
+			return nil, err
+		}
+		return &v, nil
+	case 1:
+		return resp.Volumes[0], nil
+	default:
+		// We don't expect to ever arrive at this point
+		return nil, fmt.Errorf("unexpected error - found multiple volumes with name: %s", volumeName)
+	}
 }

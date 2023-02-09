@@ -14,6 +14,8 @@ import (
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
 
 	"github.com/stretchr/testify/mock"
@@ -370,6 +372,31 @@ func TestInspectExecResp(t *testing.T) {
 		}, nil)
 
 		err := InspectExecResp(ctx, mockDocker, "test")
+		assert.Nil(t, err)
+	})
+
+}
+
+func TestGetOrCreateVolume(t *testing.T) {
+	t.Run("VolumeExists", func(t *testing.T) {
+		ctx := context.Background()
+		mockDocker := &mocks.Docker{}
+		expected := &types.Volume{Name: "test"}
+
+		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{expected}}, nil)
+		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
+		assert.Equal(t, expected, actual, "volumes should match")
+		assert.Nil(t, err)
+	})
+	t.Run("VolumeDoesNotExist", func(t *testing.T) {
+		ctx := context.Background()
+		mockDocker := &mocks.Docker{}
+		expected := types.Volume{Name: "test"}
+
+		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
+		mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: "test"}).Return(expected, nil)
+		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
+		assert.Equal(t, expected, *actual, "volumes should match")
 		assert.Nil(t, err)
 	})
 

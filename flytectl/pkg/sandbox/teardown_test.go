@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/docker/mocks"
 	"github.com/flyteorg/flytectl/pkg/k8s"
@@ -28,12 +29,12 @@ func TestTearDownFunc(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
 	mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("err"))
-	err := Teardown(ctx, mockDocker)
+	err := Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 	assert.NotNil(t, err)
 
 	mockDocker = &mocks.Docker{}
 	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(nil, fmt.Errorf("err"))
-	err = Teardown(ctx, mockDocker)
+	err = Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 	assert.NotNil(t, err)
 
 	mockDocker = &mocks.Docker{}
@@ -42,7 +43,7 @@ func TestTearDownFunc(t *testing.T) {
 	mockK8sContextMgr := &k8sMocks.ContextOps{}
 	mockK8sContextMgr.OnRemoveContext(mock.Anything).Return(nil)
 	k8s.ContextMgr = mockK8sContextMgr
-	err = Teardown(ctx, mockDocker)
+	err = Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 	assert.Nil(t, err)
 
 }

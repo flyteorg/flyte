@@ -6,7 +6,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -27,6 +29,9 @@ type Docker interface {
 	ImageList(ctx context.Context, listOption types.ImageListOptions) ([]types.ImageSummary, error)
 	ContainerStatPath(ctx context.Context, containerID, path string) (types.ContainerPathStat, error)
 	CopyFromContainer(ctx context.Context, containerID, srcPath string) (io.ReadCloser, types.ContainerPathStat, error)
+	VolumeCreate(ctx context.Context, options volume.VolumeCreateBody) (types.Volume, error)
+	VolumeList(ctx context.Context, filter filters.Args) (volume.VolumeListOKBody, error)
+	VolumeRemove(ctx context.Context, volumeID string, force bool) error
 }
 
 type FlyteDocker struct {

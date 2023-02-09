@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	labelSelector = "app=flyte"
+	internalBootstrapAgent = "flyte-sandbox-bootstrap"
+	labelSelector          = "app.kubernetes.io/name=flyte-binary"
 )
 const (
 	reloadShort = "Power cycle the Flyte executable pod, effectively picking up an updated config."
@@ -28,8 +29,68 @@ Usage
 `
 )
 
-// reloadDemoCluster will kill the flyte binary pod so the new one can pick up a new config file
+func isLegacySandbox(ctx context.Context, cli docker.Docker, containerID string) (bool, error) {
+	var result bool
+
+	// Check if sandbox is compatible with new bootstrap mechanism
+	exec, err := docker.ExecCommend(
+		ctx,
+		cli,
+		containerID,
+		[]string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapAgent)},
+	)
+	if err != nil {
+		return result, err
+	}
+	if err = docker.InspectExecResp(ctx, cli, exec.ID); err != nil {
+		return result, err
+	}
+	res, err := cli.ContainerExecInspect(ctx, exec.ID)
+	if err != nil {
+		return result, err
+	}
+
+	result = res.ExitCode != 0
+	return result, nil
+}
+
 func reloadDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+	cli, err := docker.GetDockerClient()
+	if err != nil {
+		return err
+	}
+	c, err := docker.GetSandbox(ctx, cli)
+	if err != nil {
+		return err
+	}
+	if c == nil {
+		return fmt.Errorf("reload failed - could not find an active sandbox")
+	}
+
+	// Working with a legacy sandbox - fallback to legacy reload mechanism
+	useLegacyMethod, err := isLegacySandbox(ctx, cli, c.ID)
+	if err != nil {
+		return err
+	}
+	if useLegacyMethod {
+		return legacyReloadDemoCluster(ctx)
+	}
+
+	// At this point we know that we are on a modern sandbox, and we can use the
+	// internal bootstrap agent to reload the cluster
+	exec, err := docker.ExecCommend(ctx, cli, c.ID, []string{internalBootstrapAgent})
+	if err != nil {
+		return err
+	}
+	if err = docker.InspectExecResp(ctx, cli, exec.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// legacyReloadDemoCluster will kill the flyte binary pod so the new one can pick up a new config file
+func legacyReloadDemoCluster(ctx context.Context) error {
 	k8sClient, err := k8s.GetK8sClient(docker.Kubeconfig, K8sEndpoint)
 	if err != nil {
 		fmt.Println("Could not get K8s client")

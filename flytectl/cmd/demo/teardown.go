@@ -3,10 +3,10 @@ package demo
 import (
 	"context"
 
+	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/sandbox"
 
-	"github.com/flyteorg/flytectl/pkg/docker"
-
+	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
@@ -28,5 +28,5 @@ func teardownDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 	if err != nil {
 		return err
 	}
-	return sandbox.Teardown(ctx, cli)
+	return sandbox.Teardown(ctx, cli, sandboxCmdConfig.DefaultTeardownFlags)
 }

@@ -39,7 +39,7 @@ const (
 	sandboxImageName     = "cr.flyte.org/flyteorg/flyte-sandbox"
 	demoImageName        = "cr.flyte.org/flyteorg/flyte-sandbox-bundled"
 	DefaultFlyteConfig   = "/opt/flyte/defaults.flyte.yaml"
-	k3sKubeConfigEnvVar  = "K3S_KUBECONFIG_OUTPUT=/srv/flyte/kubeconfig"
+	k3sKubeConfigEnvVar  = "K3S_KUBECONFIG_OUTPUT=/var/lib/flyte/config/kubeconfig"
 )
 
 func isNodeTainted(ctx context.Context, client corev1.CoreV1Interface) (bool, error) {
@@ -184,17 +184,33 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 		volumes = append(volumes, *vol)
 	}
 
-	// This is the state directory mount, flyte will write the kubeconfig here. May hold more in future releases
+	// This is the sandbox configuration directory mount, flyte will write the kubeconfig here. May hold more in future releases
 	// To be interoperable with the old sandbox, only mount if the directory exists, should've created by StartCluster
-	if fileInfo, err := os.Stat(docker.FlyteStateDir); err == nil {
+	if fileInfo, err := os.Stat(docker.FlyteSandboxConfigDir); err == nil {
 		if fileInfo.IsDir() {
-			if vol, err := MountVolume(docker.FlyteStateDir, docker.StateDirMountDest); err != nil {
+			if vol, err := MountVolume(docker.FlyteSandboxConfigDir, docker.FlyteSandboxInternalConfigDir); err != nil {
 				return nil, err
 			} else if vol != nil {
 				volumes = append(volumes, *vol)
 			}
 		}
 	}
+
+	// Create and mount a docker volume that will be used to persist data
+	// across sandbox clusters
+	if _, err := docker.GetOrCreateVolume(
+		ctx,
+		cli,
+		docker.FlyteSandboxVolumeName,
+		sandboxConfig.DryRun,
+	); err != nil {
+		return nil, err
+	}
+	volumes = append(volumes, mount.Mount{
+		Type:   mount.TypeVolume,
+		Source: docker.FlyteSandboxVolumeName,
+		Target: docker.FlyteSandboxInternalStorageDir,
+	})
 
 	sandboxImage := sandboxConfig.Image
 	if len(sandboxImage) == 0 {

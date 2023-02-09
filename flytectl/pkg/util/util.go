@@ -11,7 +11,6 @@ import (
 
 	"github.com/flyteorg/flytectl/pkg/configutil"
 	"github.com/flyteorg/flytectl/pkg/docker"
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/enescakir/emoji"
 	hversion "github.com/hashicorp/go-version"
@@ -57,7 +56,7 @@ func CreatePathAndFile(pathToConfig string) error {
 
 // SetupFlyteDir will create .flyte dir if not exist
 func SetupFlyteDir() error {
-	if err := os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm); err != nil {
+	if err := os.MkdirAll(docker.FlyteSandboxConfigDir, os.ModePerm); err != nil {
 		return err
 	}
 

@@ -19,6 +19,8 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/volume"
 	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/google/go-github/v42/github"
 	"github.com/stretchr/testify/assert"
@@ -86,6 +88,8 @@ func sandboxSetup() {
 	bodyStatus := make(chan container.ContainerWaitOKBody)
 	githubMock = &ghMocks.GHRepoService{}
 	sandboxCmdConfig.DefaultConfig.Image = "dummyimage"
+	mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", docker.FlyteSandboxVolumeName)})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
+	mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: docker.FlyteSandboxVolumeName}).Return(types.Volume{Name: docker.FlyteSandboxVolumeName}, nil)
 	mockDocker.OnContainerCreateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(container.ContainerCreateCreatedBody{
 		ID: "Hello",
 	}, nil)
@@ -119,7 +123,8 @@ func TestStartFunc(t *testing.T) {
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-
+		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: mock.Anything, Value: mock.Anything})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
+		mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: mock.Anything}).Return(types.Volume{}, nil)
 		_, err := startSandbox(ctx, mockDocker, githubMock, os.Stdin, config, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.Nil(t, err)
 	})
@@ -295,7 +300,6 @@ func TestStartFunc(t *testing.T) {
 		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(mock.Anything, mock.Anything, mock.Anything).Return(os.Stdin, nil)
 		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-
 		stringReader := strings.NewReader(docker.SuccessMessage)
 		reader := ioutil.NopCloser(stringReader)
 		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
