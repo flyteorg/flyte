@@ -57,7 +57,9 @@ var taskEventRequest = admin.TaskExecutionEventRequest{
 		OccurredAt:            sampleTaskEventOccurredAt,
 		Phase:                 core.TaskExecution_RUNNING,
 		RetryAttempt:          uint32(1),
-		InputUri:              "input uri",
+		InputValue: &event.TaskExecutionEvent_InputUri{
+			InputUri: "input uri",
+		},
 	},
 }
 

@@ -42,9 +42,11 @@ func TestCreateNodeExecution(t *testing.T) {
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 		},
 	})
@@ -73,9 +75,11 @@ func TestCreateNodeExecutionWithParent(t *testing.T) {
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 		},
 	})
@@ -95,8 +99,10 @@ func TestCreateNodeExecutionWithParent(t *testing.T) {
 				NodeId:      "child",
 				ExecutionId: nodeExecutionId.ExecutionId,
 			},
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 			SpecNodeId: "spec",
 			RetryGroup: "1",
@@ -140,9 +146,11 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: beganRunningAtProto,
 		},
 	})
@@ -162,9 +170,11 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "other request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         otherNodeExecutionID,
-			Phase:      core.NodeExecution_QUEUED,
-			InputUri:   inputURI,
+			Id:    otherNodeExecutionID,
+			Phase: core.NodeExecution_QUEUED,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: otherBeganRunningAtProto,
 		},
 	})
@@ -176,9 +186,11 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_SUCCEEDED,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_SUCCEEDED,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: succeededAtProto,
 			OutputResult: &event.NodeExecutionEvent_OutputUri{
 				OutputUri: outputURI,
@@ -232,9 +244,11 @@ func TestCreateAndListNodeExecutions(t *testing.T) {
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 		},
 	})
@@ -271,9 +285,11 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 		},
 	})
@@ -286,8 +302,10 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 				NodeId:      "child",
 				ExecutionId: nodeExecutionId.ExecutionId,
 			},
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 			SpecNodeId: "spec",
 			RetryGroup: "1",
@@ -305,8 +323,10 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 				NodeId:      "child2",
 				ExecutionId: nodeExecutionId.ExecutionId,
 			},
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 			SpecNodeId: "spec",
 			RetryGroup: "1",
@@ -403,9 +423,11 @@ func TestCreateChildNodeExecutionForTaskExecution(t *testing.T) {
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         childNodeExecutionID,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    childNodeExecutionID,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: childOccurredAtProto,
 			ParentTaskMetadata: &event.ParentTaskExecutionMetadata{
 				Id: taskExecutionIdentifier,

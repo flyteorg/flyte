@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/promutils"
+
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/storage"
@@ -226,6 +228,8 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 }
 
 func TestCreateTaskExecutionModelQueued(t *testing.T) {
+	ds, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
 	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
 		Request: &admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
@@ -233,12 +237,15 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 				ParentNodeExecutionId: sampleNodeExecID,
 				Phase:                 core.TaskExecution_QUEUED,
 				RetryAttempt:          1,
-				InputUri:              "input uri",
-				OccurredAt:            taskEventOccurredAtProto,
-				Reason:                "Task was scheduled",
-				TaskType:              "sidecar",
+				InputValue: &event.TaskExecutionEvent_InputData{
+					InputData: testInputs,
+				},
+				OccurredAt: taskEventOccurredAtProto,
+				Reason:     "Task was scheduled",
+				TaskType:   "sidecar",
 			},
 		},
+		StorageClient: ds,
 	})
 	assert.Nil(t, err)
 
@@ -273,7 +280,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 			RetryAttempt: &retryAttemptValue,
 		},
 		Phase:                  "QUEUED",
-		InputURI:               "input uri",
+		InputURI:               "/metadata/project/domain/name/node-id/project/domain/task-id/task-v/1/offloaded_inputs",
 		Closure:                expectedClosureBytes,
 		StartedAt:              nil,
 		TaskExecutionCreatedAt: &taskEventOccurredAt,
@@ -290,7 +297,9 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 				Phase:                 core.TaskExecution_RUNNING,
 				PhaseVersion:          uint32(2),
 				RetryAttempt:          1,
-				InputUri:              "input uri",
+				InputValue: &event.TaskExecutionEvent_InputUri{
+					InputUri: testInputURI,
+				},
 				OutputResult: &event.TaskExecutionEvent_OutputUri{
 					OutputUri: "output uri",
 				},
@@ -352,7 +361,7 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 		},
 		Phase:                  "RUNNING",
 		PhaseVersion:           uint32(2),
-		InputURI:               "input uri",
+		InputURI:               testInputURI,
 		Closure:                expectedClosureBytes,
 		StartedAt:              &taskEventOccurredAt,
 		TaskExecutionCreatedAt: &taskEventOccurredAt,
@@ -422,7 +431,9 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 			ParentNodeExecutionId: sampleNodeExecID,
 			Phase:                 core.TaskExecution_FAILED,
 			RetryAttempt:          1,
-			InputUri:              "input uri",
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: testInputURI,
+			},
 			OutputResult: &event.TaskExecutionEvent_Error{
 				Error: outputError,
 			},
@@ -1181,4 +1192,67 @@ func TestMergeMetadata(t *testing.T) {
 			assert.True(t, proto.Equal(mergeTestCase.expected, metadata))
 		})
 	}
+}
+
+func TestHandleTaskExecutionInputs(t *testing.T) {
+	ctx := context.TODO()
+	t.Run("no need to update", func(t *testing.T) {
+		taskExecutionModel := models.TaskExecution{
+			InputURI: testInputURI,
+		}
+		err := handleTaskExecutionInputs(ctx, &taskExecutionModel, nil, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, taskExecutionModel.InputURI, testInputURI)
+	})
+	t.Run("read event input data", func(t *testing.T) {
+		taskExecutionModel := models.TaskExecution{}
+		ds, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+		err = handleTaskExecutionInputs(ctx, &taskExecutionModel, &admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				TaskId:                sampleTaskID,
+				ParentNodeExecutionId: sampleNodeExecID,
+				RetryAttempt:          retryAttemptValue,
+				InputValue: &event.TaskExecutionEvent_InputData{
+					InputData: testInputs,
+				},
+			},
+		}, ds)
+		assert.NoError(t, err)
+		expectedOffloadedInputsLocation := "/metadata/project/domain/name/node-id/project/domain/task-id/task-v/1/offloaded_inputs"
+		assert.Equal(t, taskExecutionModel.InputURI, expectedOffloadedInputsLocation)
+		actualInputs := &core.LiteralMap{}
+		err = ds.ReadProtobuf(ctx, storage.DataReference(expectedOffloadedInputsLocation), actualInputs)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(actualInputs, testInputs))
+	})
+	t.Run("read event input uri", func(t *testing.T) {
+		taskExecutionModel := models.TaskExecution{}
+		err := handleTaskExecutionInputs(ctx, &taskExecutionModel, &admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				TaskId:                sampleTaskID,
+				ParentNodeExecutionId: sampleNodeExecID,
+				RetryAttempt:          retryAttemptValue,
+				InputValue: &event.TaskExecutionEvent_InputUri{
+					InputUri: testInputURI,
+				},
+			},
+		}, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, taskExecutionModel.InputURI, testInputURI)
+	})
+	t.Run("request contained no input data", func(t *testing.T) {
+		taskExecutionModel := models.TaskExecution{
+			InputURI: testInputURI,
+		}
+		err := handleTaskExecutionInputs(ctx, &taskExecutionModel, &admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				TaskId:                sampleTaskID,
+				ParentNodeExecutionId: sampleNodeExecID,
+				RetryAttempt:          retryAttemptValue,
+			},
+		}, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, taskExecutionModel.InputURI, testInputURI)
+	})
 }

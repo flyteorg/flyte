@@ -60,9 +60,11 @@ func createTaskAndNodeExecution(
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
-			Id:         nodeExecutionId,
-			Phase:      core.NodeExecution_RUNNING,
-			InputUri:   inputURI,
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
 			OccurredAt: occurredAtProto,
 		},
 	})
@@ -90,7 +92,9 @@ func TestCreateTaskExecution(t *testing.T) {
 			Phase:                 core.TaskExecution_RUNNING,
 			RetryAttempt:          1,
 			OccurredAt:            occurredAtProto,
-			InputUri:              taskExecInputURI,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
 		},
 	})
 	assert.Nil(t, err)
@@ -124,8 +128,10 @@ func TestCreateAndUpdateTaskExecution(t *testing.T) {
 			ParentNodeExecutionId: nodeExecutionId,
 			Phase:                 core.TaskExecution_FAILED,
 			OccurredAt:            beganAtProto,
-			InputUri:              taskExecInputURI,
-			RetryAttempt:          0,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
+			RetryAttempt: 0,
 		},
 	})
 	assert.Nil(t, err)
@@ -147,7 +153,9 @@ func TestCreateAndUpdateTaskExecution(t *testing.T) {
 			Phase:                 core.TaskExecution_RUNNING,
 			RetryAttempt:          1,
 			OccurredAt:            beganAtProto,
-			InputUri:              taskExecInputURI,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
 		},
 	})
 	assert.Nil(t, err)
@@ -166,7 +174,9 @@ func TestCreateAndUpdateTaskExecution(t *testing.T) {
 			Phase:                 core.TaskExecution_SUCCEEDED,
 			RetryAttempt:          1,
 			OccurredAt:            endedAtProto,
-			InputUri:              taskExecInputURI,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
 		},
 	})
 	assert.Nil(t, err)
@@ -204,8 +214,10 @@ func TestCreateAndUpdateTaskExecutionPhaseVersion(t *testing.T) {
 			ParentNodeExecutionId: nodeExecutionId,
 			Phase:                 core.TaskExecution_RUNNING,
 			OccurredAt:            beganAtProto,
-			InputUri:              taskExecInputURI,
-			RetryAttempt:          0,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
+			RetryAttempt: 0,
 		},
 	})
 	assert.Nil(t, err)
@@ -237,9 +249,11 @@ func TestCreateAndUpdateTaskExecutionPhaseVersion(t *testing.T) {
 			Phase:                 core.TaskExecution_RUNNING,
 			PhaseVersion:          1,
 			OccurredAt:            beganAtProto,
-			InputUri:              taskExecInputURI,
-			RetryAttempt:          0,
-			CustomInfo:            &customInfo,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
+			RetryAttempt: 0,
+			CustomInfo:   &customInfo,
 		},
 	})
 	assert.Nil(t, err)
@@ -275,7 +289,9 @@ func TestCreateAndListTaskExecution(t *testing.T) {
 			Phase:                 core.TaskExecution_RUNNING,
 			RetryAttempt:          1,
 			OccurredAt:            occurredAtProto,
-			InputUri:              taskExecInputURI,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
 		},
 	})
 	assert.Nil(t, err)
@@ -388,7 +404,9 @@ func TestGetTaskExecutionData(t *testing.T) {
 			ParentNodeExecutionId: nodeExecutionId,
 			Phase:                 core.TaskExecution_SUCCEEDED,
 			OccurredAt:            beganAtProto,
-			InputUri:              taskExecInputURI,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: taskExecInputURI,
+			},
 			OutputResult: &event.TaskExecutionEvent_OutputUri{
 				OutputUri: "s3://flyte/metadata/admin/output/uri",
 			},
