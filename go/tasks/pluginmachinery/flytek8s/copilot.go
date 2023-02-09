@@ -175,7 +175,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	c.SecurityContext.Capabilities.Add = append(c.SecurityContext.Capabilities.Add, pTraceCapability)
 
 	if iFace != nil {
-		if iFace.Inputs != nil {
+		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -187,7 +187,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 			})
 		}
 
-		if iFace.Outputs != nil {
+		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
@@ -210,7 +210,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 	shareProcessNamespaceEnabled := true
 	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
 	if iFace != nil {
-		if iFace.Inputs != nil {
+		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -240,7 +240,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.InitContainers = append(coPilotPod.InitContainers, downloader)
 		}
 
-		if iFace.Outputs != nil {
+		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
@@ -268,7 +268,6 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			}
 			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
 		}
-
 	}
 
 	return nil
