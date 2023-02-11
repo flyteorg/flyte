@@ -21,9 +21,10 @@ func TestLogBuildInformation(t *testing.T) {
 
 	n := time.Now()
 	BuildTime = n.String()
+	GitBranch = "main"
 	buf := bytes.NewBufferString("")
 	logrus.SetFormatter(dFormat{})
 	logrus.SetOutput(buf)
 	LogBuildInformation("hello")
-	assert.Equal(t, buf.String(), fmt.Sprintf("------------------------------------------------------------------------App [hello], Version [unknown], BuildSHA [unknown], BuildTS [%s]------------------------------------------------------------------------", n.String()))
+	assert.Equal(t, buf.String(), fmt.Sprintf("------------------------------------------------------------------------App [hello], Version [unknown], BuildSHA [unknown], BuildTS [%s], Git Branch [main]------------------------------------------------------------------------", n.String()))
 }
