@@ -213,7 +213,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec
 	expectedPorts := []v1.ContainerPort{
 		{
-			Name:          "comm",
+			Name:          "tcp-comm",
 			ContainerPort: 8786,
 			Protocol:      "TCP",
 		},
@@ -240,10 +240,10 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	}
 	expectedSerivcePorts := []v1.ServicePort{
 		{
-			Name:       "comm",
+			Name:       "tcp-comm",
 			Protocol:   "TCP",
 			Port:       8786,
-			TargetPort: intstr.FromString("comm"),
+			TargetPort: intstr.FromString("tcp-comm"),
 		},
 		{
 			Name:       "dashboard",

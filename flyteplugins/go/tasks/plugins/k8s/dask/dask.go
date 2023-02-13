@@ -247,7 +247,7 @@ func createSchedulerSpec(cluster plugins.DaskScheduler, clusterName string, defa
 					Env:       defaults.Env,
 					Ports: []v1.ContainerPort{
 						{
-							Name:          "comm",
+							Name:          "tcp-comm",
 							ContainerPort: 8786,
 							Protocol:      "TCP",
 						},
@@ -268,10 +268,10 @@ func createSchedulerSpec(cluster plugins.DaskScheduler, clusterName string, defa
 			},
 			Ports: []v1.ServicePort{
 				{
-					Name:       "comm",
+					Name:       "tcp-comm",
 					Protocol:   "TCP",
 					Port:       8786,
-					TargetPort: intstr.FromString("comm"),
+					TargetPort: intstr.FromString("tcp-comm"),
 				},
 				{
 					Name:       "dashboard",
