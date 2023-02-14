@@ -720,6 +720,7 @@ URL (`url.URL`_)
   ForceQuery: false
   Fragment: ""
   Host: ""
+  OmitHost: false
   Opaque: ""
   Path: ""
   RawFragment: ""
@@ -790,6 +791,16 @@ RawPath (string)
 .. code-block:: yaml
 
   ""
+  
+
+OmitHost (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 ForceQuery (bool)
