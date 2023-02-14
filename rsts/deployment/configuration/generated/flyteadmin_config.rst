@@ -223,6 +223,30 @@ List of scopes to request
   []
   
 
+useAudienceFromAdmin (bool)
+--------------------------------------------------------------------------------
+
+Use Audience configured from admins public endpoint config.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+audience (string)
+--------------------------------------------------------------------------------
+
+Audience to use when initiating OAuth2 authorization requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 authorizationServerUrl (string)
 --------------------------------------------------------------------------------
 
@@ -334,6 +358,7 @@ URL (`url.URL`_)
   ForceQuery: false
   Fragment: ""
   Host: ""
+  OmitHost: false
   Opaque: ""
   Path: ""
   RawFragment: ""
@@ -404,6 +429,16 @@ RawPath (string)
 .. code-block:: yaml
 
   ""
+  
+
+OmitHost (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 ForceQuery (bool)
