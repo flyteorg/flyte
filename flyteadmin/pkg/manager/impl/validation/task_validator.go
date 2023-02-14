@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	workflowengineInterfaces "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -25,7 +26,7 @@ import (
 var whitelistedTaskErr = errors.NewFlyteAdminErrorf(codes.InvalidArgument, "task type must be whitelisted before use")
 
 // This is called for a task with a non-nil container.
-func validateContainer(task core.TaskTemplate, taskConfig runtime.TaskResourceConfiguration) error {
+func validateContainer(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
 	if err := ValidateEmptyStringField(task.GetContainer().Image, shared.Image); err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func validateContainer(task core.TaskTemplate, taskConfig runtime.TaskResourceCo
 	if task.GetContainer().Resources == nil {
 		return nil
 	}
-	if err := validateTaskResources(task.Id, taskConfig.GetLimits(), task.GetContainer().Resources.Requests,
+	if err := validateTaskResources(task.Id, platformTaskResources.Limits, task.GetContainer().Resources.Requests,
 		task.GetContainer().Resources.Limits); err != nil {
 		logger.Debugf(context.Background(), "encountered errors validating task resources for [%+v]: %v",
 			task.Id, err)
@@ -43,7 +44,7 @@ func validateContainer(task core.TaskTemplate, taskConfig runtime.TaskResourceCo
 }
 
 // This is called for a task with a non-nil k8s pod.
-func validateK8sPod(task core.TaskTemplate, taskConfig runtime.TaskResourceConfiguration) error {
+func validateK8sPod(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
 	if task.GetK8SPod().PodSpec == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid TaskSpecification, pod tasks should specify their target as a K8sPod with a defined pod spec")
@@ -54,7 +55,7 @@ func validateK8sPod(task core.TaskTemplate, taskConfig runtime.TaskResourceConfi
 			task.GetK8SPod().PodSpec, err)
 		return err
 	}
-	platformTaskResourceLimits := taskResourceSetToMap(taskConfig.GetLimits())
+	platformTaskResourceLimits := taskResourceSetToMap(platformTaskResources.Limits)
 	for _, container := range podSpec.Containers {
 		err := validateResource(task.Id, resourceListToQuantity(container.Resources.Requests),
 			resourceListToQuantity(container.Resources.Limits), platformTaskResourceLimits)
@@ -76,7 +77,7 @@ func validateRuntimeMetadata(metadata core.RuntimeMetadata) error {
 }
 
 func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
-	taskConfig runtime.TaskResourceConfiguration, whitelistConfig runtime.WhitelistConfiguration) error {
+	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration) error {
 
 	if err := ValidateEmptyStringField(task.Type, shared.Type); err != nil {
 		return err
@@ -98,17 +99,17 @@ func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
 	}
 
 	if task.GetContainer() != nil {
-		return validateContainer(task, taskConfig)
+		return validateContainer(task, platformTaskResources)
 	}
 	if task.GetK8SPod() != nil {
-		return validateK8sPod(task, taskConfig)
+		return validateK8sPod(task, platformTaskResources)
 	}
 	return nil
 }
 
 func ValidateTask(
 	ctx context.Context, request admin.TaskCreateRequest, db repositoryInterfaces.Repository,
-	taskConfig runtime.TaskResourceConfiguration, whitelistConfig runtime.WhitelistConfiguration,
+	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration,
 	applicationConfig runtime.ApplicationConfiguration) error {
 	if err := ValidateIdentifier(request.Id, common.Task); err != nil {
 		return err
@@ -119,7 +120,7 @@ func ValidateTask(
 	if request.Spec == nil || request.Spec.Template == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
-	return validateTaskTemplate(*request.Id, *request.Spec.Template, taskConfig, whitelistConfig)
+	return validateTaskTemplate(*request.Id, *request.Spec.Template, platformTaskResources, whitelistConfig)
 }
 
 func taskResourceSetToMap(

@@ -20,6 +20,7 @@ import (
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
@@ -38,10 +39,11 @@ type taskMetrics struct {
 }
 
 type TaskManager struct {
-	db       repoInterfaces.Repository
-	config   runtimeInterfaces.Configuration
-	compiler workflowengine.Compiler
-	metrics  taskMetrics
+	db              repoInterfaces.Repository
+	config          runtimeInterfaces.Configuration
+	compiler        workflowengine.Compiler
+	metrics         taskMetrics
+	resourceManager interfaces.ResourceInterface
 }
 
 func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -62,7 +64,8 @@ func setDefaults(request admin.TaskCreateRequest) (admin.TaskCreateRequest, erro
 func (t *TaskManager) CreateTask(
 	ctx context.Context,
 	request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
-	if err := validation.ValidateTask(ctx, request, t.db, t.config.TaskResourceConfiguration(),
+	platformTaskResources := util.GetTaskResources(ctx, request.Id, t.resourceManager, t.config.TaskResourceConfiguration())
+	if err := validation.ValidateTask(ctx, request, t.db, platformTaskResources,
 		t.config.WhitelistConfiguration(), t.config.ApplicationConfiguration()); err != nil {
 		logger.Debugf(ctx, "Task [%+v] failed validation with err: %v", request.Id, err)
 		return nil, err
@@ -269,10 +272,12 @@ func NewTaskManager(
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized task closure"),
 		Registered:       labeled.NewCounter("num_registered", "count of registered tasks", scope),
 	}
+	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &TaskManager{
-		db:       db,
-		config:   config,
-		compiler: compiler,
-		metrics:  metrics,
+		db:              db,
+		config:          config,
+		compiler:        compiler,
+		metrics:         metrics,
+		resourceManager: resourceManager,
 	}
 }
