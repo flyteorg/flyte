@@ -3,14 +3,15 @@ module github.com/flyteorg/flytectl
 go 1.19
 
 require (
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/disiqueira/gotree v1.0.0
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
 	github.com/flyteorg/flyteidl v1.3.5
+	github.com/flyteorg/flytepropeller v1.1.1
 	github.com/flyteorg/flytestdlib v1.0.13
-	github.com/ghodss/yaml v1.0.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v42 v42.0.0
@@ -30,21 +31,15 @@ require (
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0
 	github.com/zalando/go-keyring v0.1.1
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/text v0.3.7
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
-	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3
 	k8s.io/client-go v0.21.3
-	sigs.k8s.io/yaml v1.2.0
-)
-
-require (
-	github.com/avast/retry-go v3.0.0+incompatible
-	github.com/flyteorg/flytepropeller v1.1.1
-	golang.org/x/text v0.3.7
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
@@ -81,6 +76,7 @@ require (
 	github.com/flyteorg/flyteplugins v1.0.0 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
@@ -143,6 +139,7 @@ require (
 	google.golang.org/genproto v0.0.0-20220426171045-31bebdecfb46 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect

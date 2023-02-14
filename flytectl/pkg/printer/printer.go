@@ -9,19 +9,18 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flytectl/pkg/visualize"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
 	"github.com/landoop/tableprinter"
 	"github.com/pkg/browser"
 	"github.com/yalp/jsonpath"
+	"sigs.k8s.io/yaml"
 )
 
 //go:generate enumer --type=OutputFormat -json -yaml -trimprefix=OutputFormat

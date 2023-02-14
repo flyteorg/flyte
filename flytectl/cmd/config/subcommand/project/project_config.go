@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 
 	"github.com/flyteorg/flytectl/clierrors"
-
 	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"gopkg.in/yaml.v2"
+
+	"gopkg.in/yaml.v3"
 )
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
