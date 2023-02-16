@@ -6,7 +6,7 @@ server:
   httpPort: 8088
   grpcPort: 8089
   grpcServerReflection: true
-  kube-config: /Users/ytong/.flyte/state/kubeconfig
+  kube-config: /Users/ytong/.flyte/sandbox/kubeconfig
   security:
     secure: false
     useAuth: false
@@ -62,10 +62,11 @@ flyteadmin:
   useOffloadedWorkflowClosure: false
 database:
   postgres:
-    port: 5432
+    port: 30001
     username: postgres
-    host: localhost
-    dbname: flyteadmin
+    password: postgres
+    host: 127.0.0.1
+    dbname: flyte
     options: "sslmode=disable"
 scheduler:
   eventScheduler:
@@ -115,14 +116,17 @@ Logger:
   show-source: true
   level: 6
 storage:
-  type: minio
-  connection:
-    access-key: minio
-    auth-type: accesskey
-    secret-key: miniostorage
-    disable-ssl: true
-    endpoint: "http://localhost:30084"
-    region: my-region
+  type: stow
+  stow:
+    kind: s3
+    config:
+      region: us-east-1
+      disable_ssl: true
+      v2_signing: true
+      endpoint: http://localhost:30002
+      auth_type: accesskey
+      access_key_id: minio
+      secret_key: miniostorage
   signedUrl:
     stowConfigOverride:
       endpoint: http://localhost:30084
