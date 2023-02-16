@@ -490,7 +490,7 @@ func TestFromNodeExecutionModel(t *testing.T) {
 		NodeExecutionMetadata: nodeExecutionMetadataBytes,
 		InputURI:              "input uri",
 		Duration:              duration,
-	})
+	}, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id:       &nodeExecutionIdentifier,
@@ -498,6 +498,39 @@ func TestFromNodeExecutionModel(t *testing.T) {
 		Closure:  closure,
 		Metadata: &nodeExecutionMetadata,
 	}, nodeExecution))
+}
+
+func TestFromNodeExecutionModel_Error(t *testing.T) {
+	extraLongErrMsg := string(make([]byte, 2*trimmedErrMessageLen))
+	execErr := &core.ExecutionError{
+		Code:    "CODE",
+		Message: extraLongErrMsg,
+		Kind:    core.ExecutionError_USER,
+	}
+	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: execErr},
+	})
+	nodeExecution, err := FromNodeExecutionModel(models.NodeExecution{
+		NodeExecutionKey: models.NodeExecutionKey{
+			NodeID: "nodey",
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+		},
+		Closure:               executionClosureBytes,
+		NodeExecutionMetadata: nodeExecutionMetadataBytes,
+		InputURI:              "input uri",
+		Duration:              duration,
+	}, &ExecutionTransformerOptions{TrimErrorMessage: true})
+	assert.Nil(t, err)
+
+	expectedExecErr := execErr
+	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(expectedExecErr, nodeExecution.Closure.GetError()))
 }
 
 func TestFromNodeExecutionModelWithChildren(t *testing.T) {
@@ -536,7 +569,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 	}
 	t.Run("dynamic workflow", func(t *testing.T) {
 		nodeExecModel.DynamicWorkflowRemoteClosureReference = "dummy_dynamic_worklfow_ref"
-		nodeExecution, err := FromNodeExecutionModel(nodeExecModel)
+		nodeExecution, err := FromNodeExecutionModel(nodeExecModel, DefaultExecutionTransformerOptions)
 		assert.Nil(t, err)
 		assert.True(t, proto.Equal(&admin.NodeExecution{
 			Id:       &nodeExecutionIdentifier,
@@ -552,7 +585,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 	})
 	t.Run("non dynamic workflow", func(t *testing.T) {
 		nodeExecModel.DynamicWorkflowRemoteClosureReference = ""
-		nodeExecution, err := FromNodeExecutionModel(nodeExecModel)
+		nodeExecution, err := FromNodeExecutionModel(nodeExecModel, DefaultExecutionTransformerOptions)
 		assert.Nil(t, err)
 		assert.True(t, proto.Equal(&admin.NodeExecution{
 			Id:       &nodeExecutionIdentifier,

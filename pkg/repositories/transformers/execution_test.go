@@ -528,7 +528,7 @@ func TestFromExecutionModel(t *testing.T) {
 		StartedAt:    &startedAt,
 		State:        &stateInt,
 	}
-	execution, err := FromExecutionModel(executionModel)
+	execution, err := FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -556,7 +556,7 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 		AbortCause: abortCause,
 		Closure:    executionClosureBytes,
 	}
-	execution, err := FromExecutionModel(executionModel)
+	execution, err := FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Equal(t, core.WorkflowExecution_ABORTED, execution.Closure.Phase)
 	assert.True(t, proto.Equal(&admin.AbortMetadata{
@@ -564,9 +564,39 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 	}, execution.Closure.GetAbortMetadata()))
 
 	executionModel.Phase = core.WorkflowExecution_RUNNING.String()
-	execution, err = FromExecutionModel(executionModel)
+	execution, err = FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Empty(t, execution.Closure.GetAbortCause())
+}
+
+func TestFromExecutionModel_Error(t *testing.T) {
+	extraLongErrMsg := string(make([]byte, 2*trimmedErrMessageLen))
+	execErr := &core.ExecutionError{
+		Code:    "CODE",
+		Message: extraLongErrMsg,
+		Kind:    core.ExecutionError_USER,
+	}
+	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: execErr},
+	})
+	executionModel := models.Execution{
+		ExecutionKey: models.ExecutionKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Phase:   core.WorkflowExecution_FAILED.String(),
+		Closure: executionClosureBytes,
+	}
+	execution, err := FromExecutionModel(executionModel, &ExecutionTransformerOptions{
+		TrimErrorMessage: true,
+	})
+	expectedExecErr := execErr
+	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
+	assert.Nil(t, err)
+	assert.Equal(t, core.WorkflowExecution_FAILED, execution.Closure.Phase)
+	assert.True(t, proto.Equal(expectedExecErr, execution.Closure.GetError()))
 }
 
 func TestFromExecutionModels(t *testing.T) {
@@ -611,7 +641,7 @@ func TestFromExecutionModels(t *testing.T) {
 			State:        &stateInt,
 		},
 	}
-	executions, err := FromExecutionModels(executionModels)
+	executions, err := FromExecutionModels(executionModels, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Len(t, executions, 1)
 	assert.True(t, proto.Equal(&admin.Execution{

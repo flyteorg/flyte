@@ -399,11 +399,18 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	return nil
 }
 
-func FromTaskExecutionModel(taskExecutionModel models.TaskExecution) (*admin.TaskExecution, error) {
+func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *ExecutionTransformerOptions) (*admin.TaskExecution, error) {
 	var closure admin.TaskExecutionClosure
 	err := proto.Unmarshal(taskExecutionModel.Closure, &closure)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
+	}
+	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
+		trimmedErrOutputResult := closure.GetError()
+		trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
+		closure.OutputResult = &admin.TaskExecutionClosure_Error{
+			Error: trimmedErrOutputResult,
+		}
 	}
 
 	taskExecution := &admin.TaskExecution{
@@ -435,10 +442,10 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution) (*admin.Tas
 	return taskExecution, nil
 }
 
-func FromTaskExecutionModels(taskExecutionModels []models.TaskExecution) ([]*admin.TaskExecution, error) {
+func FromTaskExecutionModels(taskExecutionModels []models.TaskExecution, opts *ExecutionTransformerOptions) ([]*admin.TaskExecution, error) {
 	taskExecutions := make([]*admin.TaskExecution, len(taskExecutionModels))
 	for idx, taskExecutionModel := range taskExecutionModels {
-		taskExecution, err := FromTaskExecutionModel(taskExecutionModel)
+		taskExecution, err := FromTaskExecutionModel(taskExecutionModel, opts)
 		if err != nil {
 			return nil, err
 		}

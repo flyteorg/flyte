@@ -22,6 +22,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
+const trimmedErrMessageLen = 100
+
 var clusterReassignablePhases = sets.NewString(core.WorkflowExecution_UNDEFINED.String(), core.WorkflowExecution_QUEUED.String())
 
 // CreateExecutionModelInput encapsulates request parameters for calls to CreateExecutionModel.
@@ -42,6 +44,15 @@ type CreateExecutionModelInput struct {
 	UserInputsURI         storage.DataReference
 	SecurityContext       *core.SecurityContext
 	LaunchEntity          core.ResourceType
+}
+
+type ExecutionTransformerOptions struct {
+	TrimErrorMessage bool
+}
+
+var DefaultExecutionTransformerOptions = &ExecutionTransformerOptions{}
+var ListExecutionTransformerOptions = &ExecutionTransformerOptions{
+	TrimErrorMessage: true,
 }
 
 // CreateExecutionModel transforms a ExecutionCreateRequest to a Execution model
@@ -305,7 +316,7 @@ func GetExecutionIdentifier(executionModel *models.Execution) core.WorkflowExecu
 	}
 }
 
-func FromExecutionModel(executionModel models.Execution) (*admin.Execution, error) {
+func FromExecutionModel(executionModel models.Execution, opts *ExecutionTransformerOptions) (*admin.Execution, error) {
 	var spec admin.ExecutionSpec
 	var err error
 	if err = proto.Unmarshal(executionModel.Spec, &spec); err != nil {
@@ -314,6 +325,13 @@ func FromExecutionModel(executionModel models.Execution) (*admin.Execution, erro
 	var closure admin.ExecutionClosure
 	if err = proto.Unmarshal(executionModel.Closure, &closure); err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
+	}
+	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
+		trimmedErrOutputResult := closure.GetError()
+		trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
+		closure.OutputResult = &admin.ExecutionClosure_Error{
+			Error: trimmedErrOutputResult,
+		}
 	}
 
 	if closure.StateChangeDetails == nil {
@@ -362,10 +380,10 @@ func PopulateDefaultStateChangeDetails(executionModel models.Execution) (*admin.
 	}, nil
 }
 
-func FromExecutionModels(executionModels []models.Execution) ([]*admin.Execution, error) {
+func FromExecutionModels(executionModels []models.Execution, opts *ExecutionTransformerOptions) ([]*admin.Execution, error) {
 	executions := make([]*admin.Execution, len(executionModels))
 	for idx, executionModel := range executionModels {
-		execution, err := FromExecutionModel(executionModel)
+		execution, err := FromExecutionModel(executionModel, opts)
 		if err != nil {
 			return nil, err
 		}

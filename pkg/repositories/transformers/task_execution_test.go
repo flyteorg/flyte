@@ -548,7 +548,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 		InputURI: "input uri",
 		Duration: duration,
 		Closure:  closureBytes,
-	})
+	}, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.TaskExecution{
 		Id: &core.TaskExecutionIdentifier{
@@ -572,6 +572,48 @@ func TestFromTaskExecutionModel(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  taskClosure,
 	}, taskExecution))
+}
+
+func TestFromTaskExecutionModel_Error(t *testing.T) {
+	extraLongErrMsg := string(make([]byte, 2*trimmedErrMessageLen))
+	execErr := &core.ExecutionError{
+		Code:    "CODE",
+		Message: extraLongErrMsg,
+		Kind:    core.ExecutionError_USER,
+	}
+	closureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: execErr},
+	})
+	taskExecution, err := FromTaskExecutionModel(models.TaskExecution{
+		TaskExecutionKey: models.TaskExecutionKey{
+			TaskKey: models.TaskKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+				Version: "version",
+			},
+			NodeExecutionKey: models.NodeExecutionKey{
+				NodeID: "node id",
+				ExecutionKey: models.ExecutionKey{
+					Project: "ex project",
+					Domain:  "ex domain",
+					Name:    "ex name",
+				},
+			},
+			RetryAttempt: &retryAttemptValue,
+		},
+		InputURI: "input uri",
+		Duration: duration,
+		Closure:  closureBytes,
+	}, &ExecutionTransformerOptions{
+		TrimErrorMessage: true,
+	})
+
+	expectedExecErr := execErr
+	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(expectedExecErr, taskExecution.Closure.GetError()))
 }
 
 func TestFromTaskExecutionModels(t *testing.T) {
@@ -609,7 +651,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 			Duration: duration,
 			Closure:  closureBytes,
 		},
-	})
+	}, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Len(t, taskExecutions, 1)
 	assert.True(t, proto.Equal(&admin.TaskExecution{
