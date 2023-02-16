@@ -645,6 +645,26 @@ func TestGetProjectAttributes_ConfigLookup(t *testing.T) {
 			},
 		}, response))
 	})
+
+	t.Run("config not merged if not wec", func(t *testing.T) {
+		appConfig := runtimeInterfaces.ApplicationConfig{
+			MaxParallelism:       3,
+			K8SServiceAccount:    "testserviceaccount",
+			Labels:               map[string]string{"lab1": "name"},
+			OutputLocationPrefix: "s3://test-bucket",
+		}
+		config.SetTopLevelConfig(appConfig)
+		request := admin.ProjectAttributesGetRequest{
+			Project:      project,
+			ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+		}
+
+		_, err := manager.GetProjectAttributes(context.Background(), request)
+		assert.Error(t, err)
+		ec, ok := err.(errors.FlyteAdminError)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, ec.Code())
+	})
 }
 
 func TestDeleteProjectAttributes(t *testing.T) {

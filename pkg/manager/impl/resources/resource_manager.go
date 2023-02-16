@@ -213,9 +213,8 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 	configLevelDefaults := m.config.GetTopLevelConfig().GetAsWorkflowExecutionConfig()
 	if err != nil {
 		ec, ok := err.(errors.FlyteAdminError)
-		if ok && ec.Code() == codes.NotFound {
+		if ok && ec.Code() == codes.NotFound && request.ResourceType == admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG {
 			// TODO: Will likely be removed after overarching settings project is done
-			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
 			return &admin.ProjectAttributesGetResponse{
 				Attributes: &admin.ProjectAttributes{
 					Project: request.Project,
