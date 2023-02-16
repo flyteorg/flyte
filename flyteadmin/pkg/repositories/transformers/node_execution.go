@@ -278,11 +278,18 @@ func UpdateNodeExecutionModel(
 	return nil
 }
 
-func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.NodeExecution, error) {
+func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution, opts *ExecutionTransformerOptions) (*admin.NodeExecution, error) {
 	var closure admin.NodeExecutionClosure
 	err := proto.Unmarshal(nodeExecutionModel.Closure, &closure)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
+	}
+	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
+		trimmedErrOutputResult := closure.GetError()
+		trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
+		closure.OutputResult = &admin.NodeExecutionClosure_Error{
+			Error: trimmedErrOutputResult,
+		}
 	}
 
 	var nodeExecutionMetadata admin.NodeExecutionMetaData

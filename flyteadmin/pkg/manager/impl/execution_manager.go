@@ -323,7 +323,7 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 	}
 	sourceExecutionID = sourceExecutionModel.ID
 	requestSpec.Metadata.Principal = sourceExecutionModel.User
-	sourceExecution, err := transformers.FromExecutionModel(*sourceExecutionModel)
+	sourceExecution, err := transformers.FromExecutionModel(*sourceExecutionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		logger.Errorf(ctx, "Failed transform parent execution model for child execution [%+v] with err: %v", workflowExecutionID, err)
 		return parentNodeExecutionID, sourceExecutionID, err
@@ -951,7 +951,7 @@ func (m *ExecutionManager) RelaunchExecution(
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
 		return nil, err
 	}
-	existingExecution, err := transformers.FromExecutionModel(*existingExecutionModel)
+	existingExecution, err := transformers.FromExecutionModel(*existingExecutionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -1008,7 +1008,7 @@ func (m *ExecutionManager) RecoverExecution(
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
 		return nil, err
 	}
-	existingExecution, err := transformers.FromExecutionModel(*existingExecutionModel)
+	existingExecution, err := transformers.FromExecutionModel(*existingExecutionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -1059,7 +1059,7 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 		return
 	}
 	// Find the reference launch plan to get the kickoff time argument
-	execution, err := transformers.FromExecutionModel(*executionModel)
+	execution, err := transformers.FromExecutionModel(*executionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		logger.Warningf(context.Background(),
 			"failed to transform execution model when emitting scheduled workflow execution stats with for "+
@@ -1302,7 +1302,7 @@ func (m *ExecutionManager) GetExecution(
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-	execution, transformerErr := transformers.FromExecutionModel(*executionModel)
+	execution, transformerErr := transformers.FromExecutionModel(*executionModel, transformers.DefaultExecutionTransformerOptions)
 	if transformerErr != nil {
 		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id,
 			transformerErr)
@@ -1345,7 +1345,7 @@ func (m *ExecutionManager) GetExecutionData(
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-	execution, err := transformers.FromExecutionModel(*executionModel)
+	execution, err := transformers.FromExecutionModel(*executionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id, err)
 		return nil, err
@@ -1445,7 +1445,7 @@ func (m *ExecutionManager) ListExecutions(
 		logger.Debugf(ctx, "Failed to list executions using input [%+v] with err %v", listExecutionsInput, err)
 		return nil, err
 	}
-	executionList, err := transformers.FromExecutionModels(output.Executions)
+	executionList, err := transformers.FromExecutionModels(output.Executions, transformers.ListExecutionTransformerOptions)
 	if err != nil {
 		logger.Errorf(ctx,
 			"Failed to transform execution models [%+v] with err: %v", output.Executions, err)
@@ -1475,7 +1475,7 @@ func (m *ExecutionManager) ListExecutions(
 func (m *ExecutionManager) publishNotifications(ctx context.Context, request admin.WorkflowExecutionEventRequest,
 	execution models.Execution) error {
 	// Notifications are stored in the Spec object of an admin.Execution object.
-	adminExecution, err := transformers.FromExecutionModel(execution)
+	adminExecution, err := transformers.FromExecutionModel(execution, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		// This shouldn't happen because execution manager marshaled the data into models.Execution.
 		m.systemMetrics.TransformerError.Inc()

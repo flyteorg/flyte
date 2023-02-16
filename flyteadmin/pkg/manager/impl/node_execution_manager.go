@@ -308,7 +308,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 // Handles making additional database calls, if necessary, to populate IsParent & IsDynamic data using the historical pattern of
 // preloading child node executions. Otherwise, simply calls transform on the input model.
 func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, nodeExecutionModel models.NodeExecution,
-	nodeExecutionID *core.NodeExecutionIdentifier) (*admin.NodeExecution, error) {
+	nodeExecutionID *core.NodeExecutionIdentifier, opts *transformers.ExecutionTransformerOptions) (*admin.NodeExecution, error) {
 	internalData, err := transformers.GetNodeExecutionInternalData(nodeExecutionModel.InternalData)
 	if err != nil {
 		return nil, err
@@ -323,7 +323,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, 
 		}
 	}
 
-	nodeExecution, err := transformers.FromNodeExecutionModel(nodeExecutionModel)
+	nodeExecution, err := transformers.FromNodeExecutionModel(nodeExecutionModel, opts)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform node execution model [%+v] to proto with err: %v", nodeExecutionID, err)
 		return nil, err
@@ -341,7 +341,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModelList(ctx context.Conte
 				Name:    nodeExecutionModel.Name,
 			},
 			NodeId: nodeExecutionModel.NodeID,
-		})
+		}, transformers.ListExecutionTransformerOptions)
 		if err != nil {
 			return nil, err
 		}
@@ -362,7 +362,7 @@ func (m *NodeExecutionManager) GetNodeExecution(
 			request.Id, err)
 		return nil, err
 	}
-	nodeExecution, err := m.transformNodeExecutionModel(ctx, *nodeExecutionModel, request.Id)
+	nodeExecution, err := m.transformNodeExecutionModel(ctx, *nodeExecutionModel, request.Id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +498,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 
-	nodeExecution, err := transformers.FromNodeExecutionModel(*nodeExecutionModel)
+	nodeExecution, err := transformers.FromNodeExecutionModel(*nodeExecutionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform node execution model [%+v] when fetching data: %v", request.Id, err)
 		return nil, err
