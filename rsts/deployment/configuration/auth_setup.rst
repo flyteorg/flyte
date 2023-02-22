@@ -22,8 +22,8 @@ the security of the overall system.
 
 In abstract, Flyte supports OAuth2 and OpenId Connect (built on top of OAuth2) to secure the various connections:
 
-* :ref:`OpenId Connect <auth-openid-appendix>`: Used to secure user's authentication to flyteadmin service.
-* :ref:`OAuth2 <auth-oauth2-appendix>`: Used to secure communication between clients (i.e. flyte-cli, flytectl and
+* :ref:`OpenId Connect <auth_appendix>`: Used to secure user's authentication to flyteadmin service.
+* :ref:`OAuth2 <auth_appendix>`: Used to secure communication between clients (i.e. flyte-cli, flytectl and
   flytepropeller) and flyteadmin service.
 
 Identity Providers Support
