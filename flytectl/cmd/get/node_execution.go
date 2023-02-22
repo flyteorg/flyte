@@ -3,6 +3,7 @@ package get
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"sort"
 	"strconv"
 
@@ -37,6 +38,7 @@ const (
 	taskExtResourceTokenPrefix = "Ext Resource Token : " //nolint
 	taskResourcePrefix         = "Resource Pool Info"
 	taskLogsPrefix             = "Logs :"
+	outputsPrefix              = "Outputs :"
 	taskLogsNamePrefix         = "Name :"
 	taskLogURIPrefix           = "URI :"
 	hyphenPrefix               = " - "
@@ -249,6 +251,12 @@ func createNodeDetailsTreeView(rootView gotree.Tree, nodeExecutionClosures []*No
 			createNodeDetailsTreeView(nExecView, nodeExecWrapper.ChildNodes)
 		}
 		createNodeTaskExecTreeView(nExecView, nodeExecWrapper.TaskExecutions)
+		if len(nodeExecWrapper.Outputs) > 0 {
+			outputsView := nExecView.Add(outputsPrefix)
+			for outputKey, outputVal := range nodeExecWrapper.Outputs {
+				outputsView.Add(fmt.Sprintf("%s: %v", outputKey, outputVal))
+			}
+		}
 	}
 	return rootView
 }
