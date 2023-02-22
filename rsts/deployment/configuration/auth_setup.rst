@@ -504,4 +504,4 @@ This collection of RFCs may be helpful to those who wish to investigate the impl
 * `PKCE RFC 7636 <https://tools.ietf.org/html/rfc7636>`_
 * `JWT RFC 7519 <https://tools.ietf.org/html/rfc7519>`_
 
-There's also a lot more detailed information into the authentication flows in the :ref:`deployment-auth-openid-appendix`.
+There's also a lot more detailed information into the authentication flows in the :ref:`following appendix <deployment-auth-openid-appendix>`.
