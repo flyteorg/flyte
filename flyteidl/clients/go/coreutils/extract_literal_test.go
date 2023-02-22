@@ -176,4 +176,27 @@ func TestFetchLiteral(t *testing.T) {
 			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
 		}
 	})
+
+	t.Run("Structured dataset", func(t *testing.T) {
+		literalVal := "s3://blah/blah/blah"
+		var dataSetColumns []*core.StructuredDatasetType_DatasetColumn
+		dataSetColumns = append(dataSetColumns, &core.StructuredDatasetType_DatasetColumn{
+			Name: "Price",
+			LiteralType: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_FLOAT,
+				},
+			},
+		})
+		var literalType = &core.LiteralType{Type: &core.LiteralType_StructuredDatasetType{StructuredDatasetType: &core.StructuredDatasetType{
+			Columns: dataSetColumns,
+			Format:  "testFormat",
+		}}}
+
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, literalVal, extractedLiteralVal)
+	})
 }

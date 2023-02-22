@@ -436,6 +436,26 @@ func MakeLiteralForSchema(path storage.DataReference, columns []*core.SchemaType
 	}
 }
 
+func MakeLiteralForStructuredDataSet(path storage.DataReference, columns []*core.StructuredDatasetType_DatasetColumn, format string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_StructuredDataset{
+					StructuredDataset: &core.StructuredDataset{
+						Uri: path.String(),
+						Metadata: &core.StructuredDatasetMetadata{
+							StructuredDatasetType: &core.StructuredDatasetType{
+								Columns: columns,
+								Format:  format,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string) *core.Literal {
 	dim := core.BlobType_SINGLE
 	if isDir {
@@ -537,6 +557,9 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 
 	case *core.LiteralType_Schema:
 		lv := MakeLiteralForSchema(storage.DataReference(fmt.Sprintf("%v", v)), newT.Schema.Columns)
+		return lv, nil
+	case *core.LiteralType_StructuredDatasetType:
+		lv := MakeLiteralForStructuredDataSet(storage.DataReference(fmt.Sprintf("%v", v)), newT.StructuredDatasetType.Columns, newT.StructuredDatasetType.Format)
 		return lv, nil
 
 	case *core.LiteralType_EnumType:

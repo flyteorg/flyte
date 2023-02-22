@@ -675,4 +675,44 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "", l.GetScalar().GetPrimitive().GetStringValue())
 	})
+
+	t.Run("Structured Data Set", func(t *testing.T) {
+		var dataSetColumns []*core.StructuredDatasetType_DatasetColumn
+		dataSetColumns = append(dataSetColumns, &core.StructuredDatasetType_DatasetColumn{
+			Name: "Price",
+			LiteralType: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_FLOAT,
+				},
+			},
+		})
+		var literalType = &core.LiteralType{Type: &core.LiteralType_StructuredDatasetType{StructuredDatasetType: &core.StructuredDatasetType{
+			Columns: dataSetColumns,
+			Format:  "testFormat",
+		}}}
+
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_StructuredDataset{
+				StructuredDataset: &core.StructuredDataset{
+					Uri: "s3://blah/blah/blah",
+					Metadata: &core.StructuredDatasetMetadata{
+						StructuredDatasetType: &core.StructuredDatasetType{
+							Columns: dataSetColumns,
+							Format:  "testFormat",
+						},
+					},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, "s3://blah/blah/blah")
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedLV, lv)
+
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
 }
