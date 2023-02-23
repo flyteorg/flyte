@@ -142,6 +142,14 @@ rules:
   - patch
   - update
 - apiGroups:
+  - ""
+  resources:
+  - podtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - flyte.lyft.com
   resources:
   - flyteworkflows
@@ -750,7 +758,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SUdJSnFtSFFLeVFYaXZOdg==
+  haSharedSecret: VnZiU0xIZjBLRVcxcjI0Zw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1245,7 +1253,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 7e8c8bcd08e450301a677b157c349f1d64b5b987ba0580368791b9c6d2cf245f
+        checksum/secret: 29be0ecfab0aea939a12ccb785931dedaccca4b6be7d3d38d925c4dc6487085e
       labels:
         app: docker-registry
         release: flyte-sandbox
