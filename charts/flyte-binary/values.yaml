@@ -119,7 +119,7 @@ clusterResourceTemplates:
   # inlineConfigMap Specify an existing ConfigMap containing additional cluster
   # resource templates, to be merged with the base configuration
   inlineConfigMap: ""
-  # labels Add labels to creatqed ConfigMap
+  # labels Add labels to created ConfigMap
   labels: {}
   # annotations Add annotations to created ConfigMap
   annotations: {}
