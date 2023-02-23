@@ -164,11 +164,10 @@ data:
             clientId: flytectl
             redirectUri: http://localhost:53593/callback
             scopes:
-            - offline
             - all
       authorizedUris:
-      {{- if .Values.ingress.host }}
-      - https://{{ tpl .Values.ingress.host . }}
+      {{- if .Values.configuration.auth.authorizedUris }}
+      {{- tpl ( .Values.configuration.auth.authorizedUris | toYaml ) . | nindent 6 }}
       {{- end }}
       - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
       - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}

@@ -16,6 +16,7 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
+| configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.enabled | bool | `false` |  |
 | configuration.auth.internal.clientSecret | string | `""` |  |
 | configuration.auth.internal.clientSecretHash | string | `""` |  |

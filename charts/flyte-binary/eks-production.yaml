@@ -27,6 +27,8 @@ configuration:
     internal:
       clientSecret: <CC_PASSWD>
       clientSecretHash: <HASHED_CC_PASSWD>
+    authorizedUris:
+    - https://flyte.company.com
   inline:
     cluster_resources:
       customData:
