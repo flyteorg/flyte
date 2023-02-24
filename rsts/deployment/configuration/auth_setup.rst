@@ -1,4 +1,4 @@
-.. _deployment-cluster-config-auth-setup:
+.. _deployment-configuration-auth-setup:
 
 ########################
 Authenticating in Flyte
