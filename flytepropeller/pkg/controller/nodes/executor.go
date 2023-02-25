@@ -190,6 +190,8 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 	case core.NodeExecution_SKIPPED:
 		return handler.PhaseInfoSkip(nil, "node execution recovery indicated original node was skipped"), nil
 	case core.NodeExecution_SUCCEEDED:
+		fallthrough
+	case core.NodeExecution_RECOVERED:
 		logger.Debugf(ctx, "Node [%+v] can be recovered. Proceeding to copy inputs and outputs", nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 	default:
 		// The node execution may be partially recoverable through intra task checkpointing. Save the checkpoint
