@@ -31,4 +31,4 @@ Once sandbox setup is complete, a ready-to-explore message is shown:
    👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30081/console 🚀 🚀 🎉 
 
 
-Visit http://localhost:30081/openapi to view swagger UI for the service and documentation of the payload fields. To test, send sample queries!
+Visit ``http://localhost:30080/api/v1/openapi`` to view swagger UI for the service and documentation of the payload fields. To test, send sample queries!
