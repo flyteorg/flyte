@@ -393,11 +393,8 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	// K8sServiceAccount and  IamRole is empty then get the values from the deprecated fields.
 	resolvedAuthRole := resolveAuthRole(request, launchPlan)
 	resolvedSecurityCtx := resolveSecurityCtx(ctx, workflowExecConfig.GetSecurityContext(), resolvedAuthRole)
-	if workflowExecConfig.GetSecurityContext() == nil &&
-		(len(resolvedSecurityCtx.GetRunAs().GetK8SServiceAccount()) > 0 ||
-			len(resolvedSecurityCtx.GetRunAs().GetIamRole()) > 0) {
-		workflowExecConfig.SecurityContext = resolvedSecurityCtx
-	}
+	workflowExecConfig.SecurityContext = resolvedSecurityCtx
+
 	// Merge the application config into workflowExecConfig. If even the deprecated fields are not set
 	workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, m.config.ApplicationConfiguration().GetTopLevelConfig())
 	// Explicitly set the security context if its nil since downstream we expect this settings to be available
