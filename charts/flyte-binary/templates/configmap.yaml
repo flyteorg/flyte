@@ -103,7 +103,7 @@ data:
         config:
           json: ""
           project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
         {{- else }}
         {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
         {{- end }}

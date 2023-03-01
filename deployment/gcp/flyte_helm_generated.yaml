@@ -200,7 +200,7 @@ data:
         config:
           json: ""
           project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       container: "<BUCKETNAME>"
       enable-multicontainer: false
       limits:
@@ -402,7 +402,7 @@ data:
         config:
           json: ""
           project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       container: "<BUCKETNAME>"
       enable-multicontainer: false
       limits:
@@ -551,7 +551,7 @@ data:
         config:
           json: ""
           project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       container: "<BUCKETNAME>"
       enable-multicontainer: false
       limits:
@@ -904,7 +904,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
+        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1192,7 +1192,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5decd5143258340704503cb1c89d283b3fa311a33792c0a2751edc6d21b1e94"
+        configChecksum: "bc69ed841506b28a42ac19bd0884d483472b3d11fe85fe7e546b879aeb30a85"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1283,7 +1283,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
+        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1371,7 +1371,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fe5c992d51159e4ad600993479272953d271a33402834861c4c73ed1204fbad"
+        configChecksum: "2b07a0c9c6c35263389e46c712af516b2151764867ec2bdd64e5467e0be9b2b"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1452,7 +1452,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.64
       annotations:
-        configChecksum: "fe5c992d51159e4ad600993479272953d271a33402834861c4c73ed1204fbad"
+        configChecksum: "2b07a0c9c6c35263389e46c712af516b2151764867ec2bdd64e5467e0be9b2b"
     spec:
       securityContext:
         fsGroup: 65534
