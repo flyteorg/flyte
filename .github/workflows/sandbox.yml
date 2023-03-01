@@ -53,7 +53,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: true
+          push: ${{ github.event_name == 'release' }}
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
@@ -110,7 +110,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64, linux/amd64
-          push: true
+          push: ${{ github.event_name == 'release' }}
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
