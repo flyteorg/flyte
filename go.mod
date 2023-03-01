@@ -73,7 +73,7 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/flyteorg/flyteidl v1.3.8-0.20230220163651-683de03df79a // indirect
-	github.com/flyteorg/flyteplugins v1.0.38-0.20230228180158-2c0ab6e22f83 // indirect
+	github.com/flyteorg/flyteplugins v1.0.38-0.20230301193051-825fe1803218 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
