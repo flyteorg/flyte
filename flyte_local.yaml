@@ -39,14 +39,16 @@ database:
     dbname: flyteadmin
     options: "sslmode=disable"
 storage:
-  type: minio
-  connection:
-    access-key: minio
-    auth-type: accesskey
-    secret-key: miniostorage
-    disable-ssl: true
-    endpoint: "http://localhost:30084"
-    region: my-region
+  type: stow
+  stow:
+    kind: s3
+    config:
+      access-key: minio
+      auth-type: accesskey
+      secret-key: miniostorage
+      disable-ssl: true
+      endpoint: "http://localhost:30084"
+      region: my-region
   cache:
     max_size_mbs: 10
     target_gc_percent: 100
