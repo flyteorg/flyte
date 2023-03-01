@@ -19,11 +19,11 @@ logger:
 
 propeller:
   create-flyteworkflow-crd: true
-  kube-config: $HOME/.flyte/state/kubeconfig
+  kube-config: $HOME/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
 
 server:
-  kube-config: $HOME/.flyte/state/kubeconfig
+  kube-config: $HOME/.flyte/sandbox/kubeconfig
 
 webhook:
   certDir: $HOME/.flyte/webhook-certs
