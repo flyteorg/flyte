@@ -91,8 +91,12 @@ Chart for basic single Flyte executable deployment
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.grpcAnnotations | object | `{}` |  |
+| ingress.grpcExtraPaths.append | list | `[]` |  |
+| ingress.grpcExtraPaths.prepend | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
+| ingress.httpExtraPaths.append | list | `[]` |  |
+| ingress.httpExtraPaths.prepend | list | `[]` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |

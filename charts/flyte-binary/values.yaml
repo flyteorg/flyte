@@ -242,14 +242,22 @@ ingress:
   create: false
   # labels Add labels to ingress resources
   labels: {}
+  # host Hostname to bind to ingress resources
+  host: ""
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add common annotations to http ingress resource
   httpAnnotations: {}
   # grpcAnnotations Add common annotations to grpc ingress resource
   grpcAnnotations: {}
-  # host Hostname to bind to ingress resources
-  host: ""
+  # httpExtraPaths Add extra paths to http ingress rule
+  httpExtraPaths:
+    prepend: []
+    append: []
+  # grpcExtraPaths Add extra paths to grpc ingress rule
+  grpcExtraPaths:
+    prepend: []
+    append: []
 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:
