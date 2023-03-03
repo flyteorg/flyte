@@ -616,6 +616,8 @@ func (m *NodeExecutionClosure) Validate() error {
 
 	// no validation rules for DeckUri
 
+	// no validation rules for DynamicJobSpecUri
+
 	switch m.OutputResult.(type) {
 
 	case *NodeExecutionClosure_OutputUri:
@@ -917,6 +919,8 @@ func (m *DynamicWorkflowNodeMetadata) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for DynamicJobSpecUri
 
 	return nil
 }

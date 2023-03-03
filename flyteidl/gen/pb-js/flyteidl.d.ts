@@ -6833,6 +6833,9 @@ export namespace flyteidl {
 
             /** DynamicWorkflowNodeMetadata compiledWorkflow */
             compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri */
+            dynamicJobSpecUri?: (string|null);
         }
 
         /** Represents a DynamicWorkflowNodeMetadata. */
@@ -6849,6 +6852,9 @@ export namespace flyteidl {
 
             /** DynamicWorkflowNodeMetadata compiledWorkflow. */
             public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri. */
+            public dynamicJobSpecUri: string;
 
             /**
              * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
@@ -13246,6 +13252,9 @@ export namespace flyteidl {
 
             /** NodeExecutionClosure deckUri */
             deckUri?: (string|null);
+
+            /** NodeExecutionClosure dynamicJobSpecUri */
+            dynamicJobSpecUri?: (string|null);
         }
 
         /** Represents a NodeExecutionClosure. */
@@ -13289,6 +13298,9 @@ export namespace flyteidl {
 
             /** NodeExecutionClosure deckUri. */
             public deckUri: string;
+
+            /** NodeExecutionClosure dynamicJobSpecUri. */
+            public dynamicJobSpecUri: string;
 
             /** NodeExecutionClosure outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");
@@ -13453,6 +13465,9 @@ export namespace flyteidl {
 
             /** DynamicWorkflowNodeMetadata compiledWorkflow */
             compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri */
+            dynamicJobSpecUri?: (string|null);
         }
 
         /** Represents a DynamicWorkflowNodeMetadata. */
@@ -13469,6 +13484,9 @@ export namespace flyteidl {
 
             /** DynamicWorkflowNodeMetadata compiledWorkflow. */
             public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri. */
+            public dynamicJobSpecUri: string;
 
             /**
              * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.

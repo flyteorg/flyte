@@ -35,25 +35,30 @@ class FlyteidladminDynamicWorkflowNodeMetadata(object):
     """
     swagger_types = {
         'id': 'CoreIdentifier',
-        'compiled_workflow': 'CoreCompiledWorkflowClosure'
+        'compiled_workflow': 'CoreCompiledWorkflowClosure',
+        'dynamic_job_spec_uri': 'str'
     }
 
     attribute_map = {
         'id': 'id',
-        'compiled_workflow': 'compiled_workflow'
+        'compiled_workflow': 'compiled_workflow',
+        'dynamic_job_spec_uri': 'dynamic_job_spec_uri'
     }
 
-    def __init__(self, id=None, compiled_workflow=None):  # noqa: E501
+    def __init__(self, id=None, compiled_workflow=None, dynamic_job_spec_uri=None):  # noqa: E501
         """FlyteidladminDynamicWorkflowNodeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._compiled_workflow = None
+        self._dynamic_job_spec_uri = None
         self.discriminator = None
 
         if id is not None:
             self.id = id
         if compiled_workflow is not None:
             self.compiled_workflow = compiled_workflow
+        if dynamic_job_spec_uri is not None:
+            self.dynamic_job_spec_uri = dynamic_job_spec_uri
 
     @property
     def id(self):
@@ -100,6 +105,29 @@ class FlyteidladminDynamicWorkflowNodeMetadata(object):
         """
 
         self._compiled_workflow = compiled_workflow
+
+    @property
+    def dynamic_job_spec_uri(self):
+        """Gets the dynamic_job_spec_uri of this FlyteidladminDynamicWorkflowNodeMetadata.  # noqa: E501
+
+        dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is required to correctly recover partially completed executions where the subworkflow has already been compiled.  # noqa: E501
+
+        :return: The dynamic_job_spec_uri of this FlyteidladminDynamicWorkflowNodeMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._dynamic_job_spec_uri
+
+    @dynamic_job_spec_uri.setter
+    def dynamic_job_spec_uri(self, dynamic_job_spec_uri):
+        """Sets the dynamic_job_spec_uri of this FlyteidladminDynamicWorkflowNodeMetadata.
+
+        dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is required to correctly recover partially completed executions where the subworkflow has already been compiled.  # noqa: E501
+
+        :param dynamic_job_spec_uri: The dynamic_job_spec_uri of this FlyteidladminDynamicWorkflowNodeMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._dynamic_job_spec_uri = dynamic_job_spec_uri
 
     def to_dict(self):
         """Returns the model properties as a dict"""

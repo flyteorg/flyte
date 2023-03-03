@@ -14,12 +14,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DynamicWorkflowNodeMetadata(_message.Message):
-    __slots__ = ["compiled_workflow", "id"]
+    __slots__ = ["compiled_workflow", "dynamic_job_spec_uri", "id"]
     COMPILED_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    DYNAMIC_JOB_SPEC_URI_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     compiled_workflow: _compiler_pb2.CompiledWorkflowClosure
+    dynamic_job_spec_uri: str
     id: _identifier_pb2.Identifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ..., dynamic_job_spec_uri: _Optional[str] = ...) -> None: ...
 
 class ExternalResourceInfo(_message.Message):
     __slots__ = ["cache_status", "external_id", "index", "logs", "phase", "retry_attempt"]
