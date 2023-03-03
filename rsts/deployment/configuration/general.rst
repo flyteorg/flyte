@@ -290,7 +290,7 @@ The legacy technique is to set configuration options in Flyte's K8s plugin confi
     These two approaches can be used simultaneously, where the K8s plugin configuration will override the default PodTemplate values.
 
 *******************************
-Using Default K8s PodTemplates
+Using K8s PodTemplates
 *******************************
 
 `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__
@@ -304,10 +304,81 @@ of Flyte's task execution. It ensures complete control over Pod configuration,
 supporting all options available through the resource and ensuring maintainability
 in future versions.
 
-To initialize a default PodTemplate in Flyte:
+Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__:
+1. client-side pod templates defined at the task level
+2. server-side defined podtemplate via ``default-pod-template-name`` in FlytePropeller
+
+
+Client-side pod templates usage
+================================
+
+To define a client-side PodTemplate we have two options: (1) use the ``pod_template`` field in the Task (TODO: link to the task),
+or (2) ``pod_template_name`` in the Task. Let's discuss the options separately.
+
+Defining ``pod_template`` in a Task
+------------------------------------
+
+We can define a pod template inline, as part of the definition of a Task, for example:
+
+.. code-block:: python
+
+    @task(
+        pod_template=PodTemplate(
+            primary_container_name="primary",
+            labels={"lKeyA": "lValA", "lKeyB": "lValB"},
+            annotations={"aKeyA": "aValA", "aKeyB": "aValB"},
+            pod_spec=V1PodSpec(
+                containers=[
+                    V1Container(
+                        name="primary",
+                        image="repo/placeholderImage:0.0.0",
+                        command="echo",
+                        args=["wow"],
+                        resources=V1ResourceRequirements(limits={"cpu": "999", "gpu": "999"}),
+                        env=[V1EnvVar(name="eKeyC", value="eValC"), V1EnvVar(name="eKeyD", value="eValD")],
+                    ),
+                ],
+                volumes=[V1Volume(name="volume")],
+                tolerations=[
+                    V1Toleration(
+                        key="num-gpus",
+                        operator="Equal",
+                        value=1,
+                        effect="NoSchedule",
+                    ),
+                ],
+            )
+        )
+    )
+    def t1() -> int:
+        ...
+
+Notice how in this example we are defining a new PodTemplate inline, which allows us to define a full
+`V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodSpec.md>`__ and also define
+the name of the primary container, labels, and annotations.
+
+Using ``pod_template_name`` in a Task
+--------------------------------------
+
+It's also possible to apply a podtemplate to a task definition by specifying ``pod_template_name`` in the task definition.
+For example:
+
+.. code-block:: python
+
+    @task(
+        pod_template_name="a_pod_template",
+    )
+    def t1() -> int:
+        ...
+
+In this example we're specifying that a PodTemplate name ``a_pod_template`` is going to be applied according to
+the server-side PodTemplate rules explained in the next section.
+
+Server-side PodTemplate
+========================
 
 Set the ``default-pod-template-name`` in FlytePropeller
-========================================================
+--------------------------------------------------------
 
 This `option <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__
 initializes a K8s informer internally to track system PodTemplate updates
@@ -330,14 +401,14 @@ An example configuration is:
         default-pod-template-name: <your_template_name>
  
 Create a PodTemplate resource
-=============================
+------------------------------
 
 Flyte recognizes PodTemplate definitions with the ``default-pod-template-name`` at two granularities. 
 
 1. A system-wide configuration can be created in the same namespace that
    FlytePropeller is running in (typically `flyte`). 
 2. PodTemplates can be applied from the same namespace that the Pod will be
-   created in. FlytePropeller always favours the PodTemplate with the more
+   created in. FlytePropeller always favors the PodTemplate with the more
    specific namespace. For example, a Pod created in the ``flytesnacks-development``
    namespace will first look for a PodTemplate from the ``flytesnacks-development``
    namespace. If that PodTemplate doesn't exist, it will look for a PodTemplate
