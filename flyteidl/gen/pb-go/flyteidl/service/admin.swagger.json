@@ -4512,6 +4512,10 @@
         "deck_uri": {
           "type": "string",
           "title": "String location uniquely identifying where the deck HTML file is.\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required\nto correctly recover partially completed executions where the subworkflow has already been compiled."
         }
       },
       "description": "Container for node execution details and results."
@@ -7367,6 +7371,10 @@
         "compiled_workflow": {
           "$ref": "#/definitions/coreCompiledWorkflowClosure",
           "description": "Represents the compiled representation of the embedded dynamic workflow."
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is\nrequired to correctly recover partially completed executions where the subworkflow has already been compiled."
         }
       },
       "description": "For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated."
@@ -7454,6 +7462,10 @@
         "compiled_workflow": {
           "$ref": "#/definitions/coreCompiledWorkflowClosure",
           "description": "Represents the compiled representation of the embedded dynamic workflow."
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is\nrequired to correctly recover partially completed executions where the workflow has already been compiled."
         }
       },
       "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."

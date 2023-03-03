@@ -7483,6 +7483,12 @@ definitions:
         title: "String location uniquely identifying where the deck HTML file is.\n\
           NativeUrl specifies the url in the format of the configured storage provider\
           \ (e.g. s3://my-bucket/randomstring/suffix.tar)"
+      dynamic_job_spec_uri:
+        type: "string"
+        description: "dynamic_job_spec_uri is the location of the DynamicJobSpec proto\
+          \ message for a DynamicWorkflow. This is required\nto correctly recover\
+          \ partially completed executions where the subworkflow has already been\
+          \ compiled."
     description: "Container for node execution details and results."
     example:
       phase: {}
@@ -7520,6 +7526,7 @@ definitions:
             artifact_id: "artifact_id"
         checkpoint_uri: "checkpoint_uri"
         cache_status: {}
+      dynamic_job_spec_uri: "dynamic_job_spec_uri"
       output_uri: "output_uri"
       started_at: "2000-01-23T04:56:07.000+00:00"
       created_at: "2000-01-23T04:56:07.000+00:00"
@@ -14121,6 +14128,7 @@ definitions:
                   ids:
                   - "ids"
                   - "ids"
+        dynamic_job_spec_uri: "dynamic_job_spec_uri"
         id:
           domain: "domain"
           resource_type: {}
@@ -14196,6 +14204,7 @@ definitions:
                 artifact_id: "artifact_id"
             checkpoint_uri: "checkpoint_uri"
             cache_status: {}
+          dynamic_job_spec_uri: "dynamic_job_spec_uri"
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"
@@ -14255,6 +14264,7 @@ definitions:
                 artifact_id: "artifact_id"
             checkpoint_uri: "checkpoint_uri"
             cache_status: {}
+          dynamic_job_spec_uri: "dynamic_job_spec_uri"
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"
@@ -58718,6 +58728,12 @@ definitions:
         description: "Represents the compiled representation of the embedded dynamic\
           \ workflow."
         $ref: "#/definitions/coreCompiledWorkflowClosure"
+      dynamic_job_spec_uri:
+        type: "string"
+        description: "dynamic_job_spec_uri is the location of the DynamicJobSpec proto\
+          \ message for this DynamicWorkflow. This is\nrequired to correctly recover\
+          \ partially completed executions where the subworkflow has already been\
+          \ compiled."
     description: "For dynamic workflow nodes we capture information about the dynamic\
       \ workflow definition that gets generated."
     example:
@@ -65266,6 +65282,7 @@ definitions:
                 ids:
                 - "ids"
                 - "ids"
+      dynamic_job_spec_uri: "dynamic_job_spec_uri"
       id:
         domain: "domain"
         resource_type: {}
@@ -65341,6 +65358,7 @@ definitions:
               artifact_id: "artifact_id"
           checkpoint_uri: "checkpoint_uri"
           cache_status: {}
+        dynamic_job_spec_uri: "dynamic_job_spec_uri"
         output_uri: "output_uri"
         started_at: "2000-01-23T04:56:07.000+00:00"
         created_at: "2000-01-23T04:56:07.000+00:00"
@@ -65524,6 +65542,11 @@ definitions:
         description: "Represents the compiled representation of the embedded dynamic\
           \ workflow."
         $ref: "#/definitions/coreCompiledWorkflowClosure"
+      dynamic_job_spec_uri:
+        type: "string"
+        description: "dynamic_job_spec_uri is the location of the DynamicJobSpec proto\
+          \ message for this DynamicWorkflow. This is\nrequired to correctly recover\
+          \ partially completed executions where the workflow has already been compiled."
     description: "For dynamic workflow nodes we send information about the dynamic\
       \ workflow definition that gets generated."
   flyteidleventTaskNodeMetadata:

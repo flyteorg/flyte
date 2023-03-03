@@ -14,12 +14,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DynamicWorkflowNodeMetadata(_message.Message):
-    __slots__ = ["compiled_workflow", "id"]
+    __slots__ = ["compiled_workflow", "dynamic_job_spec_uri", "id"]
     COMPILED_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    DYNAMIC_JOB_SPEC_URI_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     compiled_workflow: _compiler_pb2.CompiledWorkflowClosure
+    dynamic_job_spec_uri: str
     id: _identifier_pb2.Identifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ..., dynamic_job_spec_uri: _Optional[str] = ...) -> None: ...
 
 class NodeExecution(_message.Message):
     __slots__ = ["closure", "id", "input_uri", "metadata"]
@@ -34,10 +36,11 @@ class NodeExecution(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., input_uri: _Optional[str] = ..., closure: _Optional[_Union[NodeExecutionClosure, _Mapping]] = ..., metadata: _Optional[_Union[NodeExecutionMetaData, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionClosure(_message.Message):
-    __slots__ = ["created_at", "deck_uri", "duration", "error", "output_data", "output_uri", "phase", "started_at", "task_node_metadata", "updated_at", "workflow_node_metadata"]
+    __slots__ = ["created_at", "deck_uri", "duration", "dynamic_job_spec_uri", "error", "output_data", "output_uri", "phase", "started_at", "task_node_metadata", "updated_at", "workflow_node_metadata"]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     DECK_URI_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
+    DYNAMIC_JOB_SPEC_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
@@ -49,6 +52,7 @@ class NodeExecutionClosure(_message.Message):
     created_at: _timestamp_pb2.Timestamp
     deck_uri: str
     duration: _duration_pb2.Duration
+    dynamic_job_spec_uri: str
     error: _execution_pb2.ExecutionError
     output_data: _literals_pb2.LiteralMap
     output_uri: str
@@ -57,7 +61,7 @@ class NodeExecutionClosure(_message.Message):
     task_node_metadata: TaskNodeMetadata
     updated_at: _timestamp_pb2.Timestamp
     workflow_node_metadata: WorkflowNodeMetadata
-    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., deck_uri: _Optional[str] = ...) -> None: ...
+    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., deck_uri: _Optional[str] = ..., dynamic_job_spec_uri: _Optional[str] = ...) -> None: ...
 
 class NodeExecutionForTaskListRequest(_message.Message):
     __slots__ = ["filters", "limit", "sort_by", "task_execution_id", "token"]
