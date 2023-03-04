@@ -25,6 +25,9 @@ spec:
   rules:
   - http:
       paths:
+      {{- if .Values.ingress.grpcExtraPaths.prepend }}
+      {{- tpl ( .Values.ingress.grpcExtraPaths.prepend | toYaml ) . | nindent 6 }}
+      {{- end }}
       - backend:
           service:
             name: {{ include "flyte-binary.fullname" . }}
@@ -109,6 +112,9 @@ spec:
               number: {{ include "flyte-binary.service.grpcPort" . }}
         path: /flyteidl.service.SignalService/*
         pathType: ImplementationSpecific
+      {{- if .Values.ingress.grpcExtraPaths.append }}
+      {{- tpl ( .Values.ingress.grpcExtraPaths.append | toYaml ) . | nindent 6 }}
+      {{- end }}
     {{- if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}
     {{- end }}
