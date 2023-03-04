@@ -26,6 +26,10 @@ type FutureFileReader struct {
 	store                  *storage.DataStore
 }
 
+func (f FutureFileReader) GetLoc() storage.DataReference {
+	return f.loc
+}
+
 func (f FutureFileReader) Exists(ctx context.Context) (bool, error) {
 	metadata, err := f.store.Head(ctx, f.loc)
 	// If no futures file produced, then declare success and return.
