@@ -111,8 +111,9 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 	taskNodeInfoMetadata := &event.TaskNodeMetadata{}
 	if dCtx.subWorkflowClosure != nil && dCtx.subWorkflowClosure.Primary != nil && dCtx.subWorkflowClosure.Primary.Template != nil {
 		taskNodeInfoMetadata.DynamicWorkflow = &event.DynamicWorkflowNodeMetadata{
-			Id:               dCtx.subWorkflowClosure.Primary.Template.Id,
-			CompiledWorkflow: dCtx.subWorkflowClosure,
+			Id:                dCtx.subWorkflowClosure.Primary.Template.Id,
+			CompiledWorkflow:  dCtx.subWorkflowClosure,
+			DynamicJobSpecUri: dCtx.dynamicJobSpecURI,
 		}
 	}
 

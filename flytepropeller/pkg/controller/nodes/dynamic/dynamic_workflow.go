@@ -30,6 +30,7 @@ type dynamicWorkflowContext struct {
 	subWorkflowClosure *core.CompiledWorkflowClosure
 	nodeLookup         executors.NodeLookup
 	isDynamic          bool
+	dynamicJobSpecURI  string
 }
 
 const dynamicWfNameTemplate = "dynamic_%s"
@@ -183,6 +184,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 				subWorkflowClosure: workflowCacheContents.CompiledWorkflow,
 				execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), compiledWf, compiledWf, newParentInfo, nCtx.ExecutionContext()),
 				nodeLookup:         executors.NewNodeLookup(compiledWf, dynamicNodeStatus),
+				dynamicJobSpecURI:  string(f.GetLoc()),
 			}, nil
 		}
 	}
@@ -215,6 +217,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		subWorkflowClosure: closure,
 		execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), dynamicWf, dynamicWf, newParentInfo, nCtx.ExecutionContext()),
 		nodeLookup:         executors.NewNodeLookup(dynamicWf, dynamicNodeStatus),
+		dynamicJobSpecURI:  string(f.GetLoc()),
 	}, nil
 }
 
