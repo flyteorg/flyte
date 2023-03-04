@@ -104,7 +104,7 @@ func CheckAndFetchInputsForExecution(
 		} else {
 			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type", name)
+				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
 			}
 		}
 	}
