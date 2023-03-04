@@ -758,7 +758,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VnZiU0xIZjBLRVcxcjI0Zw==
+  haSharedSecret: YnFuQzZJbUdEQVo3VkhsaQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1172,11 +1172,6 @@ spec:
           httpGet:
             path: /healthcheck
             port: http
-        resources:
-          limits:
-            memory: 1Gi
-          requests:
-            cpu: 1
         volumeMounts:
         - mountPath: /etc/flyte/cluster-resource-templates
           name: cluster-resource-templates
@@ -1205,11 +1200,6 @@ spec:
         image: bitnami/postgresql:sandbox
         imagePullPolicy: Never
         name: wait-for-db
-        resources:
-          limits:
-            memory: 1Gi
-          requests:
-            cpu: 1
       serviceAccountName: flyte-sandbox
       volumes:
       - name: cluster-resource-templates
@@ -1253,7 +1243,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 29be0ecfab0aea939a12ccb785931dedaccca4b6be7d3d38d925c4dc6487085e
+        checksum/secret: 2b44bc8183b23be063b704a6a4d7f9f461a0e654d1cb76da460863e0bbc8039e
       labels:
         app: docker-registry
         release: flyte-sandbox
