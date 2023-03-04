@@ -2151,6 +2151,97 @@ func TestRecover(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, phaseInfo.GetPhase(), handler.EPhaseRecovered)
 	})
+	t.Run("recover partially completed dynamic task", func(t *testing.T) {
+		srcDynamicJobSpecURI := "src/foo/bar"
+		dstDynamicJobSpecURI := "dst/foo/bar"
+
+		// initialize node execution context
+		nCtx := &nodeHandlerMocks.NodeExecutionContext{}
+		nCtx.OnExecutionContext().Return(execContext)
+		nCtx.OnNodeExecutionMetadata().Return(nm)
+		nCtx.OnInputReader().Return(ir)
+		nCtx.OnNodeStatus().Return(ns)
+
+		mockPBStore := &storageMocks.ComposedProtobufStore{}
+		mockPBStore.On("CopyRaw", mock.Anything, storage.DataReference(srcDynamicJobSpecURI), storage.DataReference(dstDynamicJobSpecURI), mock.Anything).Return(nil)
+		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
+			return reference.String() == inputsPath || reference.String() == outputsPath
+		}), mock.Anything,
+			mock.Anything).Return(nil)
+		mockReferenceConstructor := storageMocks.ReferenceConstructor{}
+		mockReferenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("out"), "futures.pb").Return(
+			storage.DataReference(dstDynamicJobSpecURI), nil)
+		mockReferenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("out"), "futures_compiled.pb").Return(
+			storage.DataReference("out/futures_compiled.pb"), nil)
+		mockReferenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("out"), "dynamic_compiled.pb").Return(
+			storage.DataReference("out/dynamic_compiled.pb"), nil)
+		storageClient := &storage.DataStore{
+			ComposedProtobufStore: mockPBStore,
+			ReferenceConstructor:  &mockReferenceConstructor,
+		}
+
+		nCtx.OnDataStore().Return(storageClient)
+
+		reader := &nodeHandlerMocks.NodeStateReader{}
+		reader.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
+		nCtx.OnNodeStateReader().Return(reader)
+
+		writer := &nodeHandlerMocks.NodeStateWriter{}
+		writer.OnPutDynamicNodeStateMatch(mock.Anything).Run(func(args mock.Arguments) {
+			state := args.Get(0).(handler.DynamicNodeState)
+			assert.Equal(t, v1alpha1.DynamicNodePhaseParentFinalized, state.Phase)
+		}).Return(nil)
+		nCtx.OnNodeStateWriter().Return(writer)
+
+		// initialize node executor
+		recoveryClient := &recoveryMocks.Client{}
+		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
+			&admin.NodeExecution{
+				Closure: &admin.NodeExecutionClosure{
+					Phase:             core.NodeExecution_FAILED,
+					DynamicJobSpecUri: srcDynamicJobSpecURI,
+				},
+				Metadata: &admin.NodeExecutionMetaData{
+					IsDynamic: true,
+				},
+			}, nil)
+
+		dynamicWorkflow := &admin.DynamicWorkflowNodeMetadata{
+			Id: &core.Identifier{
+				ResourceType: core.ResourceType_WORKFLOW,
+				Project:      "p",
+				Domain:       "d",
+				Name:         "n",
+				Version:      "abc123",
+			},
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Primary: &core.CompiledWorkflow{
+					Template: &core.WorkflowTemplate{
+						Metadata: &core.WorkflowMetadata{
+							OnFailure: core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE,
+						},
+					},
+				},
+			},
+		}
+
+		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
+			&admin.NodeExecutionGetDataResponse{
+				FullInputs:      fullInputs,
+				FullOutputs:     fullOutputs,
+				DynamicWorkflow: dynamicWorkflow,
+			}, nil)
+
+		executor := nodeExecutor{
+			recoveryClient: recoveryClient,
+			store:          storageClient,
+			eventConfig:    eventConfig,
+		}
+
+		phaseInfo, err := executor.attemptRecovery(context.TODO(), nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, phaseInfo.GetPhase(), handler.EPhaseRunning)
+	})
 	t.Run("recover cached, dynamic task node successfully", func(t *testing.T) {
 		recoveryClient := &recoveryMocks.Client{}
 		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(

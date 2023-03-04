@@ -21,40 +21,39 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	errors2 "github.com/flyteorg/flytestdlib/errors"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
 	"github.com/flyteorg/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
+	errors2 "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/golang/protobuf/ptypes"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/golang/protobuf/ptypes"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 )
 
 type nodeMetrics struct {
@@ -156,6 +155,35 @@ func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *eve
 	return err
 }
 
+func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx handler.NodeExecutionContext,
+	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.LiteralMap, error) {
+
+	nodeInputs := recoveredData.FullInputs
+	if nodeInputs != nil {
+		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
+			c.metrics.InputsWriteFailure.Inc(ctx)
+			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
+			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
+		}
+	} else if len(recovered.InputUri) > 0 {
+		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
+		nodeInputs = &core.LiteralMap{}
+		if recoveredData.FullInputs == nil {
+			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
+				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+			}
+		}
+
+		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
+			c.metrics.InputsWriteFailure.Inc(ctx)
+			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
+			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
+		}
+	}
+
+	return nodeInputs, nil
+}
+
 func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.PhaseInfo, error) {
 	fullyQualifiedNodeID := nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
@@ -205,6 +233,44 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 					nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
+
+		// if this node is a dynamic task we attempt to recover the compiled workflow from instances where the parent
+		// task succeeded but the dynamic task did not complete. this is important to ensure correctness since node ids
+		// within the compiled closure may not be generated deterministically.
+		if recovered.Metadata != nil && recovered.Metadata.IsDynamic && len(recovered.Closure.DynamicJobSpecUri) > 0 {
+			// recover node inputs
+			recoveredData, err := c.recoveryClient.RecoverNodeExecutionData(ctx,
+				nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier, fullyQualifiedNodeID)
+			if err != nil || recoveredData == nil {
+				return handler.PhaseInfoUndefined, nil
+			}
+
+			if _, err := c.recoverInputs(ctx, nCtx, recovered, recoveredData); err != nil {
+				return handler.PhaseInfoUndefined, err
+			}
+
+			// copy previous DynamicJobSpec file
+			f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
+			if err != nil {
+				return handler.PhaseInfoUndefined, err
+			}
+
+			dynamicJobSpecReference := storage.DataReference(recovered.Closure.DynamicJobSpecUri)
+			if err := nCtx.DataStore().CopyRaw(ctx, dynamicJobSpecReference, f.GetLoc(), storage.Options{}); err != nil {
+				return handler.PhaseInfoUndefined, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err,
+					"failed to store dynamic job spec for node. source file [%s] destination file [%s]", dynamicJobSpecReference, f.GetLoc())
+			}
+
+			// transition node phase to 'Running' and dynamic task phase to 'DynamicNodePhaseParentFinalized'
+			state := nCtx.NodeStateReader().GetDynamicNodeState()
+			state.Phase = v1alpha1.DynamicNodePhaseParentFinalized
+			if err := nCtx.NodeStateWriter().PutDynamicNodeState(state); err != nil {
+				return handler.PhaseInfoUndefined, errors.Wrapf(errors.UnknownError, nCtx.NodeID(), err, "failed to store dynamic node state")
+			}
+
+			return handler.PhaseInfoRunning(&handler.ExecutionInfo{}), nil
+		}
+
 		logger.Debugf(ctx, "Node [%+v] phase [%v] is not recoverable", nCtx.NodeExecutionMetadata().GetNodeExecutionID(), recovered.Closure.Phase)
 		return handler.PhaseInfoUndefined, nil
 	}
@@ -222,31 +288,13 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 		logger.Warnf(ctx, "call to attemptRecovery node [%+v] data returned no error but also no data", nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 		return handler.PhaseInfoUndefined, nil
 	}
-	nodeInputs := recoveredData.GetFullInputs()
-	// Copy inputs to this node's expected location
-	if nodeInputs != nil {
-		if err = c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, recoveredData.FullInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return handler.PhaseInfoUndefined, errors.Wrapf(
-				errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
-	} else if len(recovered.InputUri) > 0 {
-		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
-		nodeInputs = &core.LiteralMap{}
-		if recoveredData.FullInputs == nil {
-			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
-				return handler.PhaseInfoUndefined, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
-			}
-		}
 
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return handler.PhaseInfoUndefined, errors.Wrapf(
-				errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
+	// Copy inputs to this node's expected location
+	nodeInputs, err := c.recoverInputs(ctx, nCtx, recovered, recoveredData)
+	if err != nil {
+		return handler.PhaseInfoUndefined, err
 	}
+
 	// Similarly, copy outputs' reference
 	so := storage.Options{}
 	var outputs = &core.LiteralMap{}
@@ -334,7 +382,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 		if !node.IsStartNode() {
 			if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
 				phaseInfo, err := c.attemptRecovery(ctx, nCtx)
-				if err != nil || phaseInfo.GetPhase() == handler.EPhaseRecovered {
+				if err != nil || phaseInfo.GetPhase() != handler.EPhaseUndefined {
 					return phaseInfo, err
 				}
 			}
@@ -676,7 +724,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx *nodeExe
 	// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
 	// Attempt is used throughout the system to determine the idempotent resource version.
 	nodeStatus.IncrementAttempts()
-	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying", nil)
+	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", nil)
 	// We are going to retry in the next round, so we should clear all current state
 	nodeStatus.ClearSubNodeStatus()
 	nodeStatus.ClearTaskStatus()
@@ -710,7 +758,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.abort(ctx, h, nCtx, "node failing"); err != nil {
 			return executors.NodeStatusUndefined, err
 		}
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, v1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
 		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
 		if nCtx.md.IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
@@ -725,7 +773,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructur
 		}
 
 		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, v1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
 		c.metrics.TimedOutFailure.Inc(ctx)
 		if nCtx.md.IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
@@ -738,7 +786,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.finalize(ctx, h, nCtx); err != nil {
 			return executors.NodeStatusUndefined, err
 		}
-		t := v1.Now()
+		t := metav1.Now()
 
 		started := nodeStatus.GetStartedAt()
 		if started == nil {
