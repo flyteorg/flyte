@@ -78,8 +78,6 @@ Chart for basic single Flyte executable deployment
 | deployment.podSecurityContext.runAsGroup | int | `65534` |  |
 | deployment.podSecurityContext.runAsUser | int | `65534` |  |
 | deployment.readinessProbe | object | `{}` |  |
-| deployment.resources.limits.memory | string | `"1Gi"` |  |
-| deployment.resources.requests.cpu | int | `1` |  |
 | deployment.sidecars | list | `[]` |  |
 | deployment.startupProbe | object | `{}` |  |
 | deployment.waitForDB.args | list | `[]` |  |
