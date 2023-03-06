@@ -1244,7 +1244,13 @@ func TestMergePodSpecs(t *testing.T) {
 	podSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			v1.Container{
-				Name: "foo",
+				Name: "primary",
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name:      "nccl",
+						MountPath: "abc",
+					},
+				},
 			},
 			v1.Container{
 				Name: "bar",
@@ -1292,7 +1298,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "foo")
+	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -1310,6 +1316,7 @@ func TestMergePodSpecs(t *testing.T) {
 	primaryContainer := mergedPodSpec.Containers[0]
 	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+	assert.Equal(t, 1, len(primaryContainer.VolumeMounts))
 
 	// validate default container
 	defaultContainer := mergedPodSpec.Containers[1]
