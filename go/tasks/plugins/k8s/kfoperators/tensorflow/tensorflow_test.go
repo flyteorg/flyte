@@ -383,7 +383,6 @@ func TestReplicaCounts(t *testing.T) {
 		notContains        []commonOp.ReplicaType
 	}{
 		{"NoWorkers", 1, 1, 0, true, nil, nil},
-		{"NoChiefOrPS", 0, 0, 1, true, nil, nil},
 		{"SingleChief", 1, 0, 1, false,
 			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeWorker},
 			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS}},

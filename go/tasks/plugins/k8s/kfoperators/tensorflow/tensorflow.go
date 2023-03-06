@@ -75,9 +75,6 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	if workers == 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
-	if psReplicas == 0 && chiefReplicas == 0 {
-		return nil, fmt.Errorf("either number of chief or parameter servers needs to be be more then 0")
-	}
 
 	jobSpec := kubeflowv1.TFJobSpec{
 		TFReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{},
