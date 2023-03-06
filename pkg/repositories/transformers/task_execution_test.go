@@ -585,7 +585,7 @@ func TestFromTaskExecutionModel_Error(t *testing.T) {
 		Phase:        core.WorkflowExecution_FAILED,
 		OutputResult: &admin.ExecutionClosure_Error{Error: execErr},
 	})
-	taskExecution, err := FromTaskExecutionModel(models.TaskExecution{
+	taskExecutionModel := models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
 				Project: "project",
@@ -606,12 +606,32 @@ func TestFromTaskExecutionModel_Error(t *testing.T) {
 		InputURI: "input uri",
 		Duration: duration,
 		Closure:  closureBytes,
-	}, &ExecutionTransformerOptions{
+	}
+	taskExecution, err := FromTaskExecutionModel(taskExecutionModel, &ExecutionTransformerOptions{
 		TrimErrorMessage: true,
 	})
 
 	expectedExecErr := execErr
 	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(expectedExecErr, taskExecution.Closure.GetError()))
+
+	extraShortErrMsg := string(make([]byte, 10))
+	execErr = &core.ExecutionError{
+		Code:    "CODE",
+		Message: extraShortErrMsg,
+		Kind:    core.ExecutionError_USER,
+	}
+	closureBytes, _ = proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: execErr},
+	})
+	taskExecutionModel.Closure = closureBytes
+	taskExecution, err = FromTaskExecutionModel(taskExecutionModel, &ExecutionTransformerOptions{
+		TrimErrorMessage: true,
+	})
+	expectedExecErr = execErr
+	expectedExecErr.Message = string(make([]byte, 10))
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(expectedExecErr, taskExecution.Closure.GetError()))
 }

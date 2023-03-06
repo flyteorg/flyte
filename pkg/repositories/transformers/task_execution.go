@@ -407,7 +407,9 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *Execu
 	}
 	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
 		trimmedErrOutputResult := closure.GetError()
-		trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
+		if len(trimmedErrOutputResult.Message) > trimmedErrMessageLen {
+			trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
+		}
 		closure.OutputResult = &admin.TaskExecutionClosure_Error{
 			Error: trimmedErrOutputResult,
 		}
