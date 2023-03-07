@@ -84,6 +84,3 @@ brews:
 
     # Default is false.
     skip_upload: auto
-
-    dependencies:
-    - name: go
