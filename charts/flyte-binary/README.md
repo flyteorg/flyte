@@ -17,7 +17,13 @@ Chart for basic single Flyte executable deployment
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
+| configuration.auth.enableAuthServer | bool | `true` |  |
 | configuration.auth.enabled | bool | `false` |  |
+| configuration.auth.flyteClient.audience | string | `""` |  |
+| configuration.auth.flyteClient.clientId | string | `"flytectl"` |  |
+| configuration.auth.flyteClient.redirectUri | string | `"http://localhost:53593/callback"` |  |
+| configuration.auth.flyteClient.scopes[0] | string | `"all"` |  |
+| configuration.auth.internal.clientId | string | `"flytepropeller"` |  |
 | configuration.auth.internal.clientSecret | string | `""` |  |
 | configuration.auth.internal.clientSecretHash | string | `""` |  |
 | configuration.auth.oidc.baseUrl | string | `""` |  |
