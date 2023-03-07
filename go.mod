@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/flyteorg/datacatalog v1.0.43
-	github.com/flyteorg/flyteadmin v1.1.72
-	github.com/flyteorg/flytepropeller v1.1.64
+	github.com/flyteorg/flyteadmin v1.1.77
+	github.com/flyteorg/flytepropeller v1.1.69
 	github.com/flyteorg/flytestdlib v1.0.16
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
@@ -72,8 +72,8 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.3.7 // indirect
-	github.com/flyteorg/flyteplugins v1.0.34 // indirect
+	github.com/flyteorg/flyteidl v1.3.9 // indirect
+	github.com/flyteorg/flyteplugins v1.0.40 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -182,11 +182,11 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
-	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/term v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/term v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
