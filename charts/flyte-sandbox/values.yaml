@@ -15,7 +15,7 @@ flyte-binary:
   configuration:
     database:
       password: postgres
-      port: 30001
+      host: flyte-sandbox-postgresql-hl.flyte
     storage:
       metadataContainer: my-s3-bucket
       userDataContainer: my-s3-bucket
@@ -24,7 +24,7 @@ flyte-binary:
         s3:
           disableSSL: true
           v2Signing: true
-          endpoint: http://localhost:30002
+          endpoint: http://flyte-sandbox-minio.flyte:9000
           authType: accesskey
           accessKey: minio
           secretKey: miniostorage
@@ -36,6 +36,10 @@ flyte-binary:
           templateUri: |-
             http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
+      storage:
+        signedUrl:
+          stowConfigOverride:
+            endpoint: http://localhost:30002
       plugins:
         k8s:
           default-env-vars:
@@ -55,8 +59,6 @@ flyte-binary:
         repository: bitnami/postgresql
         tag: sandbox
         pullPolicy: Never
-    extraPodSpec:
-      hostNetwork: true
   rbac:
     # This is strictly NOT RECOMMENDED in production clusters, and is only for use
     # within local Flyte sandboxes.
