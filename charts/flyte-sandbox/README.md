@@ -25,11 +25,12 @@ A Helm chart for the Flyte local sandbox
 | docker-registry.service.nodePort | int | `30000` |  |
 | docker-registry.service.type | string | `"NodePort"` |  |
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
+| flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
-| flyte-binary.configuration.database.port | int | `30001` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
+| flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.logging.level | int | `6` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
@@ -39,11 +40,10 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.storage.providerConfig.s3.accessKey | string | `"minio"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.authType | string | `"accesskey"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.disableSSL | bool | `true` |  |
-| flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://localhost:30002"` |  |
+| flyte-binary.configuration.storage.providerConfig.s3.endpoint | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.secretKey | string | `"miniostorage"` |  |
 | flyte-binary.configuration.storage.providerConfig.s3.v2Signing | bool | `true` |  |
 | flyte-binary.configuration.storage.userDataContainer | string | `"my-s3-bucket"` |  |
-| flyte-binary.deployment.extraPodSpec.hostNetwork | bool | `true` |  |
 | flyte-binary.deployment.image.pullPolicy | string | `"Never"` |  |
 | flyte-binary.deployment.image.repository | string | `"flyte-binary"` |  |
 | flyte-binary.deployment.image.tag | string | `"sandbox"` |  |

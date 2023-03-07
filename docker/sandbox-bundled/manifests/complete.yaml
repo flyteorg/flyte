@@ -453,8 +453,8 @@ data:
       postgres:
         username: postgres
         passwordPath: /var/run/secrets/flyte/db-pass
-        host: 127.0.0.1
-        port: 30001
+        host: flyte-sandbox-postgresql
+        port: 5432
         dbname: flyte
         options: "sslmode=disable"
   003-storage.yaml: |
@@ -468,7 +468,7 @@ data:
           region: us-east-1
           disable_ssl: true
           v2_signing: true
-          endpoint: http://localhost:30002
+          endpoint: http://flyte-sandbox-minio.flyte:9000
           auth_type: accesskey
           access_key_id: minio
           secret_key: miniostorage
@@ -480,6 +480,10 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    storage:
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
 kind: ConfigMap
 metadata:
   labels:
@@ -758,7 +762,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UVZmZkJkU3BERDNNcXRjWQ==
+  haSharedSecret: UnhhQkV4aGNiUVpCSk1scA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1134,7 +1138,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: f0f48d160687e6dc7e76001fdc5277ed44d814c9fc17a8484b9af09d8e47449a
+        checksum/configuration: 10334cfce0d6e5bf07e93dcfe9ddaa5977611b1d51778691fdf18ea09ca820e9
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1182,13 +1186,12 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      hostNetwork: true
       initContainers:
       - args:
         - |
           until pg_isready \
-            -h 127.0.0.1 \
-            -p 30001 \
+            -h flyte-sandbox-postgresql \
+            -p 5432 \
             -U postgres
           do
             echo waiting for database
@@ -1243,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 85b387bc793cdb8978dcd891da651b518c32b0c0e9da50e37439ad6b8bf6391a
+        checksum/secret: 2769fa55d358121f1943a864db28feb526691a8b262c71ac3ce18204d8e2ab7c
       labels:
         app: docker-registry
         release: flyte-sandbox
