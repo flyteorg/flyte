@@ -1,71 +1,45 @@
-.. _flytectl_update_workflow-execution-config:
+.. _flytectl_demo_reload:
 
-flytectl update workflow-execution-config
------------------------------------------
+flytectl demo reload
+--------------------
 
-Updates matchable resources of workflow execution config
+Power cycle the Flyte executable pod, effectively picking up an updated config.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Updates the workflow execution config for the given project and domain combination or additionally with workflow name.
-
-Updating the workflow execution config is only available from a generated file. See the get section for generating this file.
-This will completely overwrite any existing custom project and domain and workflow combination execution config.
-It is preferable to do get and generate a config file if there is an existing execution config already set and then update it to have new values.
-Refer to get workflow-execution-config section on how to generate this file.
-It takes input for workflow execution config from the config file wec.yaml,
-Example: content of wec.yaml:
-
-.. code-block:: yaml
-
-    domain: development
-    project: flytesnacks
-    max_parallelism: 5
-	security_context:
-	  run_as:
-		k8s_service_account: demo
-
-::
-
- flytectl update workflow-execution-config --attrFile wec.yaml
-
-Update workflow execution config for project, domain, and workflow combination. This will take precedence over any other
-execution config defined at project domain level.
-For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
-
-.. code-block:: yaml
-
-    domain: development
-    project: flytesnacks
-    workflow: core.control_flow.merge_sort.merge_sort
-    max_parallelism: 5
-	security_context:
-	  run_as:
-		k8s_service_account: mergesortsa
-
-::
-
- flytectl update workflow-execution-config --attrFile wec.yaml
+If you've changed the ~/.flyte/state/flyte.yaml file, run this command to restart the Flyte binary pod, effectively
+picking up the new settings:
 
 Usage
+::
+
+ flytectl demo reload
 
 
 
 ::
 
-  flytectl update workflow-execution-config [flags]
+  flytectl demo reload [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-      --attrFile string   attribute file name to be used for updating attribute for the resource type.
-      --dryRun            execute command without making any modifications.
-  -h, --help              help for workflow-execution-config
+      --dev                                    Optional. Only start minio and postgres in the sandbox.
+      --dryRun                                 Optional. Only print the docker commands to bring up flyte sandbox/demo container.This will still call github api's to get the latest flyte release to use'
+      --env strings                            Optional. Provide Env variable in key=value format which can be passed to sandbox container.
+  -h, --help                                   help for reload
+      --image string                           Optional. Provide a fully qualified path to a Flyte compliant docker image.
+      --imagePullOptions.platform string       Forces a specific platform's image to be pulled.'
+      --imagePullOptions.registryAuth string   The base64 encoded credentials for the registry.
+      --imagePullPolicy ImagePullPolicy        Optional. Defines the image pull behavior [Always/IfNotPresent/Never] (default Always)
+      --pre                                    Optional. Pre release Version of flyte will be used for sandbox.
+      --source string                          deprecated,  path of your source code,  please build images with local daemon
+      --version string                         Version of flyte. Only supports flyte releases greater than v0.10.0
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,5 +112,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_update` 	 - Update Flyte resources e.g., project.
+* :doc:`flytectl_demo` 	 - Helps with demo interactions like start, teardown, status, and exec.
 

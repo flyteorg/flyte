@@ -10,3 +10,4 @@ These are the actions which can be performed on the 'demo' resource.
     gen/flytectl_demo_status
     gen/flytectl_demo_teardown
     gen/flytectl_demo_exec
+    gen/flytectl_demo_reload
