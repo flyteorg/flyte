@@ -1,21 +1,19 @@
-.PHONY: flyte
-flyte: FLYTE_BINARY_VERSION := latest
-flyte:
-	mkdir -p images/tar/amd64
-	docker pull --platform linux/amd64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/amd64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
+define FLYTE_BINARY_BUILD
+mkdir -p images/tar/$(1)
 
-	mkdir -p images/tar/arm64
-	docker pull --platform linux/arm64 \
-		ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION)
-	docker tag ghcr.io/flyteorg/flyte-binary:$(FLYTE_BINARY_VERSION) \
-		flyte-binary:sandbox
-	docker save --output  images/tar/arm64/flyte-binary.tar flyte-binary:sandbox
-	docker rmi flyte-binary:sandbox
+docker buildx build \
+	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--platform linux/$(1) \
+	--tag flyte-binary:sandbox \
+	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
+	../..
+
+endef
+
+.PHONY: flyte
+flyte: FLYTECONSOLE_VERSION := latest
+flyte:
+	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
 .PHONY: manifests
 manifests:
@@ -41,11 +39,18 @@ build: flyte manifests
 
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
+start: FLYTE_DEV := False
 start:
+	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
+		docker volume create flyte-sandbox
 	[ -n "$(shell docker ps --filter name=^flyte-sandbox$$ --format {{.Names}})" ] || \
 		docker run --detach --rm --privileged --name flyte-sandbox \
+			--add-host "host.docker.internal:host-gateway" \
+			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
+			--volume $(HOME)/.flyte/sandbox:/var/lib/flyte/config \
+			--volume flyte-sandbox:/var/lib/flyte/storage \
 			--publish "6443" \
 			--publish "30000:30000" \
 			--publish "30001:30001" \
@@ -73,5 +78,10 @@ console:
 
 .PHONY: test
 test: export FLYTECTL_CONFIG := test/config.yaml
-test: .venv
+test: .venv kubeconfig
 	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
+	kubectl create secret generic user-info \
+		--namespace flytesnacks-development \
+		--from-literal=user_secret=sosecret \
+		--dry-run=client --output yaml | kubectl apply --filename -
+	. .venv/bin/activate && pyflyte run --remote test/secrets_wf.py wf

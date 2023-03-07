@@ -4,21 +4,13 @@
    :titlesonly:
    :hidden:
 
-   |plane| Getting Started <getting_started/index>
+   |plane| Getting Started <https://docs.flyte.org/projects/cookbook/en/latest/index.html>
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
-   |rocket| Deployment <deployment/index>
+   |rocket| Deployment and Administration <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
-
-.. toctree::
-   :caption: Getting Started
-   :maxdepth: -1
-   :name: gettingstarted
-   :hidden:
-
-   getting_started/index
 
 .. toctree::
    :caption: Concepts
@@ -37,6 +29,12 @@
    :hidden:
 
    deployment/index
+   deployment/deployment/index
+   deployment/plugins/index
+   deployment/configuration/index
+   deployment/configuration/generated/index
+   deployment/security/index
+
 
 .. toctree::
    :caption: Community
@@ -44,7 +42,11 @@
    :name: roadmaptoc
    :hidden:
 
-   Join the Community <community/index>
+   Community <community/index>
+   community/contribute
+   community/roadmap
+   Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
+   community/troubleshoot
 
 .. toctree::
    :caption: API Reference
@@ -55,240 +57,261 @@
    API Reference <reference/index>
 
 
-What is Flyte?
-==============
+*************************************************
+Production-grade Data and ML Workflows Made Easy
+*************************************************
 
-`Flyte Tags <_tags/tagsindex.html>`__
+.. image:: https://img.shields.io/badge/Graduate%20Project-Linux%20Foundation-purple?style=for-the-badge
+    :target: https://lfaidata.foundation/projects/flyte/
+    :alt: Linux Foundation
+
+.. image:: https://img.shields.io/github/stars/flyteorg/flyte?label=github&logo=github&style=for-the-badge
+   :target: https://github.com/flyteorg/flyte
+   :alt: GitHub Repo stars
+
+.. image:: https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge&color=blue
+   :target: https://github.com/flyteorg/flyte/releases/latest
+   :alt: Flyte Release
+
+.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge
+   :target: https://github.com/flyteorg/flyte/actions/workflows/tests.yml
+   :alt: GitHub Test Status
+
+.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge
+   :target: https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml
+   :alt: GitHub Sandbox Status
+
+.. image:: https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=for-the-badge
+    :target: https://github.com/flyteorg/flyte/milestones?state=closed
+    :alt: Completed Milestones
+
+.. image:: https://img.shields.io/pypi/dm/flytekit?color=blue&label=flytekit%20downloads&style=for-the-badge&logo=pypi&logoColor=white
+   :target: https://github.com/flyteorg/flytekit
+   :alt: Flytekit Downloads
+
+.. image:: https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack
+    :target: https://slack.flyte.org
+    :alt: Flyte Slack
+
+.. image:: https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge
+    :target: http://www.apache.org/licenses/LICENSE-2.0.html
+    :alt: License
 
 .. raw:: html
 
-   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and machine learning processes at scale. </p>
-
-
-Flyte is an open-source, container-native, structured programming and distributed processing platform implemented in Golang. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
-
-Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome, and many others, Flyte provides first-class support for Python, Java, and Scala. It is built directly on Kubernetes for all the benefits of containerization like portability, scalability, and reliability.
-
-
-The core unit of execution in Flyte is a :ref:`task <divedeep-tasks>`, which you can easily write with the Flytekit SDK:
-
-.. tabbed:: Python
-
-    .. code:: python
-
-        from flytekit import task, workflow
-
-        @task
-        def greet(name: str) -> str:
-            return f"Welcome, {name}!"
-
-    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
-
-    .. code:: python
-
-        @task
-        def add_question(greeting: str) -> str:
-            return f"{greeting} How are you?"
-
-        @workflow
-        def welcome(name: str) -> str:
-            greeting = greet(name=name)
-            return add_question(greeting=greeting)
-
-        welcome(name="Traveller")
-        # Output: "Welcome, Traveller! How are you?"
-
-.. tabbed:: Java
-
-    .. code:: java
-
-        @AutoService(SdkRunnableTask.class)
-        public class GreetTask extends SdkRunnableTask<GreetTask.Input, GreetTask.Output> {
-          public GreetTask() {
-            super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
-          }
-
-          public static SdkTransform of(SdkBindingData name) {
-            return new GreetTask().withInput("name", name);
-          }
-
-          @AutoValue
-          public abstract static class Input {
-            public abstract String name();
-          }
-
-          @AutoValue
-          public abstract static class Output {
-            public abstract String greeting();
-
-            public static Output create(String greeting) {
-              return new AutoValue_GreetTask_Output(greeting);
-            }
-          }
-
-          @Override
-          public Output run(Input input) {
-            return Output.create(String.format("Welcome, %s!", input.name()));
-          }
-        }
-
-    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
-
-    .. code:: java
-
-        @AutoService(SdkRunnableTask.class)
-        public class AddQuestionTask extends SdkRunnableTask<AddQuestionTask.Input, AddQuestionTask.Output> {
-          public AddQuestionTask() {
-            super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
-          }
-
-          public static SdkTransform of(SdkBindingData greeting) {
-            return new AddQuestionTask().withInput("greeting", greeting);
-          }
-
-          @AutoValue
-          public abstract static class Input {
-            public abstract String greeting();
-          }
-
-          @AutoValue
-          public abstract static class Output {
-            public abstract String greeting();
-
-            public static Output create(String greeting) {
-              return new AutoValue_AddQuestionTask_Output(greeting);
-            }
-          }
-
-          @Override
-          public Output run(Input input) {
-            return Output.create(String.format("%s How are you?", input.greeting()));
-          }
-        }
-
-    .. code:: java
-
-        @AutoService(SdkWorkflow.class)
-        public class WelcomeWorkflow extends SdkWorkflow {
-
-          @Override
-          public void expand(SdkWorkflowBuilder builder) {
-            // defines the input of the workflow
-            SdkBindingData name = builder.inputOfString("name", "The name for the welcome message");
-
-            // uses the workflow input as the task input of the GreetTask
-            SdkBindingData greeting = builder.apply("greet", GreetTask.of(name)).getOutput("greeting");
-
-            // uses the output of the GreetTask as the task input of the AddQuestionTask
-            SdkBindingData greetingWithQuestion =
-                builder.apply("add-question", AddQuestionTask.of(greeting)).getOutput("greeting");
-
-            // uses the task output of the AddQuestionTask as the output of the workflow
-            builder.output("greeting", greetingWithQuestion, "Welcome message");
-          }
-        }
-
-    Link to the example code: `WelcomeWorkflow.java <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples/src/main/java/org/flyte/examples/WelcomeWorkflow.java>`_
-
-.. tabbed:: Scala
-
-    .. code:: scala
-
-        case class GreetTaskInput(name: String)
-        case class GreetTaskOutput(greeting: String)
-
-        class GreetTask
-            extends SdkRunnableTask(
-              SdkScalaType[GreetTaskInput],
-              SdkScalaType[GreetTaskOutput]
-            ) {
-
-          override def run(input: GreetTaskInput): GreetTaskOutput = GreetTaskOutput(s"Welcome, ${input.name}!")
-        }
-
-        object GreetTask {
-          def apply(name: SdkBindingData): SdkTransform =
-            new GreetTask().withInput("name", name)
-        }
-
-    You can compose one or more tasks to create a :ref:`workflow <divedeep-workflows>`:
-
-    .. code:: scala
-
-        case class AddQuestionTaskInput(greeting: String)
-        case class AddQuestionTaskOutput(greeting: String)
-
-        class AddQuestionTask
-            extends SdkRunnableTask(
-              SdkScalaType[AddQuestionTaskInput],
-              SdkScalaType[AddQuestionTaskOutput]
-            ) {
-
-          override def run(input: AddQuestionTaskInput): AddQuestionTaskOutput = AddQuestionTaskOutput(s"${input.greeting} How are you?")
-        }
-
-        object AddQuestionTask {
-          def apply(greeting: SdkBindingData): SdkTransform =
-            new AddQuestionTask().withInput("greeting", greeting)
-        }
-
-    .. code:: scala
-
-        class WelcomeWorkflow extends SdkWorkflow {
-
-          def expand(builder: SdkWorkflowBuilder): Unit = {
-            // defines the input of the workflow
-            val name = builder.inputOfString("name", "The name for the welcome message")
-
-            // uses the workflow input as the task input of the GreetTask
-            val greeting = builder.apply("greet", GreetTask(name)).getOutput("greeting")
-
-            // uses the output of the GreetTask as the task input of the AddQuestionTask
-            val greetingWithQuestion = builder.apply("add-question", AddQuestionTask(greeting)).getOutput("greeting")
-
-            // uses the task output of the AddQuestionTask as the output of the workflow
-            builder.output("greeting", greetingWithQuestion, "Welcome message")
-          }
-        }
-
-    Link to the example code: `WelcomeWorkflow.scala <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples-scala/src/main/scala/org/flyte/examples/flytekitscala/WelcomeWorkflow.scala>`_
-
-
-
-Why Flyte?
-==========
-
-Flyte aims to increase the development velocity for data processing and machine learning applications and enable large-scale compute execution without the operational overhead. Teams can, therefore, focus on the business goals rather than the infrastructure.
-
-Core Features
--------------
-
-* Container Native
-* Reproducibility
-* Extensible Backend and SDKs
-* Ergonomic SDKs in Python, Java and Scala
-* Versioned and Auditable - all actions are recorded
-* Matches your workflow - Start with one task, define workflows, and launchplans, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
-* Battle-tested - millions of pipelines executed per month
-* Vertically-Integrated Compute - serverless experience
-* Deep understanding of data-lineage and provenance
-* Operation Visibility - cost, performance, etc.
-* Cross-Cloud Portable Pipelines
-* Support for cross language workflows
-
-Who's Using Flyte?
-------------------
-
-At `Lyft <https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59>`__, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams.
-
-For the most current list of Flyte's deployments, click `here <https://github.com/flyteorg/flyte#%EF%B8%8F-current-deployments>`_.
-
-Next Steps
-----------
-
-Whether you want to write Flyte workflows, deploy the Flyte platform to your K8s cluster, or extend and contribute to the architecture and design of Flyte, we have what you need.
-
-* :ref:`Get Started <getting-started>`
-* :ref:`Main Concepts <divedeep>`
-* :ref:`Extend Flyte <cookbook:plugins_extend>`
-* :ref:`Join the Community <community>`
+   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;">
+   Highly scalable and flexible workflow orchestration for prototyping and production
+   </p>
+
+`Flyte Tags <_tags/tagsindex.html>`__
+
+`Flyte <https://github.com/flyteorg/flyte>`__ is an open-source, Kubernetes-native
+workflow orchestrator implemented in `Go <https://go.dev/>`__. It enables highly
+concurrent, scalable and reproducible workflows for data processing, machine
+learning and analytics.
+
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify,
+Freenome, and many others, Flyte provides first-class support for
+`Python <https://docs.flyte.org/projects/flytekit/en/latest/>`__,
+`Java, and Scala <https://github.com/flyteorg/flytekit-java>`__. Data Scientists
+and ML Engineers in the industry use Flyte to create:
+
+- ETL pipelines for petabyte-scale data processing.
+- Analytics workflows for business and finance use cases.
+- Machine learning pipelines for logistics, image processsing, and cancer diagnostics.
+
+Explore Flyte
+=============
+
+Get a birds-eye view 🦅 of Flyte at the `official website <https://flyte.org/>`__:
+
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: https://flyte.org/features
+       :type: url
+       :text: ⭐️ Core features
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    From strongly typed interfaces to container-native DAGs, Flyte mitigates the
+    trade-off between scalability and usability.
+
+    ---
+
+    .. link-button:: https://flyte.org/integrations
+       :type: url
+       :text: 🤝 Integrations
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    From strongly typed interfaces to container-native DAGs, Flyte mitigates the
+    trade-off between scalability and usability.
+
+    ---
+
+    .. link-button:: https://flyte.org/airflow-alternative
+       :type: url
+       :text: 💨 Flyte vs Airflow
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Say goodbye to Airflow versioning pain and stepping over your teammate's toes
+    when you change your package versions. Ouch!
+
+    ---
+
+    .. link-button:: https://flyte.org/kubeflow-alternative
+       :type: url
+       :text: 🔁 Flyte vs Kubeflow
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Unintuitive Python DSL boilerplate got you down? With ``flytekit`` you just
+    write Python code and Flyte compiles down to type-safe execution graphs.
+
+    ---
+
+    .. link-button:: https://flyte.org/blog
+       :type: url
+       :text: 📝 Blog
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Learn more about orchestration, Flyte, and everything in between.
+
+    ---
+
+    .. link-button:: https://flyte.org/events
+       :type: url
+       :text: 🗓 Events
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Keep up-to-date with Flyte's upcoming talks, conferences, and more.
+
+
+Learn Flyte
+===========
+
+The following main sections in the documentation will guide you through your
+Flyte journey, whether you want to write Flyte workflows, deploy the Flyte
+platform to your K8s cluster, or extend and contribute its architecture and
+design.
+
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: cookbook:getting_started_index
+       :type: ref
+       :text: 🔤 Getting Started
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Get your first workflow running, learn about the Flyte development lifecycle,
+    and see the core use cases that Flyte enables.
+
+    ---
+
+    .. link-button:: cookbook:userguide
+       :type: ref
+       :text: 📖 User Guide
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    A comprehensive view of Flyte's functionality for data scientists, ML engineers,
+    data engineers, and data analysts.
+
+    ---
+
+    .. link-button:: cookbook:tutorials
+       :type: ref
+       :text: 📚 Tutorials
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    End-to-end examples of Flyte for data/feature engineering, machine learning,
+    bioinformatics, and more.
+
+    ---
+
+    .. link-button:: cookbook:integrations
+       :type: ref
+       :text: 🤝 Integrations
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Learn how to leverage a rich ecosystem of third-party tools and libraries
+    to make your Flyte workflows even more effective.
+
+    ---
+
+    .. link-button:: deployment
+       :type: ref
+       :text: 🚀 Deployment Guide
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guides for platform engineers to deploy and maintain a Flyte cluster on your
+    own infrastructure.
+
+    ---
+
+    .. link-button:: reference
+       :type: ref
+       :text: 📒 API Reference
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Reference for all of Flyte's component libraries.
+
+    ---
+
+    .. link-button:: divedeep
+       :type: ref
+       :text: 🧠 Concepts
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Dive deep into all of Flyte's concepts, from tasks and workflows to the underlying Flyte scheduler.
+
+    ---
+
+    .. link-button:: community
+       :type: ref
+       :text: 🤗 Community
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Join the fast-growing Flyte community to get help, ask questions, and contribute!
+
+Get Help
+========
+
+Have questions or need support? The best way to reach us is through Slack:
+
+.. panels::
+    :header: text-center
+    :column: col-lg-12 p-2
+
+    .. link-button:: https://flyte-org.slack.com/archives/CP2HDHKE1
+       :type: url
+       :text: 🤔 Ask the Community
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Ask anything related to Flyte and get a response within a few hours.
+
+    ---
+
+    .. link-button:: https://flyte-org.slack.com/archives/C01RXBFV1M5
+       :type: url
+       :text: 👋 Introduce yourself
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Tell us about yourself. We'd love to know about you and what brings you to Flyte.
+
+    ---
+
+    .. link-button:: https://flyte-org.slack.com/archives/CPQ3ZFQ84
+       :type: url
+       :text: 💭 Share ideas
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Share any suggestions or feedback you have on how to make Flyte better.
+
+    ---
+
+    .. link-button:: https://flyte-org.slack.com/archives/C01P3B761A6
+       :type: url
+       :text: 🛠 Get help with deploment
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    If you need any help with Flyte deployment, hit us up.

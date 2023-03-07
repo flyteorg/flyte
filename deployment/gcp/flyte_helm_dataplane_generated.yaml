@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.24
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.28
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -434,7 +434,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "fe5c992d51159e4ad600993479272953d271a33402834861c4c73ed1204fbad"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -459,12 +459,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.55"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
         - containerPort: 10254
-        resources: 
+        resources:
           limits:
             cpu: 500m
             ephemeral-storage: 2Gi
@@ -474,10 +474,10 @@ spec:
             ephemeral-storage: 2Gi
             memory: 1Gi
         volumeMounts:
-          - name: config-volume
-            mountPath: /etc/flyte/config
-          - name: auth
-            mountPath: /etc/secrets/
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: auth
+          mountPath: /etc/secrets/
         terminationMessagePolicy: "FallbackToLogsOnError"
       serviceAccountName: flytepropeller
       volumes:
@@ -513,9 +513,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.55
+        app.kubernetes.io/version: v1.1.69
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "fe5c992d51159e4ad600993479272953d271a33402834861c4c73ed1204fbad"
     spec:
       securityContext:
         fsGroup: 65534
@@ -524,7 +524,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.55"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -547,7 +547,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.55"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

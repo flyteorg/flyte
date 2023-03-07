@@ -13,8 +13,8 @@ Here are some guidelines for you to follow, which will make your first and follo
 
 TL;DR: Find the repo-specific contribution guidelines in the `Component Reference <#component-reference>`__ section.
 
-💻 Code
-=======
+💻 Becoming a Contributor
+=========================
 
 An issue tagged with ``good first issue`` is the best place to start for first-time contributors. You can find them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__.
 
@@ -34,7 +34,7 @@ On a side note, format your Go code with ``golangci-lint`` followed by ``goimpor
 If make targets are not available, you can manually format the code.
 Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
-Good news -- you can be added as a committer to any ``flyteorg`` repo as you become more involved with the project ✨.
+As you become more involved with the project you may be able to be added as a contributor to the repos you're working on, but there is a medium term effort to move all development to forks ✨.
 
 📃 Documentation
 ================
@@ -289,6 +289,51 @@ To understand how the below components interact with each other, refer to :ref:`
     * - **Purpose**: A standalone Flyte CLI
     * - **Language**: Go
     * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/projects/flytectl/en/stable/contribute.html>`__    
+
+
+🔮 Recommended Iteration Cycle
+==============================
+As you may have read in other parts of the documentation, this repo contains go code as well that pulls in all the backend components (admin, propeller, data catalog, console) into one executable.
+The Flyte team is also working on migrating the core backend repositories into one repo, some time in 2023. For the time being, you can still contribute by making changes to the individual repos, and then bringing them into this ``flyte`` repo. This setup works well for backend golang development, but is not tested for ``flyteconsole`` development. That development cycle will look a bit different. This setup here will allow you to run the Flyte binary from your IDE, hitting any breakpoints you may have, but will connect you to all the other resources of the demo environment (like postgres, rds).
+
+Setup
+*****
+
+Dev Mode Cluster
+----------------
+To launch the dependencies, teardown any old sandboxes you may have, and then run ::
+
+    ``flytectl demo start --dev``
+
+This will run the demo environment but without Flyte itself. This makes it so that you the developer can run it later, on your host machine.
+
+Set up Flyte configuration
+--------------------------
+#. Copy the file ``flyte-single-binary-local.yaml`` to ``~/.flyte/local-dev-config.yaml``
+#. Replace instances of ``$HOME`` with the real path of your home directory.
+
+Cluster Resources
+-----------------
+You'll notice one of the entries in the config is ``cluster_resources.templatePath``. In this folder you should put the templates for the cluster resource controller to use. For now, it's okay to just start with the namespace one. Create a file called ``~/.flyte/cluster-resource-templates/00_namespace.yaml`` with the following ::
+
+    .. literalinclude:: ../../charts/flyte-binary/eks-production.yaml
+       :lines: 81-85
+
+Pull Console Artifacts
+----------------------
+Run the following command from the base folder of this repo to pull in the static assets for Flyteconsole ::
+
+    make cmd/single/dist
+
+Build & Iterate
+---------------
+Update using ``go get github.com/flyteorg/<component>&gitsha`` to bring in the code of the component you're testing. From there, you can run ::
+
+    POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/local-dev-config.yaml
+
+The ``POD_NAMESPACE`` environment is required for the webhook to work. Of course you can create a build target in your IDE with the same effective command as well.
+
+After it's running, you should still be able to go to ``localhost:30080/console`` to see Flyte but now hosted by your host computer. It relies on a Docker host mapping to get the correct IP for your local host.
 
 🐞 File an Issue
 ================

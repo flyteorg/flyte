@@ -76,36 +76,37 @@ data:
       rawoutput-prefix: {{ include "flyte-binary.configuration.storage.userDataPrefix" . }}
     {{- with .Values.configuration.storage }}
     storage:
-    {{- if eq "s3" .provider }}
-      {{- with .providerConfig.s3 }}
-      type: s3
-      connection:
-        region: {{ required "Region required for S3 storage provider" .region }}
-        disable-ssl: {{ .disableSSL }}
-        {{- if .endpoint }}
-        endpoint: {{ tpl .endpoint $ }}
-        {{- end }}
-        {{- if eq "iam" .authType }}
-        auth-type: "iam"
-        {{- else if eq "accesskey" .authType }}
-        auth-type: "accesskey"
-        access-key: {{ required "Access key required for S3 storage provider" .accessKey }}
-        secret-key: {{ required "Secret key required for S3 storage provider" .secretKey }}
-        {{- else }}
-        {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
-        {{- end }}
-      {{- end }}
-    {{- else if eq "gcs" .provider }}
       type: stow
       stow:
+        {{- if eq "s3" .provider }}
+        {{- with .providerConfig.s3 }}
+        kind: s3
+        config:
+          region: {{ required "Region required for S3 storage provider" .region }}
+          disable_ssl: {{ .disableSSL }}
+          v2_signing: {{ .v2Signing }}
+          {{- if .endpoint }}
+          endpoint: {{ tpl .endpoint $ }}
+          {{- end }}
+          {{- if eq "iam" .authType }}
+          auth_type: iam
+          {{- else if eq "accesskey" .authType }}
+          auth_type: accesskey
+          access_key_id: {{ required "Access key required for S3 storage provider" .accessKey }}
+          secret_key: {{ required "Secret key required for S3 storage provider" .secretKey }}
+          {{- else }}
+          {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
+          {{- end }}
+        {{- end }}
+        {{- else if eq "gcs" .provider }}
         kind: google
         config:
           json: ""
           project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
           scopes: https://www.googleapis.com/auth/devstorage.read_write
-    {{- else }}
-    {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
-    {{- end }}
+        {{- else }}
+        {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
+        {{- end }}
       container: {{ required "Metadata container required" .metadataContainer }}
     {{- end }}
   {{- if.Values.configuration.auth.enabled }}
@@ -163,11 +164,10 @@ data:
             clientId: flytectl
             redirectUri: http://localhost:53593/callback
             scopes:
-            - offline
             - all
       authorizedUris:
-      {{- if .Values.ingress.host }}
-      - https://{{ tpl .Values.ingress.host . }}
+      {{- if .Values.configuration.auth.authorizedUris }}
+      {{- tpl ( .Values.configuration.auth.authorizedUris | toYaml ) . | nindent 6 }}
       {{- end }}
       - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
       - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}

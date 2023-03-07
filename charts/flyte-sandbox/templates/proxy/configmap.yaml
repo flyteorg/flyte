@@ -1,4 +1,4 @@
-{{- if .Values.proxy.enabled }}
+{{- if .Values.sandbox.proxy.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -22,6 +22,8 @@ data:
                               "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
                               stat_prefix: ingress_http
                               codec_type: AUTO
+                              upgrade_configs:
+                                  - upgrade_type: websocket
                               route_config:
                                   name: local_route
                                   virtual_hosts:
@@ -29,6 +31,7 @@ data:
                                         domains:
                                             - "*"
                                         routes:
+                                            {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
                                             - match:
                                                   path: "/"
                                               redirect:
@@ -105,6 +108,7 @@ data:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
+                                            {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
                                                   path: "/kubernetes-dashboard"
@@ -132,6 +136,7 @@ data:
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
         clusters:
+            {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -143,7 +148,11 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: {{ .Release.Name }}-flyte-binary
+                                          {{- if index .Values "flyte-binary" "enabled" }}
+                                          address: {{ include "flyte-sandbox.fullname" .}}
+                                          {{- else }}
+                                          address: {{ include "flyte-sandbox.localHeadlessService" . }}
+                                          {{- end }}
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -157,8 +166,13 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: {{ .Release.Name }}-flyte-binary
+                                          {{- if index .Values "flyte-binary" "enabled" }}
+                                          address: {{ include "flyte-sandbox.fullname" .}}
+                                          {{- else }}
+                                          address: {{ include "flyte-sandbox.localHeadlessService" . }}
+                                          {{- end }}
                                           port_value: 8089
+            {{- end }}
             {{- if index .Values "kubernetes-dashboard" "enabled" }}
             - name: kubernetes-dashboard
               connect_timeout: 0.25s

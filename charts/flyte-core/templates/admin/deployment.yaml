@@ -122,7 +122,7 @@ spec:
             command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
           initialDelaySeconds: 20
           periodSeconds: 5
-        resources: {{ toYaml .Values.flyteadmin.resources | nindent 10 }}
+        resources: {{- toYaml .Values.flyteadmin.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /srv/flyte
           name: shared-data
@@ -137,32 +137,32 @@ spec:
       {{- tpl (toYaml .) $ | nindent 6}}
       {{- end }}
       serviceAccountName: {{ template "flyteadmin.name" . }}
-      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
-        - emptyDir: {}
-          name: shared-data
-        - emptyDir: {}
-          name: scratch
-        - configMap:
-            name: flyte-admin-base-config
-          name: base-config-volume
-        - projected:
-            sources:
-              - configMap:
-                  name: flyte-admin-base-config
-              - configMap:
-                  name: flyte-admin-clusters-config
-          name: clusters-config-volume
-        {{- if .Values.cluster_resource_manager.enabled }}
-        - configMap:
-            name: clusterresource-template
-          name: resource-templates
-        {{- end }}
-        - name: admin-secrets
-          secret:
-            secretName: flyte-admin-secrets
-        {{- with .Values.flyteadmin.additionalVolumes -}}
-        {{ tpl (toYaml .) $ | nindent 8 }}
-        {{- end }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      - emptyDir: {}
+        name: shared-data
+      - emptyDir: {}
+        name: scratch
+      - configMap:
+          name: flyte-admin-base-config
+        name: base-config-volume
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-admin-base-config
+            - configMap:
+                name: flyte-admin-clusters-config
+        name: clusters-config-volume
+      {{- if .Values.cluster_resource_manager.enabled }}
+      - configMap:
+          name: clusterresource-template
+        name: resource-templates
+      {{- end }}
+      - name: admin-secrets
+        secret:
+          secretName: flyte-admin-secrets
+      {{- with .Values.flyteadmin.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- with .Values.flyteadmin.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

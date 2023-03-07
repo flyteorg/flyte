@@ -65,11 +65,7 @@ Create the name of the service account to use
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
-{{- if .Values.configuration.externalConfigMap -}}
-    {{- printf "%s" .Values.configuration.externalConfigMap -}}
-{{- else -}}
-    {{- printf "%s-config" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
+{{- printf "%s-config" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
@@ -139,11 +135,7 @@ Get the Secret name for Flyte authentication client secrets.
 Get the Flyte cluster resource templates ConfigMap name.
 */}}
 {{- define "flyte-binary.clusterResourceTemplates.configMapName" -}}
-{{- if .Values.clusterResourceTemplates.externalConfigMap -}}
-    {{- printf "%s" .Values.clusterResourceTemplates.externalConfigMap -}}
-{{- else -}}
-    {{- printf "%s-cluster-resource-templates" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
+{{- printf "%s-cluster-resource-templates" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*

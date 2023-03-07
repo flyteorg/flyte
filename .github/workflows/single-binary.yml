@@ -13,20 +13,31 @@ on:
   push:
     branches:
       - master
-    paths:
-      - .github/workflows/single-binary.yml
-      - charts/flyte-binary/**
-      - charts/flyte-sandbox/**
-      - cmd/**
-      - docker/sandbox-bundled/**
-      - Dockerfile
-      - go.*
-  release:
-    types: [published]
 
 jobs:
+  test-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: docker/sandbox-bundled/bootstrap
+      - name: Check formatting
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make check-fmt
+      - name: Test
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make test
+
   trigger-single-binary-build:
     runs-on: ubuntu-latest
+    needs: [test-bootstrap]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,16 +52,12 @@ jobs:
           key: ${{ runner.os }}-golang-${{ hashFiles('go.sum') }}
           restore-keys: |
             ${{ runner.os }}-golang-
-      - name: Set flyte version to release
+      - name: Set versions
         id: set_version
         run: |
-          if [ ${{ github.event_name }} = "release" ]; then
-            echo "FLYTE_CONSOLE_VERSION=$(echo ${{ github.event.release.tag_name }})" >> $GITHUB_ENV
-            echo "FLYTE_VERSION=$(echo ${{ github.event.release.tag_name }})" >> $GITHUB_ENV
-          else
-            echo "FLYTE_CONSOLE_VERSION=latest" >> $GITHUB_ENV
-            echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
-          fi
+          # TODO: Find a better way to determine the flyteconsole version
+          echo "FLYTECONSOLE_VERSION=$(yq eval '.flyteconsole.image.tag' charts/flyte-core/values.yaml)" >> $GITHUB_ENV
+          echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
@@ -84,7 +91,7 @@ jobs:
           platforms: linux/arm64
           tags: flyte-binary:sandbox
           build-args: |
-            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
@@ -97,7 +104,7 @@ jobs:
           platforms: linux/amd64
           tags: flyte-binary:sandbox
           build-args: |
-            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
@@ -110,7 +117,7 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: |
-            FLYTE_CONSOLE_VERSION=${{ env.FLYTE_CONSOLE_VERSION }}
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
@@ -132,6 +139,10 @@ jobs:
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
+      - name: Set version
+        id: set_version
+        run: |
+          echo "FLYTE_SANDBOX_VERSION=${{ github.sha }}" >> $GITHUB_ENV
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
@@ -165,4 +176,5 @@ jobs:
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
+          build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
