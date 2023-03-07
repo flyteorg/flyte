@@ -69,7 +69,7 @@ data:
         {{- else }}
         passwordPath: {{ .passwordPath }}
         {{- end }}
-        host: {{ .host }}
+        host: {{ tpl .host $ }}
         port: {{ .port }}
         dbname: {{ .dbname }}
         options: {{ .options | quote }}

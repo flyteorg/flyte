@@ -82,7 +82,7 @@ spec:
             {{- with .Values.configuration.database }}
             - |
               until pg_isready \
-                -h {{ .host }} \
+                -h {{ tpl .host $ }} \
                 -p {{ .port }} \
                 -U {{ .username }}
               do
