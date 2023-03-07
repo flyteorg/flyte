@@ -80,6 +80,8 @@ configuration:
   auth:
     # enabled Enable Flyte authentication
     enabled: false
+    # enableAuthServer Enable built-in authentication server
+    enableAuthServer: true
     # oidc OIDC configuration for Flyte authentication
     oidc:
       # baseUrl URL for OIDC provider
@@ -90,10 +92,23 @@ configuration:
       clientSecret: ""
     # internal Configuration for internal authentication
     internal:
+      # clientId Client ID for internal authentication
+      clientId: flytepropeller
       # clientSecret Client secret for internal authentication
       clientSecret: ""
-      # clientSecretHash Bcrypt hash of of clientSecret
+      # clientSecretHash Bcrypt hash of clientSecret
       clientSecretHash: ""
+    # flyteClient Configuration for Flyte client authentication
+    flyteClient:
+      # clientId Client ID for Flyte client authentication
+      clientId: flytectl
+      # redirectUri Redirect URI for Flyte client authentication
+      redirectUri: http://localhost:53593/callback
+      # scopes Scopes for Flyte client authentication
+      scopes:
+        - all
+      # audience Audience for Flyte client authentication
+      audience: ""
     # authorizedUris Set of URIs that clients are allowed to visit the service on
     authorizedUris: []
   # externalConfigMap Specify an existing, external ConfigMap to use as configuration for Flyte
