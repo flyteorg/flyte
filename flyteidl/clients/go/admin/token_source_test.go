@@ -2,8 +2,10 @@ package admin
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -12,6 +14,7 @@ import (
 	tokenCacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 type DummyTestTokenSource struct {
@@ -93,5 +96,184 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, test.expectedScopes, clientCredSourceProvider.ccConfig.Scopes)
 		assert.Equal(t, url.Values{audienceKey: {test.expectedAudience}}, clientCredSourceProvider.ccConfig.EndpointParams)
+	}
+}
+
+func TestCustomTokenSource_fetchTokenFromCache(t *testing.T) {
+	ctx := context.Background()
+	cfg := GetConfig(ctx)
+	cfg.TokenRefreshWindow = config.Duration{Duration: time.Minute}
+	cfg.ClientSecretLocation = ""
+
+	minuteAgo := time.Now().Add(-time.Minute)
+	hourAhead := time.Now().Add(time.Hour)
+	invalidToken := oauth2.Token{AccessToken: "foo", Expiry: minuteAgo}
+	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
+
+	tests := []struct {
+		name               string
+		refreshTime        time.Time
+		failedToRefresh    bool
+		token              *oauth2.Token
+		expectToken        bool
+		expectNeedsRefresh bool
+	}{
+		{
+			name:               "no token",
+			refreshTime:        hourAhead,
+			failedToRefresh:    false,
+			token:              nil,
+			expectToken:        false,
+			expectNeedsRefresh: false,
+		},
+		{
+			name:               "invalid token",
+			refreshTime:        hourAhead,
+			failedToRefresh:    false,
+			token:              &invalidToken,
+			expectToken:        false,
+			expectNeedsRefresh: false,
+		},
+		{
+			name:               "refresh exceeded",
+			refreshTime:        minuteAgo,
+			failedToRefresh:    false,
+			token:              &validToken,
+			expectToken:        false,
+			expectNeedsRefresh: false,
+		},
+		{
+			name:               "refresh exceeded failed",
+			refreshTime:        minuteAgo,
+			failedToRefresh:    true,
+			token:              &validToken,
+			expectToken:        false,
+			expectNeedsRefresh: false,
+		},
+		{
+			name:               "valid token",
+			refreshTime:        hourAhead,
+			failedToRefresh:    false,
+			token:              &validToken,
+			expectToken:        false,
+			expectNeedsRefresh: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tokenCache := &tokenCacheMocks.TokenCache{}
+			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
+			assert.NoError(t, err)
+			source, err := provider.GetTokenSource(ctx)
+			assert.NoError(t, err)
+			customSource, ok := source.(*customTokenSource)
+			assert.True(t, ok)
+
+			customSource.refreshTime = test.refreshTime
+			customSource.failedToRefresh = test.failedToRefresh
+			var tokenErr error = nil
+			if test.token == nil {
+				tokenErr = fmt.Errorf("no token")
+			}
+			tokenCache.OnGetToken().Return(nil, tokenErr).Once()
+			token, needsRefresh := customSource.fetchTokenFromCache()
+			if test.expectToken {
+				assert.NotNil(t, token)
+			} else {
+				assert.Nil(t, token)
+			}
+			assert.Equal(t, test.expectNeedsRefresh, needsRefresh)
+		})
+	}
+}
+
+func TestCustomTokenSource_Token(t *testing.T) {
+	ctx := context.Background()
+	cfg := GetConfig(ctx)
+	cfg.TokenRefreshWindow = config.Duration{Duration: time.Minute}
+	cfg.ClientSecretLocation = ""
+
+	minuteAgo := time.Now().Add(-time.Minute)
+	hourAhead := time.Now().Add(time.Hour)
+	twoHourAhead := time.Now().Add(2 * time.Hour)
+	invalidToken := oauth2.Token{AccessToken: "foo", Expiry: minuteAgo}
+	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
+	newToken := oauth2.Token{AccessToken: "foo", Expiry: twoHourAhead}
+
+	tests := []struct {
+		name            string
+		refreshTime     time.Time
+		failedToRefresh bool
+		token           *oauth2.Token
+		newToken        *oauth2.Token
+		expectedToken   *oauth2.Token
+	}{
+		{
+			name:            "cached token",
+			refreshTime:     hourAhead,
+			failedToRefresh: false,
+			token:           &validToken,
+			newToken:        nil,
+			expectedToken:   &validToken,
+		},
+		{
+			name:            "failed refresh still valid",
+			refreshTime:     minuteAgo,
+			failedToRefresh: false,
+			token:           &validToken,
+			newToken:        nil,
+			expectedToken:   &validToken,
+		},
+		{
+			name:            "failed refresh invalid",
+			refreshTime:     minuteAgo,
+			failedToRefresh: false,
+			token:           &invalidToken,
+			newToken:        nil,
+			expectedToken:   nil,
+		},
+		{
+			name:            "refresh",
+			refreshTime:     minuteAgo,
+			failedToRefresh: false,
+			token:           &invalidToken,
+			newToken:        &newToken,
+			expectedToken:   &newToken,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tokenCache := &tokenCacheMocks.TokenCache{}
+			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
+			assert.NoError(t, err)
+			source, err := provider.GetTokenSource(ctx)
+			assert.NoError(t, err)
+			customSource, ok := source.(*customTokenSource)
+			assert.True(t, ok)
+
+			mockSource := &adminMocks.TokenSource{}
+			if test.newToken != nil {
+				mockSource.OnToken().Return(test.newToken, nil)
+			} else {
+				mockSource.OnToken().Return(nil, fmt.Errorf("refresh token failed"))
+			}
+			customSource.new = mockSource
+			customSource.refreshTime = test.refreshTime
+			customSource.failedToRefresh = test.failedToRefresh
+			tokenCache.OnGetToken().Return(test.token, nil).Once()
+			if test.newToken != nil {
+				tokenCache.OnSaveToken(test.newToken).Return(nil).Once()
+			}
+			token, err := source.Token()
+			if test.expectedToken != nil {
+				assert.Equal(t, test.expectedToken, token)
+				assert.NoError(t, err)
+			} else {
+				assert.Nil(t, token)
+				assert.Error(t, err)
+			}
+		})
 	}
 }
