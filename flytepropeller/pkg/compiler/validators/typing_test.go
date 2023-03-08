@@ -579,6 +579,14 @@ func TestSchemaCasting(t *testing.T) {
 			},
 		},
 	}
+	genericStructuredDataset := &core.LiteralType{
+		Type: &core.LiteralType_StructuredDatasetType{
+			StructuredDatasetType: &core.StructuredDatasetType{
+				Columns: []*core.StructuredDatasetType_DatasetColumn{},
+				Format:  "",
+			},
+		},
+	}
 	subsetIntegerSchema := &core.LiteralType{
 		Type: &core.LiteralType_Schema{
 			Schema: &core.SchemaType{
@@ -655,6 +663,16 @@ func TestSchemaCasting(t *testing.T) {
 	t.Run("SupersetToSubsetTypedSchema", func(t *testing.T) {
 		castable := AreTypesCastable(supersetIntegerAndFloatSchema, subsetIntegerSchema)
 		assert.True(t, castable, "Schema(a=Integer, b=Float) should be castable to Schema(a=Integer)")
+	})
+
+	t.Run("GenericToSubsetTypedSchema", func(t *testing.T) {
+		castable := AreTypesCastable(genericStructuredDataset, subsetIntegerSchema)
+		assert.True(t, castable, "StructuredDataset() with generic format should be castable to Schema(a=Integer)")
+	})
+
+	t.Run("SubsetTypedSchemaToGeneric", func(t *testing.T) {
+		castable := AreTypesCastable(subsetIntegerSchema, genericStructuredDataset)
+		assert.True(t, castable, "Schema(a=Integer) should be castable to StructuredDataset() with generic format")
 	})
 
 	t.Run("SupersetStructuredToSubsetTypedSchema", func(t *testing.T) {
