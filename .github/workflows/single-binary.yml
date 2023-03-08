@@ -13,6 +13,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   test-bootstrap:
@@ -120,7 +121,7 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'workflow_dispatch' }}
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
@@ -177,4 +178,4 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'workflow_dispatch' }}
