@@ -13,17 +13,17 @@ Synopsis
 Update the description on the workflow:
 ::
 
- flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --description "Mergesort workflow example"
+ flytectl update workflow-meta -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --description "Mergesort workflow example"
 
 Archiving workflow named entity would cause this to disappear from flyteconsole UI:
 ::
 
- flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --archive
+ flytectl update workflow-meta -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --archive
 
 Activate workflow named entity:
 ::
 
- flytectl update workflow -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --activate
+ flytectl update workflow-meta -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --activate
 
 Usage
 
