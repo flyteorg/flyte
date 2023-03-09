@@ -618,8 +618,11 @@ func TestListTaskExecutions(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 
 	expectedLogs := []*core.TaskLog{{Uri: "test-log1.txt"}}
-	expectedOutputResult := &admin.TaskExecutionClosure_OutputUri{
-		OutputUri: "test-output.pb",
+	extraLongErrMsg := string(make([]byte, 2*100))
+	expectedOutputResult := &admin.TaskExecutionClosure_Error{
+		Error: &core.ExecutionError{
+			Message: extraLongErrMsg,
+		},
 	}
 	expectedClosure := &admin.TaskExecutionClosure{
 		StartedAt:    sampleTaskEventOccurredAt,
