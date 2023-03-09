@@ -178,6 +178,7 @@ require (
 	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.11.1 // indirect
@@ -227,6 +228,6 @@ require (
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
 
-replace github.com/flyteorg/flytepropeller => ../flytepropeller
+replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v1.1.71-0.20230309154502-a2f0ddbe833a
 
-replace github.com/flyteorg/flytestdlib => ../flytestdlib
+replace github.com/flyteorg/flytestdlib => github.com/flyteorg/flytestdlib v1.0.15-0.20230309145138-cdd23167d634
