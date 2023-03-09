@@ -2,7 +2,6 @@ package single
 
 import (
 	"context"
-	//"os"
 
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
