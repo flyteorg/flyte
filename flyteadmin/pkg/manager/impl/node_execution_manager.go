@@ -537,8 +537,9 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
 		} else {
 			response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
-				Id:               closure.Primary.Template.Id,
-				CompiledWorkflow: closure,
+				Id:                closure.Primary.Template.Id,
+				CompiledWorkflow:  closure,
+				DynamicJobSpecUri: nodeExecution.Closure.DynamicJobSpecUri,
 			}
 		}
 	}

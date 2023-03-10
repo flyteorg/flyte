@@ -345,6 +345,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 									},
 								},
 							},
+							DynamicJobSpecUri: "/foo/bar",
 						},
 						CheckpointUri: "last checkpoint uri",
 					},
@@ -375,6 +376,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 					CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
 				},
 			},
+			DynamicJobSpecUri: request.Event.GetTaskNodeMetadata().DynamicWorkflow.DynamicJobSpecUri,
 		}
 		var closureBytes, _ = proto.Marshal(closure)
 		assert.Equal(t, nodeExecutionModel.Closure, closureBytes)

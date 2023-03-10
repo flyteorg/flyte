@@ -233,6 +233,12 @@ func UpdateNodeExecutionModel(
 			nodeExecutionModel.CacheStatus = &st
 		}
 		nodeExecutionClosure.TargetMetadata = targetMetadata
+
+		// if this is a dynamic task then maintain the DynamicJobSpecUri
+		dynamicWorkflowMetadata := request.Event.GetTaskNodeMetadata().DynamicWorkflow
+		if dynamicWorkflowMetadata != nil && len(dynamicWorkflowMetadata.DynamicJobSpecUri) > 0 {
+			nodeExecutionClosure.DynamicJobSpecUri = dynamicWorkflowMetadata.DynamicJobSpecUri
+		}
 	}
 
 	marshaledClosure, err := proto.Marshal(&nodeExecutionClosure)
