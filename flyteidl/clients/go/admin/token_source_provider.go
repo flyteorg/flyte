@@ -208,12 +208,17 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	if p.tokenRefreshWindow > 0 {
 		source := p.ccConfig.TokenSource(ctx)
+		refreshTime := time.Time{}
+		if token, err := p.tokenCache.GetToken(); err == nil {
+			refreshTime = token.Expiry.Add(-getRandomDuration(p.tokenRefreshWindow))
+		}
 		return &customTokenSource{
 			ctx:                ctx,
 			new:                source,
 			mu:                 sync.Mutex{},
 			tokenRefreshWindow: p.tokenRefreshWindow,
 			tokenCache:         p.tokenCache,
+			refreshTime:        refreshTime,
 		}, nil
 	}
 	return p.ccConfig.TokenSource(ctx), nil
@@ -222,10 +227,10 @@ func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context
 type customTokenSource struct {
 	ctx                context.Context
 	new                oauth2.TokenSource
+	tokenRefreshWindow time.Duration
 	mu                 sync.Mutex // guards everything else
 	refreshTime        time.Time
 	failedToRefresh    bool
-	tokenRefreshWindow time.Duration
 	tokenCache         cache.TokenCache
 }
 
@@ -245,7 +250,6 @@ func (s *customTokenSource) fetchTokenFromCache() (*oauth2.Token, bool) {
 		logger.Infof(s.ctx, "cached token refresh window exceeded")
 		return token, true
 	}
-	logger.Infof(s.ctx, "using cached token")
 	return token, false
 }
 
