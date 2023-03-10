@@ -30,5 +30,5 @@ trap 'docker rm -f ${CONTAINER_ID}' EXIT
 
 # Copy distribution
 rm -rf cmd/single/dist
-docker cp ${CONTAINER_ID}:/app/dist cmd/single/
+docker cp ${CONTAINER_ID}:/app cmd/single/dist
 printf '%q' ${IMAGE_DIGEST} > cmd/single/dist/.digest
