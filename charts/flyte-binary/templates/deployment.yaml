@@ -227,6 +227,14 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
+        - name: flyteplugins-service
+          {{- with .Values.flytePluginService.image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          imagePullPolicy: {{ .pullPolicy | quote }}
+          ports:
+          - name: grpc
+            containerPort: 8000
+          {{- end}}
         {{- if .Values.deployment.sidecars }}
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}

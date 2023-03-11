@@ -762,7 +762,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MURvbG5yUFR3RUgwQTA4Qw==
+  haSharedSecret: NktZUjNQT1E0Q0ZsZU9Mbw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1186,6 +1186,12 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
+      - image: docker.io/pingsutw/flyteplugins-service:v1
+        imagePullPolicy: IfNotPresent
+        name: flyteplugins-service
+        ports:
+        - containerPort: 8000
+          name: http
       initContainers:
       - args:
         - |
@@ -1246,7 +1252,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0e89d5e5260e35afa1378a1e74ba88b993ad8882d1ee025989da60b4662be85e
+        checksum/secret: 6e4b54de0fd2df5e6a65b462321a723df8daf5f18f2d3ce1f8bebb4dfa6ff360
       labels:
         app: docker-registry
         release: flyte-sandbox
