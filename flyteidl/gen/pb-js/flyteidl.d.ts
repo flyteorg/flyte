@@ -5635,6 +5635,9 @@ export namespace flyteidl {
 
             /** K8sPod podSpec */
             podSpec?: (google.protobuf.IStruct|null);
+
+            /** K8sPod dataConfig */
+            dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
         }
 
         /** Represents a K8sPod. */
@@ -5651,6 +5654,9 @@ export namespace flyteidl {
 
             /** K8sPod podSpec. */
             public podSpec?: (google.protobuf.IStruct|null);
+
+            /** K8sPod dataConfig. */
+            public dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
 
             /**
              * Creates a new K8sPod instance using the specified properties.

@@ -13498,6 +13498,7 @@
                  * @interface IK8sPod
                  * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] K8sPod metadata
                  * @property {google.protobuf.IStruct|null} [podSpec] K8sPod podSpec
+                 * @property {flyteidl.core.IDataLoadingConfig|null} [dataConfig] K8sPod dataConfig
                  */
     
                 /**
@@ -13532,6 +13533,14 @@
                 K8sPod.prototype.podSpec = null;
     
                 /**
+                 * K8sPod dataConfig.
+                 * @member {flyteidl.core.IDataLoadingConfig|null|undefined} dataConfig
+                 * @memberof flyteidl.core.K8sPod
+                 * @instance
+                 */
+                K8sPod.prototype.dataConfig = null;
+    
+                /**
                  * Creates a new K8sPod instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.K8sPod
@@ -13559,6 +13568,8 @@
                         $root.flyteidl.core.K8sObjectMetadata.encode(message.metadata, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.podSpec != null && message.hasOwnProperty("podSpec"))
                         $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.dataConfig != null && message.hasOwnProperty("dataConfig"))
+                        $root.flyteidl.core.DataLoadingConfig.encode(message.dataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -13585,6 +13596,9 @@
                             break;
                         case 2:
                             message.podSpec = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.dataConfig = $root.flyteidl.core.DataLoadingConfig.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13614,6 +13628,11 @@
                         var error = $root.google.protobuf.Struct.verify(message.podSpec);
                         if (error)
                             return "podSpec." + error;
+                    }
+                    if (message.dataConfig != null && message.hasOwnProperty("dataConfig")) {
+                        var error = $root.flyteidl.core.DataLoadingConfig.verify(message.dataConfig);
+                        if (error)
+                            return "dataConfig." + error;
                     }
                     return null;
                 };

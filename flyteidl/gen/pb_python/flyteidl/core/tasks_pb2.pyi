@@ -107,12 +107,14 @@ class K8sObjectMetadata(_message.Message):
     def __init__(self, labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class K8sPod(_message.Message):
-    __slots__ = ["metadata", "pod_spec"]
+    __slots__ = ["data_config", "metadata", "pod_spec"]
+    DATA_CONFIG_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     POD_SPEC_FIELD_NUMBER: _ClassVar[int]
+    data_config: DataLoadingConfig
     metadata: K8sObjectMetadata
     pod_spec: _struct_pb2.Struct
-    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., data_config: _Optional[_Union[DataLoadingConfig, _Mapping]] = ...) -> None: ...
 
 class Resources(_message.Message):
     __slots__ = ["limits", "requests"]

@@ -858,6 +858,16 @@ func (m *K8SPod) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetDataConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return K8SPodValidationError{
+				field:  "DataConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
