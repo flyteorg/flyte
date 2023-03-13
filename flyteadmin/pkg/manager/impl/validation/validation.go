@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -21,6 +22,9 @@ var entityToResourceType = map[common.Entity]core.ResourceType{
 	common.Workflow:   core.ResourceType_WORKFLOW,
 	common.LaunchPlan: core.ResourceType_LAUNCH_PLAN,
 }
+
+// See https://www.rfc-editor.org/rfc/rfc3986#section-2.2
+var uriReservedChars = "!*'();:@&=+$,/?#[]"
 
 func ValidateEmptyStringField(field, fieldName string) error {
 	if field == "" {
@@ -131,6 +135,10 @@ func ValidateResourceType(resourceType core.ResourceType) error {
 func ValidateVersion(version string) error {
 	if err := ValidateEmptyStringField(version, shared.Version); err != nil {
 		return err
+	}
+	sanitizedVersion := url.QueryEscape(version)
+	if !strings.EqualFold(sanitizedVersion, version) {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "version [%s] must be url safe, cannot contains chars [%s]", version, uriReservedChars)
 	}
 	return nil
 }
