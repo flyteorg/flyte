@@ -52,14 +52,13 @@ start:
 			--volume $(PWD)/.kube:/.kube \
 			--volume $(HOME)/.flyte/sandbox:/var/lib/flyte/config \
 			--volume flyte-sandbox:/var/lib/flyte/storage \
-			--publish "6443":6443 \
+			--publish "6443":"6443" \
 			--publish "30000:30000" \
 			--publish "30001:30001" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE)
-		export KUBECONFIG=.kube/kubeconfig 
-
+		export KUBECONFIG=.kube/kubeconfig
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:

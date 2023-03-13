@@ -232,8 +232,8 @@ spec:
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           ports:
-          - name: plugin-service
-            containerPort: 8000
+          - name: plugin-grpc
+            containerPort: 9090
           {{- end}}
         {{- if .Values.deployment.sidecars }}
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
