@@ -82,7 +82,7 @@ spec:
             {{- with .Values.configuration.database }}
             - |
               until pg_isready \
-                -h {{ .host }} \
+                -h {{ tpl .host $ }} \
                 -p {{ .port }} \
                 -U {{ .username }}
               do
@@ -241,11 +241,35 @@ spec:
                 name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
         {{- end }}
         - name: cluster-resource-templates
+          {{- if .Values.clusterResourceTemplates.externalConfigMap }}
+          configMap:
+            name: {{ tpl .Values.clusterResourceTemplates.externalConfigMap . }}
+          {{- else if .Values.clusterResourceTemplates.inlineConfigMap }}
+          projected:
+            sources:
+            - configMap:
+                name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+            - configMap:
+                name: {{ tpl .Values.clusterResourceTemplates.inlineConfigMap . }}
+          {{- else }}
           configMap:
             name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+          {{- end }}
         - name: config
+          {{- if .Values.configuration.externalConfigMap }}
+          configMap:
+            name: {{ tpl .Values.configuration.externalConfigMap . }}
+          {{- else if .Values.configuration.inlineConfigMap }}
+          projected:
+            sources:
+            - configMap:
+                name: {{ include "flyte-binary.configuration.configMapName" . }}
+            - configMap:
+                name: {{ tpl .Values.configuration.inlineConfigMap . }}
+          {{- else }}
           configMap:
             name: {{ include "flyte-binary.configuration.configMapName" . }}
+          {{- end }}
         {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
         - name: db-pass
           secret:

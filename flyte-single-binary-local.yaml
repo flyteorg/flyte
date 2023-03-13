@@ -1,12 +1,5 @@
 # This is a sample configuration file for running single-binary Flyte locally against
 # a sandbox.
-# Usage:
-# 1. Copy this file to ~/.flyte/local-dev-config.yaml`
-# 2. Replace instance of $HOME with the realpath of your home directory
-# 3. Run sandbox in development mode: `flytectl demo start --dev`
-# 4. Fetch Flyteconsole distribution: `make cmd/single/dist`
-# 4. Start Flyte locally: `POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/local-dev-config.yaml`
-
 admin:
   endpoint: localhost:8089
   insecure: true
@@ -26,17 +19,17 @@ logger:
 
 propeller:
   create-flyteworkflow-crd: true
-  kube-config: $HOME/.flyte/state/kubeconfig
+  kube-config: $HOME/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
 
 server:
-  kube-config: $HOME/.flyte/state/kubeconfig
+  kube-config: $HOME/.flyte/sandbox/kubeconfig
 
 webhook:
   certDir: $HOME/.flyte/webhook-certs
   localCert: true
-  secretName: sandbox-flyte-sandbox-webhook-secret
-  serviceName: sandbox-flyte-sandbox-local
+  secretName: flyte-sandbox-webhook-secret
+  serviceName: flyte-sandbox-local
   servicePort: 9443
 
 tasks:
@@ -57,7 +50,7 @@ plugins:
     stackdriver-enabled: false
   k8s:
     default-env-vars:
-    - FLYTE_AWS_ENDPOINT: http://sandbox-minio.flyte:9000
+    - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
     - FLYTE_AWS_ACCESS_KEY_ID: minio
     - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   k8s-array:

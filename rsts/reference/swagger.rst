@@ -15,14 +15,11 @@ FlyteIDL also houses open API schema definitions for the exposed services:
 - `Auth <https://github.com/flyteorg/flyteidl/blob/master/gen/pb-go/flyteidl/service/auth.swagger.json>`__
 - `Identity <https://github.com/flyteorg/flyteidl/blob/master/gen/pb-go/flyteidl/service/identity.swagger.json>`__
 
-For convenience, Flyte deployments also ship with a `redocly/redoc <https://github.com/Redocly/redoc>`__ image container to expose swagger UI.
-By default, it is only deployed in sandbox deployments.
-
 To view the UI, run the following command:
 
 .. prompt:: bash $
 
-   flytectl sandbox start
+   flytectl demo start
 
 Once sandbox setup is complete, a ready-to-explore message is shown:
 
@@ -31,4 +28,4 @@ Once sandbox setup is complete, a ready-to-explore message is shown:
    👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30081/console 🚀 🚀 🎉 
 
 
-Visit http://localhost:30081/openapi to view swagger UI for the service and documentation of the payload fields. To test, send sample queries!
+Visit ``http://localhost:30080/api/v1/openapi`` to view the swagger documentation of the payload fields.

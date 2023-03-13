@@ -21,6 +21,9 @@ metadata:
 data:
   000-core.yaml: |
     admin:
+      {{- if .Values.configuration.auth.enabled }}
+      clientId: {{ .Values.configuration.auth.internal.clientId }}
+      {{- end }}
       endpoint: localhost:8089
       insecure: true
     catalog-cache:
@@ -66,7 +69,7 @@ data:
         {{- else }}
         passwordPath: {{ .passwordPath }}
         {{- end }}
-        host: {{ .host }}
+        host: {{ tpl .host $ }}
         port: {{ .port }}
         dbname: {{ .dbname }}
         options: {{ .options | quote }}
@@ -109,14 +112,15 @@ data:
         {{- end }}
       container: {{ required "Metadata container required" .metadataContainer }}
     {{- end }}
-  {{- if.Values.configuration.auth.enabled }}
+  {{- if .Values.configuration.auth.enabled }}
   004-auth.yaml: |
     auth:
       appAuth:
+        {{- if .Values.configuration.auth.enableAuthServer }}
         selfAuthServer:
           staticClients:
             flytepropeller:
-              client_secret: {{ required "Internal client secret hash required when authentication is enabled" .Values.configuration.auth.internal.clientSecretHash | quote }}
+              client_secret: {{ required "Internal client secret hash required when built-in authentication server is enabled" .Values.configuration.auth.internal.clientSecretHash | quote }}
               grant_types:
               - refresh_token
               - client_credentials
@@ -159,16 +163,12 @@ data:
               - all
               - offline
               - access_token
+        {{- end }}
         thirdPartyConfig:
-          flyteClient:
-            clientId: flytectl
-            redirectUri: http://localhost:53593/callback
-            scopes:
-            - offline
-            - all
+          flyteClient: {{ .Values.configuration.auth.flyteClient | toYaml | nindent 12 }}
       authorizedUris:
-      {{- if .Values.ingress.host }}
-      - https://{{ tpl .Values.ingress.host . }}
+      {{- if .Values.configuration.auth.authorizedUris }}
+      {{- tpl ( .Values.configuration.auth.authorizedUris | toYaml ) . | nindent 6 }}
       {{- end }}
       - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
       - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}

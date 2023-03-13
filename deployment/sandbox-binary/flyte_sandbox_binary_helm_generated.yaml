@@ -161,6 +161,14 @@ rules:
     - patch
     - update
   - apiGroups:
+    - ""
+    resources:
+    - podtemplates
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
     - flyte.lyft.com
     resources:
     - flyteworkflows
@@ -314,11 +322,6 @@ spec:
                 echo waiting for database
                 sleep 0.1
               done
-          resources:
-            limits:
-              memory: 1Gi
-            requests:
-              cpu: 1
       containers:
         - name: flyte
           image: "ghcr.io/flyteorg/flyte-binary:latest"
@@ -351,11 +354,6 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
-          resources:
-            limits:
-              memory: 1Gi
-            requests:
-              cpu: 1
           volumeMounts:
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates

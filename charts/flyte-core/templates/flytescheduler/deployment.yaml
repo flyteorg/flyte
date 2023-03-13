@@ -36,11 +36,11 @@ spec:
         image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
         imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
         name: flytescheduler-check
-        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - name: auth
+          mountPath: /etc/secrets/
       {{- end }}
       containers:
       - command:
@@ -53,22 +53,31 @@ spec:
         name: flytescheduler
         ports:
           - containerPort: {{ .Values.configmap.schedulerConfig.scheduler.profilerPort }}
-        resources: {{ toYaml .Values.flytescheduler.resources | nindent 10 }}
-        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
-          - mountPath: /etc/flyte/config
-            name: config-volume
-          - name: auth
-            mountPath: /etc/secrets/
-      serviceAccountName: {{ template "flytescheduler.name" . }}
-      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
-        - emptyDir: {}
-          name: shared-data
-        - configMap:
-            name: flyte-scheduler-config
+        resources: {{- toYaml .Values.flytescheduler.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/flyte/config
           name: config-volume
         - name: auth
-          secret:
-            secretName: flyte-secret-auth
+          mountPath: /etc/secrets/
+        {{- with .Values.flytescheduler.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.flytescheduler.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
+      serviceAccountName: {{ template "flytescheduler.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-scheduler-config
+        name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+      {{- with .Values.flytescheduler.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- with .Values.flytescheduler.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

@@ -2,7 +2,7 @@ export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
 
 define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose
+pip-compile $(1) --upgrade --verbose --resolver=backtracking
 endef
 
 GIT_VERSION := $(shell git describe --always --tags)
@@ -94,6 +94,11 @@ help: ## List available commands and their usage
 setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local development
 	@bash script/setup_local_dev.sh
 
-.PHONY: buildmanual
-buildmanual:
-	docker buildx build --file Dockerfile --platform linux/arm64,linux/amd64 --tag ghcr.io/flyteorg/flyte-binary:mysql --push .
+# This builds the flyte binary image for whatever architecture you're on. Don't push this image to the official
+# registry because we need those to be multi-arch.
+.PHONY: build_native_flyte
+build_native_flyte: FLYTECONSOLE_VERSION := latest
+build_native_flyte:
+	docker build \
+	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--tag flyte-binary:native .

@@ -11,7 +11,7 @@ Launch plans provide a way to templatize Flyte workflow invocations. Launch plan
 
 In addition to templatized inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch
 plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
-optional notifications. Refer to the :ref:`deployment-cluster-config-notifications` for a deep dive into available notifications.
+optional notifications. Refer to the :ref:`deployment-configuration-notifications` for a deep dive into available notifications.
 
 The Association between Workflows and LaunchPlans
 -------------------------------------------------

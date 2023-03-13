@@ -32,18 +32,18 @@ Components
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
 
-Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CRD which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status' (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
+Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status' (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
 
-K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CRD is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRDs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRDs, but this will have limited visibility and usability.
+K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CR is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRs, but this will have limited visibility and usability.
 
 WorkQueue/WorkerPool
 ----------------------
 
 FlytePropeller supports concurrent execution of multiple, unique workflows using a WorkQueue and WorkerPool.
 
-The WorkQueue is a FIFO queue storing workflow ID strings that require a lookup to retrieve the FlyteWorkflow CRD to ensure up-to-date status. A workflow may be added to the queue in a variety of circumstances:
+The WorkQueue is a FIFO queue storing workflow ID strings that require a lookup to retrieve the FlyteWorkflow CR to ensure up-to-date status. A workflow may be added to the queue in a variety of circumstances:
 
-#. A new FlyteWorkflow CRD is created or an existing instance is updated
+#. A new FlyteWorkflow CR is created or an existing instance is updated
 #. The K8s Informer resyncs the FlyteWorkflow periodically (necessary to detect workflow timeouts and ensure liveness)
 #. A FlytePropeller worker experiences an error during a processing loop
 #. The WorkflowExecutor observes a completed downstream node
@@ -54,7 +54,7 @@ The WorkerPool is implemented as a collection of goroutines, one for each worker
 WorkflowExecutor
 ----------------
 
-The WorkflowExecutor is responsible for handling high-level workflow operations. This includes maintaining the workflow phase (for example: running, failing, succeeded, etc.) according to the underlying node phases and administering pending cleanup operations. For example, aborting existing node evaluations during workflow failures or removing FlyteWorkflow CRD finalizers on completion to ensure the CRD is deleted. Additionally, at the conclusion of each evaluation round, the WorkflowExecutor updates the FlyteWorkflow CRD with updated metadata fields to track the status between evaluation iterations.
+The WorkflowExecutor is responsible for handling high-level workflow operations. This includes maintaining the workflow phase (for example: running, failing, succeeded, etc.) according to the underlying node phases and administering pending cleanup operations. For example, aborting existing node evaluations during workflow failures or removing FlyteWorkflow CRD finalizers on completion to ensure the CR is deleted. Additionally, at the conclusion of each evaluation round, the WorkflowExecutor updates the FlyteWorkflow CR with updated metadata fields to track the status between evaluation iterations.
 
 NodeExecutor
 ------------
@@ -69,8 +69,8 @@ NodeHandlers
 FlytePropeller includes a robust collection of NodeHandlers to support diverse evaluation of the workflow DAG:
 
 * **TaskHandler (Plugins)**: These are responsible for executing plugin specific tasks. This may include contacting FlyteAdmin to schedule K8s pod to perform work, calling a web API to begin/track evaluation, and much more. The plugin paradigm exposes an extensible interface for adding functionality to Flyte workflows.
-* **DynamicHandler**: Flyte workflow CRDs are initialized using a DAG compiled during the registration process. The numerous benefits of this approach are beyond the scope of this document. However, there are situations where the complete DAG is unknown at compile time. For example, when executing a task on each value of an input list. Using Dynamic nodes, a new DAG subgraph may be dynamically compiled during runtime and linked to the existing FlyteWorkflow CRD.
-* **WorkflowHandler**: This handler allows embedding workflows within another workflow definition. The API exposes this functionality using either (1) an inline execution, where the workflow function is invoked directly resulting in a single FlyteWorkflow CRD with an appended sub-workflow, or (2) a launch plan, which uses a TODO to create a separate sub-FlyteWorkflow CRD whose execution state is linked to the parent FlyteWorkflow CRD.
+* **DynamicHandler**: Flyte workflow CRs are initialized using a DAG compiled during the registration process. The numerous benefits of this approach are beyond the scope of this document. However, there are situations where the complete DAG is unknown at compile time. For example, when executing a task on each value of an input list. Using Dynamic nodes, a new DAG subgraph may be dynamically compiled during runtime and linked to the existing FlyteWorkflow CR.
+* **WorkflowHandler**: This handler allows embedding workflows within another workflow definition. The API exposes this functionality using either (1) an inline execution, where the workflow function is invoked directly resulting in a single FlyteWorkflow CR with an appended sub-workflow, or (2) a launch plan, which uses a TODO to create a separate sub-FlyteWorkflow CR whose execution state is linked to the parent FlyteWorkflow CR.
 * **BranchHandler**: The branch handler allows the DAG to follow a specific control path based on input (or computed) values.
 * **Start / End Handlers**: These are dummy handlers which process input and output data and in turn transition start and end nodes to success.
 
