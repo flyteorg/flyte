@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -174,6 +175,14 @@ func TestValidateDescriptionEntityListRequest(t *testing.T) {
 func TestValidateVersion(t *testing.T) {
 	err := ValidateVersion("")
 	assert.EqualError(t, err, "missing version")
+
+	t.Run("url safe versions only", func(t *testing.T) {
+		assert.NoError(t, ValidateVersion("Foo123"))
+		for _, reservedChar := range uriReservedChars {
+			invalidVersion := fmt.Sprintf("foo%c", reservedChar)
+			assert.NotNil(t, ValidateVersion(invalidVersion))
+		}
+	})
 }
 
 func TestValidateListTaskRequest(t *testing.T) {
