@@ -232,7 +232,7 @@ spec:
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           ports:
-          - name: grpc
+          - name: plugin-service
             containerPort: 8000
           {{- end}}
         {{- if .Values.deployment.sidecars }}

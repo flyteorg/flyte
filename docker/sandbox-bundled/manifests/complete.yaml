@@ -432,9 +432,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
+          - grpc
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
+          - bigquery_query_job_task: grpc
     plugins:
       logs:
         kubernetes-enabled: true
@@ -762,7 +764,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: NktZUjNQT1E0Q0ZsZU9Mbw==
+  haSharedSecret: b1o5RnUzdW9TaVJCVlI5Qg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -865,6 +867,9 @@ spec:
     nodePort: null
     port: 8089
     targetPort: grpc
+  - name: plugin-grpc
+    port: 8000
+    targetPort: plugin-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
@@ -1138,7 +1143,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 10334cfce0d6e5bf07e93dcfe9ddaa5977611b1d51778691fdf18ea09ca820e9
+        checksum/configuration: 15f224b0c221f418f292cef5fee829900cc8c53a80439bb354bd31a366eebd2d
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1191,7 +1196,7 @@ spec:
         name: flyteplugins-service
         ports:
         - containerPort: 8000
-          name: http
+          name: plugin-service
       initContainers:
       - args:
         - |
@@ -1252,7 +1257,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 6e4b54de0fd2df5e6a65b462321a723df8daf5f18f2d3ce1f8bebb4dfa6ff360
+        checksum/secret: 72ae7ada930f62c4bedda9fe3892657baabe7237771491d13a8c8fec7a7f0c44
       labels:
         app: docker-registry
         release: flyte-sandbox

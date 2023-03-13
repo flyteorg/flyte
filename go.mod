@@ -220,3 +220,7 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+
+replace github.com/flyteorg/flyteplugins => github.com/flyteorg/flyteplugins v1.0.38-0.20230306201927-1c20b2664b97
+
+replace github.com/flyteorg/flytepropeller => github.com/flyteorg/flytepropeller v1.1.62-0.20230224022740-a700d7eac489

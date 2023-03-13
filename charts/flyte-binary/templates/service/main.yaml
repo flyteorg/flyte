@@ -48,6 +48,9 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
+    - name: plugin-grpc
+      port: 8000
+      targetPort: plugin-grpc
     {{- if .Values.service.extraPorts }}
     {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}
     {{- end }}

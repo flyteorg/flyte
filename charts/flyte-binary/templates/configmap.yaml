@@ -51,9 +51,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
+          - grpc
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
+          - bigquery_query_job_task: grpc
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s-array:
