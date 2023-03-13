@@ -219,14 +219,21 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// add copilot configuration to primaryContainer and PodSpec (if necessary)
-	if taskTemplate.GetContainer() != nil {
-		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot, primaryContainer,
-			taskTemplate.Interface, taskTemplate.GetContainer().DataConfig); err != nil {
+	var dataLoadingConfig *core.DataLoadingConfig
+	if container := taskTemplate.GetContainer(); container != nil {
+		dataLoadingConfig = container.GetDataConfig()
+	} else if pod := taskTemplate.GetK8SPod(); pod != nil {
+		dataLoadingConfig = pod.GetDataConfig()
+	}
+
+	if dataLoadingConfig != nil {
+		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
+			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
 		if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
-			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), taskTemplate.GetContainer().GetDataConfig()); err != nil {
+			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 	}
