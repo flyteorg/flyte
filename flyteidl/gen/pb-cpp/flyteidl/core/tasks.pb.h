@@ -2141,6 +2141,15 @@ class K8sPod final :
   ::google::protobuf::Struct* mutable_pod_spec();
   void set_allocated_pod_spec(::google::protobuf::Struct* pod_spec);
 
+  // .flyteidl.core.DataLoadingConfig data_config = 3;
+  bool has_data_config() const;
+  void clear_data_config();
+  static const int kDataConfigFieldNumber = 3;
+  const ::flyteidl::core::DataLoadingConfig& data_config() const;
+  ::flyteidl::core::DataLoadingConfig* release_data_config();
+  ::flyteidl::core::DataLoadingConfig* mutable_data_config();
+  void set_allocated_data_config(::flyteidl::core::DataLoadingConfig* data_config);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.K8sPod)
  private:
   class HasBitSetters;
@@ -2148,6 +2157,7 @@ class K8sPod final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::K8sObjectMetadata* metadata_;
   ::google::protobuf::Struct* pod_spec_;
+  ::flyteidl::core::DataLoadingConfig* data_config_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
@@ -4351,6 +4361,57 @@ inline void K8sPod::set_allocated_pod_spec(::google::protobuf::Struct* pod_spec)
   }
   pod_spec_ = pod_spec;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.K8sPod.pod_spec)
+}
+
+// .flyteidl.core.DataLoadingConfig data_config = 3;
+inline bool K8sPod::has_data_config() const {
+  return this != internal_default_instance() && data_config_ != nullptr;
+}
+inline void K8sPod::clear_data_config() {
+  if (GetArenaNoVirtual() == nullptr && data_config_ != nullptr) {
+    delete data_config_;
+  }
+  data_config_ = nullptr;
+}
+inline const ::flyteidl::core::DataLoadingConfig& K8sPod::data_config() const {
+  const ::flyteidl::core::DataLoadingConfig* p = data_config_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.K8sPod.data_config)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::DataLoadingConfig*>(
+      &::flyteidl::core::_DataLoadingConfig_default_instance_);
+}
+inline ::flyteidl::core::DataLoadingConfig* K8sPod::release_data_config() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.K8sPod.data_config)
+  
+  ::flyteidl::core::DataLoadingConfig* temp = data_config_;
+  data_config_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::DataLoadingConfig* K8sPod::mutable_data_config() {
+  
+  if (data_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::DataLoadingConfig>(GetArenaNoVirtual());
+    data_config_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.K8sPod.data_config)
+  return data_config_;
+}
+inline void K8sPod::set_allocated_data_config(::flyteidl::core::DataLoadingConfig* data_config) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete data_config_;
+  }
+  if (data_config) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      data_config = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  data_config_ = data_config;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.K8sPod.data_config)
 }
 
 // -------------------------------------------------------------------

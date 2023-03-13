@@ -11696,6 +11696,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -11950,6 +11958,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -15211,6 +15227,14 @@ definitions:
                     string_value: "string_value"
                     null_value: {}
                     bool_value: true
+              data_config:
+                io_strategy:
+                  upload_mode: {}
+                  download_mode: {}
+                format: {}
+                output_path: "output_path"
+                enabled: true
+                input_path: "input_path"
             id:
               domain: "domain"
               resource_type: {}
@@ -15481,6 +15505,14 @@ definitions:
                   string_value: "string_value"
                   null_value: {}
                   bool_value: true
+            data_config:
+              io_strategy:
+                upload_mode: {}
+                download_mode: {}
+              format: {}
+              output_path: "output_path"
+              enabled: true
+              input_path: "input_path"
           id:
             domain: "domain"
             resource_type: {}
@@ -16148,6 +16180,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -16412,6 +16452,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -20804,6 +20852,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -21058,6 +21114,14 @@ definitions:
                       string_value: "string_value"
                       null_value: {}
                       bool_value: true
+                data_config:
+                  io_strategy:
+                    upload_mode: {}
+                    download_mode: {}
+                  format: {}
+                  output_path: "output_path"
+                  enabled: true
+                  input_path: "input_path"
               id:
                 domain: "domain"
                 resource_type: {}
@@ -27618,6 +27682,14 @@ definitions:
                     string_value: "string_value"
                     null_value: {}
                     bool_value: true
+              data_config:
+                io_strategy:
+                  upload_mode: {}
+                  download_mode: {}
+                format: {}
+                output_path: "output_path"
+                enabled: true
+                input_path: "input_path"
             id:
               domain: "domain"
               resource_type: {}
@@ -27872,6 +27944,14 @@ definitions:
                     string_value: "string_value"
                     null_value: {}
                     bool_value: true
+              data_config:
+                io_strategy:
+                  upload_mode: {}
+                  download_mode: {}
+                format: {}
+                output_path: "output_path"
+                enabled: true
+                input_path: "input_path"
             id:
               domain: "domain"
               resource_type: {}
@@ -34341,6 +34421,14 @@ definitions:
                         string_value: "string_value"
                         null_value: {}
                         bool_value: true
+                  data_config:
+                    io_strategy:
+                      upload_mode: {}
+                      download_mode: {}
+                    format: {}
+                    output_path: "output_path"
+                    enabled: true
+                    input_path: "input_path"
                 id:
                   domain: "domain"
                   resource_type: {}
@@ -34595,6 +34683,14 @@ definitions:
                         string_value: "string_value"
                         null_value: {}
                         bool_value: true
+                  data_config:
+                    io_strategy:
+                      upload_mode: {}
+                      download_mode: {}
+                    format: {}
+                    output_path: "output_path"
+                    enabled: true
+                    input_path: "input_path"
                 id:
                   domain: "domain"
                   resource_type: {}
@@ -40895,6 +40991,14 @@ definitions:
                         string_value: "string_value"
                         null_value: {}
                         bool_value: true
+                  data_config:
+                    io_strategy:
+                      upload_mode: {}
+                      download_mode: {}
+                    format: {}
+                    output_path: "output_path"
+                    enabled: true
+                    input_path: "input_path"
                 id:
                   domain: "domain"
                   resource_type: {}
@@ -41149,6 +41253,14 @@ definitions:
                         string_value: "string_value"
                         null_value: {}
                         bool_value: true
+                  data_config:
+                    io_strategy:
+                      upload_mode: {}
+                      download_mode: {}
+                    format: {}
+                    output_path: "output_path"
+                    enabled: true
+                    input_path: "input_path"
                 id:
                   domain: "domain"
                   resource_type: {}
@@ -44131,6 +44243,14 @@ definitions:
                 string_value: "string_value"
                 null_value: {}
                 bool_value: true
+          data_config:
+            io_strategy:
+              upload_mode: {}
+              download_mode: {}
+            format: {}
+            output_path: "output_path"
+            enabled: true
+            input_path: "input_path"
         id:
           domain: "domain"
           resource_type: {}
@@ -50459,6 +50579,14 @@ definitions:
                   string_value: "string_value"
                   null_value: {}
                   bool_value: true
+            data_config:
+              io_strategy:
+                upload_mode: {}
+                download_mode: {}
+              format: {}
+              output_path: "output_path"
+              enabled: true
+              input_path: "input_path"
           id:
             domain: "domain"
             resource_type: {}
@@ -50713,6 +50841,14 @@ definitions:
                   string_value: "string_value"
                   null_value: {}
                   bool_value: true
+            data_config:
+              io_strategy:
+                upload_mode: {}
+                download_mode: {}
+              format: {}
+              output_path: "output_path"
+              enabled: true
+              input_path: "input_path"
           id:
             domain: "domain"
             resource_type: {}
@@ -53435,6 +53571,17 @@ definitions:
           \ https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n\
           - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
         $ref: "#/definitions/protobufStruct"
+      data_config:
+        title: "BETA: Optional configuration for DataLoading. If not specified, then\
+          \ default values are used.\nThis makes it possible to to run a completely\
+          \ portable container, that uses inputs and outputs\nonly from the local\
+          \ file-system and without having any reference to flytekit. This is supported\
+          \ only on K8s at the moment.\nIf data loading is enabled, then data will\
+          \ be mounted in accompanying directories specified in the DataLoadingConfig.\
+          \ If the directories\nare not specified, inputs will be mounted onto and\
+          \ outputs will be uploaded from a pre-determined file-system path. Refer\
+          \ to the documentation\nto understand the default paths.\nOnly K8s"
+        $ref: "#/definitions/coreDataLoadingConfig"
     description: "Defines a pod spec and additional pod metadata that is created when\
       \ a task is executed."
     example:
@@ -53454,6 +53601,14 @@ definitions:
             string_value: "string_value"
             null_value: {}
             bool_value: true
+      data_config:
+        io_strategy:
+          upload_mode: {}
+          download_mode: {}
+        format: {}
+        output_path: "output_path"
+        enabled: true
+        input_path: "input_path"
   coreKeyValuePair:
     type: "object"
     properties:
@@ -55671,6 +55826,14 @@ definitions:
               string_value: "string_value"
               null_value: {}
               bool_value: true
+        data_config:
+          io_strategy:
+            upload_mode: {}
+            download_mode: {}
+          format: {}
+          output_path: "output_path"
+          enabled: true
+          input_path: "input_path"
       id:
         domain: "domain"
         resource_type: {}
@@ -62850,6 +63013,14 @@ definitions:
                     string_value: "string_value"
                     null_value: {}
                     bool_value: true
+              data_config:
+                io_strategy:
+                  upload_mode: {}
+                  download_mode: {}
+                format: {}
+                output_path: "output_path"
+                enabled: true
+                input_path: "input_path"
             id:
               domain: "domain"
               resource_type: {}
@@ -63104,6 +63275,14 @@ definitions:
                     string_value: "string_value"
                     null_value: {}
                     bool_value: true
+              data_config:
+                io_strategy:
+                  upload_mode: {}
+                  download_mode: {}
+                format: {}
+                output_path: "output_path"
+                enabled: true
+                input_path: "input_path"
             id:
               domain: "domain"
               resource_type: {}

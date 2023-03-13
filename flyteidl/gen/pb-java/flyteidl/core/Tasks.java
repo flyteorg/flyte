@@ -15308,6 +15308,49 @@ public final class Tasks {
      * <code>.google.protobuf.Struct pod_spec = 2;</code>
      */
     com.google.protobuf.StructOrBuilder getPodSpecOrBuilder();
+
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    boolean hasDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfig getDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder();
   }
   /**
    * <pre>
@@ -15374,6 +15417,19 @@ public final class Tasks {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(podSpec_);
                 podSpec_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              flyteidl.core.Tasks.DataLoadingConfig.Builder subBuilder = null;
+              if (dataConfig_ != null) {
+                subBuilder = dataConfig_.toBuilder();
+              }
+              dataConfig_ = input.readMessage(flyteidl.core.Tasks.DataLoadingConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(dataConfig_);
+                dataConfig_ = subBuilder.buildPartial();
               }
 
               break;
@@ -15485,6 +15541,57 @@ public final class Tasks {
       return getPodSpec();
     }
 
+    public static final int DATA_CONFIG_FIELD_NUMBER = 3;
+    private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public boolean hasDataConfig() {
+      return dataConfig_ != null;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+      return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+      return getDataConfig();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15505,6 +15612,9 @@ public final class Tasks {
       if (podSpec_ != null) {
         output.writeMessage(2, getPodSpec());
       }
+      if (dataConfig_ != null) {
+        output.writeMessage(3, getDataConfig());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -15521,6 +15631,10 @@ public final class Tasks {
       if (podSpec_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getPodSpec());
+      }
+      if (dataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getDataConfig());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15547,6 +15661,11 @@ public final class Tasks {
         if (!getPodSpec()
             .equals(other.getPodSpec())) return false;
       }
+      if (hasDataConfig() != other.hasDataConfig()) return false;
+      if (hasDataConfig()) {
+        if (!getDataConfig()
+            .equals(other.getDataConfig())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -15565,6 +15684,10 @@ public final class Tasks {
       if (hasPodSpec()) {
         hash = (37 * hash) + POD_SPEC_FIELD_NUMBER;
         hash = (53 * hash) + getPodSpec().hashCode();
+      }
+      if (hasDataConfig()) {
+        hash = (37 * hash) + DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getDataConfig().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -15715,6 +15838,12 @@ public final class Tasks {
           podSpec_ = null;
           podSpecBuilder_ = null;
         }
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
         return this;
       }
 
@@ -15750,6 +15879,11 @@ public final class Tasks {
           result.podSpec_ = podSpec_;
         } else {
           result.podSpec_ = podSpecBuilder_.build();
+        }
+        if (dataConfigBuilder_ == null) {
+          result.dataConfig_ = dataConfig_;
+        } else {
+          result.dataConfig_ = dataConfigBuilder_.build();
         }
         onBuilt();
         return result;
@@ -15804,6 +15938,9 @@ public final class Tasks {
         }
         if (other.hasPodSpec()) {
           mergePodSpec(other.getPodSpec());
+        }
+        if (other.hasDataConfig()) {
+          mergeDataConfig(other.getDataConfig());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -16165,6 +16302,213 @@ public final class Tasks {
           podSpec_ = null;
         }
         return podSpecBuilder_;
+      }
+
+      private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> dataConfigBuilder_;
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public boolean hasDataConfig() {
+        return dataConfigBuilder_ != null || dataConfig_ != null;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        } else {
+          return dataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder setDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          dataConfig_ = value;
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder setDataConfig(
+          flyteidl.core.Tasks.DataLoadingConfig.Builder builderForValue) {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder mergeDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (dataConfig_ != null) {
+            dataConfig_ =
+              flyteidl.core.Tasks.DataLoadingConfig.newBuilder(dataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            dataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          dataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder clearDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+          onChanged();
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig.Builder getDataConfigBuilder() {
+        
+        onChanged();
+        return getDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+        if (dataConfigBuilder_ != null) {
+          return dataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return dataConfig_ == null ?
+              flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> 
+          getDataConfigFieldBuilder() {
+        if (dataConfigBuilder_ == null) {
+          dataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder>(
+                  getDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          dataConfig_ = null;
+        }
+        return dataConfigBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -18392,20 +18736,22 @@ public final class Tasks {
       "oadingConfig.LiteralMapFormat\022.\n\013io_stra" +
       "tegy\030\005 \001(\0132\031.flyteidl.core.IOStrategy\"1\n" +
       "\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n" +
-      "\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .f" +
-      "lyteidl.core.K8sObjectMetadata\022)\n\010pod_sp" +
-      "ec\030\002 \001(\0132\027.google.protobuf.Struct\"\374\001\n\021K8" +
-      "sObjectMetadata\022<\n\006labels\030\001 \003(\0132,.flytei" +
-      "dl.core.K8sObjectMetadata.LabelsEntry\022F\n" +
-      "\013annotations\030\002 \003(\01321.flyteidl.core.K8sOb" +
-      "jectMetadata.AnnotationsEntry\032-\n\013LabelsE" +
-      "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020" +
-      "AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
-      " \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001(\t\022+\n\007di" +
-      "alect\030\002 \001(\0162\032.flyteidl.core.Sql.Dialect\"" +
-      "7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANSI\020\001\022\010\n\004H" +
-      "IVE\020\002\022\t\n\005OTHER\020\003B6Z4github.com/flyteorg/" +
-      "flyteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "\005PROTO\020\002\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 ." +
+      "flyteidl.core.K8sObjectMetadata\022)\n\010pod_s" +
+      "pec\030\002 \001(\0132\027.google.protobuf.Struct\0225\n\013da" +
+      "ta_config\030\003 \001(\0132 .flyteidl.core.DataLoad" +
+      "ingConfig\"\374\001\n\021K8sObjectMetadata\022<\n\006label" +
+      "s\030\001 \003(\0132,.flyteidl.core.K8sObjectMetadat" +
+      "a.LabelsEntry\022F\n\013annotations\030\002 \003(\01321.fly" +
+      "teidl.core.K8sObjectMetadata.Annotations" +
+      "Entry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
+      "ue\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030" +
+      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstate" +
+      "ment\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.c" +
+      "ore.Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020" +
+      "\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4gith" +
+      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
+      "idl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18496,7 +18842,7 @@ public final class Tasks {
     internal_static_flyteidl_core_K8sPod_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sPod_descriptor,
-        new java.lang.String[] { "Metadata", "PodSpec", });
+        new java.lang.String[] { "Metadata", "PodSpec", "DataConfig", });
     internal_static_flyteidl_core_K8sObjectMetadata_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable = new
