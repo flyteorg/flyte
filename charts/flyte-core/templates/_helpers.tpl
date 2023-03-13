@@ -74,6 +74,20 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteplugins_service.name" -}}
+datacatalog
+{{- end -}}
+
+{{- define "flyteplugins_service.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flyteplugins_service.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "flyteplugins_service.labels" -}}
+{{ include "flyteplugins_service.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
 
 {{- define "flytepropeller.name" -}}
 flytepropeller

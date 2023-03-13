@@ -1193,7 +1193,7 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      - image: docker.io/pingsutw/flyteplugins-service:v1
+      - image: docker.io/pingsutw/flyteplugins-service:v2
         imagePullPolicy: IfNotPresent
         name: flyteplugins-service
         ports:

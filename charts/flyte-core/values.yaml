@@ -199,6 +199,65 @@ datacatalog:
   priorityClassName: ""
 
 #
+# DATACATALOG SETTINGS
+#
+
+flyteplugins_service:
+  enabled: true
+  # -- Replicas count for Datacatalog deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Datacatalog deployment
+    repository: docker.io/pingsutw/flyteplugins-service # DATACATALOG_IMAGE
+    # -- Docker image tag
+    tag: v2 # DATACATALOG_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Datacatalog deployment
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/flyteplugins-service/config/*.yaml
+  # -- Service settings for Datacatalog
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: NodePort
+  # -- Configuration for service accounts for Datacatalog
+  serviceAccount:
+    # -- Should a service account be created for Datacatalog
+    create: true
+    # -- Annotations for ServiceAccount attached to Datacatalog pods
+    annotations: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
+  # -- Annotations for Datacatalog pods
+  podAnnotations: {}
+  # -- nodeSelector for Datacatalog deployment
+  nodeSelector: {}
+  # -- tolerations for Datacatalog deployment
+  tolerations: []
+  # -- affinity for Datacatalog deployment
+  affinity: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
+  # -- Sets priorityClassName for datacatalog pod(s).
+  priorityClassName: ""
+
+#
 # FLYTEPROPELLER SETTINGS
 #
 

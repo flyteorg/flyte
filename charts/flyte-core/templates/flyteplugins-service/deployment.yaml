@@ -1,0 +1,58 @@
+{{- if .Values.flyteplugins_service.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyteplugins_service.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteplugins_service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flyteplugins_service.replicaCount }}
+  selector:
+    matchLabels: {{ include "flyteplugins_service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/flyteplugins_service/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteplugins_service.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flyteplugins_service.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
+      {{- if .Values.datacatalog.priorityClassName }}
+      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
+      {{- end }}
+      containers:
+      - command:
+        - pyflyte
+        - serve
+        image: "{{ .Values.flyteplugins_service.image.repository }}:{{ .Values.flyteplugins_service.image.tag }}"
+        imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
+        name: flyteplugins-service
+        ports:
+        - containerPort: 9090
+          name: plugin-grpc
+        resources: {{- toYaml .Values.flyteplugins_service.resources | nindent 10 }}
+        {{- with .Values.datacatalog.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.datacatalog.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
+      serviceAccountName: {{ template "flyteplugins_service.name" . }}
+      {{- with .Values.flyteplugins_service.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
+      {{- with .Values.flyteplugins_service.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteplugins_service.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteplugins_service.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}
