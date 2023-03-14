@@ -35,6 +35,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type MockHTTPClient struct {
@@ -498,6 +499,64 @@ func TestHydrateNode(t *testing.T) {
 		task := &admin.Task{}
 		err := hydrateSpec(task, "", *rconfig.DefaultFilesConfig)
 		assert.NotNil(t, err)
+	})
+}
+
+func TestHydrateGateNode(t *testing.T) {
+	t.Run("Hydrate Sleep", func(t *testing.T) {
+		registerFilesSetup()
+		// Write a node that contains a GateNode
+		node := &core.Node{
+			Target: &core.Node_GateNode{
+				GateNode: &core.GateNode{
+					Condition: &core.GateNode_Sleep{
+						Sleep: &core.SleepCondition{
+							Duration: &durationpb.Duration{
+								Seconds: 10,
+							},
+						},
+					},
+				},
+			},
+		}
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		assert.Nil(t, err)
+	})
+
+	t.Run("Hydrate Signal", func(t *testing.T) {
+		registerFilesSetup()
+		// Write a node that contains a GateNode
+		node := &core.Node{
+			Target: &core.Node_GateNode{
+				GateNode: &core.GateNode{
+					Condition: &core.GateNode_Signal{
+						Signal: &core.SignalCondition{
+							SignalId: "abc",
+						},
+					},
+				},
+			},
+		}
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		assert.Nil(t, err)
+	})
+
+	t.Run("Hydrate Approve", func(t *testing.T) {
+		registerFilesSetup()
+		// Write a node that contains a GateNode
+		node := &core.Node{
+			Target: &core.Node_GateNode{
+				GateNode: &core.GateNode{
+					Condition: &core.GateNode_Approve{
+						Approve: &core.ApproveCondition{
+							SignalId: "abc",
+						},
+					},
+				},
+			},
+		}
+		err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+		assert.Nil(t, err)
 	})
 }
 

@@ -245,6 +245,8 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 		default:
 			return fmt.Errorf("unknown type %T", branchNodeWrapper.BranchNode.IfElse.Default)
 		}
+	case *core.Node_GateNode:
+		// Do nothing.
 	default:
 		return fmt.Errorf("unknown type %T", v)
 	}
