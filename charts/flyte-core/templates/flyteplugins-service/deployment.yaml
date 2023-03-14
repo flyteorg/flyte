@@ -22,7 +22,7 @@ spec:
         fsGroup: 1001
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
-      {{- if .Values.datacatalog.priorityClassName }}
+      {{- if .Values.flyteplugins_service.priorityClassName }}
       priorityClassName: {{ .Values.datacatalog.priorityClassName }}
       {{- end }}
       containers:
@@ -30,16 +30,16 @@ spec:
         - pyflyte
         - serve
         image: "{{ .Values.flyteplugins_service.image.repository }}:{{ .Values.flyteplugins_service.image.tag }}"
-        imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
+        imagePullPolicy: "{{ .Values.flyteplugins_service.image.pullPolicy }}"
         name: flyteplugins-service
         ports:
-        - containerPort: 9090
+        - containerPort: 80
           name: plugin-grpc
         resources: {{- toYaml .Values.flyteplugins_service.resources | nindent 10 }}
-        {{- with .Values.datacatalog.additionalVolumeMounts -}}
+        {{- with .Values.flyteplugins_service.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
-      {{- with .Values.datacatalog.additionalContainers -}}
+      {{- with .Values.flyteplugins_service.additionalContainers -}}
       {{- tpl (toYaml .) $ | nindent 6}}
       {{- end }}
       serviceAccountName: {{ template "flyteplugins_service.name" . }}

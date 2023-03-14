@@ -450,8 +450,8 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      grpc:
-        grpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+      flyteplugins-service:
+        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:80
   002-database.yaml: |
     database:
       postgres:
@@ -766,7 +766,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: cVdBSk5SaW1UNXpsNDNUbQ==
+  haSharedSecret: UkNISXpwT1JBV1dRaGFkNg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -870,7 +870,7 @@ spec:
     port: 8089
     targetPort: grpc
   - name: plugin-grpc
-    port: 8000
+    port: 9090
     targetPort: plugin-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
@@ -1145,7 +1145,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: be351884d663b7e7bc409328261bd201b6eaf886b2a1198eec54eff4a130eed1
+        checksum/configuration: fda12335726ff5daec3763f1fc6a721bf121d44552df93c3af1cd8507b3ce0a4
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1197,8 +1197,8 @@ spec:
         imagePullPolicy: IfNotPresent
         name: flyteplugins-service
         ports:
-        - containerPort: 8000
-          name: plugin-service
+        - containerPort: 80
+          name: plugin-grpc
       initContainers:
       - args:
         - |
@@ -1259,7 +1259,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 7c5fd3047caba3e4b26b6071d24211345a9b9a6401a1e7e7b7b6793257d1f661
+        checksum/secret: 9f727494329b7917ad6d69fec631fb14be43955141cd9b5a4bbbec674918ed25
       labels:
         app: docker-registry
         release: flyte-sandbox

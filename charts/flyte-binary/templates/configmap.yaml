@@ -61,8 +61,8 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      grpc:
-        grpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:9090
+      flyteplugins-service:
+        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:80
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:

@@ -14,7 +14,7 @@ spec:
   {{- end }}
   ports:
   - name: plugin-grpc
-    port: 9090
+    port: 80
     protocol: TCP
     targetPort: plugin-grpc
   selector: {{ include "flyteplugins_service.selectorLabels" . | nindent 4 }}
