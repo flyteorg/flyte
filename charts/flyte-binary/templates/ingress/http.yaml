@@ -25,6 +25,9 @@ spec:
   rules:
   - http:
       paths:
+      {{- if .Values.ingress.httpExtraPaths.prepend }}
+      {{- tpl ( .Values.ingress.httpExtraPaths.prepend | toYaml ) . | nindent 6 }}
+      {{- end }}
       - backend:
           service:
             name: {{ include "flyte-binary.fullname" . }}
@@ -158,6 +161,9 @@ spec:
               number: {{ include "flyte-binary.service.httpPort" . }}
         path: /oauth2/*
         pathType: ImplementationSpecific
+      {{- if .Values.ingress.httpExtraPaths.append }}
+      {{- tpl ( .Values.ingress.httpExtraPaths.append | toYaml ) . | nindent 6 }}
+      {{- end }}
     {{- if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}
     {{- end }}

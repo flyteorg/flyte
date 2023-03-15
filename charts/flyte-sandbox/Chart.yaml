@@ -33,14 +33,14 @@ dependencies:
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
   - name: kubernetes-dashboard
-    version: 5.11.0
+    version: 6.0.0
     repository: https://kubernetes.github.io/dashboard/
     condition: kubernetes-dashboard.enabled
   - name: minio
-    version: 11.10.13
+    version: 12.1.1
     repository: https://charts.bitnami.com/bitnami
     condition: minio.enabled
   - name: postgresql
-    version: 12.1.0
+    version: 12.1.9
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled

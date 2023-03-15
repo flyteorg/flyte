@@ -16,7 +16,14 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
+| configuration.auth.authorizedUris | list | `[]` |  |
+| configuration.auth.enableAuthServer | bool | `true` |  |
 | configuration.auth.enabled | bool | `false` |  |
+| configuration.auth.flyteClient.audience | string | `""` |  |
+| configuration.auth.flyteClient.clientId | string | `"flytectl"` |  |
+| configuration.auth.flyteClient.redirectUri | string | `"http://localhost:53593/callback"` |  |
+| configuration.auth.flyteClient.scopes[0] | string | `"all"` |  |
+| configuration.auth.internal.clientId | string | `"flytepropeller"` |  |
 | configuration.auth.internal.clientSecret | string | `""` |  |
 | configuration.auth.internal.clientSecretHash | string | `""` |  |
 | configuration.auth.oidc.baseUrl | string | `""` |  |
@@ -77,8 +84,6 @@ Chart for basic single Flyte executable deployment
 | deployment.podSecurityContext.runAsGroup | int | `65534` |  |
 | deployment.podSecurityContext.runAsUser | int | `65534` |  |
 | deployment.readinessProbe | object | `{}` |  |
-| deployment.resources.limits.memory | string | `"1Gi"` |  |
-| deployment.resources.requests.cpu | int | `1` |  |
 | deployment.sidecars | list | `[]` |  |
 | deployment.startupProbe | object | `{}` |  |
 | deployment.waitForDB.args | list | `[]` |  |
@@ -90,8 +95,12 @@ Chart for basic single Flyte executable deployment
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.grpcAnnotations | object | `{}` |  |
+| ingress.grpcExtraPaths.append | list | `[]` |  |
+| ingress.grpcExtraPaths.prepend | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
+| ingress.httpExtraPaths.append | list | `[]` |  |
+| ingress.httpExtraPaths.prepend | list | `[]` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |

@@ -65,14 +65,28 @@ Create the name of the service account to use
 Name of inline ConfigMap containing additional configuration or overrides for Flyte
 */}}
 {{- define "flyte-sandbox.configuration.inlineConfigMap" -}}
-{{- printf "%s-extra-config" (include "flyte-sandbox.fullname" .) -}}
+{{- printf "%s-extra-config" .Release.Name -}}
 {{- end }}
 
 {{/*
 Name of inline ConfigMap containing additional cluster resource templates
 */}}
 {{- define "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" -}}
-{{- printf "%s-extra-cluster-resource-templates" (include "flyte-sandbox.fullname" .) -}}
+{{- printf "%s-extra-cluster-resource-templates" .Release.Name -}}
+{{- end }}
+
+{{/*
+Name of PersistentVolume and PersistentVolumeClaim for PostgreSQL database
+*/}}
+{{- define "flyte-sandbox.persistence.dbVolumeName" -}}
+{{- printf "%s-db-storage" .Release.Name -}}
+{{- end }}
+
+{{/*
+Name of PersistentVolume and PersistentVolumeClaim for Minio
+*/}}
+{{- define "flyte-sandbox.persistence.minioVolumeName" -}}
+{{- printf "%s-minio-storage" .Release.Name -}}
 {{- end }}
 
 {{/*
@@ -87,12 +101,12 @@ app.kubernetes.io/component: proxy
 Name of Envoy proxy configmap
 */}}
 {{- define "flyte-sandbox.proxyConfigMapName" -}}
-{{- printf "%s-proxy-config" (include "flyte-sandbox.fullname" .) -}}
+{{- printf "%s-proxy-config" .Release.Name -}}
 {{- end }}
 
 {{/*
 Name of development-mode Flyte headless service
 */}}
 {{- define "flyte-sandbox.localHeadlessService" -}}
-{{- printf "%s-local" (include "flyte-sandbox.fullname" .) -}}
+{{- printf "%s-local" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end }}

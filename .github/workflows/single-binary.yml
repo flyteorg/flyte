@@ -13,10 +13,32 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
+  test-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: docker/sandbox-bundled/bootstrap
+      - name: Check formatting
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make check-fmt
+      - name: Test
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make test
+
   trigger-single-binary-build:
     runs-on: ubuntu-latest
+    needs: [test-bootstrap]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -99,7 +121,7 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'workflow_dispatch' }}
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
@@ -156,4 +178,4 @@ jobs:
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'workflow_dispatch' }}

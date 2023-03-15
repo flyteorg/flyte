@@ -1,7 +1,6 @@
 docker-registry:
   enabled: true
   image:
-    repository: registry
     tag: sandbox
     pullPolicy: Never
   persistence:
@@ -15,8 +14,8 @@ flyte-binary:
   enabled: true
   configuration:
     database:
+      host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
       password: postgres
-      port: 30001
     storage:
       metadataContainer: my-s3-bucket
       userDataContainer: my-s3-bucket
@@ -25,7 +24,7 @@ flyte-binary:
         s3:
           disableSSL: true
           v2Signing: true
-          endpoint: http://localhost:30002
+          endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
           authType: accesskey
           accessKey: minio
           secretKey: miniostorage
@@ -37,10 +36,14 @@ flyte-binary:
           templateUri: |-
             http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
+      storage:
+        signedURL:
+          stowConfigOverride:
+            endpoint: http://localhost:30002
       plugins:
         k8s:
           default-env-vars:
-            - FLYTE_AWS_ENDPOINT: http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}:9000
+            - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
@@ -56,13 +59,24 @@ flyte-binary:
         repository: bitnami/postgresql
         tag: sandbox
         pullPolicy: Never
-    extraPodSpec:
-      hostNetwork: true
+  rbac:
+    # This is strictly NOT RECOMMENDED in production clusters, and is only for use
+    # within local Flyte sandboxes.
+    # When using cluster resource templates to create additional namespaced roles,
+    # Flyte is required to have a superset of those permissions. To simplify
+    # experimenting with new backend plugins that require additional roles be created
+    # with cluster resource templates (e.g. Spark), we add the following:
+    extraRules:
+      - apiGroups:
+        - '*'
+        resources:
+        - '*'
+        verbs:
+        - '*'
 
 kubernetes-dashboard:
   enabled: true
   image:
-    repository: kubernetesui/dashboard
     tag: sandbox
     pullPolicy: Never
   extraArgs:
@@ -79,7 +93,6 @@ kubernetes-dashboard:
 minio:
   enabled: true
   image:
-    repository: bitnami/minio
     tag: sandbox
     pullPolicy: Never
   auth:
@@ -95,12 +108,16 @@ minio:
       api: 30002
   persistence:
     enabled: true
-    storageClass: local-path
+    existingClaim: '{{ include "flyte-sandbox.persistence.minioVolumeName" . }}'
+  volumePermissions:
+    enabled: true
+    image:
+      tag: sandbox
+      pullPolicy: Never
 
 postgresql:
   enabled: true
   image:
-    repository: bitnami/postgresql
     tag: sandbox
     pullPolicy: Never
   auth:
@@ -114,7 +131,12 @@ postgresql:
         postgresql: 30001
     persistence:
       enabled: true
-      storageClass: local-path
+      existingClaim: '{{ include "flyte-sandbox.persistence.dbVolumeName" . }}'
+  volumePermissions:
+    enabled: true
+    image:
+      tag: sandbox
+      pullPolicy: Never
 
 sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's

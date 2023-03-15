@@ -45,9 +45,7 @@ data:
   notifications.yaml: |
     notifications:
       type: {{ .Values.workflow_notifications.config.notifications.type }}
-      {{- with .Values.workflow_notifications.config.notifications.region }}
-      region: {{- tpl (.) $ }}
-      {{- end }}
+      region: {{ tpl .Values.workflow_notifications.config.notifications.region $ }}
       {{- with .Values.workflow_notifications.config.notifications.publisher }}
       publisher: {{- tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

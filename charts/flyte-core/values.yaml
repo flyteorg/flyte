@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.1.70 # FLYTEADMIN_TAG
+    tag: v1.1.77 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -75,10 +75,12 @@ flyteadmin:
   # -- affinity for Flyteadmin deployment
   affinity: {}
   secrets: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
   additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
   additionalVolumeMounts: []
-  # -- Appends additional containers to the containers list. May include template values.
-  additionalContainers: {}
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the serve command
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
@@ -95,7 +97,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.1.70 # FLYTESCHEDULER_TAG
+    tag: v1.1.77 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -128,6 +130,12 @@ flytescheduler:
   # -- affinity for Flytescheduler deployment
   affinity: {}
   secrets: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Sets priorityClassName for flyte scheduler pod(s).
   priorityClassName: ""
 
@@ -143,7 +151,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.0.41 # DATACATALOG_TAG
+    tag: v1.0.43 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -179,6 +187,12 @@ datacatalog:
   tolerations: []
   # -- affinity for Datacatalog deployment
   affinity: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
@@ -198,7 +212,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.1.62 # FLYTEPROPELLER_TAG
+    tag: v1.1.69 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -232,6 +246,12 @@ flytepropeller:
   tolerations: []
   # -- affinity for Flytepropeller deployment
   affinity: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
   # -- Appends extra command line arguments to the main command
   extraArgs: {}
   # -- Defines the cluster name used in events sent to Admin
@@ -250,7 +270,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.4.1 # FLYTECONSOLE_TAG
+    tag: v1.4.3 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -575,7 +595,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.24 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.28 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
