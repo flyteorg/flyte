@@ -181,6 +181,27 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
+| flyteplugins_service.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| flyteplugins_service.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| flyteplugins_service.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| flyteplugins_service.affinity | object | `{}` | affinity for Datacatalog deployment |
+| flyteplugins_service.configPath | string | `"/etc/flyteplugins-service/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteplugins_service.enabled | bool | `true` |  |
+| flyteplugins_service.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
+| flyteplugins_service.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flyteplugins_service.image.repository | string | `"docker.io/pingsutw/flyteplugins-service"` | Docker image for Datacatalog deployment |
+| flyteplugins_service.image.tag | string | `"v2"` | Docker image tag |
+| flyteplugins_service.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
+| flyteplugins_service.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
+| flyteplugins_service.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| flyteplugins_service.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
+| flyteplugins_service.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
+| flyteplugins_service.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
+| flyteplugins_service.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Datacatalog |
+| flyteplugins_service.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
+| flyteplugins_service.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
+| flyteplugins_service.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flyteplugins_service.tolerations | list | `[]` | tolerations for Datacatalog deployment |
 | flytepropeller.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flytepropeller.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flytepropeller.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
