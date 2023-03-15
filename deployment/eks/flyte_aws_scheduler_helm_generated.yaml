@@ -482,6 +482,7 @@ data:
     tasks:
       task-plugins:
         default-for-task-types:
+          bigquery_query_job_task: flyteplugins-service
           container: container
           container_array: k8s-array
           sidecar: sidecar
@@ -1304,7 +1305,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c79b7a29b87ff4c544d0e198a00808e8a21e5983306faf85deb86819cb2e6e0"
+        configChecksum: "e7ed1d8eeb981ea212a45581b35d313d6db364a456d58d8fbcdfead4dceb62b"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1386,7 +1387,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.69
       annotations:
-        configChecksum: "c79b7a29b87ff4c544d0e198a00808e8a21e5983306faf85deb86819cb2e6e0"
+        configChecksum: "e7ed1d8eeb981ea212a45581b35d313d6db364a456d58d8fbcdfead4dceb62b"
     spec:
       securityContext:
         fsGroup: 65534

@@ -252,7 +252,7 @@ spec:
       targetPort: grpc
       nodePort: null
     - name: plugin-grpc
-      port: 9090
+      port: 80
       targetPort: plugin-grpc
   selector:
     app.kubernetes.io/name: flyte-binary

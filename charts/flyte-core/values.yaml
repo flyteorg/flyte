@@ -199,21 +199,21 @@ datacatalog:
   priorityClassName: ""
 
 #
-# DATACATALOG SETTINGS
+# FLYTEPLUGINS_SERVICE SETTINGS
 #
 
 flyteplugins_service:
   enabled: true
-  # -- Replicas count for Datacatalog deployment
+  # -- Replicas count for flyteplugins-service deployment
   replicaCount: 1
   image:
-    # -- Docker image for Datacatalog deployment
-    repository: docker.io/pingsutw/flyteplugins-service # DATACATALOG_IMAGE
+    # -- Docker image for flyteplugins-service deployment
+    repository: docker.io/pingsutw/flyteplugins-service # FLYTEPLUGINS_SERVICE_IMAGE
     # -- Docker image tag
-    tag: v2 # DATACATALOG_TAG
+    tag: v2 # FLYTEPLUGINS_SERVICE_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Datacatalog deployment
+  # -- Default resources requests and limits for flyteplugins-service deployment
   resources:
     limits:
       cpu: 500m
@@ -225,26 +225,26 @@ flyteplugins_service:
       memory: 50Mi
   # -- Default regex string for searching configuration files
   configPath: /etc/flyteplugins-service/config/*.yaml
-  # -- Service settings for Datacatalog
+  # -- Service settings for flyteplugins-service
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
-  # -- Configuration for service accounts for Datacatalog
+  # -- Configuration for service accounts for flyteplugins-service
   serviceAccount:
-    # -- Should a service account be created for Datacatalog
+    # -- Should a service account be created for flyteplugins-service
     create: true
-    # -- Annotations for ServiceAccount attached to Datacatalog pods
+    # -- Annotations for ServiceAccount attached to flyteplugins-service pods
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
-  # -- Annotations for Datacatalog pods
+  # -- Annotations for flyteplugins-service pods
   podAnnotations: {}
-  # -- nodeSelector for Datacatalog deployment
+  # -- nodeSelector for flyteplugins-service deployment
   nodeSelector: {}
-  # -- tolerations for Datacatalog deployment
+  # -- tolerations for flyteplugins-service deployment
   tolerations: []
-  # -- affinity for Datacatalog deployment
+  # -- affinity for flyteplugins-service deployment
   affinity: {}
   # -- Appends additional volumes to the deployment spec. May include template values.
   additionalVolumes: []
@@ -715,10 +715,12 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - flyteplugins-service
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
+          bigquery_query_job_task: flyteplugins-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:
