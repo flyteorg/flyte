@@ -30,9 +30,12 @@ Changes not requiring RFCs include:
 Some good practices when starting an RFC include:
 
 - Gathering feedback from team or community members first, to confirm that the changes will indeed be useful
-- Starting a Discussion at the [RFC Incubator](https://github.com/flyteorg/flyte/discussions/new?category=rfc-incubator) to gauge interest.
+- Starting a Discussion at the [RFC Incubator](https://github.com/flyteorg/flyte/discussions/new?category=rfc-incubator) to gauge interest. Once you have received positive feedback, especially from Maintainers or Steering Committee members, please proceed to:
+    - Ask in the Discussion for confirmation to submit an RFC
+    - If there's no objection (silence is approval) then create an Issue from the Discussion ([see how](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue#creating-an-issue-from-discussion))
+    - Proceed to [open a PR](#opening-a-pull-request)
 - Discussing the topic on the [#contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) Slack channel
-- Adding the topic to the Contributor's [meeting agenda](https://hackmd.io/@davidmirror/rkqCpbK1n) to make sure it allings with roadmap
+- Adding the topic to the Contributor's [meeting agenda](https://hackmd.io/@davidmirror/rkqCpbK1n) to make sure it alligns with roadmap
 - Taking the time to produce a well-written, well-thought-of document by using the template located [here](https://github.com/flyteorg/flyte/blob/RFC-Process/rfc/RFC-0000-Template.md).
 
 ## Where to store RFCs
@@ -49,7 +52,7 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
   Reviewer: At least one of [Flyte maintainers](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md).
 ## The process
 
-![](RFC-Process-diagram.png)
+![](RFC-Process-diagram-v2.png)
 ### Opening a Pull Request
 
 * Fork the [flyte repository](https://github.com/flyteorg/flyte).
