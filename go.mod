@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/flyteorg/datacatalog v1.0.43
-	github.com/flyteorg/flyteadmin v1.1.82
+	github.com/flyteorg/flyteadmin v1.1.80
 	github.com/flyteorg/flytepropeller v1.1.70
 	github.com/flyteorg/flytestdlib v1.0.16
 	github.com/golang/glog v1.0.0
@@ -68,6 +68,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/emicklei/go-restful v2.9.6+incompatible // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
