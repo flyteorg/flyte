@@ -133,14 +133,6 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		})
 	}
 
-	g.Go(func() error {
-		err := propellerEntrypoint.StartControllerManager(childCtx, mgr)
-		if err != nil {
-			logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
-		}
-		return err
-	})
-
 	if !cfg.Disabled {
 		g.Go(func() error {
 			logger.Infof(childCtx, "Starting Flyte Propeller...")

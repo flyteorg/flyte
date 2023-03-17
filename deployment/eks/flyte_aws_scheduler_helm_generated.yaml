@@ -868,7 +868,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -885,7 +885,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -899,7 +899,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -912,7 +912,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -935,7 +935,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1036,7 +1036,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.78"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.79"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -1089,7 +1089,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.4.8"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.5.2"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
