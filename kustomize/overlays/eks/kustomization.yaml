@@ -21,11 +21,11 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v1.1.78 # FLYTEADMIN_TAG override the tag
+    newTag: v1.1.82 # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v1.4.8 # FLYTECONSOLE_TAG  the tag
+    newTag: v1.5.2 # FLYTECONSOLE_TAG  the tag
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
