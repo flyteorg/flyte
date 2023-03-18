@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.service.grpc.name" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.commonLabels }}
+    {{- tpl ( .Values.service.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.grpc.labels }}
+    {{- tpl ( .Values.service.grpc.labels | toYaml ) . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.commonAnnotations }}
+    {{- tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.grpc.annotations }}
+    {{- tpl ( .Values.service.grpc.annotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+spec:
+{{- with .Values.service.grpc }}
+  type: {{ .type }}
+  {{- if or (eq .type "LoadBalancer") (eq .type "NodePort") }}
+  externalTrafficPolicy: {{ .externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .type "LoadBalancer") (not (empty .loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .type "LoadBalancer") (not (empty .loadBalancerIP)) }}
+  loadBalancerIP: {{ .loadBalancerIP }}
+  {{- end }}
+  {{- if and .clusterIP (eq .type "ClusterIP") }}
+  clusterIP: {{ .clusterIP }}
+  {{- end }}
+  ports:
+    - name: grpc
+      port: {{ include "flyte-binary.service.grpc.port" $ }}
+      targetPort: grpc
+      {{- if and (or (eq .type "NodePort") (eq .type "LoadBalancer")) (not (empty .nodePort)) }}
+      nodePort: {{ .nodePort }}
+      {{- else if eq .type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .extraPorts }}
+    {{- tpl ( .extraPorts | toYaml ) . | nindent 4 }}
+    {{- end }}
+{{- end }}
+  selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}

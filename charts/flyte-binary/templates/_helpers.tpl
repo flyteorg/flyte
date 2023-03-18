@@ -139,17 +139,31 @@ Get the Flyte cluster resource templates ConfigMap name.
 {{- end -}}
 
 {{/*
+Get the Flyte HTTP service name
+*/}}
+{{- define "flyte-binary.service.http.name" -}}
+{{- printf "%s-http" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the Flyte GRPC service name
+*/}}
+{{- define "flyte-binary.service.grpc.name" -}}
+{{- printf "%s-grpc" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
 Get the Flyte service HTTP port.
 */}}
-{{- define "flyte-binary.service.httpPort" -}}
-{{- default 8088 .Values.service.ports.http -}}
+{{- define "flyte-binary.service.http.port" -}}
+{{- default 8088 .Values.service.http.port -}}
 {{- end -}}
 
 {{/*
 Get the Flyte service GRPC port.
 */}}
-{{- define "flyte-binary.service.grpcPort" -}}
-{{- default 8089 .Values.service.ports.grpc -}}
+{{- define "flyte-binary.service.grpc.port" -}}
+{{- default 8089 .Values.service.grpc.port -}}
 {{- end -}}
 
 {{/*
