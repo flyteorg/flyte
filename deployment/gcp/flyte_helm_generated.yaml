@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flyteadmin
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: datacatalog
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -32,7 +32,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flytescheduler
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
     app.kubernetes.io/instance: flyte
@@ -44,7 +44,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flytepropeller
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -59,14 +59,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flyte-pod-webhook
-  namespace: default
+  namespace: flyte
 ---
 # Source: flyte-core/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: flyte-admin-secrets
-  namespace: default
+  namespace: flyte
 type: Opaque
 stringData:
 ---
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: flyte-secret-auth
-  namespace: default
+  namespace: flyte
 type: Opaque
 stringData:
   client_secret: foobar
@@ -95,7 +95,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: flyte-pod-webhook
-  namespace: default
+  namespace: flyte
 type: Opaque
 ---
 # Source: flyte-core/templates/admin/configmap.yaml
@@ -103,7 +103,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-admin-clusters-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -120,7 +120,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-admin-base-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -249,7 +249,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: clusterresource-template
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -292,7 +292,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-clusterresourcesync-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -354,7 +354,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-console-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
@@ -369,7 +369,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: datacatalog-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -413,7 +413,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-scheduler-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
     app.kubernetes.io/instance: flyte
@@ -447,7 +447,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-propeller-config
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -602,7 +602,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: default-flyteadmin
+  name: flyte-flyteadmin
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -632,7 +632,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: default-flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -706,8 +706,8 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: default-flyte-pod-webhook
-  namespace: default
+  name: flyte-flyte-pod-webhook
+  namespace: flyte
 rules:
   - apiGroups:
       - "*"
@@ -726,7 +726,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: default-flyteadmin-binding
+  name: flyte-flyteadmin-binding
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -735,17 +735,17 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: default-flyteadmin
+  name: flyte-flyteadmin
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
-  namespace: default
+  namespace: flyte
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: default-flytepropeller
+  name: flyte-flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
     app.kubernetes.io/instance: flyte
@@ -754,34 +754,34 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: default-flytepropeller
+  name: flyte-flytepropeller
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
-  namespace: default
+  namespace: flyte
 ---
 # Source: flyte-core/templates/propeller/webhook.yaml
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: default-flyte-pod-webhook
-  namespace: default
+  name: flyte-flyte-pod-webhook
+  namespace: flyte
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: default-flyte-pod-webhook
+  name: flyte-flyte-pod-webhook
 subjects:
   - kind: ServiceAccount
     name: flyte-pod-webhook
-    namespace: default
+    namespace: flyte
 ---
 # Source: flyte-core/templates/admin/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: flyteadmin
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -817,7 +817,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flyteconsole
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
@@ -839,7 +839,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: datacatalog
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -872,7 +872,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: datacatalog
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -897,7 +897,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flyte-pod-webhook
-  namespace: default
+  namespace: flyte
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
@@ -914,7 +914,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flyteadmin
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -929,7 +929,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fcfc9d312cc03c0634d3ee1d4fd48b901d210253f3711518e0e2e2646c0efae"
+        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1086,7 +1086,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: syncresources
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteclusterresourcesync
     app.kubernetes.io/instance: flyte
@@ -1101,7 +1101,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "caaa6a9e98955c590d1cb053fa370071930dffeda991924806dc777fa920c82"
+        configChecksum: "dc18f5d54e0770c574e6b0693724047e22063030259104eebb554398d63209f"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -1142,7 +1142,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flyteconsole
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteconsole
     app.kubernetes.io/instance: flyte
@@ -1157,7 +1157,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1a0b2241d45201a40cfcfee9244a4883bba0ec59044e87a7b2c6f6d8c39dece"
+        configChecksum: "2f930e1732c47d0849f79f9a8d06262ec97597a217bbf2337ae4f2938402ee0"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
@@ -1202,7 +1202,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: datacatalog
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -1217,7 +1217,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59330960b84a1aa6c591aacd3e814d8a4ee0a9647824a8446735dc3da3fba50"
+        configChecksum: "5decd5143258340704503cb1c89d283b3fa311a33792c0a2751edc6d21b1e94"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1293,7 +1293,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: datacatalog
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -1344,7 +1344,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flytescheduler
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: flytescheduler
     app.kubernetes.io/instance: flyte
@@ -1359,7 +1359,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fcfc9d312cc03c0634d3ee1d4fd48b901d210253f3711518e0e2e2646c0efae"
+        configChecksum: "03a38330f086ba10896963aad5434645a54487ca0818f810df0549bf0436be9"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1431,7 +1431,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: flyte
   name: flytepropeller
   labels: 
     app.kubernetes.io/name: flytepropeller
@@ -1447,7 +1447,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "10b72982fb518ae6aa61780501edc0e77ee07683825cbb96cd58dd3652b2fad"
+        configChecksum: "4ddfe850392582f347ed6e8ddc09ab320513233c3c15765b0ab3d6e952da41b"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1514,7 +1514,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flyte-pod-webhook
-  namespace: default
+  namespace: flyte
   labels:
     app: flyte-pod-webhook
 spec:
@@ -1528,7 +1528,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.69
       annotations:
-        configChecksum: "10b72982fb518ae6aa61780501edc0e77ee07683825cbb96cd58dd3652b2fad"
+        configChecksum: "4ddfe850392582f347ed6e8ddc09ab320513233c3c15765b0ab3d6e952da41b"
     spec:
       securityContext:
         fsGroup: 65534
@@ -1597,7 +1597,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flyte-core
-  namespace: default
+  namespace: flyte
   annotations: 
     cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx
@@ -1756,7 +1756,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: flyte-core-grpc
-  namespace: default
+  namespace: flyte
   annotations:
     cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx

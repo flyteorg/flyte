@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flyte-flyte-binary
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-flyte-binary-cluster-resource-templates
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -38,7 +38,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flyte-flyte-binary-config
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -122,7 +122,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: flyte-flyte-binary-cluster-role
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -210,7 +210,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: flyte-flyte-binary-cluster-role-binding
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -225,14 +225,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flyte-flyte-binary
-    namespace: "default"
+    namespace: "flyte"
 ---
 # Source: flyte-binary/templates/service/main.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: flyte-flyte-binary
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -263,7 +263,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flyte-flyte-binary-webhook
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -286,7 +286,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flyte-flyte-binary
-  namespace: "default"
+  namespace: "flyte"
   labels:
     helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
@@ -308,8 +308,8 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: 3cd75274e1e161fa5b221a0bb529252024d15368f21442a3203f18fd82026560
-        checksum/cluster-resource-templates: 6811293191a824aab22e005311ef11ee43e53835890ee3eba755c4a288881490
+        checksum/configuration: 8c3e5f8c02110f446935d678eae595edc67521a539750cddc65589bf67cbf05b
+        checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
       initContainers:

@@ -321,7 +321,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flyte-kubernetes-dashboard
-    namespace: default
+    namespace: flyte
 ---
 # Source: flyte-deps/charts/kubernetes-dashboard/templates/clusterrolebinding-readonly.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -355,7 +355,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flyte-kubernetes-dashboard
-    namespace: default
+    namespace: flyte
 ---
 # Source: flyte-deps/charts/kubernetes-dashboard/templates/role.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -435,7 +435,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flyte-kubernetes-dashboard
-    namespace: default
+    namespace: flyte
 ---
 # Source: flyte-deps/charts/kubernetes-dashboard/templates/service.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -481,7 +481,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: minio
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
@@ -509,7 +509,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
@@ -532,7 +532,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redoc
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: redoc
     app.kubernetes.io/instance: flyte
@@ -554,7 +554,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flyte-pod-webhook
-  namespace: default
+  namespace: flyte
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
@@ -617,7 +617,7 @@ spec:
         image: "kubernetesui/dashboard:v2.2.0"
         imagePullPolicy: IfNotPresent
         args:
-          - --namespace=default
+          - --namespace=flyte
           - --metrics-provider=none
           - --enable-skip-login
           - --enable-insecure-login
@@ -663,7 +663,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: minio
     app.kubernetes.io/instance: flyte
@@ -718,7 +718,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: default
+  namespace: flyte
   labels: 
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
