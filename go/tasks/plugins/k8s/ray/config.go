@@ -2,6 +2,7 @@ package ray
 
 import (
 	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+	pluginmachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -40,6 +41,9 @@ type Config struct {
 
 	// NodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	NodeIPAddress string `json:"nodeIPAddress,omitempty"`
+
+	// Remote Ray Cluster Config
+	RemoteClusterConfig pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
 }
 
 func GetConfig() *Config {

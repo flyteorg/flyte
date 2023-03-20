@@ -371,5 +371,19 @@ func init() {
 			ResourceToWatch:     &rayv1alpha1.RayJob{},
 			Plugin:              rayJobResourceHandler{},
 			IsDefault:           false,
+			CustomKubeClient: func(ctx context.Context) (pluginsCore.KubeClient, error) {
+				remoteConfig := GetConfig().RemoteClusterConfig
+				if !remoteConfig.Enabled {
+					// use controller-runtime KubeClient
+					return nil, nil
+				}
+
+				kubeConfig, err := k8s.KubeClientConfig(remoteConfig.Endpoint, remoteConfig.Auth)
+				if err != nil {
+					return nil, err
+				}
+
+				return k8s.NewDefaultKubeClient(kubeConfig)
+			},
 		})
 }
