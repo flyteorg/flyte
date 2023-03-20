@@ -1,7 +1,7 @@
 package models
 
 import (
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +29,11 @@ type PartitionKey struct {
 // BeforeCreate so that we set the UUID in golang rather than from a DB function call
 func (dataset *Dataset) BeforeCreate(tx *gorm.DB) error {
 	if dataset.UUID == "" {
-		generated := uuid.NewV4()
+		generated, err := uuid.NewV4()
+		if err != nil {
+			return err
+		}
+
 		tx.Model(dataset).Update("UUID", generated)
 	}
 	return nil
