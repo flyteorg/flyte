@@ -101,6 +101,7 @@ from flyteadmin.models.admin_project_register_response import AdminProjectRegist
 from flyteadmin.models.admin_project_update_response import AdminProjectUpdateResponse
 from flyteadmin.models.admin_projects import AdminProjects
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig
+from flyteadmin.models.admin_reason import AdminReason
 from flyteadmin.models.admin_schedule import AdminSchedule
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort

@@ -15044,6 +15044,23 @@ definitions:
       \ for more background information."
     example:
       output_location_prefix: "output_location_prefix"
+  adminReason:
+    type: "object"
+    properties:
+      occurred_at:
+        type: "string"
+        format: "date-time"
+        description: "occurred_at is the timestamp indicating the instant that this\
+          \ reason happened."
+      message:
+        type: "string"
+        description: "message is the explanation for the most recent phase transition\
+          \ or status update."
+    description: "Reason is a single message annotated with a timestamp to indicate\
+      \ the instant the reason occurred."
+    example:
+      occurred_at: "2000-01-23T04:56:07.000+00:00"
+      message: "message"
   adminSchedule:
     type: "object"
     properties:
@@ -15752,6 +15769,13 @@ definitions:
           \ data is maintained using this\nproto message. For example, event_verison\
           \ > 0 means that maps tasks logs use the\nTaskExecutionMetadata ExternalResourceInfo\
           \ fields for each subtask rather than the TaskLog\nin this message."
+      reasons:
+        type: "array"
+        description: "A time-series of the phase transition or update explanations.\
+          \ This, when compared to storing a singular reason\nas previously done,\
+          \ is much more valuable in visualizing and understanding historical evaluations."
+        items:
+          $ref: "#/definitions/adminReason"
     description: "Container for task execution details and results."
     example:
       phase: {}
@@ -15792,6 +15816,11 @@ definitions:
           namespace: "namespace"
         generated_name: "generated_name"
         plugin_identifier: "plugin_identifier"
+      reasons:
+      - occurred_at: "2000-01-23T04:56:07.000+00:00"
+        message: "message"
+      - occurred_at: "2000-01-23T04:56:07.000+00:00"
+        message: "message"
       created_at: "2000-01-23T04:56:07.000+00:00"
       error:
         code: "code"
@@ -15941,6 +15970,11 @@ definitions:
               namespace: "namespace"
             generated_name: "generated_name"
             plugin_identifier: "plugin_identifier"
+          reasons:
+          - occurred_at: "2000-01-23T04:56:07.000+00:00"
+            message: "message"
+          - occurred_at: "2000-01-23T04:56:07.000+00:00"
+            message: "message"
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
@@ -16030,6 +16064,11 @@ definitions:
               namespace: "namespace"
             generated_name: "generated_name"
             plugin_identifier: "plugin_identifier"
+          reasons:
+          - occurred_at: "2000-01-23T04:56:07.000+00:00"
+            message: "message"
+          - occurred_at: "2000-01-23T04:56:07.000+00:00"
+            message: "message"
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
@@ -65625,6 +65664,11 @@ definitions:
             namespace: "namespace"
           generated_name: "generated_name"
           plugin_identifier: "plugin_identifier"
+        reasons:
+        - occurred_at: "2000-01-23T04:56:07.000+00:00"
+          message: "message"
+        - occurred_at: "2000-01-23T04:56:07.000+00:00"
+          message: "message"
         created_at: "2000-01-23T04:56:07.000+00:00"
         error:
           code: "code"
