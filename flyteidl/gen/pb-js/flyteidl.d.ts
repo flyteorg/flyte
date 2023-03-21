@@ -6375,6 +6375,97 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a Span. */
+        interface ISpan {
+
+            /** Span startTime */
+            startTime?: (google.protobuf.ITimestamp|null);
+
+            /** Span endTime */
+            endTime?: (google.protobuf.ITimestamp|null);
+
+            /** Span workflowId */
+            workflowId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** Span nodeId */
+            nodeId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** Span taskId */
+            taskId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** Span operationId */
+            operationId?: (string|null);
+
+            /** Span spans */
+            spans?: (flyteidl.core.ISpan[]|null);
+        }
+
+        /** Represents a Span. */
+        class Span implements ISpan {
+
+            /**
+             * Constructs a new Span.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISpan);
+
+            /** Span startTime. */
+            public startTime?: (google.protobuf.ITimestamp|null);
+
+            /** Span endTime. */
+            public endTime?: (google.protobuf.ITimestamp|null);
+
+            /** Span workflowId. */
+            public workflowId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** Span nodeId. */
+            public nodeId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** Span taskId. */
+            public taskId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** Span operationId. */
+            public operationId: string;
+
+            /** Span spans. */
+            public spans: flyteidl.core.ISpan[];
+
+            /** Span id. */
+            public id?: ("workflowId"|"nodeId"|"taskId"|"operationId");
+
+            /**
+             * Creates a new Span instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Span instance
+             */
+            public static create(properties?: flyteidl.core.ISpan): flyteidl.core.Span;
+
+            /**
+             * Encodes the specified Span message. Does not implicitly {@link flyteidl.core.Span.verify|verify} messages.
+             * @param message Span message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISpan, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Span message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Span
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Span;
+
+            /**
+             * Verifies a Span message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a WorkflowClosure. */
         interface IWorkflowClosure {
 
@@ -6590,6 +6681,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent deckUri */
             deckUri?: (string|null);
+
+            /** NodeExecutionEvent reportedAt */
+            reportedAt?: (google.protobuf.ITimestamp|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -6660,6 +6754,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent deckUri. */
             public deckUri: string;
+
+            /** NodeExecutionEvent reportedAt. */
+            public reportedAt?: (google.protobuf.ITimestamp|null);
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -7055,6 +7152,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent eventVersion */
             eventVersion?: (number|null);
+
+            /** TaskExecutionEvent reportedAt */
+            reportedAt?: (google.protobuf.ITimestamp|null);
         }
 
         /** Represents a TaskExecutionEvent. */
@@ -7119,6 +7219,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent eventVersion. */
             public eventVersion: number;
+
+            /** TaskExecutionEvent reportedAt. */
+            public reportedAt?: (google.protobuf.ITimestamp|null);
 
             /** TaskExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -11029,6 +11132,116 @@ export namespace flyteidl {
 
             /**
              * Verifies an ExecutionUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowExecutionGetMetricsRequest. */
+        interface IWorkflowExecutionGetMetricsRequest {
+
+            /** WorkflowExecutionGetMetricsRequest id */
+            id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowExecutionGetMetricsRequest depth */
+            depth?: (number|null);
+        }
+
+        /** Represents a WorkflowExecutionGetMetricsRequest. */
+        class WorkflowExecutionGetMetricsRequest implements IWorkflowExecutionGetMetricsRequest {
+
+            /**
+             * Constructs a new WorkflowExecutionGetMetricsRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowExecutionGetMetricsRequest);
+
+            /** WorkflowExecutionGetMetricsRequest id. */
+            public id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowExecutionGetMetricsRequest depth. */
+            public depth: number;
+
+            /**
+             * Creates a new WorkflowExecutionGetMetricsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowExecutionGetMetricsRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowExecutionGetMetricsRequest): flyteidl.admin.WorkflowExecutionGetMetricsRequest;
+
+            /**
+             * Encodes the specified WorkflowExecutionGetMetricsRequest message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionGetMetricsRequest.verify|verify} messages.
+             * @param message WorkflowExecutionGetMetricsRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowExecutionGetMetricsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowExecutionGetMetricsRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowExecutionGetMetricsRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowExecutionGetMetricsRequest;
+
+            /**
+             * Verifies a WorkflowExecutionGetMetricsRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowExecutionGetMetricsResponse. */
+        interface IWorkflowExecutionGetMetricsResponse {
+
+            /** WorkflowExecutionGetMetricsResponse span */
+            span?: (flyteidl.core.ISpan|null);
+        }
+
+        /** Represents a WorkflowExecutionGetMetricsResponse. */
+        class WorkflowExecutionGetMetricsResponse implements IWorkflowExecutionGetMetricsResponse {
+
+            /**
+             * Constructs a new WorkflowExecutionGetMetricsResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowExecutionGetMetricsResponse);
+
+            /** WorkflowExecutionGetMetricsResponse span. */
+            public span?: (flyteidl.core.ISpan|null);
+
+            /**
+             * Creates a new WorkflowExecutionGetMetricsResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowExecutionGetMetricsResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowExecutionGetMetricsResponse): flyteidl.admin.WorkflowExecutionGetMetricsResponse;
+
+            /**
+             * Encodes the specified WorkflowExecutionGetMetricsResponse message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionGetMetricsResponse.verify|verify} messages.
+             * @param message WorkflowExecutionGetMetricsResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowExecutionGetMetricsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowExecutionGetMetricsResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowExecutionGetMetricsResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowExecutionGetMetricsResponse;
+
+            /**
+             * Verifies a WorkflowExecutionGetMetricsResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -18014,6 +18227,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public listDescriptionEntities(request: flyteidl.admin.IDescriptionEntityListRequest): Promise<flyteidl.admin.DescriptionEntityList>;
+
+            /**
+             * Calls GetExecutionMetrics.
+             * @param request WorkflowExecutionGetMetricsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowExecutionGetMetricsResponse
+             */
+            public getExecutionMetrics(request: flyteidl.admin.IWorkflowExecutionGetMetricsRequest, callback: flyteidl.service.AdminService.GetExecutionMetricsCallback): void;
+
+            /**
+             * Calls GetExecutionMetrics.
+             * @param request WorkflowExecutionGetMetricsRequest message or plain object
+             * @returns Promise
+             */
+            public getExecutionMetrics(request: flyteidl.admin.IWorkflowExecutionGetMetricsRequest): Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>;
         }
 
         namespace AdminService {
@@ -18381,6 +18608,13 @@ export namespace flyteidl {
              * @param [response] DescriptionEntityList
              */
             type ListDescriptionEntitiesCallback = (error: (Error|null), response?: flyteidl.admin.DescriptionEntityList) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getExecutionMetrics}.
+             * @param error Error, if any
+             * @param [response] WorkflowExecutionGetMetricsResponse
+             */
+            type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */

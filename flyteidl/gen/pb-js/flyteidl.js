@@ -15279,6 +15279,270 @@
                 return ErrorDocument;
             })();
     
+            core.Span = (function() {
+    
+                /**
+                 * Properties of a Span.
+                 * @memberof flyteidl.core
+                 * @interface ISpan
+                 * @property {google.protobuf.ITimestamp|null} [startTime] Span startTime
+                 * @property {google.protobuf.ITimestamp|null} [endTime] Span endTime
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowId] Span workflowId
+                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [nodeId] Span nodeId
+                 * @property {flyteidl.core.ITaskExecutionIdentifier|null} [taskId] Span taskId
+                 * @property {string|null} [operationId] Span operationId
+                 * @property {Array.<flyteidl.core.ISpan>|null} [spans] Span spans
+                 */
+    
+                /**
+                 * Constructs a new Span.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Span.
+                 * @implements ISpan
+                 * @constructor
+                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
+                 */
+                function Span(properties) {
+                    this.spans = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Span startTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} startTime
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.startTime = null;
+    
+                /**
+                 * Span endTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} endTime
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.endTime = null;
+    
+                /**
+                 * Span workflowId.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.workflowId = null;
+    
+                /**
+                 * Span nodeId.
+                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} nodeId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.nodeId = null;
+    
+                /**
+                 * Span taskId.
+                 * @member {flyteidl.core.ITaskExecutionIdentifier|null|undefined} taskId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.taskId = null;
+    
+                /**
+                 * Span operationId.
+                 * @member {string} operationId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.operationId = "";
+    
+                /**
+                 * Span spans.
+                 * @member {Array.<flyteidl.core.ISpan>} spans
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.spans = $util.emptyArray;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * Span id.
+                 * @member {"workflowId"|"nodeId"|"taskId"|"operationId"|undefined} id
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Object.defineProperty(Span.prototype, "id", {
+                    get: $util.oneOfGetter($oneOfFields = ["workflowId", "nodeId", "taskId", "operationId"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new Span instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
+                 * @returns {flyteidl.core.Span} Span instance
+                 */
+                Span.create = function create(properties) {
+                    return new Span(properties);
+                };
+    
+                /**
+                 * Encodes the specified Span message. Does not implicitly {@link flyteidl.core.Span.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {flyteidl.core.ISpan} message Span message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Span.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.startTime != null && message.hasOwnProperty("startTime"))
+                        $root.google.protobuf.Timestamp.encode(message.startTime, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.endTime != null && message.hasOwnProperty("endTime"))
+                        $root.google.protobuf.Timestamp.encode(message.endTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowId, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.nodeId != null && message.hasOwnProperty("nodeId"))
+                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.nodeId, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.taskId != null && message.hasOwnProperty("taskId"))
+                        $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskId, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.operationId != null && message.hasOwnProperty("operationId"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.operationId);
+                    if (message.spans != null && message.spans.length)
+                        for (var i = 0; i < message.spans.length; ++i)
+                            $root.flyteidl.core.Span.encode(message.spans[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Span message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Span} Span
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Span.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Span();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.startTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.endTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.workflowId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.nodeId = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.taskId = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.operationId = reader.string();
+                            break;
+                        case 7:
+                            if (!(message.spans && message.spans.length))
+                                message.spans = [];
+                            message.spans.push($root.flyteidl.core.Span.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Span message.
+                 * @function verify
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Span.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.startTime != null && message.hasOwnProperty("startTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.startTime);
+                        if (error)
+                            return "startTime." + error;
+                    }
+                    if (message.endTime != null && message.hasOwnProperty("endTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.endTime);
+                        if (error)
+                            return "endTime." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowId);
+                            if (error)
+                                return "workflowId." + error;
+                        }
+                    }
+                    if (message.nodeId != null && message.hasOwnProperty("nodeId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.nodeId);
+                            if (error)
+                                return "nodeId." + error;
+                        }
+                    }
+                    if (message.taskId != null && message.hasOwnProperty("taskId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.TaskExecutionIdentifier.verify(message.taskId);
+                            if (error)
+                                return "taskId." + error;
+                        }
+                    }
+                    if (message.operationId != null && message.hasOwnProperty("operationId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        if (!$util.isString(message.operationId))
+                            return "operationId: string expected";
+                    }
+                    if (message.spans != null && message.hasOwnProperty("spans")) {
+                        if (!Array.isArray(message.spans))
+                            return "spans: array expected";
+                        for (var i = 0; i < message.spans.length; ++i) {
+                            var error = $root.flyteidl.core.Span.verify(message.spans[i]);
+                            if (error)
+                                return "spans." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return Span;
+            })();
+    
             core.WorkflowClosure = (function() {
     
                 /**
@@ -15716,6 +15980,7 @@
                  * @property {boolean|null} [isParent] NodeExecutionEvent isParent
                  * @property {boolean|null} [isDynamic] NodeExecutionEvent isDynamic
                  * @property {string|null} [deckUri] NodeExecutionEvent deckUri
+                 * @property {google.protobuf.ITimestamp|null} [reportedAt] NodeExecutionEvent reportedAt
                  */
     
                 /**
@@ -15893,6 +16158,14 @@
                  */
                 NodeExecutionEvent.prototype.deckUri = "";
     
+                /**
+                 * NodeExecutionEvent reportedAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} reportedAt
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.reportedAt = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -15993,6 +16266,8 @@
                         writer.uint32(/* id 19, wireType 2 =*/154).string(message.deckUri);
                     if (message.inputData != null && message.hasOwnProperty("inputData"))
                         $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
+                    if (message.reportedAt != null && message.hasOwnProperty("reportedAt"))
+                        $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                     return writer;
                 };
     
@@ -16073,6 +16348,9 @@
                             break;
                         case 19:
                             message.deckUri = reader.string();
+                            break;
+                        case 21:
+                            message.reportedAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -16213,6 +16491,11 @@
                     if (message.deckUri != null && message.hasOwnProperty("deckUri"))
                         if (!$util.isString(message.deckUri))
                             return "deckUri: string expected";
+                    if (message.reportedAt != null && message.hasOwnProperty("reportedAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.reportedAt);
+                        if (error)
+                            return "reportedAt." + error;
+                    }
                     return null;
                 };
     
@@ -16925,6 +17208,7 @@
                  * @property {string|null} [taskType] TaskExecutionEvent taskType
                  * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
                  * @property {number|null} [eventVersion] TaskExecutionEvent eventVersion
+                 * @property {google.protobuf.ITimestamp|null} [reportedAt] TaskExecutionEvent reportedAt
                  */
     
                 /**
@@ -17087,6 +17371,14 @@
                  */
                 TaskExecutionEvent.prototype.eventVersion = 0;
     
+                /**
+                 * TaskExecutionEvent reportedAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} reportedAt
+                 * @memberof flyteidl.event.TaskExecutionEvent
+                 * @instance
+                 */
+                TaskExecutionEvent.prototype.reportedAt = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -17173,6 +17465,8 @@
                         writer.uint32(/* id 18, wireType 0 =*/144).int32(message.eventVersion);
                     if (message.inputData != null && message.hasOwnProperty("inputData"))
                         $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
+                    if (message.reportedAt != null && message.hasOwnProperty("reportedAt"))
+                        $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
                     return writer;
                 };
     
@@ -17249,6 +17543,9 @@
                             break;
                         case 18:
                             message.eventVersion = reader.int32();
+                            break;
+                        case 20:
+                            message.reportedAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17376,6 +17673,11 @@
                     if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
                         if (!$util.isInteger(message.eventVersion))
                             return "eventVersion: integer expected";
+                    if (message.reportedAt != null && message.hasOwnProperty("reportedAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.reportedAt);
+                        if (error)
+                            return "reportedAt." + error;
+                    }
                     return null;
                 };
     
@@ -26567,6 +26869,247 @@
                 };
     
                 return ExecutionUpdateResponse;
+            })();
+    
+            admin.WorkflowExecutionGetMetricsRequest = (function() {
+    
+                /**
+                 * Properties of a WorkflowExecutionGetMetricsRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowExecutionGetMetricsRequest
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] WorkflowExecutionGetMetricsRequest id
+                 * @property {number|null} [depth] WorkflowExecutionGetMetricsRequest depth
+                 */
+    
+                /**
+                 * Constructs a new WorkflowExecutionGetMetricsRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowExecutionGetMetricsRequest.
+                 * @implements IWorkflowExecutionGetMetricsRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest=} [properties] Properties to set
+                 */
+                function WorkflowExecutionGetMetricsRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowExecutionGetMetricsRequest id.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @instance
+                 */
+                WorkflowExecutionGetMetricsRequest.prototype.id = null;
+    
+                /**
+                 * WorkflowExecutionGetMetricsRequest depth.
+                 * @member {number} depth
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @instance
+                 */
+                WorkflowExecutionGetMetricsRequest.prototype.depth = 0;
+    
+                /**
+                 * Creates a new WorkflowExecutionGetMetricsRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowExecutionGetMetricsRequest} WorkflowExecutionGetMetricsRequest instance
+                 */
+                WorkflowExecutionGetMetricsRequest.create = function create(properties) {
+                    return new WorkflowExecutionGetMetricsRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowExecutionGetMetricsRequest message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionGetMetricsRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest} message WorkflowExecutionGetMetricsRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowExecutionGetMetricsRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.depth != null && message.hasOwnProperty("depth"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.depth);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowExecutionGetMetricsRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowExecutionGetMetricsRequest} WorkflowExecutionGetMetricsRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowExecutionGetMetricsRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionGetMetricsRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.depth = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowExecutionGetMetricsRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowExecutionGetMetricsRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.depth != null && message.hasOwnProperty("depth"))
+                        if (!$util.isInteger(message.depth))
+                            return "depth: integer expected";
+                    return null;
+                };
+    
+                return WorkflowExecutionGetMetricsRequest;
+            })();
+    
+            admin.WorkflowExecutionGetMetricsResponse = (function() {
+    
+                /**
+                 * Properties of a WorkflowExecutionGetMetricsResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowExecutionGetMetricsResponse
+                 * @property {flyteidl.core.ISpan|null} [span] WorkflowExecutionGetMetricsResponse span
+                 */
+    
+                /**
+                 * Constructs a new WorkflowExecutionGetMetricsResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowExecutionGetMetricsResponse.
+                 * @implements IWorkflowExecutionGetMetricsResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsResponse=} [properties] Properties to set
+                 */
+                function WorkflowExecutionGetMetricsResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowExecutionGetMetricsResponse span.
+                 * @member {flyteidl.core.ISpan|null|undefined} span
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsResponse
+                 * @instance
+                 */
+                WorkflowExecutionGetMetricsResponse.prototype.span = null;
+    
+                /**
+                 * Creates a new WorkflowExecutionGetMetricsResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowExecutionGetMetricsResponse} WorkflowExecutionGetMetricsResponse instance
+                 */
+                WorkflowExecutionGetMetricsResponse.create = function create(properties) {
+                    return new WorkflowExecutionGetMetricsResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowExecutionGetMetricsResponse message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionGetMetricsResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsResponse} message WorkflowExecutionGetMetricsResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowExecutionGetMetricsResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.span != null && message.hasOwnProperty("span"))
+                        $root.flyteidl.core.Span.encode(message.span, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowExecutionGetMetricsResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowExecutionGetMetricsResponse} WorkflowExecutionGetMetricsResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowExecutionGetMetricsResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionGetMetricsResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.span = $root.flyteidl.core.Span.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowExecutionGetMetricsResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowExecutionGetMetricsResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowExecutionGetMetricsResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.span != null && message.hasOwnProperty("span")) {
+                        var error = $root.flyteidl.core.Span.verify(message.span);
+                        if (error)
+                            return "span." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowExecutionGetMetricsResponse;
             })();
     
             admin.LaunchPlanCreateRequest = (function() {
@@ -42900,6 +43443,39 @@
                  * @instance
                  * @param {flyteidl.admin.IDescriptionEntityListRequest} request DescriptionEntityListRequest message or plain object
                  * @returns {Promise<flyteidl.admin.DescriptionEntityList>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getExecutionMetrics}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetExecutionMetricsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.WorkflowExecutionGetMetricsResponse} [response] WorkflowExecutionGetMetricsResponse
+                 */
+    
+                /**
+                 * Calls GetExecutionMetrics.
+                 * @function getExecutionMetrics
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest} request WorkflowExecutionGetMetricsRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetExecutionMetricsCallback} callback Node-style callback called with the error, if any, and WorkflowExecutionGetMetricsResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getExecutionMetrics = function getExecutionMetrics(request, callback) {
+                    return this.rpcCall(getExecutionMetrics, $root.flyteidl.admin.WorkflowExecutionGetMetricsRequest, $root.flyteidl.admin.WorkflowExecutionGetMetricsResponse, request, callback);
+                }, "name", { value: "GetExecutionMetrics" });
+    
+                /**
+                 * Calls GetExecutionMetrics.
+                 * @function getExecutionMetrics
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest} request WorkflowExecutionGetMetricsRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>} Promise
                  * @variation 2
                  */
     

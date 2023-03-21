@@ -1299,6 +1299,46 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminListMatchableAttributesResponse"
+  /api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}:
+    get:
+      tags:
+      - "AdminService"
+      summary: "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`."
+      operationId: "GetExecutionMetrics"
+      parameters:
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User or system provided value for the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - name: "depth"
+        in: "query"
+        description: "depth defines the number of Flyte entity levels to traverse\
+          \ when breaking down execution details."
+        required: false
+        type: "integer"
+        format: "int32"
+        x-exportParamName: "Depth"
+        x-optionalDataType: "Int32"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminWorkflowExecutionGetMetricsResponse"
   /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}:
     get:
       tags:
@@ -30322,6 +30362,48 @@ definitions:
         url: "url"
       full_outputs:
         literals: {}
+  adminWorkflowExecutionGetMetricsResponse:
+    type: "object"
+    properties:
+      span:
+        description: "Span defines the top-level breakdown of the workflows execution.\
+          \ More precise information is nested in a\nhierarchical structure using\
+          \ Flyte entity references."
+        $ref: "#/definitions/coreSpan"
+    description: "WorkflowExecutionGetMetricsResponse represents the response containing\
+      \ metrics for the specified workflow execution."
+    example:
+      span:
+        start_time: "2000-01-23T04:56:07.000+00:00"
+        spans:
+        - null
+        - null
+        workflow_id:
+          domain: "domain"
+          name: "name"
+          project: "project"
+        end_time: "2000-01-23T04:56:07.000+00:00"
+        task_id:
+          task_id:
+            domain: "domain"
+            resource_type: {}
+            name: "name"
+            project: "project"
+            version: "version"
+          node_execution_id:
+            execution_id:
+              domain: "domain"
+              name: "name"
+              project: "project"
+            node_id: "node_id"
+          retry_attempt: 0
+        operation_id: "operation_id"
+        node_id:
+          execution_id:
+            domain: "domain"
+            name: "name"
+            project: "project"
+          node_id: "node_id"
   adminWorkflowList:
     type: "object"
     properties:
@@ -55463,6 +55545,70 @@ definitions:
       \ duration."
     example:
       duration: "duration"
+  coreSpan:
+    type: "object"
+    properties:
+      start_time:
+        type: "string"
+        format: "date-time"
+        description: "start_time defines the instance this span began."
+      end_time:
+        type: "string"
+        format: "date-time"
+        description: "end_time defines the instance this span completed."
+      workflow_id:
+        description: "workflow_id is the id of the workflow execution this Span represents."
+        $ref: "#/definitions/coreWorkflowExecutionIdentifier"
+      node_id:
+        description: "node_id is the id of the node execution this Span represents."
+        $ref: "#/definitions/coreNodeExecutionIdentifier"
+      task_id:
+        description: "task_id is the id of the task execution this Span represents."
+        $ref: "#/definitions/coreTaskExecutionIdentifier"
+      operation_id:
+        type: "string"
+        description: "operation_id is the id of a unique operation that this Span\
+          \ represents."
+      spans:
+        type: "array"
+        description: "spans defines a collection of Spans that breakdown this execution."
+        items:
+          $ref: "#/definitions/coreSpan"
+    description: "Span represents a duration trace of Flyte execution. The id field\
+      \ denotes a Flyte execution entity or an operation\nwhich uniquely identifies\
+      \ the Span. The spans attribute allows this Span to be further broken down into\
+      \ more\nprecise definitions."
+    example:
+      start_time: "2000-01-23T04:56:07.000+00:00"
+      spans:
+      - null
+      - null
+      workflow_id:
+        domain: "domain"
+        name: "name"
+        project: "project"
+      end_time: "2000-01-23T04:56:07.000+00:00"
+      task_id:
+        task_id:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        node_execution_id:
+          execution_id:
+            domain: "domain"
+            name: "name"
+            project: "project"
+          node_id: "node_id"
+        retry_attempt: 0
+      operation_id: "operation_id"
+      node_id:
+        execution_id:
+          domain: "domain"
+          name: "name"
+          project: "project"
+        node_id: "node_id"
   coreSql:
     type: "object"
     properties:
@@ -58718,6 +58864,15 @@ definitions:
         title: "String location uniquely identifying where the deck HTML file is\n\
           NativeUrl specifies the url in the format of the configured storage provider\
           \ (e.g. s3://my-bucket/randomstring/suffix.tar)"
+      reported_at:
+        type: "string"
+        format: "date-time"
+        description: "This timestamp represents the instant when the event was reported\
+          \ by the executing framework. For example,\nwhen first processing a node\
+          \ the `occurred_at` timestamp should be the instant propeller makes progress,\
+          \ so when\nliteral inputs are initially copied. The event however will not\
+          \ be sent until after the copy completes.\nExtracting both of these timestamps\
+          \ facilitates a more accurate portrayal of the evaluation time-series."
   eventParentNodeExecutionMetadata:
     type: "object"
     properties:
@@ -58827,6 +58982,15 @@ definitions:
           \ > 0 means that maps tasks report logs using the\nTaskExecutionMetadata\
           \ ExternalResourceInfo fields for each subtask rather than the TaskLog\n\
           in this message."
+      reported_at:
+        type: "string"
+        format: "date-time"
+        description: "This timestamp represents the instant when the event was reported\
+          \ by the executing framework. For example, a k8s\npod task may be marked\
+          \ completed at (ie. `occurred_at`) the instant the container running user\
+          \ code completes,\nbut this event will not be reported until the pod is\
+          \ marked as completed. Extracting both of these timestamps\nfacilitates\
+          \ a more accurate portrayal of the evaluation time-series."
     description: "Plugin specific execution event information. For tasks like Python,\
       \ Hive, Spark, DynamicJob."
   eventTaskExecutionMetadata:

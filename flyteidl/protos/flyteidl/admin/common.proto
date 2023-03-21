@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
 
 // Encapsulation of fields that identifies a Flyte resource.
 // A Flyte resource can be a task, workflow or launch plan.

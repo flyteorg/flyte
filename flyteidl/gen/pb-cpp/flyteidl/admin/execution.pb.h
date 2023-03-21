@@ -37,6 +37,7 @@
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/metrics.pb.h"
 #include "flyteidl/core/security.pb.h"
 #include <google/protobuf/duration.pb.h>
 #include <google/protobuf/timestamp.pb.h>
@@ -51,7 +52,7 @@ struct TableStruct_flyteidl_2fadmin_2fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[21]
+  static const ::google::protobuf::internal::ParseTable schema[23]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -120,6 +121,12 @@ extern WorkflowExecutionGetDataRequestDefaultTypeInternal _WorkflowExecutionGetD
 class WorkflowExecutionGetDataResponse;
 class WorkflowExecutionGetDataResponseDefaultTypeInternal;
 extern WorkflowExecutionGetDataResponseDefaultTypeInternal _WorkflowExecutionGetDataResponse_default_instance_;
+class WorkflowExecutionGetMetricsRequest;
+class WorkflowExecutionGetMetricsRequestDefaultTypeInternal;
+extern WorkflowExecutionGetMetricsRequestDefaultTypeInternal _WorkflowExecutionGetMetricsRequest_default_instance_;
+class WorkflowExecutionGetMetricsResponse;
+class WorkflowExecutionGetMetricsResponseDefaultTypeInternal;
+extern WorkflowExecutionGetMetricsResponseDefaultTypeInternal _WorkflowExecutionGetMetricsResponse_default_instance_;
 class WorkflowExecutionGetRequest;
 class WorkflowExecutionGetRequestDefaultTypeInternal;
 extern WorkflowExecutionGetRequestDefaultTypeInternal _WorkflowExecutionGetRequest_default_instance_;
@@ -147,6 +154,8 @@ template<> ::flyteidl::admin::NotificationList* Arena::CreateMaybeMessage<::flyt
 template<> ::flyteidl::admin::SystemMetadata* Arena::CreateMaybeMessage<::flyteidl::admin::SystemMetadata>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetDataRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetDataRequest>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetDataResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetDataResponse>(Arena*);
+template<> ::flyteidl::admin::WorkflowExecutionGetMetricsRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetMetricsRequest>(Arena*);
+template<> ::flyteidl::admin::WorkflowExecutionGetMetricsResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetMetricsResponse>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetRequest>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -3276,6 +3285,243 @@ class ExecutionUpdateResponse final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WorkflowExecutionGetMetricsRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowExecutionGetMetricsRequest) */ {
+ public:
+  WorkflowExecutionGetMetricsRequest();
+  virtual ~WorkflowExecutionGetMetricsRequest();
+
+  WorkflowExecutionGetMetricsRequest(const WorkflowExecutionGetMetricsRequest& from);
+
+  inline WorkflowExecutionGetMetricsRequest& operator=(const WorkflowExecutionGetMetricsRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WorkflowExecutionGetMetricsRequest(WorkflowExecutionGetMetricsRequest&& from) noexcept
+    : WorkflowExecutionGetMetricsRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowExecutionGetMetricsRequest& operator=(WorkflowExecutionGetMetricsRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WorkflowExecutionGetMetricsRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WorkflowExecutionGetMetricsRequest* internal_default_instance() {
+    return reinterpret_cast<const WorkflowExecutionGetMetricsRequest*>(
+               &_WorkflowExecutionGetMetricsRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    21;
+
+  void Swap(WorkflowExecutionGetMetricsRequest* other);
+  friend void swap(WorkflowExecutionGetMetricsRequest& a, WorkflowExecutionGetMetricsRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowExecutionGetMetricsRequest* New() const final {
+    return CreateMaybeMessage<WorkflowExecutionGetMetricsRequest>(nullptr);
+  }
+
+  WorkflowExecutionGetMetricsRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowExecutionGetMetricsRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WorkflowExecutionGetMetricsRequest& from);
+  void MergeFrom(const WorkflowExecutionGetMetricsRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowExecutionGetMetricsRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.WorkflowExecutionIdentifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& id() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_id();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::core::WorkflowExecutionIdentifier* id);
+
+  // int32 depth = 2;
+  void clear_depth();
+  static const int kDepthFieldNumber = 2;
+  ::google::protobuf::int32 depth() const;
+  void set_depth(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* id_;
+  ::google::protobuf::int32 depth_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WorkflowExecutionGetMetricsResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowExecutionGetMetricsResponse) */ {
+ public:
+  WorkflowExecutionGetMetricsResponse();
+  virtual ~WorkflowExecutionGetMetricsResponse();
+
+  WorkflowExecutionGetMetricsResponse(const WorkflowExecutionGetMetricsResponse& from);
+
+  inline WorkflowExecutionGetMetricsResponse& operator=(const WorkflowExecutionGetMetricsResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WorkflowExecutionGetMetricsResponse(WorkflowExecutionGetMetricsResponse&& from) noexcept
+    : WorkflowExecutionGetMetricsResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowExecutionGetMetricsResponse& operator=(WorkflowExecutionGetMetricsResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WorkflowExecutionGetMetricsResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WorkflowExecutionGetMetricsResponse* internal_default_instance() {
+    return reinterpret_cast<const WorkflowExecutionGetMetricsResponse*>(
+               &_WorkflowExecutionGetMetricsResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    22;
+
+  void Swap(WorkflowExecutionGetMetricsResponse* other);
+  friend void swap(WorkflowExecutionGetMetricsResponse& a, WorkflowExecutionGetMetricsResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowExecutionGetMetricsResponse* New() const final {
+    return CreateMaybeMessage<WorkflowExecutionGetMetricsResponse>(nullptr);
+  }
+
+  WorkflowExecutionGetMetricsResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowExecutionGetMetricsResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WorkflowExecutionGetMetricsResponse& from);
+  void MergeFrom(const WorkflowExecutionGetMetricsResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowExecutionGetMetricsResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.Span span = 1;
+  bool has_span() const;
+  void clear_span();
+  static const int kSpanFieldNumber = 1;
+  const ::flyteidl::core::Span& span() const;
+  ::flyteidl::core::Span* release_span();
+  ::flyteidl::core::Span* mutable_span();
+  void set_allocated_span(::flyteidl::core::Span* span);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::Span* span_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
 };
@@ -6519,9 +6765,125 @@ inline void ExecutionStateChangeDetails::set_allocated_principal(::std::string* 
 
 // ExecutionUpdateResponse
 
+// -------------------------------------------------------------------
+
+// WorkflowExecutionGetMetricsRequest
+
+// .flyteidl.core.WorkflowExecutionIdentifier id = 1;
+inline bool WorkflowExecutionGetMetricsRequest::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& WorkflowExecutionGetMetricsRequest::id() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionGetMetricsRequest.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* WorkflowExecutionGetMetricsRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionGetMetricsRequest.id)
+  
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* WorkflowExecutionGetMetricsRequest::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionGetMetricsRequest.id)
+  return id_;
+}
+inline void WorkflowExecutionGetMetricsRequest::set_allocated_id(::flyteidl::core::WorkflowExecutionIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionGetMetricsRequest.id)
+}
+
+// int32 depth = 2;
+inline void WorkflowExecutionGetMetricsRequest::clear_depth() {
+  depth_ = 0;
+}
+inline ::google::protobuf::int32 WorkflowExecutionGetMetricsRequest::depth() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionGetMetricsRequest.depth)
+  return depth_;
+}
+inline void WorkflowExecutionGetMetricsRequest::set_depth(::google::protobuf::int32 value) {
+  
+  depth_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowExecutionGetMetricsRequest.depth)
+}
+
+// -------------------------------------------------------------------
+
+// WorkflowExecutionGetMetricsResponse
+
+// .flyteidl.core.Span span = 1;
+inline bool WorkflowExecutionGetMetricsResponse::has_span() const {
+  return this != internal_default_instance() && span_ != nullptr;
+}
+inline const ::flyteidl::core::Span& WorkflowExecutionGetMetricsResponse::span() const {
+  const ::flyteidl::core::Span* p = span_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionGetMetricsResponse.span)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Span*>(
+      &::flyteidl::core::_Span_default_instance_);
+}
+inline ::flyteidl::core::Span* WorkflowExecutionGetMetricsResponse::release_span() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionGetMetricsResponse.span)
+  
+  ::flyteidl::core::Span* temp = span_;
+  span_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Span* WorkflowExecutionGetMetricsResponse::mutable_span() {
+  
+  if (span_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Span>(GetArenaNoVirtual());
+    span_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionGetMetricsResponse.span)
+  return span_;
+}
+inline void WorkflowExecutionGetMetricsResponse::set_allocated_span(::flyteidl::core::Span* span) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(span_);
+  }
+  if (span) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      span = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, span, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  span_ = span;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionGetMetricsResponse.span)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
