@@ -358,8 +358,8 @@ github.com/fatih/structs v1.0.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
-github.com/flyteorg/datacatalog v1.0.43 h1:FE94l6smtPK2KRQlZaBH5tHYp7qF/dKY9HKJtOrhcWc=
-github.com/flyteorg/datacatalog v1.0.43/go.mod h1:Ax0alrcxdvyHHDqxozz6JRcS0BarvUSW6aq3a5IHgN8=
+github.com/flyteorg/datacatalog v1.0.44 h1:EHdlV4jA1QjnxI6uj9m5fQg+O0VAxsgSG9MWkWAW4Gs=
+github.com/flyteorg/datacatalog v1.0.44/go.mod h1:VhtWkjCBJ9LZpt6uqTyKMYq1IAkW7dUeAdbWN9DI6h0=
 github.com/flyteorg/flyteadmin v1.1.79 h1:3rtLfrxM9FXjib94rtQ6Ms9rUNYwtC2xru7EOhuJjbk=
 github.com/flyteorg/flyteadmin v1.1.79/go.mod h1:bwsFajPrcVKFvWMMwDUwC5B8Mdg4UO2hScnoisGs74o=
 github.com/flyteorg/flyteidl v1.3.9 h1:MHUa89yKwCz58mQC2OxTzYjr0d3fA14qKG462v+RAyk=
@@ -1352,7 +1352,6 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/santhosh-tekuri/jsonschema v1.2.4/go.mod h1:TEAUOeZSmIxTTuHatJzrvARHiuO9LYd+cIxzgEHCQI4=
 github.com/santhosh-tekuri/jsonschema/v2 v2.1.0/go.mod h1:yzJzKUGV4RbWqWIBBP4wSOBqavX5saE02yirLS0OTyg=
-github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
 github.com/segmentio/analytics-go v3.0.1+incompatible/go.mod h1:C7CYBtQWk4vRk2RyLu0qOcbHJ18E3F1HV2C/8JvKN48=

@@ -151,7 +151,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.0.43 # DATACATALOG_TAG
+    tag: v1.0.44 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment

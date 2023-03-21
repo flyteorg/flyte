@@ -119,7 +119,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v1.0.43"` | Docker image tag |
+| datacatalog.image.tag | string | `"v1.0.44"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |

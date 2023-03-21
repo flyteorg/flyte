@@ -27,7 +27,7 @@ images:
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
-    newTag: v1.0.43 # DATACATALOG_TAG override the tag
+    newTag: v1.0.44 # DATACATALOG_TAG override the tag
     newName: cr.flyte.org/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
