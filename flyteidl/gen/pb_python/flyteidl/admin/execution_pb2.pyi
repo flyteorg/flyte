@@ -3,6 +3,7 @@ from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import metrics_pb2 as _metrics_pb2
 from flyteidl.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
@@ -246,6 +247,20 @@ class WorkflowExecutionGetDataResponse(_message.Message):
     inputs: _common_pb2.UrlBlob
     outputs: _common_pb2.UrlBlob
     def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+
+class WorkflowExecutionGetMetricsRequest(_message.Message):
+    __slots__ = ["depth", "id"]
+    DEPTH_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    depth: int
+    id: _identifier_pb2.WorkflowExecutionIdentifier
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., depth: _Optional[int] = ...) -> None: ...
+
+class WorkflowExecutionGetMetricsResponse(_message.Message):
+    __slots__ = ["span"]
+    SPAN_FIELD_NUMBER: _ClassVar[int]
+    span: _metrics_pb2.Span
+    def __init__(self, span: _Optional[_Union[_metrics_pb2.Span, _Mapping]] = ...) -> None: ...
 
 class WorkflowExecutionGetRequest(_message.Message):
     __slots__ = ["id"]

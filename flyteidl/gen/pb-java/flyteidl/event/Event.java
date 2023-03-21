@@ -2411,6 +2411,40 @@ public final class Event {
     com.google.protobuf.ByteString
         getDeckUriBytes();
 
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    boolean hasReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    com.google.protobuf.Timestamp getReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
+
     public flyteidl.event.Event.NodeExecutionEvent.InputValueCase getInputValueCase();
 
     public flyteidl.event.Event.NodeExecutionEvent.OutputResultCase getOutputResultCase();
@@ -2645,6 +2679,19 @@ public final class Event {
                 inputValue_ = subBuilder.buildPartial();
               }
               inputValueCase_ = 20;
+              break;
+            }
+            case 170: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (reportedAt_ != null) {
+                subBuilder = reportedAt_.toBuilder();
+              }
+              reportedAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(reportedAt_);
+                reportedAt_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -3458,6 +3505,48 @@ public final class Event {
       }
     }
 
+    public static final int REPORTED_AT_FIELD_NUMBER = 21;
+    private com.google.protobuf.Timestamp reportedAt_;
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public boolean hasReportedAt() {
+      return reportedAt_ != null;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public com.google.protobuf.Timestamp getReportedAt() {
+      return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+      return getReportedAt();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3531,6 +3620,9 @@ public final class Event {
       }
       if (inputValueCase_ == 20) {
         output.writeMessage(20, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        output.writeMessage(21, getReportedAt());
       }
       unknownFields.writeTo(output);
     }
@@ -3614,6 +3706,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(20, (flyteidl.core.Literals.LiteralMap) inputValue_);
       }
+      if (reportedAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, getReportedAt());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3666,6 +3762,11 @@ public final class Event {
           != other.getIsDynamic()) return false;
       if (!getDeckUri()
           .equals(other.getDeckUri())) return false;
+      if (hasReportedAt() != other.hasReportedAt()) return false;
+      if (hasReportedAt()) {
+        if (!getReportedAt()
+            .equals(other.getReportedAt())) return false;
+      }
       if (!getInputValueCase().equals(other.getInputValueCase())) return false;
       switch (inputValueCase_) {
         case 5:
@@ -3756,6 +3857,10 @@ public final class Event {
           getIsDynamic());
       hash = (37 * hash) + DECK_URI_FIELD_NUMBER;
       hash = (53 * hash) + getDeckUri().hashCode();
+      if (hasReportedAt()) {
+        hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getReportedAt().hashCode();
+      }
       switch (inputValueCase_) {
         case 5:
           hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
@@ -3971,6 +4076,12 @@ public final class Event {
 
         deckUri_ = "";
 
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
         inputValueCase_ = 0;
         inputValue_ = null;
         outputResultCase_ = 0;
@@ -4073,6 +4184,11 @@ public final class Event {
         result.isParent_ = isParent_;
         result.isDynamic_ = isDynamic_;
         result.deckUri_ = deckUri_;
+        if (reportedAtBuilder_ == null) {
+          result.reportedAt_ = reportedAt_;
+        } else {
+          result.reportedAt_ = reportedAtBuilder_.build();
+        }
         result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
         result.targetMetadataCase_ = targetMetadataCase_;
@@ -4167,6 +4283,9 @@ public final class Event {
         if (!other.getDeckUri().isEmpty()) {
           deckUri_ = other.deckUri_;
           onChanged();
+        }
+        if (other.hasReportedAt()) {
+          mergeReportedAt(other.getReportedAt());
         }
         switch (other.getInputValueCase()) {
           case INPUT_URI: {
@@ -6483,6 +6602,186 @@ public final class Event {
         deckUri_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.Timestamp reportedAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> reportedAtBuilder_;
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public boolean hasReportedAt() {
+        return reportedAtBuilder_ != null || reportedAt_ != null;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.Timestamp getReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        } else {
+          return reportedAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder setReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reportedAt_ = value;
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder setReportedAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder mergeReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (reportedAt_ != null) {
+            reportedAt_ =
+              com.google.protobuf.Timestamp.newBuilder(reportedAt_).mergeFrom(value).buildPartial();
+          } else {
+            reportedAt_ = value;
+          }
+          onChanged();
+        } else {
+          reportedAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder clearReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+          onChanged();
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getReportedAtBuilder() {
+        
+        onChanged();
+        return getReportedAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+        if (reportedAtBuilder_ != null) {
+          return reportedAtBuilder_.getMessageOrBuilder();
+        } else {
+          return reportedAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getReportedAtFieldBuilder() {
+        if (reportedAtBuilder_ == null) {
+          reportedAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getReportedAt(),
+                  getParentForChildren(),
+                  isClean());
+          reportedAt_ = null;
+        }
+        return reportedAtBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11218,6 +11517,40 @@ public final class Event {
      */
     int getEventVersion();
 
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    boolean hasReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    com.google.protobuf.Timestamp getReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
+
     public flyteidl.event.Event.TaskExecutionEvent.InputValueCase getInputValueCase();
 
     public flyteidl.event.Event.TaskExecutionEvent.OutputResultCase getOutputResultCase();
@@ -11435,6 +11768,19 @@ public final class Event {
                 inputValue_ = subBuilder.buildPartial();
               }
               inputValueCase_ = 19;
+              break;
+            }
+            case 162: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (reportedAt_ != null) {
+                subBuilder = reportedAt_.toBuilder();
+              }
+              reportedAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(reportedAt_);
+                reportedAt_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -12199,6 +12545,48 @@ public final class Event {
       return eventVersion_;
     }
 
+    public static final int REPORTED_AT_FIELD_NUMBER = 20;
+    private com.google.protobuf.Timestamp reportedAt_;
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public boolean hasReportedAt() {
+      return reportedAt_ != null;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public com.google.protobuf.Timestamp getReportedAt() {
+      return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+      return getReportedAt();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -12266,6 +12654,9 @@ public final class Event {
       }
       if (inputValueCase_ == 19) {
         output.writeMessage(19, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        output.writeMessage(20, getReportedAt());
       }
       unknownFields.writeTo(output);
     }
@@ -12343,6 +12734,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(19, (flyteidl.core.Literals.LiteralMap) inputValue_);
       }
+      if (reportedAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, getReportedAt());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -12398,6 +12793,11 @@ public final class Event {
       }
       if (getEventVersion()
           != other.getEventVersion()) return false;
+      if (hasReportedAt() != other.hasReportedAt()) return false;
+      if (hasReportedAt()) {
+        if (!getReportedAt()
+            .equals(other.getReportedAt())) return false;
+      }
       if (!getInputValueCase().equals(other.getInputValueCase())) return false;
       switch (inputValueCase_) {
         case 8:
@@ -12477,6 +12877,10 @@ public final class Event {
       }
       hash = (37 * hash) + EVENT_VERSION_FIELD_NUMBER;
       hash = (53 * hash) + getEventVersion();
+      if (hasReportedAt()) {
+        hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getReportedAt().hashCode();
+      }
       switch (inputValueCase_) {
         case 8:
           hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
@@ -12693,6 +13097,12 @@ public final class Event {
         }
         eventVersion_ = 0;
 
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
         inputValueCase_ = 0;
         inputValue_ = null;
         outputResultCase_ = 0;
@@ -12793,6 +13203,11 @@ public final class Event {
           result.metadata_ = metadataBuilder_.build();
         }
         result.eventVersion_ = eventVersion_;
+        if (reportedAtBuilder_ == null) {
+          result.reportedAt_ = reportedAt_;
+        } else {
+          result.reportedAt_ = reportedAtBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
@@ -12908,6 +13323,9 @@ public final class Event {
         }
         if (other.getEventVersion() != 0) {
           setEventVersion(other.getEventVersion());
+        }
+        if (other.hasReportedAt()) {
+          mergeReportedAt(other.getReportedAt());
         }
         switch (other.getInputValueCase()) {
           case INPUT_URI: {
@@ -15302,6 +15720,186 @@ public final class Event {
         eventVersion_ = 0;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.Timestamp reportedAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> reportedAtBuilder_;
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public boolean hasReportedAt() {
+        return reportedAtBuilder_ != null || reportedAt_ != null;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.Timestamp getReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        } else {
+          return reportedAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder setReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reportedAt_ = value;
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder setReportedAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder mergeReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (reportedAt_ != null) {
+            reportedAt_ =
+              com.google.protobuf.Timestamp.newBuilder(reportedAt_).mergeFrom(value).buildPartial();
+          } else {
+            reportedAt_ = value;
+          }
+          onChanged();
+        } else {
+          reportedAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder clearReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+          onChanged();
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getReportedAtBuilder() {
+        
+        onChanged();
+        return getReportedAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+        if (reportedAtBuilder_ != null) {
+          return reportedAtBuilder_.getMessageOrBuilder();
+        } else {
+          return reportedAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getReportedAtFieldBuilder() {
+        if (reportedAtBuilder_ == null) {
+          reportedAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getReportedAt(),
+                  getParentForChildren(),
+                  isClean());
+          reportedAt_ = null;
+        }
+        return reportedAtBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -19689,7 +20287,7 @@ public final class Event {
       "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly" +
       "teidl.core.ExecutionErrorH\000\0220\n\013output_da" +
       "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n" +
-      "\routput_result\"\336\006\n\022NodeExecutionEvent\0222\n" +
+      "\routput_result\"\217\007\n\022NodeExecutionEvent\0222\n" +
       "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI" +
       "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030" +
       "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas" +
@@ -19709,61 +20307,64 @@ public final class Event {
       "tadata\022\023\n\013retry_group\030\013 \001(\t\022\024\n\014spec_node" +
       "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
       "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
-      "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\tB\r\n\013input_va" +
-      "lueB\017\n\routput_resultB\021\n\017target_metadata\"" +
-      "X\n\024WorkflowNodeMetadata\022@\n\014execution_id\030" +
-      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
-      "dentifier\"\245\002\n\020TaskNodeMetadata\0227\n\014cache_" +
-      "status\030\001 \001(\0162!.flyteidl.core.CatalogCach" +
-      "eStatus\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl." +
-      "core.CatalogMetadata\022D\n\022reservation_stat" +
-      "us\030\003 \001(\0162(.flyteidl.core.CatalogReservat" +
-      "ion.Status\022\026\n\016checkpoint_uri\030\004 \001(\t\022E\n\020dy" +
-      "namic_workflow\030\020 \001(\0132+.flyteidl.event.Dy" +
-      "namicWorkflowNodeMetadata\"\245\001\n\033DynamicWor" +
-      "kflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.flyteidl" +
-      ".core.Identifier\022A\n\021compiled_workflow\030\002 " +
-      "\001(\0132&.flyteidl.core.CompiledWorkflowClos" +
-      "ure\022\034\n\024dynamic_job_spec_uri\030\003 \001(\t\"Q\n\033Par" +
-      "entTaskExecutionMetadata\0222\n\002id\030\001 \001(\0132&.f" +
-      "lyteidl.core.TaskExecutionIdentifier\".\n\033" +
-      "ParentNodeExecutionMetadata\022\017\n\007node_id\030\001" +
-      " \001(\t\"\326\005\n\022TaskExecutionEvent\022*\n\007task_id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022H\n\030paren" +
-      "t_node_execution_id\030\002 \001(\0132&.flyteidl.cor" +
-      "e.NodeExecutionIdentifier\022\025\n\rretry_attem" +
-      "pt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core." +
-      "TaskExecution.Phase\022\023\n\013producer_id\030\005 \001(\t" +
-      "\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLog\022/" +
-      "\n\013occurred_at\030\007 \001(\0132\032.google.protobuf.Ti" +
-      "mestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n\ninput_da" +
-      "ta\030\023 \001(\0132\031.flyteidl.core.LiteralMapH\000\022\024\n" +
-      "\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n \001(\0132\035.fly" +
-      "teidl.core.ExecutionErrorH\001\0220\n\013output_da" +
-      "ta\030\021 \001(\0132\031.flyteidl.core.LiteralMapH\001\022,\n" +
-      "\013custom_info\030\013 \001(\0132\027.google.protobuf.Str" +
-      "uct\022\025\n\rphase_version\030\014 \001(\r\022\016\n\006reason\030\r \001" +
-      "(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132" +
-      "%.flyteidl.event.TaskExecutionMetadata\022\025" +
-      "\n\revent_version\030\022 \001(\005B\r\n\013input_valueB\017\n\r" +
-      "output_result\"\343\001\n\024ExternalResourceInfo\022\023" +
-      "\n\013external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rre" +
+      "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
+      "_at\030\025 \001(\0132\032.google.protobuf.TimestampB\r\n" +
+      "\013input_valueB\017\n\routput_resultB\021\n\017target_" +
+      "metadata\"X\n\024WorkflowNodeMetadata\022@\n\014exec" +
+      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
+      "xecutionIdentifier\"\245\002\n\020TaskNodeMetadata\022" +
+      "7\n\014cache_status\030\001 \001(\0162!.flyteidl.core.Ca" +
+      "talogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036." +
+      "flyteidl.core.CatalogMetadata\022D\n\022reserva" +
+      "tion_status\030\003 \001(\0162(.flyteidl.core.Catalo" +
+      "gReservation.Status\022\026\n\016checkpoint_uri\030\004 " +
+      "\001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl" +
+      ".event.DynamicWorkflowNodeMetadata\"\245\001\n\033D" +
+      "ynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031" +
+      ".flyteidl.core.Identifier\022A\n\021compiled_wo" +
+      "rkflow\030\002 \001(\0132&.flyteidl.core.CompiledWor" +
+      "kflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 \001" +
+      "(\t\"Q\n\033ParentTaskExecutionMetadata\0222\n\002id\030" +
+      "\001 \001(\0132&.flyteidl.core.TaskExecutionIdent" +
+      "ifier\".\n\033ParentNodeExecutionMetadata\022\017\n\007" +
+      "node_id\030\001 \001(\t\"\207\006\n\022TaskExecutionEvent\022*\n\007" +
+      "task_id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\022H\n\030parent_node_execution_id\030\002 \001(\0132&.fly" +
+      "teidl.core.NodeExecutionIdentifier\022\025\n\rre" +
       "try_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyte" +
-      "idl.core.TaskExecution.Phase\0227\n\014cache_st" +
-      "atus\030\005 \001(\0162!.flyteidl.core.CatalogCacheS" +
-      "tatus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.Task" +
-      "Log\"?\n\020ResourcePoolInfo\022\030\n\020allocation_to" +
-      "ken\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExe" +
-      "cutionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@" +
-      "\n\022external_resources\030\002 \003(\0132$.flyteidl.ev" +
-      "ent.ExternalResourceInfo\022<\n\022resource_poo" +
-      "l_info\030\003 \003(\0132 .flyteidl.event.ResourcePo" +
-      "olInfo\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016ins" +
-      "tance_class\030\020 \001(\01623.flyteidl.event.TaskE" +
-      "xecutionMetadata.InstanceClass\"/\n\rInstan" +
-      "ceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B" +
-      "7Z5github.com/flyteorg/flyteidl/gen/pb-g" +
-      "o/flyteidl/eventb\006proto3"
+      "idl.core.TaskExecution.Phase\022\023\n\013producer" +
+      "_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core." +
+      "TaskLog\022/\n\013occurred_at\030\007 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n" +
+      "\ninput_data\030\023 \001(\0132\031.flyteidl.core.Litera" +
+      "lMapH\000\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n " +
+      "\001(\0132\035.flyteidl.core.ExecutionErrorH\001\0220\n\013" +
+      "output_data\030\021 \001(\0132\031.flyteidl.core.Litera" +
+      "lMapH\001\022,\n\013custom_info\030\013 \001(\0132\027.google.pro" +
+      "tobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\016\n\006r" +
+      "eason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010metada" +
+      "ta\030\020 \001(\0132%.flyteidl.event.TaskExecutionM" +
+      "etadata\022\025\n\revent_version\030\022 \001(\005\022/\n\013report" +
+      "ed_at\030\024 \001(\0132\032.google.protobuf.TimestampB" +
+      "\r\n\013input_valueB\017\n\routput_result\"\343\001\n\024Exte" +
+      "rnalResourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n" +
+      "\005index\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005p" +
+      "hase\030\004 \001(\0162\".flyteidl.core.TaskExecution" +
+      ".Phase\0227\n\014cache_status\030\005 \001(\0162!.flyteidl." +
+      "core.CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026." +
+      "flyteidl.core.TaskLog\"?\n\020ResourcePoolInf" +
+      "o\022\030\n\020allocation_token\030\001 \001(\t\022\021\n\tnamespace" +
+      "\030\002 \001(\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016gene" +
+      "rated_name\030\001 \001(\t\022@\n\022external_resources\030\002" +
+      " \003(\0132$.flyteidl.event.ExternalResourceIn" +
+      "fo\022<\n\022resource_pool_info\030\003 \003(\0132 .flyteid" +
+      "l.event.ResourcePoolInfo\022\031\n\021plugin_ident" +
+      "ifier\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.fl" +
+      "yteidl.event.TaskExecutionMetadata.Insta" +
+      "nceClass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021" +
+      "\n\rINTERRUPTIBLE\020\001B7Z5github.com/flyteorg" +
+      "/flyteidl/gen/pb-go/flyteidl/eventb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19795,7 +20396,7 @@ public final class Event {
     internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_NodeExecutionEvent_descriptor,
-        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "InputValue", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "InputValue", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_event_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_WorkflowNodeMetadata_fieldAccessorTable = new
@@ -19831,7 +20432,7 @@ public final class Event {
     internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionEvent_descriptor,
-        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "TaskType", "Metadata", "EventVersion", "InputValue", "OutputResult", });
+        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
     internal_static_flyteidl_event_ExternalResourceInfo_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_event_ExternalResourceInfo_fieldAccessorTable = new

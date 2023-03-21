@@ -1482,6 +1482,54 @@
         ]
       }
     },
+    "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "GetExecutionMetrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionGetMetricsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "depth",
+            "description": "depth defines the number of Flyte entity levels to traverse when breaking down execution details.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
@@ -5426,6 +5474,16 @@
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."
     },
+    "adminWorkflowExecutionGetMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "span": {
+          "$ref": "#/definitions/coreSpan",
+          "description": "Span defines the top-level breakdown of the workflows execution. More precise information is nested in a\nhierarchical structure using Flyte entity references."
+        }
+      },
+      "description": "WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution."
+    },
     "adminWorkflowList": {
       "type": "object",
       "properties": {
@@ -6633,6 +6691,45 @@
       },
       "description": "SleepCondition represents a dependency on waiting for the specified duration."
     },
+    "coreSpan": {
+      "type": "object",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "start_time defines the instance this span began."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "end_time defines the instance this span completed."
+        },
+        "workflow_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "description": "workflow_id is the id of the workflow execution this Span represents."
+        },
+        "node_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier",
+          "description": "node_id is the id of the node execution this Span represents."
+        },
+        "task_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier",
+          "description": "task_id is the id of the task execution this Span represents."
+        },
+        "operation_id": {
+          "type": "string",
+          "description": "operation_id is the id of a unique operation that this Span represents."
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreSpan"
+          },
+          "description": "spans defines a collection of Spans that breakdown this execution."
+        }
+      },
+      "description": "Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation\nwhich uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more\nprecise definitions."
+    },
     "coreSql": {
       "type": "object",
       "properties": {
@@ -7204,6 +7301,11 @@
         "deck_uri": {
           "type": "string",
           "title": "String location uniquely identifying where the deck HTML file is\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+        },
+        "reported_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This timestamp represents the instant when the event was reported by the executing framework. For example,\nwhen first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when\nliteral inputs are initially copied. The event however will not be sent until after the copy completes.\nExtracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series."
         }
       }
     },
@@ -7319,6 +7421,11 @@
           "type": "integer",
           "format": "int32",
           "description": "The event version is used to indicate versioned changes in how data is reported using this\nproto message. For example, event_verison \u003e 0 means that maps tasks report logs using the\nTaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog\nin this message."
+        },
+        "reported_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s\npod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,\nbut this event will not be reported until the pod is marked as completed. Extracting both of these timestamps\nfacilitates a more accurate portrayal of the evaluation time-series."
         }
       },
       "description": "Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob."

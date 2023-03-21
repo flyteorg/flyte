@@ -35,6 +35,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**GetDescriptionEntity**](docs/AdminServiceApi.md#getdescriptionentity) | **Get** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
 *AdminServiceApi* | [**GetExecution**](docs/AdminServiceApi.md#getexecution) | **Get** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**GetExecutionData**](docs/AdminServiceApi.md#getexecutiondata) | **Get** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**GetExecutionMetrics**](docs/AdminServiceApi.md#getexecutionmetrics) | **Get** /api/v1/metrics/executions/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**GetLaunchPlan**](docs/AdminServiceApi.md#getlaunchplan) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
 *AdminServiceApi* | [**GetNamedEntity**](docs/AdminServiceApi.md#getnamedentity) | **Get** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
 *AdminServiceApi* | [**GetNodeExecution**](docs/AdminServiceApi.md#getnodeexecution) | **Get** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
@@ -202,6 +203,7 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowExecutionEventRequest](docs/AdminWorkflowExecutionEventRequest.md)
  - [AdminWorkflowExecutionEventResponse](docs/AdminWorkflowExecutionEventResponse.md)
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)
+ - [AdminWorkflowExecutionGetMetricsResponse](docs/AdminWorkflowExecutionGetMetricsResponse.md)
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
@@ -276,6 +278,7 @@ Class | Method | HTTP request | Description
  - [CoreSignalCondition](docs/CoreSignalCondition.md)
  - [CoreSimpleType](docs/CoreSimpleType.md)
  - [CoreSleepCondition](docs/CoreSleepCondition.md)
+ - [CoreSpan](docs/CoreSpan.md)
  - [CoreSql](docs/CoreSql.md)
  - [CoreStructuredDataset](docs/CoreStructuredDataset.md)
  - [CoreStructuredDatasetMetadata](docs/CoreStructuredDatasetMetadata.md)

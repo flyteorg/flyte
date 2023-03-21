@@ -46,6 +46,7 @@
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/admin/description_entity.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/metrics.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fservice_2fadmin_2eproto

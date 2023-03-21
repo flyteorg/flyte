@@ -45,4 +45,6 @@ type EventTaskExecutionEvent struct {
 	Metadata *EventTaskExecutionMetadata `json:"metadata,omitempty"`
 	// The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.
 	EventVersion int32 `json:"event_version,omitempty"`
+	// This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes, but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+	ReportedAt time.Time `json:"reported_at,omitempty"`
 }

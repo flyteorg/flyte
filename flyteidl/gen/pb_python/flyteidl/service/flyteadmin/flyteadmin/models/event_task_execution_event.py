@@ -57,7 +57,8 @@ class EventTaskExecutionEvent(object):
         'reason': 'str',
         'task_type': 'str',
         'metadata': 'EventTaskExecutionMetadata',
-        'event_version': 'int'
+        'event_version': 'int',
+        'reported_at': 'datetime'
     }
 
     attribute_map = {
@@ -78,10 +79,11 @@ class EventTaskExecutionEvent(object):
         'reason': 'reason',
         'task_type': 'task_type',
         'metadata': 'metadata',
-        'event_version': 'event_version'
+        'event_version': 'event_version',
+        'reported_at': 'reported_at'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, task_type=None, metadata=None, event_version=None, reported_at=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -102,6 +104,7 @@ class EventTaskExecutionEvent(object):
         self._task_type = None
         self._metadata = None
         self._event_version = None
+        self._reported_at = None
         self.discriminator = None
 
         if task_id is not None:
@@ -140,6 +143,8 @@ class EventTaskExecutionEvent(object):
             self.metadata = metadata
         if event_version is not None:
             self.event_version = event_version
+        if reported_at is not None:
+            self.reported_at = reported_at
 
     @property
     def task_id(self):
@@ -542,6 +547,29 @@ class EventTaskExecutionEvent(object):
         """
 
         self._event_version = event_version
+
+    @property
+    def reported_at(self):
+        """Gets the reported_at of this EventTaskExecutionEvent.  # noqa: E501
+
+        This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes, but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.  # noqa: E501
+
+        :return: The reported_at of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: datetime
+        """
+        return self._reported_at
+
+    @reported_at.setter
+    def reported_at(self, reported_at):
+        """Sets the reported_at of this EventTaskExecutionEvent.
+
+        This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes, but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.  # noqa: E501
+
+        :param reported_at: The reported_at of this EventTaskExecutionEvent.  # noqa: E501
+        :type: datetime
+        """
+
+        self._reported_at = reported_at
 
     def to_dict(self):
         """Returns the model properties as a dict"""

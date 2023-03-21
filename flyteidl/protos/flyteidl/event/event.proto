@@ -104,6 +104,12 @@ message NodeExecutionEvent {
     // String location uniquely identifying where the deck HTML file is
     // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
     string deck_uri = 19;
+
+    // This timestamp represents the instant when the event was reported by the executing framework. For example,
+    // when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+    // literal inputs are initially copied. The event however will not be sent until after the copy completes.
+    // Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+    google.protobuf.Timestamp reported_at = 21;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched
@@ -221,6 +227,12 @@ message TaskExecutionEvent {
     // TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
     // in this message.
     int32 event_version = 18;
+
+    // This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+    // pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+    // but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+    // facilitates a more accurate portrayal of the evaluation time-series. 
+    google.protobuf.Timestamp reported_at = 20;
 }
 
 // This message contains metadata about external resources produced or used by a specific task execution.

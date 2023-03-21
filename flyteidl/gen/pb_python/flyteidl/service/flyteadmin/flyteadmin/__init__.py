@@ -143,6 +143,7 @@ from flyteadmin.models.admin_workflow_execution_config import AdminWorkflowExecu
 from flyteadmin.models.admin_workflow_execution_event_request import AdminWorkflowExecutionEventRequest
 from flyteadmin.models.admin_workflow_execution_event_response import AdminWorkflowExecutionEventResponse
 from flyteadmin.models.admin_workflow_execution_get_data_response import AdminWorkflowExecutionGetDataResponse
+from flyteadmin.models.admin_workflow_execution_get_metrics_response import AdminWorkflowExecutionGetMetricsResponse
 from flyteadmin.models.admin_workflow_list import AdminWorkflowList
 from flyteadmin.models.admin_workflow_spec import AdminWorkflowSpec
 from flyteadmin.models.blob_type_blob_dimensionality import BlobTypeBlobDimensionality
@@ -217,6 +218,7 @@ from flyteadmin.models.core_security_context import CoreSecurityContext
 from flyteadmin.models.core_signal_condition import CoreSignalCondition
 from flyteadmin.models.core_simple_type import CoreSimpleType
 from flyteadmin.models.core_sleep_condition import CoreSleepCondition
+from flyteadmin.models.core_span import CoreSpan
 from flyteadmin.models.core_sql import CoreSql
 from flyteadmin.models.core_structured_dataset import CoreStructuredDataset
 from flyteadmin.models.core_structured_dataset_metadata import CoreStructuredDatasetMetadata

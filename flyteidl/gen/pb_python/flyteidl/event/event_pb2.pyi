@@ -40,7 +40,7 @@ class ExternalResourceInfo(_message.Message):
     def __init__(self, external_id: _Optional[str] = ..., index: _Optional[int] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class NodeExecutionEvent(_message.Message):
-    __slots__ = ["deck_uri", "error", "event_version", "id", "input_data", "input_uri", "is_dynamic", "is_parent", "node_name", "occurred_at", "output_data", "output_uri", "parent_node_metadata", "parent_task_metadata", "phase", "producer_id", "retry_group", "spec_node_id", "task_node_metadata", "workflow_node_metadata"]
+    __slots__ = ["deck_uri", "error", "event_version", "id", "input_data", "input_uri", "is_dynamic", "is_parent", "node_name", "occurred_at", "output_data", "output_uri", "parent_node_metadata", "parent_task_metadata", "phase", "producer_id", "reported_at", "retry_group", "spec_node_id", "task_node_metadata", "workflow_node_metadata"]
     DECK_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     EVENT_VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -57,6 +57,7 @@ class NodeExecutionEvent(_message.Message):
     PARENT_TASK_METADATA_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
+    REPORTED_AT_FIELD_NUMBER: _ClassVar[int]
     RETRY_GROUP_FIELD_NUMBER: _ClassVar[int]
     SPEC_NODE_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_NODE_METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -77,11 +78,12 @@ class NodeExecutionEvent(_message.Message):
     parent_task_metadata: ParentTaskExecutionMetadata
     phase: _execution_pb2.NodeExecution.Phase
     producer_id: str
+    reported_at: _timestamp_pb2.Timestamp
     retry_group: str
     spec_node_id: str
     task_node_metadata: TaskNodeMetadata
     workflow_node_metadata: WorkflowNodeMetadata
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ParentNodeExecutionMetadata(_message.Message):
     __slots__ = ["node_id"]
@@ -104,7 +106,7 @@ class ResourcePoolInfo(_message.Message):
     def __init__(self, allocation_token: _Optional[str] = ..., namespace: _Optional[str] = ...) -> None: ...
 
 class TaskExecutionEvent(_message.Message):
-    __slots__ = ["custom_info", "error", "event_version", "input_data", "input_uri", "logs", "metadata", "occurred_at", "output_data", "output_uri", "parent_node_execution_id", "phase", "phase_version", "producer_id", "reason", "retry_attempt", "task_id", "task_type"]
+    __slots__ = ["custom_info", "error", "event_version", "input_data", "input_uri", "logs", "metadata", "occurred_at", "output_data", "output_uri", "parent_node_execution_id", "phase", "phase_version", "producer_id", "reason", "reported_at", "retry_attempt", "task_id", "task_type"]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     EVENT_VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -120,6 +122,7 @@ class TaskExecutionEvent(_message.Message):
     PHASE_VERSION_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
+    REPORTED_AT_FIELD_NUMBER: _ClassVar[int]
     RETRY_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -138,10 +141,11 @@ class TaskExecutionEvent(_message.Message):
     phase_version: int
     producer_id: str
     reason: str
+    reported_at: _timestamp_pb2.Timestamp
     retry_attempt: int
     task_id: _identifier_pb2.Identifier
     task_type: str
-    def __init__(self, task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., parent_node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., producer_id: _Optional[str] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., phase_version: _Optional[int] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ...) -> None: ...
+    def __init__(self, task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., parent_node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., producer_id: _Optional[str] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., phase_version: _Optional[int] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class TaskExecutionMetadata(_message.Message):
     __slots__ = ["external_resources", "generated_name", "instance_class", "plugin_identifier", "resource_pool_info"]
