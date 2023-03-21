@@ -37889,6 +37889,7 @@
                  * @property {string|null} [taskType] TaskExecutionClosure taskType
                  * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionClosure metadata
                  * @property {number|null} [eventVersion] TaskExecutionClosure eventVersion
+                 * @property {Array.<flyteidl.admin.IReason>|null} [reasons] TaskExecutionClosure reasons
                  */
     
                 /**
@@ -37901,6 +37902,7 @@
                  */
                 function TaskExecutionClosure(properties) {
                     this.logs = [];
+                    this.reasons = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -38019,6 +38021,14 @@
                  */
                 TaskExecutionClosure.prototype.eventVersion = 0;
     
+                /**
+                 * TaskExecutionClosure reasons.
+                 * @member {Array.<flyteidl.admin.IReason>} reasons
+                 * @memberof flyteidl.admin.TaskExecutionClosure
+                 * @instance
+                 */
+                TaskExecutionClosure.prototype.reasons = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -38086,6 +38096,9 @@
                         $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                     if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
                         writer.uint32(/* id 17, wireType 0 =*/136).int32(message.eventVersion);
+                    if (message.reasons != null && message.reasons.length)
+                        for (var i = 0; i < message.reasons.length; ++i)
+                            $root.flyteidl.admin.Reason.encode(message.reasons[i], writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
                     return writer;
                 };
     
@@ -38150,6 +38163,11 @@
                             break;
                         case 17:
                             message.eventVersion = reader.int32();
+                            break;
+                        case 18:
+                            if (!(message.reasons && message.reasons.length))
+                                message.reasons = [];
+                            message.reasons.push($root.flyteidl.admin.Reason.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -38258,10 +38276,148 @@
                     if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
                         if (!$util.isInteger(message.eventVersion))
                             return "eventVersion: integer expected";
+                    if (message.reasons != null && message.hasOwnProperty("reasons")) {
+                        if (!Array.isArray(message.reasons))
+                            return "reasons: array expected";
+                        for (var i = 0; i < message.reasons.length; ++i) {
+                            var error = $root.flyteidl.admin.Reason.verify(message.reasons[i]);
+                            if (error)
+                                return "reasons." + error;
+                        }
+                    }
                     return null;
                 };
     
                 return TaskExecutionClosure;
+            })();
+    
+            admin.Reason = (function() {
+    
+                /**
+                 * Properties of a Reason.
+                 * @memberof flyteidl.admin
+                 * @interface IReason
+                 * @property {google.protobuf.ITimestamp|null} [occurredAt] Reason occurredAt
+                 * @property {string|null} [message] Reason message
+                 */
+    
+                /**
+                 * Constructs a new Reason.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a Reason.
+                 * @implements IReason
+                 * @constructor
+                 * @param {flyteidl.admin.IReason=} [properties] Properties to set
+                 */
+                function Reason(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Reason occurredAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} occurredAt
+                 * @memberof flyteidl.admin.Reason
+                 * @instance
+                 */
+                Reason.prototype.occurredAt = null;
+    
+                /**
+                 * Reason message.
+                 * @member {string} message
+                 * @memberof flyteidl.admin.Reason
+                 * @instance
+                 */
+                Reason.prototype.message = "";
+    
+                /**
+                 * Creates a new Reason instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.Reason
+                 * @static
+                 * @param {flyteidl.admin.IReason=} [properties] Properties to set
+                 * @returns {flyteidl.admin.Reason} Reason instance
+                 */
+                Reason.create = function create(properties) {
+                    return new Reason(properties);
+                };
+    
+                /**
+                 * Encodes the specified Reason message. Does not implicitly {@link flyteidl.admin.Reason.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.Reason
+                 * @static
+                 * @param {flyteidl.admin.IReason} message Reason message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Reason.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.occurredAt != null && message.hasOwnProperty("occurredAt"))
+                        $root.google.protobuf.Timestamp.encode(message.occurredAt, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Reason message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.Reason
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.Reason} Reason
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Reason.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Reason();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.occurredAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.message = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Reason message.
+                 * @function verify
+                 * @memberof flyteidl.admin.Reason
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Reason.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.occurredAt != null && message.hasOwnProperty("occurredAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.occurredAt);
+                        if (error)
+                            return "occurredAt." + error;
+                    }
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
+                    return null;
+                };
+    
+                return Reason;
             })();
     
             admin.TaskExecutionGetDataRequest = (function() {

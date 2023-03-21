@@ -13,6 +13,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class Reason(_message.Message):
+    __slots__ = ["message", "occurred_at"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    occurred_at: _timestamp_pb2.Timestamp
+    def __init__(self, occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ...) -> None: ...
+
 class TaskExecution(_message.Message):
     __slots__ = ["closure", "id", "input_uri", "is_parent"]
     CLOSURE_FIELD_NUMBER: _ClassVar[int]
@@ -26,7 +34,7 @@ class TaskExecution(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., input_uri: _Optional[str] = ..., closure: _Optional[_Union[TaskExecutionClosure, _Mapping]] = ..., is_parent: bool = ...) -> None: ...
 
 class TaskExecutionClosure(_message.Message):
-    __slots__ = ["created_at", "custom_info", "duration", "error", "event_version", "logs", "metadata", "output_data", "output_uri", "phase", "reason", "started_at", "task_type", "updated_at"]
+    __slots__ = ["created_at", "custom_info", "duration", "error", "event_version", "logs", "metadata", "output_data", "output_uri", "phase", "reason", "reasons", "started_at", "task_type", "updated_at"]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
@@ -37,6 +45,7 @@ class TaskExecutionClosure(_message.Message):
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
+    REASONS_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -52,10 +61,11 @@ class TaskExecutionClosure(_message.Message):
     output_uri: str
     phase: _execution_pb2.TaskExecution.Phase
     reason: str
+    reasons: _containers.RepeatedCompositeFieldContainer[Reason]
     started_at: _timestamp_pb2.Timestamp
     task_type: str
     updated_at: _timestamp_pb2.Timestamp
-    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ...) -> None: ...
+    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reasons: _Optional[_Iterable[_Union[Reason, _Mapping]]] = ...) -> None: ...
 
 class TaskExecutionGetDataRequest(_message.Message):
     __slots__ = ["id"]

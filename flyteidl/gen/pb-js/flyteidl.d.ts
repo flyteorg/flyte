@@ -15907,6 +15907,9 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure eventVersion */
             eventVersion?: (number|null);
+
+            /** TaskExecutionClosure reasons */
+            reasons?: (flyteidl.admin.IReason[]|null);
         }
 
         /** Represents a TaskExecutionClosure. */
@@ -15960,6 +15963,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure eventVersion. */
             public eventVersion: number;
 
+            /** TaskExecutionClosure reasons. */
+            public reasons: flyteidl.admin.IReason[];
+
             /** TaskExecutionClosure outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");
 
@@ -15990,6 +15996,64 @@ export namespace flyteidl {
 
             /**
              * Verifies a TaskExecutionClosure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Reason. */
+        interface IReason {
+
+            /** Reason occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** Reason message */
+            message?: (string|null);
+        }
+
+        /** Represents a Reason. */
+        class Reason implements IReason {
+
+            /**
+             * Constructs a new Reason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IReason);
+
+            /** Reason occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** Reason message. */
+            public message: string;
+
+            /**
+             * Creates a new Reason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Reason instance
+             */
+            public static create(properties?: flyteidl.admin.IReason): flyteidl.admin.Reason;
+
+            /**
+             * Encodes the specified Reason message. Does not implicitly {@link flyteidl.admin.Reason.verify|verify} messages.
+             * @param message Reason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Reason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Reason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Reason;
+
+            /**
+             * Verifies a Reason message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

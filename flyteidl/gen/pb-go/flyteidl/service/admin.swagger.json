@@ -4871,6 +4871,21 @@
       },
       "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).\nSee https://github.com/flyteorg/flyte/issues/211 for more background information."
     },
+    "adminReason": {
+      "type": "object",
+      "properties": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "occurred_at is the timestamp indicating the instant that this reason happened."
+        },
+        "message": {
+          "type": "string",
+          "description": "message is the explanation for the most recent phase transition or status update."
+        }
+      },
+      "description": "Reason is a single message annotated with a timestamp to indicate the instant the reason occurred."
+    },
     "adminSchedule": {
       "type": "object",
       "properties": {
@@ -5053,6 +5068,13 @@
           "type": "integer",
           "format": "int32",
           "description": "The event version is used to indicate versioned changes in how data is maintained using this\nproto message. For example, event_verison \u003e 0 means that maps tasks logs use the\nTaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog\nin this message."
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminReason"
+          },
+          "description": "A time-series of the phase transition or update explanations. This, when compared to storing a singular reason\nas previously done, is much more valuable in visualizing and understanding historical evaluations."
         }
       },
       "description": "Container for task execution details and results."

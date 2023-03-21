@@ -216,6 +216,7 @@ Class | Method | HTTP request | Description
  - [AdminProjectUpdateResponse](docs/AdminProjectUpdateResponse.md)
  - [AdminProjects](docs/AdminProjects.md)
  - [AdminRawOutputDataConfig](docs/AdminRawOutputDataConfig.md)
+ - [AdminReason](docs/AdminReason.md)
  - [AdminSchedule](docs/AdminSchedule.md)
  - [AdminSlackNotification](docs/AdminSlackNotification.md)
  - [AdminSort](docs/AdminSort.md)
