@@ -57,6 +57,9 @@ start:
 			--publish "30001:30001" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
+			--publish "32080:32080" \
+			--publish "32443:32443" \
+			--publish "32444:32444" \
 			$(FLYTE_SANDBOX_IMAGE)
 		export KUBECONFIG=.kube/kubeconfig
 .PHONY: kubeconfig

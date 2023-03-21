@@ -32,6 +32,10 @@ dependencies:
     version: v0.1.10
     repository: file://../flyte-binary
     condition: flyte-binary.enabled
+  - name: kong
+    version: 2.16.5
+    repository: https://charts.konghq.com
+    condition: kong.enabled
   - name: kubernetes-dashboard
     version: 6.0.0
     repository: https://kubernetes.github.io/dashboard/

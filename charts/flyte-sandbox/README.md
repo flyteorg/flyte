@@ -11,6 +11,7 @@ A Helm chart for the Flyte local sandbox
 | file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 12.1.1 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.1.9 |
+| https://charts.konghq.com | kong | 2.16.5 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 
@@ -51,10 +52,30 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
 | flyte-binary.enabled | bool | `true` |  |
+| flyte-binary.ingress.commonAnnotations."kubernetes.io/ingress.class" | string | `"kong"` |  |
+| flyte-binary.ingress.create | bool | `true` |  |
+| flyte-binary.ingress.grpc.annotations."konghq.com/protocols" | string | `"grpc"` |  |
 | flyte-binary.nameOverride | string | `"flyte-sandbox"` |  |
 | flyte-binary.rbac.extraRules[0].apiGroups[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].resources[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].verbs[0] | string | `"*"` |  |
+| flyte-binary.service.grpc.annotations."konghq.com/protocol" | string | `"grpc"` |  |
+| kong.admin.enabled | bool | `true` |  |
+| kong.admin.tls.nodePort | int | `32444` |  |
+| kong.admin.type | string | `"NodePort"` |  |
+| kong.enabled | bool | `true` |  |
+| kong.env.database | string | `"postgres"` |  |
+| kong.env.pg_database | string | `"postgres"` |  |
+| kong.env.pg_host | string | `"flyte-sandbox-postgresql"` |  |
+| kong.env.pg_password | string | `"postgres"` |  |
+| kong.env.pg_ssl | string | `"off"` |  |
+| kong.env.pg_ssl_verify | string | `"off"` |  |
+| kong.env.pg_user | string | `"postgres"` |  |
+| kong.ingressController.enabled | bool | `true` |  |
+| kong.proxy.enabled | bool | `true` |  |
+| kong.proxy.http.nodePort | int | `32080` |  |
+| kong.proxy.tls.nodePort | int | `32443` |  |
+| kong.proxy.type | string | `"NodePort"` |  |
 | kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-insecure-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-skip-login"` |  |

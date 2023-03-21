@@ -21,6 +21,18 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
@@ -40,6 +52,77 @@ metadata:
   namespace: flyte
 secrets:
 - name: flyte-sandbox-minio
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+  namespace: flyte
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - pods
+  - secrets
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resourceNames:
+  - kong-ingress-controller-leader-kong-kong
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  - coordination.k8s.io
+  resources:
+  - configmaps
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - endpoints
+  verbs:
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -194,6 +277,230 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - ingressclassparameterses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongconsumers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongconsumers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongplugins
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongplugins/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - tcpingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - tcpingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - udpingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - udpingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongclusterplugins
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongclusterplugins/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
@@ -330,6 +637,26 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flyte-sandbox-kong
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kong
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kubernetes-dashboard
     app.kubernetes.io/version: 2.7.0
     helm.sh/chart: kubernetes-dashboard-6.0.0
@@ -362,6 +689,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flyte-sandbox
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-sandbox-kong
+subjects:
+- kind: ServiceAccount
+  name: flyte-sandbox-kong
   namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -762,7 +1108,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: b2VKUWRRdHhxRFZTdjBoZw==
+  haSharedSecret: cTRxbGVrNXZldk12T0k0NA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -775,6 +1121,38 @@ metadata:
   name: flyte-sandbox-docker-registry-secret
   namespace: flyte
 type: Opaque
+---
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKRENDQWd5Z0F3SUJBZ0lSQUtKdG5wTHFFRWo5SEZBUDlmaksxT1F3RFFZSktvWklodmNOQVFFTEJRQXcKSERFYU1CZ0dBMVVFQXhNUmEyOXVaeTFoWkcxcGMzTnBiMjR0WTJFd0hoY05Nak13TXpJeE1qSXlPVEk0V2hjTgpNek13TXpFNE1qSXlPVEk0V2pBY01Sb3dHQVlEVlFRREV4RnJiMjVuTFdGa2JXbHpjMmx2YmkxallUQ0NBU0l3CkRRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFOSHdRTkNKSnJFMHllYk00aGV1dUR2enZtcG0KQ3lmRnpYMjlEUVdpTmFnVUF2cmM2YW44NDVmRWlub3Zvb1JoZXVWVFRLaXp5R1Fwb1JXeGwyVGlkQndqT0w3YQoxZGd0U0ltODROR3RBN3lhbWZmTGxhc04wQVZaWkZ6MStXdzBpNzN0RGkvVS9wM05WSmJFVUJQRFRCQzh6UWtIClJ5Q1ozNTRXcEZteWVBcUwyTmkxN0ZoaUdXNW1vZWt0c2VmWUljdCtuamVQZUI4YWJCSk40U0prbTlLRW9rUnkKWDhHZmdMWSsvdmxjaWZXNXpYQzRrQThvdWlLRytHVkZ6R1hzUUt3SHVTREJvOWdBRkFVUUN2L0kyUWtHM1ZTZQpyV1VYVktscU9vSzFVSWsyV0lwdmd0enVXWjVOUEtMdHUwdkhkZktwQ3dnUU5WMUlpTTI0THJXbGpxa0NBd0VBCkFhTmhNRjh3RGdZRFZSMFBBUUgvQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUYKQlFjREFqQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01CMEdBMVVkRGdRV0JCVEVhRW01bm9GRkIwZ0cvdnFpZnE0dwoxSlJUaXpBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQVJCQ3QzQTZwNFhrSnM0dHhRaVF1aExIQ0I3Mm81NnZJCitwUmlweStBSEs3ZE1mUk1wT2F6RCtFSXF3MFd5bXJqRkg3TS9GMFowMzZUQXlYYkVPMGVmUDFteHhpUXNDK1UKbitHN0ZKMWxBbzMzVkI1bXN4eGhJcEZlOFhFSitPMy9RNWhIS1NFMDdoekkzeWpZWlRxeHlrMlo5SHVkR0NJZQo4alRBbCtLZUw0eGZOY3BZRTNPVVJ6Uk81dVJIOUdEL0FlZnd1b3hQdVdhckJjVkVzbXlzdGEreXBSWGdEMnRxClFaT1cwN3BTU09LMjFNQ0k5RVA5VWhRNWpRcGJHSTFjWHNHNWEwNDRFVnBySkFDdmtJcUQvYnJkQkFiSVBHYTEKSlpzU0N4RVBDOUNXMFFRMHhDZ1FUSndqY0VJS0dKSXlkTG1rd3F0a2tSd2xEUGo5TTlWcytnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBMGZCQTBJa21zVFRKNXN6aUY2NjRPL08rYW1ZTEo4WE5mYjBOQmFJMXFCUUMrdHpwCnFmempsOFNLZWkraWhHRjY1Vk5NcUxQSVpDbWhGYkdYWk9KMEhDTTR2dHJWMkMxSWliemcwYTBEdkpxWjk4dVYKcXczUUJWbGtYUFg1YkRTTHZlME9MOVQrbmMxVWxzUlFFOE5NRUx6TkNRZEhJSm5mbmhha1diSjRDb3ZZMkxYcwpXR0laYm1haDZTMng1OWdoeTM2ZU40OTRIeHBzRWszaEltU2Iwb1NpUkhKZndaK0F0ajcrK1Z5Sjlibk5jTGlRCkR5aTZJb2I0WlVYTVpleEFyQWU1SU1HajJBQVVCUkFLLzhqWkNRYmRWSjZ0WlJkVXFXbzZnclZRaVRaWWltK0MKM081Wm5rMDhvdTI3UzhkMThxa0xDQkExWFVpSXpiZ3V0YVdPcVFJREFRQUJBb0lCQUJvL2tic0JDdWRwRkQxWgpMSU9OZ3Rkc0dFaXhUWC9CaVhuSkkxR3JBRTV0Z2huZmVRK1o0TkxlN2ZsczcwTGg5VDJxOXBDNU9icmNRWm0yCnhKa0dmMEh0WFhEdlo0RkoyQ0h3amFOcG9HZjZaSG5JNklPa2pIZSt2MytuK1hGLytHRGN2TU5hUENONndySy8KQk13VHhQVHF4aS8weXYzV2YxRUN2N1cvVEtiMHJ6K1pDbE5ueUF0NWhxU21ycFFmejF6aVEzRDIxOFhGQUVNdApUUjRmODNBMjZGWUpUMElrSXRRL0pOaTZ5blhYZHdSS3hoajQvdDM3b3J6aDFlaVFqNnV1QkhFZEJ3YTlranBPClhHa0t6QXRQOGRJTXJFTkVnME42UVllTzdJdE1QY1cyODJldWVsbURPUURaUktkSUh5R3cxZ2ZhYjltR2RtcUsKU2pqY1JxRUNnWUVBN25LVmtKYjdEK0cwVWNyWHVTcmNRMFk4N0ptdjBNbmNqUTFxekdDK0VTdjN3UWhaelhvYQppOFRxZVVEb3BBTjVWQ1k5Z1diOWdzVlpBKzVucTRwMTZoeUhnUUV1Nk1ZWSs4UGJKVEI2QWhoQmdEQ0ZMVkhaCitVSlA4RjhkYXFUNEtLWTNFTzdYclRlVVBVbnZ2T3FrdGRwSGdCSElnbHdHWWVWLy9xVHJRalVDZ1lFQTRXUnUKSjRFYU1zQVNpU2xhcnBzcTM2K2lDUDZYVmZWdHE4YXFkZkFyRmR5R3ZUYkx2TGxDc1ZKK3FsY3M0TjJDWGs0YwpnWE1GeXZ3Zi81SUgxK3pSZnZzTC9tb2lVUHBqeUxjbzBOVmt6T0NHZUFKM3A3RTlSeWh5REpqczc4SGFEWmEzCmdRZ1YvREhQdWN6RWxmTkRhcjgzWDlOMklucVlFZ0dBOVdzd3FTVUNnWUFLR0xINmtGb0xIeHg2aGlOQ1JPMVUKcittdWZ3ZHh5TXBjOHA5K0RlNmVYWVU5R0RSdFBlbFgxN3V4N0t5dEhUU0srcCtLRmlsUDJ6bGNzRUNWZytSZwpTRnI0Zkd0WEVlUkc3TkVmcndETGkrbGlHeXZZY21uUFl4NXRhQ21mdFdLSW5oa2d6MncwZW5EOWMxOENXZEVsCm5odCs4Y0hTdTBETjdtRFFFSDJoclFLQmdFSHhSaUVjcm5PR3FtV2l5YnNuL3FVdkYzTVdPV1NXeDUxb0pGc1oKQnlJQVFSTit3cURXZXVLeVJnakVOSWNkaDVUYnVZOU4vYlhqaWVFVjhtR0VFYzdhMkNsNUY4MGxWS2hXbmdScgpTbkIraUJqNGI5V0tEMm1RTmIzbHgveGxkTXhnK2hNd01HNTJqRlhKeVFJdUI5MWxVR2dpei85S2FzOXB6VGNBClExNVpBb0dBSGxzYy9zaTcvb1liNlJ4UEpjMnphQUUwbC9qaU83Qk01MUdoWktYOFVmend3b21VYVFBeGExMDEKSW9KKzg4YTBzVkNINEpWc1psY0RhT290QiszQVMwZ1BoSVJ5MWdOckNxWW1FVXVXT2hwbDhhZlF6OFNVbDd6MwpKWlpYNFRHYTN3cGcyN0dFanpuTHM4Tkh3WWlhOG9WNm5lV09oM1IrTXkvUzB0a1ZOSU09Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-validation-webhook-ca-keypair
+  namespace: flyte
+type: kubernetes.io/tls
+---
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURmakNDQW1hZ0F3SUJBZ0lRQSt2Q0taUE1wRzZjQ2hDTkRIRmg3akFOQmdrcWhraUc5dzBCQVFzRkFEQWMKTVJvd0dBWURWUVFERXhGcmIyNW5MV0ZrYldsemMybHZiaTFqWVRBZUZ3MHlNekF6TWpFeU1qSTVNamxhRncwegpNekF6TVRneU1qSTVNamxhTURveE9EQTJCZ05WQkFNVEwyWnNlWFJsTFhOaGJtUmliM2d0YTI5dVp5MTJZV3hwClpHRjBhVzl1TFhkbFltaHZiMnN1Wm14NWRHVXVjM1pqTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEEKTUlJQkNnS0NBUUVBbzBzMDN2WUt2T2RrMmpBSHNvZEJaZjZQUWVDWTFZM3F5VG8wOThxcERHMnJ1Z3hkbzVRUQpMZTFxcW1sT3FkQTk2bXY2cFYvUFo0TUUyTDN2cFNhQXdHSGQ5MEg4WE5DN1c5aTFIblhOdzdjNDR0eW43ZzJ4CjlRNmVRU2dkelBBOFZJUWR6YkFJQk1TZGp6UitZampVTlVyTTJ4QklPOWJuZG5ZSGZLVm8zRE5QL2dOT1BwN04KamFJREI3d2xId1MyRHJoeHp4MzdhaWp3dTVHL3Awa3VicmVLeGF5dGIyaHlMM0VmNHdWeTk1aWpxbkVZTkFGOAo1dEhqYXdiWmZBQjhQdk9PVjFrS3MwRFhNU1RPSXdWMU1saWk1VWZWWnpEd1hLVXMxZFNBL0dkR1k3eUxBR3R3Ckc2b1dZYjNmbXpDYVhOalE0MU1LSklldHdWOXd0bnIvK1FJREFRQUJvNEdkTUlHYU1BNEdBMVVkRHdFQi93UUUKQXdJRm9EQWRCZ05WSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3REFZRFZSMFRBUUgvQkFJdwpBREFmQmdOVkhTTUVHREFXZ0JURWFFbTVub0ZGQjBnRy92cWlmcTR3MUpSVGl6QTZCZ05WSFJFRU16QXhnaTltCmJIbDBaUzF6WVc1a1ltOTRMV3R2Ym1jdGRtRnNhV1JoZEdsdmJpMTNaV0pvYjI5ckxtWnNlWFJsTG5OMll6QU4KQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBV0RSK0g2eE9DYTR5QjVMVURkUjF3b3MzS3FjaEhSTkVVaFNDM1JxSwpGMzF2Y2dIS1ZodVhuV3ZxYXE2eThkSTNvQ0hTNmx4YWE2MGYxV1lnWmtLVE9yYldIWWE3OEx6QkhBUTRHdXFnCmdodklqSDZFYU1peEw2QW1SVUUwZDFyb21Rb3VsQVRtWDFyT2hhNGlpUTVTTWdlV1BJdjJJaEVLMjdHdlRhM0UKcXJtVVVoV1FEUXFEZ2dFR1JRaC8zdkJKREE3ZlhhSFZGNDV1eGYyN1EycTBkMHA5NmI0QU9iNjNmV010RkU5VAo5TmdsTGp5NTVtaDVhbUJVdUhTS21DdjFuVTRqNjFSbVNlejY4TmdybFk4bFRMSU5PaUxuWW15YnRIS3o1VkNrCjBHa2htNjFzQkluS244NHUyeVlDV0kyYlBkSGoveFRqZUNkdGtKY0FVS2cxVUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBbzBzMDN2WUt2T2RrMmpBSHNvZEJaZjZQUWVDWTFZM3F5VG8wOThxcERHMnJ1Z3hkCm81UVFMZTFxcW1sT3FkQTk2bXY2cFYvUFo0TUUyTDN2cFNhQXdHSGQ5MEg4WE5DN1c5aTFIblhOdzdjNDR0eW4KN2cyeDlRNmVRU2dkelBBOFZJUWR6YkFJQk1TZGp6UitZampVTlVyTTJ4QklPOWJuZG5ZSGZLVm8zRE5QL2dOTwpQcDdOamFJREI3d2xId1MyRHJoeHp4MzdhaWp3dTVHL3Awa3VicmVLeGF5dGIyaHlMM0VmNHdWeTk1aWpxbkVZCk5BRjg1dEhqYXdiWmZBQjhQdk9PVjFrS3MwRFhNU1RPSXdWMU1saWk1VWZWWnpEd1hLVXMxZFNBL0dkR1k3eUwKQUd0d0c2b1dZYjNmbXpDYVhOalE0MU1LSklldHdWOXd0bnIvK1FJREFRQUJBb0lCQURIMFl2TkdqOWhrYll6MgpIcFMySGdLbTBvcVR2QTJ3d2IvWHA3YWFjQWJXVWkremNyNEZJTUg4SEtLUFhycENjMzZRay9nZGpHU2RSMUZMCklkSURLbVl3U21oRzduNHllTzdMSi9WdWtva3FOeVBuM3hQTGFzS09PMG14alJSUjloTGc3QUV0dGZaSGMvQUkKWGhXTVR4Y1NrQU1BUXlqVFFMSVR2NHlaU2EvN0lYKytqRDBSaXlBdER1UEpaaHZOMHpjZEhIU0FFek9menB1bQoyczZ4SThQYnRPMXZCV2JGSUMrckVCZy9JVzh4UHlNYmNCUUljWlBoektiNTc3T2IxMVlreDQ5dVVJMWNDZHl5Cm16RkpyUVFFWlFSL1lZbEdwYlV4czlWMlYxclFwS1lsS2tybEtZVEdFRUJTZ1VIenhQb3lLWi9rYU5idG1ML08KMGhKelRhVUNnWUVBeC9ReWNFa1JvUmtjT2FXZGRuRHZNMnArZ0cxZU9iYlZKQ2l5a0pBZkF1QlVPb25nRTdCSwoyVjlMZS9hQkkyWEhlelM1N3lLQ3R5eUZwOEg5L1ZmTFNwR3d4WXIvQXYyZm5SSlNMamtGbjBmay9rNThvUHg5Clc5ZHVoRVhIT3FJcDdJVGcvMHZpSVpwSGZUVDUxdk1ZbnBWc0l0V0tONFpCVnJLUDFWRFcxeHNDZ1lFQTBSQngKTjMrU1FNeWYyTVdGUjhMMk00QjAvYTdkaGpwSG9LZi9oWEEyNVF3ZzFGWkJ0Rjg2aE1UUmFIdEg3bjlvbW9TcwpUZjFORzJiUzZTQk10NDFXcGhiaDJSbnBGQWtVSGZ0RXgwVEMxZWd2dWNZU1BKZlpiVVYzZ3FtOWdzOTAzUThjCjZueVQrZHpHdEdzYkVoekdISVM0RGxFR0tzVG9SdTBCUU5uQlVuc0NnWUFJbm4waUcvUTNsb2FCOGFLay9WOUMKUHgvdTEwZ05ndFVUTnZIamkyTGEwK0t0bDAzaWEySCtscjRCUFBINkhhUUlxcEF0UDdhVXdNV09JcTJaSXhTdgpSVEp5Z1hoV242b21zaWg2dDVpSGNpanIwV1JMNkRaYkpDRXVjSGVURG5SeUxwUW9UUlFWVUxvdUtuOXVoWklWCkcrbktZcHdQb3Fqa1hOUVlaT0N0NndLQmdGcklFd0dRYWNldGt6T2tBWTM1d01MNFl0VE5tKy92V3E4T2hFeEQKUC9NUjR5ZVJGUkxuenhkY0I3cWczY2xZbGVtUzl1Y2V1TjdQTllKNXZoWnVUMVByMThKWUYvZlZRV0VMZlFBeQpnWkExTkpRc3lEcDdqYlIvVjdmclVSbCtVRGExbTA3UExjcHY3ZkRtR1dreUNXelV6TCthdTF6VENESFVOSmtlCmRXNEZBb0dBS0N4cUNTaXpZaG14c0VwU1V5ZkNVZEJoVk44K0tMQkRrNlIzRVR3YWtoRk9IS2F4aXBpczRTL0gKYzg2VmVxeSs5VjdWaGNvL0VXK1RBbVExZml2dWVzR0tXVC91Qy9yWlMrb1dHY01IamYrdkhSWXNJS2M0bThRbwpUWWpkS2pHc1dkQXUvcUlTbUY3SFdtM3U5SWhsTkgzNTFjbVJHMUhzN1lsRkF5cUpjWXc9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-validation-webhook-keypair
+  namespace: flyte
+type: kubernetes.io/tls
 ---
 apiVersion: v1
 kind: Secret
@@ -869,6 +1247,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    konghq.com/protocol: grpc
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
@@ -909,6 +1289,85 @@ spec:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-admin
+  namespace: flyte
+spec:
+  ports:
+  - name: kong-admin-tls
+    nodePort: 32444
+    port: 8444
+    protocol: TCP
+    targetPort: 8444
+  selector:
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: kong
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    enable-metrics: "true"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-proxy
+  namespace: flyte
+spec:
+  ports:
+  - name: kong-proxy
+    nodePort: 32080
+    port: 80
+    protocol: TCP
+    targetPort: 8000
+  - name: kong-proxy-tls
+    nodePort: 32443
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: kong
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-validation-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: webhook
+  selector:
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
 ---
 apiVersion: v1
 kind: Service
@@ -1264,7 +1723,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 48e64be9ebcd5c9ff9ad152978104552589aa88ff0bd550670a9ec8455151979
+        checksum/secret: bd28d5a65c1fc869eff98e4b33534334229c9bc2e047da2ce3335866f4461f26
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1310,6 +1769,414 @@ spec:
         name: flyte-sandbox-docker-registry-config
       - emptyDir: {}
         name: data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: app
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: app
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: kong
+  template:
+    metadata:
+      annotations:
+        kuma.io/gateway: enabled
+        kuma.io/service-account-token-volume: flyte-sandbox-kong-token
+        traffic.sidecar.istio.io/includeInboundPorts: ""
+      labels:
+        app: flyte-sandbox-kong
+        app.kubernetes.io/component: app
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kong
+        app.kubernetes.io/version: "3.1"
+        helm.sh/chart: kong-2.16.5
+        version: "3.1"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args: null
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: CONTROLLER_ADMISSION_WEBHOOK_LISTEN
+          value: 0.0.0.0:8080
+        - name: CONTROLLER_ELECTION_ID
+          value: kong-ingress-controller-leader-kong
+        - name: CONTROLLER_INGRESS_CLASS
+          value: kong
+        - name: CONTROLLER_KONG_ADMIN_TLS_SKIP_VERIFY
+          value: "true"
+        - name: CONTROLLER_KONG_ADMIN_URL
+          value: https://localhost:8444
+        - name: CONTROLLER_PUBLISH_SERVICE
+          value: flyte/flyte-sandbox-kong-proxy
+        image: kong/kubernetes-ingress-controller:2.8
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: ingress-controller
+        ports:
+        - containerPort: 8080
+          name: webhook
+          protocol: TCP
+        - containerPort: 10255
+          name: cmetrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /readyz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /admission-webhook
+          name: webhook-cert
+          readOnly: true
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: flyte-sandbox-kong-token
+          readOnly: true
+      - env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - kong
+              - quit
+              - --wait=15
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /status
+            port: status
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: proxy
+        ports:
+        - containerPort: 8444
+          name: admin-tls
+          protocol: TCP
+        - containerPort: 8000
+          name: proxy
+          protocol: TCP
+        - containerPort: 8443
+          name: proxy-tls
+          protocol: TCP
+        - containerPort: 8100
+          name: status
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /status
+            port: status
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      initContainers:
+      - command:
+        - rm
+        - -vrf
+        - $KONG_PREFIX/pids
+        env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        name: clear-stale-pid
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      - args:
+        - /bin/bash
+        - -c
+        - export KONG_NGINX_DAEMON=on KONG_PREFIX=`mktemp -d` KONG_KEYRING_ENABLED=off;
+          until kong start; do echo 'waiting for db'; sleep 1; done; kong stop
+        env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        name: wait-for-db
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      securityContext: {}
+      serviceAccountName: flyte-sandbox-kong
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 256Mi
+        name: flyte-sandbox-kong-prefix-dir
+      - emptyDir:
+          sizeLimit: 1Gi
+        name: flyte-sandbox-kong-tmp
+      - name: webhook-cert
+        secret:
+          secretName: flyte-sandbox-kong-validation-webhook-keypair
+      - name: flyte-sandbox-kong-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+              - key: ca.crt
+                path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+              - fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+                path: namespace
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1712,3 +2579,685 @@ spec:
   updateStrategy:
     rollingUpdate: {}
     type: RollingUpdate
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/component: init-migrations
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-init-migrations
+  namespace: flyte
+spec:
+  backoffLimit: null
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app.kubernetes.io/component: init-migrations
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kong
+        app.kubernetes.io/version: "3.1"
+        helm.sh/chart: kong-2.16.5
+      name: kong-init-migrations
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - kong
+        - migrations
+        - bootstrap
+        env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        name: kong-migrations
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      restartPolicy: OnFailure
+      securityContext: {}
+      serviceAccountName: flyte-sandbox-kong
+      volumes:
+      - emptyDir:
+          sizeLimit: 256Mi
+        name: flyte-sandbox-kong-prefix-dir
+      - emptyDir:
+          sizeLimit: 1Gi
+        name: flyte-sandbox-kong-tmp
+      - name: webhook-cert
+        secret:
+          secretName: flyte-sandbox-kong-validation-webhook-keypair
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+  labels:
+    app.kubernetes.io/component: post-upgrade-migrations
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-post-upgrade-migrations
+  namespace: flyte
+spec:
+  backoffLimit: null
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app.kubernetes.io/component: post-upgrade-migrations
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kong
+        app.kubernetes.io/version: "3.1"
+        helm.sh/chart: kong-2.16.5
+      name: kong-post-upgrade-migrations
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - kong
+        - migrations
+        - finish
+        env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        name: kong-post-upgrade-migrations
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      restartPolicy: OnFailure
+      securityContext: {}
+      serviceAccountName: flyte-sandbox-kong
+      volumes:
+      - emptyDir:
+          sizeLimit: 256Mi
+        name: flyte-sandbox-kong-prefix-dir
+      - emptyDir:
+          sizeLimit: 1Gi
+        name: flyte-sandbox-kong-tmp
+      - name: webhook-cert
+        secret:
+          secretName: flyte-sandbox-kong-validation-webhook-keypair
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+  labels:
+    app.kubernetes.io/component: pre-upgrade-migrations
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-pre-upgrade-migrations
+  namespace: flyte
+spec:
+  backoffLimit: null
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app.kubernetes.io/component: pre-upgrade-migrations
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kong
+        app.kubernetes.io/version: "3.1"
+        helm.sh/chart: kong-2.16.5
+      name: kong-pre-upgrade-migrations
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - kong
+        - migrations
+        - up
+        env:
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_GUI_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_ADMIN_GUI_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ADMIN_LISTEN
+          value: 0.0.0.0:8444 http2 ssl
+        - name: KONG_CLUSTER_LISTEN
+          value: "off"
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_KIC
+          value: "on"
+        - name: KONG_LUA_PACKAGE_PATH
+          value: /opt/?.lua;/opt/?/init.lua;;
+        - name: KONG_NGINX_WORKER_PROCESSES
+          value: "2"
+        - name: KONG_PG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: flyte-sandbox-postgresql
+        - name: KONG_PG_PASSWORD
+          value: postgres
+        - name: KONG_PG_PORT
+          value: "5432"
+        - name: KONG_PG_SSL
+          value: "off"
+        - name: KONG_PG_SSL_VERIFY
+          value: "off"
+        - name: KONG_PG_USER
+          value: postgres
+        - name: KONG_PLUGINS
+          value: bundled
+        - name: KONG_PORTAL_API_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PORTAL_API_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PORT_MAPS
+          value: 80:8000, 443:8443
+        - name: KONG_PREFIX
+          value: /kong_prefix/
+        - name: KONG_PROXY_ACCESS_LOG
+          value: /dev/stdout
+        - name: KONG_PROXY_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_PROXY_LISTEN
+          value: 0.0.0.0:8000, 0.0.0.0:8443 http2 ssl
+        - name: KONG_PROXY_STREAM_ACCESS_LOG
+          value: /dev/stdout basic
+        - name: KONG_PROXY_STREAM_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_ROUTER_FLAVOR
+          value: traditional
+        - name: KONG_STATUS_ACCESS_LOG
+          value: "off"
+        - name: KONG_STATUS_ERROR_LOG
+          value: /dev/stderr
+        - name: KONG_STATUS_LISTEN
+          value: 0.0.0.0:8100
+        - name: KONG_STREAM_LISTEN
+          value: "off"
+        - name: KONG_NGINX_DAEMON
+          value: "off"
+        image: kong:3.1
+        imagePullPolicy: IfNotPresent
+        name: kong-upgrade-migrations
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /kong_prefix/
+          name: flyte-sandbox-kong-prefix-dir
+        - mountPath: /tmp
+          name: flyte-sandbox-kong-tmp
+      restartPolicy: OnFailure
+      securityContext: {}
+      serviceAccountName: flyte-sandbox-kong
+      volumes:
+      - emptyDir:
+          sizeLimit: 256Mi
+        name: flyte-sandbox-kong-prefix-dir
+      - emptyDir:
+          sizeLimit: 1Gi
+        name: flyte-sandbox-kong-tmp
+      - name: webhook-cert
+        secret:
+          secretName: flyte-sandbox-kong-validation-webhook-keypair
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/protocols: grpc
+    kubernetes.io/ingress.class: kong
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-grpc
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.AdminService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.DataProxyService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.DataProxyService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.AuthMetadataService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.IdentityService/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /grpc.health.v1.Health
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /grpc.health.v1.Health/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.SignalService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-grpc
+            port:
+              number: 8089
+        path: /flyteidl.service.SignalService/*
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-http
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /console
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /console/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /api
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /api/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /healthcheck
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /v1/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /.well-known
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /config/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /oauth2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-sandbox-http
+            port:
+              number: 8088
+        path: /oauth2/*
+        pathType: ImplementationSpecific
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/version: "3.1"
+    helm.sh/chart: kong-2.16.5
+  name: flyte-sandbox-kong-validations
+  namespace: flyte
+webhooks:
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKRENDQWd5Z0F3SUJBZ0lSQUtKdG5wTHFFRWo5SEZBUDlmaksxT1F3RFFZSktvWklodmNOQVFFTEJRQXcKSERFYU1CZ0dBMVVFQXhNUmEyOXVaeTFoWkcxcGMzTnBiMjR0WTJFd0hoY05Nak13TXpJeE1qSXlPVEk0V2hjTgpNek13TXpFNE1qSXlPVEk0V2pBY01Sb3dHQVlEVlFRREV4RnJiMjVuTFdGa2JXbHpjMmx2YmkxallUQ0NBU0l3CkRRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFOSHdRTkNKSnJFMHllYk00aGV1dUR2enZtcG0KQ3lmRnpYMjlEUVdpTmFnVUF2cmM2YW44NDVmRWlub3Zvb1JoZXVWVFRLaXp5R1Fwb1JXeGwyVGlkQndqT0w3YQoxZGd0U0ltODROR3RBN3lhbWZmTGxhc04wQVZaWkZ6MStXdzBpNzN0RGkvVS9wM05WSmJFVUJQRFRCQzh6UWtIClJ5Q1ozNTRXcEZteWVBcUwyTmkxN0ZoaUdXNW1vZWt0c2VmWUljdCtuamVQZUI4YWJCSk40U0prbTlLRW9rUnkKWDhHZmdMWSsvdmxjaWZXNXpYQzRrQThvdWlLRytHVkZ6R1hzUUt3SHVTREJvOWdBRkFVUUN2L0kyUWtHM1ZTZQpyV1VYVktscU9vSzFVSWsyV0lwdmd0enVXWjVOUEtMdHUwdkhkZktwQ3dnUU5WMUlpTTI0THJXbGpxa0NBd0VBCkFhTmhNRjh3RGdZRFZSMFBBUUgvQkFRREFnS2tNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUYKQlFjREFqQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01CMEdBMVVkRGdRV0JCVEVhRW01bm9GRkIwZ0cvdnFpZnE0dwoxSlJUaXpBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQVJCQ3QzQTZwNFhrSnM0dHhRaVF1aExIQ0I3Mm81NnZJCitwUmlweStBSEs3ZE1mUk1wT2F6RCtFSXF3MFd5bXJqRkg3TS9GMFowMzZUQXlYYkVPMGVmUDFteHhpUXNDK1UKbitHN0ZKMWxBbzMzVkI1bXN4eGhJcEZlOFhFSitPMy9RNWhIS1NFMDdoekkzeWpZWlRxeHlrMlo5SHVkR0NJZQo4alRBbCtLZUw0eGZOY3BZRTNPVVJ6Uk81dVJIOUdEL0FlZnd1b3hQdVdhckJjVkVzbXlzdGEreXBSWGdEMnRxClFaT1cwN3BTU09LMjFNQ0k5RVA5VWhRNWpRcGJHSTFjWHNHNWEwNDRFVnBySkFDdmtJcUQvYnJkQkFiSVBHYTEKSlpzU0N4RVBDOUNXMFFRMHhDZ1FUSndqY0VJS0dKSXlkTG1rd3F0a2tSd2xEUGo5TTlWcytnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    service:
+      name: flyte-sandbox-kong-validation-webhook
+      namespace: flyte
+  failurePolicy: Ignore
+  name: validations.kong.konghq.com
+  objectSelector:
+    matchExpressions:
+    - key: owner
+      operator: NotIn
+      values:
+      - helm
+  rules:
+  - apiGroups:
+    - configuration.konghq.com
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - kongconsumers
+    - kongplugins
+    - kongclusterplugins
+    - kongingresses
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - UPDATE
+    resources:
+    - secrets
+  sideEffects: None

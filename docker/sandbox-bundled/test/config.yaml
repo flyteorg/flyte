@@ -1,7 +1,8 @@
 admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-  endpoint: dns:///localhost:30080
-  insecure: true
+  endpoint: dns:///localhost:32443
+  insecure: false
+  insecureSkipVerify: true
   authType: Pkce
 logger:
   show-source: true

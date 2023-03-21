@@ -59,6 +59,17 @@ flyte-binary:
         repository: bitnami/postgresql
         tag: sandbox
         pullPolicy: Never
+  service:
+    grpc:
+      annotations:
+        konghq.com/protocol: grpc
+  ingress:
+    create: true
+    commonAnnotations:
+      kubernetes.io/ingress.class: kong
+    grpc:
+      annotations:
+        konghq.com/protocols: grpc
   rbac:
     # This is strictly NOT RECOMMENDED in production clusters, and is only for use
     # within local Flyte sandboxes.
@@ -73,6 +84,34 @@ flyte-binary:
         - '*'
         verbs:
         - '*'
+
+kong:
+  enabled: true
+  env:
+    database: postgres
+    pg_database: postgres
+    pg_host: flyte-sandbox-postgresql
+    pg_ssl: "off"
+    pg_ssl_verify: "off"
+    pg_user: postgres
+    pg_password: postgres
+
+  admin:
+    enabled: true
+    type: NodePort
+    tls:
+      nodePort: 32444
+
+  proxy:
+    enabled: true
+    type: NodePort
+    http:
+      nodePort: 32080
+    tls:
+      nodePort: 32443
+
+  ingressController:
+    enabled: true
 
 kubernetes-dashboard:
   enabled: true
