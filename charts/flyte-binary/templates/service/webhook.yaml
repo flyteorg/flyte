@@ -7,15 +7,15 @@ metadata:
     {{- if .Values.commonLabels }}
     {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.service.labels }}
-    {{- tpl ( .Values.service.labels | toYaml ) . | nindent 4 }}
+    {{- if .Values.service.commonLabels }}
+    {{- tpl ( .Values.service.commonLabels | toYaml ) . | nindent 4 }}
     {{- end }}
   annotations:
     {{- if .Values.commonAnnotations }}
     {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.service.annotations }}
-    {{- tpl ( .Values.service.annotations | toYaml ) . | nindent 4 }}
+    {{- if .Values.service.commonAnnotations }}
+    {{- tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   type: ClusterIP
