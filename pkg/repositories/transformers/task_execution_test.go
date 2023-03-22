@@ -255,7 +255,13 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 		CreatedAt: taskEventOccurredAtProto,
 		UpdatedAt: taskEventOccurredAtProto,
 		Reason:    "Task was scheduled",
-		TaskType:  "sidecar",
+		Reasons: []*admin.Reason{
+			&admin.Reason{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+		},
+		TaskType: "sidecar",
 	}
 
 	expectedClosureBytes, err := proto.Marshal(expectedClosure)
@@ -338,6 +344,8 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 		CustomInfo: &customInfo,
 	}
 
+	t.Logf("expected %+v %+v\n", expectedClosure.Reason, expectedClosure.Reasons)
+
 	expectedClosureBytes, err := proto.Marshal(expectedClosure)
 	assert.Nil(t, err)
 
@@ -386,6 +394,13 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		CustomInfo: transformMapToStructPB(t, map[string]string{
 			"key1": "value1",
 		}),
+		Reason: "Task was scheduled",
+		Reasons: []*admin.Reason{
+			&admin.Reason{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+		},
 	}
 
 	closureBytes, err := proto.Marshal(existingClosure)
@@ -481,6 +496,16 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 			"key1": "value1 updated",
 		}),
 		Reason: "task failed",
+		Reasons: []*admin.Reason{
+			&admin.Reason{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+			&admin.Reason{
+				OccurredAt: occuredAtProto,
+				Message:    "task failed",
+			},
+		},
 	}
 
 	expectedClosureBytes, err := proto.Marshal(expectedClosure)
