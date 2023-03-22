@@ -170,10 +170,10 @@ data:
       {{- if .Values.configuration.auth.authorizedUris }}
       {{- tpl ( .Values.configuration.auth.authorizedUris | toYaml ) . | nindent 6 }}
       {{- end }}
-      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.http.port" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.http.port" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.http.port" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.http.port" . }}
+      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.httpPort" . }}
       userAuth:
         openId:
           baseUrl: {{ required "OIDC base URL required when authentication is enabled" .Values.configuration.auth.oidc.baseUrl | quote }}
