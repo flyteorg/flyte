@@ -225,85 +225,55 @@ deployment:
 
 # service Configure service for Flyte
 service:
-  # commonLabels Add common labels to Flyte services
-  commonLabels: {}
-  # commonAnnotations Add common annotations to Flyte services
-  commonAnnotations: {}
-  http:
-    # labels Add labels to Flyte service
-    labels: {}
-    # annotations Add annotations to service
-    annotations: {}
-    # type Kubernetes service type
-    type: ClusterIP
-    # port Flyte service port
-    # If not specified, defaults to corresponding container port
-    port: ""
-    # nodePort Node port for Flyte service if service type is `NodePort` or `LoadBalancer`
-    nodePort: ""
-    # clusterIP Set static IP if service type is `ClusterIP`
-    clusterIP: ""
-    # loadBalancerIP Set static IP if service type is `LoadBalancer`
-    loadBalancerIP: ""
-    # externalTrafficPolicy Enable client source IP preservation if service type is `NodePort` or `LoadBalancer`
-    # See: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-    externalTrafficPolicy: Cluster
-    # loadBalancerSourceRanges Addresses that are allowed when service is `LoadBalancer`
-    loadBalancerSourceRanges: []
-    # extraPorts Additional ports to add to Flyte service
-    extraPorts: []
-  grpc:
-    # labels Add labels to Flyte service
-    labels: {}
-    # annotations Add annotations to service
-    annotations: {}
-    # type Kubernetes service type
-    type: ClusterIP
-    # port Flyte service port
-    # If not specified, defaults to corresponding container port
-    port: ""
-    # nodePort Node port for Flyte service if service type is `NodePort` or `LoadBalancer`
-    nodePort: ""
-    # clusterIP Set static IP if service type is `ClusterIP`
-    clusterIP: ""
-    # loadBalancerIP Set static IP if service type is `LoadBalancer`
-    loadBalancerIP: ""
-    # externalTrafficPolicy Enable client source IP preservation if service type is `NodePort` or `LoadBalancer`
-    # See: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-    externalTrafficPolicy: Cluster
-    # loadBalancerSourceRanges Addresses that are allowed when service is `LoadBalancer`
-    loadBalancerSourceRanges: []
-    # extraPorts Additional ports to add to Flyte service
-    extraPorts: []
+  # type Kubernetes service type
+  type: ClusterIP
+  # ports Flyte service ports
+  # If not specified, defaults to corresponding container ports
+  ports:
+    http: ""
+    grpc: ""
+  # nodePorts Node ports for Flyte service if service type is `NodePort` or `LoadBalancer`
+  nodePorts:
+    http: ""
+    grpc: ""
+  # clusterIP Set static IP if service type is `ClusterIP`
+  clusterIP: ""
+  # labels Add labels to Flyte services
+  labels: {}
+  # annotations Add annotations to Flyte services
+  annotations: {}
+  # loadBalancerIP Set static IP if service type is `LoadBalancer`
+  loadBalancerIP: ""
+  # externalTrafficPolicy Enable client source IP preservation if service type is `NodePort` or `LoadBalancer`
+  # See: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  externalTrafficPolicy: Cluster
+  # loadBalancerSourceRanges Addresses that are allowed when service is `LoadBalancer`
+  loadBalancerSourceRanges: []
+  # extraPorts Additional ports to add to Flyte service
+  extraPorts: []
 
 # ingress Configure ingress for Flyte
 ingress:
   # create Create ingress resources
   create: false
-  # commonLabels Add common labels to ingress resources
-  commonLabels: {}
-  # commonAnnotations Add common annotations to ingress resources
-  commonAnnotations: {}
+  # labels Add labels to ingress resources
+  labels: {}
   # host Hostname to bind to ingress resources
   host: ""
-  http:
-    # labels Add labels to ingress resource
-    labels: {}
-    # annotations Add annotations to ingress resource
-    annotations: {}
-    # extraPaths Add extra paths to ingress rule
-    extraPaths:
-      prepend: []
-      append: []
-  grpc:
-    # labels Add labels to ingress resource
-    labels: {}
-    # annotations Add annotations to ingress resource
-    annotations: {}
-    # extraPaths Add extra paths to ingress rule
-    extraPaths:
-      prepend: []
-      append: []
+  # commonAnnotations Add common annotations to all ingress resources
+  commonAnnotations: {}
+  # httpAnnotations Add common annotations to http ingress resource
+  httpAnnotations: {}
+  # grpcAnnotations Add common annotations to grpc ingress resource
+  grpcAnnotations: {}
+  # httpExtraPaths Add extra paths to http ingress rule
+  httpExtraPaths:
+    prepend: []
+    append: []
+  # grpcExtraPaths Add extra paths to grpc ingress rule
+  grpcExtraPaths:
+    prepend: []
+    append: []
 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:

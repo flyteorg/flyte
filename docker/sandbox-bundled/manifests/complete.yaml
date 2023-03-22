@@ -679,7 +679,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox-http
+                                          address: flyte-sandbox
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -693,7 +693,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox-grpc
+                                          address: flyte-sandbox
                                           port_value: 8089
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
@@ -762,7 +762,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: b2VKUWRRdHhxRFZTdjBoZw==
+  haSharedSecret: R2ZBT0pkdGtuZ0tQeHFuSg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -848,6 +848,32 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 8088
+    targetPort: http
+  - name: grpc
+    nodePort: null
+    port: 8089
+    targetPort: grpc
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -865,50 +891,6 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-v0.1.10
-  name: flyte-sandbox-grpc
-  namespace: flyte
-spec:
-  ports:
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-v0.1.10
-  name: flyte-sandbox-http
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1264,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 48e64be9ebcd5c9ff9ad152978104552589aa88ff0bd550670a9ec8455151979
+        checksum/secret: b7af65b89a798a2365e092b31a46eaacce978a64328b65fea14f014dee5e5d79
       labels:
         app: docker-registry
         release: flyte-sandbox
