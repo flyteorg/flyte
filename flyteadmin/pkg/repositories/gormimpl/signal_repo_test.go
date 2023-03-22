@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
@@ -19,6 +20,12 @@ import (
 
 var (
 	signalModel = &models.Signal{
+		BaseModel: models.BaseModel{
+			ID:        10,
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
+			DeletedAt: nil,
+		},
 		SignalKey: models.SignalKey{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -34,6 +41,7 @@ var (
 
 func toSignalMap(signalModel models.Signal) map[string]interface{} {
 	signal := make(map[string]interface{})
+	signal["id"] = signalModel.ID
 	signal["created_at"] = signalModel.CreatedAt
 	signal["updated_at"] = signalModel.UpdatedAt
 	signal["execution_project"] = signalModel.Project
@@ -92,7 +100,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	// create initial signalModel
 	mockInsertQuery := GlobalMock.NewMock()
 	mockInsertQuery.WithQuery(
-		`INSERT INTO "signals" ("id","created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","signal_id","type","value") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
+		`INSERT INTO "signals" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","signal_id","type","value","id") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
 
 	err := signalRepo.GetOrCreate(ctx, signalModel)
 	assert.NoError(t, err)
@@ -104,7 +112,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	signalModels := []map[string]interface{}{toSignalMap(*signalModel)}
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "signals" WHERE "signals"."created_at" = $1 AND "signals"."updated_at" = $2 AND "signals"."execution_project" = $3 AND "signals"."execution_domain" = $4 AND "signals"."execution_name" = $5 AND "signals"."signal_id" = $6 AND "signals"."execution_project" = $7 AND "signals"."execution_domain" = $8 AND "signals"."execution_name" = $9 AND "signals"."signal_id" = $10 ORDER BY "signals"."id" LIMIT 1`).WithReply(signalModels)
+		`SELECT * FROM "signals" WHERE "signals"."id" = $1 AND "signals"."created_at" = $2 AND "signals"."updated_at" = $3 AND "signals"."execution_project" = $4 AND "signals"."execution_domain" = $5 AND "signals"."execution_name" = $6 AND "signals"."signal_id" = $7 AND "signals"."execution_project" = $8 AND "signals"."execution_domain" = $9 AND "signals"."execution_name" = $10 AND "signals"."signal_id" = $11 ORDER BY "signals"."id" LIMIT 1`).WithReply(signalModels)
 
 	// retrieve existing signalModel
 	lookupSignalModel := &models.Signal{}
