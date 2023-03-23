@@ -148,8 +148,14 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	pod := r.(*v1.Pod)
 
 	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
+	reportedAt := flytek8s.GetReportedAt(pod).Time
+	if reportedAt.IsZero() {
+		reportedAt = transitionOccurredAt
+	}
+
 	info := pluginsCore.TaskInfo{
 		OccurredAt: &transitionOccurredAt,
+		ReportedAt: &reportedAt,
 	}
 
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
