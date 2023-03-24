@@ -33,6 +33,7 @@ sed -i "s,tag:[^P]*# FLYTEPROPELLER_TAG,tag: ${FLYTEPROPELLER_TAG} # FLYTEPROPEL
 
 sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot:${FLYTECOPILOT_TAG} # FLYTECOPILOT_IMAGE," ./charts/flyte/values.yaml
 sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot:${FLYTECOPILOT_TAG} # FLYTECOPILOT_IMAGE," ./charts/flyte-core/values.yaml
+sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${FLYTECOPILOT_TAG} # FLYTECOPILOT_TAG," ./charts/flyte-binary/values.yaml
 
 go get github.com/flyteorg/flyteadmin@${FLYTEADMIN_TAG}
 go get github.com/flyteorg/flytepropeller@${FLYTEPROPELLER_TAG}
