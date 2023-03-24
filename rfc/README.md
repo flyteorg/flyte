@@ -66,9 +66,9 @@ Once a pull request is opened, the RFC is now in development and the following w
 * It will be introduced in a future Contributor's meetup, happenning every other week, except othwerwise informed.
 * The proposal will be discussed as much as possible in the RFC pull request directly. Any outside discussion will be summarized in the comment thread
 * When deemed "ready", a maintainer or TSC member will propose a "motion for Final Comment Period (FCP)" along with a disposition of the outcome (merge, close, or postpone). This step is taken when enough discussions of the tradeoffs have taken place and the community is in a position to make a decision. 
-* The proposal enters FCP unless there's any objection (lazy consensus)
-* The Final Comment Period will last 7 days. If there's no objection, the FCP can close early
-* If no substantial new arguments or ideas are raised, the FCP will follow the outcome decided
+* The proposal enters FCP unless there's any objection (lazy consensus).
+* The Final Comment Period will last 7 days. If there's no objection, the FCP can close early.
+* If no substantial new arguments or ideas are raised, the FCP will follow the outcome decided.
 * The RFC author could also withdraw the proposal if they decide to accept a competing proposal as a better alternative or if they deem the original idea as not applicable anymore. 
 
 ### Acceptance criteria
