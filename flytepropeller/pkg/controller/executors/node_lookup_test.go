@@ -18,14 +18,20 @@ type nsg struct {
 	v1alpha1.NodeStatusGetter
 }
 
+type dag struct {
+	DAGStructure
+}
+
 func TestNewNodeLookup(t *testing.T) {
 	n := ng{}
 	ns := nsg{}
-	nl := NewNodeLookup(n, ns)
+	d := dag{}
+	nl := NewNodeLookup(n, ns, d)
 	assert.NotNil(t, nl)
 	typed := nl.(contextualNodeLookup)
 	assert.Equal(t, n, typed.NodeGetter)
 	assert.Equal(t, ns, typed.NodeStatusGetter)
+	assert.Equal(t, d, typed.DAGStructure)
 }
 
 func TestNewTestNodeLookup(t *testing.T) {

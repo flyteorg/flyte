@@ -209,7 +209,7 @@ func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx 
 	}
 
 	status := nCtx.NodeStatus()
-	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
+	nodeLookup := executors.NewNodeLookup(subWorkflow, status, subWorkflow)
 	return s.HandleFailureNodeOfSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
@@ -220,7 +220,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 	}
 
 	status := nCtx.NodeStatus()
-	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
+	nodeLookup := executors.NewNodeLookup(subWorkflow, status, subWorkflow)
 
 	// assert startStatus.IsComplete() == true
 	return s.startAndHandleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
@@ -233,7 +233,7 @@ func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx ha
 	}
 
 	status := nCtx.NodeStatus()
-	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
+	nodeLookup := executors.NewNodeLookup(subWorkflow, status, subWorkflow)
 	return s.handleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
@@ -243,7 +243,7 @@ func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeE
 		return err
 	}
 	status := nCtx.NodeStatus()
-	nodeLookup := executors.NewNodeLookup(subWorkflow, status)
+	nodeLookup := executors.NewNodeLookup(subWorkflow, status, subWorkflow)
 	execContext, err := s.getExecutionContextForDownstream(nCtx)
 	if err != nil {
 		return err

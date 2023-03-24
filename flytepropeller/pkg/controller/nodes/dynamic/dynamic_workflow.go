@@ -183,7 +183,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 				subWorkflow:        compiledWf,
 				subWorkflowClosure: workflowCacheContents.CompiledWorkflow,
 				execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), compiledWf, compiledWf, newParentInfo, nCtx.ExecutionContext()),
-				nodeLookup:         executors.NewNodeLookup(compiledWf, dynamicNodeStatus),
+				nodeLookup:         executors.NewNodeLookup(compiledWf, dynamicNodeStatus, compiledWf),
 				dynamicJobSpecURI:  string(f.GetLoc()),
 			}, nil
 		}
@@ -216,7 +216,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		subWorkflow:        dynamicWf,
 		subWorkflowClosure: closure,
 		execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), dynamicWf, dynamicWf, newParentInfo, nCtx.ExecutionContext()),
-		nodeLookup:         executors.NewNodeLookup(dynamicWf, dynamicNodeStatus),
+		nodeLookup:         executors.NewNodeLookup(dynamicWf, dynamicNodeStatus, dynamicWf),
 		dynamicJobSpecURI:  string(f.GetLoc()),
 	}, nil
 }
