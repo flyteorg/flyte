@@ -659,6 +659,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	}
 
 	barrierTick := uint32(0)
+	occurredAt := time.Now()
 	// STEP 2: If no cache-hit and not transitioning to PhaseWaitingForCache, then lets invoke the plugin and wait for a transition out of undefined
 	if pluginTrns.execInfo.TaskNodeInfo == nil || (pluginTrns.pInfo.Phase() != pluginCore.PhaseWaitingForCache &&
 		pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.CacheStatus != core.CatalogCacheStatus_CACHE_HIT) {
@@ -724,6 +725,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 			PluginID:              p.GetID(),
 			ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
 			ClusterID:             t.clusterID,
+			OccurredAt:            occurredAt,
 		})
 		if err != nil {
 			return handler.UnknownTransition, err
@@ -750,6 +752,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		PluginID:              p.GetID(),
 		ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
 		ClusterID:             t.clusterID,
+		OccurredAt:            occurredAt,
 	})
 	if err != nil {
 		logger.Errorf(ctx, "failed to convert plugin transition to TaskExecutionEvent. Error: %s", err.Error())

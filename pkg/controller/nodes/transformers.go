@@ -114,6 +114,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			OccurredAt:   occurredTime,
 			ProducerId:   clusterID,
 			EventVersion: nodeExecutionEventVersion,
+			ReportedAt:   ptypes.TimestampNow(),
 		}
 	} else {
 		nev = &event.NodeExecutionEvent{
@@ -122,6 +123,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			OccurredAt:   occurredTime,
 			ProducerId:   clusterID,
 			EventVersion: nodeExecutionEventVersion,
+			ReportedAt:   ptypes.TimestampNow(),
 		}
 	}
 

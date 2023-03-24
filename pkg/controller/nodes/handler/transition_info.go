@@ -105,6 +105,16 @@ func (p PhaseInfo) WithInfo(i *ExecutionInfo) PhaseInfo {
 	}
 }
 
+func (p PhaseInfo) WithOccuredAt(t time.Time) PhaseInfo {
+	return PhaseInfo{
+		p:          p.p,
+		occurredAt: t,
+		err:        p.err,
+		info:       p.info,
+		reason:     p.reason,
+	}
+}
+
 var PhaseInfoUndefined = PhaseInfo{p: EPhaseUndefined}
 
 func phaseInfo(p EPhase, err *core.ExecutionError, info *ExecutionInfo, reason string) PhaseInfo {
