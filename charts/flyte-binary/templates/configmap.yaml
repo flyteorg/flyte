@@ -56,6 +56,11 @@ data:
           - container_array: K8S-ARRAY
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
+      k8s:
+        co-pilot:
+          {{- with ( index .Values.configuration "co-pilot" ).image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          {{- end }}
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
