@@ -15,6 +15,47 @@ type NodeLookup struct {
 	mock.Mock
 }
 
+type NodeLookup_FromNode struct {
+	*mock.Call
+}
+
+func (_m NodeLookup_FromNode) Return(_a0 []string, _a1 error) *NodeLookup_FromNode {
+	return &NodeLookup_FromNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *NodeLookup) OnFromNode(id string) *NodeLookup_FromNode {
+	c_call := _m.On("FromNode", id)
+	return &NodeLookup_FromNode{Call: c_call}
+}
+
+func (_m *NodeLookup) OnFromNodeMatch(matchers ...interface{}) *NodeLookup_FromNode {
+	c_call := _m.On("FromNode", matchers...)
+	return &NodeLookup_FromNode{Call: c_call}
+}
+
+// FromNode provides a mock function with given fields: id
+func (_m *NodeLookup) FromNode(id string) ([]string, error) {
+	ret := _m.Called(id)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(string) []string); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type NodeLookup_GetNode struct {
 	*mock.Call
 }
@@ -88,4 +129,45 @@ func (_m *NodeLookup) GetNodeExecutionStatus(ctx context.Context, id string) v1a
 	}
 
 	return r0
+}
+
+type NodeLookup_ToNode struct {
+	*mock.Call
+}
+
+func (_m NodeLookup_ToNode) Return(_a0 []string, _a1 error) *NodeLookup_ToNode {
+	return &NodeLookup_ToNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *NodeLookup) OnToNode(id string) *NodeLookup_ToNode {
+	c_call := _m.On("ToNode", id)
+	return &NodeLookup_ToNode{Call: c_call}
+}
+
+func (_m *NodeLookup) OnToNodeMatch(matchers ...interface{}) *NodeLookup_ToNode {
+	c_call := _m.On("ToNode", matchers...)
+	return &NodeLookup_ToNode{Call: c_call}
+}
+
+// ToNode provides a mock function with given fields: id
+func (_m *NodeLookup) ToNode(id string) ([]string, error) {
+	ret := _m.Called(id)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(string) []string); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
