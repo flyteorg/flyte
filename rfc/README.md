@@ -9,7 +9,7 @@ An RFC - Request For Comments - is a document issued mainly to recommend changes
 You need to follow this process if you intend to make a significant change to the system or changes to the user experience. What constitutes a "significant" change is evolving based on community feedback, but may include the following:
 
   - Semantics or syntax changes, other than bugfixes (e.g. introducing a new Flytekit language feature)
-  - Core-Language updates (e.g. FlyteIdl changes that introduce new wire-format)
+  - Core-Language updates (e.g. FlyteIdl changes that introduce a new wire-format)
   - Documentation restructuring
   - Service-to-Service changes (e.g. new gRPC APIs)
   - Breaking changes
