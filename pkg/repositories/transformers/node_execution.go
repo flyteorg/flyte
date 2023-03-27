@@ -115,10 +115,15 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 		Phase: input.Request.Event.Phase.String(),
 	}
 
+	reportedAt := input.Request.Event.ReportedAt
+	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
+		reportedAt = input.Request.Event.OccurredAt
+	}
+
 	closure := admin.NodeExecutionClosure{
 		Phase:     input.Request.Event.Phase,
 		CreatedAt: input.Request.Event.OccurredAt,
-		UpdatedAt: input.Request.Event.OccurredAt,
+		UpdatedAt: reportedAt,
 	}
 
 	nodeExecutionMetadata := admin.NodeExecutionMetaData{
@@ -161,7 +166,11 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
 	}
 	nodeExecution.NodeExecutionCreatedAt = &nodeExecutionCreatedAt
-	nodeExecution.NodeExecutionUpdatedAt = &nodeExecutionCreatedAt
+	nodeExecutionUpdatedAt, err := ptypes.Timestamp(reportedAt)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event reported_at timestamp")
+	}
+	nodeExecution.NodeExecutionUpdatedAt = &nodeExecutionUpdatedAt
 	if input.Request.Event.ParentTaskMetadata != nil {
 		nodeExecution.ParentTaskExecutionID = input.ParentTaskExecutionID
 	}
@@ -195,7 +204,11 @@ func UpdateNodeExecutionModel(
 	}
 	nodeExecutionModel.Phase = request.Event.Phase.String()
 	nodeExecutionClosure.Phase = request.Event.Phase
-	nodeExecutionClosure.UpdatedAt = request.Event.OccurredAt
+	reportedAt := request.Event.ReportedAt
+	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
+		reportedAt = request.Event.OccurredAt
+	}
+	nodeExecutionClosure.UpdatedAt = reportedAt
 
 	if request.Event.Phase == core.NodeExecution_RUNNING {
 		err := addNodeRunningState(request, nodeExecutionModel, &nodeExecutionClosure)
@@ -248,7 +261,7 @@ func UpdateNodeExecutionModel(
 	}
 
 	nodeExecutionModel.Closure = marshaledClosure
-	updatedAt, err := ptypes.Timestamp(request.Event.OccurredAt)
+	updatedAt, err := ptypes.Timestamp(reportedAt)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to parse updated at timestamp")
 	}

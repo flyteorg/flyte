@@ -45,6 +45,7 @@ type AdminService struct {
 	NamedEntityManager       interfaces.NamedEntityInterface
 	VersionManager           interfaces.VersionInterface
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
+	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
 }
 
@@ -157,6 +158,11 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		nodeExecutionEventWriter.Run()
 	}()
 
+	nodeExecutionManager := manager.NewNodeExecutionManager(repo, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
+		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
+	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
+		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
+
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
@@ -167,12 +173,12 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		NamedEntityManager:       namedEntityManager,
 		DescriptionEntityManager: descriptionEntityManager,
 		VersionManager:           versionManager,
-		NodeExecutionManager: manager.NewNodeExecutionManager(repo, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
-			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter),
-		TaskExecutionManager: manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
-			adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher),
-		ProjectManager:  manager.NewProjectManager(repo, configuration),
-		ResourceManager: resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
-		Metrics:         InitMetrics(adminScope),
+		NodeExecutionManager:     nodeExecutionManager,
+		TaskExecutionManager:     taskExecutionManager,
+		ProjectManager:           manager.NewProjectManager(repo, configuration),
+		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
+		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
+			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
+		Metrics: InitMetrics(adminScope),
 	}
 }
