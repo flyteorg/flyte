@@ -36,6 +36,14 @@ flyte-binary:
           templateUri: |-
             http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
+      task_resources:
+        defaults:
+          cpu: "0"
+          memory: "0"
+        limits:
+          cpu: "0"
+          gpu: "0"
+          memory: "0"
       storage:
         signedURL:
           stowConfigOverride:
