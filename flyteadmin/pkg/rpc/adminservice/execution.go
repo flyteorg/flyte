@@ -131,13 +131,31 @@ func (m *AdminService) GetExecutionData(
 	}
 	var response *admin.WorkflowExecutionGetDataResponse
 	var err error
-	m.Metrics.executionEndpointMetrics.get.Time(func() {
+	m.Metrics.executionEndpointMetrics.getData.Time(func() {
 		response, err = m.ExecutionManager.GetExecutionData(ctx, *request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getData)
 	}
 	m.Metrics.executionEndpointMetrics.getData.Success()
+	return response, nil
+}
+
+func (m *AdminService) GetExecutionMetrics(
+	ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.WorkflowExecutionGetMetricsResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.getMetrics.Time(func() {
+		response, err = m.MetricsManager.GetExecutionMetrics(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getMetrics)
+	}
+	m.Metrics.executionEndpointMetrics.getMetrics.Success()
 	return response, nil
 }
 

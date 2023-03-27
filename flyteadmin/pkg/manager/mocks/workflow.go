@@ -7,9 +7,11 @@ import (
 )
 
 type CreateWorkflowFunc func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error)
+type GetWorkflowFunc func(ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error)
 
 type MockWorkflowManager struct {
 	createWorkflowFunc CreateWorkflowFunc
+	getWorkflowFunc    GetWorkflowFunc
 }
 
 func (r *MockWorkflowManager) SetCreateCallback(createFunction CreateWorkflowFunc) {
@@ -30,8 +32,15 @@ func (r *MockWorkflowManager) ListWorkflows(ctx context.Context,
 	return nil, nil
 }
 
+func (r *MockWorkflowManager) SetGetCallback(getFunction GetWorkflowFunc) {
+	r.getWorkflowFunc = getFunction
+}
+
 func (r *MockWorkflowManager) GetWorkflow(
 	ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error) {
+	if r.getWorkflowFunc != nil {
+		return r.getWorkflowFunc(ctx, request)
+	}
 	return nil, nil
 }
 

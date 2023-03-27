@@ -139,9 +139,14 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		})
 	}
 
+	reportedAt := input.Request.Event.ReportedAt
+	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
+		reportedAt = input.Request.Event.OccurredAt
+	}
+
 	closure := &admin.TaskExecutionClosure{
 		Phase:        input.Request.Event.Phase,
-		UpdatedAt:    input.Request.Event.OccurredAt,
+		UpdatedAt:    reportedAt,
 		CreatedAt:    input.Request.Event.OccurredAt,
 		Logs:         input.Request.Event.Logs,
 		CustomInfo:   input.Request.Event.CustomInfo,
@@ -190,7 +195,11 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
 	}
 	taskExecution.TaskExecutionCreatedAt = &taskExecutionCreatedAt
-	taskExecution.TaskExecutionUpdatedAt = &taskExecutionCreatedAt
+	taskExecutionUpdatedAt, err := ptypes.Timestamp(reportedAt)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event reported_at timestamp")
+	}
+	taskExecution.TaskExecutionUpdatedAt = &taskExecutionUpdatedAt
 
 	return taskExecution, nil
 }
@@ -368,7 +377,11 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	taskExecutionModel.Phase = request.Event.Phase.String()
 	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
 	taskExecutionClosure.Phase = request.Event.Phase
-	taskExecutionClosure.UpdatedAt = request.Event.OccurredAt
+	reportedAt := request.Event.ReportedAt
+	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
+		reportedAt = request.Event.OccurredAt
+	}
+	taskExecutionClosure.UpdatedAt = reportedAt
 	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
 	if len(request.Event.Reason) > 0 {
 		if taskExecutionClosure.Reason != request.Event.Reason {
@@ -412,7 +425,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 			codes.Internal, "failed to marshal task execution closure with error: %v", err)
 	}
 	taskExecutionModel.Closure = marshaledClosure
-	updatedAt, err := ptypes.Timestamp(request.Event.OccurredAt)
+	updatedAt, err := ptypes.Timestamp(reportedAt)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to parse updated at timestamp")
 	}

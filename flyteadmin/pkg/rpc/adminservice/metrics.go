@@ -17,6 +17,7 @@ type executionEndpointMetrics struct {
 	get         util.RequestMetrics
 	update      util.RequestMetrics
 	getData     util.RequestMetrics
+	getMetrics  util.RequestMetrics
 	list        util.RequestMetrics
 	terminate   util.RequestMetrics
 }
@@ -47,6 +48,7 @@ type nodeExecutionEndpointMetrics struct {
 	createEvent  util.RequestMetrics
 	get          util.RequestMetrics
 	getData      util.RequestMetrics
+	getMetrics   util.RequestMetrics
 	list         util.RequestMetrics
 	listChildren util.RequestMetrics
 }
@@ -137,6 +139,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			get:         util.NewRequestMetrics(adminScope, "get_execution"),
 			update:      util.NewRequestMetrics(adminScope, "update_execution"),
 			getData:     util.NewRequestMetrics(adminScope, "get_execution_data"),
+			getMetrics:  util.NewRequestMetrics(adminScope, "get_execution_metrics"),
 			list:        util.NewRequestMetrics(adminScope, "list_execution"),
 			terminate:   util.NewRequestMetrics(adminScope, "terminate_execution"),
 		},
@@ -161,6 +164,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			createEvent:  util.NewRequestMetrics(adminScope, "create_node_execution_event"),
 			get:          util.NewRequestMetrics(adminScope, "get_node_execution"),
 			getData:      util.NewRequestMetrics(adminScope, "get_node_execution_data"),
+			getMetrics:   util.NewRequestMetrics(adminScope, "get_node_execution_metrics"),
 			list:         util.NewRequestMetrics(adminScope, "list_node_execution"),
 			listChildren: util.NewRequestMetrics(adminScope, "list_children_node_executions"),
 		},
