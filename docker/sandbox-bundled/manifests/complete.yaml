@@ -766,7 +766,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UkNISXpwT1JBV1dRaGFkNg==
+  haSharedSecret: SHZxUzRLYTM1VUV6WnFLeQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -870,7 +870,7 @@ spec:
     port: 8089
     targetPort: grpc
   - name: plugin-grpc
-    port: 9090
+    port: 80
     targetPort: plugin-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
@@ -1259,7 +1259,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 9f727494329b7917ad6d69fec631fb14be43955141cd9b5a4bbbec674918ed25
+        checksum/secret: 4ea74feb5a5e75e33ef4ccb2773d6b656cc3d799a7f9ce9595d440aeebe5dc3a
       labels:
         app: docker-registry
         release: flyte-sandbox
