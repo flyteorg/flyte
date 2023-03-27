@@ -102,6 +102,11 @@ func dummyContainerTaskContext(resources *v1.ResourceRequirements, command []str
 	taskCtx.OnTaskReader().Return(taskReader)
 
 	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
+
+	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
+	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
+	taskCtx.OnPluginStateReader().Return(pluginStateReader)
+
 	return taskCtx
 }
 
@@ -140,6 +145,10 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 }
 
 func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
+	command := []string{"command"}
+	args := []string{"{{.Input}}"}
+	taskCtx := dummyContainerTaskContext(containerResourceRequirements, command, args)
+
 	j := &v1.Pod{
 		Status: v1.PodStatus{},
 	}
@@ -147,21 +156,21 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 	ctx := context.TODO()
 	t.Run("running", func(t *testing.T) {
 		j.Status.Phase = v1.PodRunning
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 	})
 
 	t.Run("queued", func(t *testing.T) {
 		j.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, phaseInfo.Phase())
 	})
 
 	t.Run("failNoCondition", func(t *testing.T) {
 		j.Status.Phase = v1.PodFailed
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -177,7 +186,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 				Type: v1.PodReasonUnschedulable,
 			},
 		}
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -186,7 +195,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		j.Status.Phase = v1.PodSucceeded
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.NotNil(t, phaseInfo)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
@@ -199,6 +208,10 @@ func TestContainerTaskExecutor_GetProperties(t *testing.T) {
 }
 
 func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
+	command := []string{"command"}
+	args := []string{"{{.Input}}"}
+	taskCtx := dummyContainerTaskContext(containerResourceRequirements, command, args)
+
 	ctx := context.TODO()
 	reason := "InvalidImageName"
 	message := "Failed to apply default image tag \"TEST/flyteorg/myapp:latest\": couldn't parse image reference" +
@@ -230,7 +243,7 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 
 	t.Run("failInvalidImageName", func(t *testing.T) {
 		pendingPod.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, nil, pendingPod)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, pendingPod)
 		finalReason := fmt.Sprintf("|%s", reason)
 		finalMessage := fmt.Sprintf("|%s", message)
 		assert.NoError(t, err)

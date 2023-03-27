@@ -120,6 +120,10 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 
 	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
 
+	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
+	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
+	taskCtx.OnPluginStateReader().Return(pluginStateReader)
+
 	return taskCtx
 }
 

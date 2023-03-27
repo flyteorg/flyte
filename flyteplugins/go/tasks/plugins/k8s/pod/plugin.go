@@ -145,6 +145,12 @@ func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContex
 }
 
 func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string) (pluginsCore.PhaseInfo, error) {
+	pluginState := k8s.PluginState{}
+	_, err := pluginContext.PluginStateReader().Get(&pluginState)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
 	pod := r.(*v1.Pod)
 
 	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
@@ -166,36 +172,49 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		info.Logs = taskLogs
 	}
 
+	phaseInfo := pluginsCore.PhaseInfoUndefined
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
-		return flytek8s.DemystifySuccess(pod.Status, info)
+		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
 	case v1.PodFailed:
-		return flytek8s.DemystifyFailure(pod.Status, info)
+		phaseInfo, err = flytek8s.DemystifyFailure(pod.Status, info)
 	case v1.PodPending:
-		return flytek8s.DemystifyPending(pod.Status)
+		phaseInfo, err = flytek8s.DemystifyPending(pod.Status)
 	case v1.PodReasonUnschedulable:
-		return pluginsCore.PhaseInfoQueued(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable"), nil
+		phaseInfo = pluginsCore.PhaseInfoQueued(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable")
 	case v1.PodUnknown:
-		return pluginsCore.PhaseInfoUndefined, nil
-	}
-
-	primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
-	if !exists {
-		// if the primary container annotation dos not exist, then the task requires all containers
-		// to succeed to declare success. therefore, if the pod is not in one of the above states we
-		// fallback to declaring the task as 'running'.
-		if len(info.Logs) > 0 {
-			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion+1, &info), nil
+		// DO NOTHING
+	default:
+		primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
+		if !exists {
+			// if the primary container annotation dos not exist, then the task requires all containers
+			// to succeed to declare success. therefore, if the pod is not in one of the above states we
+			// fallback to declaring the task as 'running'.
+			phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
+			if len(info.Logs) > 0 {
+				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
+			}
+		} else {
+			// if the primary container annotation exists, we use the status of the specified container
+			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
+			if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
+				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
+			}
 		}
-		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info), nil
 	}
 
-	// if the primary container annotation exists, we use the status of the specified container
-	primaryContainerPhase := flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
-	if primaryContainerPhase.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
-		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion+1, primaryContainerPhase.Info()), nil
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
+
+		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
+		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
+		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
+		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
 	}
-	return primaryContainerPhase, nil
+
+	return phaseInfo, err
 }
 
 func (plugin) GetProperties() k8s.PluginProperties {
