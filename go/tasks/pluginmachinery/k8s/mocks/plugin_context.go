@@ -150,6 +150,40 @@ func (_m *PluginContext) OutputWriter() io.OutputWriter {
 	return r0
 }
 
+type PluginContext_PluginStateReader struct {
+	*mock.Call
+}
+
+func (_m PluginContext_PluginStateReader) Return(_a0 core.PluginStateReader) *PluginContext_PluginStateReader {
+	return &PluginContext_PluginStateReader{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *PluginContext) OnPluginStateReader() *PluginContext_PluginStateReader {
+	c_call := _m.On("PluginStateReader")
+	return &PluginContext_PluginStateReader{Call: c_call}
+}
+
+func (_m *PluginContext) OnPluginStateReaderMatch(matchers ...interface{}) *PluginContext_PluginStateReader {
+	c_call := _m.On("PluginStateReader", matchers...)
+	return &PluginContext_PluginStateReader{Call: c_call}
+}
+
+// PluginStateReader provides a mock function with given fields:
+func (_m *PluginContext) PluginStateReader() core.PluginStateReader {
+	ret := _m.Called()
+
+	var r0 core.PluginStateReader
+	if rf, ok := ret.Get(0).(func() core.PluginStateReader); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.PluginStateReader)
+		}
+	}
+
+	return r0
+}
+
 type PluginContext_TaskExecutionMetadata struct {
 	*mock.Call
 }

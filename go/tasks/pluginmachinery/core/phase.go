@@ -139,6 +139,16 @@ func (p PhaseInfo) Err() *core.ExecutionError {
 	return p.err
 }
 
+func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
+	return PhaseInfo{
+		phase:   p.phase,
+		version: version,
+		info:    p.info,
+		err:     p.err,
+		reason:  p.reason,
+	}
+}
+
 func (p PhaseInfo) String() string {
 	if p.err != nil {
 		return fmt.Sprintf("Phase<%s:%d Error:%s>", p.phase, p.version, p.err)
