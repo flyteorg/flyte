@@ -187,6 +187,12 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, defaults defaults) (*dask
 			memory := limits.Memory().String()
 			workerArgs = append(workerArgs, "--memory-limit", memory)
 		}
+		// If limits includes gpu, assume dask cuda worker cli startup
+		// https://docs.rapids.ai/api/dask-cuda/nightly/quickstart.html#dask-cuda-worker
+		// TODO: is this how gpu resources are called?
+		if limits.Gpu() != nil {
+			workerArgs[0] = "dask cuda worker"
+		}
 	}
 
 	wokerSpec := v1.PodSpec{
