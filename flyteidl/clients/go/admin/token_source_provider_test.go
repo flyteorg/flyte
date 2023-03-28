@@ -14,7 +14,6 @@ import (
 	tokenCacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/config"
 )
 
 func TestNewTokenSourceProvider(t *testing.T) {
@@ -81,149 +80,9 @@ func TestNewTokenSourceProvider(t *testing.T) {
 	}
 }
 
-func TestCustomTokenSource_GetTokenSource(t *testing.T) {
-	ctx := context.Background()
-	cfg := GetConfig(ctx)
-	cfg.TokenRefreshWindow = config.Duration{Duration: time.Minute}
-	cfg.ClientSecretLocation = ""
-
-	hourAhead := time.Now().Add(time.Hour)
-	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
-
-	tests := []struct {
-		name  string
-		token *oauth2.Token
-	}{
-		{
-			name:  "no token",
-			token: nil,
-		},
-		{
-
-			name:  "valid token",
-			token: &validToken,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			tokenCache := &tokenCacheMocks.TokenCache{}
-			var tokenErr error = nil
-			if test.token == nil {
-				tokenErr = fmt.Errorf("no token")
-			}
-			tokenCache.OnGetToken().Return(test.token, tokenErr).Once()
-			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
-			assert.NoError(t, err)
-
-			source, err := provider.GetTokenSource(ctx)
-			assert.NoError(t, err)
-			customSource, ok := source.(*customTokenSource)
-			assert.True(t, ok)
-
-			if test.token == nil {
-				assert.Equal(t, time.Time{}, customSource.refreshTime)
-			} else {
-				assert.LessOrEqual(t, customSource.refreshTime.Unix(), test.token.Expiry.Unix())
-				assert.GreaterOrEqual(t, customSource.refreshTime.Unix(), test.token.Expiry.Add(-cfg.TokenRefreshWindow.Duration).Unix())
-			}
-		})
-	}
-}
-
-func TestCustomTokenSource_fetchTokenFromCache(t *testing.T) {
-	ctx := context.Background()
-	cfg := GetConfig(ctx)
-	cfg.TokenRefreshWindow = config.Duration{Duration: time.Minute}
-	cfg.ClientSecretLocation = ""
-
-	minuteAgo := time.Now().Add(-time.Minute)
-	hourAhead := time.Now().Add(time.Hour)
-	invalidToken := oauth2.Token{AccessToken: "foo", Expiry: minuteAgo}
-	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
-
-	tests := []struct {
-		name               string
-		refreshTime        time.Time
-		failedToRefresh    bool
-		token              *oauth2.Token
-		expectToken        bool
-		expectNeedsRefresh bool
-	}{
-		{
-			name:               "no token",
-			refreshTime:        hourAhead,
-			failedToRefresh:    false,
-			token:              nil,
-			expectToken:        false,
-			expectNeedsRefresh: false,
-		},
-		{
-			name:               "invalid token",
-			refreshTime:        hourAhead,
-			failedToRefresh:    false,
-			token:              &invalidToken,
-			expectToken:        false,
-			expectNeedsRefresh: false,
-		},
-		{
-			name:               "refresh exceeded",
-			refreshTime:        minuteAgo,
-			failedToRefresh:    false,
-			token:              &validToken,
-			expectToken:        true,
-			expectNeedsRefresh: true,
-		},
-		{
-			name:               "refresh exceeded failed",
-			refreshTime:        minuteAgo,
-			failedToRefresh:    true,
-			token:              &validToken,
-			expectToken:        true,
-			expectNeedsRefresh: false,
-		},
-		{
-			name:               "valid token",
-			refreshTime:        hourAhead,
-			failedToRefresh:    false,
-			token:              &validToken,
-			expectToken:        true,
-			expectNeedsRefresh: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			tokenCache := &tokenCacheMocks.TokenCache{}
-			var tokenErr error = nil
-			if test.token == nil {
-				tokenErr = fmt.Errorf("no token")
-			}
-			tokenCache.OnGetToken().Return(test.token, tokenErr).Twice()
-			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
-			assert.NoError(t, err)
-			source, err := provider.GetTokenSource(ctx)
-			assert.NoError(t, err)
-			customSource, ok := source.(*customTokenSource)
-			assert.True(t, ok)
-
-			customSource.refreshTime = test.refreshTime
-			customSource.failedToRefresh = test.failedToRefresh
-			token, needsRefresh := customSource.fetchTokenFromCache()
-			if test.expectToken {
-				assert.NotNil(t, token)
-			} else {
-				assert.Nil(t, token)
-			}
-			assert.Equal(t, test.expectNeedsRefresh, needsRefresh)
-		})
-	}
-}
-
 func TestCustomTokenSource_Token(t *testing.T) {
 	ctx := context.Background()
 	cfg := GetConfig(ctx)
-	cfg.TokenRefreshWindow = config.Duration{Duration: time.Minute}
 	cfg.ClientSecretLocation = ""
 
 	minuteAgo := time.Now().Add(-time.Minute)
@@ -234,51 +93,41 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	newToken := oauth2.Token{AccessToken: "foo", Expiry: twoHourAhead}
 
 	tests := []struct {
-		name            string
-		refreshTime     time.Time
-		failedToRefresh bool
-		token           *oauth2.Token
-		newToken        *oauth2.Token
-		expectedToken   *oauth2.Token
+		name          string
+		token         *oauth2.Token
+		newToken      *oauth2.Token
+		expectedToken *oauth2.Token
 	}{
 		{
-			name:            "cached token",
-			refreshTime:     hourAhead,
-			failedToRefresh: false,
-			token:           &validToken,
-			newToken:        nil,
-			expectedToken:   &validToken,
+			name:          "no cached token",
+			token:         nil,
+			newToken:      &newToken,
+			expectedToken: &newToken,
 		},
 		{
-			name:            "failed refresh still valid",
-			refreshTime:     minuteAgo,
-			failedToRefresh: false,
-			token:           &validToken,
-			newToken:        nil,
-			expectedToken:   &validToken,
+			name:          "cached token valid",
+			token:         &validToken,
+			newToken:      nil,
+			expectedToken: &validToken,
 		},
 		{
-			name:            "failed refresh invalid",
-			refreshTime:     minuteAgo,
-			failedToRefresh: false,
-			token:           &invalidToken,
-			newToken:        nil,
-			expectedToken:   nil,
+			name:          "cached token expired",
+			token:         &invalidToken,
+			newToken:      &newToken,
+			expectedToken: &newToken,
 		},
 		{
-			name:            "refresh",
-			refreshTime:     minuteAgo,
-			failedToRefresh: false,
-			token:           &invalidToken,
-			newToken:        &newToken,
-			expectedToken:   &newToken,
+			name:          "failed new token",
+			token:         &invalidToken,
+			newToken:      nil,
+			expectedToken: nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			tokenCache := &tokenCacheMocks.TokenCache{}
-			tokenCache.OnGetToken().Return(test.token, nil).Twice()
+			tokenCache.OnGetToken().Return(test.token, nil).Once()
 			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
 			assert.NoError(t, err)
 			source, err := provider.GetTokenSource(ctx)
@@ -287,14 +136,14 @@ func TestCustomTokenSource_Token(t *testing.T) {
 			assert.True(t, ok)
 
 			mockSource := &adminMocks.TokenSource{}
-			if test.newToken != nil {
-				mockSource.OnToken().Return(test.newToken, nil)
-			} else {
-				mockSource.OnToken().Return(nil, fmt.Errorf("refresh token failed"))
+			if test.token != &validToken {
+				if test.newToken != nil {
+					mockSource.OnToken().Return(test.newToken, nil)
+				} else {
+					mockSource.OnToken().Return(nil, fmt.Errorf("refresh token failed"))
+				}
 			}
 			customSource.new = mockSource
-			customSource.refreshTime = test.refreshTime
-			customSource.failedToRefresh = test.failedToRefresh
 			if test.newToken != nil {
 				tokenCache.OnSaveToken(test.newToken).Return(nil).Once()
 			}
@@ -306,6 +155,8 @@ func TestCustomTokenSource_Token(t *testing.T) {
 				assert.Nil(t, token)
 				assert.Error(t, err)
 			}
+			tokenCache.AssertExpectations(t)
+			mockSource.AssertExpectations(t)
 		})
 	}
 }
