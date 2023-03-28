@@ -5,122 +5,107 @@ Troubleshooting Guide
 
 .. tags:: Troubleshoot, Basic
 
-.. admonition:: Why did we craft this guide?
+The content in this section will help Flyte users to isolate the most possible causes for some of the common issues that could arise while getting started with the project.
 
-    To help streamline your onboarding experience as much as possible, and sort out common issues.
+Before getting started, collect the following information from the underlying infrastructure:
 
-Here are a couple of techniques we believe could help get you up and running in no time! 
-
-Troubles With ``flytectl sandbox start``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- The process hangs at ``Waiting for Flyte to become ready...`` for a while; OR 
-- It ends with a message ``Timed out while waiting for the datacatalog rollout to be created``.
-
-How Do I Debug?
-"""""""""""""""
-
-- Sandbox is a Docker container that runs Kubernetes and Flyte in it. So you can simply ``exec`` into it;
+- Capture the ``Status`` column from the output of: 
 
 .. prompt:: bash $
 
- docker ps
+kubectl describe pod <PodName> -n <namespace>
 
-.. code-block::
-
- CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS         PORTS                                                                                                           NAMES
- d3ab7e4cb17c   cr.flyte.org/flyteorg/flyte-sandbox:dind   "tini flyte-entrypoi…"   7 minutes ago   Up 7 minutes   127.0.0.1:30081-30082->30081-30082/tcp, 127.0.0.1:30084->30084/tcp, 2375-2376/tcp, 127.0.0.1:30086->30086/tcp   flyte-sandbox
+- Pay close attention to the `Events` section in the output.
+- Also, collect the logs from the Pod:
 
 .. prompt:: bash $
 
- docker exec -it <imageid> bash
+$ kubectl logs pods -n <namespace>
 
-and run: ::
+Depending on the contents of the logs or the `Events`, you can try different things:
 
-    kubectl get pods -n flyte
+- ``message: '0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.'``
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+This issue is more common on MacOS devices. Make sure that your Docker daemon has allocated a minimum of 4 CPU cores and 3GB of RAM
 
-You can check on the pending pods and perform a detailed check as to why a pod is failing by running: ::
+- ``terminated with exit code (137). Reason [OOMKilled]``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+- For single binary environment deployed with Helm chart, make sure you are using `the most recent charts <https://github.com/flyteorg/flyte/tree/master/charts>`_
 
-    kubectl describe po <pod-name> -n flyte 
+- For EKS deployments, you cand adjust resource limits and requests in the `inline <https://github.com/flyteorg/flyte/blob/d60c9af85a59ebb4c2265f76cb082b992078a309/charts/flyte-binary/eks-production.yaml#L30>`_ section of the ``eks-production.yaml`` file. Example:
+.. code-block:: yaml
 
-- Also, you can use this command to simply export this variable to use local kubectl::
+  inline: 
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 100Mi
+        storage: 100Mi
+      limits:
+        memory: 1Gi
 
-    export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
+- Also, the default container resource limits are can be overriden from the task itself:
+.. code-block:: python
 
-- If you would like to reclaim disk space, run: ::
+      from flytekit import Resources, task
+      @task(limits=Resources(mem="256Mi")    
+      def your_task(...
 
-    docker system prune [OPTIONS]
+- ``Error: ImagePullBackOff``
+"""""""""""""""""""""""""""
+- If your environment requires the use of a network proxy use the ``--env`` option when starting the sandbox and pass the proxy configuration:
+.. prompt:: bash $
 
-- Increase mem/CPU available for Docker.
+$ flytectl demo start --env HTTP_PROXY=<your-proxy-IP>
 
+- If you're building a custom Docker image, make sure to use a tag other than ``latest``. Otherwise, the Kubernetes default pull policy will be changed from ``IfNotPresent`` to ``Always``, forcing an image pull with every Pod deployment.
 
-Troubles With ``flyte sandbox`` Log Viewing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Issues running workloads
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- When testing locally using the ``flyte sandbox`` command, one way to view the logs is using the ``Kubernetes Logs (User)`` option on the FlyteConsole. 
-- This takes you to the Kubernetes dashboard which requires a login.
+- ``OPENSSL_internal:WRONG_VERSION_NUMBER`` after trying ``pyflyte run --remote....``
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+- For ``flyte-binary``: make sure that the endpoint name you have set in your ``config.yaml`` file, is included in the DNS names of the SSL certificate installed (be it self signed or issued by a Certificate Authority)
+  -  For ``sandbox``: verify the ``FLYTECTL_CONFIG`` environment variable has the correct value by running:
+.. prompt:: bash $
+$ export FLYTECTL_CONFIG=~/.flyte/config-sandbox.yaml
 
-::
+- ``ModuleNotFoundError``
+""""""""""""""""""""""""
+- If you're using a custom container image and using Docker, make sure your ``Dockerfile`` is located at the same level of the ``flyte`` directory and that there is an empty ``__init__.py`` file in your project's folder :
+.. prompt:: bash $
 
-     kind: Deployment
-     apiVersion: apps/v1
-     metadata:
-       name: kubernetes-dashboard
-       namespace: kubernetes-dashboard
-     spec:
-       template:
-         spec:
-           containers:
-             - name: kubernetes-dashboard
-               args:
-                 - --namespace=kubernetes-dashboard
-                 - --enable-insecure-login
-                 - --enable-skip-login
-                 - --disable-settings-authorizer
+myflyteapp
+├── Dockerfile
+├── docker_build_and_tag.sh
+├── flyte
+│         ├── __init__.py
+│         └── workflows
+│             ├── __init__.py
+│             └── example.py
+└── requirements.txt
+- ``An error occurred (AccessDenied) when calling the PutObject operation`` in an EKS deployments
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+- Make sure that the Kubernetes service account Flyte is using has the annotation that refers to the IAM Role is connected to:
+.. prompt:: bash $
 
-.. note::
+$ kubectl describe sa <my-flyte-sa> -n <flyte-namespace>
 
-   There is a ``skip`` button that takes you straight to the logs without logging in.
+Example output:
+.. prompt:: bash $
 
-Troubles With Flytectl Commands Within Proxy Settings
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Name:                <my-flyte-sa>
+Namespace:           flyte
+Labels:              app.kubernetes.io/managed-by=eksctl
+Annotations:         eks.amazonaws.com/role-arn: arn:aws:iam::<aws-account-id>:role/flyte-system-role
+Image pull secrets:  <none>
+Mountable secrets:   <none>
+Tokens:              <none>
+Events:              <none>
 
-- Flytectl uses gRPC APIs of FlyteAdmin to administer Flyte resources and in the case of proxy settings, it uses an additional ``CONNECT`` handshake at the gRPC layer to perform the same. Additional info is available on this `gRPC proxy documentation <https://github.com/grpc/grpc-go/blob/master/Documentation/proxy.md>`__ page.
+- Otherwise, obtain your IAM role's ARN and manually annotate the service account:
+.. prompt:: bash $
 
-- In the Windows environment, it has been noticed that the ``NO_PROXY`` variable doesn't work to bypass the proxy settings. This `GRPC issue <https://github.com/grpc/grpc/issues/9989>`__ provides additional details, though it doesn't seem to have been tested on Windows yet. To bypass this issue, unset both ``HTTP_PROXY`` and ``HTTPS_PROXY`` variables.
+  $ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
 
-Troubles With Flytectl Commands With Cloudflare DNS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Flytectl produces permission errors with Cloudflare DNS endpoints
-- Cloudflare instance proxies by default the requests and filters out gRPC.
-- **To fix this**: 
-    - Enable gRPC in the network tab; or
-    - Turn off the proxy.
-
-Troubles With Flytectl Commands With Auth Enabled
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Flytectl commands use OpenID connect if auth is enabled in the Flyte environment
-- It opens an ``HTTP`` server port on localhost:53593. It has a callback endpoint for the OpenID connect server to call into for the response.
-    - If the callback server call fails, please check if flytectl failed to run the server.
-    - Verify that you have an entry for localhost in your ``/etc/hosts`` file.
-    - It could also mean that the callback took longer than the default 15 secs, and the flytectl wait deadline expired. 
-
-Troubles With Inconsistent Names for Pods and Downstream Resources
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Don't rely on the name of a Flyte node to always match the name of its corresponding Kubernetes pod or downstream resource
-- Flyte uses the format ``executionid-node-id-attempt`` from the node to assign a name to a Kubernetes pod or downstream resource.
-- But if this is an invalid name for a Kubernetes pod, Flyte assigns a valid name of random characters instead.
-
-Troubles with handling large responses in ``FlyteRemote.sync`` 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- ``Received message larger than max (xxx vs. 4194304)`` usually crops up when the message size is too large.
-- To fix this, edit the ``flyte-admin-base-config`` config map using the command ``kubectl edit cm flyte-admin-base-config -n flyte`` to increase the ``maxMessageSizeBytes`` value.
-
-
-I Still Need Help!
-^^^^^^^^^^^^^^^^^^
-Our `Slack <https://slack.flyte.org/>`__ community is always available and ready to help!
+- Refer to this community-maintained `guides <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/03-roles-service-accounts.md>`_ for further information about Flyte deployment on EKS
