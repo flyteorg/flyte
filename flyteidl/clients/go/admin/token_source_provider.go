@@ -8,11 +8,9 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
-	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
@@ -167,9 +165,8 @@ func GetPKCEAuthTokenSource(ctx context.Context, pkceTokenOrchestrator pkce.Toke
 }
 
 type ClientCredentialsTokenSourceProvider struct {
-	ccConfig           clientcredentials.Config
-	tokenRefreshWindow time.Duration
-	tokenCache         cache.TokenCache
+	ccConfig   clientcredentials.Config
+	tokenCache cache.TokenCache
 }
 
 func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, scopes []string, tokenURL string,
@@ -201,92 +198,45 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 			Scopes:         scopes,
 			EndpointParams: endpointParams,
 		},
-		tokenRefreshWindow: cfg.TokenRefreshWindow.Duration,
-		tokenCache:         tokenCache}, nil
+		tokenCache: tokenCache}, nil
 }
 
 func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	if p.tokenRefreshWindow > 0 {
-		source := p.ccConfig.TokenSource(ctx)
-		refreshTime := time.Time{}
-		if token, err := p.tokenCache.GetToken(); err == nil {
-			refreshTime = token.Expiry.Add(-getRandomDuration(p.tokenRefreshWindow))
-		}
-		return &customTokenSource{
-			ctx:                ctx,
-			new:                source,
-			mu:                 sync.Mutex{},
-			tokenRefreshWindow: p.tokenRefreshWindow,
-			tokenCache:         p.tokenCache,
-			refreshTime:        refreshTime,
-		}, nil
-	}
-	return p.ccConfig.TokenSource(ctx), nil
+	return &customTokenSource{
+		ctx:        ctx,
+		new:        p.ccConfig.TokenSource(ctx),
+		mu:         sync.Mutex{},
+		tokenCache: p.tokenCache,
+	}, nil
 }
 
 type customTokenSource struct {
-	ctx                context.Context
-	new                oauth2.TokenSource
-	tokenRefreshWindow time.Duration
-	mu                 sync.Mutex // guards everything else
-	refreshTime        time.Time
-	failedToRefresh    bool
-	tokenCache         cache.TokenCache
-}
-
-// fetchTokenFromCache returns the cached token if available, and a bool indicating if we should try to refresh it.
-// This function is not thread safe and should be called with the lock held.
-func (s *customTokenSource) fetchTokenFromCache() (*oauth2.Token, bool) {
-	token, err := s.tokenCache.GetToken()
-	if err != nil {
-		logger.Infof(s.ctx, "no token found in cache")
-		return nil, false
-	}
-	if !token.Valid() {
-		logger.Infof(s.ctx, "cached token invalid")
-		return nil, false
-	}
-	if time.Now().After(s.refreshTime) && !s.failedToRefresh {
-		logger.Infof(s.ctx, "cached token refresh window exceeded")
-		return token, true
-	}
-	return token, false
+	ctx        context.Context
+	mu         sync.Mutex // guards everything else
+	new        oauth2.TokenSource
+	tokenCache cache.TokenCache
 }
 
 func (s *customTokenSource) Token() (*oauth2.Token, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	cachedToken, needsRefresh := s.fetchTokenFromCache()
-	if cachedToken != nil && !needsRefresh {
-		return cachedToken, nil
+	if token, err := s.tokenCache.GetToken(); err == nil && token.Valid() {
+		return token, nil
 	}
 
 	token, err := s.new.Token()
 	if err != nil {
-		if needsRefresh {
-			logger.Warnf(s.ctx, "failed to refresh token, using last cached token until expired")
-			s.failedToRefresh = true
-			return cachedToken, nil
-		}
-		logger.Errorf(s.ctx, "failed to refresh token")
-		return nil, err
+		return nil, fmt.Errorf("failed to get token: %w", err)
 	}
-	logger.Infof(s.ctx, "refreshed token")
+	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
+
 	err = s.tokenCache.SaveToken(token)
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to cache token, using anyway")
+		logger.Warnf(s.ctx, "failed to cache token")
 	}
-	s.failedToRefresh = false
-	s.refreshTime = token.Expiry.Add(-getRandomDuration(s.tokenRefreshWindow))
-	return token, nil
-}
 
-// Get random duration between 0 and maxDuration
-func getRandomDuration(maxDuration time.Duration) time.Duration {
-	// d is 1.0 to 2.0 times maxDuration
-	d := wait.Jitter(maxDuration, 1)
-	return d - maxDuration
+	return token, nil
 }
 
 type DeviceFlowTokenSourceProvider struct {
