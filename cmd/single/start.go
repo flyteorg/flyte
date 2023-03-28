@@ -142,7 +142,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 
 	if !cfg.DisableWebhook || !cfg.Disabled {
 		g.Go(func() error {
-			err := controller.StartControllerManager(childCtx, mgr)
+			err := propellerEntrypoint.StartControllerManager(childCtx, mgr)
 			if err != nil {
 				logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
 			}
