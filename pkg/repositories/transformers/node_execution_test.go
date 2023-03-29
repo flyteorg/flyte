@@ -199,35 +199,51 @@ func TestAddTerminalState_Error(t *testing.T) {
 
 func TestCreateNodeExecutionModel(t *testing.T) {
 	parentTaskExecID := uint(8)
-	nodeExecutionModel, err := CreateNodeExecutionModel(context.TODO(), ToNodeExecutionModelInput{
-		Request: &admin.NodeExecutionEventRequest{
-			Event: &event.NodeExecutionEvent{
-				Id: &core.NodeExecutionIdentifier{
-					NodeId: "node id",
-					ExecutionId: &core.WorkflowExecutionIdentifier{
-						Project: "project",
-						Domain:  "domain",
-						Name:    "name",
-					},
+	request := &admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				NodeId: "node id",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
 				},
-				Phase: core.NodeExecution_RUNNING,
-				InputValue: &event.NodeExecutionEvent_InputUri{
-					InputUri: testInputURI,
-				},
-				OutputResult: &event.NodeExecutionEvent_OutputUri{
-					OutputUri: "output uri",
-				},
-				OccurredAt: occurredAtProto,
-				ParentTaskMetadata: &event.ParentTaskExecutionMetadata{
-					Id: &core.TaskExecutionIdentifier{
-						RetryAttempt: 1,
-					},
-				},
-				IsParent:     true,
-				IsDynamic:    true,
-				EventVersion: 2,
 			},
+			Phase: core.NodeExecution_RUNNING,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: testInputURI,
+			},
+			OutputResult: &event.NodeExecutionEvent_OutputUri{
+				OutputUri: "output uri",
+			},
+			OccurredAt: occurredAtProto,
+			TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+				TaskNodeMetadata: &event.TaskNodeMetadata{
+					CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
+					CatalogKey: &core.CatalogMetadata{
+						DatasetId: &core.Identifier{
+							ResourceType: core.ResourceType_DATASET,
+							Name:         "x",
+							Project:      "proj",
+							Domain:       "domain",
+						},
+					},
+					CheckpointUri: "last checkpoint uri",
+				},
+			},
+			ParentTaskMetadata: &event.ParentTaskExecutionMetadata{
+				Id: &core.TaskExecutionIdentifier{
+					RetryAttempt: 1,
+				},
+			},
+			IsParent:     true,
+			IsDynamic:    true,
+			EventVersion: 2,
 		},
+	}
+
+	nodeExecutionModel, err := CreateNodeExecutionModel(context.TODO(), ToNodeExecutionModelInput{
+		Request:               request,
 		ParentTaskExecutionID: &parentTaskExecID,
 	})
 	assert.Nil(t, err)
@@ -237,6 +253,13 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		StartedAt: occurredAtProto,
 		CreatedAt: occurredAtProto,
 		UpdatedAt: occurredAtProto,
+		TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
+			TaskNodeMetadata: &admin.TaskNodeMetadata{
+				CacheStatus:   request.Event.GetTaskNodeMetadata().CacheStatus,
+				CatalogKey:    request.Event.GetTaskNodeMetadata().CatalogKey,
+				CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
+			},
+		},
 	}
 	var closureBytes, _ = proto.Marshal(closure)
 	var nodeExecutionMetadata, _ = proto.Marshal(&admin.NodeExecutionMetaData{
@@ -247,6 +270,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		EventVersion: 2,
 	}
 	internalDataBytes, _ := proto.Marshal(internalData)
+	cacheStatus := request.Event.GetTaskNodeMetadata().CacheStatus.String()
 	assert.Equal(t, &models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: "node id",
@@ -264,6 +288,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		NodeExecutionUpdatedAt: &occurredAt,
 		NodeExecutionMetadata:  nodeExecutionMetadata,
 		ParentTaskExecutionID:  &parentTaskExecID,
+		CacheStatus:            &cacheStatus,
 		InternalData:           internalDataBytes,
 	}, nodeExecutionModel)
 }

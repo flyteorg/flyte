@@ -136,6 +136,9 @@ func TestCreateNodeEvent(t *testing.T) {
 		StartedAt: occurredAtProto,
 		CreatedAt: occurredAtProto,
 		UpdatedAt: occurredAtProto,
+		TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
+			TaskNodeMetadata: &admin.TaskNodeMetadata{},
+		},
 	}
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetCreateCallback(
