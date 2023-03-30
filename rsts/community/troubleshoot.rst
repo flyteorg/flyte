@@ -6,7 +6,7 @@ Troubleshooting Guide
 
 .. tags:: Troubleshoot, Basic
 
-The content in this section will help Flyte users to isolate the most possible causes for some of the common issues that could arise while getting started with the project.
+The content in this section will help Flyte users isolate the most possible causes for some of the common issues that could arise while getting started with the project.
 
 Before getting started, collect the following information from the underlying infrastructure:
 
