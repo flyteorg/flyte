@@ -31,6 +31,11 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
 | flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.cpu | string | `"0"` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.memory | string | `"0"` |  |
+| flyte-binary.configuration.inline.task_resources.limits.cpu | string | `"0"` |  |
+| flyte-binary.configuration.inline.task_resources.limits.gpu | string | `"0"` |  |
+| flyte-binary.configuration.inline.task_resources.limits.memory | string | `"0"` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.logging.level | int | `6` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
