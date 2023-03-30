@@ -487,6 +487,14 @@ data:
       signedURL:
         stowConfigOverride:
           endpoint: http://localhost:30002
+    task_resources:
+      defaults:
+        cpu: "0"
+        memory: "0"
+      limits:
+        cpu: "0"
+        gpu: "0"
+        memory: "0"
 kind: ConfigMap
 metadata:
   labels:
@@ -765,7 +773,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VnBOU0tUSU41Q2xCcnlQeA==
+  haSharedSecret: d0JFVmRTazdJOVhiQ1VQRw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1141,7 +1149,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: cb6d3e1eda0d2913ad4a594e28137dd790892054856f74583344f7abaf00a11d
+        checksum/configuration: 812a428633d9c83340ee4afc9eefda37a641e6e2337cc6a1265258c9d23f4324
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1249,7 +1257,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 91c457e16b511b53b62ae35de8ee25922d4f6bdd9314080917d35a4371913dfe
+        checksum/secret: 86d4297bed78971e06091f86bacbf4529b7dce6b6683f945557f420ddeb2b35e
       labels:
         app: docker-registry
         release: flyte-sandbox
