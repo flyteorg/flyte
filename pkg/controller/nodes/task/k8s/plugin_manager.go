@@ -59,7 +59,8 @@ const (
 )
 
 type PluginState struct {
-	Phase PluginPhase
+	Phase          PluginPhase
+	K8sPluginState k8s.PluginState
 }
 
 type PluginMetrics struct {
@@ -247,7 +248,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
 }
 
-func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s.PluginState) (pluginsCore.Transition, error) {
 
 	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
@@ -274,7 +275,7 @@ func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore
 		e.metrics.ResourceDeleted.Inc(ctx)
 	}
 
-	pCtx := newPluginContext(tCtx)
+	pCtx := newPluginContext(tCtx, k8sPluginState)
 	p, err := e.plugin.GetTaskPhase(ctx, pCtx, o)
 	if err != nil {
 		logger.Warnf(ctx, "failed to check status of resource in plugin [%s], with error: %s", e.GetID(), err.Error())
@@ -311,6 +312,7 @@ func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore
 }
 
 func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+	// read phase state
 	ps := PluginState{}
 	if v, err := tCtx.PluginStateReader().Get(&ps); err != nil {
 		if v != pluginStateVersion {
@@ -318,16 +320,44 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 		}
 		return pluginsCore.UnknownTransition, errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
+
+	// evaluate plugin
+	var err error
+	var transition pluginsCore.Transition
+	pluginPhase := ps.Phase
 	if ps.Phase == PluginPhaseNotStarted {
-		t, err := e.LaunchResource(ctx, tCtx)
-		if err == nil && t.Info().Phase() == pluginsCore.PhaseQueued {
-			if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &PluginState{Phase: PluginPhaseStarted}); err != nil {
-				return pluginsCore.UnknownTransition, err
-			}
+		transition, err = e.LaunchResource(ctx, tCtx)
+		if err == nil && transition.Info().Phase() == pluginsCore.PhaseQueued {
+			pluginPhase = PluginPhaseStarted
 		}
-		return t, err
+	} else {
+		transition, err = e.CheckResourcePhase(ctx, tCtx, &ps.K8sPluginState)
 	}
-	return e.CheckResourcePhase(ctx, tCtx)
+
+	if err != nil {
+		return transition, err
+	}
+
+	// persist any changes in phase state
+	k8sPluginState := ps.K8sPluginState
+	if ps.Phase != pluginPhase || k8sPluginState.Phase != transition.Info().Phase() ||
+		k8sPluginState.PhaseVersion != transition.Info().Version() || k8sPluginState.Reason != transition.Info().Reason() {
+
+		newPluginState := PluginState{
+			Phase: pluginPhase,
+			K8sPluginState: k8s.PluginState{
+				Phase:        transition.Info().Phase(),
+				PhaseVersion: transition.Info().Version(),
+				Reason:       transition.Info().Reason(),
+			},
+		}
+
+		if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &newPluginState); err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+	}
+
+	return transition, err
 }
 
 func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
