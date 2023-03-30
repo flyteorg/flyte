@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"k8s.io/client-go/kubernetes/scheme"
@@ -711,6 +712,157 @@ func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
 			} else {
 				assert.Nil(t, d.r)
 			}
+		})
+	}
+}
+
+func TestPluginManager_Handle_PluginState(t *testing.T) {
+	ctx := context.TODO()
+	tm := getMockTaskExecutionMetadata()
+	res := &v1.Pod{
+		ObjectMeta: v12.ObjectMeta{
+			Name:      tm.GetTaskExecutionID().GetGeneratedName(),
+			Namespace: tm.GetNamespace(),
+		},
+	}
+
+	pluginStateQueued := PluginState{
+		Phase: PluginPhaseStarted,
+		K8sPluginState: k8s.PluginState{
+			Phase:        pluginsCore.PhaseQueued,
+			PhaseVersion: 0,
+			Reason:       "foo",
+		},
+	}
+	pluginStateQueuedVersion1 := PluginState{
+		Phase: PluginPhaseStarted,
+		K8sPluginState: k8s.PluginState{
+			Phase:        pluginsCore.PhaseQueued,
+			PhaseVersion: 1,
+			Reason:       "foo",
+		},
+	}
+	pluginStateQueuedReasonBar := PluginState{
+		Phase: PluginPhaseStarted,
+		K8sPluginState: k8s.PluginState{
+			Phase:        pluginsCore.PhaseQueued,
+			PhaseVersion: 0,
+			Reason:       "bar",
+		},
+	}
+	pluginStateRunning := PluginState{
+		Phase: PluginPhaseStarted,
+		K8sPluginState: k8s.PluginState{
+			Phase:        pluginsCore.PhaseRunning,
+			PhaseVersion: 0,
+			Reason:       "",
+		},
+	}
+
+	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
+	phaseInfoQueuedVersion1 := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+		pluginStateQueuedVersion1.K8sPluginState.PhaseVersion,
+		pluginStateQueuedVersion1.K8sPluginState.Reason,
+		nil,
+	)
+	phaseInfoQueuedReasonBar := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+		pluginStateQueuedReasonBar.K8sPluginState.PhaseVersion,
+		pluginStateQueuedReasonBar.K8sPluginState.Reason,
+		nil,
+	)
+	phaseInfoRunning := pluginsCore.PhaseInfoRunning(0, nil)
+
+	tests := []struct {
+		name                string
+		startPluginState    PluginState
+		reportedPhaseInfo   pluginsCore.PhaseInfo
+		expectedPluginState PluginState
+	}{
+		{
+			"NoChange",
+			pluginStateQueued,
+			phaseInfoQueued,
+			pluginStateQueued,
+		},
+		{
+			"K8sPhaseChange",
+			pluginStateQueued,
+			phaseInfoRunning,
+			pluginStateRunning,
+		},
+		{
+			"PhaseVersionChange",
+			pluginStateQueued,
+			phaseInfoQueuedVersion1,
+			pluginStateQueuedVersion1,
+		},
+		{
+			"ReasonChange",
+			pluginStateQueued,
+			phaseInfoQueuedReasonBar,
+			pluginStateQueuedReasonBar,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// mock TaskExecutionContext
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.OnTaskExecutionMetadata().Return(getMockTaskExecutionMetadata())
+
+			tReader := &pluginsCoreMock.TaskReader{}
+			tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{}, nil)
+			tCtx.OnTaskReader().Return(tReader)
+
+			// mock state reader / writer to use local pluginState variable
+			pluginState := &tt.startPluginState
+			customStateReader := &pluginsCoreMock.PluginStateReader{}
+			customStateReader.OnGetMatch(mock.MatchedBy(func(i interface{}) bool {
+				ps, ok := i.(*PluginState)
+				if ok {
+					*ps = *pluginState
+					return true
+				}
+				return false
+			})).Return(uint8(0), nil)
+			tCtx.OnPluginStateReader().Return(customStateReader)
+
+			customStateWriter := &pluginsCoreMock.PluginStateWriter{}
+			customStateWriter.OnPutMatch(mock.Anything, mock.MatchedBy(func(i interface{}) bool {
+				ps, ok := i.(*PluginState)
+				if ok {
+					*pluginState = *ps
+				}
+				return ok
+			})).Return(nil)
+			tCtx.OnPluginStateWriter().Return(customStateWriter)
+			tCtx.OnOutputWriter().Return(&dummyOutputWriter{})
+
+			fc := extendedFakeClient{Client: fake.NewFakeClient(res)}
+
+			mockResourceHandler := &pluginsk8sMock.Plugin{}
+			mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
+			mockResourceHandler.On("BuildIdentityResource", mock.Anything, tCtx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+			mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(tt.reportedPhaseInfo, nil)
+
+			// create new PluginManager
+			pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
+				ID:              "x",
+				ResourceToWatch: &v1.Pod{},
+				Plugin:          mockResourceHandler,
+			}, NewResourceMonitorIndex())
+			assert.NoError(t, err)
+
+			// handle plugin
+			_, err = pluginManager.Handle(ctx, tCtx)
+			assert.NoError(t, err)
+
+			// verify expected PluginState
+			newPluginState := PluginState{}
+			_, err = tCtx.PluginStateReader().Get(&newPluginState)
+			assert.NoError(t, err)
+
+			assert.True(t, reflect.DeepEqual(newPluginState, tt.expectedPluginState))
 		})
 	}
 }
