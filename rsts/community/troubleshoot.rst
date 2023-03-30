@@ -77,7 +77,7 @@ Issues running workloads
 -  For ``sandbox``: verify the ``FLYTECTL_CONFIG`` environment variable has the correct value by running:
 
 .. prompt:: bash $
-  
+
  $ export FLYTECTL_CONFIG=~/.flyte/config-sandbox.yaml
 
 ``ModuleNotFoundError``
@@ -123,6 +123,6 @@ Example output:
 
 .. prompt:: bash $
 
-$ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
+ $ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
 
 - Refer to this community-maintained `guides <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/03-roles-service-accounts.md>`_ for further information about Flyte deployment on EKS
