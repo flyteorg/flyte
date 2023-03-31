@@ -211,6 +211,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_gcpSecretManager.sidecarImage", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("gcpSecretManager.sidecarImage", testValue)
+			if vString, err := cmdFlags.GetString("gcpSecretManager.sidecarImage"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GCPSecretManagerConfig.SidecarImage)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_vaultSecretManager.role", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

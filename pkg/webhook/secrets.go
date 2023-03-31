@@ -74,6 +74,7 @@ func NewSecretsMutator(cfg *config.Config, _ promutils.Scope) *SecretsMutator {
 			NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())),
 			NewK8sSecretsInjector(),
 			NewAWSSecretManagerInjector(cfg.AWSSecretManagerConfig),
+			NewGCPSecretManagerInjector(cfg.GCPSecretManagerConfig),
 			NewVaultSecretManagerInjector(cfg.VaultSecretManagerConfig),
 		},
 	}

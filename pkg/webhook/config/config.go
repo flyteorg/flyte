@@ -33,6 +33,19 @@ var (
 				},
 			},
 		},
+		GCPSecretManagerConfig: GCPSecretManagerConfig{
+			SidecarImage: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine",
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("500Mi"),
+					corev1.ResourceCPU:    resource.MustParse("200m"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("500Mi"),
+					corev1.ResourceCPU:    resource.MustParse("200m"),
+				},
+			},
+		},
 		VaultSecretManagerConfig: VaultSecretManagerConfig{
 			Role:      "flyte",
 			KVVersion: KVVersion2,
@@ -56,6 +69,10 @@ const (
 	// SecretManagerTypeAWS defines a secret manager webhook that injects a side car to pull secrets from AWS Secret
 	// Manager and mount them to a local file system (in memory) and share that mount with other containers in the pod.
 	SecretManagerTypeAWS
+
+	// SecretManagerTypeGCP defines a secret manager webhook that injects a side car to pull secrets from GCP Secret
+	// Manager and mount them to a local file system (in memory) and share that mount with other containers in the pod.
+	SecretManagerTypeGCP
 
 	// SecretManagerTypeVault defines a secret manager webhook that pulls secrets from Hashicorp Vault.
 	SecretManagerTypeVault
@@ -81,10 +98,16 @@ type Config struct {
 	SecretName               string                   `json:"secretName" pflag:",Secret name to write generated certs to."`
 	SecretManagerType        SecretManagerType        `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
 	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
+	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
 }
 
 type AWSSecretManagerConfig struct {
+	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
+	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+}
+
+type GCPSecretManagerConfig struct {
 	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
 	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
 }
