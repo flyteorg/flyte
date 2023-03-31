@@ -30,133 +30,133 @@ spec:
       {{- end }}
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /console
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /console/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /api
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /api/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /healthcheck
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /v1/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /.well-known
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /.well-known/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /login
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /login/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /logout
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /logout/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /callback
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /callback/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /me
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /config
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /config/*
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /oauth2
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: {{ include "flyte-binary.fullname" . }}
+            name: {{ include "flyte-binary.service.http.name" . }}
             port:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /oauth2/*
