@@ -50,6 +50,23 @@ func (s SubTaskExecutionContext) TaskReader() pluginsCore.TaskReader {
 	return s.subtaskReader
 }
 
+// pluginStateReader overrides the default PluginStateReader because the maptask does not persist
+// state between task evaluations.
+type pluginStateReader struct{}
+
+func (p pluginStateReader) GetStateVersion() uint8 {
+	return 0
+}
+
+func (p pluginStateReader) Get(t interface{}) (stateVersion uint8, err error) {
+	return 0, nil
+}
+
+// PluginStateReader overrides the default behavior to return a custom pluginStateReader.
+func (s SubTaskExecutionContext) PluginStateReader() pluginsCore.PluginStateReader {
+	return pluginStateReader{}
+}
+
 // NewSubtaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
 func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
 	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
