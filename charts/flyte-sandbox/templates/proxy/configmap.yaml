@@ -149,7 +149,7 @@ data:
                                   address:
                                       socket_address:
                                           {{- if index .Values "flyte-binary" "enabled" }}
-                                          address: {{ include "flyte-sandbox.fullname" .}}
+                                          address: {{ include "flyte-binary.service.http.name" .}}
                                           {{- else }}
                                           address: {{ include "flyte-sandbox.localHeadlessService" . }}
                                           {{- end }}
@@ -167,7 +167,7 @@ data:
                                   address:
                                       socket_address:
                                           {{- if index .Values "flyte-binary" "enabled" }}
-                                          address: {{ include "flyte-sandbox.fullname" .}}
+                                          address: {{ include "flyte-binary.service.grpc.name" .}}
                                           {{- else }}
                                           address: {{ include "flyte-sandbox.localHeadlessService" . }}
                                           {{- end }}
