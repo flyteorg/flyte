@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-type AdminTaskCreateRequest struct {
+type FlyteidladminTaskCreateRequest struct {
 	Id *CoreIdentifier `json:"id,omitempty"`
 	Spec *AdminTaskSpec `json:"spec,omitempty"`
 }

@@ -10,5 +10,5 @@
 package flyteadmin
 
 // Represents a response structure if task creation succeeds.
-type AdminTaskCreateResponse struct {
+type FlyteidladminTaskCreateResponse struct {
 }

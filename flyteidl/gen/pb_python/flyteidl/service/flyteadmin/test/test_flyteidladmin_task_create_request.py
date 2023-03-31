@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.admin_task_create_request import AdminTaskCreateRequest  # noqa: E501
+from flyteadmin.models.flyteidladmin_task_create_request import FlyteidladminTaskCreateRequest  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestAdminTaskCreateRequest(unittest.TestCase):
-    """AdminTaskCreateRequest unit test stubs"""
+class TestFlyteidladminTaskCreateRequest(unittest.TestCase):
+    """FlyteidladminTaskCreateRequest unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestAdminTaskCreateRequest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testAdminTaskCreateRequest(self):
-        """Test AdminTaskCreateRequest"""
+    def testFlyteidladminTaskCreateRequest(self):
+        """Test FlyteidladminTaskCreateRequest"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.admin_task_create_request.AdminTaskCreateRequest()  # noqa: E501
+        # model = flyteadmin.models.flyteidladmin_task_create_request.FlyteidladminTaskCreateRequest()  # noqa: E501
         pass
 
 

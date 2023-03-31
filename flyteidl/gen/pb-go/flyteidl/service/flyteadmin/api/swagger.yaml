@@ -2193,13 +2193,13 @@ paths:
         name: "body"
         required: true
         schema:
-          $ref: "#/definitions/adminTaskCreateRequest"
+          $ref: "#/definitions/flyteidladminTaskCreateRequest"
         x-exportParamName: "Body"
       responses:
         200:
           description: "A successful response."
           schema:
-            $ref: "#/definitions/adminTaskCreateResponse"
+            $ref: "#/definitions/flyteidladminTaskCreateResponse"
   /api/v1/tasks/{id.project}/{id.domain}:
     get:
       tags:
@@ -15736,20 +15736,6 @@ definitions:
           sql:
             dialect: {}
             statement: "statement"
-  adminTaskCreateRequest:
-    type: "object"
-    properties:
-      id:
-        title: "id represents the unique identifier of the task.\n+required"
-        $ref: "#/definitions/coreIdentifier"
-      spec:
-        title: "Represents the specification for task.\n+required"
-        $ref: "#/definitions/adminTaskSpec"
-    title: "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task`\
-      \ for more details"
-  adminTaskCreateResponse:
-    type: "object"
-    description: "Represents a response structure if task creation succeeds."
   adminTaskExecutionClosure:
     type: "object"
     properties:
@@ -65752,6 +65738,20 @@ definitions:
         output_data:
           literals: {}
         deck_uri: "deck_uri"
+  flyteidladminTaskCreateRequest:
+    type: "object"
+    properties:
+      id:
+        title: "id represents the unique identifier of the task.\n+required"
+        $ref: "#/definitions/coreIdentifier"
+      spec:
+        title: "Represents the specification for task.\n+required"
+        $ref: "#/definitions/adminTaskSpec"
+    title: "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task`\
+      \ for more details"
+  flyteidladminTaskCreateResponse:
+    type: "object"
+    description: "Represents a response structure if task creation succeeds."
   flyteidladminTaskExecution:
     type: "object"
     properties:
