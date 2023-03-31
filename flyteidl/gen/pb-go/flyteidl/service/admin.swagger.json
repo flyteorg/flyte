@@ -2490,7 +2490,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminTaskCreateResponse"
+              "$ref": "#/definitions/flyteidladminTaskCreateResponse"
             }
           }
         },
@@ -2500,7 +2500,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/adminTaskCreateRequest"
+              "$ref": "#/definitions/flyteidladminTaskCreateRequest"
             }
           }
         ],
@@ -5033,24 +5033,6 @@
       },
       "description": "Compute task attributes which include values derived from the TaskSpec, as well as plugin-specific data\nand task metadata."
     },
-    "adminTaskCreateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/coreIdentifier",
-          "title": "id represents the unique identifier of the task.\n+required"
-        },
-        "spec": {
-          "$ref": "#/definitions/adminTaskSpec",
-          "title": "Represents the specification for task.\n+required"
-        }
-      },
-      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
-    },
-    "adminTaskCreateResponse": {
-      "type": "object",
-      "description": "Represents a response structure if task creation succeeds."
-    },
     "adminTaskExecutionClosure": {
       "type": "object",
       "properties": {
@@ -7533,6 +7515,24 @@
         }
       },
       "description": "Encapsulates all details for a single node execution entity.\nA node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested\nsub-workflow, or even a separate child-workflow execution.\nThe same task can be called repeatedly in a single workflow but each node is unique."
+    },
+    "flyteidladminTaskCreateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "id represents the unique identifier of the task.\n+required"
+        },
+        "spec": {
+          "$ref": "#/definitions/adminTaskSpec",
+          "title": "Represents the specification for task.\n+required"
+        }
+      },
+      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
+    },
+    "flyteidladminTaskCreateResponse": {
+      "type": "object",
+      "description": "Represents a response structure if task creation succeeds."
     },
     "flyteidladminTaskExecution": {
       "type": "object",

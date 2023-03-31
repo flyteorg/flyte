@@ -333,8 +333,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskCreateRequest body: (required)
-        :return: AdminTaskCreateResponse
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -354,8 +354,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskCreateRequest body: (required)
-        :return: AdminTaskCreateResponse
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -413,7 +413,7 @@ class AdminServiceApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='AdminTaskCreateResponse',  # noqa: E501
+            response_type='FlyteidladminTaskCreateResponse',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
