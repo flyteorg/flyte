@@ -989,6 +989,13 @@ ray (`ray.Config`_)
   dashboardHost: 0.0.0.0
   includeDashboard: true
   nodeIPAddress: $MY_POD_IP
+  remoteClusterConfig:
+    auth:
+      caCertPath: ""
+      tokenPath: ""
+    enabled: false
+    endpoint: ""
+    name: ""
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -2947,6 +2954,100 @@ nodeIPAddress (string)
   $MY_POD_IP
   
 
+remoteClusterConfig (`k8s.ClusterConfig (remoteClusterConfig)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Configuration of remote K8s cluster for ray jobs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  auth:
+    caCertPath: ""
+    tokenPath: ""
+  enabled: false
+  endpoint: ""
+  name: ""
+  
+
+k8s.ClusterConfig (remoteClusterConfig)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Friendly name of the remote cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Remote K8s cluster endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+auth (`k8s.Auth (auth)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caCertPath: ""
+  tokenPath: ""
+  
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Boolean flag to enable or disable
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+k8s.Auth (auth)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tokenPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Token path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+caCertPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Certificate path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 snowflake.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4818,6 +4919,25 @@ AWS Secret Manager config.
   sidecarImage: docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
   
 
+gcpSecretManager (`config.GCPSecretManagerConfig`_)
+--------------------------------------------------------------------------------
+
+GCP Secret Manager config.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 500Mi
+  sidecarImage: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
 vaultSecretManager (`config.VaultSecretManagerConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4884,6 +5004,36 @@ requests (v1.ResourceList)
 
   cpu: 200m
   memory: 500Mi
+  
+
+config.GCPSecretManagerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sidecarImage (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Specifies the sidecar docker image to use
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
+resources (`v1.ResourceRequirements`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  limits:
+    cpu: 200m
+    memory: 500Mi
+  requests:
+    cpu: 200m
+    memory: 500Mi
   
 
 config.VaultSecretManagerConfig
