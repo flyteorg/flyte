@@ -26,13 +26,13 @@ Please join us on:
     :target: https://www.linkedin.com/groups/13962256
     :alt: LinkedIn
 
-.. TODO: add back when new newsletter is up and running
-.. Also, feel free to sign up for our newsletter, Flyte Monthly, for a quick update on what we've been up to and upcoming events.
 
-.. .. link-button:: https://www.getrevue.co/profile/flyte
-..     :type: url
-..     :text: Flyte Monthly
-..     :classes: btn-outline-secondary
+Also, feel free to sign up for our newsletter, Flyte Monthly, for a quick update on what we've been up to and upcoming events.
+
+.. link-button:: https://lists.lfaidata.foundation/g/flyte-announce/join
+    :type: url
+    :text: Flyte Monthly
+    :classes: btn-outline-secondary
 
 
 Open Source Community Sync
@@ -48,12 +48,12 @@ Check it out, subscribe to the `calendar <https://www.addevent.com/calendar/kE35
 Office Hours
 ------------
 
-Flyte maintainers are available on Zoom for you to ask anything, weekly on Wednesdays:
+Flyte maintainers are available on Zoom for you to ask questions to Flyte maintainers, weekly on Wednesdays:
 
 .. image:: https://img.shields.io/badge/Join-7am%20PT/3pm%20GMT-yellow?style=for-the-badge
-    :target: https://www.addevent.com/event/zF10349020/
+    :target: https://calendly.com/flyte-office-hours-01/30min?
     :alt: 7am PT / 3pm GMT Office Hours
 
 .. image:: https://img.shields.io/badge/Join-9pm%20PT/10.30am%20IST-yellow?style=for-the-badge
-    :target: https://www.addevent.com/event/zF10349020/
+    :target: https://calendly.com/flyte-office-hours-01/30min?
     :alt: 7am PT / 3pm GMT Office Hours
