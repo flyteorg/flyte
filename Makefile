@@ -42,6 +42,7 @@ release_automation:
 	mkdir -p release
 	bash script/release.sh
 	bash script/generate_config_docs.sh
+	$(MAKE) -C docker/sandbox-bundled manifests
 
 .PHONY: deploy_sandbox
 deploy_sandbox: 
