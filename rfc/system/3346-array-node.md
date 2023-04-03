@@ -26,7 +26,7 @@ The proposed solution should fix these aforementioned issues and hopefully stymi
 
 We propose to introduce a new Flyte Node type, namely ArrayNode. The ArrayNode will contain a definition for the mappable subnode, operating on a collection of input / output lists, and integrating into the existing Flyte DAG just like any other Node type. This means a `map_task` will be executed entirely within FlytePropeller, leveraging the existing Node traversal rather than encapsulating as a separate plugin. This is the "secret sauce" in supporting the missing functionality.
 
-The main challenge in this implementation is maintaining support for the specific efficiencies that the current approach employees. The `map_task` is more than syntactic sugar, to achieve better performance it:
+The main challenge in this implementation is maintaining support for the specific efficiencies that the current approach employes. The `map_task` is more than syntactic sugar, to achieve better performance it:
 - Does not copy individual list input values for each subtask, rather flytekit is informed of the specific input index that it will read directly. This reduces the I/O costs of scaling `map_task`.
 - Performs asynchronous batched cache lookups, minimizing the cost of datacatalog RPCs
 - Stores subtask state using a bitarray rather than full resolution plugin metadata. This minimization reduces the information on each subtask, allowing for more effective scaling.
@@ -74,7 +74,7 @@ flytekit will require 3 known updates, but further analysis here will defer to t
 
 #### flyteconsole
 
-The current flyteconsole support for `map_task` (ie. subtasks that are TaskNode) should be backwards compatible with this proposed ArrayNode implementation. However, the additional support for mapping over different Flyte Node types at scale will require some thought and design for an intuitive UI. This information will be reported with the same parent/child relationship that is currently used for subworkflows / dynamtic tasks / etc, but these visualizations are not designed to scale into thousands of subnode executions.
+The current flyteconsole support for `map_task` (ie. subtasks that are TaskNode) should be backwards compatible with this proposed ArrayNode implementation. However, the additional support for mapping over different Flyte Node types at scale will require some thought and design for an intuitive UI. This information will be reported with the same parent/child relationship that is currently used for subworkflows / dynamic tasks / etc, but these visualizations are not designed to scale into thousands of subnode executions.
 
 ## 4 Metrics & Dashboards
 
@@ -92,7 +92,7 @@ The obvious alternative is continuing maintenance on the `k8s_array` backend plu
 
 First, this implementation should be fully backwards compatible with some minor caveats. We will need to keep the existing `k8s_array` plugin around to execute legacy code as the existing flyteidl definition for these tasks will will refer to the `k8s_array` backend plugin. Conversion between these legacy definitions and the new ArrayNode implementation will not be supported because there may be fields without a 1 to 1 mapping. Rather, the flytekit update will compile all new `map_task` declarations into using the ArrayNode, so conversion of existing `map_task` definitions will require recompiling and registering the task.
 
-Currently, the UI supports displaying `map_task` executions using the `ExternalResource` collection from defined in each `TaskExecutionEvent`. This will continue working as expected. However, the UI will need to be updated with support for mapping over other Flyte Node types. The metadata for these executions will be very similar to the parent/child relation ships between subworkflows and dynamic tasks.
+Currently, the UI supports displaying `map_task` executions using the `ExternalResource` collection defined in each `TaskExecutionEvent`. This will continue working as expected. However, the UI will need to be updated with support for mapping over other Flyte Node types. The metadata for these executions will be very similar to the parent/child relationships between subworkflows and dynamic tasks.
 
 ## 8 Unresolved questions
 
