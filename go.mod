@@ -3,10 +3,10 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.44
-	github.com/flyteorg/flyteadmin v1.1.88
+	github.com/flyteorg/datacatalog v1.0.42-0.20230313154914-9b14ebaed6f5
+	github.com/flyteorg/flyteadmin v1.1.87-0.20230330200628-8effaf7bce07
 	github.com/flyteorg/flytepropeller v1.1.76
-	github.com/flyteorg/flytestdlib v1.0.16
+	github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
