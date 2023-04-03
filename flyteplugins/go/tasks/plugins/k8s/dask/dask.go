@@ -189,9 +189,8 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, defaults defaults) (*dask
 		}
 		// If limits includes gpu, assume dask cuda worker cli startup
 		// https://docs.rapids.ai/api/dask-cuda/nightly/quickstart.html#dask-cuda-worker
-		// TODO: is this how gpu resources are called?
-		if limits.Gpu() != nil {
-			workerArgs[0] = "dask cuda worker"
+		if !limits.Name(flytek8s.ResourceNvidiaGPU, "0").IsZero() {
+			workerArgs[0] = "dask-cuda-worker"
 		}
 	}
 

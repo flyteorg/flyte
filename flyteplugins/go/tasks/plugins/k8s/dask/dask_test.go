@@ -340,6 +340,34 @@ func TestBuildResourceDaskDefaultResoureRequirements(t *testing.T) {
 	assert.Contains(t, workerSpec.Containers[0].Args, "2G")
 }
 
+func TestBuildResourceGPUCudaWorkerArgs(t *testing.T) {
+	protobufResources := core.Resources{
+		Limits: []*core.Resources_ResourceEntry{
+			{
+				Name:  core.Resources_GPU,
+				Value: "1",
+			},
+		},
+	}
+	expectedResources, _ := flytek8s.ToK8sResourceRequirements(&protobufResources)
+
+	flyteWorkflowResources := v1.ResourceRequirements{}
+
+	daskResourceHandler := daskResourceHandler{}
+	taskTemplate := dummyDaskTaskTemplate("", &protobufResources)
+	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, false)
+	resource, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	daskJob, ok := resource.(*daskAPI.DaskJob)
+	assert.True(t, ok)
+
+	// Default Workers
+	workerSpec := daskJob.Spec.Cluster.Spec.Worker.Spec
+	assert.Equal(t, *expectedResources, workerSpec.Containers[0].Resources)
+	assert.Contains(t, workerSpec.Containers[0].Args, "dask-cuda-worker")
+}
+
 func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 	protobufResources := core.Resources{
 		Requests: []*core.Resources_ResourceEntry{
