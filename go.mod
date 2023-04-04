@@ -82,6 +82,7 @@ require (
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/go-redis/redis v6.15.7+incompatible // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/go-test/deep v1.0.7 // indirect
 	github.com/goccy/go-json v0.4.8 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
@@ -164,6 +165,7 @@ require (
 	github.com/ray-project/kuberay/ray-operator v0.0.0-20220728052838-eaa75fa6707c // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -203,6 +205,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.2-0.20210529014059-a5c7eec3c614 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/mysql v1.4.4 // indirect
 	gorm.io/driver/sqlite v1.1.1 // indirect
 	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755 // indirect
 	k8s.io/api v0.24.1 // indirect
