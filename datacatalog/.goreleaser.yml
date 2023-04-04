@@ -1,0 +1,40 @@
+project_name: datacatalog
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: datacatalog
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    binary: datacatalog
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: datacatalog-archive
+    name_template: |-
+      datacatalog_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+      {{- end -}}
+    builds:
+      - datacatalog
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
