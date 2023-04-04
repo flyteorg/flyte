@@ -305,14 +305,14 @@ supporting all options available through the resource and ensuring maintainabili
 in future versions.
 
 Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__:
-1. client-side pod templates defined at the task level
-2. server-side defined podtemplate via ``default-pod-template-name`` in FlytePropeller
+1. Compile-time PodTemplate defined at the task level
+2. Runtime PodeTemplates, defined via ``default-pod-template-name`` in FlytePropeller
 
 
-Client-side pod templates usage
-================================
+Compile-time PodTemplate usage
+=======================================
 
-To define a client-side PodTemplate we have two options: (1) use the ``pod_template`` field in the Task (TODO: link to the task),
+To define a static PodTemplate we have two options: (1) use the ``pod_template`` field in the Task (TODO: link to the task),
 or (2) ``pod_template_name`` in the Task. Let's discuss the options separately.
 
 Defining ``pod_template`` in a Task
@@ -360,7 +360,7 @@ the name of the primary container, labels, and annotations.
 Using ``pod_template_name`` in a Task
 --------------------------------------
 
-It's also possible to apply a podtemplate to a task definition by specifying ``pod_template_name`` in the task definition.
+It's also possible to apply a PodTemplate to a task definition by specifying ``pod_template_name`` in the task definition.
 For example:
 
 .. code-block:: python
@@ -372,10 +372,10 @@ For example:
         ...
 
 In this example we're specifying that a PodTemplate name ``a_pod_template`` is going to be applied according to
-the server-side PodTemplate rules explained in the next section.
+the runtime PodTemplate rules explained in the next section.
 
-Server-side PodTemplate
-========================
+Runtime PodTemplate
+====================
 
 Set the ``default-pod-template-name`` in FlytePropeller
 --------------------------------------------------------
