@@ -79,12 +79,20 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 
 		size := -1
 		var literalCollection *idlCore.LiteralCollection
-		var discoveredInputName string
+		literals := make([][]*idlCore.Literal, 0)
+		discoveredInputNames := make([]string, 0)
 		for inputName, literal := range inputs.Literals {
 			if literalCollection = literal.GetCollection(); literalCollection != nil {
-				size = len(literal.GetCollection().Literals)
-				discoveredInputName = inputName
-				break
+				// validate length of input list
+				if size != -1 && size != len(literalCollection.Literals) {
+					state = state.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason("all maptask input lists must be the same length")
+					return state, nil
+				}
+
+				literals = append(literals, literalCollection.Literals)
+				discoveredInputNames = append(discoveredInputNames, inputName)
+
+				size = len(literalCollection.Literals)
 			}
 		}
 
@@ -105,7 +113,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		arrayJobSize = int64(size)
 
 		// build input readers
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), literalCollection.Literals, discoveredInputName)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), literals, discoveredInputNames)
 	}
 
 	if arrayJobSize > maxArrayJobSize {
@@ -242,16 +250,17 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		}
 
 		var literalCollection *idlCore.LiteralCollection
-		var discoveredInputName string
+		literals := make([][]*idlCore.Literal, 0)
+		discoveredInputNames := make([]string, 0)
 		for inputName, literal := range inputs.Literals {
 			if literalCollection = literal.GetCollection(); literalCollection != nil {
-				discoveredInputName = inputName
-				break
+				literals = append(literals, literalCollection.Literals)
+				discoveredInputNames = append(discoveredInputNames, inputName)
 			}
 		}
 
 		// build input readers
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), literalCollection.Literals, discoveredInputName)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), literals, discoveredInputNames)
 	}
 
 	// output reader
@@ -470,14 +479,19 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 
 // ConstructStaticInputReaders constructs input readers that comply with the io.InputReader interface but have their
 // inputs already populated.
-func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputs []*idlCore.Literal, inputName string) []io.InputReader {
+func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputs [][]*idlCore.Literal, inputNames []string) []io.InputReader {
 	inputReaders := make([]io.InputReader, 0, len(inputs))
-	for i := 0; i < len(inputs); i++ {
-		inputReaders = append(inputReaders, NewStaticInputReader(inputPaths, &idlCore.LiteralMap{
-			Literals: map[string]*idlCore.Literal{
-				inputName: inputs[i],
-			},
-		}))
+	if len(inputs) == 0 {
+		return inputReaders
+	}
+
+	for i := 0; i < len(inputs[0]); i++ {
+		literals := make(map[string]*idlCore.Literal)
+		for j := 0; j < len(inputNames); j++ {
+			literals[inputNames[j]] = inputs[j][i]
+		}
+
+		inputReaders = append(inputReaders, NewStaticInputReader(inputPaths, &idlCore.LiteralMap{Literals: literals}))
 	}
 
 	return inputReaders
