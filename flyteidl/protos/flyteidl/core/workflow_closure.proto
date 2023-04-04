@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/workflow.proto";
+import "flyteidl/core/tasks.proto";
+
+// Defines an enclosed package of workflow and tasks it references.
+message WorkflowClosure {
+    //required. Workflow template.
+    WorkflowTemplate workflow = 1;
+
+    //optional. A collection of tasks referenced by the workflow. Only needed if the workflow
+    // references tasks.
+    repeated TaskTemplate tasks = 2;
+}

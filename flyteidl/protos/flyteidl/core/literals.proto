@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "flyteidl/core/types.proto";
+
+// Primitive Types
+message Primitive {
+    // Defines one of simple primitive types. These types will get translated into different programming languages as
+    // described in https://developers.google.com/protocol-buffers/docs/proto#scalar.
+    oneof value {
+        int64 integer = 1;
+        double float_value = 2;
+        string string_value = 3;
+        bool boolean = 4;
+        google.protobuf.Timestamp datetime = 5;
+        google.protobuf.Duration duration = 6;
+    }
+}
+
+// Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally
+// undefined since it can be assigned to a scalar of any LiteralType.
+message Void {
+}
+
+// Refers to an offloaded set of files. It encapsulates the type of the store and a unique uri for where the data is.
+// There are no restrictions on how the uri is formatted since it will depend on how to interact with the store.
+message Blob {
+    BlobMetadata metadata = 1;
+    string uri = 3;
+}
+
+message BlobMetadata {
+    BlobType type = 1;
+}
+
+// A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
+// It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
+message Binary {
+    bytes value = 1;
+    string tag = 2;
+}
+
+// A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
+message Schema {
+    string uri = 1;
+    SchemaType type = 3;
+}
+
+// The runtime representation of a tagged union value. See `UnionType` for more details.
+message Union {
+    Literal value = 1;
+    LiteralType type = 2;
+}
+
+message StructuredDatasetMetadata {
+    // Bundle the type information along with the literal.
+    // This is here because StructuredDatasets can often be more defined at run time than at compile time.
+    // That is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,
+    // without any column information, but at run time, you might have that column information.
+    // flytekit python will copy this type information into the literal, from the type information, if not provided by
+    // the various plugins (encoders).
+    // Since this field is run time generated, it's not used for any type checking.
+    StructuredDatasetType structured_dataset_type = 1;
+}
+
+message StructuredDataset {
+    // String location uniquely identifying where the data is.
+    // Should start with the storage location (e.g. s3://, gs://, bq://, etc.)
+    string uri = 1;
+
+    StructuredDatasetMetadata metadata = 2;
+}
+
+message Scalar {
+    oneof value {
+        Primitive primitive = 1;
+        Blob blob = 2;
+        Binary binary = 3;
+        Schema schema = 4;
+        Void none_type = 5;
+        Error error = 6;
+        google.protobuf.Struct generic = 7;
+        StructuredDataset structured_dataset = 8;
+        Union union = 9;
+    }
+}
+
+// A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
+message Literal {
+    oneof value {
+        // A simple value.
+        Scalar scalar = 1;
+
+        // A collection of literals to allow nesting.
+        LiteralCollection collection = 2;
+
+        // A map of strings to literals.
+        LiteralMap map = 3;
+    }
+
+    // A hash representing this literal.
+    // This is used for caching purposes. For more details refer to RFC 1893
+    // (https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)
+    string hash = 4;
+}
+
+// A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
+message LiteralCollection {
+    repeated Literal literals = 1;
+}
+
+// A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
+message LiteralMap {
+    map<string, Literal> literals = 1;
+}
+
+// A collection of BindingData items.
+message BindingDataCollection {
+    repeated BindingData bindings = 1;
+}
+
+// A map of BindingData items.
+message BindingDataMap {
+    map<string, BindingData> bindings = 1;
+}
+
+message UnionInfo {
+  LiteralType targetType = 1;
+}
+
+// Specifies either a simple value or a reference to another output.
+message BindingData {
+    oneof value {
+        // A simple scalar value.
+        Scalar scalar = 1;
+
+        // A collection of binding data. This allows nesting of binding data to any number
+        // of levels.
+        BindingDataCollection collection = 2;
+
+        // References an output promised by another node.
+        OutputReference promise = 3;
+
+        // A map of bindings. The key is always a string.
+        BindingDataMap map = 4;
+    }
+
+    UnionInfo union = 5;
+}
+
+// An input/output binding of a variable to either static value or a node output.
+message Binding {
+    // Variable name must match an input/output variable of the node.
+    string var = 1;
+
+    // Data to use to bind this variable.
+    BindingData binding = 2;
+}
+
+// A generic key value pair.
+message KeyValuePair {
+    //required.
+    string key = 1;
+
+    //+optional.
+    string value = 2;
+}
+
+// Retry strategy associated with an executable unit.
+message RetryStrategy {
+    // Number of retries. Retries will be consumed when the job fails with a recoverable error.
+    // The number of retries must be less than or equals to 10.
+    uint32 retries = 5;
+}

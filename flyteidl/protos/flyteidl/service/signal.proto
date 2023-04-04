@@ -1,0 +1,55 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+import "flyteidl/admin/signal.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+
+// SignalService defines an RPC Service that may create, update, and retrieve signal(s).
+service SignalService {
+  // Fetches or creates a :ref:`ref_flyteidl.admin.Signal`.
+  rpc GetOrCreateSignal (flyteidl.admin.SignalGetOrCreateRequest) returns (flyteidl.admin.Signal) {
+    // Purposefully left out an HTTP API for this RPC call. This is meant to idempotently retrieve
+    // a signal, meaning the first call will create the signal and all subsequent calls will
+    // fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
+    // is not exposed to mitigate unintended behavior.
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a signal, creating it if it does not exist."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.
+  rpc ListSignals (flyteidl.admin.SignalListRequest) returns (flyteidl.admin.SignalList) {
+    option (google.api.http) = {
+      get: "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing signal definitions matching the input signal id filters."
+    // };
+  }
+
+  // Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition
+  rpc SetSignal (flyteidl.admin.SignalSetRequest) returns (flyteidl.admin.SignalSetResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/signals"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Set a signal value."
+    //   responses: {
+    //     key: "400"
+    //     value: {
+    //       description: "Returned for bad request that may have failed validation."
+    //     }
+    //   }
+    //   responses: {
+    //     key: "409"
+    //     value: {
+    //       description: "Returned for a request that references an identical entity that has already been registered."
+    //     }
+    //   }
+    // };
+  }
+}

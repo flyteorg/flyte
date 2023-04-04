@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/tasks.proto";
+import "flyteidl/core/compiler.proto";
+import "flyteidl/admin/description_entity.proto";
+import "google/protobuf/timestamp.proto";
+
+// Represents a request structure to create a revision of a task.
+// See :ref:`ref_flyteidl.admin.Task` for more details
+message TaskCreateRequest {
+    // id represents the unique identifier of the task.
+    // +required
+    core.Identifier id           = 1;
+    
+    // Represents the specification for task.
+    // +required
+    TaskSpec spec                = 2;
+}
+
+// Represents a response structure if task creation succeeds.
+message TaskCreateResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// Flyte workflows are composed of many ordered tasks. That is small, reusable, self-contained logical blocks
+// arranged to process workflow inputs and produce a deterministic set of outputs.
+// Tasks can come in many varieties tuned for specialized behavior. 
+message Task {
+    // id represents the unique identifier of the task.
+    core.Identifier id       = 1;
+
+    // closure encapsulates all the fields that maps to a compiled version of the task.
+    TaskClosure closure      = 2;
+
+    // One-liner overview of the entity.
+    string short_description = 3;
+}
+
+// Represents a list of tasks returned from the admin.
+// See :ref:`ref_flyteidl.admin.Task` for more details
+message TaskList {
+    // A list of tasks returned based on the request.
+    repeated Task tasks = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token        = 2;
+}
+
+// Represents a structure that encapsulates the user-configured specification of the task.
+message TaskSpec {
+    // Template of the task that encapsulates all the metadata of the task.
+    core.TaskTemplate template = 1;
+
+    // Represents the specification for description entity.
+    DescriptionEntity description        = 2;
+}
+
+// Compute task attributes which include values derived from the TaskSpec, as well as plugin-specific data
+// and task metadata.
+message TaskClosure {
+    // Represents the compiled representation of the task from the specification provided.
+    core.CompiledTask compiled_task = 1;
+        
+    // Time at which the task was created.
+    google.protobuf.Timestamp created_at = 2;
+}

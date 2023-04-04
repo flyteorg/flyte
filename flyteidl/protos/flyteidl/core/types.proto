@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "google/protobuf/struct.proto";
+
+// Define a set of simple types.
+enum SimpleType {
+    NONE = 0;
+    INTEGER = 1;
+    FLOAT = 2;
+    STRING = 3;
+    BOOLEAN = 4;
+    DATETIME = 5;
+    DURATION = 6;
+    BINARY = 7;
+    ERROR = 8;
+    STRUCT = 9;
+}
+
+// Defines schema columns and types to strongly type-validate schemas interoperability.
+message SchemaType {
+    message SchemaColumn {
+        // A unique name -within the schema type- for the column
+        string name = 1;
+
+        enum SchemaColumnType {
+            INTEGER = 0;
+            FLOAT = 1;
+            STRING = 2;
+            BOOLEAN = 3;
+            DATETIME = 4;
+            DURATION = 5;
+        }
+
+        // The column type. This allows a limited set of types currently.
+        SchemaColumnType type = 2;
+    }
+
+    // A list of ordered columns this schema comprises of.
+    repeated SchemaColumn columns = 3;
+}
+
+message StructuredDatasetType {
+    message DatasetColumn {
+        // A unique name within the schema type for the column.
+        string name = 1;
+
+        // The column type.
+        LiteralType literal_type = 2;
+    }
+
+    // A list of ordered columns this schema comprises of.
+    repeated DatasetColumn columns = 1;
+
+    // This is the storage format, the format of the bits at rest
+    // parquet, feather, csv, etc.
+    // For two types to be compatible, the format will need to be an exact match.
+    string format = 2;
+
+    // This is a string representing the type that the bytes in external_schema_bytes are formatted in.
+    // This is an optional field that will not be used for type checking.
+    string external_schema_type = 3;
+
+    // The serialized bytes of a third-party schema library like Arrow.
+    // This is an optional field that will not be used for type checking.
+    bytes external_schema_bytes = 4;
+}
+
+// Defines type behavior for blob objects
+message BlobType {
+    enum BlobDimensionality {
+        SINGLE = 0;
+        MULTIPART = 1;
+    }
+
+    // Format can be a free form string understood by SDK/UI etc like
+    // csv, parquet etc
+    string format = 1;
+    BlobDimensionality dimensionality = 2;
+}
+
+// Enables declaring enum types, with predefined string values
+// For len(values) > 0, the first value in the ordered list is regarded as the default value. If you wish
+// To provide no defaults, make the first value as undefined.
+message EnumType {
+    // Predefined set of enum values.
+    repeated string values = 1;
+}
+
+// Defines a tagged union type, also known as a variant (and formally as the sum type).
+//
+// A sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag
+// A value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by
+// storing the varaint's tag with the literal value and can be examined in runtime.
+//
+// Type S is typically written as
+// S := Apple A | Banana B | Cantaloupe C | ...
+//
+// Notably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:
+// Optional X := X | Null
+//
+// See also: https://en.wikipedia.org/wiki/Tagged_union
+message UnionType {
+    // Predefined set of variants in union.
+    repeated LiteralType variants = 1;
+}
+
+// Hints to improve type matching
+// e.g. allows distinguishing output from custom type transformers
+// even if the underlying IDL serialization matches.
+message TypeStructure {
+    // Must exactly match for types to be castable
+    string tag = 1;
+}
+
+// TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
+message TypeAnnotation {
+    // A arbitrary JSON payload to describe a type.
+    google.protobuf.Struct annotations = 1;
+}
+
+// Defines a strong type to allow type checking between interfaces.
+message LiteralType {
+    oneof type {
+        // A simple type that can be compared one-to-one with another.
+        SimpleType simple = 1;
+
+        // A complex type that requires matching of inner fields.
+        SchemaType schema = 2;
+
+        // Defines the type of the value of a collection. Only homogeneous collections are allowed.
+        LiteralType collection_type = 3;
+
+        // Defines the type of the value of a map type. The type of the key is always a string.
+        LiteralType map_value_type = 4;
+
+        // A blob might have specialized implementation details depending on associated metadata.
+        BlobType blob = 5;
+
+        // Defines an enum with pre-defined string values.
+        EnumType enum_type = 7;
+
+        // Generalized schema support
+        StructuredDatasetType structured_dataset_type = 8;
+
+        // Defines an union type with pre-defined LiteralTypes.
+        UnionType union_type = 10;
+    }
+
+    // This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by
+    // consumers to identify special behavior or display extended information for the type.
+    google.protobuf.Struct metadata = 6;
+
+    // This field contains arbitrary data that might have special semantic
+    // meaning for the client but does not effect internal flyte behavior.
+    TypeAnnotation annotation = 9;
+
+    // Hints to improve type matching.
+    TypeStructure structure = 11;
+}
+
+// A reference to an output produced by a node. The type can be retrieved -and validated- from
+// the underlying interface of the node.
+message OutputReference {
+    // Node id must exist at the graph layer.
+    string node_id = 1;
+
+    // Variable name must refer to an output variable for the node.
+    string var = 2;
+}
+
+// Represents an error thrown from a node.
+message Error {
+    // The node id that threw the error.
+    string failed_node_id = 1;
+
+    // Error message thrown.
+    string message = 2;
+}

@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/types.proto";
+
+// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+// See :ref:`ref_flyteidl.admin.Signal` for more details
+message SignalGetOrCreateRequest {
+    // A unique identifier for the requested signal.
+    core.SignalIdentifier id = 1;
+
+    // A type denoting the required value type for this signal.
+    core.LiteralType type = 2;
+}
+
+// SignalListRequest represents a request structure to retrieve a collection of signals.
+// See :ref:`ref_flyteidl.admin.Signal` for more details
+message SignalListRequest {
+    // Indicates the workflow execution to filter by.
+    // +required
+    core.WorkflowExecutionIdentifier workflow_execution_id = 1;
+
+    // Indicates the number of resources to be returned.
+    // +required
+    uint32 limit = 2;
+
+    // In the case of multiple pages of results, the, server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token = 3;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by = 5;
+}
+
+// SignalList represents collection of signals along with the token of the last result.
+// See :ref:`ref_flyteidl.admin.Signal` for more details
+message SignalList {
+    // A list of signals matching the input filters.
+    repeated Signal signals = 1;    
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token = 2;
+}
+
+// SignalSetRequest represents a request structure to set the value on a signal. Setting a signal
+// effetively satisfies the signal condition within a Flyte workflow.
+// See :ref:`ref_flyteidl.admin.Signal` for more details
+message SignalSetRequest {
+    // A unique identifier for the requested signal.
+    core.SignalIdentifier id = 1;    
+
+    // The value of this signal, must match the defining signal type.
+    core.Literal value = 2;
+}
+
+// SignalSetResponse represents a response structure if signal setting succeeds.
+message SignalSetResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// Signal encapsulates a unique identifier, associated metadata, and a value for a single Flyte
+// signal. Signals may exist either without a set value (representing a signal request) or with a
+// populated value (indicating the signal has been given).
+message Signal {
+    // A unique identifier for the requested signal.
+    core.SignalIdentifier id = 1;
+
+    // A type denoting the required value type for this signal.
+    core.LiteralType type = 2;
+
+    // The value of the signal. This is only available if the signal has been "set" and must match
+    // the defined the type.
+    core.Literal value = 3;
+}
