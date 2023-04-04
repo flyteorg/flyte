@@ -1,0 +1,76 @@
+workflow:
+  id:
+    name: core.flyte_basics.documented_workflow.numpy_docstring
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        data:
+          description: A data class pertaining to the new record to be stored in the
+            DataFrame
+          type:
+            Type:
+              Simple: 9
+            metadata:
+              $ref: '#/definitions/PandasdataSchema'
+              $schema: http://json-schema.org/draft-07/schema#
+              definitions:
+                PandasdataSchema:
+                  additionalProperties: false
+                  properties:
+                    id:
+                      default: 3
+                      title: id
+                      type: integer
+                    name:
+                      default: Bonnie
+                      title: name
+                      type: string
+                  type: object
+        df:
+          description: Pandas DataFrame
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+    outputs:
+      variables:
+        o0:
+          description: Pandas DataFrame
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.flyte_basics.documented_workflow.add_data
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: data
+      var: data
+    - binding:
+        Value:
+          Promise:
+            var: df
+      var: df
+    metadata:
+      InterruptibleValue: null
+      name: add_data
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

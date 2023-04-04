@@ -1,0 +1,254 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - n1
+      n1:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+    upstream:
+      end-node:
+        ids:
+        - n1
+      n0:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - n0
+  template:
+    id:
+      name: core.containerization.multi_images.my_workflow
+      resource_type: 2
+    interface:
+      inputs: {}
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: o0
+        var: o0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.containerization.multi_images.svm_trainer
+              resource_type: 1
+          overrides: {}
+      id: n0
+      metadata:
+        InterruptibleValue: null
+        name: svm_trainer
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.containerization.multi_images.svm_predictor
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: test_features
+        var: X_test
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: train_features
+        var: X_train
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: test_labels
+        var: y_test
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: train_labels
+        var: y_train
+      metadata:
+        InterruptibleValue: null
+        name: svm_predictor
+        retries: {}
+      upstream_node_ids:
+      - n0
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.containerization.multi_images
+        - task-name
+        - svm_predictor
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:multi-image-predict-98b125fd57d20594026941c2ebe7ef662e5acb7d6423660a65f493ca2d9aa267
+        resources: {}
+    id:
+      name: core.containerization.multi_images.svm_predictor
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          X_test:
+            description: X_test
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          X_train:
+            description: X_train
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          y_test:
+            description: y_test
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          y_train:
+            description: y_train
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.containerization.multi_images
+        - task-name
+        - svm_trainer
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-with-sklearn-baa17ccf39aa667c5950bd713a4366ce7d5fccaf7f85e6be8c07fe4b522f92c3
+        resources: {}
+    id:
+      name: core.containerization.multi_images.svm_trainer
+      resource_type: 1
+    interface:
+      inputs: {}
+      outputs:
+        variables:
+          test_features:
+            description: test_features
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          test_labels:
+            description: test_labels
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          train_features:
+            description: train_features
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+          train_labels:
+            description: train_labels
+            type:
+              Type:
+                StructuredDatasetType:
+                  format: parquet
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
