@@ -208,4 +208,10 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
-replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+replace (
+	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+	github.com/flyteorg/flyteidl => ../flyteidl
+	github.com/flyteorg/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flytestdlib => ../flytestdlib
+)

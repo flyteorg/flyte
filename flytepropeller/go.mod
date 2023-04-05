@@ -146,4 +146,9 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
+replace (
+	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
+	github.com/flyteorg/flyteidl => ../flyteidl
+	github.com/flyteorg/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flytestdlib => ../flytestdlib
+)
