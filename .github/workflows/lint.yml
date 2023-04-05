@@ -35,8 +35,7 @@ jobs:
       - name: test
         run: echo ${{ matrix.package }}
       - name: Get changed folders
-        run: |
-          pwd
+        run: make install && make lint
 
 #      - name: Set up Go
 #        uses: actions/setup-go@v3
