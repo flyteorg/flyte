@@ -25,6 +25,11 @@ jobs:
         uses: actions/checkout@v3
       - name: test
         run: echo ${{ steps.get_changed.outputs.matrix }}
+      - name: Get changed folders
+        run: |
+          folders=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '^([^/]+/)*$' | uniq)
+          echo $folders
+
 #      - name: Set up Go
 #        uses: actions/setup-go@v3
 #        with:
