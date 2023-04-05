@@ -3,32 +3,38 @@ name: Lint
 on: push
 
 jobs:
-  generate_matrix:
-    name: Generate Matrix
+  changes:
     runs-on: ubuntu-latest
+    outputs:
+      # Expose matched filters as job 'packages' output variable
+      packages: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: Stockopedia/action-get-changed-files@v1
-        id: get_changed
+      # For pull requests it's not necessary to checkout the code
+      - uses: dorny/paths-filter@v2
+        id: filter
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          ignore: "**/+(.github)"
-          foldersOnly: true
-          format: csv
-      - name: Echo changed files
-        run: echo ${{ steps.get_changed.outputs.matrix }}
+          filters: |
+            flyteadmin: flyteadmin
+            flytepropeller: flytepropeller
   lint:
-    needs: generate_matrix
-    name: Run Lint
+    needs: changes
+    strategy:
+      matrix:
+        # Parse JSON array containing names of all filters matching any of changed files
+        # e.g. ['package1', 'package2'] if both package folders contains changes
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: test
-        run: echo ${{ steps.get_changed.outputs.matrix }}
+        run: echo ${{ matrix.package }}
       - name: Get changed folders
         run: |
-          folders=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '^([^/]+/)*$' | uniq)
-          echo $folders
+          pwd
 
 #      - name: Set up Go
 #        uses: actions/setup-go@v3
