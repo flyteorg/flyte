@@ -20,9 +20,6 @@ jobs:
     needs: generate_matrix
     name: Run Lint
     runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        component: [${{ steps.get_changed.outputs.matrix }}]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
