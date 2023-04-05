@@ -16,8 +16,8 @@ jobs:
         id: filter
         with:
           filters: |
-            flyteadmin: flyteadmin
-            flytepropeller: flytepropeller
+            flyteadmin: flyteadmin/**
+            flytepropeller: flytepropeller/**
   lint:
     needs: changes
     strategy:
