@@ -1,5 +1,21 @@
 # Flyte 1.5 release
 
+## Platform
+
+We're laying the foundation for an improved experience to help performance investigations. Stay tuned for more details!
+
+We can now submit Ray jobs to separate clusters (other than the one flytepropeller is running). Thanks to https://github.com/flyteorg/flyteplugins/pull/321.
+
+Several bug fixes, including:
+- [Fix fast-cache bug on first node event](https://github.com/flyteorg/flyteadmin/pull/483)
+- [Split flyte-binary services into http and grpc in helm charts](https://github.com/flyteorg/flyte/pull/3518)
+
+### Database Migrations
+One of the improvements planned requires us to clean up our database migrations. We have done so in this release so you should see a series of new migrations. 
+These should have zero impact if you are otherwise up-to-date on migrations (which is why they are all labeled `noop`) but please be aware that it will add a minute or so to the 
+init container/command that runs the migrations in the default Helm charts. Notably, because these should be a no-op, they also do not come with any rollback commands. 
+If you experience any issues, please let us know.
+
 ## Flytekit
 
 Python 3.11 is now officially supported.
@@ -93,15 +109,3 @@ Map tasks do not support partial tasks with lists as inputs.
 
 Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/waiting_for_external_inputs.html#waiting-for-external-inputs). 
 Better support for dataclasses in the launch form.
-
-## Platform 
-
-We're laying the foundation for an improved experience to help performance investigations. Stay tuned for more details!
-
-We can now submit Ray jobs to separate clusters (other than the one flytepropeller is running). Thanks to https://github.com/flyteorg/flyteplugins/pull/321.
-
-Several bug fixes, including:
-- [Fix fast-cache bug on first node event](https://github.com/flyteorg/flyteadmin/pull/483)
-- [Split flyte-binary services into http and grpc in helm charts](https://github.com/flyteorg/flyte/pull/3518)
-
-
