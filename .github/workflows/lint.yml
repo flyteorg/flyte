@@ -1,12 +1,7 @@
 name: Lint
 
-on:
-  workflow_call:
-    inputs:
-      go-version:
-        default: "1.19"
-        required: false
-        type: string
+on: push
+
 jobs:
   generate_matrix:
     name: Generate Matrix
