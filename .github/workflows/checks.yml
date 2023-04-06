@@ -37,6 +37,6 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: $GO_VERSION
+          go-version: "$GO_VERSION"
       - name: Lint
         run: make install && make lint
