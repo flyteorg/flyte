@@ -1,6 +1,10 @@
-name: Lint
+name: Checks Flyte Components
 
 on: push
+
+env:
+  GO_VERSION: "1.19"
+
 
 jobs:
   changes:
@@ -15,10 +19,12 @@ jobs:
         id: filter
         with:
           filters: |
+            check: flyte*/**
             flyteadmin: flyteadmin/**
             flytepropeller: flytepropeller/**
   lint:
     needs: changes
+    if: needs.changes.outputs.check == 'true'
     strategy:
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
@@ -27,5 +33,11 @@ jobs:
       run:
         working-directory: ${{ matrix.package }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: $GO_VERSION
       - name: Lint
-        uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+        run: make install && make lint
