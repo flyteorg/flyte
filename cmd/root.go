@@ -24,8 +24,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog"
 )
@@ -34,8 +32,6 @@ type RootOptions struct {
 	*clientcmd.ConfigOverrides
 	showSource     bool
 	clientConfig   clientcmd.ClientConfig
-	restConfig     *rest.Config
-	kubeClient     kubernetes.Interface
 	Scope          promutils.Scope
 	Store          *storage.DataStore
 	configAccessor config.Accessor
@@ -129,7 +125,7 @@ func NewDataCommand() *cobra.Command {
 				return errors.Wrap(err, "failed to create datastore client")
 			}
 			rootOpts.Store = store
-			return rootOpts.ConfigureClient()
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return rootOpts.executeRootCmd()
@@ -179,20 +175,6 @@ func (r *RootOptions) initConfig(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func (r *RootOptions) ConfigureClient() error {
-	restConfig, err := r.clientConfig.ClientConfig()
-	if err != nil {
-		return err
-	}
-	k, err := kubernetes.NewForConfig(restConfig)
-	if err != nil {
-		return err
-	}
-	r.restConfig = restConfig
-	r.kubeClient = k
 	return nil
 }
 

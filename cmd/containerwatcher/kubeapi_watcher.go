@@ -8,7 +8,9 @@ import (
 	v13 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
+	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 type ContainerInformation struct {
@@ -80,6 +82,14 @@ func (k kubeAPIWatcher) WaitToExit(ctx context.Context) error {
 	return k.wait(ctx, k.info, f)
 }
 
-func NewKubeAPIWatcher(_ context.Context, coreClient v1.CoreV1Interface, info ContainerInformation) (Watcher, error) {
-	return kubeAPIWatcher{coreClient: coreClient, info: info}, nil
+func NewKubeAPIWatcher(_ context.Context, clientConfig clientcmd.ClientConfig, info ContainerInformation) (Watcher, error) {
+	restConfig, err := clientConfig.ClientConfig()
+	if err != nil {
+		return kubeAPIWatcher{info: info}, err
+	}
+	kubeClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return kubeAPIWatcher{info: info}, err
+	}
+	return kubeAPIWatcher{coreClient: kubeClient.CoreV1(), info: info}, nil
 }
