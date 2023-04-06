@@ -24,7 +24,7 @@ jobs:
             flytepropeller: flytepropeller/**
   lint:
     needs: changes
-    if: needs.changes.steps.filter.outputs.check == 'true'
+    # if: needs.changes.steps.filter.outputs.check == 'true'
     strategy:
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: test
+        run: echo ${{ needs.changes.outputs.packages }}
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
