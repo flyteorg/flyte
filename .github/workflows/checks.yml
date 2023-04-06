@@ -9,7 +9,6 @@ jobs:
       # Expose matched filters as job 'packages' output variable
       packages: ${{ steps.filter.outputs.changes }}
     steps:
-      # For pull requests it's not necessary to checkout the code
       - name: Checkout
         uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -22,24 +21,11 @@ jobs:
     needs: changes
     strategy:
       matrix:
-        # Parse JSON array containing names of all filters matching any of changed files
-        # e.g. ['package1', 'package2'] if both package folders contains changes
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ matrix.package }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: test
-        run: echo ${{ matrix.package }}
-      - name: Get changed folders
-        run: make install && make lint
-
-#      - name: Set up Go
-#        uses: actions/setup-go@v3
-#        with:
-#          go-version: ${{ inputs.go-version }}
-#      - name: Lint
-#        run: cd ${{ matrix.component }} && make install && make lint
+      - name: Lint
+        uses: flyteorg/flytetools/.github/workflows/lint.yml@master
