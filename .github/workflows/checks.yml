@@ -24,7 +24,7 @@ jobs:
             flytepropeller: flytepropeller/**
   lint:
     needs: changes
-    if: needs.changes.step.filter.outputs.check == 'true'
+    if: needs.changes.steps.filter.outputs.check == 'true'
     strategy:
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
