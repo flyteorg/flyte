@@ -216,7 +216,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx handler.NodeExe
 	// A recoverable node execution should always be in a terminal phase
 	switch recovered.Closure.Phase {
 	case core.NodeExecution_SKIPPED:
-		return handler.PhaseInfoSkip(nil, "node execution recovery indicated original node was skipped"), nil
+		return handler.PhaseInfoUndefined, nil
 	case core.NodeExecution_SUCCEEDED:
 		fallthrough
 	case core.NodeExecution_RECOVERED:
