@@ -109,10 +109,12 @@ Chart for basic single Flyte executable deployment
 | rbac.create | bool | `true` |  |
 | rbac.extraRules | list | `[]` |  |
 | rbac.labels | object | `{}` |  |
-| service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
+| service.commonAnnotations | object | `{}` |  |
 | service.externalTrafficPolicy | string | `"Cluster"` |  |
 | service.extraPorts | list | `[]` |  |
+| service.grpcAnnotations | object | `{}` |  |
+| service.httpAnnotations | object | `{}` |  |
 | service.labels | object | `{}` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |
