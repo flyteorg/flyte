@@ -131,6 +131,14 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	})
 
 	g.Go(func() error {
+		err := controller.StartControllerManager(childCtx, mgr)
+		if err != nil {
+			logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
+		}
+		return err
+	})
+
+	g.Go(func() error {
 		err := webhook.Run(childCtx, propellerCfg, cfg, defaultNamespace, &webhookScope, mgr)
 		if err != nil {
 			logger.Fatalf(childCtx, "Failed to start webhook. Error: %v", err)

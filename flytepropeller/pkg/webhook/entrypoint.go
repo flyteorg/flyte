@@ -52,8 +52,10 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
 
-	logger.Infof(ctx, "Starting controller-runtime manager")
-	return (*mgr).Start(ctx)
+	logger.Infof(ctx, "Started propeller webhook")
+	<-ctx.Done()
+
+	return nil
 }
 
 func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {
