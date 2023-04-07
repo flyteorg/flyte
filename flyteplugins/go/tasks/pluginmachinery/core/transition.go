@@ -11,6 +11,7 @@ const (
 	// The transition is eventually consistent. For all the state written may not be visible in the next call, but eventually will persist
 	// Best to use when the plugin logic is completely idempotent. This is also the most performant option.
 	TransitionTypeEphemeral TransitionType = iota
+	// @deprecated support for Barrier type transitions has been deprecated
 	// This transition tries its best to make the latest state visible for every consecutive read. But, it is possible
 	// to go back in time, i.e. monotonic consistency is violated (in rare cases).
 	TransitionTypeBarrier
