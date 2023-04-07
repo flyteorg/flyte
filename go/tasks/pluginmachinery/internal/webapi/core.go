@@ -97,7 +97,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return core.UnknownTransition, err
 	}
 
-	return core.DoTransitionType(core.TransitionTypeBarrier, phaseInfo), nil
+	return core.DoTransition(phaseInfo), nil
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {

@@ -63,7 +63,7 @@ func (p Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		return core.UnknownTransition, err
 	}
 
-	return core.DoTransitionType(core.TransitionTypeBarrier, phaseInfo), nil
+	return core.DoTransition(phaseInfo), nil
 }
 
 func (p Executor) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {

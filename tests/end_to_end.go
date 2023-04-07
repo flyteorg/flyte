@@ -252,7 +252,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.OnMaxDatasetSizeBytes().Return(1000000)
 	tCtx.OnSecretManager().Return(secretManager)
 
-	trns := pluginCore.DoTransitionType(pluginCore.TransitionTypeBarrier, pluginCore.PhaseInfoQueued(time.Now(), 0, ""))
+	trns := pluginCore.DoTransition(pluginCore.PhaseInfoQueued(time.Now(), 0, ""))
 	for !trns.Info().Phase().IsTerminal() {
 		trns, err = executor.Handle(ctx, tCtx)
 		assert.NoError(t, err)
