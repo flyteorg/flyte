@@ -8,3 +8,5 @@ plugins:
     out: gen/pb_python
   - remote: buf.build/protocolbuffers/plugins/pyi:v21.9.0-1
     out: gen/pb_python
+  - plugin: buf.build/community/neoeinstein-prost
+    out: gen/pb_rust
