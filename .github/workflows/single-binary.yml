@@ -143,6 +143,8 @@ jobs:
           load: true
           allow: "security.insecure"
           tags: flyte-sandbox-bundled:local
+      # Without this, the GHA runner is under disk pressure and evicts all the pods.
+      # Buildx cache uses roughly 50% (7gb) of the GHA runner's disk (14gb).
       - name: Prune Docker Buildx cache to reclaim storage
         run: docker buildx prune --all --force
       - name: Set up Python
