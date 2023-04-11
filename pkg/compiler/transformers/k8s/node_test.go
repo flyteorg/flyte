@@ -93,22 +93,6 @@ func TestBuildNodeSpec(t *testing.T) {
 		mustBuild(t, n, 1, errs.NewScope())
 	})
 
-	t.Run("Task with resources", func(t *testing.T) {
-		expectedCPU := resource.MustParse("10Mi")
-		n.Node.Target = &core.Node_TaskNode{
-			TaskNode: &core.TaskNode{
-				Reference: &core.TaskNode_ReferenceId{
-					ReferenceId: &core.Identifier{Name: "ref_2"},
-				},
-			},
-		}
-
-		spec := mustBuild(t, n, 1, errs.NewScope())
-		assert.NotNil(t, spec.Resources)
-		assert.NotNil(t, spec.Resources.Requests.Cpu())
-		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
-	})
-
 	t.Run("node with resource overrides", func(t *testing.T) {
 		expectedCPU := resource.MustParse("20Mi")
 		n.Node.Target = &core.Node_TaskNode{

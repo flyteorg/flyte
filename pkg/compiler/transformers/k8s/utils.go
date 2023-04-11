@@ -48,18 +48,6 @@ func computeDeadline(n *core.Node) (*v1.Duration, error) {
 	return deadline, nil
 }
 
-func getResources(task *core.TaskTemplate) *core.Resources {
-	if task == nil {
-		return nil
-	}
-
-	if task.GetContainer() == nil {
-		return nil
-	}
-
-	return task.GetContainer().Resources
-}
-
 func toAliasValueArray(aliases []*core.Alias) []v1alpha1.Alias {
 	if aliases == nil {
 		return nil
