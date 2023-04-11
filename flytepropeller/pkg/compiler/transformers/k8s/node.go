@@ -45,8 +45,6 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 		if n.GetTaskNode().Overrides != nil && n.GetTaskNode().Overrides.Resources != nil {
 			resources = n.GetTaskNode().Overrides.Resources
-		} else {
-			resources = getResources(task)
 		}
 	}
 
