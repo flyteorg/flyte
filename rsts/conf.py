@@ -246,6 +246,9 @@ mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "
 
+# prevent css style tags from being copied by the copy button
+copybutton_exclude = 'style[type="text/css"]'
+
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
