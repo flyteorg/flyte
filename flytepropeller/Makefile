@@ -3,17 +3,18 @@ include boilerplate/flyte/docker_build/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 include boilerplate/flyte/end2end/Makefile
 
-
 .PHONY: update_boilerplate
 update_boilerplate:
 	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 .PHONY: linux_compile
+linux_compile: export CGO_ENABLED = 0
+linux_compile: export GOOS = linux
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flytepropeller ./cmd/controller/main.go
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flytepropeller-manager ./cmd/manager/main.go
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/kubectl-flyte ./cmd/kubectl-flyte/main.go
+	go build -o /artifacts/flytepropeller ./cmd/controller/main.go
+	go build -o /artifacts/flytepropeller-manager ./cmd/manager/main.go
+	go build -o /artifacts/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 .PHONY: compile
 compile:
@@ -25,9 +26,9 @@ compile:
 cross_compile:
 	@glide install
 	@mkdir -p ./bin/cross
-	GOOS=linux GOARCH=amd64 go build -o bin/cross/flytepropeller ./cmd/controller/main.go
-	GOOS=linux GOARCH=amd64 go build -o bin/cross/flytepropeller-manager ./cmd/manager/main.go
-	GOOS=linux GOARCH=amd64 go build -o bin/cross/kubectl-flyte ./cmd/kubectl-flyte/main.go
+	go build -o bin/cross/flytepropeller ./cmd/controller/main.go
+	go build -o bin/cross/flytepropeller-manager ./cmd/manager/main.go
+	go build -o bin/cross/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 op_code_generate:
 	@RESOURCE_NAME=flyteworkflow OPERATOR_PKG=github.com/flyteorg/flytepropeller ./hack/update-codegen.sh
@@ -53,4 +54,3 @@ clean:
 golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
-
