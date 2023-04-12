@@ -14,10 +14,6 @@ golden:
 	go test ./tests -update
 
 
-generate:
-	@echo "************************ go generate **********************************"
-	go generate ./...
-
 # This is the only target that should be overriden by the project. Get your binary into ${GOREPO}/bin
 .PHONY: compile
 compile:

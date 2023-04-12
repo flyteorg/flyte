@@ -23,13 +23,13 @@ func (_m AutoRefreshCache_Get) Return(_a0 utils.CacheItem) *AutoRefreshCache_Get
 }
 
 func (_m *AutoRefreshCache) OnGet(id string) *AutoRefreshCache_Get {
-	c := _m.On("Get", id)
-	return &AutoRefreshCache_Get{Call: c}
+	c_call := _m.On("Get", id)
+	return &AutoRefreshCache_Get{Call: c_call}
 }
 
 func (_m *AutoRefreshCache) OnGetMatch(matchers ...interface{}) *AutoRefreshCache_Get {
-	c := _m.On("Get", matchers...)
-	return &AutoRefreshCache_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &AutoRefreshCache_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields: id
@@ -57,13 +57,13 @@ func (_m AutoRefreshCache_GetOrCreate) Return(_a0 utils.CacheItem, _a1 error) *A
 }
 
 func (_m *AutoRefreshCache) OnGetOrCreate(item utils.CacheItem) *AutoRefreshCache_GetOrCreate {
-	c := _m.On("GetOrCreate", item)
-	return &AutoRefreshCache_GetOrCreate{Call: c}
+	c_call := _m.On("GetOrCreate", item)
+	return &AutoRefreshCache_GetOrCreate{Call: c_call}
 }
 
 func (_m *AutoRefreshCache) OnGetOrCreateMatch(matchers ...interface{}) *AutoRefreshCache_GetOrCreate {
-	c := _m.On("GetOrCreate", matchers...)
-	return &AutoRefreshCache_GetOrCreate{Call: c}
+	c_call := _m.On("GetOrCreate", matchers...)
+	return &AutoRefreshCache_GetOrCreate{Call: c_call}
 }
 
 // GetOrCreate provides a mock function with given fields: item
