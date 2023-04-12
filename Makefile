@@ -11,8 +11,10 @@ clean:
 	rm -rf bin
 
 .PHONY: linux_compile
+linux_compile: export CGO_ENABLED ?= 0
+linux_compile: export GOOS ?= linux
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flyte-copilot .
+	go build -o /artifacts/flyte-copilot .
 
 .PHONY: compile
 compile:
