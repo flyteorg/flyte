@@ -33,6 +33,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -53,6 +54,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -83,6 +85,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -125,6 +128,7 @@ jobs:
     needs: [ changes, docker-build ]
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -188,6 +192,7 @@ jobs:
     needs: [ changes, docker-build ]
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -229,6 +234,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
@@ -249,6 +255,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
