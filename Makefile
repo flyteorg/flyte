@@ -9,8 +9,8 @@ update_boilerplate:
 	@boilerplate/update.sh
 
 .PHONY: linux_compile
-linux_compile: export CGO_ENABLED = 0
-linux_compile: export GOOS = linux
+linux_compile: export CGO_ENABLED ?= 0
+linux_compile: export GOOS ?= linux
 linux_compile:
 	go build -o /artifacts/flytepropeller ./cmd/controller/main.go
 	go build -o /artifacts/flytepropeller-manager ./cmd/manager/main.go
