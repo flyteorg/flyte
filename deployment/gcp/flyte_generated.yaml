@@ -8071,7 +8071,7 @@ data:
           json: ""
           # TODO: replace <project-id> with the GCP project ID
           project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
       container: "flyte"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
@@ -8084,7 +8084,7 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-d56hkd9229
+  name: datacatalog-config-mk4gcdf6db
   namespace: flyte
 ---
 apiVersion: v1
@@ -8182,7 +8182,7 @@ data:
           json: ""
           # TODO: replace <project-id> with the GCP project ID
           project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
       container: "flyte"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
@@ -8206,7 +8206,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-7g6ctk6762
+  name: flyte-admin-config-gf99k75c82
   namespace: flyte
 ---
 apiVersion: v1
@@ -8350,7 +8350,7 @@ data:
           json: ""
           # TODO: replace <project-id> with the GCP project ID
           project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
       container: "flyte"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
@@ -8374,7 +8374,7 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-fgbm2gk6tt
+  name: flyte-propeller-config-kgbdtkgf56
   namespace: flyte
 ---
 apiVersion: v1
@@ -8722,7 +8722,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-d56hkd9229
+          name: datacatalog-config-mk4gcdf6db
         name: config-volume
       - name: db-pass
         secret:
@@ -8806,7 +8806,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-fgbm2gk6tt
+          name: flyte-propeller-config-kgbdtkgf56
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8958,7 +8958,7 @@ spec:
       - emptyDir: {}
         name: scratch
       - configMap:
-          name: flyte-admin-config-7g6ctk6762
+          name: flyte-admin-config-gf99k75c82
         name: config-volume
       - configMap:
           name: clusterresource-template-4fbh4bk26k
@@ -9066,7 +9066,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-fgbm2gk6tt
+          name: flyte-propeller-config-kgbdtkgf56
         name: config-volume
       - name: auth
         secret:
@@ -9329,7 +9329,7 @@ spec:
               name: clusterresource-template-4fbh4bk26k
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7g6ctk6762
+              name: flyte-admin-config-gf99k75c82
             name: config-volume
           - name: db-pass
             secret:
