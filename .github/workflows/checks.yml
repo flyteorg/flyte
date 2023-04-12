@@ -71,7 +71,6 @@ jobs:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
       FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
 
-
   push-docker-image-flytescheduler:
     name: Build & Push Flytescheduler Image
     needs: [ bump_version ]

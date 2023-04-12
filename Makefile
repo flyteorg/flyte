@@ -21,8 +21,10 @@ docker_build_scheduler:
 	docker build -t $$FLYTE_SCHEDULER_REPOSITORY:$(GIT_HASH) -f Dockerfile.scheduler .
 
 .PHONY: integration
+integration: export CGO_ENABLED ?= 0
+integration: export GOFLAGS ?= -count=1
 integration:
-	CGO_ENABLED=0 GOFLAGS="-count=1" go test -v -tags=integration ./tests/...
+	go test -v -tags=integration ./tests/...
 
 .PHONY: k8s_integration
 k8s_integration:
@@ -51,12 +53,16 @@ compile_scheduler_debug:
 
 
 .PHONY: linux_compile
+linux_compile: export CGO_ENABLED ?= 0
+linux_compile: export GOOS ?= linux
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
+	go build -o /artifacts/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: linux_compile_scheduler
+linux_compile_scheduler: export CGO_ENABLED ?= 0
+linux_compile_scheduler: export GOOS ?= linux
 linux_compile_scheduler:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
+	go build -o /artifacts/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
 
 
 .PHONY: server
@@ -77,4 +83,3 @@ seed_projects:
 	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile
-
