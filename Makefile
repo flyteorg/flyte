@@ -13,8 +13,8 @@ compile:
 	go build -o datacatalog ./cmd/main.go && mv ./datacatalog ./bin
 
 .PHONY: linux_compile
-linux_compile: export CGO_ENABLED = 0
-linux_compile: export GOOS = linux
+linux_compile: export CGO_ENABLED ?= 0
+linux_compile: export GOOS ?= linux
 linux_compile:
 	go build -o /artifacts/datacatalog ./cmd/
 
