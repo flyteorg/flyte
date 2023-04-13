@@ -30,9 +30,9 @@ For example, here's the config file wec.yaml:
     domain: development
     project: flytesnacks
     max_parallelism: 5
-	security_context:
-  		run_as:
-    		k8s_service_account: demo
+    security_context:
+      run_as:
+        k8s_service_account: demo
 
 Max_parallelism is optional in the file as it is unread during the delete command but can be retained since the same file can be used for get, update and delete commands.
 

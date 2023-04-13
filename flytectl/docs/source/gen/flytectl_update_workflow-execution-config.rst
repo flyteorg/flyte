@@ -24,9 +24,9 @@ Example: content of wec.yaml:
     domain: development
     project: flytesnacks
     max_parallelism: 5
-	security_context:
-	  run_as:
-		k8s_service_account: demo
+    security_context:
+      run_as:
+        k8s_service_account: demo
 
 ::
 
@@ -42,9 +42,9 @@ For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, d
     project: flytesnacks
     workflow: core.control_flow.merge_sort.merge_sort
     max_parallelism: 5
-	security_context:
-	  run_as:
-		k8s_service_account: mergesortsa
+    security_context:
+      run_as:
+        k8s_service_account: mergesortsa
 
 ::
 
