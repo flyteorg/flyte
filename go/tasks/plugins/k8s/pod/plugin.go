@@ -121,8 +121,10 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		return nil, err
 	}
 
-	// set primary container name if this is executed as a sidecar
-	if taskTemplate.Type == SidecarTaskType {
+	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
+	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
+	// container we can mark the task as complete before the Pod has been marked complete.
+	if taskTemplate.Type == SidecarTaskType || len(podSpec.Containers) == 1 {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -187,7 +189,20 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	default:
 		primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
 		if !exists {
-			// if the primary container annotation dos not exist, then the task requires all containers
+			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
+			// succeeded rather than waiting for the Pod to be marked completed.
+			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
+			for _, s := range pod.Status.ContainerStatuses {
+				if s.State.Waiting != nil || s.State.Running != nil || (s.State.Terminated != nil && s.State.Terminated.ExitCode != 0) {
+					allSuccessfullyTerminated = false
+				}
+			}
+
+			if allSuccessfullyTerminated {
+				return flytek8s.DemystifySuccess(pod.Status, info)
+			}
+
+			// if the primary container annotation does not exist, then the task requires all containers
 			// to succeed to declare success. therefore, if the pod is not in one of the above states we
 			// fallback to declaring the task as 'running'.
 			phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)

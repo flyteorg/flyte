@@ -77,8 +77,18 @@ func advancePodPhases(ctx context.Context, store *storage.DataStore, outputWrite
 
 	for _, pod := range podList.Items {
 		newPhase := nextHappyPodPhase(pod.Status.Phase)
+		primaryContainerName := pod.Annotations["primary_container_name"]
+		if len(primaryContainerName) <= 0 {
+			primaryContainerName = "foo"
+		}
 		pod.Status.ContainerStatuses = []v1.ContainerStatus{
-			{ContainerID: "cont_123"},
+			v1.ContainerStatus{
+				Name:        primaryContainerName,
+				ContainerID: primaryContainerName,
+				State: v1.ContainerState{
+					Running: &v1.ContainerStateRunning{},
+				},
+			},
 		}
 
 		if pod.Status.Phase != newPhase && newPhase == v1.PodSucceeded {
@@ -93,6 +103,10 @@ func advancePodPhases(ctx context.Context, store *storage.DataStore, outputWrite
 
 					break
 				}
+			}
+
+			pod.Status.ContainerStatuses[0].State = v1.ContainerState{
+				Terminated: &v1.ContainerStateTerminated{},
 			}
 
 			ref := outputWriter.GetOutputPath()
