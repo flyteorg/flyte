@@ -4,6 +4,7 @@ type TransitionType int
 
 const (
 	TransitionTypeEphemeral TransitionType = iota
+	// @deprecated support for Barrier type transitions has been deprecated
 	TransitionTypeBarrier
 )
 

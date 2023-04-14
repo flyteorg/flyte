@@ -127,48 +127,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_barrier.enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("barrier.enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("barrier.enabled"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.BarrierConfig.Enabled)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_barrier.cache-size", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("barrier.cache-size", testValue)
-			if vInt, err := cmdFlags.GetInt("barrier.cache-size"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BarrierConfig.CacheSize)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_barrier.cache-ttl", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.BarrierConfig.CacheTTL.String()
-
-			cmdFlags.Set("barrier.cache-ttl", testValue)
-			if vString, err := cmdFlags.GetString("barrier.cache-ttl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BarrierConfig.CacheTTL)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_backoff.base-second", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

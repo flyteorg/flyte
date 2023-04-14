@@ -207,7 +207,6 @@ type Handler struct {
 	kubeClient      pluginCore.KubeClient
 	secretManager   pluginCore.SecretManager
 	resourceManager resourcemanager.BaseResourceManager
-	barrierCache    *barrier
 	cfg             *config.Config
 	pluginScope     promutils.Scope
 	eventConfig     *controllerConfig.EventConfig
@@ -658,48 +657,19 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		}
 	}
 
-	barrierTick := uint32(0)
 	occurredAt := time.Now()
 	// STEP 2: If no cache-hit and not transitioning to PhaseWaitingForCache, then lets invoke the plugin and wait for a transition out of undefined
 	if pluginTrns.execInfo.TaskNodeInfo == nil || (pluginTrns.pInfo.Phase() != pluginCore.PhaseWaitingForCache &&
 		pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.CacheStatus != core.CatalogCacheStatus_CACHE_HIT) {
-		prevBarrier := t.barrierCache.GetPreviousBarrierTransition(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
-		// Lets start with the current barrierTick (the value to be stored) same as the barrierTick in the cache
-		barrierTick = prevBarrier.BarrierClockTick
-		// Lets check if this value in cache is less than or equal to one in the store
-		if barrierTick <= ts.BarrierClockTick {
-			var err error
-			pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
-			if err != nil {
-				return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
-			}
-			if pluginTrns.IsPreviouslyObserved() {
-				logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
-				return pluginTrns.FinalTransition(ctx)
-			}
-			// Now no matter what we should update the barrierTick (stored in state)
-			// This is because the state is ahead of the inmemory representation
-			// This can happen in the case where the process restarted or the barrier cache got reset
-			barrierTick = ts.BarrierClockTick
-			// Now if the transition is of type barrier, lets tick the clock by one from the prev known value
-			// store that in the cache
-			if pluginTrns.ttype == handler.TransitionTypeBarrier {
-				logger.Infof(ctx, "Barrier transition observed for Plugin [%s], TaskExecID [%s]. recording: [%s]", p.GetID(), tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), pluginTrns.pInfo.String())
-				barrierTick = barrierTick + 1
-				t.barrierCache.RecordBarrierTransition(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), BarrierTransition{
-					BarrierClockTick: barrierTick,
-					CallLog: PluginCallLog{
-						PluginTransition: pluginTrns,
-					},
-				})
 
-			}
-		} else {
-			// Barrier tick will remain to be the one in cache.
-			// Now it may happen that the cache may get reset before we store the barrier tick
-			// this will cause us to lose that information and potentially replaying.
-			logger.Infof(ctx, "Replaying Barrier transition for cache tick [%d] < stored tick [%d], Plugin [%s], TaskExecID [%s]. recording: [%s]", barrierTick, ts.BarrierClockTick, p.GetID(), tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), prevBarrier.CallLog.PluginTransition.pInfo.String())
-			pluginTrns = prevBarrier.CallLog.PluginTransition
+		var err error
+		pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
+		if err != nil {
+			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
+		}
+		if pluginTrns.IsPreviouslyObserved() {
+			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
+			return pluginTrns.FinalTransition(ctx)
 		}
 	}
 
@@ -775,7 +745,6 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		PluginStateVersion:                 pluginTrns.pluginStateVersion,
 		PluginPhase:                        pluginTrns.pInfo.Phase(),
 		PluginPhaseVersion:                 pluginTrns.pInfo.Version(),
-		BarrierClockTick:                   barrierTick,
 		LastPhaseUpdatedAt:                 time.Now(),
 		PreviousNodeExecutionCheckpointURI: ts.PreviousNodeExecutionCheckpointURI,
 	})
@@ -932,7 +901,6 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 		asyncCatalog:    async,
 		resourceManager: nil,
 		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		barrierCache:    newLRUBarrier(ctx, cfg.BarrierConfig),
 		cfg:             cfg,
 		eventConfig:     eventConfig,
 		clusterID:       clusterID,
