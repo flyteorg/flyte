@@ -156,6 +156,14 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 	ctx := context.TODO()
 	t.Run("running", func(t *testing.T) {
 		j.Status.Phase = v1.PodRunning
+		j.Status.ContainerStatuses = []v1.ContainerStatus{
+			{
+				State: v1.ContainerState{
+					Running: &v1.ContainerStateRunning{},
+				},
+			},
+		}
+
 		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
@@ -191,6 +199,23 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
 		assert.Equal(t, "Unschedulable", ec)
+	})
+
+	t.Run("successOptimized", func(t *testing.T) {
+		j.Status.Phase = v1.PodRunning
+		j.Status.ContainerStatuses = []v1.ContainerStatus{
+			{
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 0,
+					},
+				},
+			},
+		}
+
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 
 	t.Run("success", func(t *testing.T) {

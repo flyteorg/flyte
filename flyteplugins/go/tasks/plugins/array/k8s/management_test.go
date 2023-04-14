@@ -164,6 +164,13 @@ func TestCheckSubTasksState(t *testing.T) {
 		pod.Spec.Containers = append(pod.Spec.Containers, v1.Container{Name: "foo"})
 
 		pod.Status.Phase = v1.PodRunning
+		pod.Status.ContainerStatuses = []v1.ContainerStatus{
+			v1.ContainerStatus{
+				State: v1.ContainerState{
+					Running: &v1.ContainerStateRunning{},
+				},
+			},
+		}
 		_ = fakeKubeClient.Create(ctx, pod)
 		_ = fakeKubeCache.Create(ctx, pod)
 	}
