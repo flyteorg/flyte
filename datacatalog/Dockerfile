@@ -22,7 +22,7 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
     sha256sum -c .grpc_checksum
 
 # COPY only the go mod files for efficient caching
-COPY . /go/src/github.com/flyteorg/flyte/datacatalog/
+COPY . /go/src/github.com/flyteorg/flyte/
 WORKDIR /go/src/github.com/flyteorg/flyte/datacatalog
 
 # Pull dependencies
