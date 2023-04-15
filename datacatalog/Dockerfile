@@ -22,14 +22,14 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
     sha256sum -c .grpc_checksum
 
 # COPY only the go mod files for efficient caching
-COPY go.mod go.sum /go/src/github.com/flyteorg/datacatalog/
-WORKDIR /go/src/github.com/flyteorg/datacatalog
+COPY . /go/src/github.com/flyteorg/flyte/datacatalog/
+WORKDIR /go/src/github.com/flyteorg/flyte/datacatalog
 
 # Pull dependencies
 RUN go mod download
 
 # COPY the rest of the source code
-COPY . /go/src/github.com/flyteorg/datacatalog/
+
 
 # This 'linux_compile' target should compile binaries to the /artifacts directory
 # The main entrypoint should be compiled to /artifacts/datacatalog

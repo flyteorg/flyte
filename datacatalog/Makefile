@@ -15,7 +15,3 @@ compile:
 .PHONY: linux_compile
 linux_compile:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/datacatalog ./cmd/
-
-.PHONY: generate
-generate:
-	@go generate ./...
