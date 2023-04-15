@@ -29,13 +29,13 @@ func (_m ExecutableWorkflowStatus_ConstructNodeDataDir) Return(_a0 storage.DataR
 }
 
 func (_m *ExecutableWorkflowStatus) OnConstructNodeDataDir(ctx context.Context, name string) *ExecutableWorkflowStatus_ConstructNodeDataDir {
-	c := _m.On("ConstructNodeDataDir", ctx, name)
-	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c}
+	c_call := _m.On("ConstructNodeDataDir", ctx, name)
+	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnConstructNodeDataDirMatch(matchers ...interface{}) *ExecutableWorkflowStatus_ConstructNodeDataDir {
-	c := _m.On("ConstructNodeDataDir", matchers...)
-	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c}
+	c_call := _m.On("ConstructNodeDataDir", matchers...)
+	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c_call}
 }
 
 // ConstructNodeDataDir provides a mock function with given fields: ctx, name
@@ -68,13 +68,13 @@ func (_m ExecutableWorkflowStatus_GetDataDir) Return(_a0 storage.DataReference) 
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetDataDir() *ExecutableWorkflowStatus_GetDataDir {
-	c := _m.On("GetDataDir")
-	return &ExecutableWorkflowStatus_GetDataDir{Call: c}
+	c_call := _m.On("GetDataDir")
+	return &ExecutableWorkflowStatus_GetDataDir{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetDataDirMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetDataDir {
-	c := _m.On("GetDataDir", matchers...)
-	return &ExecutableWorkflowStatus_GetDataDir{Call: c}
+	c_call := _m.On("GetDataDir", matchers...)
+	return &ExecutableWorkflowStatus_GetDataDir{Call: c_call}
 }
 
 // GetDataDir provides a mock function with given fields:
@@ -100,13 +100,13 @@ func (_m ExecutableWorkflowStatus_GetExecutionError) Return(_a0 *core.ExecutionE
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetExecutionError() *ExecutableWorkflowStatus_GetExecutionError {
-	c := _m.On("GetExecutionError")
-	return &ExecutableWorkflowStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError")
+	return &ExecutableWorkflowStatus_GetExecutionError{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetExecutionError {
-	c := _m.On("GetExecutionError", matchers...)
-	return &ExecutableWorkflowStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError", matchers...)
+	return &ExecutableWorkflowStatus_GetExecutionError{Call: c_call}
 }
 
 // GetExecutionError provides a mock function with given fields:
@@ -134,13 +134,13 @@ func (_m ExecutableWorkflowStatus_GetLastUpdatedAt) Return(_a0 *v1.Time) *Execut
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetLastUpdatedAt() *ExecutableWorkflowStatus_GetLastUpdatedAt {
-	c := _m.On("GetLastUpdatedAt")
-	return &ExecutableWorkflowStatus_GetLastUpdatedAt{Call: c}
+	c_call := _m.On("GetLastUpdatedAt")
+	return &ExecutableWorkflowStatus_GetLastUpdatedAt{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetLastUpdatedAtMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetLastUpdatedAt {
-	c := _m.On("GetLastUpdatedAt", matchers...)
-	return &ExecutableWorkflowStatus_GetLastUpdatedAt{Call: c}
+	c_call := _m.On("GetLastUpdatedAt", matchers...)
+	return &ExecutableWorkflowStatus_GetLastUpdatedAt{Call: c_call}
 }
 
 // GetLastUpdatedAt provides a mock function with given fields:
@@ -168,13 +168,13 @@ func (_m ExecutableWorkflowStatus_GetMessage) Return(_a0 string) *ExecutableWork
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetMessage() *ExecutableWorkflowStatus_GetMessage {
-	c := _m.On("GetMessage")
-	return &ExecutableWorkflowStatus_GetMessage{Call: c}
+	c_call := _m.On("GetMessage")
+	return &ExecutableWorkflowStatus_GetMessage{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetMessageMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetMessage {
-	c := _m.On("GetMessage", matchers...)
-	return &ExecutableWorkflowStatus_GetMessage{Call: c}
+	c_call := _m.On("GetMessage", matchers...)
+	return &ExecutableWorkflowStatus_GetMessage{Call: c_call}
 }
 
 // GetMessage provides a mock function with given fields:
@@ -200,13 +200,13 @@ func (_m ExecutableWorkflowStatus_GetNodeExecutionStatus) Return(_a0 v1alpha1.Ex
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableWorkflowStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", matchers...)
-	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", matchers...)
+	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c_call}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id
@@ -234,13 +234,13 @@ func (_m ExecutableWorkflowStatus_GetOutputReference) Return(_a0 storage.DataRef
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetOutputReference() *ExecutableWorkflowStatus_GetOutputReference {
-	c := _m.On("GetOutputReference")
-	return &ExecutableWorkflowStatus_GetOutputReference{Call: c}
+	c_call := _m.On("GetOutputReference")
+	return &ExecutableWorkflowStatus_GetOutputReference{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetOutputReferenceMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetOutputReference {
-	c := _m.On("GetOutputReference", matchers...)
-	return &ExecutableWorkflowStatus_GetOutputReference{Call: c}
+	c_call := _m.On("GetOutputReference", matchers...)
+	return &ExecutableWorkflowStatus_GetOutputReference{Call: c_call}
 }
 
 // GetOutputReference provides a mock function with given fields:
@@ -266,13 +266,13 @@ func (_m ExecutableWorkflowStatus_GetPhase) Return(_a0 v1alpha1.WorkflowPhase) *
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetPhase() *ExecutableWorkflowStatus_GetPhase {
-	c := _m.On("GetPhase")
-	return &ExecutableWorkflowStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase")
+	return &ExecutableWorkflowStatus_GetPhase{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetPhase {
-	c := _m.On("GetPhase", matchers...)
-	return &ExecutableWorkflowStatus_GetPhase{Call: c}
+	c_call := _m.On("GetPhase", matchers...)
+	return &ExecutableWorkflowStatus_GetPhase{Call: c_call}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -298,13 +298,13 @@ func (_m ExecutableWorkflowStatus_GetStartedAt) Return(_a0 *v1.Time) *Executable
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetStartedAt() *ExecutableWorkflowStatus_GetStartedAt {
-	c := _m.On("GetStartedAt")
-	return &ExecutableWorkflowStatus_GetStartedAt{Call: c}
+	c_call := _m.On("GetStartedAt")
+	return &ExecutableWorkflowStatus_GetStartedAt{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetStartedAtMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetStartedAt {
-	c := _m.On("GetStartedAt", matchers...)
-	return &ExecutableWorkflowStatus_GetStartedAt{Call: c}
+	c_call := _m.On("GetStartedAt", matchers...)
+	return &ExecutableWorkflowStatus_GetStartedAt{Call: c_call}
 }
 
 // GetStartedAt provides a mock function with given fields:
@@ -332,13 +332,13 @@ func (_m ExecutableWorkflowStatus_GetStoppedAt) Return(_a0 *v1.Time) *Executable
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetStoppedAt() *ExecutableWorkflowStatus_GetStoppedAt {
-	c := _m.On("GetStoppedAt")
-	return &ExecutableWorkflowStatus_GetStoppedAt{Call: c}
+	c_call := _m.On("GetStoppedAt")
+	return &ExecutableWorkflowStatus_GetStoppedAt{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnGetStoppedAtMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetStoppedAt {
-	c := _m.On("GetStoppedAt", matchers...)
-	return &ExecutableWorkflowStatus_GetStoppedAt{Call: c}
+	c_call := _m.On("GetStoppedAt", matchers...)
+	return &ExecutableWorkflowStatus_GetStoppedAt{Call: c_call}
 }
 
 // GetStoppedAt provides a mock function with given fields:
@@ -371,13 +371,13 @@ func (_m ExecutableWorkflowStatus_IsTerminated) Return(_a0 bool) *ExecutableWork
 }
 
 func (_m *ExecutableWorkflowStatus) OnIsTerminated() *ExecutableWorkflowStatus_IsTerminated {
-	c := _m.On("IsTerminated")
-	return &ExecutableWorkflowStatus_IsTerminated{Call: c}
+	c_call := _m.On("IsTerminated")
+	return &ExecutableWorkflowStatus_IsTerminated{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowStatus) OnIsTerminatedMatch(matchers ...interface{}) *ExecutableWorkflowStatus_IsTerminated {
-	c := _m.On("IsTerminated", matchers...)
-	return &ExecutableWorkflowStatus_IsTerminated{Call: c}
+	c_call := _m.On("IsTerminated", matchers...)
+	return &ExecutableWorkflowStatus_IsTerminated{Call: c_call}
 }
 
 // IsTerminated provides a mock function with given fields:

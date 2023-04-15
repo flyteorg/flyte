@@ -27,13 +27,13 @@ func (_m OutputResolver_ExtractOutput) Return(values *core.Literal, err error) *
 }
 
 func (_m *OutputResolver) OnExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode, bindToVar string) *OutputResolver_ExtractOutput {
-	c := _m.On("ExtractOutput", ctx, nl, n, bindToVar)
-	return &OutputResolver_ExtractOutput{Call: c}
+	c_call := _m.On("ExtractOutput", ctx, nl, n, bindToVar)
+	return &OutputResolver_ExtractOutput{Call: c_call}
 }
 
 func (_m *OutputResolver) OnExtractOutputMatch(matchers ...interface{}) *OutputResolver_ExtractOutput {
-	c := _m.On("ExtractOutput", matchers...)
-	return &OutputResolver_ExtractOutput{Call: c}
+	c_call := _m.On("ExtractOutput", matchers...)
+	return &OutputResolver_ExtractOutput{Call: c_call}
 }
 
 // ExtractOutput provides a mock function with given fields: ctx, nl, n, bindToVar

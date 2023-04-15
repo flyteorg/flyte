@@ -24,13 +24,13 @@ func (_m EventRecorder_RecordNodeEvent) Return(_a0 error) *EventRecorder_RecordN
 }
 
 func (_m *EventRecorder) OnRecordNodeEvent(ctx context.Context, _a1 *event.NodeExecutionEvent) *EventRecorder_RecordNodeEvent {
-	c := _m.On("RecordNodeEvent", ctx, _a1)
-	return &EventRecorder_RecordNodeEvent{Call: c}
+	c_call := _m.On("RecordNodeEvent", ctx, _a1)
+	return &EventRecorder_RecordNodeEvent{Call: c_call}
 }
 
 func (_m *EventRecorder) OnRecordNodeEventMatch(matchers ...interface{}) *EventRecorder_RecordNodeEvent {
-	c := _m.On("RecordNodeEvent", matchers...)
-	return &EventRecorder_RecordNodeEvent{Call: c}
+	c_call := _m.On("RecordNodeEvent", matchers...)
+	return &EventRecorder_RecordNodeEvent{Call: c_call}
 }
 
 // RecordNodeEvent provides a mock function with given fields: ctx, _a1
@@ -56,13 +56,13 @@ func (_m EventRecorder_RecordTaskEvent) Return(_a0 error) *EventRecorder_RecordT
 }
 
 func (_m *EventRecorder) OnRecordTaskEvent(ctx context.Context, _a1 *event.TaskExecutionEvent) *EventRecorder_RecordTaskEvent {
-	c := _m.On("RecordTaskEvent", ctx, _a1)
-	return &EventRecorder_RecordTaskEvent{Call: c}
+	c_call := _m.On("RecordTaskEvent", ctx, _a1)
+	return &EventRecorder_RecordTaskEvent{Call: c_call}
 }
 
 func (_m *EventRecorder) OnRecordTaskEventMatch(matchers ...interface{}) *EventRecorder_RecordTaskEvent {
-	c := _m.On("RecordTaskEvent", matchers...)
-	return &EventRecorder_RecordTaskEvent{Call: c}
+	c_call := _m.On("RecordTaskEvent", matchers...)
+	return &EventRecorder_RecordTaskEvent{Call: c_call}
 }
 
 // RecordTaskEvent provides a mock function with given fields: ctx, _a1
@@ -88,13 +88,13 @@ func (_m EventRecorder_RecordWorkflowEvent) Return(_a0 error) *EventRecorder_Rec
 }
 
 func (_m *EventRecorder) OnRecordWorkflowEvent(ctx context.Context, _a1 *event.WorkflowExecutionEvent) *EventRecorder_RecordWorkflowEvent {
-	c := _m.On("RecordWorkflowEvent", ctx, _a1)
-	return &EventRecorder_RecordWorkflowEvent{Call: c}
+	c_call := _m.On("RecordWorkflowEvent", ctx, _a1)
+	return &EventRecorder_RecordWorkflowEvent{Call: c_call}
 }
 
 func (_m *EventRecorder) OnRecordWorkflowEventMatch(matchers ...interface{}) *EventRecorder_RecordWorkflowEvent {
-	c := _m.On("RecordWorkflowEvent", matchers...)
-	return &EventRecorder_RecordWorkflowEvent{Call: c}
+	c_call := _m.On("RecordWorkflowEvent", matchers...)
+	return &EventRecorder_RecordWorkflowEvent{Call: c_call}
 }
 
 // RecordWorkflowEvent provides a mock function with given fields: ctx, _a1

@@ -21,13 +21,13 @@ func (_m ExecutableWorkflowNode_GetLaunchPlanRefID) Return(_a0 *v1alpha1.Identif
 }
 
 func (_m *ExecutableWorkflowNode) OnGetLaunchPlanRefID() *ExecutableWorkflowNode_GetLaunchPlanRefID {
-	c := _m.On("GetLaunchPlanRefID")
-	return &ExecutableWorkflowNode_GetLaunchPlanRefID{Call: c}
+	c_call := _m.On("GetLaunchPlanRefID")
+	return &ExecutableWorkflowNode_GetLaunchPlanRefID{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowNode) OnGetLaunchPlanRefIDMatch(matchers ...interface{}) *ExecutableWorkflowNode_GetLaunchPlanRefID {
-	c := _m.On("GetLaunchPlanRefID", matchers...)
-	return &ExecutableWorkflowNode_GetLaunchPlanRefID{Call: c}
+	c_call := _m.On("GetLaunchPlanRefID", matchers...)
+	return &ExecutableWorkflowNode_GetLaunchPlanRefID{Call: c_call}
 }
 
 // GetLaunchPlanRefID provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableWorkflowNode_GetSubWorkflowRef) Return(_a0 *string) *Executab
 }
 
 func (_m *ExecutableWorkflowNode) OnGetSubWorkflowRef() *ExecutableWorkflowNode_GetSubWorkflowRef {
-	c := _m.On("GetSubWorkflowRef")
-	return &ExecutableWorkflowNode_GetSubWorkflowRef{Call: c}
+	c_call := _m.On("GetSubWorkflowRef")
+	return &ExecutableWorkflowNode_GetSubWorkflowRef{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowNode) OnGetSubWorkflowRefMatch(matchers ...interface{}) *ExecutableWorkflowNode_GetSubWorkflowRef {
-	c := _m.On("GetSubWorkflowRef", matchers...)
-	return &ExecutableWorkflowNode_GetSubWorkflowRef{Call: c}
+	c_call := _m.On("GetSubWorkflowRef", matchers...)
+	return &ExecutableWorkflowNode_GetSubWorkflowRef{Call: c_call}
 }
 
 // GetSubWorkflowRef provides a mock function with given fields:

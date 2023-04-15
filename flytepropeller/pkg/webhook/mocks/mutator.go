@@ -23,13 +23,13 @@ func (_m Mutator_ID) Return(_a0 string) *Mutator_ID {
 }
 
 func (_m *Mutator) OnID() *Mutator_ID {
-	c := _m.On("ID")
-	return &Mutator_ID{Call: c}
+	c_call := _m.On("ID")
+	return &Mutator_ID{Call: c_call}
 }
 
 func (_m *Mutator) OnIDMatch(matchers ...interface{}) *Mutator_ID {
-	c := _m.On("ID", matchers...)
-	return &Mutator_ID{Call: c}
+	c_call := _m.On("ID", matchers...)
+	return &Mutator_ID{Call: c_call}
 }
 
 // ID provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m Mutator_Mutate) Return(newP *v1.Pod, changed bool, err error) *Mutator_
 }
 
 func (_m *Mutator) OnMutate(ctx context.Context, p *v1.Pod) *Mutator_Mutate {
-	c := _m.On("Mutate", ctx, p)
-	return &Mutator_Mutate{Call: c}
+	c_call := _m.On("Mutate", ctx, p)
+	return &Mutator_Mutate{Call: c_call}
 }
 
 func (_m *Mutator) OnMutateMatch(matchers ...interface{}) *Mutator_Mutate {
-	c := _m.On("Mutate", matchers...)
-	return &Mutator_Mutate{Call: c}
+	c_call := _m.On("Mutate", matchers...)
+	return &Mutator_Mutate{Call: c_call}
 }
 
 // Mutate provides a mock function with given fields: ctx, p

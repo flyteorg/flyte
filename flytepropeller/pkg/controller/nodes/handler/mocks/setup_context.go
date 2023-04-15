@@ -21,13 +21,13 @@ func (_m SetupContext_EnqueueOwner) Return(_a0 func(string)) *SetupContext_Enque
 }
 
 func (_m *SetupContext) OnEnqueueOwner() *SetupContext_EnqueueOwner {
-	c := _m.On("EnqueueOwner")
-	return &SetupContext_EnqueueOwner{Call: c}
+	c_call := _m.On("EnqueueOwner")
+	return &SetupContext_EnqueueOwner{Call: c_call}
 }
 
 func (_m *SetupContext) OnEnqueueOwnerMatch(matchers ...interface{}) *SetupContext_EnqueueOwner {
-	c := _m.On("EnqueueOwner", matchers...)
-	return &SetupContext_EnqueueOwner{Call: c}
+	c_call := _m.On("EnqueueOwner", matchers...)
+	return &SetupContext_EnqueueOwner{Call: c_call}
 }
 
 // EnqueueOwner provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m SetupContext_MetricsScope) Return(_a0 promutils.Scope) *SetupContext_Me
 }
 
 func (_m *SetupContext) OnMetricsScope() *SetupContext_MetricsScope {
-	c := _m.On("MetricsScope")
-	return &SetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope")
+	return &SetupContext_MetricsScope{Call: c_call}
 }
 
 func (_m *SetupContext) OnMetricsScopeMatch(matchers ...interface{}) *SetupContext_MetricsScope {
-	c := _m.On("MetricsScope", matchers...)
-	return &SetupContext_MetricsScope{Call: c}
+	c_call := _m.On("MetricsScope", matchers...)
+	return &SetupContext_MetricsScope{Call: c_call}
 }
 
 // MetricsScope provides a mock function with given fields:
@@ -89,13 +89,13 @@ func (_m SetupContext_OwnerKind) Return(_a0 string) *SetupContext_OwnerKind {
 }
 
 func (_m *SetupContext) OnOwnerKind() *SetupContext_OwnerKind {
-	c := _m.On("OwnerKind")
-	return &SetupContext_OwnerKind{Call: c}
+	c_call := _m.On("OwnerKind")
+	return &SetupContext_OwnerKind{Call: c_call}
 }
 
 func (_m *SetupContext) OnOwnerKindMatch(matchers ...interface{}) *SetupContext_OwnerKind {
-	c := _m.On("OwnerKind", matchers...)
-	return &SetupContext_OwnerKind{Call: c}
+	c_call := _m.On("OwnerKind", matchers...)
+	return &SetupContext_OwnerKind{Call: c_call}
 }
 
 // OwnerKind provides a mock function with given fields:

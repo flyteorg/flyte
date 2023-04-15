@@ -28,13 +28,13 @@ func (_m SecretsInjector_Inject) Return(newP *v1.Pod, injected bool, err error) 
 }
 
 func (_m *SecretsInjector) OnInject(ctx context.Context, secrets *core.Secret, p *v1.Pod) *SecretsInjector_Inject {
-	c := _m.On("Inject", ctx, secrets, p)
-	return &SecretsInjector_Inject{Call: c}
+	c_call := _m.On("Inject", ctx, secrets, p)
+	return &SecretsInjector_Inject{Call: c_call}
 }
 
 func (_m *SecretsInjector) OnInjectMatch(matchers ...interface{}) *SecretsInjector_Inject {
-	c := _m.On("Inject", matchers...)
-	return &SecretsInjector_Inject{Call: c}
+	c_call := _m.On("Inject", matchers...)
+	return &SecretsInjector_Inject{Call: c_call}
 }
 
 // Inject provides a mock function with given fields: ctx, secrets, p
@@ -76,13 +76,13 @@ func (_m SecretsInjector_Type) Return(_a0 config.SecretManagerType) *SecretsInje
 }
 
 func (_m *SecretsInjector) OnType() *SecretsInjector_Type {
-	c := _m.On("Type")
-	return &SecretsInjector_Type{Call: c}
+	c_call := _m.On("Type")
+	return &SecretsInjector_Type{Call: c_call}
 }
 
 func (_m *SecretsInjector) OnTypeMatch(matchers ...interface{}) *SecretsInjector_Type {
-	c := _m.On("Type", matchers...)
-	return &SecretsInjector_Type{Call: c}
+	c_call := _m.On("Type", matchers...)
+	return &SecretsInjector_Type{Call: c_call}
 }
 
 // Type provides a mock function with given fields:

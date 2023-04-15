@@ -25,13 +25,13 @@ func (_m HandlerFactory_GetHandler) Return(_a0 handler.Node, _a1 error) *Handler
 }
 
 func (_m *HandlerFactory) OnGetHandler(kind v1alpha1.NodeKind) *HandlerFactory_GetHandler {
-	c := _m.On("GetHandler", kind)
-	return &HandlerFactory_GetHandler{Call: c}
+	c_call := _m.On("GetHandler", kind)
+	return &HandlerFactory_GetHandler{Call: c_call}
 }
 
 func (_m *HandlerFactory) OnGetHandlerMatch(matchers ...interface{}) *HandlerFactory_GetHandler {
-	c := _m.On("GetHandler", matchers...)
-	return &HandlerFactory_GetHandler{Call: c}
+	c_call := _m.On("GetHandler", matchers...)
+	return &HandlerFactory_GetHandler{Call: c_call}
 }
 
 // GetHandler provides a mock function with given fields: kind
@@ -66,13 +66,13 @@ func (_m HandlerFactory_Setup) Return(_a0 error) *HandlerFactory_Setup {
 }
 
 func (_m *HandlerFactory) OnSetup(ctx context.Context, setup handler.SetupContext) *HandlerFactory_Setup {
-	c := _m.On("Setup", ctx, setup)
-	return &HandlerFactory_Setup{Call: c}
+	c_call := _m.On("Setup", ctx, setup)
+	return &HandlerFactory_Setup{Call: c_call}
 }
 
 func (_m *HandlerFactory) OnSetupMatch(matchers ...interface{}) *HandlerFactory_Setup {
-	c := _m.On("Setup", matchers...)
-	return &HandlerFactory_Setup{Call: c}
+	c_call := _m.On("Setup", matchers...)
+	return &HandlerFactory_Setup{Call: c_call}
 }
 
 // Setup provides a mock function with given fields: ctx, setup

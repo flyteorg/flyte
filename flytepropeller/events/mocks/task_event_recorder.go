@@ -26,13 +26,13 @@ func (_m TaskEventRecorder_RecordTaskEvent) Return(_a0 error) *TaskEventRecorder
 }
 
 func (_m *TaskEventRecorder) OnRecordTaskEvent(ctx context.Context, _a1 *event.TaskExecutionEvent, eventConfig *config.EventConfig) *TaskEventRecorder_RecordTaskEvent {
-	c := _m.On("RecordTaskEvent", ctx, _a1, eventConfig)
-	return &TaskEventRecorder_RecordTaskEvent{Call: c}
+	c_call := _m.On("RecordTaskEvent", ctx, _a1, eventConfig)
+	return &TaskEventRecorder_RecordTaskEvent{Call: c_call}
 }
 
 func (_m *TaskEventRecorder) OnRecordTaskEventMatch(matchers ...interface{}) *TaskEventRecorder_RecordTaskEvent {
-	c := _m.On("RecordTaskEvent", matchers...)
-	return &TaskEventRecorder_RecordTaskEvent{Call: c}
+	c_call := _m.On("RecordTaskEvent", matchers...)
+	return &TaskEventRecorder_RecordTaskEvent{Call: c_call}
 }
 
 // RecordTaskEvent provides a mock function with given fields: ctx, _a1, eventConfig

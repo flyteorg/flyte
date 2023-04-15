@@ -57,13 +57,13 @@ func (_m MutableNodeStatus_GetBranchStatus) Return(_a0 v1alpha1.MutableBranchNod
 }
 
 func (_m *MutableNodeStatus) OnGetBranchStatus() *MutableNodeStatus_GetBranchStatus {
-	c := _m.On("GetBranchStatus")
-	return &MutableNodeStatus_GetBranchStatus{Call: c}
+	c_call := _m.On("GetBranchStatus")
+	return &MutableNodeStatus_GetBranchStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetBranchStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetBranchStatus {
-	c := _m.On("GetBranchStatus", matchers...)
-	return &MutableNodeStatus_GetBranchStatus{Call: c}
+	c_call := _m.On("GetBranchStatus", matchers...)
+	return &MutableNodeStatus_GetBranchStatus{Call: c_call}
 }
 
 // GetBranchStatus provides a mock function with given fields:
@@ -91,13 +91,13 @@ func (_m MutableNodeStatus_GetDynamicNodeStatus) Return(_a0 v1alpha1.MutableDyna
 }
 
 func (_m *MutableNodeStatus) OnGetDynamicNodeStatus() *MutableNodeStatus_GetDynamicNodeStatus {
-	c := _m.On("GetDynamicNodeStatus")
-	return &MutableNodeStatus_GetDynamicNodeStatus{Call: c}
+	c_call := _m.On("GetDynamicNodeStatus")
+	return &MutableNodeStatus_GetDynamicNodeStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetDynamicNodeStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetDynamicNodeStatus {
-	c := _m.On("GetDynamicNodeStatus", matchers...)
-	return &MutableNodeStatus_GetDynamicNodeStatus{Call: c}
+	c_call := _m.On("GetDynamicNodeStatus", matchers...)
+	return &MutableNodeStatus_GetDynamicNodeStatus{Call: c_call}
 }
 
 // GetDynamicNodeStatus provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m MutableNodeStatus_GetGateNodeStatus) Return(_a0 v1alpha1.MutableGateNod
 }
 
 func (_m *MutableNodeStatus) OnGetGateNodeStatus() *MutableNodeStatus_GetGateNodeStatus {
-	c := _m.On("GetGateNodeStatus")
-	return &MutableNodeStatus_GetGateNodeStatus{Call: c}
+	c_call := _m.On("GetGateNodeStatus")
+	return &MutableNodeStatus_GetGateNodeStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetGateNodeStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetGateNodeStatus {
-	c := _m.On("GetGateNodeStatus", matchers...)
-	return &MutableNodeStatus_GetGateNodeStatus{Call: c}
+	c_call := _m.On("GetGateNodeStatus", matchers...)
+	return &MutableNodeStatus_GetGateNodeStatus{Call: c_call}
 }
 
 // GetGateNodeStatus provides a mock function with given fields:
@@ -159,13 +159,13 @@ func (_m MutableNodeStatus_GetOrCreateBranchStatus) Return(_a0 v1alpha1.MutableB
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateBranchStatus() *MutableNodeStatus_GetOrCreateBranchStatus {
-	c := _m.On("GetOrCreateBranchStatus")
-	return &MutableNodeStatus_GetOrCreateBranchStatus{Call: c}
+	c_call := _m.On("GetOrCreateBranchStatus")
+	return &MutableNodeStatus_GetOrCreateBranchStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateBranchStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetOrCreateBranchStatus {
-	c := _m.On("GetOrCreateBranchStatus", matchers...)
-	return &MutableNodeStatus_GetOrCreateBranchStatus{Call: c}
+	c_call := _m.On("GetOrCreateBranchStatus", matchers...)
+	return &MutableNodeStatus_GetOrCreateBranchStatus{Call: c_call}
 }
 
 // GetOrCreateBranchStatus provides a mock function with given fields:
@@ -193,13 +193,13 @@ func (_m MutableNodeStatus_GetOrCreateDynamicNodeStatus) Return(_a0 v1alpha1.Mut
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateDynamicNodeStatus() *MutableNodeStatus_GetOrCreateDynamicNodeStatus {
-	c := _m.On("GetOrCreateDynamicNodeStatus")
-	return &MutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c}
+	c_call := _m.On("GetOrCreateDynamicNodeStatus")
+	return &MutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateDynamicNodeStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetOrCreateDynamicNodeStatus {
-	c := _m.On("GetOrCreateDynamicNodeStatus", matchers...)
-	return &MutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c}
+	c_call := _m.On("GetOrCreateDynamicNodeStatus", matchers...)
+	return &MutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c_call}
 }
 
 // GetOrCreateDynamicNodeStatus provides a mock function with given fields:
@@ -227,13 +227,13 @@ func (_m MutableNodeStatus_GetOrCreateGateNodeStatus) Return(_a0 v1alpha1.Mutabl
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateGateNodeStatus() *MutableNodeStatus_GetOrCreateGateNodeStatus {
-	c := _m.On("GetOrCreateGateNodeStatus")
-	return &MutableNodeStatus_GetOrCreateGateNodeStatus{Call: c}
+	c_call := _m.On("GetOrCreateGateNodeStatus")
+	return &MutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateGateNodeStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetOrCreateGateNodeStatus {
-	c := _m.On("GetOrCreateGateNodeStatus", matchers...)
-	return &MutableNodeStatus_GetOrCreateGateNodeStatus{Call: c}
+	c_call := _m.On("GetOrCreateGateNodeStatus", matchers...)
+	return &MutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
 }
 
 // GetOrCreateGateNodeStatus provides a mock function with given fields:
@@ -261,13 +261,13 @@ func (_m MutableNodeStatus_GetOrCreateTaskStatus) Return(_a0 v1alpha1.MutableTas
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateTaskStatus() *MutableNodeStatus_GetOrCreateTaskStatus {
-	c := _m.On("GetOrCreateTaskStatus")
-	return &MutableNodeStatus_GetOrCreateTaskStatus{Call: c}
+	c_call := _m.On("GetOrCreateTaskStatus")
+	return &MutableNodeStatus_GetOrCreateTaskStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateTaskStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetOrCreateTaskStatus {
-	c := _m.On("GetOrCreateTaskStatus", matchers...)
-	return &MutableNodeStatus_GetOrCreateTaskStatus{Call: c}
+	c_call := _m.On("GetOrCreateTaskStatus", matchers...)
+	return &MutableNodeStatus_GetOrCreateTaskStatus{Call: c_call}
 }
 
 // GetOrCreateTaskStatus provides a mock function with given fields:
@@ -295,13 +295,13 @@ func (_m MutableNodeStatus_GetOrCreateWorkflowStatus) Return(_a0 v1alpha1.Mutabl
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateWorkflowStatus() *MutableNodeStatus_GetOrCreateWorkflowStatus {
-	c := _m.On("GetOrCreateWorkflowStatus")
-	return &MutableNodeStatus_GetOrCreateWorkflowStatus{Call: c}
+	c_call := _m.On("GetOrCreateWorkflowStatus")
+	return &MutableNodeStatus_GetOrCreateWorkflowStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetOrCreateWorkflowStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetOrCreateWorkflowStatus {
-	c := _m.On("GetOrCreateWorkflowStatus", matchers...)
-	return &MutableNodeStatus_GetOrCreateWorkflowStatus{Call: c}
+	c_call := _m.On("GetOrCreateWorkflowStatus", matchers...)
+	return &MutableNodeStatus_GetOrCreateWorkflowStatus{Call: c_call}
 }
 
 // GetOrCreateWorkflowStatus provides a mock function with given fields:
@@ -329,13 +329,13 @@ func (_m MutableNodeStatus_GetTaskStatus) Return(_a0 v1alpha1.MutableTaskNodeSta
 }
 
 func (_m *MutableNodeStatus) OnGetTaskStatus() *MutableNodeStatus_GetTaskStatus {
-	c := _m.On("GetTaskStatus")
-	return &MutableNodeStatus_GetTaskStatus{Call: c}
+	c_call := _m.On("GetTaskStatus")
+	return &MutableNodeStatus_GetTaskStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetTaskStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetTaskStatus {
-	c := _m.On("GetTaskStatus", matchers...)
-	return &MutableNodeStatus_GetTaskStatus{Call: c}
+	c_call := _m.On("GetTaskStatus", matchers...)
+	return &MutableNodeStatus_GetTaskStatus{Call: c_call}
 }
 
 // GetTaskStatus provides a mock function with given fields:
@@ -363,13 +363,13 @@ func (_m MutableNodeStatus_GetWorkflowStatus) Return(_a0 v1alpha1.MutableWorkflo
 }
 
 func (_m *MutableNodeStatus) OnGetWorkflowStatus() *MutableNodeStatus_GetWorkflowStatus {
-	c := _m.On("GetWorkflowStatus")
-	return &MutableNodeStatus_GetWorkflowStatus{Call: c}
+	c_call := _m.On("GetWorkflowStatus")
+	return &MutableNodeStatus_GetWorkflowStatus{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnGetWorkflowStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetWorkflowStatus {
-	c := _m.On("GetWorkflowStatus", matchers...)
-	return &MutableNodeStatus_GetWorkflowStatus{Call: c}
+	c_call := _m.On("GetWorkflowStatus", matchers...)
+	return &MutableNodeStatus_GetWorkflowStatus{Call: c_call}
 }
 
 // GetWorkflowStatus provides a mock function with given fields:
@@ -397,13 +397,13 @@ func (_m MutableNodeStatus_IncrementAttempts) Return(_a0 uint32) *MutableNodeSta
 }
 
 func (_m *MutableNodeStatus) OnIncrementAttempts() *MutableNodeStatus_IncrementAttempts {
-	c := _m.On("IncrementAttempts")
-	return &MutableNodeStatus_IncrementAttempts{Call: c}
+	c_call := _m.On("IncrementAttempts")
+	return &MutableNodeStatus_IncrementAttempts{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnIncrementAttemptsMatch(matchers ...interface{}) *MutableNodeStatus_IncrementAttempts {
-	c := _m.On("IncrementAttempts", matchers...)
-	return &MutableNodeStatus_IncrementAttempts{Call: c}
+	c_call := _m.On("IncrementAttempts", matchers...)
+	return &MutableNodeStatus_IncrementAttempts{Call: c_call}
 }
 
 // IncrementAttempts provides a mock function with given fields:
@@ -429,13 +429,13 @@ func (_m MutableNodeStatus_IncrementSystemFailures) Return(_a0 uint32) *MutableN
 }
 
 func (_m *MutableNodeStatus) OnIncrementSystemFailures() *MutableNodeStatus_IncrementSystemFailures {
-	c := _m.On("IncrementSystemFailures")
-	return &MutableNodeStatus_IncrementSystemFailures{Call: c}
+	c_call := _m.On("IncrementSystemFailures")
+	return &MutableNodeStatus_IncrementSystemFailures{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnIncrementSystemFailuresMatch(matchers ...interface{}) *MutableNodeStatus_IncrementSystemFailures {
-	c := _m.On("IncrementSystemFailures", matchers...)
-	return &MutableNodeStatus_IncrementSystemFailures{Call: c}
+	c_call := _m.On("IncrementSystemFailures", matchers...)
+	return &MutableNodeStatus_IncrementSystemFailures{Call: c_call}
 }
 
 // IncrementSystemFailures provides a mock function with given fields:
@@ -461,13 +461,13 @@ func (_m MutableNodeStatus_IsDirty) Return(_a0 bool) *MutableNodeStatus_IsDirty 
 }
 
 func (_m *MutableNodeStatus) OnIsDirty() *MutableNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

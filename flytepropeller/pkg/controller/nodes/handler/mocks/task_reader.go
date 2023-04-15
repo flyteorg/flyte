@@ -24,13 +24,13 @@ func (_m TaskReader_GetTaskID) Return(_a0 *core.Identifier) *TaskReader_GetTaskI
 }
 
 func (_m *TaskReader) OnGetTaskID() *TaskReader_GetTaskID {
-	c := _m.On("GetTaskID")
-	return &TaskReader_GetTaskID{Call: c}
+	c_call := _m.On("GetTaskID")
+	return &TaskReader_GetTaskID{Call: c_call}
 }
 
 func (_m *TaskReader) OnGetTaskIDMatch(matchers ...interface{}) *TaskReader_GetTaskID {
-	c := _m.On("GetTaskID", matchers...)
-	return &TaskReader_GetTaskID{Call: c}
+	c_call := _m.On("GetTaskID", matchers...)
+	return &TaskReader_GetTaskID{Call: c_call}
 }
 
 // GetTaskID provides a mock function with given fields:
@@ -58,13 +58,13 @@ func (_m TaskReader_GetTaskType) Return(_a0 string) *TaskReader_GetTaskType {
 }
 
 func (_m *TaskReader) OnGetTaskType() *TaskReader_GetTaskType {
-	c := _m.On("GetTaskType")
-	return &TaskReader_GetTaskType{Call: c}
+	c_call := _m.On("GetTaskType")
+	return &TaskReader_GetTaskType{Call: c_call}
 }
 
 func (_m *TaskReader) OnGetTaskTypeMatch(matchers ...interface{}) *TaskReader_GetTaskType {
-	c := _m.On("GetTaskType", matchers...)
-	return &TaskReader_GetTaskType{Call: c}
+	c_call := _m.On("GetTaskType", matchers...)
+	return &TaskReader_GetTaskType{Call: c_call}
 }
 
 // GetTaskType provides a mock function with given fields:
@@ -90,13 +90,13 @@ func (_m TaskReader_Read) Return(_a0 *core.TaskTemplate, _a1 error) *TaskReader_
 }
 
 func (_m *TaskReader) OnRead(ctx context.Context) *TaskReader_Read {
-	c := _m.On("Read", ctx)
-	return &TaskReader_Read{Call: c}
+	c_call := _m.On("Read", ctx)
+	return &TaskReader_Read{Call: c_call}
 }
 
 func (_m *TaskReader) OnReadMatch(matchers ...interface{}) *TaskReader_Read {
-	c := _m.On("Read", matchers...)
-	return &TaskReader_Read{Call: c}
+	c_call := _m.On("Read", matchers...)
+	return &TaskReader_Read{Call: c_call}
 }
 
 // Read provides a mock function with given fields: ctx

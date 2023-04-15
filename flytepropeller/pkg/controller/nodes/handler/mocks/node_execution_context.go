@@ -32,13 +32,13 @@ func (_m NodeExecutionContext_ContextualNodeLookup) Return(_a0 executors.NodeLoo
 }
 
 func (_m *NodeExecutionContext) OnContextualNodeLookup() *NodeExecutionContext_ContextualNodeLookup {
-	c := _m.On("ContextualNodeLookup")
-	return &NodeExecutionContext_ContextualNodeLookup{Call: c}
+	c_call := _m.On("ContextualNodeLookup")
+	return &NodeExecutionContext_ContextualNodeLookup{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnContextualNodeLookupMatch(matchers ...interface{}) *NodeExecutionContext_ContextualNodeLookup {
-	c := _m.On("ContextualNodeLookup", matchers...)
-	return &NodeExecutionContext_ContextualNodeLookup{Call: c}
+	c_call := _m.On("ContextualNodeLookup", matchers...)
+	return &NodeExecutionContext_ContextualNodeLookup{Call: c_call}
 }
 
 // ContextualNodeLookup provides a mock function with given fields:
@@ -66,13 +66,13 @@ func (_m NodeExecutionContext_CurrentAttempt) Return(_a0 uint32) *NodeExecutionC
 }
 
 func (_m *NodeExecutionContext) OnCurrentAttempt() *NodeExecutionContext_CurrentAttempt {
-	c := _m.On("CurrentAttempt")
-	return &NodeExecutionContext_CurrentAttempt{Call: c}
+	c_call := _m.On("CurrentAttempt")
+	return &NodeExecutionContext_CurrentAttempt{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnCurrentAttemptMatch(matchers ...interface{}) *NodeExecutionContext_CurrentAttempt {
-	c := _m.On("CurrentAttempt", matchers...)
-	return &NodeExecutionContext_CurrentAttempt{Call: c}
+	c_call := _m.On("CurrentAttempt", matchers...)
+	return &NodeExecutionContext_CurrentAttempt{Call: c_call}
 }
 
 // CurrentAttempt provides a mock function with given fields:
@@ -98,13 +98,13 @@ func (_m NodeExecutionContext_DataStore) Return(_a0 *storage.DataStore) *NodeExe
 }
 
 func (_m *NodeExecutionContext) OnDataStore() *NodeExecutionContext_DataStore {
-	c := _m.On("DataStore")
-	return &NodeExecutionContext_DataStore{Call: c}
+	c_call := _m.On("DataStore")
+	return &NodeExecutionContext_DataStore{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnDataStoreMatch(matchers ...interface{}) *NodeExecutionContext_DataStore {
-	c := _m.On("DataStore", matchers...)
-	return &NodeExecutionContext_DataStore{Call: c}
+	c_call := _m.On("DataStore", matchers...)
+	return &NodeExecutionContext_DataStore{Call: c_call}
 }
 
 // DataStore provides a mock function with given fields:
@@ -132,13 +132,13 @@ func (_m NodeExecutionContext_EnqueueOwnerFunc) Return(_a0 func() error) *NodeEx
 }
 
 func (_m *NodeExecutionContext) OnEnqueueOwnerFunc() *NodeExecutionContext_EnqueueOwnerFunc {
-	c := _m.On("EnqueueOwnerFunc")
-	return &NodeExecutionContext_EnqueueOwnerFunc{Call: c}
+	c_call := _m.On("EnqueueOwnerFunc")
+	return &NodeExecutionContext_EnqueueOwnerFunc{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnEnqueueOwnerFuncMatch(matchers ...interface{}) *NodeExecutionContext_EnqueueOwnerFunc {
-	c := _m.On("EnqueueOwnerFunc", matchers...)
-	return &NodeExecutionContext_EnqueueOwnerFunc{Call: c}
+	c_call := _m.On("EnqueueOwnerFunc", matchers...)
+	return &NodeExecutionContext_EnqueueOwnerFunc{Call: c_call}
 }
 
 // EnqueueOwnerFunc provides a mock function with given fields:
@@ -166,13 +166,13 @@ func (_m NodeExecutionContext_EventsRecorder) Return(_a0 events.TaskEventRecorde
 }
 
 func (_m *NodeExecutionContext) OnEventsRecorder() *NodeExecutionContext_EventsRecorder {
-	c := _m.On("EventsRecorder")
-	return &NodeExecutionContext_EventsRecorder{Call: c}
+	c_call := _m.On("EventsRecorder")
+	return &NodeExecutionContext_EventsRecorder{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnEventsRecorderMatch(matchers ...interface{}) *NodeExecutionContext_EventsRecorder {
-	c := _m.On("EventsRecorder", matchers...)
-	return &NodeExecutionContext_EventsRecorder{Call: c}
+	c_call := _m.On("EventsRecorder", matchers...)
+	return &NodeExecutionContext_EventsRecorder{Call: c_call}
 }
 
 // EventsRecorder provides a mock function with given fields:
@@ -200,13 +200,13 @@ func (_m NodeExecutionContext_ExecutionContext) Return(_a0 executors.ExecutionCo
 }
 
 func (_m *NodeExecutionContext) OnExecutionContext() *NodeExecutionContext_ExecutionContext {
-	c := _m.On("ExecutionContext")
-	return &NodeExecutionContext_ExecutionContext{Call: c}
+	c_call := _m.On("ExecutionContext")
+	return &NodeExecutionContext_ExecutionContext{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnExecutionContextMatch(matchers ...interface{}) *NodeExecutionContext_ExecutionContext {
-	c := _m.On("ExecutionContext", matchers...)
-	return &NodeExecutionContext_ExecutionContext{Call: c}
+	c_call := _m.On("ExecutionContext", matchers...)
+	return &NodeExecutionContext_ExecutionContext{Call: c_call}
 }
 
 // ExecutionContext provides a mock function with given fields:
@@ -234,13 +234,13 @@ func (_m NodeExecutionContext_InputReader) Return(_a0 io.InputReader) *NodeExecu
 }
 
 func (_m *NodeExecutionContext) OnInputReader() *NodeExecutionContext_InputReader {
-	c := _m.On("InputReader")
-	return &NodeExecutionContext_InputReader{Call: c}
+	c_call := _m.On("InputReader")
+	return &NodeExecutionContext_InputReader{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnInputReaderMatch(matchers ...interface{}) *NodeExecutionContext_InputReader {
-	c := _m.On("InputReader", matchers...)
-	return &NodeExecutionContext_InputReader{Call: c}
+	c_call := _m.On("InputReader", matchers...)
+	return &NodeExecutionContext_InputReader{Call: c_call}
 }
 
 // InputReader provides a mock function with given fields:
@@ -268,13 +268,13 @@ func (_m NodeExecutionContext_MaxDatasetSizeBytes) Return(_a0 int64) *NodeExecut
 }
 
 func (_m *NodeExecutionContext) OnMaxDatasetSizeBytes() *NodeExecutionContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes")
-	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes")
+	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *NodeExecutionContext_MaxDatasetSizeBytes {
-	c := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c}
+	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
+	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c_call}
 }
 
 // MaxDatasetSizeBytes provides a mock function with given fields:
@@ -300,13 +300,13 @@ func (_m NodeExecutionContext_Node) Return(_a0 v1alpha1.ExecutableNode) *NodeExe
 }
 
 func (_m *NodeExecutionContext) OnNode() *NodeExecutionContext_Node {
-	c := _m.On("Node")
-	return &NodeExecutionContext_Node{Call: c}
+	c_call := _m.On("Node")
+	return &NodeExecutionContext_Node{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeMatch(matchers ...interface{}) *NodeExecutionContext_Node {
-	c := _m.On("Node", matchers...)
-	return &NodeExecutionContext_Node{Call: c}
+	c_call := _m.On("Node", matchers...)
+	return &NodeExecutionContext_Node{Call: c_call}
 }
 
 // Node provides a mock function with given fields:
@@ -334,13 +334,13 @@ func (_m NodeExecutionContext_NodeExecutionMetadata) Return(_a0 handler.NodeExec
 }
 
 func (_m *NodeExecutionContext) OnNodeExecutionMetadata() *NodeExecutionContext_NodeExecutionMetadata {
-	c := _m.On("NodeExecutionMetadata")
-	return &NodeExecutionContext_NodeExecutionMetadata{Call: c}
+	c_call := _m.On("NodeExecutionMetadata")
+	return &NodeExecutionContext_NodeExecutionMetadata{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeExecutionMetadataMatch(matchers ...interface{}) *NodeExecutionContext_NodeExecutionMetadata {
-	c := _m.On("NodeExecutionMetadata", matchers...)
-	return &NodeExecutionContext_NodeExecutionMetadata{Call: c}
+	c_call := _m.On("NodeExecutionMetadata", matchers...)
+	return &NodeExecutionContext_NodeExecutionMetadata{Call: c_call}
 }
 
 // NodeExecutionMetadata provides a mock function with given fields:
@@ -368,13 +368,13 @@ func (_m NodeExecutionContext_NodeID) Return(_a0 string) *NodeExecutionContext_N
 }
 
 func (_m *NodeExecutionContext) OnNodeID() *NodeExecutionContext_NodeID {
-	c := _m.On("NodeID")
-	return &NodeExecutionContext_NodeID{Call: c}
+	c_call := _m.On("NodeID")
+	return &NodeExecutionContext_NodeID{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeIDMatch(matchers ...interface{}) *NodeExecutionContext_NodeID {
-	c := _m.On("NodeID", matchers...)
-	return &NodeExecutionContext_NodeID{Call: c}
+	c_call := _m.On("NodeID", matchers...)
+	return &NodeExecutionContext_NodeID{Call: c_call}
 }
 
 // NodeID provides a mock function with given fields:
@@ -400,13 +400,13 @@ func (_m NodeExecutionContext_NodeStateReader) Return(_a0 handler.NodeStateReade
 }
 
 func (_m *NodeExecutionContext) OnNodeStateReader() *NodeExecutionContext_NodeStateReader {
-	c := _m.On("NodeStateReader")
-	return &NodeExecutionContext_NodeStateReader{Call: c}
+	c_call := _m.On("NodeStateReader")
+	return &NodeExecutionContext_NodeStateReader{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeStateReaderMatch(matchers ...interface{}) *NodeExecutionContext_NodeStateReader {
-	c := _m.On("NodeStateReader", matchers...)
-	return &NodeExecutionContext_NodeStateReader{Call: c}
+	c_call := _m.On("NodeStateReader", matchers...)
+	return &NodeExecutionContext_NodeStateReader{Call: c_call}
 }
 
 // NodeStateReader provides a mock function with given fields:
@@ -434,13 +434,13 @@ func (_m NodeExecutionContext_NodeStateWriter) Return(_a0 handler.NodeStateWrite
 }
 
 func (_m *NodeExecutionContext) OnNodeStateWriter() *NodeExecutionContext_NodeStateWriter {
-	c := _m.On("NodeStateWriter")
-	return &NodeExecutionContext_NodeStateWriter{Call: c}
+	c_call := _m.On("NodeStateWriter")
+	return &NodeExecutionContext_NodeStateWriter{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeStateWriterMatch(matchers ...interface{}) *NodeExecutionContext_NodeStateWriter {
-	c := _m.On("NodeStateWriter", matchers...)
-	return &NodeExecutionContext_NodeStateWriter{Call: c}
+	c_call := _m.On("NodeStateWriter", matchers...)
+	return &NodeExecutionContext_NodeStateWriter{Call: c_call}
 }
 
 // NodeStateWriter provides a mock function with given fields:
@@ -468,13 +468,13 @@ func (_m NodeExecutionContext_NodeStatus) Return(_a0 v1alpha1.ExecutableNodeStat
 }
 
 func (_m *NodeExecutionContext) OnNodeStatus() *NodeExecutionContext_NodeStatus {
-	c := _m.On("NodeStatus")
-	return &NodeExecutionContext_NodeStatus{Call: c}
+	c_call := _m.On("NodeStatus")
+	return &NodeExecutionContext_NodeStatus{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnNodeStatusMatch(matchers ...interface{}) *NodeExecutionContext_NodeStatus {
-	c := _m.On("NodeStatus", matchers...)
-	return &NodeExecutionContext_NodeStatus{Call: c}
+	c_call := _m.On("NodeStatus", matchers...)
+	return &NodeExecutionContext_NodeStatus{Call: c_call}
 }
 
 // NodeStatus provides a mock function with given fields:
@@ -502,13 +502,13 @@ func (_m NodeExecutionContext_OutputShardSelector) Return(_a0 ioutils.ShardSelec
 }
 
 func (_m *NodeExecutionContext) OnOutputShardSelector() *NodeExecutionContext_OutputShardSelector {
-	c := _m.On("OutputShardSelector")
-	return &NodeExecutionContext_OutputShardSelector{Call: c}
+	c_call := _m.On("OutputShardSelector")
+	return &NodeExecutionContext_OutputShardSelector{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnOutputShardSelectorMatch(matchers ...interface{}) *NodeExecutionContext_OutputShardSelector {
-	c := _m.On("OutputShardSelector", matchers...)
-	return &NodeExecutionContext_OutputShardSelector{Call: c}
+	c_call := _m.On("OutputShardSelector", matchers...)
+	return &NodeExecutionContext_OutputShardSelector{Call: c_call}
 }
 
 // OutputShardSelector provides a mock function with given fields:
@@ -536,13 +536,13 @@ func (_m NodeExecutionContext_RawOutputPrefix) Return(_a0 storage.DataReference)
 }
 
 func (_m *NodeExecutionContext) OnRawOutputPrefix() *NodeExecutionContext_RawOutputPrefix {
-	c := _m.On("RawOutputPrefix")
-	return &NodeExecutionContext_RawOutputPrefix{Call: c}
+	c_call := _m.On("RawOutputPrefix")
+	return &NodeExecutionContext_RawOutputPrefix{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnRawOutputPrefixMatch(matchers ...interface{}) *NodeExecutionContext_RawOutputPrefix {
-	c := _m.On("RawOutputPrefix", matchers...)
-	return &NodeExecutionContext_RawOutputPrefix{Call: c}
+	c_call := _m.On("RawOutputPrefix", matchers...)
+	return &NodeExecutionContext_RawOutputPrefix{Call: c_call}
 }
 
 // RawOutputPrefix provides a mock function with given fields:
@@ -568,13 +568,13 @@ func (_m NodeExecutionContext_TaskReader) Return(_a0 handler.TaskReader) *NodeEx
 }
 
 func (_m *NodeExecutionContext) OnTaskReader() *NodeExecutionContext_TaskReader {
-	c := _m.On("TaskReader")
-	return &NodeExecutionContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader")
+	return &NodeExecutionContext_TaskReader{Call: c_call}
 }
 
 func (_m *NodeExecutionContext) OnTaskReaderMatch(matchers ...interface{}) *NodeExecutionContext_TaskReader {
-	c := _m.On("TaskReader", matchers...)
-	return &NodeExecutionContext_TaskReader{Call: c}
+	c_call := _m.On("TaskReader", matchers...)
+	return &NodeExecutionContext_TaskReader{Call: c_call}
 }
 
 // TaskReader provides a mock function with given fields:

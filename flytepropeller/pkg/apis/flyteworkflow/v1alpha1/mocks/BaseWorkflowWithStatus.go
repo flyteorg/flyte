@@ -23,13 +23,13 @@ func (_m BaseWorkflowWithStatus_FromNode) Return(_a0 []string, _a1 error) *BaseW
 }
 
 func (_m *BaseWorkflowWithStatus) OnFromNode(name string) *BaseWorkflowWithStatus_FromNode {
-	c := _m.On("FromNode", name)
-	return &BaseWorkflowWithStatus_FromNode{Call: c}
+	c_call := _m.On("FromNode", name)
+	return &BaseWorkflowWithStatus_FromNode{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnFromNodeMatch(matchers ...interface{}) *BaseWorkflowWithStatus_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &BaseWorkflowWithStatus_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &BaseWorkflowWithStatus_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: name
@@ -64,13 +64,13 @@ func (_m BaseWorkflowWithStatus_GetID) Return(_a0 string) *BaseWorkflowWithStatu
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetID() *BaseWorkflowWithStatus_GetID {
-	c := _m.On("GetID")
-	return &BaseWorkflowWithStatus_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &BaseWorkflowWithStatus_GetID{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetIDMatch(matchers ...interface{}) *BaseWorkflowWithStatus_GetID {
-	c := _m.On("GetID", matchers...)
-	return &BaseWorkflowWithStatus_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &BaseWorkflowWithStatus_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -96,13 +96,13 @@ func (_m BaseWorkflowWithStatus_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetNode(nodeID string) *BaseWorkflowWithStatus_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &BaseWorkflowWithStatus_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &BaseWorkflowWithStatus_GetNode{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetNodeMatch(matchers ...interface{}) *BaseWorkflowWithStatus_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &BaseWorkflowWithStatus_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &BaseWorkflowWithStatus_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID
@@ -137,13 +137,13 @@ func (_m BaseWorkflowWithStatus_GetNodeExecutionStatus) Return(_a0 v1alpha1.Exec
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetNodeExecutionStatus(ctx context.Context, id string) *BaseWorkflowWithStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &BaseWorkflowWithStatus_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &BaseWorkflowWithStatus_GetNodeExecutionStatus{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *BaseWorkflowWithStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", matchers...)
-	return &BaseWorkflowWithStatus_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", matchers...)
+	return &BaseWorkflowWithStatus_GetNodeExecutionStatus{Call: c_call}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id
@@ -171,13 +171,13 @@ func (_m BaseWorkflowWithStatus_StartNode) Return(_a0 v1alpha1.ExecutableNode) *
 }
 
 func (_m *BaseWorkflowWithStatus) OnStartNode() *BaseWorkflowWithStatus_StartNode {
-	c := _m.On("StartNode")
-	return &BaseWorkflowWithStatus_StartNode{Call: c}
+	c_call := _m.On("StartNode")
+	return &BaseWorkflowWithStatus_StartNode{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnStartNodeMatch(matchers ...interface{}) *BaseWorkflowWithStatus_StartNode {
-	c := _m.On("StartNode", matchers...)
-	return &BaseWorkflowWithStatus_StartNode{Call: c}
+	c_call := _m.On("StartNode", matchers...)
+	return &BaseWorkflowWithStatus_StartNode{Call: c_call}
 }
 
 // StartNode provides a mock function with given fields:
@@ -205,13 +205,13 @@ func (_m BaseWorkflowWithStatus_ToNode) Return(_a0 []string, _a1 error) *BaseWor
 }
 
 func (_m *BaseWorkflowWithStatus) OnToNode(name string) *BaseWorkflowWithStatus_ToNode {
-	c := _m.On("ToNode", name)
-	return &BaseWorkflowWithStatus_ToNode{Call: c}
+	c_call := _m.On("ToNode", name)
+	return &BaseWorkflowWithStatus_ToNode{Call: c_call}
 }
 
 func (_m *BaseWorkflowWithStatus) OnToNodeMatch(matchers ...interface{}) *BaseWorkflowWithStatus_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &BaseWorkflowWithStatus_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &BaseWorkflowWithStatus_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: name

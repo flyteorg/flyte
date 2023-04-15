@@ -23,13 +23,13 @@ func (_m ExecutableWorkflowNodeStatus_GetExecutionError) Return(_a0 *core.Execut
 }
 
 func (_m *ExecutableWorkflowNodeStatus) OnGetExecutionError() *ExecutableWorkflowNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError")
-	return &ExecutableWorkflowNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError")
+	return &ExecutableWorkflowNodeStatus_GetExecutionError{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowNodeStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableWorkflowNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError", matchers...)
-	return &ExecutableWorkflowNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError", matchers...)
+	return &ExecutableWorkflowNodeStatus_GetExecutionError{Call: c_call}
 }
 
 // GetExecutionError provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m ExecutableWorkflowNodeStatus_GetWorkflowNodePhase) Return(_a0 v1alpha1.
 }
 
 func (_m *ExecutableWorkflowNodeStatus) OnGetWorkflowNodePhase() *ExecutableWorkflowNodeStatus_GetWorkflowNodePhase {
-	c := _m.On("GetWorkflowNodePhase")
-	return &ExecutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c}
+	c_call := _m.On("GetWorkflowNodePhase")
+	return &ExecutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c_call}
 }
 
 func (_m *ExecutableWorkflowNodeStatus) OnGetWorkflowNodePhaseMatch(matchers ...interface{}) *ExecutableWorkflowNodeStatus_GetWorkflowNodePhase {
-	c := _m.On("GetWorkflowNodePhase", matchers...)
-	return &ExecutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c}
+	c_call := _m.On("GetWorkflowNodePhase", matchers...)
+	return &ExecutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c_call}
 }
 
 // GetWorkflowNodePhase provides a mock function with given fields:

@@ -21,13 +21,13 @@ func (_m ExecutableIfBlock_GetCondition) Return(_a0 *core.BooleanExpression) *Ex
 }
 
 func (_m *ExecutableIfBlock) OnGetCondition() *ExecutableIfBlock_GetCondition {
-	c := _m.On("GetCondition")
-	return &ExecutableIfBlock_GetCondition{Call: c}
+	c_call := _m.On("GetCondition")
+	return &ExecutableIfBlock_GetCondition{Call: c_call}
 }
 
 func (_m *ExecutableIfBlock) OnGetConditionMatch(matchers ...interface{}) *ExecutableIfBlock_GetCondition {
-	c := _m.On("GetCondition", matchers...)
-	return &ExecutableIfBlock_GetCondition{Call: c}
+	c_call := _m.On("GetCondition", matchers...)
+	return &ExecutableIfBlock_GetCondition{Call: c_call}
 }
 
 // GetCondition provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableIfBlock_GetThenNode) Return(_a0 *string) *ExecutableIfBlock_G
 }
 
 func (_m *ExecutableIfBlock) OnGetThenNode() *ExecutableIfBlock_GetThenNode {
-	c := _m.On("GetThenNode")
-	return &ExecutableIfBlock_GetThenNode{Call: c}
+	c_call := _m.On("GetThenNode")
+	return &ExecutableIfBlock_GetThenNode{Call: c_call}
 }
 
 func (_m *ExecutableIfBlock) OnGetThenNodeMatch(matchers ...interface{}) *ExecutableIfBlock_GetThenNode {
-	c := _m.On("GetThenNode", matchers...)
-	return &ExecutableIfBlock_GetThenNode{Call: c}
+	c_call := _m.On("GetThenNode", matchers...)
+	return &ExecutableIfBlock_GetThenNode{Call: c_call}
 }
 
 // GetThenNode provides a mock function with given fields:

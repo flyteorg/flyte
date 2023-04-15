@@ -30,13 +30,13 @@ func (_m WorkflowBuilder_AddEdges) Return(ok bool) *WorkflowBuilder_AddEdges {
 }
 
 func (_m *WorkflowBuilder) OnAddEdges(n common.NodeBuilder, edgeDirection common.EdgeDirection, errs errors.CompileErrors) *WorkflowBuilder_AddEdges {
-	c := _m.On("AddEdges", n, edgeDirection, errs)
-	return &WorkflowBuilder_AddEdges{Call: c}
+	c_call := _m.On("AddEdges", n, edgeDirection, errs)
+	return &WorkflowBuilder_AddEdges{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnAddEdgesMatch(matchers ...interface{}) *WorkflowBuilder_AddEdges {
-	c := _m.On("AddEdges", matchers...)
-	return &WorkflowBuilder_AddEdges{Call: c}
+	c_call := _m.On("AddEdges", matchers...)
+	return &WorkflowBuilder_AddEdges{Call: c_call}
 }
 
 // AddEdges provides a mock function with given fields: n, edgeDirection, errs
@@ -67,13 +67,13 @@ func (_m WorkflowBuilder_AddNode) Return(node common.NodeBuilder, ok bool) *Work
 }
 
 func (_m *WorkflowBuilder) OnAddNode(n common.NodeBuilder, errs errors.CompileErrors) *WorkflowBuilder_AddNode {
-	c := _m.On("AddNode", n, errs)
-	return &WorkflowBuilder_AddNode{Call: c}
+	c_call := _m.On("AddNode", n, errs)
+	return &WorkflowBuilder_AddNode{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnAddNodeMatch(matchers ...interface{}) *WorkflowBuilder_AddNode {
-	c := _m.On("AddNode", matchers...)
-	return &WorkflowBuilder_AddNode{Call: c}
+	c_call := _m.On("AddNode", matchers...)
+	return &WorkflowBuilder_AddNode{Call: c_call}
 }
 
 // AddNode provides a mock function with given fields: n, errs
@@ -113,13 +113,13 @@ func (_m WorkflowBuilder_GetCompiledSubWorkflow) Return(wf *core.CompiledWorkflo
 }
 
 func (_m *WorkflowBuilder) OnGetCompiledSubWorkflow(id core.Identifier) *WorkflowBuilder_GetCompiledSubWorkflow {
-	c := _m.On("GetCompiledSubWorkflow", id)
-	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c}
+	c_call := _m.On("GetCompiledSubWorkflow", id)
+	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetCompiledSubWorkflowMatch(matchers ...interface{}) *WorkflowBuilder_GetCompiledSubWorkflow {
-	c := _m.On("GetCompiledSubWorkflow", matchers...)
-	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c}
+	c_call := _m.On("GetCompiledSubWorkflow", matchers...)
+	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c_call}
 }
 
 // GetCompiledSubWorkflow provides a mock function with given fields: id
@@ -154,13 +154,13 @@ func (_m WorkflowBuilder_GetCoreWorkflow) Return(_a0 *core.CompiledWorkflow) *Wo
 }
 
 func (_m *WorkflowBuilder) OnGetCoreWorkflow() *WorkflowBuilder_GetCoreWorkflow {
-	c := _m.On("GetCoreWorkflow")
-	return &WorkflowBuilder_GetCoreWorkflow{Call: c}
+	c_call := _m.On("GetCoreWorkflow")
+	return &WorkflowBuilder_GetCoreWorkflow{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetCoreWorkflowMatch(matchers ...interface{}) *WorkflowBuilder_GetCoreWorkflow {
-	c := _m.On("GetCoreWorkflow", matchers...)
-	return &WorkflowBuilder_GetCoreWorkflow{Call: c}
+	c_call := _m.On("GetCoreWorkflow", matchers...)
+	return &WorkflowBuilder_GetCoreWorkflow{Call: c_call}
 }
 
 // GetCoreWorkflow provides a mock function with given fields:
@@ -188,13 +188,13 @@ func (_m WorkflowBuilder_GetDownstreamNodes) Return(_a0 common.StringAdjacencyLi
 }
 
 func (_m *WorkflowBuilder) OnGetDownstreamNodes() *WorkflowBuilder_GetDownstreamNodes {
-	c := _m.On("GetDownstreamNodes")
-	return &WorkflowBuilder_GetDownstreamNodes{Call: c}
+	c_call := _m.On("GetDownstreamNodes")
+	return &WorkflowBuilder_GetDownstreamNodes{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetDownstreamNodesMatch(matchers ...interface{}) *WorkflowBuilder_GetDownstreamNodes {
-	c := _m.On("GetDownstreamNodes", matchers...)
-	return &WorkflowBuilder_GetDownstreamNodes{Call: c}
+	c_call := _m.On("GetDownstreamNodes", matchers...)
+	return &WorkflowBuilder_GetDownstreamNodes{Call: c_call}
 }
 
 // GetDownstreamNodes provides a mock function with given fields:
@@ -222,13 +222,13 @@ func (_m WorkflowBuilder_GetFailureNode) Return(_a0 common.Node) *WorkflowBuilde
 }
 
 func (_m *WorkflowBuilder) OnGetFailureNode() *WorkflowBuilder_GetFailureNode {
-	c := _m.On("GetFailureNode")
-	return &WorkflowBuilder_GetFailureNode{Call: c}
+	c_call := _m.On("GetFailureNode")
+	return &WorkflowBuilder_GetFailureNode{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetFailureNodeMatch(matchers ...interface{}) *WorkflowBuilder_GetFailureNode {
-	c := _m.On("GetFailureNode", matchers...)
-	return &WorkflowBuilder_GetFailureNode{Call: c}
+	c_call := _m.On("GetFailureNode", matchers...)
+	return &WorkflowBuilder_GetFailureNode{Call: c_call}
 }
 
 // GetFailureNode provides a mock function with given fields:
@@ -256,13 +256,13 @@ func (_m WorkflowBuilder_GetLaunchPlan) Return(wf common.InterfaceProvider, foun
 }
 
 func (_m *WorkflowBuilder) OnGetLaunchPlan(id core.Identifier) *WorkflowBuilder_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", id)
-	return &WorkflowBuilder_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", id)
+	return &WorkflowBuilder_GetLaunchPlan{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetLaunchPlanMatch(matchers ...interface{}) *WorkflowBuilder_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", matchers...)
-	return &WorkflowBuilder_GetLaunchPlan{Call: c}
+	c_call := _m.On("GetLaunchPlan", matchers...)
+	return &WorkflowBuilder_GetLaunchPlan{Call: c_call}
 }
 
 // GetLaunchPlan provides a mock function with given fields: id
@@ -297,13 +297,13 @@ func (_m WorkflowBuilder_GetNode) Return(node common.NodeBuilder, found bool) *W
 }
 
 func (_m *WorkflowBuilder) OnGetNode(id string) *WorkflowBuilder_GetNode {
-	c := _m.On("GetNode", id)
-	return &WorkflowBuilder_GetNode{Call: c}
+	c_call := _m.On("GetNode", id)
+	return &WorkflowBuilder_GetNode{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetNodeMatch(matchers ...interface{}) *WorkflowBuilder_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &WorkflowBuilder_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &WorkflowBuilder_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: id
@@ -338,13 +338,13 @@ func (_m WorkflowBuilder_GetNodes) Return(_a0 common.NodeIndex) *WorkflowBuilder
 }
 
 func (_m *WorkflowBuilder) OnGetNodes() *WorkflowBuilder_GetNodes {
-	c := _m.On("GetNodes")
-	return &WorkflowBuilder_GetNodes{Call: c}
+	c_call := _m.On("GetNodes")
+	return &WorkflowBuilder_GetNodes{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetNodesMatch(matchers ...interface{}) *WorkflowBuilder_GetNodes {
-	c := _m.On("GetNodes", matchers...)
-	return &WorkflowBuilder_GetNodes{Call: c}
+	c_call := _m.On("GetNodes", matchers...)
+	return &WorkflowBuilder_GetNodes{Call: c_call}
 }
 
 // GetNodes provides a mock function with given fields:
@@ -372,13 +372,13 @@ func (_m WorkflowBuilder_GetOrCreateNodeBuilder) Return(_a0 common.NodeBuilder) 
 }
 
 func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilder(n *core.Node) *WorkflowBuilder_GetOrCreateNodeBuilder {
-	c := _m.On("GetOrCreateNodeBuilder", n)
-	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
+	c_call := _m.On("GetOrCreateNodeBuilder", n)
+	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetOrCreateNodeBuilderMatch(matchers ...interface{}) *WorkflowBuilder_GetOrCreateNodeBuilder {
-	c := _m.On("GetOrCreateNodeBuilder", matchers...)
-	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c}
+	c_call := _m.On("GetOrCreateNodeBuilder", matchers...)
+	return &WorkflowBuilder_GetOrCreateNodeBuilder{Call: c_call}
 }
 
 // GetOrCreateNodeBuilder provides a mock function with given fields: n
@@ -406,13 +406,13 @@ func (_m WorkflowBuilder_GetSubWorkflow) Return(wf *core.CompiledWorkflow, found
 }
 
 func (_m *WorkflowBuilder) OnGetSubWorkflow(id core.Identifier) *WorkflowBuilder_GetSubWorkflow {
-	c := _m.On("GetSubWorkflow", id)
-	return &WorkflowBuilder_GetSubWorkflow{Call: c}
+	c_call := _m.On("GetSubWorkflow", id)
+	return &WorkflowBuilder_GetSubWorkflow{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetSubWorkflowMatch(matchers ...interface{}) *WorkflowBuilder_GetSubWorkflow {
-	c := _m.On("GetSubWorkflow", matchers...)
-	return &WorkflowBuilder_GetSubWorkflow{Call: c}
+	c_call := _m.On("GetSubWorkflow", matchers...)
+	return &WorkflowBuilder_GetSubWorkflow{Call: c_call}
 }
 
 // GetSubWorkflow provides a mock function with given fields: id
@@ -447,13 +447,13 @@ func (_m WorkflowBuilder_GetTask) Return(task common.Task, found bool) *Workflow
 }
 
 func (_m *WorkflowBuilder) OnGetTask(id core.Identifier) *WorkflowBuilder_GetTask {
-	c := _m.On("GetTask", id)
-	return &WorkflowBuilder_GetTask{Call: c}
+	c_call := _m.On("GetTask", id)
+	return &WorkflowBuilder_GetTask{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetTaskMatch(matchers ...interface{}) *WorkflowBuilder_GetTask {
-	c := _m.On("GetTask", matchers...)
-	return &WorkflowBuilder_GetTask{Call: c}
+	c_call := _m.On("GetTask", matchers...)
+	return &WorkflowBuilder_GetTask{Call: c_call}
 }
 
 // GetTask provides a mock function with given fields: id
@@ -488,13 +488,13 @@ func (_m WorkflowBuilder_GetTasks) Return(_a0 common.TaskIndex) *WorkflowBuilder
 }
 
 func (_m *WorkflowBuilder) OnGetTasks() *WorkflowBuilder_GetTasks {
-	c := _m.On("GetTasks")
-	return &WorkflowBuilder_GetTasks{Call: c}
+	c_call := _m.On("GetTasks")
+	return &WorkflowBuilder_GetTasks{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetTasksMatch(matchers ...interface{}) *WorkflowBuilder_GetTasks {
-	c := _m.On("GetTasks", matchers...)
-	return &WorkflowBuilder_GetTasks{Call: c}
+	c_call := _m.On("GetTasks", matchers...)
+	return &WorkflowBuilder_GetTasks{Call: c_call}
 }
 
 // GetTasks provides a mock function with given fields:
@@ -522,13 +522,13 @@ func (_m WorkflowBuilder_GetUpstreamNodes) Return(_a0 common.StringAdjacencyList
 }
 
 func (_m *WorkflowBuilder) OnGetUpstreamNodes() *WorkflowBuilder_GetUpstreamNodes {
-	c := _m.On("GetUpstreamNodes")
-	return &WorkflowBuilder_GetUpstreamNodes{Call: c}
+	c_call := _m.On("GetUpstreamNodes")
+	return &WorkflowBuilder_GetUpstreamNodes{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnGetUpstreamNodesMatch(matchers ...interface{}) *WorkflowBuilder_GetUpstreamNodes {
-	c := _m.On("GetUpstreamNodes", matchers...)
-	return &WorkflowBuilder_GetUpstreamNodes{Call: c}
+	c_call := _m.On("GetUpstreamNodes", matchers...)
+	return &WorkflowBuilder_GetUpstreamNodes{Call: c_call}
 }
 
 // GetUpstreamNodes provides a mock function with given fields:
@@ -561,13 +561,13 @@ func (_m WorkflowBuilder_ValidateWorkflow) Return(_a0 common.Workflow, _a1 bool)
 }
 
 func (_m *WorkflowBuilder) OnValidateWorkflow(fg *core.CompiledWorkflow, errs errors.CompileErrors) *WorkflowBuilder_ValidateWorkflow {
-	c := _m.On("ValidateWorkflow", fg, errs)
-	return &WorkflowBuilder_ValidateWorkflow{Call: c}
+	c_call := _m.On("ValidateWorkflow", fg, errs)
+	return &WorkflowBuilder_ValidateWorkflow{Call: c_call}
 }
 
 func (_m *WorkflowBuilder) OnValidateWorkflowMatch(matchers ...interface{}) *WorkflowBuilder_ValidateWorkflow {
-	c := _m.On("ValidateWorkflow", matchers...)
-	return &WorkflowBuilder_ValidateWorkflow{Call: c}
+	c_call := _m.On("ValidateWorkflow", matchers...)
+	return &WorkflowBuilder_ValidateWorkflow{Call: c_call}
 }
 
 // ValidateWorkflow provides a mock function with given fields: fg, errs

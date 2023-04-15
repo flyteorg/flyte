@@ -119,8 +119,8 @@ jobs:
           # should rewrite this pipeline to use docker buildx with cache type=gha.
           DOCKER_BUILDKIT: "1"
         run: |
-          docker build -t flyteorg/${{ github.event.repository.name }}:builder --target builder --cache-from=flyteorg/${{ github.event.repository.name }}:builder ../
-          docker build -t flyteorg/${{ github.event.repository.name }}:latest --cache-from=flyteorg/${{ github.event.repository.name }}:builder ../
+          docker build -t flyteorg/flyte/${{ matrix.package }}:builder --target builder --cache-from=flyteorg/flyte/${{ matrix.package }}:builder -f Dockerfile ../
+          docker build -t flyteorg/flyte/${{ matrix.package }}:latest --cache-from=flyteorg/flyte/${{ matrix.package }}:builder -f Dockerfile ../
 
       - name: Tag and cache docker image
         if : ${{ matrix.package == 'flyteadmin'}}

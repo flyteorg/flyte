@@ -23,13 +23,13 @@ func (_m MutableWorkflowNodeStatus_GetExecutionError) Return(_a0 *core.Execution
 }
 
 func (_m *MutableWorkflowNodeStatus) OnGetExecutionError() *MutableWorkflowNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError")
-	return &MutableWorkflowNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError")
+	return &MutableWorkflowNodeStatus_GetExecutionError{Call: c_call}
 }
 
 func (_m *MutableWorkflowNodeStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *MutableWorkflowNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError", matchers...)
-	return &MutableWorkflowNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError", matchers...)
+	return &MutableWorkflowNodeStatus_GetExecutionError{Call: c_call}
 }
 
 // GetExecutionError provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m MutableWorkflowNodeStatus_GetWorkflowNodePhase) Return(_a0 v1alpha1.Wor
 }
 
 func (_m *MutableWorkflowNodeStatus) OnGetWorkflowNodePhase() *MutableWorkflowNodeStatus_GetWorkflowNodePhase {
-	c := _m.On("GetWorkflowNodePhase")
-	return &MutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c}
+	c_call := _m.On("GetWorkflowNodePhase")
+	return &MutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c_call}
 }
 
 func (_m *MutableWorkflowNodeStatus) OnGetWorkflowNodePhaseMatch(matchers ...interface{}) *MutableWorkflowNodeStatus_GetWorkflowNodePhase {
-	c := _m.On("GetWorkflowNodePhase", matchers...)
-	return &MutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c}
+	c_call := _m.On("GetWorkflowNodePhase", matchers...)
+	return &MutableWorkflowNodeStatus_GetWorkflowNodePhase{Call: c_call}
 }
 
 // GetWorkflowNodePhase provides a mock function with given fields:
@@ -89,13 +89,13 @@ func (_m MutableWorkflowNodeStatus_IsDirty) Return(_a0 bool) *MutableWorkflowNod
 }
 
 func (_m *MutableWorkflowNodeStatus) OnIsDirty() *MutableWorkflowNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableWorkflowNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableWorkflowNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableWorkflowNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableWorkflowNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableWorkflowNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableWorkflowNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

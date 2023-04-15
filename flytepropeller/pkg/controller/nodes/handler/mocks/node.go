@@ -23,13 +23,13 @@ func (_m Node_Abort) Return(_a0 error) *Node_Abort {
 }
 
 func (_m *Node) OnAbort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) *Node_Abort {
-	c := _m.On("Abort", ctx, executionContext, reason)
-	return &Node_Abort{Call: c}
+	c_call := _m.On("Abort", ctx, executionContext, reason)
+	return &Node_Abort{Call: c_call}
 }
 
 func (_m *Node) OnAbortMatch(matchers ...interface{}) *Node_Abort {
-	c := _m.On("Abort", matchers...)
-	return &Node_Abort{Call: c}
+	c_call := _m.On("Abort", matchers...)
+	return &Node_Abort{Call: c_call}
 }
 
 // Abort provides a mock function with given fields: ctx, executionContext, reason
@@ -55,13 +55,13 @@ func (_m Node_Finalize) Return(_a0 error) *Node_Finalize {
 }
 
 func (_m *Node) OnFinalize(ctx context.Context, executionContext handler.NodeExecutionContext) *Node_Finalize {
-	c := _m.On("Finalize", ctx, executionContext)
-	return &Node_Finalize{Call: c}
+	c_call := _m.On("Finalize", ctx, executionContext)
+	return &Node_Finalize{Call: c_call}
 }
 
 func (_m *Node) OnFinalizeMatch(matchers ...interface{}) *Node_Finalize {
-	c := _m.On("Finalize", matchers...)
-	return &Node_Finalize{Call: c}
+	c_call := _m.On("Finalize", matchers...)
+	return &Node_Finalize{Call: c_call}
 }
 
 // Finalize provides a mock function with given fields: ctx, executionContext
@@ -87,13 +87,13 @@ func (_m Node_FinalizeRequired) Return(_a0 bool) *Node_FinalizeRequired {
 }
 
 func (_m *Node) OnFinalizeRequired() *Node_FinalizeRequired {
-	c := _m.On("FinalizeRequired")
-	return &Node_FinalizeRequired{Call: c}
+	c_call := _m.On("FinalizeRequired")
+	return &Node_FinalizeRequired{Call: c_call}
 }
 
 func (_m *Node) OnFinalizeRequiredMatch(matchers ...interface{}) *Node_FinalizeRequired {
-	c := _m.On("FinalizeRequired", matchers...)
-	return &Node_FinalizeRequired{Call: c}
+	c_call := _m.On("FinalizeRequired", matchers...)
+	return &Node_FinalizeRequired{Call: c_call}
 }
 
 // FinalizeRequired provides a mock function with given fields:
@@ -119,13 +119,13 @@ func (_m Node_Handle) Return(_a0 handler.Transition, _a1 error) *Node_Handle {
 }
 
 func (_m *Node) OnHandle(ctx context.Context, executionContext handler.NodeExecutionContext) *Node_Handle {
-	c := _m.On("Handle", ctx, executionContext)
-	return &Node_Handle{Call: c}
+	c_call := _m.On("Handle", ctx, executionContext)
+	return &Node_Handle{Call: c_call}
 }
 
 func (_m *Node) OnHandleMatch(matchers ...interface{}) *Node_Handle {
-	c := _m.On("Handle", matchers...)
-	return &Node_Handle{Call: c}
+	c_call := _m.On("Handle", matchers...)
+	return &Node_Handle{Call: c_call}
 }
 
 // Handle provides a mock function with given fields: ctx, executionContext
@@ -158,13 +158,13 @@ func (_m Node_Setup) Return(_a0 error) *Node_Setup {
 }
 
 func (_m *Node) OnSetup(ctx context.Context, setupContext handler.SetupContext) *Node_Setup {
-	c := _m.On("Setup", ctx, setupContext)
-	return &Node_Setup{Call: c}
+	c_call := _m.On("Setup", ctx, setupContext)
+	return &Node_Setup{Call: c_call}
 }
 
 func (_m *Node) OnSetupMatch(matchers ...interface{}) *Node_Setup {
-	c := _m.On("Setup", matchers...)
-	return &Node_Setup{Call: c}
+	c_call := _m.On("Setup", matchers...)
+	return &Node_Setup{Call: c_call}
 }
 
 // Setup provides a mock function with given fields: ctx, setupContext

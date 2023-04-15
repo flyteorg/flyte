@@ -21,13 +21,13 @@ func (_m NodeGetter_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1 bool) *Node
 }
 
 func (_m *NodeGetter) OnGetNode(nodeID string) *NodeGetter_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &NodeGetter_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &NodeGetter_GetNode{Call: c_call}
 }
 
 func (_m *NodeGetter) OnGetNodeMatch(matchers ...interface{}) *NodeGetter_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &NodeGetter_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &NodeGetter_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID

@@ -21,13 +21,13 @@ func (_m Comparable_Compare) Return(_a0 bool) *Comparable_Compare {
 }
 
 func (_m *Comparable) OnCompare(to random.Comparable) *Comparable_Compare {
-	c := _m.On("Compare", to)
-	return &Comparable_Compare{Call: c}
+	c_call := _m.On("Compare", to)
+	return &Comparable_Compare{Call: c_call}
 }
 
 func (_m *Comparable) OnCompareMatch(matchers ...interface{}) *Comparable_Compare {
-	c := _m.On("Compare", matchers...)
-	return &Comparable_Compare{Call: c}
+	c_call := _m.On("Compare", matchers...)
+	return &Comparable_Compare{Call: c_call}
 }
 
 // Compare provides a mock function with given fields: to

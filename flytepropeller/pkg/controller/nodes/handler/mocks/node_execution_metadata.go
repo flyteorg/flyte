@@ -26,13 +26,13 @@ func (_m NodeExecutionMetadata_GetAnnotations) Return(_a0 map[string]string) *No
 }
 
 func (_m *NodeExecutionMetadata) OnGetAnnotations() *NodeExecutionMetadata_GetAnnotations {
-	c := _m.On("GetAnnotations")
-	return &NodeExecutionMetadata_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations")
+	return &NodeExecutionMetadata_GetAnnotations{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetAnnotationsMatch(matchers ...interface{}) *NodeExecutionMetadata_GetAnnotations {
-	c := _m.On("GetAnnotations", matchers...)
-	return &NodeExecutionMetadata_GetAnnotations{Call: c}
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &NodeExecutionMetadata_GetAnnotations{Call: c_call}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -60,13 +60,13 @@ func (_m NodeExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint
 }
 
 func (_m *NodeExecutionMetadata) OnGetInterruptibleFailureThreshold() *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
-	c := _m.On("GetInterruptibleFailureThreshold")
-	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+	c_call := _m.On("GetInterruptibleFailureThreshold")
+	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matchers ...interface{}) *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
-	c := _m.On("GetInterruptibleFailureThreshold", matchers...)
-	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c}
+	c_call := _m.On("GetInterruptibleFailureThreshold", matchers...)
+	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: c_call}
 }
 
 // GetInterruptibleFailureThreshold provides a mock function with given fields:
@@ -92,13 +92,13 @@ func (_m NodeExecutionMetadata_GetK8sServiceAccount) Return(_a0 string) *NodeExe
 }
 
 func (_m *NodeExecutionMetadata) OnGetK8sServiceAccount() *NodeExecutionMetadata_GetK8sServiceAccount {
-	c := _m.On("GetK8sServiceAccount")
-	return &NodeExecutionMetadata_GetK8sServiceAccount{Call: c}
+	c_call := _m.On("GetK8sServiceAccount")
+	return &NodeExecutionMetadata_GetK8sServiceAccount{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetK8sServiceAccountMatch(matchers ...interface{}) *NodeExecutionMetadata_GetK8sServiceAccount {
-	c := _m.On("GetK8sServiceAccount", matchers...)
-	return &NodeExecutionMetadata_GetK8sServiceAccount{Call: c}
+	c_call := _m.On("GetK8sServiceAccount", matchers...)
+	return &NodeExecutionMetadata_GetK8sServiceAccount{Call: c_call}
 }
 
 // GetK8sServiceAccount provides a mock function with given fields:
@@ -124,13 +124,13 @@ func (_m NodeExecutionMetadata_GetLabels) Return(_a0 map[string]string) *NodeExe
 }
 
 func (_m *NodeExecutionMetadata) OnGetLabels() *NodeExecutionMetadata_GetLabels {
-	c := _m.On("GetLabels")
-	return &NodeExecutionMetadata_GetLabels{Call: c}
+	c_call := _m.On("GetLabels")
+	return &NodeExecutionMetadata_GetLabels{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetLabelsMatch(matchers ...interface{}) *NodeExecutionMetadata_GetLabels {
-	c := _m.On("GetLabels", matchers...)
-	return &NodeExecutionMetadata_GetLabels{Call: c}
+	c_call := _m.On("GetLabels", matchers...)
+	return &NodeExecutionMetadata_GetLabels{Call: c_call}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -158,13 +158,13 @@ func (_m NodeExecutionMetadata_GetNamespace) Return(_a0 string) *NodeExecutionMe
 }
 
 func (_m *NodeExecutionMetadata) OnGetNamespace() *NodeExecutionMetadata_GetNamespace {
-	c := _m.On("GetNamespace")
-	return &NodeExecutionMetadata_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace")
+	return &NodeExecutionMetadata_GetNamespace{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetNamespaceMatch(matchers ...interface{}) *NodeExecutionMetadata_GetNamespace {
-	c := _m.On("GetNamespace", matchers...)
-	return &NodeExecutionMetadata_GetNamespace{Call: c}
+	c_call := _m.On("GetNamespace", matchers...)
+	return &NodeExecutionMetadata_GetNamespace{Call: c_call}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -190,13 +190,13 @@ func (_m NodeExecutionMetadata_GetNodeExecutionID) Return(_a0 *core.NodeExecutio
 }
 
 func (_m *NodeExecutionMetadata) OnGetNodeExecutionID() *NodeExecutionMetadata_GetNodeExecutionID {
-	c := _m.On("GetNodeExecutionID")
-	return &NodeExecutionMetadata_GetNodeExecutionID{Call: c}
+	c_call := _m.On("GetNodeExecutionID")
+	return &NodeExecutionMetadata_GetNodeExecutionID{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetNodeExecutionIDMatch(matchers ...interface{}) *NodeExecutionMetadata_GetNodeExecutionID {
-	c := _m.On("GetNodeExecutionID", matchers...)
-	return &NodeExecutionMetadata_GetNodeExecutionID{Call: c}
+	c_call := _m.On("GetNodeExecutionID", matchers...)
+	return &NodeExecutionMetadata_GetNodeExecutionID{Call: c_call}
 }
 
 // GetNodeExecutionID provides a mock function with given fields:
@@ -224,13 +224,13 @@ func (_m NodeExecutionMetadata_GetOwnerID) Return(_a0 types.NamespacedName) *Nod
 }
 
 func (_m *NodeExecutionMetadata) OnGetOwnerID() *NodeExecutionMetadata_GetOwnerID {
-	c := _m.On("GetOwnerID")
-	return &NodeExecutionMetadata_GetOwnerID{Call: c}
+	c_call := _m.On("GetOwnerID")
+	return &NodeExecutionMetadata_GetOwnerID{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetOwnerIDMatch(matchers ...interface{}) *NodeExecutionMetadata_GetOwnerID {
-	c := _m.On("GetOwnerID", matchers...)
-	return &NodeExecutionMetadata_GetOwnerID{Call: c}
+	c_call := _m.On("GetOwnerID", matchers...)
+	return &NodeExecutionMetadata_GetOwnerID{Call: c_call}
 }
 
 // GetOwnerID provides a mock function with given fields:
@@ -256,13 +256,13 @@ func (_m NodeExecutionMetadata_GetOwnerReference) Return(_a0 v1.OwnerReference) 
 }
 
 func (_m *NodeExecutionMetadata) OnGetOwnerReference() *NodeExecutionMetadata_GetOwnerReference {
-	c := _m.On("GetOwnerReference")
-	return &NodeExecutionMetadata_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference")
+	return &NodeExecutionMetadata_GetOwnerReference{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetOwnerReferenceMatch(matchers ...interface{}) *NodeExecutionMetadata_GetOwnerReference {
-	c := _m.On("GetOwnerReference", matchers...)
-	return &NodeExecutionMetadata_GetOwnerReference{Call: c}
+	c_call := _m.On("GetOwnerReference", matchers...)
+	return &NodeExecutionMetadata_GetOwnerReference{Call: c_call}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -288,13 +288,13 @@ func (_m NodeExecutionMetadata_GetSecurityContext) Return(_a0 core.SecurityConte
 }
 
 func (_m *NodeExecutionMetadata) OnGetSecurityContext() *NodeExecutionMetadata_GetSecurityContext {
-	c := _m.On("GetSecurityContext")
-	return &NodeExecutionMetadata_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext")
+	return &NodeExecutionMetadata_GetSecurityContext{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnGetSecurityContextMatch(matchers ...interface{}) *NodeExecutionMetadata_GetSecurityContext {
-	c := _m.On("GetSecurityContext", matchers...)
-	return &NodeExecutionMetadata_GetSecurityContext{Call: c}
+	c_call := _m.On("GetSecurityContext", matchers...)
+	return &NodeExecutionMetadata_GetSecurityContext{Call: c_call}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -320,13 +320,13 @@ func (_m NodeExecutionMetadata_IsInterruptible) Return(_a0 bool) *NodeExecutionM
 }
 
 func (_m *NodeExecutionMetadata) OnIsInterruptible() *NodeExecutionMetadata_IsInterruptible {
-	c := _m.On("IsInterruptible")
-	return &NodeExecutionMetadata_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible")
+	return &NodeExecutionMetadata_IsInterruptible{Call: c_call}
 }
 
 func (_m *NodeExecutionMetadata) OnIsInterruptibleMatch(matchers ...interface{}) *NodeExecutionMetadata_IsInterruptible {
-	c := _m.On("IsInterruptible", matchers...)
-	return &NodeExecutionMetadata_IsInterruptible{Call: c}
+	c_call := _m.On("IsInterruptible", matchers...)
+	return &NodeExecutionMetadata_IsInterruptible{Call: c_call}
 }
 
 // IsInterruptible provides a mock function with given fields:

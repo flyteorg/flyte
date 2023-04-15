@@ -21,13 +21,13 @@ func (_m DAGStructureWithStartNode_FromNode) Return(_a0 []string, _a1 error) *DA
 }
 
 func (_m *DAGStructureWithStartNode) OnFromNode(id string) *DAGStructureWithStartNode_FromNode {
-	c := _m.On("FromNode", id)
-	return &DAGStructureWithStartNode_FromNode{Call: c}
+	c_call := _m.On("FromNode", id)
+	return &DAGStructureWithStartNode_FromNode{Call: c_call}
 }
 
 func (_m *DAGStructureWithStartNode) OnFromNodeMatch(matchers ...interface{}) *DAGStructureWithStartNode_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &DAGStructureWithStartNode_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &DAGStructureWithStartNode_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: id
@@ -62,13 +62,13 @@ func (_m DAGStructureWithStartNode_StartNode) Return(_a0 v1alpha1.ExecutableNode
 }
 
 func (_m *DAGStructureWithStartNode) OnStartNode() *DAGStructureWithStartNode_StartNode {
-	c := _m.On("StartNode")
-	return &DAGStructureWithStartNode_StartNode{Call: c}
+	c_call := _m.On("StartNode")
+	return &DAGStructureWithStartNode_StartNode{Call: c_call}
 }
 
 func (_m *DAGStructureWithStartNode) OnStartNodeMatch(matchers ...interface{}) *DAGStructureWithStartNode_StartNode {
-	c := _m.On("StartNode", matchers...)
-	return &DAGStructureWithStartNode_StartNode{Call: c}
+	c_call := _m.On("StartNode", matchers...)
+	return &DAGStructureWithStartNode_StartNode{Call: c_call}
 }
 
 // StartNode provides a mock function with given fields:
@@ -96,13 +96,13 @@ func (_m DAGStructureWithStartNode_ToNode) Return(_a0 []string, _a1 error) *DAGS
 }
 
 func (_m *DAGStructureWithStartNode) OnToNode(id string) *DAGStructureWithStartNode_ToNode {
-	c := _m.On("ToNode", id)
-	return &DAGStructureWithStartNode_ToNode{Call: c}
+	c_call := _m.On("ToNode", id)
+	return &DAGStructureWithStartNode_ToNode{Call: c_call}
 }
 
 func (_m *DAGStructureWithStartNode) OnToNodeMatch(matchers ...interface{}) *DAGStructureWithStartNode_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &DAGStructureWithStartNode_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &DAGStructureWithStartNode_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: id

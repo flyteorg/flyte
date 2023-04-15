@@ -21,13 +21,13 @@ func (_m ExecutableSubWorkflow_FromNode) Return(_a0 []string, _a1 error) *Execut
 }
 
 func (_m *ExecutableSubWorkflow) OnFromNode(name string) *ExecutableSubWorkflow_FromNode {
-	c := _m.On("FromNode", name)
-	return &ExecutableSubWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", name)
+	return &ExecutableSubWorkflow_FromNode{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnFromNodeMatch(matchers ...interface{}) *ExecutableSubWorkflow_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &ExecutableSubWorkflow_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &ExecutableSubWorkflow_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: name
@@ -62,13 +62,13 @@ func (_m ExecutableSubWorkflow_GetConnections) Return(_a0 *v1alpha1.Connections)
 }
 
 func (_m *ExecutableSubWorkflow) OnGetConnections() *ExecutableSubWorkflow_GetConnections {
-	c := _m.On("GetConnections")
-	return &ExecutableSubWorkflow_GetConnections{Call: c}
+	c_call := _m.On("GetConnections")
+	return &ExecutableSubWorkflow_GetConnections{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetConnectionsMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetConnections {
-	c := _m.On("GetConnections", matchers...)
-	return &ExecutableSubWorkflow_GetConnections{Call: c}
+	c_call := _m.On("GetConnections", matchers...)
+	return &ExecutableSubWorkflow_GetConnections{Call: c_call}
 }
 
 // GetConnections provides a mock function with given fields:
@@ -96,13 +96,13 @@ func (_m ExecutableSubWorkflow_GetID) Return(_a0 string) *ExecutableSubWorkflow_
 }
 
 func (_m *ExecutableSubWorkflow) OnGetID() *ExecutableSubWorkflow_GetID {
-	c := _m.On("GetID")
-	return &ExecutableSubWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ExecutableSubWorkflow_GetID{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetIDMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ExecutableSubWorkflow_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ExecutableSubWorkflow_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -128,13 +128,13 @@ func (_m ExecutableSubWorkflow_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1 
 }
 
 func (_m *ExecutableSubWorkflow) OnGetNode(nodeID string) *ExecutableSubWorkflow_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &ExecutableSubWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &ExecutableSubWorkflow_GetNode{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetNodeMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &ExecutableSubWorkflow_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &ExecutableSubWorkflow_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID
@@ -169,13 +169,13 @@ func (_m ExecutableSubWorkflow_GetNodes) Return(_a0 []string) *ExecutableSubWork
 }
 
 func (_m *ExecutableSubWorkflow) OnGetNodes() *ExecutableSubWorkflow_GetNodes {
-	c := _m.On("GetNodes")
-	return &ExecutableSubWorkflow_GetNodes{Call: c}
+	c_call := _m.On("GetNodes")
+	return &ExecutableSubWorkflow_GetNodes{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetNodesMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetNodes {
-	c := _m.On("GetNodes", matchers...)
-	return &ExecutableSubWorkflow_GetNodes{Call: c}
+	c_call := _m.On("GetNodes", matchers...)
+	return &ExecutableSubWorkflow_GetNodes{Call: c_call}
 }
 
 // GetNodes provides a mock function with given fields:
@@ -203,13 +203,13 @@ func (_m ExecutableSubWorkflow_GetOnFailureNode) Return(_a0 v1alpha1.ExecutableN
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOnFailureNode() *ExecutableSubWorkflow_GetOnFailureNode {
-	c := _m.On("GetOnFailureNode")
-	return &ExecutableSubWorkflow_GetOnFailureNode{Call: c}
+	c_call := _m.On("GetOnFailureNode")
+	return &ExecutableSubWorkflow_GetOnFailureNode{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOnFailureNodeMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetOnFailureNode {
-	c := _m.On("GetOnFailureNode", matchers...)
-	return &ExecutableSubWorkflow_GetOnFailureNode{Call: c}
+	c_call := _m.On("GetOnFailureNode", matchers...)
+	return &ExecutableSubWorkflow_GetOnFailureNode{Call: c_call}
 }
 
 // GetOnFailureNode provides a mock function with given fields:
@@ -237,13 +237,13 @@ func (_m ExecutableSubWorkflow_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowO
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOnFailurePolicy() *ExecutableSubWorkflow_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy")
-	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy")
+	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetOnFailurePolicy {
-	c := _m.On("GetOnFailurePolicy", matchers...)
-	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c}
+	c_call := _m.On("GetOnFailurePolicy", matchers...)
+	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c_call}
 }
 
 // GetOnFailurePolicy provides a mock function with given fields:
@@ -269,13 +269,13 @@ func (_m ExecutableSubWorkflow_GetOutputBindings) Return(_a0 []*v1alpha1.Binding
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOutputBindings() *ExecutableSubWorkflow_GetOutputBindings {
-	c := _m.On("GetOutputBindings")
-	return &ExecutableSubWorkflow_GetOutputBindings{Call: c}
+	c_call := _m.On("GetOutputBindings")
+	return &ExecutableSubWorkflow_GetOutputBindings{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOutputBindingsMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetOutputBindings {
-	c := _m.On("GetOutputBindings", matchers...)
-	return &ExecutableSubWorkflow_GetOutputBindings{Call: c}
+	c_call := _m.On("GetOutputBindings", matchers...)
+	return &ExecutableSubWorkflow_GetOutputBindings{Call: c_call}
 }
 
 // GetOutputBindings provides a mock function with given fields:
@@ -303,13 +303,13 @@ func (_m ExecutableSubWorkflow_GetOutputs) Return(_a0 *v1alpha1.OutputVarMap) *E
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOutputs() *ExecutableSubWorkflow_GetOutputs {
-	c := _m.On("GetOutputs")
-	return &ExecutableSubWorkflow_GetOutputs{Call: c}
+	c_call := _m.On("GetOutputs")
+	return &ExecutableSubWorkflow_GetOutputs{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnGetOutputsMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetOutputs {
-	c := _m.On("GetOutputs", matchers...)
-	return &ExecutableSubWorkflow_GetOutputs{Call: c}
+	c_call := _m.On("GetOutputs", matchers...)
+	return &ExecutableSubWorkflow_GetOutputs{Call: c_call}
 }
 
 // GetOutputs provides a mock function with given fields:
@@ -337,13 +337,13 @@ func (_m ExecutableSubWorkflow_StartNode) Return(_a0 v1alpha1.ExecutableNode) *E
 }
 
 func (_m *ExecutableSubWorkflow) OnStartNode() *ExecutableSubWorkflow_StartNode {
-	c := _m.On("StartNode")
-	return &ExecutableSubWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode")
+	return &ExecutableSubWorkflow_StartNode{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnStartNodeMatch(matchers ...interface{}) *ExecutableSubWorkflow_StartNode {
-	c := _m.On("StartNode", matchers...)
-	return &ExecutableSubWorkflow_StartNode{Call: c}
+	c_call := _m.On("StartNode", matchers...)
+	return &ExecutableSubWorkflow_StartNode{Call: c_call}
 }
 
 // StartNode provides a mock function with given fields:
@@ -371,13 +371,13 @@ func (_m ExecutableSubWorkflow_ToNode) Return(_a0 []string, _a1 error) *Executab
 }
 
 func (_m *ExecutableSubWorkflow) OnToNode(name string) *ExecutableSubWorkflow_ToNode {
-	c := _m.On("ToNode", name)
-	return &ExecutableSubWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", name)
+	return &ExecutableSubWorkflow_ToNode{Call: c_call}
 }
 
 func (_m *ExecutableSubWorkflow) OnToNodeMatch(matchers ...interface{}) *ExecutableSubWorkflow_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &ExecutableSubWorkflow_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &ExecutableSubWorkflow_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: name

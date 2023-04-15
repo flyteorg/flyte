@@ -22,13 +22,13 @@ func (_m ShardStrategy_GetPodCount) Return(_a0 int) *ShardStrategy_GetPodCount {
 }
 
 func (_m *ShardStrategy) OnGetPodCount() *ShardStrategy_GetPodCount {
-	c := _m.On("GetPodCount")
-	return &ShardStrategy_GetPodCount{Call: c}
+	c_call := _m.On("GetPodCount")
+	return &ShardStrategy_GetPodCount{Call: c_call}
 }
 
 func (_m *ShardStrategy) OnGetPodCountMatch(matchers ...interface{}) *ShardStrategy_GetPodCount {
-	c := _m.On("GetPodCount", matchers...)
-	return &ShardStrategy_GetPodCount{Call: c}
+	c_call := _m.On("GetPodCount", matchers...)
+	return &ShardStrategy_GetPodCount{Call: c_call}
 }
 
 // GetPodCount provides a mock function with given fields:
@@ -54,13 +54,13 @@ func (_m ShardStrategy_HashCode) Return(_a0 uint32, _a1 error) *ShardStrategy_Ha
 }
 
 func (_m *ShardStrategy) OnHashCode() *ShardStrategy_HashCode {
-	c := _m.On("HashCode")
-	return &ShardStrategy_HashCode{Call: c}
+	c_call := _m.On("HashCode")
+	return &ShardStrategy_HashCode{Call: c_call}
 }
 
 func (_m *ShardStrategy) OnHashCodeMatch(matchers ...interface{}) *ShardStrategy_HashCode {
-	c := _m.On("HashCode", matchers...)
-	return &ShardStrategy_HashCode{Call: c}
+	c_call := _m.On("HashCode", matchers...)
+	return &ShardStrategy_HashCode{Call: c_call}
 }
 
 // HashCode provides a mock function with given fields:
@@ -93,13 +93,13 @@ func (_m ShardStrategy_UpdatePodSpec) Return(_a0 error) *ShardStrategy_UpdatePod
 }
 
 func (_m *ShardStrategy) OnUpdatePodSpec(pod *v1.PodSpec, containerName string, podIndex int) *ShardStrategy_UpdatePodSpec {
-	c := _m.On("UpdatePodSpec", pod, containerName, podIndex)
-	return &ShardStrategy_UpdatePodSpec{Call: c}
+	c_call := _m.On("UpdatePodSpec", pod, containerName, podIndex)
+	return &ShardStrategy_UpdatePodSpec{Call: c_call}
 }
 
 func (_m *ShardStrategy) OnUpdatePodSpecMatch(matchers ...interface{}) *ShardStrategy_UpdatePodSpec {
-	c := _m.On("UpdatePodSpec", matchers...)
-	return &ShardStrategy_UpdatePodSpec{Call: c}
+	c_call := _m.On("UpdatePodSpec", matchers...)
+	return &ShardStrategy_UpdatePodSpec{Call: c_call}
 }
 
 // UpdatePodSpec provides a mock function with given fields: pod, containerName, podIndex

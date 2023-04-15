@@ -23,13 +23,13 @@ func (_m NodeStatusGetter_GetNodeExecutionStatus) Return(_a0 v1alpha1.Executable
 }
 
 func (_m *NodeStatusGetter) OnGetNodeExecutionStatus(ctx context.Context, id string) *NodeStatusGetter_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c_call}
 }
 
 func (_m *NodeStatusGetter) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *NodeStatusGetter_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", matchers...)
-	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", matchers...)
+	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c_call}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id

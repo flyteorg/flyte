@@ -27,13 +27,13 @@ func (_m ClientBuilder_Build) Return(_a0 client.Client, _a1 error) *ClientBuilde
 }
 
 func (_m *ClientBuilder) OnBuild(_a0 cache.Cache, config *rest.Config, options client.Options) *ClientBuilder_Build {
-	c := _m.On("Build", _a0, config, options)
-	return &ClientBuilder_Build{Call: c}
+	c_call := _m.On("Build", _a0, config, options)
+	return &ClientBuilder_Build{Call: c_call}
 }
 
 func (_m *ClientBuilder) OnBuildMatch(matchers ...interface{}) *ClientBuilder_Build {
-	c := _m.On("Build", matchers...)
-	return &ClientBuilder_Build{Call: c}
+	c_call := _m.On("Build", matchers...)
+	return &ClientBuilder_Build{Call: c_call}
 }
 
 // Build provides a mock function with given fields: _a0, config, options
@@ -68,13 +68,13 @@ func (_m ClientBuilder_WithUncached) Return(_a0 executors.ClientBuilder) *Client
 }
 
 func (_m *ClientBuilder) OnWithUncached(objs ...client.Object) *ClientBuilder_WithUncached {
-	c := _m.On("WithUncached", objs)
-	return &ClientBuilder_WithUncached{Call: c}
+	c_call := _m.On("WithUncached", objs)
+	return &ClientBuilder_WithUncached{Call: c_call}
 }
 
 func (_m *ClientBuilder) OnWithUncachedMatch(matchers ...interface{}) *ClientBuilder_WithUncached {
-	c := _m.On("WithUncached", matchers...)
-	return &ClientBuilder_WithUncached{Call: c}
+	c_call := _m.On("WithUncached", matchers...)
+	return &ClientBuilder_WithUncached{Call: c_call}
 }
 
 // WithUncached provides a mock function with given fields: objs

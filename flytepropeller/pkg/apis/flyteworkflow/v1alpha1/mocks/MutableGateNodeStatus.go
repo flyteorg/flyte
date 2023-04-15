@@ -21,13 +21,13 @@ func (_m MutableGateNodeStatus_GetGateNodePhase) Return(_a0 v1alpha1.GateNodePha
 }
 
 func (_m *MutableGateNodeStatus) OnGetGateNodePhase() *MutableGateNodeStatus_GetGateNodePhase {
-	c := _m.On("GetGateNodePhase")
-	return &MutableGateNodeStatus_GetGateNodePhase{Call: c}
+	c_call := _m.On("GetGateNodePhase")
+	return &MutableGateNodeStatus_GetGateNodePhase{Call: c_call}
 }
 
 func (_m *MutableGateNodeStatus) OnGetGateNodePhaseMatch(matchers ...interface{}) *MutableGateNodeStatus_GetGateNodePhase {
-	c := _m.On("GetGateNodePhase", matchers...)
-	return &MutableGateNodeStatus_GetGateNodePhase{Call: c}
+	c_call := _m.On("GetGateNodePhase", matchers...)
+	return &MutableGateNodeStatus_GetGateNodePhase{Call: c_call}
 }
 
 // GetGateNodePhase provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m MutableGateNodeStatus_IsDirty) Return(_a0 bool) *MutableGateNodeStatus_
 }
 
 func (_m *MutableGateNodeStatus) OnIsDirty() *MutableGateNodeStatus_IsDirty {
-	c := _m.On("IsDirty")
-	return &MutableGateNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty")
+	return &MutableGateNodeStatus_IsDirty{Call: c_call}
 }
 
 func (_m *MutableGateNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableGateNodeStatus_IsDirty {
-	c := _m.On("IsDirty", matchers...)
-	return &MutableGateNodeStatus_IsDirty{Call: c}
+	c_call := _m.On("IsDirty", matchers...)
+	return &MutableGateNodeStatus_IsDirty{Call: c_call}
 }
 
 // IsDirty provides a mock function with given fields:

@@ -24,13 +24,13 @@ func (_m NodeLookup_FromNode) Return(_a0 []string, _a1 error) *NodeLookup_FromNo
 }
 
 func (_m *NodeLookup) OnFromNode(id string) *NodeLookup_FromNode {
-	c := _m.On("FromNode", id)
-	return &NodeLookup_FromNode{Call: c}
+	c_call := _m.On("FromNode", id)
+	return &NodeLookup_FromNode{Call: c_call}
 }
 
 func (_m *NodeLookup) OnFromNodeMatch(matchers ...interface{}) *NodeLookup_FromNode {
-	c := _m.On("FromNode", matchers...)
-	return &NodeLookup_FromNode{Call: c}
+	c_call := _m.On("FromNode", matchers...)
+	return &NodeLookup_FromNode{Call: c_call}
 }
 
 // FromNode provides a mock function with given fields: id
@@ -65,13 +65,13 @@ func (_m NodeLookup_GetNode) Return(_a0 v1alpha1.ExecutableNode, _a1 bool) *Node
 }
 
 func (_m *NodeLookup) OnGetNode(nodeID string) *NodeLookup_GetNode {
-	c := _m.On("GetNode", nodeID)
-	return &NodeLookup_GetNode{Call: c}
+	c_call := _m.On("GetNode", nodeID)
+	return &NodeLookup_GetNode{Call: c_call}
 }
 
 func (_m *NodeLookup) OnGetNodeMatch(matchers ...interface{}) *NodeLookup_GetNode {
-	c := _m.On("GetNode", matchers...)
-	return &NodeLookup_GetNode{Call: c}
+	c_call := _m.On("GetNode", matchers...)
+	return &NodeLookup_GetNode{Call: c_call}
 }
 
 // GetNode provides a mock function with given fields: nodeID
@@ -106,13 +106,13 @@ func (_m NodeLookup_GetNodeExecutionStatus) Return(_a0 v1alpha1.ExecutableNodeSt
 }
 
 func (_m *NodeLookup) OnGetNodeExecutionStatus(ctx context.Context, id string) *NodeLookup_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &NodeLookup_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &NodeLookup_GetNodeExecutionStatus{Call: c_call}
 }
 
 func (_m *NodeLookup) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *NodeLookup_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", matchers...)
-	return &NodeLookup_GetNodeExecutionStatus{Call: c}
+	c_call := _m.On("GetNodeExecutionStatus", matchers...)
+	return &NodeLookup_GetNodeExecutionStatus{Call: c_call}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id
@@ -140,13 +140,13 @@ func (_m NodeLookup_ToNode) Return(_a0 []string, _a1 error) *NodeLookup_ToNode {
 }
 
 func (_m *NodeLookup) OnToNode(id string) *NodeLookup_ToNode {
-	c := _m.On("ToNode", id)
-	return &NodeLookup_ToNode{Call: c}
+	c_call := _m.On("ToNode", id)
+	return &NodeLookup_ToNode{Call: c_call}
 }
 
 func (_m *NodeLookup) OnToNodeMatch(matchers ...interface{}) *NodeLookup_ToNode {
-	c := _m.On("ToNode", matchers...)
-	return &NodeLookup_ToNode{Call: c}
+	c_call := _m.On("ToNode", matchers...)
+	return &NodeLookup_ToNode{Call: c_call}
 }
 
 // ToNode provides a mock function with given fields: id

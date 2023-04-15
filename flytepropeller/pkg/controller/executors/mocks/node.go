@@ -27,13 +27,13 @@ func (_m Node_AbortHandler) Return(_a0 error) *Node_AbortHandler {
 }
 
 func (_m *Node) OnAbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode, reason string) *Node_AbortHandler {
-	c := _m.On("AbortHandler", ctx, execContext, dag, nl, currentNode, reason)
-	return &Node_AbortHandler{Call: c}
+	c_call := _m.On("AbortHandler", ctx, execContext, dag, nl, currentNode, reason)
+	return &Node_AbortHandler{Call: c_call}
 }
 
 func (_m *Node) OnAbortHandlerMatch(matchers ...interface{}) *Node_AbortHandler {
-	c := _m.On("AbortHandler", matchers...)
-	return &Node_AbortHandler{Call: c}
+	c_call := _m.On("AbortHandler", matchers...)
+	return &Node_AbortHandler{Call: c_call}
 }
 
 // AbortHandler provides a mock function with given fields: ctx, execContext, dag, nl, currentNode, reason
@@ -59,13 +59,13 @@ func (_m Node_FinalizeHandler) Return(_a0 error) *Node_FinalizeHandler {
 }
 
 func (_m *Node) OnFinalizeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) *Node_FinalizeHandler {
-	c := _m.On("FinalizeHandler", ctx, execContext, dag, nl, currentNode)
-	return &Node_FinalizeHandler{Call: c}
+	c_call := _m.On("FinalizeHandler", ctx, execContext, dag, nl, currentNode)
+	return &Node_FinalizeHandler{Call: c_call}
 }
 
 func (_m *Node) OnFinalizeHandlerMatch(matchers ...interface{}) *Node_FinalizeHandler {
-	c := _m.On("FinalizeHandler", matchers...)
-	return &Node_FinalizeHandler{Call: c}
+	c_call := _m.On("FinalizeHandler", matchers...)
+	return &Node_FinalizeHandler{Call: c_call}
 }
 
 // FinalizeHandler provides a mock function with given fields: ctx, execContext, dag, nl, currentNode
@@ -91,13 +91,13 @@ func (_m Node_Initialize) Return(_a0 error) *Node_Initialize {
 }
 
 func (_m *Node) OnInitialize(ctx context.Context) *Node_Initialize {
-	c := _m.On("Initialize", ctx)
-	return &Node_Initialize{Call: c}
+	c_call := _m.On("Initialize", ctx)
+	return &Node_Initialize{Call: c_call}
 }
 
 func (_m *Node) OnInitializeMatch(matchers ...interface{}) *Node_Initialize {
-	c := _m.On("Initialize", matchers...)
-	return &Node_Initialize{Call: c}
+	c_call := _m.On("Initialize", matchers...)
+	return &Node_Initialize{Call: c_call}
 }
 
 // Initialize provides a mock function with given fields: ctx
@@ -123,13 +123,13 @@ func (_m Node_RecursiveNodeHandler) Return(_a0 executors.NodeStatus, _a1 error) 
 }
 
 func (_m *Node) OnRecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) *Node_RecursiveNodeHandler {
-	c := _m.On("RecursiveNodeHandler", ctx, execContext, dag, nl, currentNode)
-	return &Node_RecursiveNodeHandler{Call: c}
+	c_call := _m.On("RecursiveNodeHandler", ctx, execContext, dag, nl, currentNode)
+	return &Node_RecursiveNodeHandler{Call: c_call}
 }
 
 func (_m *Node) OnRecursiveNodeHandlerMatch(matchers ...interface{}) *Node_RecursiveNodeHandler {
-	c := _m.On("RecursiveNodeHandler", matchers...)
-	return &Node_RecursiveNodeHandler{Call: c}
+	c_call := _m.On("RecursiveNodeHandler", matchers...)
+	return &Node_RecursiveNodeHandler{Call: c_call}
 }
 
 // RecursiveNodeHandler provides a mock function with given fields: ctx, execContext, dag, nl, currentNode
@@ -162,13 +162,13 @@ func (_m Node_SetInputsForStartNode) Return(_a0 executors.NodeStatus, _a1 error)
 }
 
 func (_m *Node) OnSetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) *Node_SetInputsForStartNode {
-	c := _m.On("SetInputsForStartNode", ctx, execContext, dag, nl, inputs)
-	return &Node_SetInputsForStartNode{Call: c}
+	c_call := _m.On("SetInputsForStartNode", ctx, execContext, dag, nl, inputs)
+	return &Node_SetInputsForStartNode{Call: c_call}
 }
 
 func (_m *Node) OnSetInputsForStartNodeMatch(matchers ...interface{}) *Node_SetInputsForStartNode {
-	c := _m.On("SetInputsForStartNode", matchers...)
-	return &Node_SetInputsForStartNode{Call: c}
+	c_call := _m.On("SetInputsForStartNode", matchers...)
+	return &Node_SetInputsForStartNode{Call: c_call}
 }
 
 // SetInputsForStartNode provides a mock function with given fields: ctx, execContext, dag, nl, inputs

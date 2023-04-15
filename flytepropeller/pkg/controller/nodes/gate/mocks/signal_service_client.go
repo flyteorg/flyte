@@ -26,13 +26,13 @@ func (_m SignalServiceClient_GetOrCreateSignal) Return(_a0 *admin.Signal, _a1 er
 }
 
 func (_m *SignalServiceClient) OnGetOrCreateSignal(ctx context.Context, in *admin.SignalGetOrCreateRequest, opts ...grpc.CallOption) *SignalServiceClient_GetOrCreateSignal {
-	c := _m.On("GetOrCreateSignal", ctx, in, opts)
-	return &SignalServiceClient_GetOrCreateSignal{Call: c}
+	c_call := _m.On("GetOrCreateSignal", ctx, in, opts)
+	return &SignalServiceClient_GetOrCreateSignal{Call: c_call}
 }
 
 func (_m *SignalServiceClient) OnGetOrCreateSignalMatch(matchers ...interface{}) *SignalServiceClient_GetOrCreateSignal {
-	c := _m.On("GetOrCreateSignal", matchers...)
-	return &SignalServiceClient_GetOrCreateSignal{Call: c}
+	c_call := _m.On("GetOrCreateSignal", matchers...)
+	return &SignalServiceClient_GetOrCreateSignal{Call: c_call}
 }
 
 // GetOrCreateSignal provides a mock function with given fields: ctx, in, opts
@@ -74,13 +74,13 @@ func (_m SignalServiceClient_ListSignals) Return(_a0 *admin.SignalList, _a1 erro
 }
 
 func (_m *SignalServiceClient) OnListSignals(ctx context.Context, in *admin.SignalListRequest, opts ...grpc.CallOption) *SignalServiceClient_ListSignals {
-	c := _m.On("ListSignals", ctx, in, opts)
-	return &SignalServiceClient_ListSignals{Call: c}
+	c_call := _m.On("ListSignals", ctx, in, opts)
+	return &SignalServiceClient_ListSignals{Call: c_call}
 }
 
 func (_m *SignalServiceClient) OnListSignalsMatch(matchers ...interface{}) *SignalServiceClient_ListSignals {
-	c := _m.On("ListSignals", matchers...)
-	return &SignalServiceClient_ListSignals{Call: c}
+	c_call := _m.On("ListSignals", matchers...)
+	return &SignalServiceClient_ListSignals{Call: c_call}
 }
 
 // ListSignals provides a mock function with given fields: ctx, in, opts
@@ -122,13 +122,13 @@ func (_m SignalServiceClient_SetSignal) Return(_a0 *admin.SignalSetResponse, _a1
 }
 
 func (_m *SignalServiceClient) OnSetSignal(ctx context.Context, in *admin.SignalSetRequest, opts ...grpc.CallOption) *SignalServiceClient_SetSignal {
-	c := _m.On("SetSignal", ctx, in, opts)
-	return &SignalServiceClient_SetSignal{Call: c}
+	c_call := _m.On("SetSignal", ctx, in, opts)
+	return &SignalServiceClient_SetSignal{Call: c_call}
 }
 
 func (_m *SignalServiceClient) OnSetSignalMatch(matchers ...interface{}) *SignalServiceClient_SetSignal {
-	c := _m.On("SetSignal", matchers...)
-	return &SignalServiceClient_SetSignal{Call: c}
+	c_call := _m.On("SetSignal", matchers...)
+	return &SignalServiceClient_SetSignal{Call: c_call}
 }
 
 // SetSignal provides a mock function with given fields: ctx, in, opts

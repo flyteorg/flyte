@@ -32,13 +32,13 @@ func (_m TaskNodeHandler_Abort) Return(_a0 error) *TaskNodeHandler_Abort {
 }
 
 func (_m *TaskNodeHandler) OnAbort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) *TaskNodeHandler_Abort {
-	c := _m.On("Abort", ctx, executionContext, reason)
-	return &TaskNodeHandler_Abort{Call: c}
+	c_call := _m.On("Abort", ctx, executionContext, reason)
+	return &TaskNodeHandler_Abort{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnAbortMatch(matchers ...interface{}) *TaskNodeHandler_Abort {
-	c := _m.On("Abort", matchers...)
-	return &TaskNodeHandler_Abort{Call: c}
+	c_call := _m.On("Abort", matchers...)
+	return &TaskNodeHandler_Abort{Call: c_call}
 }
 
 // Abort provides a mock function with given fields: ctx, executionContext, reason
@@ -64,13 +64,13 @@ func (_m TaskNodeHandler_Finalize) Return(_a0 error) *TaskNodeHandler_Finalize {
 }
 
 func (_m *TaskNodeHandler) OnFinalize(ctx context.Context, executionContext handler.NodeExecutionContext) *TaskNodeHandler_Finalize {
-	c := _m.On("Finalize", ctx, executionContext)
-	return &TaskNodeHandler_Finalize{Call: c}
+	c_call := _m.On("Finalize", ctx, executionContext)
+	return &TaskNodeHandler_Finalize{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnFinalizeMatch(matchers ...interface{}) *TaskNodeHandler_Finalize {
-	c := _m.On("Finalize", matchers...)
-	return &TaskNodeHandler_Finalize{Call: c}
+	c_call := _m.On("Finalize", matchers...)
+	return &TaskNodeHandler_Finalize{Call: c_call}
 }
 
 // Finalize provides a mock function with given fields: ctx, executionContext
@@ -96,13 +96,13 @@ func (_m TaskNodeHandler_FinalizeRequired) Return(_a0 bool) *TaskNodeHandler_Fin
 }
 
 func (_m *TaskNodeHandler) OnFinalizeRequired() *TaskNodeHandler_FinalizeRequired {
-	c := _m.On("FinalizeRequired")
-	return &TaskNodeHandler_FinalizeRequired{Call: c}
+	c_call := _m.On("FinalizeRequired")
+	return &TaskNodeHandler_FinalizeRequired{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnFinalizeRequiredMatch(matchers ...interface{}) *TaskNodeHandler_FinalizeRequired {
-	c := _m.On("FinalizeRequired", matchers...)
-	return &TaskNodeHandler_FinalizeRequired{Call: c}
+	c_call := _m.On("FinalizeRequired", matchers...)
+	return &TaskNodeHandler_FinalizeRequired{Call: c_call}
 }
 
 // FinalizeRequired provides a mock function with given fields:
@@ -128,13 +128,13 @@ func (_m TaskNodeHandler_Handle) Return(_a0 handler.Transition, _a1 error) *Task
 }
 
 func (_m *TaskNodeHandler) OnHandle(ctx context.Context, executionContext handler.NodeExecutionContext) *TaskNodeHandler_Handle {
-	c := _m.On("Handle", ctx, executionContext)
-	return &TaskNodeHandler_Handle{Call: c}
+	c_call := _m.On("Handle", ctx, executionContext)
+	return &TaskNodeHandler_Handle{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnHandleMatch(matchers ...interface{}) *TaskNodeHandler_Handle {
-	c := _m.On("Handle", matchers...)
-	return &TaskNodeHandler_Handle{Call: c}
+	c_call := _m.On("Handle", matchers...)
+	return &TaskNodeHandler_Handle{Call: c_call}
 }
 
 // Handle provides a mock function with given fields: ctx, executionContext
@@ -167,13 +167,13 @@ func (_m TaskNodeHandler_Setup) Return(_a0 error) *TaskNodeHandler_Setup {
 }
 
 func (_m *TaskNodeHandler) OnSetup(ctx context.Context, setupContext handler.SetupContext) *TaskNodeHandler_Setup {
-	c := _m.On("Setup", ctx, setupContext)
-	return &TaskNodeHandler_Setup{Call: c}
+	c_call := _m.On("Setup", ctx, setupContext)
+	return &TaskNodeHandler_Setup{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnSetupMatch(matchers ...interface{}) *TaskNodeHandler_Setup {
-	c := _m.On("Setup", matchers...)
-	return &TaskNodeHandler_Setup{Call: c}
+	c_call := _m.On("Setup", matchers...)
+	return &TaskNodeHandler_Setup{Call: c_call}
 }
 
 // Setup provides a mock function with given fields: ctx, setupContext
@@ -199,13 +199,13 @@ func (_m TaskNodeHandler_ValidateOutputAndCacheAdd) Return(_a0 catalog.Status, _
 }
 
 func (_m *TaskNodeHandler) OnValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig, tr ioutils.SimpleTaskReader, m catalog.Metadata) *TaskNodeHandler_ValidateOutputAndCacheAdd {
-	c := _m.On("ValidateOutputAndCacheAdd", ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
-	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: c}
+	c_call := _m.On("ValidateOutputAndCacheAdd", ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
+	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: c_call}
 }
 
 func (_m *TaskNodeHandler) OnValidateOutputAndCacheAddMatch(matchers ...interface{}) *TaskNodeHandler_ValidateOutputAndCacheAdd {
-	c := _m.On("ValidateOutputAndCacheAdd", matchers...)
-	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: c}
+	c_call := _m.On("ValidateOutputAndCacheAdd", matchers...)
+	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: c_call}
 }
 
 // ValidateOutputAndCacheAdd provides a mock function with given fields: ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m

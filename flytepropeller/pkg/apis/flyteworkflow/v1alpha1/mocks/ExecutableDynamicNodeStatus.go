@@ -23,13 +23,13 @@ func (_m ExecutableDynamicNodeStatus_GetDynamicNodePhase) Return(_a0 v1alpha1.Dy
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetDynamicNodePhase() *ExecutableDynamicNodeStatus_GetDynamicNodePhase {
-	c := _m.On("GetDynamicNodePhase")
-	return &ExecutableDynamicNodeStatus_GetDynamicNodePhase{Call: c}
+	c_call := _m.On("GetDynamicNodePhase")
+	return &ExecutableDynamicNodeStatus_GetDynamicNodePhase{Call: c_call}
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetDynamicNodePhaseMatch(matchers ...interface{}) *ExecutableDynamicNodeStatus_GetDynamicNodePhase {
-	c := _m.On("GetDynamicNodePhase", matchers...)
-	return &ExecutableDynamicNodeStatus_GetDynamicNodePhase{Call: c}
+	c_call := _m.On("GetDynamicNodePhase", matchers...)
+	return &ExecutableDynamicNodeStatus_GetDynamicNodePhase{Call: c_call}
 }
 
 // GetDynamicNodePhase provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableDynamicNodeStatus_GetDynamicNodeReason) Return(_a0 string) *E
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetDynamicNodeReason() *ExecutableDynamicNodeStatus_GetDynamicNodeReason {
-	c := _m.On("GetDynamicNodeReason")
-	return &ExecutableDynamicNodeStatus_GetDynamicNodeReason{Call: c}
+	c_call := _m.On("GetDynamicNodeReason")
+	return &ExecutableDynamicNodeStatus_GetDynamicNodeReason{Call: c_call}
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetDynamicNodeReasonMatch(matchers ...interface{}) *ExecutableDynamicNodeStatus_GetDynamicNodeReason {
-	c := _m.On("GetDynamicNodeReason", matchers...)
-	return &ExecutableDynamicNodeStatus_GetDynamicNodeReason{Call: c}
+	c_call := _m.On("GetDynamicNodeReason", matchers...)
+	return &ExecutableDynamicNodeStatus_GetDynamicNodeReason{Call: c_call}
 }
 
 // GetDynamicNodeReason provides a mock function with given fields:
@@ -87,13 +87,13 @@ func (_m ExecutableDynamicNodeStatus_GetExecutionError) Return(_a0 *core.Executi
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetExecutionError() *ExecutableDynamicNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError")
-	return &ExecutableDynamicNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError")
+	return &ExecutableDynamicNodeStatus_GetExecutionError{Call: c_call}
 }
 
 func (_m *ExecutableDynamicNodeStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableDynamicNodeStatus_GetExecutionError {
-	c := _m.On("GetExecutionError", matchers...)
-	return &ExecutableDynamicNodeStatus_GetExecutionError{Call: c}
+	c_call := _m.On("GetExecutionError", matchers...)
+	return &ExecutableDynamicNodeStatus_GetExecutionError{Call: c_call}
 }
 
 // GetExecutionError provides a mock function with given fields:

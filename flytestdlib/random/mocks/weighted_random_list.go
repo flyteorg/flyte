@@ -24,13 +24,13 @@ func (_m WeightedRandomList_Get) Return(_a0 random.Comparable) *WeightedRandomLi
 }
 
 func (_m *WeightedRandomList) OnGet() *WeightedRandomList_Get {
-	c := _m.On("Get")
-	return &WeightedRandomList_Get{Call: c}
+	c_call := _m.On("Get")
+	return &WeightedRandomList_Get{Call: c_call}
 }
 
 func (_m *WeightedRandomList) OnGetMatch(matchers ...interface{}) *WeightedRandomList_Get {
-	c := _m.On("Get", matchers...)
-	return &WeightedRandomList_Get{Call: c}
+	c_call := _m.On("Get", matchers...)
+	return &WeightedRandomList_Get{Call: c_call}
 }
 
 // Get provides a mock function with given fields:
@@ -58,13 +58,13 @@ func (_m WeightedRandomList_GetWithSeed) Return(_a0 random.Comparable, _a1 error
 }
 
 func (_m *WeightedRandomList) OnGetWithSeed(seed rand.Source) *WeightedRandomList_GetWithSeed {
-	c := _m.On("GetWithSeed", seed)
-	return &WeightedRandomList_GetWithSeed{Call: c}
+	c_call := _m.On("GetWithSeed", seed)
+	return &WeightedRandomList_GetWithSeed{Call: c_call}
 }
 
 func (_m *WeightedRandomList) OnGetWithSeedMatch(matchers ...interface{}) *WeightedRandomList_GetWithSeed {
-	c := _m.On("GetWithSeed", matchers...)
-	return &WeightedRandomList_GetWithSeed{Call: c}
+	c_call := _m.On("GetWithSeed", matchers...)
+	return &WeightedRandomList_GetWithSeed{Call: c_call}
 }
 
 // GetWithSeed provides a mock function with given fields: seed
@@ -99,13 +99,13 @@ func (_m WeightedRandomList_Len) Return(_a0 int) *WeightedRandomList_Len {
 }
 
 func (_m *WeightedRandomList) OnLen() *WeightedRandomList_Len {
-	c := _m.On("Len")
-	return &WeightedRandomList_Len{Call: c}
+	c_call := _m.On("Len")
+	return &WeightedRandomList_Len{Call: c_call}
 }
 
 func (_m *WeightedRandomList) OnLenMatch(matchers ...interface{}) *WeightedRandomList_Len {
-	c := _m.On("Len", matchers...)
-	return &WeightedRandomList_Len{Call: c}
+	c_call := _m.On("Len", matchers...)
+	return &WeightedRandomList_Len{Call: c_call}
 }
 
 // Len provides a mock function with given fields:
@@ -131,13 +131,13 @@ func (_m WeightedRandomList_List) Return(_a0 []random.Comparable) *WeightedRando
 }
 
 func (_m *WeightedRandomList) OnList() *WeightedRandomList_List {
-	c := _m.On("List")
-	return &WeightedRandomList_List{Call: c}
+	c_call := _m.On("List")
+	return &WeightedRandomList_List{Call: c_call}
 }
 
 func (_m *WeightedRandomList) OnListMatch(matchers ...interface{}) *WeightedRandomList_List {
-	c := _m.On("List", matchers...)
-	return &WeightedRandomList_List{Call: c}
+	c_call := _m.On("List", matchers...)
+	return &WeightedRandomList_List{Call: c_call}
 }
 
 // List provides a mock function with given fields:
