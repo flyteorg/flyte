@@ -110,6 +110,7 @@ jobs:
       - name: Prime docker cache
         run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
       - name: Build dockerfile
+        if : ${{ matrix.package }} == 'flyteadmin' || ${{ matrix.package }} == 'flytepropeller' || ${{ matrix.package }} == 'flytecopilot'
         env:
           # We are unable to leverage docker buildx here without changing the
           # caching mechanism significantly. See here for the caching options
