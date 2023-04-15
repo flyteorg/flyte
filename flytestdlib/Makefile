@@ -13,7 +13,6 @@ golden:
 	go test ./storage -update
 	go test ./tests -update
 
-
 # This is the only target that should be overriden by the project. Get your binary into ${GOREPO}/bin
 .PHONY: compile
 compile:

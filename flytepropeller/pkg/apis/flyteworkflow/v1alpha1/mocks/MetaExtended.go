@@ -27,13 +27,13 @@ func (_m MetaExtended_FindSubWorkflow) Return(_a0 v1alpha1.ExecutableSubWorkflow
 }
 
 func (_m *MetaExtended) OnFindSubWorkflow(subID string) *MetaExtended_FindSubWorkflow {
-	c_call := _m.On("FindSubWorkflow", subID)
-	return &MetaExtended_FindSubWorkflow{Call: c_call}
+	c := _m.On("FindSubWorkflow", subID)
+	return &MetaExtended_FindSubWorkflow{Call: c}
 }
 
 func (_m *MetaExtended) OnFindSubWorkflowMatch(matchers ...interface{}) *MetaExtended_FindSubWorkflow {
-	c_call := _m.On("FindSubWorkflow", matchers...)
-	return &MetaExtended_FindSubWorkflow{Call: c_call}
+	c := _m.On("FindSubWorkflow", matchers...)
+	return &MetaExtended_FindSubWorkflow{Call: c}
 }
 
 // FindSubWorkflow provides a mock function with given fields: subID
@@ -61,13 +61,13 @@ func (_m MetaExtended_GetAnnotations) Return(_a0 map[string]string) *MetaExtende
 }
 
 func (_m *MetaExtended) OnGetAnnotations() *MetaExtended_GetAnnotations {
-	c_call := _m.On("GetAnnotations")
-	return &MetaExtended_GetAnnotations{Call: c_call}
+	c := _m.On("GetAnnotations")
+	return &MetaExtended_GetAnnotations{Call: c}
 }
 
 func (_m *MetaExtended) OnGetAnnotationsMatch(matchers ...interface{}) *MetaExtended_GetAnnotations {
-	c_call := _m.On("GetAnnotations", matchers...)
-	return &MetaExtended_GetAnnotations{Call: c_call}
+	c := _m.On("GetAnnotations", matchers...)
+	return &MetaExtended_GetAnnotations{Call: c}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -95,13 +95,13 @@ func (_m MetaExtended_GetCreationTimestamp) Return(_a0 v1.Time) *MetaExtended_Ge
 }
 
 func (_m *MetaExtended) OnGetCreationTimestamp() *MetaExtended_GetCreationTimestamp {
-	c_call := _m.On("GetCreationTimestamp")
-	return &MetaExtended_GetCreationTimestamp{Call: c_call}
+	c := _m.On("GetCreationTimestamp")
+	return &MetaExtended_GetCreationTimestamp{Call: c}
 }
 
 func (_m *MetaExtended) OnGetCreationTimestampMatch(matchers ...interface{}) *MetaExtended_GetCreationTimestamp {
-	c_call := _m.On("GetCreationTimestamp", matchers...)
-	return &MetaExtended_GetCreationTimestamp{Call: c_call}
+	c := _m.On("GetCreationTimestamp", matchers...)
+	return &MetaExtended_GetCreationTimestamp{Call: c}
 }
 
 // GetCreationTimestamp provides a mock function with given fields:
@@ -127,13 +127,13 @@ func (_m MetaExtended_GetDefinitionVersion) Return(_a0 v1alpha1.WorkflowDefiniti
 }
 
 func (_m *MetaExtended) OnGetDefinitionVersion() *MetaExtended_GetDefinitionVersion {
-	c_call := _m.On("GetDefinitionVersion")
-	return &MetaExtended_GetDefinitionVersion{Call: c_call}
+	c := _m.On("GetDefinitionVersion")
+	return &MetaExtended_GetDefinitionVersion{Call: c}
 }
 
 func (_m *MetaExtended) OnGetDefinitionVersionMatch(matchers ...interface{}) *MetaExtended_GetDefinitionVersion {
-	c_call := _m.On("GetDefinitionVersion", matchers...)
-	return &MetaExtended_GetDefinitionVersion{Call: c_call}
+	c := _m.On("GetDefinitionVersion", matchers...)
+	return &MetaExtended_GetDefinitionVersion{Call: c}
 }
 
 // GetDefinitionVersion provides a mock function with given fields:
@@ -159,13 +159,13 @@ func (_m MetaExtended_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *MetaEx
 }
 
 func (_m *MetaExtended) OnGetEventVersion() *MetaExtended_GetEventVersion {
-	c_call := _m.On("GetEventVersion")
-	return &MetaExtended_GetEventVersion{Call: c_call}
+	c := _m.On("GetEventVersion")
+	return &MetaExtended_GetEventVersion{Call: c}
 }
 
 func (_m *MetaExtended) OnGetEventVersionMatch(matchers ...interface{}) *MetaExtended_GetEventVersion {
-	c_call := _m.On("GetEventVersion", matchers...)
-	return &MetaExtended_GetEventVersion{Call: c_call}
+	c := _m.On("GetEventVersion", matchers...)
+	return &MetaExtended_GetEventVersion{Call: c}
 }
 
 // GetEventVersion provides a mock function with given fields:
@@ -191,13 +191,13 @@ func (_m MetaExtended_GetExecutionID) Return(_a0 v1alpha1.WorkflowExecutionIdent
 }
 
 func (_m *MetaExtended) OnGetExecutionID() *MetaExtended_GetExecutionID {
-	c_call := _m.On("GetExecutionID")
-	return &MetaExtended_GetExecutionID{Call: c_call}
+	c := _m.On("GetExecutionID")
+	return &MetaExtended_GetExecutionID{Call: c}
 }
 
 func (_m *MetaExtended) OnGetExecutionIDMatch(matchers ...interface{}) *MetaExtended_GetExecutionID {
-	c_call := _m.On("GetExecutionID", matchers...)
-	return &MetaExtended_GetExecutionID{Call: c_call}
+	c := _m.On("GetExecutionID", matchers...)
+	return &MetaExtended_GetExecutionID{Call: c}
 }
 
 // GetExecutionID provides a mock function with given fields:
@@ -223,13 +223,13 @@ func (_m MetaExtended_GetExecutionStatus) Return(_a0 v1alpha1.ExecutableWorkflow
 }
 
 func (_m *MetaExtended) OnGetExecutionStatus() *MetaExtended_GetExecutionStatus {
-	c_call := _m.On("GetExecutionStatus")
-	return &MetaExtended_GetExecutionStatus{Call: c_call}
+	c := _m.On("GetExecutionStatus")
+	return &MetaExtended_GetExecutionStatus{Call: c}
 }
 
 func (_m *MetaExtended) OnGetExecutionStatusMatch(matchers ...interface{}) *MetaExtended_GetExecutionStatus {
-	c_call := _m.On("GetExecutionStatus", matchers...)
-	return &MetaExtended_GetExecutionStatus{Call: c_call}
+	c := _m.On("GetExecutionStatus", matchers...)
+	return &MetaExtended_GetExecutionStatus{Call: c}
 }
 
 // GetExecutionStatus provides a mock function with given fields:
@@ -257,13 +257,13 @@ func (_m MetaExtended_GetK8sWorkflowID) Return(_a0 types.NamespacedName) *MetaEx
 }
 
 func (_m *MetaExtended) OnGetK8sWorkflowID() *MetaExtended_GetK8sWorkflowID {
-	c_call := _m.On("GetK8sWorkflowID")
-	return &MetaExtended_GetK8sWorkflowID{Call: c_call}
+	c := _m.On("GetK8sWorkflowID")
+	return &MetaExtended_GetK8sWorkflowID{Call: c}
 }
 
 func (_m *MetaExtended) OnGetK8sWorkflowIDMatch(matchers ...interface{}) *MetaExtended_GetK8sWorkflowID {
-	c_call := _m.On("GetK8sWorkflowID", matchers...)
-	return &MetaExtended_GetK8sWorkflowID{Call: c_call}
+	c := _m.On("GetK8sWorkflowID", matchers...)
+	return &MetaExtended_GetK8sWorkflowID{Call: c}
 }
 
 // GetK8sWorkflowID provides a mock function with given fields:
@@ -289,13 +289,13 @@ func (_m MetaExtended_GetLabels) Return(_a0 map[string]string) *MetaExtended_Get
 }
 
 func (_m *MetaExtended) OnGetLabels() *MetaExtended_GetLabels {
-	c_call := _m.On("GetLabels")
-	return &MetaExtended_GetLabels{Call: c_call}
+	c := _m.On("GetLabels")
+	return &MetaExtended_GetLabels{Call: c}
 }
 
 func (_m *MetaExtended) OnGetLabelsMatch(matchers ...interface{}) *MetaExtended_GetLabels {
-	c_call := _m.On("GetLabels", matchers...)
-	return &MetaExtended_GetLabels{Call: c_call}
+	c := _m.On("GetLabels", matchers...)
+	return &MetaExtended_GetLabels{Call: c}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -323,13 +323,13 @@ func (_m MetaExtended_GetName) Return(_a0 string) *MetaExtended_GetName {
 }
 
 func (_m *MetaExtended) OnGetName() *MetaExtended_GetName {
-	c_call := _m.On("GetName")
-	return &MetaExtended_GetName{Call: c_call}
+	c := _m.On("GetName")
+	return &MetaExtended_GetName{Call: c}
 }
 
 func (_m *MetaExtended) OnGetNameMatch(matchers ...interface{}) *MetaExtended_GetName {
-	c_call := _m.On("GetName", matchers...)
-	return &MetaExtended_GetName{Call: c_call}
+	c := _m.On("GetName", matchers...)
+	return &MetaExtended_GetName{Call: c}
 }
 
 // GetName provides a mock function with given fields:
@@ -355,13 +355,13 @@ func (_m MetaExtended_GetNamespace) Return(_a0 string) *MetaExtended_GetNamespac
 }
 
 func (_m *MetaExtended) OnGetNamespace() *MetaExtended_GetNamespace {
-	c_call := _m.On("GetNamespace")
-	return &MetaExtended_GetNamespace{Call: c_call}
+	c := _m.On("GetNamespace")
+	return &MetaExtended_GetNamespace{Call: c}
 }
 
 func (_m *MetaExtended) OnGetNamespaceMatch(matchers ...interface{}) *MetaExtended_GetNamespace {
-	c_call := _m.On("GetNamespace", matchers...)
-	return &MetaExtended_GetNamespace{Call: c_call}
+	c := _m.On("GetNamespace", matchers...)
+	return &MetaExtended_GetNamespace{Call: c}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -387,13 +387,13 @@ func (_m MetaExtended_GetOwnerReference) Return(_a0 v1.OwnerReference) *MetaExte
 }
 
 func (_m *MetaExtended) OnGetOwnerReference() *MetaExtended_GetOwnerReference {
-	c_call := _m.On("GetOwnerReference")
-	return &MetaExtended_GetOwnerReference{Call: c_call}
+	c := _m.On("GetOwnerReference")
+	return &MetaExtended_GetOwnerReference{Call: c}
 }
 
 func (_m *MetaExtended) OnGetOwnerReferenceMatch(matchers ...interface{}) *MetaExtended_GetOwnerReference {
-	c_call := _m.On("GetOwnerReference", matchers...)
-	return &MetaExtended_GetOwnerReference{Call: c_call}
+	c := _m.On("GetOwnerReference", matchers...)
+	return &MetaExtended_GetOwnerReference{Call: c}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -419,13 +419,13 @@ func (_m MetaExtended_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutputDataC
 }
 
 func (_m *MetaExtended) OnGetRawOutputDataConfig() *MetaExtended_GetRawOutputDataConfig {
-	c_call := _m.On("GetRawOutputDataConfig")
-	return &MetaExtended_GetRawOutputDataConfig{Call: c_call}
+	c := _m.On("GetRawOutputDataConfig")
+	return &MetaExtended_GetRawOutputDataConfig{Call: c}
 }
 
 func (_m *MetaExtended) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *MetaExtended_GetRawOutputDataConfig {
-	c_call := _m.On("GetRawOutputDataConfig", matchers...)
-	return &MetaExtended_GetRawOutputDataConfig{Call: c_call}
+	c := _m.On("GetRawOutputDataConfig", matchers...)
+	return &MetaExtended_GetRawOutputDataConfig{Call: c}
 }
 
 // GetRawOutputDataConfig provides a mock function with given fields:
@@ -451,13 +451,13 @@ func (_m MetaExtended_GetSecurityContext) Return(_a0 core.SecurityContext) *Meta
 }
 
 func (_m *MetaExtended) OnGetSecurityContext() *MetaExtended_GetSecurityContext {
-	c_call := _m.On("GetSecurityContext")
-	return &MetaExtended_GetSecurityContext{Call: c_call}
+	c := _m.On("GetSecurityContext")
+	return &MetaExtended_GetSecurityContext{Call: c}
 }
 
 func (_m *MetaExtended) OnGetSecurityContextMatch(matchers ...interface{}) *MetaExtended_GetSecurityContext {
-	c_call := _m.On("GetSecurityContext", matchers...)
-	return &MetaExtended_GetSecurityContext{Call: c_call}
+	c := _m.On("GetSecurityContext", matchers...)
+	return &MetaExtended_GetSecurityContext{Call: c}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -483,13 +483,13 @@ func (_m MetaExtended_GetServiceAccountName) Return(_a0 string) *MetaExtended_Ge
 }
 
 func (_m *MetaExtended) OnGetServiceAccountName() *MetaExtended_GetServiceAccountName {
-	c_call := _m.On("GetServiceAccountName")
-	return &MetaExtended_GetServiceAccountName{Call: c_call}
+	c := _m.On("GetServiceAccountName")
+	return &MetaExtended_GetServiceAccountName{Call: c}
 }
 
 func (_m *MetaExtended) OnGetServiceAccountNameMatch(matchers ...interface{}) *MetaExtended_GetServiceAccountName {
-	c_call := _m.On("GetServiceAccountName", matchers...)
-	return &MetaExtended_GetServiceAccountName{Call: c_call}
+	c := _m.On("GetServiceAccountName", matchers...)
+	return &MetaExtended_GetServiceAccountName{Call: c}
 }
 
 // GetServiceAccountName provides a mock function with given fields:
@@ -515,13 +515,13 @@ func (_m MetaExtended_GetTask) Return(_a0 v1alpha1.ExecutableTask, _a1 error) *M
 }
 
 func (_m *MetaExtended) OnGetTask(id string) *MetaExtended_GetTask {
-	c_call := _m.On("GetTask", id)
-	return &MetaExtended_GetTask{Call: c_call}
+	c := _m.On("GetTask", id)
+	return &MetaExtended_GetTask{Call: c}
 }
 
 func (_m *MetaExtended) OnGetTaskMatch(matchers ...interface{}) *MetaExtended_GetTask {
-	c_call := _m.On("GetTask", matchers...)
-	return &MetaExtended_GetTask{Call: c_call}
+	c := _m.On("GetTask", matchers...)
+	return &MetaExtended_GetTask{Call: c}
 }
 
 // GetTask provides a mock function with given fields: id
@@ -556,13 +556,13 @@ func (_m MetaExtended_IsInterruptible) Return(_a0 bool) *MetaExtended_IsInterrup
 }
 
 func (_m *MetaExtended) OnIsInterruptible() *MetaExtended_IsInterruptible {
-	c_call := _m.On("IsInterruptible")
-	return &MetaExtended_IsInterruptible{Call: c_call}
+	c := _m.On("IsInterruptible")
+	return &MetaExtended_IsInterruptible{Call: c}
 }
 
 func (_m *MetaExtended) OnIsInterruptibleMatch(matchers ...interface{}) *MetaExtended_IsInterruptible {
-	c_call := _m.On("IsInterruptible", matchers...)
-	return &MetaExtended_IsInterruptible{Call: c_call}
+	c := _m.On("IsInterruptible", matchers...)
+	return &MetaExtended_IsInterruptible{Call: c}
 }
 
 // IsInterruptible provides a mock function with given fields:

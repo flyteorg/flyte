@@ -24,13 +24,13 @@ func (_m Workflow_HandleAbortedWorkflow) Return(_a0 error) *Workflow_HandleAbort
 }
 
 func (_m *Workflow) OnHandleAbortedWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) *Workflow_HandleAbortedWorkflow {
-	c_call := _m.On("HandleAbortedWorkflow", ctx, w, maxRetries)
-	return &Workflow_HandleAbortedWorkflow{Call: c_call}
+	c := _m.On("HandleAbortedWorkflow", ctx, w, maxRetries)
+	return &Workflow_HandleAbortedWorkflow{Call: c}
 }
 
 func (_m *Workflow) OnHandleAbortedWorkflowMatch(matchers ...interface{}) *Workflow_HandleAbortedWorkflow {
-	c_call := _m.On("HandleAbortedWorkflow", matchers...)
-	return &Workflow_HandleAbortedWorkflow{Call: c_call}
+	c := _m.On("HandleAbortedWorkflow", matchers...)
+	return &Workflow_HandleAbortedWorkflow{Call: c}
 }
 
 // HandleAbortedWorkflow provides a mock function with given fields: ctx, w, maxRetries
@@ -56,13 +56,13 @@ func (_m Workflow_HandleFlyteWorkflow) Return(_a0 error) *Workflow_HandleFlyteWo
 }
 
 func (_m *Workflow) OnHandleFlyteWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) *Workflow_HandleFlyteWorkflow {
-	c_call := _m.On("HandleFlyteWorkflow", ctx, w)
-	return &Workflow_HandleFlyteWorkflow{Call: c_call}
+	c := _m.On("HandleFlyteWorkflow", ctx, w)
+	return &Workflow_HandleFlyteWorkflow{Call: c}
 }
 
 func (_m *Workflow) OnHandleFlyteWorkflowMatch(matchers ...interface{}) *Workflow_HandleFlyteWorkflow {
-	c_call := _m.On("HandleFlyteWorkflow", matchers...)
-	return &Workflow_HandleFlyteWorkflow{Call: c_call}
+	c := _m.On("HandleFlyteWorkflow", matchers...)
+	return &Workflow_HandleFlyteWorkflow{Call: c}
 }
 
 // HandleFlyteWorkflow provides a mock function with given fields: ctx, w
@@ -88,13 +88,13 @@ func (_m Workflow_Initialize) Return(_a0 error) *Workflow_Initialize {
 }
 
 func (_m *Workflow) OnInitialize(ctx context.Context) *Workflow_Initialize {
-	c_call := _m.On("Initialize", ctx)
-	return &Workflow_Initialize{Call: c_call}
+	c := _m.On("Initialize", ctx)
+	return &Workflow_Initialize{Call: c}
 }
 
 func (_m *Workflow) OnInitializeMatch(matchers ...interface{}) *Workflow_Initialize {
-	c_call := _m.On("Initialize", matchers...)
-	return &Workflow_Initialize{Call: c_call}
+	c := _m.On("Initialize", matchers...)
+	return &Workflow_Initialize{Call: c}
 }
 
 // Initialize provides a mock function with given fields: ctx

@@ -23,13 +23,13 @@ func (_m NodeBuilder_GetBranchNode) Return(_a0 *core.BranchNode) *NodeBuilder_Ge
 }
 
 func (_m *NodeBuilder) OnGetBranchNode() *NodeBuilder_GetBranchNode {
-	c_call := _m.On("GetBranchNode")
-	return &NodeBuilder_GetBranchNode{Call: c_call}
+	c := _m.On("GetBranchNode")
+	return &NodeBuilder_GetBranchNode{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetBranchNodeMatch(matchers ...interface{}) *NodeBuilder_GetBranchNode {
-	c_call := _m.On("GetBranchNode", matchers...)
-	return &NodeBuilder_GetBranchNode{Call: c_call}
+	c := _m.On("GetBranchNode", matchers...)
+	return &NodeBuilder_GetBranchNode{Call: c}
 }
 
 // GetBranchNode provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m NodeBuilder_GetCoreNode) Return(_a0 *core.Node) *NodeBuilder_GetCoreNod
 }
 
 func (_m *NodeBuilder) OnGetCoreNode() *NodeBuilder_GetCoreNode {
-	c_call := _m.On("GetCoreNode")
-	return &NodeBuilder_GetCoreNode{Call: c_call}
+	c := _m.On("GetCoreNode")
+	return &NodeBuilder_GetCoreNode{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetCoreNodeMatch(matchers ...interface{}) *NodeBuilder_GetCoreNode {
-	c_call := _m.On("GetCoreNode", matchers...)
-	return &NodeBuilder_GetCoreNode{Call: c_call}
+	c := _m.On("GetCoreNode", matchers...)
+	return &NodeBuilder_GetCoreNode{Call: c}
 }
 
 // GetCoreNode provides a mock function with given fields:
@@ -91,13 +91,13 @@ func (_m NodeBuilder_GetGateNode) Return(_a0 *core.GateNode) *NodeBuilder_GetGat
 }
 
 func (_m *NodeBuilder) OnGetGateNode() *NodeBuilder_GetGateNode {
-	c_call := _m.On("GetGateNode")
-	return &NodeBuilder_GetGateNode{Call: c_call}
+	c := _m.On("GetGateNode")
+	return &NodeBuilder_GetGateNode{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetGateNodeMatch(matchers ...interface{}) *NodeBuilder_GetGateNode {
-	c_call := _m.On("GetGateNode", matchers...)
-	return &NodeBuilder_GetGateNode{Call: c_call}
+	c := _m.On("GetGateNode", matchers...)
+	return &NodeBuilder_GetGateNode{Call: c}
 }
 
 // GetGateNode provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m NodeBuilder_GetId) Return(_a0 string) *NodeBuilder_GetId {
 }
 
 func (_m *NodeBuilder) OnGetId() *NodeBuilder_GetId {
-	c_call := _m.On("GetId")
-	return &NodeBuilder_GetId{Call: c_call}
+	c := _m.On("GetId")
+	return &NodeBuilder_GetId{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetIdMatch(matchers ...interface{}) *NodeBuilder_GetId {
-	c_call := _m.On("GetId", matchers...)
-	return &NodeBuilder_GetId{Call: c_call}
+	c := _m.On("GetId", matchers...)
+	return &NodeBuilder_GetId{Call: c}
 }
 
 // GetId provides a mock function with given fields:
@@ -157,13 +157,13 @@ func (_m NodeBuilder_GetInputs) Return(_a0 []*core.Binding) *NodeBuilder_GetInpu
 }
 
 func (_m *NodeBuilder) OnGetInputs() *NodeBuilder_GetInputs {
-	c_call := _m.On("GetInputs")
-	return &NodeBuilder_GetInputs{Call: c_call}
+	c := _m.On("GetInputs")
+	return &NodeBuilder_GetInputs{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetInputsMatch(matchers ...interface{}) *NodeBuilder_GetInputs {
-	c_call := _m.On("GetInputs", matchers...)
-	return &NodeBuilder_GetInputs{Call: c_call}
+	c := _m.On("GetInputs", matchers...)
+	return &NodeBuilder_GetInputs{Call: c}
 }
 
 // GetInputs provides a mock function with given fields:
@@ -191,13 +191,13 @@ func (_m NodeBuilder_GetInterface) Return(_a0 *core.TypedInterface) *NodeBuilder
 }
 
 func (_m *NodeBuilder) OnGetInterface() *NodeBuilder_GetInterface {
-	c_call := _m.On("GetInterface")
-	return &NodeBuilder_GetInterface{Call: c_call}
+	c := _m.On("GetInterface")
+	return &NodeBuilder_GetInterface{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetInterfaceMatch(matchers ...interface{}) *NodeBuilder_GetInterface {
-	c_call := _m.On("GetInterface", matchers...)
-	return &NodeBuilder_GetInterface{Call: c_call}
+	c := _m.On("GetInterface", matchers...)
+	return &NodeBuilder_GetInterface{Call: c}
 }
 
 // GetInterface provides a mock function with given fields:
@@ -225,13 +225,13 @@ func (_m NodeBuilder_GetMetadata) Return(_a0 *core.NodeMetadata) *NodeBuilder_Ge
 }
 
 func (_m *NodeBuilder) OnGetMetadata() *NodeBuilder_GetMetadata {
-	c_call := _m.On("GetMetadata")
-	return &NodeBuilder_GetMetadata{Call: c_call}
+	c := _m.On("GetMetadata")
+	return &NodeBuilder_GetMetadata{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetMetadataMatch(matchers ...interface{}) *NodeBuilder_GetMetadata {
-	c_call := _m.On("GetMetadata", matchers...)
-	return &NodeBuilder_GetMetadata{Call: c_call}
+	c := _m.On("GetMetadata", matchers...)
+	return &NodeBuilder_GetMetadata{Call: c}
 }
 
 // GetMetadata provides a mock function with given fields:
@@ -259,13 +259,13 @@ func (_m NodeBuilder_GetOutputAliases) Return(_a0 []*core.Alias) *NodeBuilder_Ge
 }
 
 func (_m *NodeBuilder) OnGetOutputAliases() *NodeBuilder_GetOutputAliases {
-	c_call := _m.On("GetOutputAliases")
-	return &NodeBuilder_GetOutputAliases{Call: c_call}
+	c := _m.On("GetOutputAliases")
+	return &NodeBuilder_GetOutputAliases{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetOutputAliasesMatch(matchers ...interface{}) *NodeBuilder_GetOutputAliases {
-	c_call := _m.On("GetOutputAliases", matchers...)
-	return &NodeBuilder_GetOutputAliases{Call: c_call}
+	c := _m.On("GetOutputAliases", matchers...)
+	return &NodeBuilder_GetOutputAliases{Call: c}
 }
 
 // GetOutputAliases provides a mock function with given fields:
@@ -293,13 +293,13 @@ func (_m NodeBuilder_GetSubWorkflow) Return(_a0 common.Workflow) *NodeBuilder_Ge
 }
 
 func (_m *NodeBuilder) OnGetSubWorkflow() *NodeBuilder_GetSubWorkflow {
-	c_call := _m.On("GetSubWorkflow")
-	return &NodeBuilder_GetSubWorkflow{Call: c_call}
+	c := _m.On("GetSubWorkflow")
+	return &NodeBuilder_GetSubWorkflow{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetSubWorkflowMatch(matchers ...interface{}) *NodeBuilder_GetSubWorkflow {
-	c_call := _m.On("GetSubWorkflow", matchers...)
-	return &NodeBuilder_GetSubWorkflow{Call: c_call}
+	c := _m.On("GetSubWorkflow", matchers...)
+	return &NodeBuilder_GetSubWorkflow{Call: c}
 }
 
 // GetSubWorkflow provides a mock function with given fields:
@@ -327,13 +327,13 @@ func (_m NodeBuilder_GetTask) Return(_a0 common.Task) *NodeBuilder_GetTask {
 }
 
 func (_m *NodeBuilder) OnGetTask() *NodeBuilder_GetTask {
-	c_call := _m.On("GetTask")
-	return &NodeBuilder_GetTask{Call: c_call}
+	c := _m.On("GetTask")
+	return &NodeBuilder_GetTask{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetTaskMatch(matchers ...interface{}) *NodeBuilder_GetTask {
-	c_call := _m.On("GetTask", matchers...)
-	return &NodeBuilder_GetTask{Call: c_call}
+	c := _m.On("GetTask", matchers...)
+	return &NodeBuilder_GetTask{Call: c}
 }
 
 // GetTask provides a mock function with given fields:
@@ -361,13 +361,13 @@ func (_m NodeBuilder_GetTaskNode) Return(_a0 *core.TaskNode) *NodeBuilder_GetTas
 }
 
 func (_m *NodeBuilder) OnGetTaskNode() *NodeBuilder_GetTaskNode {
-	c_call := _m.On("GetTaskNode")
-	return &NodeBuilder_GetTaskNode{Call: c_call}
+	c := _m.On("GetTaskNode")
+	return &NodeBuilder_GetTaskNode{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetTaskNodeMatch(matchers ...interface{}) *NodeBuilder_GetTaskNode {
-	c_call := _m.On("GetTaskNode", matchers...)
-	return &NodeBuilder_GetTaskNode{Call: c_call}
+	c := _m.On("GetTaskNode", matchers...)
+	return &NodeBuilder_GetTaskNode{Call: c}
 }
 
 // GetTaskNode provides a mock function with given fields:
@@ -395,13 +395,13 @@ func (_m NodeBuilder_GetUpstreamNodeIds) Return(_a0 []string) *NodeBuilder_GetUp
 }
 
 func (_m *NodeBuilder) OnGetUpstreamNodeIds() *NodeBuilder_GetUpstreamNodeIds {
-	c_call := _m.On("GetUpstreamNodeIds")
-	return &NodeBuilder_GetUpstreamNodeIds{Call: c_call}
+	c := _m.On("GetUpstreamNodeIds")
+	return &NodeBuilder_GetUpstreamNodeIds{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetUpstreamNodeIdsMatch(matchers ...interface{}) *NodeBuilder_GetUpstreamNodeIds {
-	c_call := _m.On("GetUpstreamNodeIds", matchers...)
-	return &NodeBuilder_GetUpstreamNodeIds{Call: c_call}
+	c := _m.On("GetUpstreamNodeIds", matchers...)
+	return &NodeBuilder_GetUpstreamNodeIds{Call: c}
 }
 
 // GetUpstreamNodeIds provides a mock function with given fields:
@@ -429,13 +429,13 @@ func (_m NodeBuilder_GetWorkflowNode) Return(_a0 *core.WorkflowNode) *NodeBuilde
 }
 
 func (_m *NodeBuilder) OnGetWorkflowNode() *NodeBuilder_GetWorkflowNode {
-	c_call := _m.On("GetWorkflowNode")
-	return &NodeBuilder_GetWorkflowNode{Call: c_call}
+	c := _m.On("GetWorkflowNode")
+	return &NodeBuilder_GetWorkflowNode{Call: c}
 }
 
 func (_m *NodeBuilder) OnGetWorkflowNodeMatch(matchers ...interface{}) *NodeBuilder_GetWorkflowNode {
-	c_call := _m.On("GetWorkflowNode", matchers...)
-	return &NodeBuilder_GetWorkflowNode{Call: c_call}
+	c := _m.On("GetWorkflowNode", matchers...)
+	return &NodeBuilder_GetWorkflowNode{Call: c}
 }
 
 // GetWorkflowNode provides a mock function with given fields:

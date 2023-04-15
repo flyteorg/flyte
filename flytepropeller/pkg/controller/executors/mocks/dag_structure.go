@@ -18,13 +18,13 @@ func (_m DAGStructure_FromNode) Return(_a0 []string, _a1 error) *DAGStructure_Fr
 }
 
 func (_m *DAGStructure) OnFromNode(id string) *DAGStructure_FromNode {
-	c_call := _m.On("FromNode", id)
-	return &DAGStructure_FromNode{Call: c_call}
+	c := _m.On("FromNode", id)
+	return &DAGStructure_FromNode{Call: c}
 }
 
 func (_m *DAGStructure) OnFromNodeMatch(matchers ...interface{}) *DAGStructure_FromNode {
-	c_call := _m.On("FromNode", matchers...)
-	return &DAGStructure_FromNode{Call: c_call}
+	c := _m.On("FromNode", matchers...)
+	return &DAGStructure_FromNode{Call: c}
 }
 
 // FromNode provides a mock function with given fields: id
@@ -59,13 +59,13 @@ func (_m DAGStructure_ToNode) Return(_a0 []string, _a1 error) *DAGStructure_ToNo
 }
 
 func (_m *DAGStructure) OnToNode(id string) *DAGStructure_ToNode {
-	c_call := _m.On("ToNode", id)
-	return &DAGStructure_ToNode{Call: c_call}
+	c := _m.On("ToNode", id)
+	return &DAGStructure_ToNode{Call: c}
 }
 
 func (_m *DAGStructure) OnToNodeMatch(matchers ...interface{}) *DAGStructure_ToNode {
-	c_call := _m.On("ToNode", matchers...)
-	return &DAGStructure_ToNode{Call: c_call}
+	c := _m.On("ToNode", matchers...)
+	return &DAGStructure_ToNode{Call: c}
 }
 
 // ToNode provides a mock function with given fields: id

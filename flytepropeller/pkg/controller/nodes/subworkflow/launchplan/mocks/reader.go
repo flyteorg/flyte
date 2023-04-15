@@ -26,13 +26,13 @@ func (_m Reader_GetLaunchPlan) Return(_a0 *admin.LaunchPlan, _a1 error) *Reader_
 }
 
 func (_m *Reader) OnGetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) *Reader_GetLaunchPlan {
-	c_call := _m.On("GetLaunchPlan", ctx, launchPlanRef)
-	return &Reader_GetLaunchPlan{Call: c_call}
+	c := _m.On("GetLaunchPlan", ctx, launchPlanRef)
+	return &Reader_GetLaunchPlan{Call: c}
 }
 
 func (_m *Reader) OnGetLaunchPlanMatch(matchers ...interface{}) *Reader_GetLaunchPlan {
-	c_call := _m.On("GetLaunchPlan", matchers...)
-	return &Reader_GetLaunchPlan{Call: c_call}
+	c := _m.On("GetLaunchPlan", matchers...)
+	return &Reader_GetLaunchPlan{Call: c}
 }
 
 // GetLaunchPlan provides a mock function with given fields: ctx, launchPlanRef

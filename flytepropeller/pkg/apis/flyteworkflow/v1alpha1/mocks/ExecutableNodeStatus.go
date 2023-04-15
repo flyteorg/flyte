@@ -59,13 +59,13 @@ func (_m ExecutableNodeStatus_GetAttempts) Return(_a0 uint32) *ExecutableNodeSta
 }
 
 func (_m *ExecutableNodeStatus) OnGetAttempts() *ExecutableNodeStatus_GetAttempts {
-	c_call := _m.On("GetAttempts")
-	return &ExecutableNodeStatus_GetAttempts{Call: c_call}
+	c := _m.On("GetAttempts")
+	return &ExecutableNodeStatus_GetAttempts{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetAttemptsMatch(matchers ...interface{}) *ExecutableNodeStatus_GetAttempts {
-	c_call := _m.On("GetAttempts", matchers...)
-	return &ExecutableNodeStatus_GetAttempts{Call: c_call}
+	c := _m.On("GetAttempts", matchers...)
+	return &ExecutableNodeStatus_GetAttempts{Call: c}
 }
 
 // GetAttempts provides a mock function with given fields:
@@ -91,13 +91,13 @@ func (_m ExecutableNodeStatus_GetBranchStatus) Return(_a0 v1alpha1.MutableBranch
 }
 
 func (_m *ExecutableNodeStatus) OnGetBranchStatus() *ExecutableNodeStatus_GetBranchStatus {
-	c_call := _m.On("GetBranchStatus")
-	return &ExecutableNodeStatus_GetBranchStatus{Call: c_call}
+	c := _m.On("GetBranchStatus")
+	return &ExecutableNodeStatus_GetBranchStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetBranchStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetBranchStatus {
-	c_call := _m.On("GetBranchStatus", matchers...)
-	return &ExecutableNodeStatus_GetBranchStatus{Call: c_call}
+	c := _m.On("GetBranchStatus", matchers...)
+	return &ExecutableNodeStatus_GetBranchStatus{Call: c}
 }
 
 // GetBranchStatus provides a mock function with given fields:
@@ -125,13 +125,13 @@ func (_m ExecutableNodeStatus_GetDataDir) Return(_a0 storage.DataReference) *Exe
 }
 
 func (_m *ExecutableNodeStatus) OnGetDataDir() *ExecutableNodeStatus_GetDataDir {
-	c_call := _m.On("GetDataDir")
-	return &ExecutableNodeStatus_GetDataDir{Call: c_call}
+	c := _m.On("GetDataDir")
+	return &ExecutableNodeStatus_GetDataDir{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetDataDirMatch(matchers ...interface{}) *ExecutableNodeStatus_GetDataDir {
-	c_call := _m.On("GetDataDir", matchers...)
-	return &ExecutableNodeStatus_GetDataDir{Call: c_call}
+	c := _m.On("GetDataDir", matchers...)
+	return &ExecutableNodeStatus_GetDataDir{Call: c}
 }
 
 // GetDataDir provides a mock function with given fields:
@@ -157,13 +157,13 @@ func (_m ExecutableNodeStatus_GetDynamicNodeStatus) Return(_a0 v1alpha1.MutableD
 }
 
 func (_m *ExecutableNodeStatus) OnGetDynamicNodeStatus() *ExecutableNodeStatus_GetDynamicNodeStatus {
-	c_call := _m.On("GetDynamicNodeStatus")
-	return &ExecutableNodeStatus_GetDynamicNodeStatus{Call: c_call}
+	c := _m.On("GetDynamicNodeStatus")
+	return &ExecutableNodeStatus_GetDynamicNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetDynamicNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetDynamicNodeStatus {
-	c_call := _m.On("GetDynamicNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetDynamicNodeStatus{Call: c_call}
+	c := _m.On("GetDynamicNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetDynamicNodeStatus{Call: c}
 }
 
 // GetDynamicNodeStatus provides a mock function with given fields:
@@ -191,13 +191,13 @@ func (_m ExecutableNodeStatus_GetExecutionError) Return(_a0 *core.ExecutionError
 }
 
 func (_m *ExecutableNodeStatus) OnGetExecutionError() *ExecutableNodeStatus_GetExecutionError {
-	c_call := _m.On("GetExecutionError")
-	return &ExecutableNodeStatus_GetExecutionError{Call: c_call}
+	c := _m.On("GetExecutionError")
+	return &ExecutableNodeStatus_GetExecutionError{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableNodeStatus_GetExecutionError {
-	c_call := _m.On("GetExecutionError", matchers...)
-	return &ExecutableNodeStatus_GetExecutionError{Call: c_call}
+	c := _m.On("GetExecutionError", matchers...)
+	return &ExecutableNodeStatus_GetExecutionError{Call: c}
 }
 
 // GetExecutionError provides a mock function with given fields:
@@ -225,13 +225,13 @@ func (_m ExecutableNodeStatus_GetGateNodeStatus) Return(_a0 v1alpha1.MutableGate
 }
 
 func (_m *ExecutableNodeStatus) OnGetGateNodeStatus() *ExecutableNodeStatus_GetGateNodeStatus {
-	c_call := _m.On("GetGateNodeStatus")
-	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c_call}
+	c := _m.On("GetGateNodeStatus")
+	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetGateNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetGateNodeStatus {
-	c_call := _m.On("GetGateNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c_call}
+	c := _m.On("GetGateNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetGateNodeStatus{Call: c}
 }
 
 // GetGateNodeStatus provides a mock function with given fields:
@@ -259,13 +259,13 @@ func (_m ExecutableNodeStatus_GetLastAttemptStartedAt) Return(_a0 *v1.Time) *Exe
 }
 
 func (_m *ExecutableNodeStatus) OnGetLastAttemptStartedAt() *ExecutableNodeStatus_GetLastAttemptStartedAt {
-	c_call := _m.On("GetLastAttemptStartedAt")
-	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c_call}
+	c := _m.On("GetLastAttemptStartedAt")
+	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetLastAttemptStartedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetLastAttemptStartedAt {
-	c_call := _m.On("GetLastAttemptStartedAt", matchers...)
-	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c_call}
+	c := _m.On("GetLastAttemptStartedAt", matchers...)
+	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c}
 }
 
 // GetLastAttemptStartedAt provides a mock function with given fields:
@@ -293,13 +293,13 @@ func (_m ExecutableNodeStatus_GetLastUpdatedAt) Return(_a0 *v1.Time) *Executable
 }
 
 func (_m *ExecutableNodeStatus) OnGetLastUpdatedAt() *ExecutableNodeStatus_GetLastUpdatedAt {
-	c_call := _m.On("GetLastUpdatedAt")
-	return &ExecutableNodeStatus_GetLastUpdatedAt{Call: c_call}
+	c := _m.On("GetLastUpdatedAt")
+	return &ExecutableNodeStatus_GetLastUpdatedAt{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetLastUpdatedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetLastUpdatedAt {
-	c_call := _m.On("GetLastUpdatedAt", matchers...)
-	return &ExecutableNodeStatus_GetLastUpdatedAt{Call: c_call}
+	c := _m.On("GetLastUpdatedAt", matchers...)
+	return &ExecutableNodeStatus_GetLastUpdatedAt{Call: c}
 }
 
 // GetLastUpdatedAt provides a mock function with given fields:
@@ -327,13 +327,13 @@ func (_m ExecutableNodeStatus_GetMessage) Return(_a0 string) *ExecutableNodeStat
 }
 
 func (_m *ExecutableNodeStatus) OnGetMessage() *ExecutableNodeStatus_GetMessage {
-	c_call := _m.On("GetMessage")
-	return &ExecutableNodeStatus_GetMessage{Call: c_call}
+	c := _m.On("GetMessage")
+	return &ExecutableNodeStatus_GetMessage{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetMessageMatch(matchers ...interface{}) *ExecutableNodeStatus_GetMessage {
-	c_call := _m.On("GetMessage", matchers...)
-	return &ExecutableNodeStatus_GetMessage{Call: c_call}
+	c := _m.On("GetMessage", matchers...)
+	return &ExecutableNodeStatus_GetMessage{Call: c}
 }
 
 // GetMessage provides a mock function with given fields:
@@ -359,13 +359,13 @@ func (_m ExecutableNodeStatus_GetNodeExecutionStatus) Return(_a0 v1alpha1.Execut
 }
 
 func (_m *ExecutableNodeStatus) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableNodeStatus_GetNodeExecutionStatus {
-	c_call := _m.On("GetNodeExecutionStatus", ctx, id)
-	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c_call}
+	c := _m.On("GetNodeExecutionStatus", ctx, id)
+	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetNodeExecutionStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetNodeExecutionStatus {
-	c_call := _m.On("GetNodeExecutionStatus", matchers...)
-	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c_call}
+	c := _m.On("GetNodeExecutionStatus", matchers...)
+	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c}
 }
 
 // GetNodeExecutionStatus provides a mock function with given fields: ctx, id
@@ -393,13 +393,13 @@ func (_m ExecutableNodeStatus_GetOrCreateBranchStatus) Return(_a0 v1alpha1.Mutab
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateBranchStatus() *ExecutableNodeStatus_GetOrCreateBranchStatus {
-	c_call := _m.On("GetOrCreateBranchStatus")
-	return &ExecutableNodeStatus_GetOrCreateBranchStatus{Call: c_call}
+	c := _m.On("GetOrCreateBranchStatus")
+	return &ExecutableNodeStatus_GetOrCreateBranchStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateBranchStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateBranchStatus {
-	c_call := _m.On("GetOrCreateBranchStatus", matchers...)
-	return &ExecutableNodeStatus_GetOrCreateBranchStatus{Call: c_call}
+	c := _m.On("GetOrCreateBranchStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateBranchStatus{Call: c}
 }
 
 // GetOrCreateBranchStatus provides a mock function with given fields:
@@ -427,13 +427,13 @@ func (_m ExecutableNodeStatus_GetOrCreateDynamicNodeStatus) Return(_a0 v1alpha1.
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateDynamicNodeStatus() *ExecutableNodeStatus_GetOrCreateDynamicNodeStatus {
-	c_call := _m.On("GetOrCreateDynamicNodeStatus")
-	return &ExecutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c_call}
+	c := _m.On("GetOrCreateDynamicNodeStatus")
+	return &ExecutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateDynamicNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateDynamicNodeStatus {
-	c_call := _m.On("GetOrCreateDynamicNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c_call}
+	c := _m.On("GetOrCreateDynamicNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateDynamicNodeStatus{Call: c}
 }
 
 // GetOrCreateDynamicNodeStatus provides a mock function with given fields:
@@ -461,13 +461,13 @@ func (_m ExecutableNodeStatus_GetOrCreateGateNodeStatus) Return(_a0 v1alpha1.Mut
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateGateNodeStatus() *ExecutableNodeStatus_GetOrCreateGateNodeStatus {
-	c_call := _m.On("GetOrCreateGateNodeStatus")
-	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
+	c := _m.On("GetOrCreateGateNodeStatus")
+	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateGateNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateGateNodeStatus {
-	c_call := _m.On("GetOrCreateGateNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c_call}
+	c := _m.On("GetOrCreateGateNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateGateNodeStatus{Call: c}
 }
 
 // GetOrCreateGateNodeStatus provides a mock function with given fields:
@@ -495,13 +495,13 @@ func (_m ExecutableNodeStatus_GetOrCreateTaskStatus) Return(_a0 v1alpha1.Mutable
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateTaskStatus() *ExecutableNodeStatus_GetOrCreateTaskStatus {
-	c_call := _m.On("GetOrCreateTaskStatus")
-	return &ExecutableNodeStatus_GetOrCreateTaskStatus{Call: c_call}
+	c := _m.On("GetOrCreateTaskStatus")
+	return &ExecutableNodeStatus_GetOrCreateTaskStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateTaskStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateTaskStatus {
-	c_call := _m.On("GetOrCreateTaskStatus", matchers...)
-	return &ExecutableNodeStatus_GetOrCreateTaskStatus{Call: c_call}
+	c := _m.On("GetOrCreateTaskStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateTaskStatus{Call: c}
 }
 
 // GetOrCreateTaskStatus provides a mock function with given fields:
@@ -529,13 +529,13 @@ func (_m ExecutableNodeStatus_GetOrCreateWorkflowStatus) Return(_a0 v1alpha1.Mut
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateWorkflowStatus() *ExecutableNodeStatus_GetOrCreateWorkflowStatus {
-	c_call := _m.On("GetOrCreateWorkflowStatus")
-	return &ExecutableNodeStatus_GetOrCreateWorkflowStatus{Call: c_call}
+	c := _m.On("GetOrCreateWorkflowStatus")
+	return &ExecutableNodeStatus_GetOrCreateWorkflowStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOrCreateWorkflowStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateWorkflowStatus {
-	c_call := _m.On("GetOrCreateWorkflowStatus", matchers...)
-	return &ExecutableNodeStatus_GetOrCreateWorkflowStatus{Call: c_call}
+	c := _m.On("GetOrCreateWorkflowStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateWorkflowStatus{Call: c}
 }
 
 // GetOrCreateWorkflowStatus provides a mock function with given fields:
@@ -563,13 +563,13 @@ func (_m ExecutableNodeStatus_GetOutputDir) Return(_a0 storage.DataReference) *E
 }
 
 func (_m *ExecutableNodeStatus) OnGetOutputDir() *ExecutableNodeStatus_GetOutputDir {
-	c_call := _m.On("GetOutputDir")
-	return &ExecutableNodeStatus_GetOutputDir{Call: c_call}
+	c := _m.On("GetOutputDir")
+	return &ExecutableNodeStatus_GetOutputDir{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetOutputDirMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOutputDir {
-	c_call := _m.On("GetOutputDir", matchers...)
-	return &ExecutableNodeStatus_GetOutputDir{Call: c_call}
+	c := _m.On("GetOutputDir", matchers...)
+	return &ExecutableNodeStatus_GetOutputDir{Call: c}
 }
 
 // GetOutputDir provides a mock function with given fields:
@@ -595,13 +595,13 @@ func (_m ExecutableNodeStatus_GetParentNodeID) Return(_a0 *string) *ExecutableNo
 }
 
 func (_m *ExecutableNodeStatus) OnGetParentNodeID() *ExecutableNodeStatus_GetParentNodeID {
-	c_call := _m.On("GetParentNodeID")
-	return &ExecutableNodeStatus_GetParentNodeID{Call: c_call}
+	c := _m.On("GetParentNodeID")
+	return &ExecutableNodeStatus_GetParentNodeID{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetParentNodeIDMatch(matchers ...interface{}) *ExecutableNodeStatus_GetParentNodeID {
-	c_call := _m.On("GetParentNodeID", matchers...)
-	return &ExecutableNodeStatus_GetParentNodeID{Call: c_call}
+	c := _m.On("GetParentNodeID", matchers...)
+	return &ExecutableNodeStatus_GetParentNodeID{Call: c}
 }
 
 // GetParentNodeID provides a mock function with given fields:
@@ -629,13 +629,13 @@ func (_m ExecutableNodeStatus_GetParentTaskID) Return(_a0 *core.TaskExecutionIde
 }
 
 func (_m *ExecutableNodeStatus) OnGetParentTaskID() *ExecutableNodeStatus_GetParentTaskID {
-	c_call := _m.On("GetParentTaskID")
-	return &ExecutableNodeStatus_GetParentTaskID{Call: c_call}
+	c := _m.On("GetParentTaskID")
+	return &ExecutableNodeStatus_GetParentTaskID{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetParentTaskIDMatch(matchers ...interface{}) *ExecutableNodeStatus_GetParentTaskID {
-	c_call := _m.On("GetParentTaskID", matchers...)
-	return &ExecutableNodeStatus_GetParentTaskID{Call: c_call}
+	c := _m.On("GetParentTaskID", matchers...)
+	return &ExecutableNodeStatus_GetParentTaskID{Call: c}
 }
 
 // GetParentTaskID provides a mock function with given fields:
@@ -663,13 +663,13 @@ func (_m ExecutableNodeStatus_GetPhase) Return(_a0 v1alpha1.NodePhase) *Executab
 }
 
 func (_m *ExecutableNodeStatus) OnGetPhase() *ExecutableNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase")
-	return &ExecutableNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase")
+	return &ExecutableNodeStatus_GetPhase{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase", matchers...)
-	return &ExecutableNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase", matchers...)
+	return &ExecutableNodeStatus_GetPhase{Call: c}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -695,13 +695,13 @@ func (_m ExecutableNodeStatus_GetQueuedAt) Return(_a0 *v1.Time) *ExecutableNodeS
 }
 
 func (_m *ExecutableNodeStatus) OnGetQueuedAt() *ExecutableNodeStatus_GetQueuedAt {
-	c_call := _m.On("GetQueuedAt")
-	return &ExecutableNodeStatus_GetQueuedAt{Call: c_call}
+	c := _m.On("GetQueuedAt")
+	return &ExecutableNodeStatus_GetQueuedAt{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetQueuedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetQueuedAt {
-	c_call := _m.On("GetQueuedAt", matchers...)
-	return &ExecutableNodeStatus_GetQueuedAt{Call: c_call}
+	c := _m.On("GetQueuedAt", matchers...)
+	return &ExecutableNodeStatus_GetQueuedAt{Call: c}
 }
 
 // GetQueuedAt provides a mock function with given fields:
@@ -729,13 +729,13 @@ func (_m ExecutableNodeStatus_GetStartedAt) Return(_a0 *v1.Time) *ExecutableNode
 }
 
 func (_m *ExecutableNodeStatus) OnGetStartedAt() *ExecutableNodeStatus_GetStartedAt {
-	c_call := _m.On("GetStartedAt")
-	return &ExecutableNodeStatus_GetStartedAt{Call: c_call}
+	c := _m.On("GetStartedAt")
+	return &ExecutableNodeStatus_GetStartedAt{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetStartedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetStartedAt {
-	c_call := _m.On("GetStartedAt", matchers...)
-	return &ExecutableNodeStatus_GetStartedAt{Call: c_call}
+	c := _m.On("GetStartedAt", matchers...)
+	return &ExecutableNodeStatus_GetStartedAt{Call: c}
 }
 
 // GetStartedAt provides a mock function with given fields:
@@ -763,13 +763,13 @@ func (_m ExecutableNodeStatus_GetStoppedAt) Return(_a0 *v1.Time) *ExecutableNode
 }
 
 func (_m *ExecutableNodeStatus) OnGetStoppedAt() *ExecutableNodeStatus_GetStoppedAt {
-	c_call := _m.On("GetStoppedAt")
-	return &ExecutableNodeStatus_GetStoppedAt{Call: c_call}
+	c := _m.On("GetStoppedAt")
+	return &ExecutableNodeStatus_GetStoppedAt{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetStoppedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetStoppedAt {
-	c_call := _m.On("GetStoppedAt", matchers...)
-	return &ExecutableNodeStatus_GetStoppedAt{Call: c_call}
+	c := _m.On("GetStoppedAt", matchers...)
+	return &ExecutableNodeStatus_GetStoppedAt{Call: c}
 }
 
 // GetStoppedAt provides a mock function with given fields:
@@ -797,13 +797,13 @@ func (_m ExecutableNodeStatus_GetSystemFailures) Return(_a0 uint32) *ExecutableN
 }
 
 func (_m *ExecutableNodeStatus) OnGetSystemFailures() *ExecutableNodeStatus_GetSystemFailures {
-	c_call := _m.On("GetSystemFailures")
-	return &ExecutableNodeStatus_GetSystemFailures{Call: c_call}
+	c := _m.On("GetSystemFailures")
+	return &ExecutableNodeStatus_GetSystemFailures{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetSystemFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_GetSystemFailures {
-	c_call := _m.On("GetSystemFailures", matchers...)
-	return &ExecutableNodeStatus_GetSystemFailures{Call: c_call}
+	c := _m.On("GetSystemFailures", matchers...)
+	return &ExecutableNodeStatus_GetSystemFailures{Call: c}
 }
 
 // GetSystemFailures provides a mock function with given fields:
@@ -829,13 +829,13 @@ func (_m ExecutableNodeStatus_GetTaskNodeStatus) Return(_a0 v1alpha1.ExecutableT
 }
 
 func (_m *ExecutableNodeStatus) OnGetTaskNodeStatus() *ExecutableNodeStatus_GetTaskNodeStatus {
-	c_call := _m.On("GetTaskNodeStatus")
-	return &ExecutableNodeStatus_GetTaskNodeStatus{Call: c_call}
+	c := _m.On("GetTaskNodeStatus")
+	return &ExecutableNodeStatus_GetTaskNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetTaskNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetTaskNodeStatus {
-	c_call := _m.On("GetTaskNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetTaskNodeStatus{Call: c_call}
+	c := _m.On("GetTaskNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetTaskNodeStatus{Call: c}
 }
 
 // GetTaskNodeStatus provides a mock function with given fields:
@@ -863,13 +863,13 @@ func (_m ExecutableNodeStatus_GetTaskStatus) Return(_a0 v1alpha1.MutableTaskNode
 }
 
 func (_m *ExecutableNodeStatus) OnGetTaskStatus() *ExecutableNodeStatus_GetTaskStatus {
-	c_call := _m.On("GetTaskStatus")
-	return &ExecutableNodeStatus_GetTaskStatus{Call: c_call}
+	c := _m.On("GetTaskStatus")
+	return &ExecutableNodeStatus_GetTaskStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetTaskStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetTaskStatus {
-	c_call := _m.On("GetTaskStatus", matchers...)
-	return &ExecutableNodeStatus_GetTaskStatus{Call: c_call}
+	c := _m.On("GetTaskStatus", matchers...)
+	return &ExecutableNodeStatus_GetTaskStatus{Call: c}
 }
 
 // GetTaskStatus provides a mock function with given fields:
@@ -897,13 +897,13 @@ func (_m ExecutableNodeStatus_GetWorkflowNodeStatus) Return(_a0 v1alpha1.Executa
 }
 
 func (_m *ExecutableNodeStatus) OnGetWorkflowNodeStatus() *ExecutableNodeStatus_GetWorkflowNodeStatus {
-	c_call := _m.On("GetWorkflowNodeStatus")
-	return &ExecutableNodeStatus_GetWorkflowNodeStatus{Call: c_call}
+	c := _m.On("GetWorkflowNodeStatus")
+	return &ExecutableNodeStatus_GetWorkflowNodeStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetWorkflowNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetWorkflowNodeStatus {
-	c_call := _m.On("GetWorkflowNodeStatus", matchers...)
-	return &ExecutableNodeStatus_GetWorkflowNodeStatus{Call: c_call}
+	c := _m.On("GetWorkflowNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetWorkflowNodeStatus{Call: c}
 }
 
 // GetWorkflowNodeStatus provides a mock function with given fields:
@@ -931,13 +931,13 @@ func (_m ExecutableNodeStatus_GetWorkflowStatus) Return(_a0 v1alpha1.MutableWork
 }
 
 func (_m *ExecutableNodeStatus) OnGetWorkflowStatus() *ExecutableNodeStatus_GetWorkflowStatus {
-	c_call := _m.On("GetWorkflowStatus")
-	return &ExecutableNodeStatus_GetWorkflowStatus{Call: c_call}
+	c := _m.On("GetWorkflowStatus")
+	return &ExecutableNodeStatus_GetWorkflowStatus{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnGetWorkflowStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetWorkflowStatus {
-	c_call := _m.On("GetWorkflowStatus", matchers...)
-	return &ExecutableNodeStatus_GetWorkflowStatus{Call: c_call}
+	c := _m.On("GetWorkflowStatus", matchers...)
+	return &ExecutableNodeStatus_GetWorkflowStatus{Call: c}
 }
 
 // GetWorkflowStatus provides a mock function with given fields:
@@ -965,13 +965,13 @@ func (_m ExecutableNodeStatus_IncrementAttempts) Return(_a0 uint32) *ExecutableN
 }
 
 func (_m *ExecutableNodeStatus) OnIncrementAttempts() *ExecutableNodeStatus_IncrementAttempts {
-	c_call := _m.On("IncrementAttempts")
-	return &ExecutableNodeStatus_IncrementAttempts{Call: c_call}
+	c := _m.On("IncrementAttempts")
+	return &ExecutableNodeStatus_IncrementAttempts{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnIncrementAttemptsMatch(matchers ...interface{}) *ExecutableNodeStatus_IncrementAttempts {
-	c_call := _m.On("IncrementAttempts", matchers...)
-	return &ExecutableNodeStatus_IncrementAttempts{Call: c_call}
+	c := _m.On("IncrementAttempts", matchers...)
+	return &ExecutableNodeStatus_IncrementAttempts{Call: c}
 }
 
 // IncrementAttempts provides a mock function with given fields:
@@ -997,13 +997,13 @@ func (_m ExecutableNodeStatus_IncrementSystemFailures) Return(_a0 uint32) *Execu
 }
 
 func (_m *ExecutableNodeStatus) OnIncrementSystemFailures() *ExecutableNodeStatus_IncrementSystemFailures {
-	c_call := _m.On("IncrementSystemFailures")
-	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c_call}
+	c := _m.On("IncrementSystemFailures")
+	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnIncrementSystemFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_IncrementSystemFailures {
-	c_call := _m.On("IncrementSystemFailures", matchers...)
-	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c_call}
+	c := _m.On("IncrementSystemFailures", matchers...)
+	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c}
 }
 
 // IncrementSystemFailures provides a mock function with given fields:
@@ -1029,13 +1029,13 @@ func (_m ExecutableNodeStatus_IsCached) Return(_a0 bool) *ExecutableNodeStatus_I
 }
 
 func (_m *ExecutableNodeStatus) OnIsCached() *ExecutableNodeStatus_IsCached {
-	c_call := _m.On("IsCached")
-	return &ExecutableNodeStatus_IsCached{Call: c_call}
+	c := _m.On("IsCached")
+	return &ExecutableNodeStatus_IsCached{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnIsCachedMatch(matchers ...interface{}) *ExecutableNodeStatus_IsCached {
-	c_call := _m.On("IsCached", matchers...)
-	return &ExecutableNodeStatus_IsCached{Call: c_call}
+	c := _m.On("IsCached", matchers...)
+	return &ExecutableNodeStatus_IsCached{Call: c}
 }
 
 // IsCached provides a mock function with given fields:
@@ -1061,13 +1061,13 @@ func (_m ExecutableNodeStatus_IsDirty) Return(_a0 bool) *ExecutableNodeStatus_Is
 }
 
 func (_m *ExecutableNodeStatus) OnIsDirty() *ExecutableNodeStatus_IsDirty {
-	c_call := _m.On("IsDirty")
-	return &ExecutableNodeStatus_IsDirty{Call: c_call}
+	c := _m.On("IsDirty")
+	return &ExecutableNodeStatus_IsDirty{Call: c}
 }
 
 func (_m *ExecutableNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *ExecutableNodeStatus_IsDirty {
-	c_call := _m.On("IsDirty", matchers...)
-	return &ExecutableNodeStatus_IsDirty{Call: c_call}
+	c := _m.On("IsDirty", matchers...)
+	return &ExecutableNodeStatus_IsDirty{Call: c}
 }
 
 // IsDirty provides a mock function with given fields:

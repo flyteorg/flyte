@@ -21,13 +21,13 @@ func (_m ParentInfoGetter_GetParentInfo) Return(_a0 executors.ImmutableParentInf
 }
 
 func (_m *ParentInfoGetter) OnGetParentInfo() *ParentInfoGetter_GetParentInfo {
-	c_call := _m.On("GetParentInfo")
-	return &ParentInfoGetter_GetParentInfo{Call: c_call}
+	c := _m.On("GetParentInfo")
+	return &ParentInfoGetter_GetParentInfo{Call: c}
 }
 
 func (_m *ParentInfoGetter) OnGetParentInfoMatch(matchers ...interface{}) *ParentInfoGetter_GetParentInfo {
-	c_call := _m.On("GetParentInfo", matchers...)
-	return &ParentInfoGetter_GetParentInfo{Call: c_call}
+	c := _m.On("GetParentInfo", matchers...)
+	return &ParentInfoGetter_GetParentInfo{Call: c}
 }
 
 // GetParentInfo provides a mock function with given fields:

@@ -21,13 +21,13 @@ func (_m NodeStateWriter_PutBranchNode) Return(_a0 error) *NodeStateWriter_PutBr
 }
 
 func (_m *NodeStateWriter) OnPutBranchNode(s handler.BranchNodeState) *NodeStateWriter_PutBranchNode {
-	c_call := _m.On("PutBranchNode", s)
-	return &NodeStateWriter_PutBranchNode{Call: c_call}
+	c := _m.On("PutBranchNode", s)
+	return &NodeStateWriter_PutBranchNode{Call: c}
 }
 
 func (_m *NodeStateWriter) OnPutBranchNodeMatch(matchers ...interface{}) *NodeStateWriter_PutBranchNode {
-	c_call := _m.On("PutBranchNode", matchers...)
-	return &NodeStateWriter_PutBranchNode{Call: c_call}
+	c := _m.On("PutBranchNode", matchers...)
+	return &NodeStateWriter_PutBranchNode{Call: c}
 }
 
 // PutBranchNode provides a mock function with given fields: s
@@ -53,13 +53,13 @@ func (_m NodeStateWriter_PutDynamicNodeState) Return(_a0 error) *NodeStateWriter
 }
 
 func (_m *NodeStateWriter) OnPutDynamicNodeState(s handler.DynamicNodeState) *NodeStateWriter_PutDynamicNodeState {
-	c_call := _m.On("PutDynamicNodeState", s)
-	return &NodeStateWriter_PutDynamicNodeState{Call: c_call}
+	c := _m.On("PutDynamicNodeState", s)
+	return &NodeStateWriter_PutDynamicNodeState{Call: c}
 }
 
 func (_m *NodeStateWriter) OnPutDynamicNodeStateMatch(matchers ...interface{}) *NodeStateWriter_PutDynamicNodeState {
-	c_call := _m.On("PutDynamicNodeState", matchers...)
-	return &NodeStateWriter_PutDynamicNodeState{Call: c_call}
+	c := _m.On("PutDynamicNodeState", matchers...)
+	return &NodeStateWriter_PutDynamicNodeState{Call: c}
 }
 
 // PutDynamicNodeState provides a mock function with given fields: s
@@ -85,13 +85,13 @@ func (_m NodeStateWriter_PutGateNodeState) Return(_a0 error) *NodeStateWriter_Pu
 }
 
 func (_m *NodeStateWriter) OnPutGateNodeState(s handler.GateNodeState) *NodeStateWriter_PutGateNodeState {
-	c_call := _m.On("PutGateNodeState", s)
-	return &NodeStateWriter_PutGateNodeState{Call: c_call}
+	c := _m.On("PutGateNodeState", s)
+	return &NodeStateWriter_PutGateNodeState{Call: c}
 }
 
 func (_m *NodeStateWriter) OnPutGateNodeStateMatch(matchers ...interface{}) *NodeStateWriter_PutGateNodeState {
-	c_call := _m.On("PutGateNodeState", matchers...)
-	return &NodeStateWriter_PutGateNodeState{Call: c_call}
+	c := _m.On("PutGateNodeState", matchers...)
+	return &NodeStateWriter_PutGateNodeState{Call: c}
 }
 
 // PutGateNodeState provides a mock function with given fields: s
@@ -117,13 +117,13 @@ func (_m NodeStateWriter_PutTaskNodeState) Return(_a0 error) *NodeStateWriter_Pu
 }
 
 func (_m *NodeStateWriter) OnPutTaskNodeState(s handler.TaskNodeState) *NodeStateWriter_PutTaskNodeState {
-	c_call := _m.On("PutTaskNodeState", s)
-	return &NodeStateWriter_PutTaskNodeState{Call: c_call}
+	c := _m.On("PutTaskNodeState", s)
+	return &NodeStateWriter_PutTaskNodeState{Call: c}
 }
 
 func (_m *NodeStateWriter) OnPutTaskNodeStateMatch(matchers ...interface{}) *NodeStateWriter_PutTaskNodeState {
-	c_call := _m.On("PutTaskNodeState", matchers...)
-	return &NodeStateWriter_PutTaskNodeState{Call: c_call}
+	c := _m.On("PutTaskNodeState", matchers...)
+	return &NodeStateWriter_PutTaskNodeState{Call: c}
 }
 
 // PutTaskNodeState provides a mock function with given fields: s
@@ -149,13 +149,13 @@ func (_m NodeStateWriter_PutWorkflowNodeState) Return(_a0 error) *NodeStateWrite
 }
 
 func (_m *NodeStateWriter) OnPutWorkflowNodeState(s handler.WorkflowNodeState) *NodeStateWriter_PutWorkflowNodeState {
-	c_call := _m.On("PutWorkflowNodeState", s)
-	return &NodeStateWriter_PutWorkflowNodeState{Call: c_call}
+	c := _m.On("PutWorkflowNodeState", s)
+	return &NodeStateWriter_PutWorkflowNodeState{Call: c}
 }
 
 func (_m *NodeStateWriter) OnPutWorkflowNodeStateMatch(matchers ...interface{}) *NodeStateWriter_PutWorkflowNodeState {
-	c_call := _m.On("PutWorkflowNodeState", matchers...)
-	return &NodeStateWriter_PutWorkflowNodeState{Call: c_call}
+	c := _m.On("PutWorkflowNodeState", matchers...)
+	return &NodeStateWriter_PutWorkflowNodeState{Call: c}
 }
 
 // PutWorkflowNodeState provides a mock function with given fields: s

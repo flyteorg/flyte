@@ -21,13 +21,13 @@ func (_m ExecutableGateNodeStatus_GetGateNodePhase) Return(_a0 v1alpha1.GateNode
 }
 
 func (_m *ExecutableGateNodeStatus) OnGetGateNodePhase() *ExecutableGateNodeStatus_GetGateNodePhase {
-	c_call := _m.On("GetGateNodePhase")
-	return &ExecutableGateNodeStatus_GetGateNodePhase{Call: c_call}
+	c := _m.On("GetGateNodePhase")
+	return &ExecutableGateNodeStatus_GetGateNodePhase{Call: c}
 }
 
 func (_m *ExecutableGateNodeStatus) OnGetGateNodePhaseMatch(matchers ...interface{}) *ExecutableGateNodeStatus_GetGateNodePhase {
-	c_call := _m.On("GetGateNodePhase", matchers...)
-	return &ExecutableGateNodeStatus_GetGateNodePhase{Call: c_call}
+	c := _m.On("GetGateNodePhase", matchers...)
+	return &ExecutableGateNodeStatus_GetGateNodePhase{Call: c}
 }
 
 // GetGateNodePhase provides a mock function with given fields:

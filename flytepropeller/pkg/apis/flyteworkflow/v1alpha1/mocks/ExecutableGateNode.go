@@ -23,13 +23,13 @@ func (_m ExecutableGateNode_GetApprove) Return(_a0 *core.ApproveCondition) *Exec
 }
 
 func (_m *ExecutableGateNode) OnGetApprove() *ExecutableGateNode_GetApprove {
-	c_call := _m.On("GetApprove")
-	return &ExecutableGateNode_GetApprove{Call: c_call}
+	c := _m.On("GetApprove")
+	return &ExecutableGateNode_GetApprove{Call: c}
 }
 
 func (_m *ExecutableGateNode) OnGetApproveMatch(matchers ...interface{}) *ExecutableGateNode_GetApprove {
-	c_call := _m.On("GetApprove", matchers...)
-	return &ExecutableGateNode_GetApprove{Call: c_call}
+	c := _m.On("GetApprove", matchers...)
+	return &ExecutableGateNode_GetApprove{Call: c}
 }
 
 // GetApprove provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m ExecutableGateNode_GetKind) Return(_a0 v1alpha1.ConditionKind) *Executa
 }
 
 func (_m *ExecutableGateNode) OnGetKind() *ExecutableGateNode_GetKind {
-	c_call := _m.On("GetKind")
-	return &ExecutableGateNode_GetKind{Call: c_call}
+	c := _m.On("GetKind")
+	return &ExecutableGateNode_GetKind{Call: c}
 }
 
 func (_m *ExecutableGateNode) OnGetKindMatch(matchers ...interface{}) *ExecutableGateNode_GetKind {
-	c_call := _m.On("GetKind", matchers...)
-	return &ExecutableGateNode_GetKind{Call: c_call}
+	c := _m.On("GetKind", matchers...)
+	return &ExecutableGateNode_GetKind{Call: c}
 }
 
 // GetKind provides a mock function with given fields:
@@ -89,13 +89,13 @@ func (_m ExecutableGateNode_GetSignal) Return(_a0 *core.SignalCondition) *Execut
 }
 
 func (_m *ExecutableGateNode) OnGetSignal() *ExecutableGateNode_GetSignal {
-	c_call := _m.On("GetSignal")
-	return &ExecutableGateNode_GetSignal{Call: c_call}
+	c := _m.On("GetSignal")
+	return &ExecutableGateNode_GetSignal{Call: c}
 }
 
 func (_m *ExecutableGateNode) OnGetSignalMatch(matchers ...interface{}) *ExecutableGateNode_GetSignal {
-	c_call := _m.On("GetSignal", matchers...)
-	return &ExecutableGateNode_GetSignal{Call: c_call}
+	c := _m.On("GetSignal", matchers...)
+	return &ExecutableGateNode_GetSignal{Call: c}
 }
 
 // GetSignal provides a mock function with given fields:
@@ -123,13 +123,13 @@ func (_m ExecutableGateNode_GetSleep) Return(_a0 *core.SleepCondition) *Executab
 }
 
 func (_m *ExecutableGateNode) OnGetSleep() *ExecutableGateNode_GetSleep {
-	c_call := _m.On("GetSleep")
-	return &ExecutableGateNode_GetSleep{Call: c_call}
+	c := _m.On("GetSleep")
+	return &ExecutableGateNode_GetSleep{Call: c}
 }
 
 func (_m *ExecutableGateNode) OnGetSleepMatch(matchers ...interface{}) *ExecutableGateNode_GetSleep {
-	c_call := _m.On("GetSleep", matchers...)
-	return &ExecutableGateNode_GetSleep{Call: c_call}
+	c := _m.On("GetSleep", matchers...)
+	return &ExecutableGateNode_GetSleep{Call: c}
 }
 
 // GetSleep provides a mock function with given fields:

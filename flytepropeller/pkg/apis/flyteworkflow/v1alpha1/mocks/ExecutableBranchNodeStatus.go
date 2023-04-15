@@ -21,13 +21,13 @@ func (_m ExecutableBranchNodeStatus_GetFinalizedNode) Return(_a0 *string) *Execu
 }
 
 func (_m *ExecutableBranchNodeStatus) OnGetFinalizedNode() *ExecutableBranchNodeStatus_GetFinalizedNode {
-	c_call := _m.On("GetFinalizedNode")
-	return &ExecutableBranchNodeStatus_GetFinalizedNode{Call: c_call}
+	c := _m.On("GetFinalizedNode")
+	return &ExecutableBranchNodeStatus_GetFinalizedNode{Call: c}
 }
 
 func (_m *ExecutableBranchNodeStatus) OnGetFinalizedNodeMatch(matchers ...interface{}) *ExecutableBranchNodeStatus_GetFinalizedNode {
-	c_call := _m.On("GetFinalizedNode", matchers...)
-	return &ExecutableBranchNodeStatus_GetFinalizedNode{Call: c_call}
+	c := _m.On("GetFinalizedNode", matchers...)
+	return &ExecutableBranchNodeStatus_GetFinalizedNode{Call: c}
 }
 
 // GetFinalizedNode provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableBranchNodeStatus_GetPhase) Return(_a0 v1alpha1.BranchNodePhas
 }
 
 func (_m *ExecutableBranchNodeStatus) OnGetPhase() *ExecutableBranchNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase")
-	return &ExecutableBranchNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase")
+	return &ExecutableBranchNodeStatus_GetPhase{Call: c}
 }
 
 func (_m *ExecutableBranchNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableBranchNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase", matchers...)
-	return &ExecutableBranchNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase", matchers...)
+	return &ExecutableBranchNodeStatus_GetPhase{Call: c}
 }
 
 // GetPhase provides a mock function with given fields:

@@ -24,13 +24,13 @@ func (_m EventSink_Close) Return(_a0 error) *EventSink_Close {
 }
 
 func (_m *EventSink) OnClose() *EventSink_Close {
-	c_call := _m.On("Close")
-	return &EventSink_Close{Call: c_call}
+	c := _m.On("Close")
+	return &EventSink_Close{Call: c}
 }
 
 func (_m *EventSink) OnCloseMatch(matchers ...interface{}) *EventSink_Close {
-	c_call := _m.On("Close", matchers...)
-	return &EventSink_Close{Call: c_call}
+	c := _m.On("Close", matchers...)
+	return &EventSink_Close{Call: c}
 }
 
 // Close provides a mock function with given fields:
@@ -56,13 +56,13 @@ func (_m EventSink_Sink) Return(_a0 error) *EventSink_Sink {
 }
 
 func (_m *EventSink) OnSink(ctx context.Context, message protoiface.MessageV1) *EventSink_Sink {
-	c_call := _m.On("Sink", ctx, message)
-	return &EventSink_Sink{Call: c_call}
+	c := _m.On("Sink", ctx, message)
+	return &EventSink_Sink{Call: c}
 }
 
 func (_m *EventSink) OnSinkMatch(matchers ...interface{}) *EventSink_Sink {
-	c_call := _m.On("Sink", matchers...)
-	return &EventSink_Sink{Call: c_call}
+	c := _m.On("Sink", matchers...)
+	return &EventSink_Sink{Call: c}
 }
 
 // Sink provides a mock function with given fields: ctx, message

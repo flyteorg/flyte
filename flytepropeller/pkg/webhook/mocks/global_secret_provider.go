@@ -23,13 +23,13 @@ func (_m GlobalSecretProvider_GetForSecret) Return(_a0 string, _a1 error) *Globa
 }
 
 func (_m *GlobalSecretProvider) OnGetForSecret(ctx context.Context, secret *core.Secret) *GlobalSecretProvider_GetForSecret {
-	c_call := _m.On("GetForSecret", ctx, secret)
-	return &GlobalSecretProvider_GetForSecret{Call: c_call}
+	c := _m.On("GetForSecret", ctx, secret)
+	return &GlobalSecretProvider_GetForSecret{Call: c}
 }
 
 func (_m *GlobalSecretProvider) OnGetForSecretMatch(matchers ...interface{}) *GlobalSecretProvider_GetForSecret {
-	c_call := _m.On("GetForSecret", matchers...)
-	return &GlobalSecretProvider_GetForSecret{Call: c_call}
+	c := _m.On("GetForSecret", matchers...)
+	return &GlobalSecretProvider_GetForSecret{Call: c}
 }
 
 // GetForSecret provides a mock function with given fields: ctx, secret

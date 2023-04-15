@@ -25,13 +25,13 @@ func (_m FlyteWorkflow_Get) Return(_a0 *v1alpha1.FlyteWorkflow, _a1 error) *Flyt
 }
 
 func (_m *FlyteWorkflow) OnGet(ctx context.Context, namespace string, name string) *FlyteWorkflow_Get {
-	c_call := _m.On("Get", ctx, namespace, name)
-	return &FlyteWorkflow_Get{Call: c_call}
+	c := _m.On("Get", ctx, namespace, name)
+	return &FlyteWorkflow_Get{Call: c}
 }
 
 func (_m *FlyteWorkflow) OnGetMatch(matchers ...interface{}) *FlyteWorkflow_Get {
-	c_call := _m.On("Get", matchers...)
-	return &FlyteWorkflow_Get{Call: c_call}
+	c := _m.On("Get", matchers...)
+	return &FlyteWorkflow_Get{Call: c}
 }
 
 // Get provides a mock function with given fields: ctx, namespace, name
@@ -66,13 +66,13 @@ func (_m FlyteWorkflow_Update) Return(newWF *v1alpha1.FlyteWorkflow, err error) 
 }
 
 func (_m *FlyteWorkflow) OnUpdate(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass) *FlyteWorkflow_Update {
-	c_call := _m.On("Update", ctx, workflow, priorityClass)
-	return &FlyteWorkflow_Update{Call: c_call}
+	c := _m.On("Update", ctx, workflow, priorityClass)
+	return &FlyteWorkflow_Update{Call: c}
 }
 
 func (_m *FlyteWorkflow) OnUpdateMatch(matchers ...interface{}) *FlyteWorkflow_Update {
-	c_call := _m.On("Update", matchers...)
-	return &FlyteWorkflow_Update{Call: c_call}
+	c := _m.On("Update", matchers...)
+	return &FlyteWorkflow_Update{Call: c}
 }
 
 // Update provides a mock function with given fields: ctx, workflow, priorityClass
@@ -107,13 +107,13 @@ func (_m FlyteWorkflow_UpdateStatus) Return(newWF *v1alpha1.FlyteWorkflow, err e
 }
 
 func (_m *FlyteWorkflow) OnUpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass) *FlyteWorkflow_UpdateStatus {
-	c_call := _m.On("UpdateStatus", ctx, workflow, priorityClass)
-	return &FlyteWorkflow_UpdateStatus{Call: c_call}
+	c := _m.On("UpdateStatus", ctx, workflow, priorityClass)
+	return &FlyteWorkflow_UpdateStatus{Call: c}
 }
 
 func (_m *FlyteWorkflow) OnUpdateStatusMatch(matchers ...interface{}) *FlyteWorkflow_UpdateStatus {
-	c_call := _m.On("UpdateStatus", matchers...)
-	return &FlyteWorkflow_UpdateStatus{Call: c_call}
+	c := _m.On("UpdateStatus", matchers...)
+	return &FlyteWorkflow_UpdateStatus{Call: c}
 }
 
 // UpdateStatus provides a mock function with given fields: ctx, workflow, priorityClass

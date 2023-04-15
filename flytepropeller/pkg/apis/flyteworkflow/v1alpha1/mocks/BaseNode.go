@@ -21,13 +21,13 @@ func (_m BaseNode_GetID) Return(_a0 string) *BaseNode_GetID {
 }
 
 func (_m *BaseNode) OnGetID() *BaseNode_GetID {
-	c_call := _m.On("GetID")
-	return &BaseNode_GetID{Call: c_call}
+	c := _m.On("GetID")
+	return &BaseNode_GetID{Call: c}
 }
 
 func (_m *BaseNode) OnGetIDMatch(matchers ...interface{}) *BaseNode_GetID {
-	c_call := _m.On("GetID", matchers...)
-	return &BaseNode_GetID{Call: c_call}
+	c := _m.On("GetID", matchers...)
+	return &BaseNode_GetID{Call: c}
 }
 
 // GetID provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m BaseNode_GetKind) Return(_a0 v1alpha1.NodeKind) *BaseNode_GetKind {
 }
 
 func (_m *BaseNode) OnGetKind() *BaseNode_GetKind {
-	c_call := _m.On("GetKind")
-	return &BaseNode_GetKind{Call: c_call}
+	c := _m.On("GetKind")
+	return &BaseNode_GetKind{Call: c}
 }
 
 func (_m *BaseNode) OnGetKindMatch(matchers ...interface{}) *BaseNode_GetKind {
-	c_call := _m.On("GetKind", matchers...)
-	return &BaseNode_GetKind{Call: c_call}
+	c := _m.On("GetKind", matchers...)
+	return &BaseNode_GetKind{Call: c}
 }
 
 // GetKind provides a mock function with given fields:

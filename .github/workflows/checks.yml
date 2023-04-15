@@ -110,7 +110,7 @@ jobs:
       - name: Prime docker cache
         run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
       - name: Build dockerfile
-        if : ${{ matrix.package }} == 'flyteadmin' || ${{ matrix.package }} == 'flytepropeller' || ${{ matrix.package }} == 'flytecopilot'
+        if : ${{ matrix.package == 'flyteadmin'}}
         env:
           # We are unable to leverage docker buildx here without changing the
           # caching mechanism significantly. See here for the caching options
@@ -119,10 +119,11 @@ jobs:
           # should rewrite this pipeline to use docker buildx with cache type=gha.
           DOCKER_BUILDKIT: "1"
         run: |
-          docker build -t flyteorg/${{ github.event.repository.name }}:builder --target builder --cache-from=flyteorg/${{ github.event.repository.name }}:builder .
-          docker build -t flyteorg/${{ github.event.repository.name }}:latest --cache-from=flyteorg/${{ github.event.repository.name }}:builder .
+          docker build -t flyteorg/${{ github.event.repository.name }}:builder --target builder --cache-from=flyteorg/${{ github.event.repository.name }}:builder ../
+          docker build -t flyteorg/${{ github.event.repository.name }}:latest --cache-from=flyteorg/${{ github.event.repository.name }}:builder ../
 
       - name: Tag and cache docker image
+        if : ${{ matrix.package == 'flyteadmin'}}
         run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ github.event.repository.name }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ github.event.repository.name }}:latest -o /tmp/tmp/docker-images/snapshot.tar
 
   end-to-end:

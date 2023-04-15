@@ -18,13 +18,13 @@ func (_m Mutable_IsDirty) Return(_a0 bool) *Mutable_IsDirty {
 }
 
 func (_m *Mutable) OnIsDirty() *Mutable_IsDirty {
-	c_call := _m.On("IsDirty")
-	return &Mutable_IsDirty{Call: c_call}
+	c := _m.On("IsDirty")
+	return &Mutable_IsDirty{Call: c}
 }
 
 func (_m *Mutable) OnIsDirtyMatch(matchers ...interface{}) *Mutable_IsDirty {
-	c_call := _m.On("IsDirty", matchers...)
-	return &Mutable_IsDirty{Call: c_call}
+	c := _m.On("IsDirty", matchers...)
+	return &Mutable_IsDirty{Call: c}
 }
 
 // IsDirty provides a mock function with given fields:

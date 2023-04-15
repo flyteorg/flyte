@@ -21,13 +21,13 @@ func (_m TaskDetailsGetter_GetTask) Return(_a0 v1alpha1.ExecutableTask, _a1 erro
 }
 
 func (_m *TaskDetailsGetter) OnGetTask(id string) *TaskDetailsGetter_GetTask {
-	c_call := _m.On("GetTask", id)
-	return &TaskDetailsGetter_GetTask{Call: c_call}
+	c := _m.On("GetTask", id)
+	return &TaskDetailsGetter_GetTask{Call: c}
 }
 
 func (_m *TaskDetailsGetter) OnGetTaskMatch(matchers ...interface{}) *TaskDetailsGetter_GetTask {
-	c_call := _m.On("GetTask", matchers...)
-	return &TaskDetailsGetter_GetTask{Call: c_call}
+	c := _m.On("GetTask", matchers...)
+	return &TaskDetailsGetter_GetTask{Call: c}
 }
 
 // GetTask provides a mock function with given fields: id

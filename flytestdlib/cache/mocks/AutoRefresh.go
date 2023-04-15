@@ -24,13 +24,13 @@ func (_m AutoRefresh_DeleteDelayed) Return(_a0 error) *AutoRefresh_DeleteDelayed
 }
 
 func (_m *AutoRefresh) OnDeleteDelayed(id string) *AutoRefresh_DeleteDelayed {
-	c_call := _m.On("DeleteDelayed", id)
-	return &AutoRefresh_DeleteDelayed{Call: c_call}
+	c := _m.On("DeleteDelayed", id)
+	return &AutoRefresh_DeleteDelayed{Call: c}
 }
 
 func (_m *AutoRefresh) OnDeleteDelayedMatch(matchers ...interface{}) *AutoRefresh_DeleteDelayed {
-	c_call := _m.On("DeleteDelayed", matchers...)
-	return &AutoRefresh_DeleteDelayed{Call: c_call}
+	c := _m.On("DeleteDelayed", matchers...)
+	return &AutoRefresh_DeleteDelayed{Call: c}
 }
 
 // DeleteDelayed provides a mock function with given fields: id
@@ -56,13 +56,13 @@ func (_m AutoRefresh_Get) Return(_a0 cache.Item, _a1 error) *AutoRefresh_Get {
 }
 
 func (_m *AutoRefresh) OnGet(id string) *AutoRefresh_Get {
-	c_call := _m.On("Get", id)
-	return &AutoRefresh_Get{Call: c_call}
+	c := _m.On("Get", id)
+	return &AutoRefresh_Get{Call: c}
 }
 
 func (_m *AutoRefresh) OnGetMatch(matchers ...interface{}) *AutoRefresh_Get {
-	c_call := _m.On("Get", matchers...)
-	return &AutoRefresh_Get{Call: c_call}
+	c := _m.On("Get", matchers...)
+	return &AutoRefresh_Get{Call: c}
 }
 
 // Get provides a mock function with given fields: id
@@ -97,13 +97,13 @@ func (_m AutoRefresh_GetOrCreate) Return(_a0 cache.Item, _a1 error) *AutoRefresh
 }
 
 func (_m *AutoRefresh) OnGetOrCreate(id string, item cache.Item) *AutoRefresh_GetOrCreate {
-	c_call := _m.On("GetOrCreate", id, item)
-	return &AutoRefresh_GetOrCreate{Call: c_call}
+	c := _m.On("GetOrCreate", id, item)
+	return &AutoRefresh_GetOrCreate{Call: c}
 }
 
 func (_m *AutoRefresh) OnGetOrCreateMatch(matchers ...interface{}) *AutoRefresh_GetOrCreate {
-	c_call := _m.On("GetOrCreate", matchers...)
-	return &AutoRefresh_GetOrCreate{Call: c_call}
+	c := _m.On("GetOrCreate", matchers...)
+	return &AutoRefresh_GetOrCreate{Call: c}
 }
 
 // GetOrCreate provides a mock function with given fields: id, item
@@ -138,13 +138,13 @@ func (_m AutoRefresh_Start) Return(_a0 error) *AutoRefresh_Start {
 }
 
 func (_m *AutoRefresh) OnStart(ctx context.Context) *AutoRefresh_Start {
-	c_call := _m.On("Start", ctx)
-	return &AutoRefresh_Start{Call: c_call}
+	c := _m.On("Start", ctx)
+	return &AutoRefresh_Start{Call: c}
 }
 
 func (_m *AutoRefresh) OnStartMatch(matchers ...interface{}) *AutoRefresh_Start {
-	c_call := _m.On("Start", matchers...)
-	return &AutoRefresh_Start{Call: c_call}
+	c := _m.On("Start", matchers...)
+	return &AutoRefresh_Start{Call: c}
 }
 
 // Start provides a mock function with given fields: ctx

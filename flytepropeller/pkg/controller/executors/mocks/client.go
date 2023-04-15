@@ -23,13 +23,13 @@ func (_m Client_GetCache) Return(_a0 cache.Cache) *Client_GetCache {
 }
 
 func (_m *Client) OnGetCache() *Client_GetCache {
-	c_call := _m.On("GetCache")
-	return &Client_GetCache{Call: c_call}
+	c := _m.On("GetCache")
+	return &Client_GetCache{Call: c}
 }
 
 func (_m *Client) OnGetCacheMatch(matchers ...interface{}) *Client_GetCache {
-	c_call := _m.On("GetCache", matchers...)
-	return &Client_GetCache{Call: c_call}
+	c := _m.On("GetCache", matchers...)
+	return &Client_GetCache{Call: c}
 }
 
 // GetCache provides a mock function with given fields:
@@ -57,13 +57,13 @@ func (_m Client_GetClient) Return(_a0 client.Client) *Client_GetClient {
 }
 
 func (_m *Client) OnGetClient() *Client_GetClient {
-	c_call := _m.On("GetClient")
-	return &Client_GetClient{Call: c_call}
+	c := _m.On("GetClient")
+	return &Client_GetClient{Call: c}
 }
 
 func (_m *Client) OnGetClientMatch(matchers ...interface{}) *Client_GetClient {
-	c_call := _m.On("GetClient", matchers...)
-	return &Client_GetClient{Call: c_call}
+	c := _m.On("GetClient", matchers...)
+	return &Client_GetClient{Call: c}
 }
 
 // GetClient provides a mock function with given fields:

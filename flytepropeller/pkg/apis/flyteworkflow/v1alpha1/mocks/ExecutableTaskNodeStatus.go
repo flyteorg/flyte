@@ -23,13 +23,13 @@ func (_m ExecutableTaskNodeStatus_GetBarrierClockTick) Return(_a0 uint32) *Execu
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetBarrierClockTick() *ExecutableTaskNodeStatus_GetBarrierClockTick {
-	c_call := _m.On("GetBarrierClockTick")
-	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
+	c := _m.On("GetBarrierClockTick")
+	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetBarrierClockTickMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetBarrierClockTick {
-	c_call := _m.On("GetBarrierClockTick", matchers...)
-	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c_call}
+	c := _m.On("GetBarrierClockTick", matchers...)
+	return &ExecutableTaskNodeStatus_GetBarrierClockTick{Call: c}
 }
 
 // GetBarrierClockTick provides a mock function with given fields:
@@ -55,13 +55,13 @@ func (_m ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt) Return(_a0 time.Time) *
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetLastPhaseUpdatedAt() *ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c_call := _m.On("GetLastPhaseUpdatedAt")
-	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
+	c := _m.On("GetLastPhaseUpdatedAt")
+	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetLastPhaseUpdatedAtMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt {
-	c_call := _m.On("GetLastPhaseUpdatedAt", matchers...)
-	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c_call}
+	c := _m.On("GetLastPhaseUpdatedAt", matchers...)
+	return &ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt{Call: c}
 }
 
 // GetLastPhaseUpdatedAt provides a mock function with given fields:
@@ -87,13 +87,13 @@ func (_m ExecutableTaskNodeStatus_GetPhase) Return(_a0 int) *ExecutableTaskNodeS
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhase() *ExecutableTaskNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase")
-	return &ExecutableTaskNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase")
+	return &ExecutableTaskNodeStatus_GetPhase{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase", matchers...)
-	return &ExecutableTaskNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase", matchers...)
+	return &ExecutableTaskNodeStatus_GetPhase{Call: c}
 }
 
 // GetPhase provides a mock function with given fields:
@@ -119,13 +119,13 @@ func (_m ExecutableTaskNodeStatus_GetPhaseVersion) Return(_a0 uint32) *Executabl
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseVersion() *ExecutableTaskNodeStatus_GetPhaseVersion {
-	c_call := _m.On("GetPhaseVersion")
-	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
+	c := _m.On("GetPhaseVersion")
+	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPhaseVersionMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPhaseVersion {
-	c_call := _m.On("GetPhaseVersion", matchers...)
-	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c_call}
+	c := _m.On("GetPhaseVersion", matchers...)
+	return &ExecutableTaskNodeStatus_GetPhaseVersion{Call: c}
 }
 
 // GetPhaseVersion provides a mock function with given fields:
@@ -151,13 +151,13 @@ func (_m ExecutableTaskNodeStatus_GetPluginState) Return(_a0 []byte) *Executable
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginState() *ExecutableTaskNodeStatus_GetPluginState {
-	c_call := _m.On("GetPluginState")
-	return &ExecutableTaskNodeStatus_GetPluginState{Call: c_call}
+	c := _m.On("GetPluginState")
+	return &ExecutableTaskNodeStatus_GetPluginState{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPluginState {
-	c_call := _m.On("GetPluginState", matchers...)
-	return &ExecutableTaskNodeStatus_GetPluginState{Call: c_call}
+	c := _m.On("GetPluginState", matchers...)
+	return &ExecutableTaskNodeStatus_GetPluginState{Call: c}
 }
 
 // GetPluginState provides a mock function with given fields:
@@ -185,13 +185,13 @@ func (_m ExecutableTaskNodeStatus_GetPluginStateVersion) Return(_a0 uint32) *Exe
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateVersion() *ExecutableTaskNodeStatus_GetPluginStateVersion {
-	c_call := _m.On("GetPluginStateVersion")
-	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
+	c := _m.On("GetPluginStateVersion")
+	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPluginStateVersionMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPluginStateVersion {
-	c_call := _m.On("GetPluginStateVersion", matchers...)
-	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c_call}
+	c := _m.On("GetPluginStateVersion", matchers...)
+	return &ExecutableTaskNodeStatus_GetPluginStateVersion{Call: c}
 }
 
 // GetPluginStateVersion provides a mock function with given fields:
@@ -217,13 +217,13 @@ func (_m ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath) Return
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPreviousNodeExecutionCheckpointPath() *ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath {
-	c_call := _m.On("GetPreviousNodeExecutionCheckpointPath")
-	return &ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath{Call: c_call}
+	c := _m.On("GetPreviousNodeExecutionCheckpointPath")
+	return &ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath{Call: c}
 }
 
 func (_m *ExecutableTaskNodeStatus) OnGetPreviousNodeExecutionCheckpointPathMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath {
-	c_call := _m.On("GetPreviousNodeExecutionCheckpointPath", matchers...)
-	return &ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath{Call: c_call}
+	c := _m.On("GetPreviousNodeExecutionCheckpointPath", matchers...)
+	return &ExecutableTaskNodeStatus_GetPreviousNodeExecutionCheckpointPath{Call: c}
 }
 
 // GetPreviousNodeExecutionCheckpointPath provides a mock function with given fields:

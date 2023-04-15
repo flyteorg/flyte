@@ -29,13 +29,13 @@ func (_m ExecutionContext_CurrentParallelism) Return(_a0 uint32) *ExecutionConte
 }
 
 func (_m *ExecutionContext) OnCurrentParallelism() *ExecutionContext_CurrentParallelism {
-	c_call := _m.On("CurrentParallelism")
-	return &ExecutionContext_CurrentParallelism{Call: c_call}
+	c := _m.On("CurrentParallelism")
+	return &ExecutionContext_CurrentParallelism{Call: c}
 }
 
 func (_m *ExecutionContext) OnCurrentParallelismMatch(matchers ...interface{}) *ExecutionContext_CurrentParallelism {
-	c_call := _m.On("CurrentParallelism", matchers...)
-	return &ExecutionContext_CurrentParallelism{Call: c_call}
+	c := _m.On("CurrentParallelism", matchers...)
+	return &ExecutionContext_CurrentParallelism{Call: c}
 }
 
 // CurrentParallelism provides a mock function with given fields:
@@ -61,13 +61,13 @@ func (_m ExecutionContext_FindSubWorkflow) Return(_a0 v1alpha1.ExecutableSubWork
 }
 
 func (_m *ExecutionContext) OnFindSubWorkflow(subID string) *ExecutionContext_FindSubWorkflow {
-	c_call := _m.On("FindSubWorkflow", subID)
-	return &ExecutionContext_FindSubWorkflow{Call: c_call}
+	c := _m.On("FindSubWorkflow", subID)
+	return &ExecutionContext_FindSubWorkflow{Call: c}
 }
 
 func (_m *ExecutionContext) OnFindSubWorkflowMatch(matchers ...interface{}) *ExecutionContext_FindSubWorkflow {
-	c_call := _m.On("FindSubWorkflow", matchers...)
-	return &ExecutionContext_FindSubWorkflow{Call: c_call}
+	c := _m.On("FindSubWorkflow", matchers...)
+	return &ExecutionContext_FindSubWorkflow{Call: c}
 }
 
 // FindSubWorkflow provides a mock function with given fields: subID
@@ -95,13 +95,13 @@ func (_m ExecutionContext_GetAnnotations) Return(_a0 map[string]string) *Executi
 }
 
 func (_m *ExecutionContext) OnGetAnnotations() *ExecutionContext_GetAnnotations {
-	c_call := _m.On("GetAnnotations")
-	return &ExecutionContext_GetAnnotations{Call: c_call}
+	c := _m.On("GetAnnotations")
+	return &ExecutionContext_GetAnnotations{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetAnnotationsMatch(matchers ...interface{}) *ExecutionContext_GetAnnotations {
-	c_call := _m.On("GetAnnotations", matchers...)
-	return &ExecutionContext_GetAnnotations{Call: c_call}
+	c := _m.On("GetAnnotations", matchers...)
+	return &ExecutionContext_GetAnnotations{Call: c}
 }
 
 // GetAnnotations provides a mock function with given fields:
@@ -129,13 +129,13 @@ func (_m ExecutionContext_GetCreationTimestamp) Return(_a0 v1.Time) *ExecutionCo
 }
 
 func (_m *ExecutionContext) OnGetCreationTimestamp() *ExecutionContext_GetCreationTimestamp {
-	c_call := _m.On("GetCreationTimestamp")
-	return &ExecutionContext_GetCreationTimestamp{Call: c_call}
+	c := _m.On("GetCreationTimestamp")
+	return &ExecutionContext_GetCreationTimestamp{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetCreationTimestampMatch(matchers ...interface{}) *ExecutionContext_GetCreationTimestamp {
-	c_call := _m.On("GetCreationTimestamp", matchers...)
-	return &ExecutionContext_GetCreationTimestamp{Call: c_call}
+	c := _m.On("GetCreationTimestamp", matchers...)
+	return &ExecutionContext_GetCreationTimestamp{Call: c}
 }
 
 // GetCreationTimestamp provides a mock function with given fields:
@@ -161,13 +161,13 @@ func (_m ExecutionContext_GetDefinitionVersion) Return(_a0 v1alpha1.WorkflowDefi
 }
 
 func (_m *ExecutionContext) OnGetDefinitionVersion() *ExecutionContext_GetDefinitionVersion {
-	c_call := _m.On("GetDefinitionVersion")
-	return &ExecutionContext_GetDefinitionVersion{Call: c_call}
+	c := _m.On("GetDefinitionVersion")
+	return &ExecutionContext_GetDefinitionVersion{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetDefinitionVersionMatch(matchers ...interface{}) *ExecutionContext_GetDefinitionVersion {
-	c_call := _m.On("GetDefinitionVersion", matchers...)
-	return &ExecutionContext_GetDefinitionVersion{Call: c_call}
+	c := _m.On("GetDefinitionVersion", matchers...)
+	return &ExecutionContext_GetDefinitionVersion{Call: c}
 }
 
 // GetDefinitionVersion provides a mock function with given fields:
@@ -193,13 +193,13 @@ func (_m ExecutionContext_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *Ex
 }
 
 func (_m *ExecutionContext) OnGetEventVersion() *ExecutionContext_GetEventVersion {
-	c_call := _m.On("GetEventVersion")
-	return &ExecutionContext_GetEventVersion{Call: c_call}
+	c := _m.On("GetEventVersion")
+	return &ExecutionContext_GetEventVersion{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetEventVersionMatch(matchers ...interface{}) *ExecutionContext_GetEventVersion {
-	c_call := _m.On("GetEventVersion", matchers...)
-	return &ExecutionContext_GetEventVersion{Call: c_call}
+	c := _m.On("GetEventVersion", matchers...)
+	return &ExecutionContext_GetEventVersion{Call: c}
 }
 
 // GetEventVersion provides a mock function with given fields:
@@ -225,13 +225,13 @@ func (_m ExecutionContext_GetExecutionConfig) Return(_a0 v1alpha1.ExecutionConfi
 }
 
 func (_m *ExecutionContext) OnGetExecutionConfig() *ExecutionContext_GetExecutionConfig {
-	c_call := _m.On("GetExecutionConfig")
-	return &ExecutionContext_GetExecutionConfig{Call: c_call}
+	c := _m.On("GetExecutionConfig")
+	return &ExecutionContext_GetExecutionConfig{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetExecutionConfigMatch(matchers ...interface{}) *ExecutionContext_GetExecutionConfig {
-	c_call := _m.On("GetExecutionConfig", matchers...)
-	return &ExecutionContext_GetExecutionConfig{Call: c_call}
+	c := _m.On("GetExecutionConfig", matchers...)
+	return &ExecutionContext_GetExecutionConfig{Call: c}
 }
 
 // GetExecutionConfig provides a mock function with given fields:
@@ -257,13 +257,13 @@ func (_m ExecutionContext_GetExecutionID) Return(_a0 v1alpha1.WorkflowExecutionI
 }
 
 func (_m *ExecutionContext) OnGetExecutionID() *ExecutionContext_GetExecutionID {
-	c_call := _m.On("GetExecutionID")
-	return &ExecutionContext_GetExecutionID{Call: c_call}
+	c := _m.On("GetExecutionID")
+	return &ExecutionContext_GetExecutionID{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetExecutionIDMatch(matchers ...interface{}) *ExecutionContext_GetExecutionID {
-	c_call := _m.On("GetExecutionID", matchers...)
-	return &ExecutionContext_GetExecutionID{Call: c_call}
+	c := _m.On("GetExecutionID", matchers...)
+	return &ExecutionContext_GetExecutionID{Call: c}
 }
 
 // GetExecutionID provides a mock function with given fields:
@@ -289,13 +289,13 @@ func (_m ExecutionContext_GetID) Return(_a0 string) *ExecutionContext_GetID {
 }
 
 func (_m *ExecutionContext) OnGetID() *ExecutionContext_GetID {
-	c_call := _m.On("GetID")
-	return &ExecutionContext_GetID{Call: c_call}
+	c := _m.On("GetID")
+	return &ExecutionContext_GetID{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetIDMatch(matchers ...interface{}) *ExecutionContext_GetID {
-	c_call := _m.On("GetID", matchers...)
-	return &ExecutionContext_GetID{Call: c_call}
+	c := _m.On("GetID", matchers...)
+	return &ExecutionContext_GetID{Call: c}
 }
 
 // GetID provides a mock function with given fields:
@@ -321,13 +321,13 @@ func (_m ExecutionContext_GetK8sWorkflowID) Return(_a0 types.NamespacedName) *Ex
 }
 
 func (_m *ExecutionContext) OnGetK8sWorkflowID() *ExecutionContext_GetK8sWorkflowID {
-	c_call := _m.On("GetK8sWorkflowID")
-	return &ExecutionContext_GetK8sWorkflowID{Call: c_call}
+	c := _m.On("GetK8sWorkflowID")
+	return &ExecutionContext_GetK8sWorkflowID{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetK8sWorkflowIDMatch(matchers ...interface{}) *ExecutionContext_GetK8sWorkflowID {
-	c_call := _m.On("GetK8sWorkflowID", matchers...)
-	return &ExecutionContext_GetK8sWorkflowID{Call: c_call}
+	c := _m.On("GetK8sWorkflowID", matchers...)
+	return &ExecutionContext_GetK8sWorkflowID{Call: c}
 }
 
 // GetK8sWorkflowID provides a mock function with given fields:
@@ -353,13 +353,13 @@ func (_m ExecutionContext_GetLabels) Return(_a0 map[string]string) *ExecutionCon
 }
 
 func (_m *ExecutionContext) OnGetLabels() *ExecutionContext_GetLabels {
-	c_call := _m.On("GetLabels")
-	return &ExecutionContext_GetLabels{Call: c_call}
+	c := _m.On("GetLabels")
+	return &ExecutionContext_GetLabels{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetLabelsMatch(matchers ...interface{}) *ExecutionContext_GetLabels {
-	c_call := _m.On("GetLabels", matchers...)
-	return &ExecutionContext_GetLabels{Call: c_call}
+	c := _m.On("GetLabels", matchers...)
+	return &ExecutionContext_GetLabels{Call: c}
 }
 
 // GetLabels provides a mock function with given fields:
@@ -387,13 +387,13 @@ func (_m ExecutionContext_GetName) Return(_a0 string) *ExecutionContext_GetName 
 }
 
 func (_m *ExecutionContext) OnGetName() *ExecutionContext_GetName {
-	c_call := _m.On("GetName")
-	return &ExecutionContext_GetName{Call: c_call}
+	c := _m.On("GetName")
+	return &ExecutionContext_GetName{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetNameMatch(matchers ...interface{}) *ExecutionContext_GetName {
-	c_call := _m.On("GetName", matchers...)
-	return &ExecutionContext_GetName{Call: c_call}
+	c := _m.On("GetName", matchers...)
+	return &ExecutionContext_GetName{Call: c}
 }
 
 // GetName provides a mock function with given fields:
@@ -419,13 +419,13 @@ func (_m ExecutionContext_GetNamespace) Return(_a0 string) *ExecutionContext_Get
 }
 
 func (_m *ExecutionContext) OnGetNamespace() *ExecutionContext_GetNamespace {
-	c_call := _m.On("GetNamespace")
-	return &ExecutionContext_GetNamespace{Call: c_call}
+	c := _m.On("GetNamespace")
+	return &ExecutionContext_GetNamespace{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetNamespaceMatch(matchers ...interface{}) *ExecutionContext_GetNamespace {
-	c_call := _m.On("GetNamespace", matchers...)
-	return &ExecutionContext_GetNamespace{Call: c_call}
+	c := _m.On("GetNamespace", matchers...)
+	return &ExecutionContext_GetNamespace{Call: c}
 }
 
 // GetNamespace provides a mock function with given fields:
@@ -451,13 +451,13 @@ func (_m ExecutionContext_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowOnFail
 }
 
 func (_m *ExecutionContext) OnGetOnFailurePolicy() *ExecutionContext_GetOnFailurePolicy {
-	c_call := _m.On("GetOnFailurePolicy")
-	return &ExecutionContext_GetOnFailurePolicy{Call: c_call}
+	c := _m.On("GetOnFailurePolicy")
+	return &ExecutionContext_GetOnFailurePolicy{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ExecutionContext_GetOnFailurePolicy {
-	c_call := _m.On("GetOnFailurePolicy", matchers...)
-	return &ExecutionContext_GetOnFailurePolicy{Call: c_call}
+	c := _m.On("GetOnFailurePolicy", matchers...)
+	return &ExecutionContext_GetOnFailurePolicy{Call: c}
 }
 
 // GetOnFailurePolicy provides a mock function with given fields:
@@ -483,13 +483,13 @@ func (_m ExecutionContext_GetOwnerReference) Return(_a0 v1.OwnerReference) *Exec
 }
 
 func (_m *ExecutionContext) OnGetOwnerReference() *ExecutionContext_GetOwnerReference {
-	c_call := _m.On("GetOwnerReference")
-	return &ExecutionContext_GetOwnerReference{Call: c_call}
+	c := _m.On("GetOwnerReference")
+	return &ExecutionContext_GetOwnerReference{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetOwnerReferenceMatch(matchers ...interface{}) *ExecutionContext_GetOwnerReference {
-	c_call := _m.On("GetOwnerReference", matchers...)
-	return &ExecutionContext_GetOwnerReference{Call: c_call}
+	c := _m.On("GetOwnerReference", matchers...)
+	return &ExecutionContext_GetOwnerReference{Call: c}
 }
 
 // GetOwnerReference provides a mock function with given fields:
@@ -515,13 +515,13 @@ func (_m ExecutionContext_GetParentInfo) Return(_a0 executors.ImmutableParentInf
 }
 
 func (_m *ExecutionContext) OnGetParentInfo() *ExecutionContext_GetParentInfo {
-	c_call := _m.On("GetParentInfo")
-	return &ExecutionContext_GetParentInfo{Call: c_call}
+	c := _m.On("GetParentInfo")
+	return &ExecutionContext_GetParentInfo{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetParentInfoMatch(matchers ...interface{}) *ExecutionContext_GetParentInfo {
-	c_call := _m.On("GetParentInfo", matchers...)
-	return &ExecutionContext_GetParentInfo{Call: c_call}
+	c := _m.On("GetParentInfo", matchers...)
+	return &ExecutionContext_GetParentInfo{Call: c}
 }
 
 // GetParentInfo provides a mock function with given fields:
@@ -549,13 +549,13 @@ func (_m ExecutionContext_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutputD
 }
 
 func (_m *ExecutionContext) OnGetRawOutputDataConfig() *ExecutionContext_GetRawOutputDataConfig {
-	c_call := _m.On("GetRawOutputDataConfig")
-	return &ExecutionContext_GetRawOutputDataConfig{Call: c_call}
+	c := _m.On("GetRawOutputDataConfig")
+	return &ExecutionContext_GetRawOutputDataConfig{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *ExecutionContext_GetRawOutputDataConfig {
-	c_call := _m.On("GetRawOutputDataConfig", matchers...)
-	return &ExecutionContext_GetRawOutputDataConfig{Call: c_call}
+	c := _m.On("GetRawOutputDataConfig", matchers...)
+	return &ExecutionContext_GetRawOutputDataConfig{Call: c}
 }
 
 // GetRawOutputDataConfig provides a mock function with given fields:
@@ -581,13 +581,13 @@ func (_m ExecutionContext_GetSecurityContext) Return(_a0 core.SecurityContext) *
 }
 
 func (_m *ExecutionContext) OnGetSecurityContext() *ExecutionContext_GetSecurityContext {
-	c_call := _m.On("GetSecurityContext")
-	return &ExecutionContext_GetSecurityContext{Call: c_call}
+	c := _m.On("GetSecurityContext")
+	return &ExecutionContext_GetSecurityContext{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetSecurityContextMatch(matchers ...interface{}) *ExecutionContext_GetSecurityContext {
-	c_call := _m.On("GetSecurityContext", matchers...)
-	return &ExecutionContext_GetSecurityContext{Call: c_call}
+	c := _m.On("GetSecurityContext", matchers...)
+	return &ExecutionContext_GetSecurityContext{Call: c}
 }
 
 // GetSecurityContext provides a mock function with given fields:
@@ -613,13 +613,13 @@ func (_m ExecutionContext_GetServiceAccountName) Return(_a0 string) *ExecutionCo
 }
 
 func (_m *ExecutionContext) OnGetServiceAccountName() *ExecutionContext_GetServiceAccountName {
-	c_call := _m.On("GetServiceAccountName")
-	return &ExecutionContext_GetServiceAccountName{Call: c_call}
+	c := _m.On("GetServiceAccountName")
+	return &ExecutionContext_GetServiceAccountName{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetServiceAccountNameMatch(matchers ...interface{}) *ExecutionContext_GetServiceAccountName {
-	c_call := _m.On("GetServiceAccountName", matchers...)
-	return &ExecutionContext_GetServiceAccountName{Call: c_call}
+	c := _m.On("GetServiceAccountName", matchers...)
+	return &ExecutionContext_GetServiceAccountName{Call: c}
 }
 
 // GetServiceAccountName provides a mock function with given fields:
@@ -645,13 +645,13 @@ func (_m ExecutionContext_GetTask) Return(_a0 v1alpha1.ExecutableTask, _a1 error
 }
 
 func (_m *ExecutionContext) OnGetTask(id string) *ExecutionContext_GetTask {
-	c_call := _m.On("GetTask", id)
-	return &ExecutionContext_GetTask{Call: c_call}
+	c := _m.On("GetTask", id)
+	return &ExecutionContext_GetTask{Call: c}
 }
 
 func (_m *ExecutionContext) OnGetTaskMatch(matchers ...interface{}) *ExecutionContext_GetTask {
-	c_call := _m.On("GetTask", matchers...)
-	return &ExecutionContext_GetTask{Call: c_call}
+	c := _m.On("GetTask", matchers...)
+	return &ExecutionContext_GetTask{Call: c}
 }
 
 // GetTask provides a mock function with given fields: id
@@ -686,13 +686,13 @@ func (_m ExecutionContext_IncrementParallelism) Return(_a0 uint32) *ExecutionCon
 }
 
 func (_m *ExecutionContext) OnIncrementParallelism() *ExecutionContext_IncrementParallelism {
-	c_call := _m.On("IncrementParallelism")
-	return &ExecutionContext_IncrementParallelism{Call: c_call}
+	c := _m.On("IncrementParallelism")
+	return &ExecutionContext_IncrementParallelism{Call: c}
 }
 
 func (_m *ExecutionContext) OnIncrementParallelismMatch(matchers ...interface{}) *ExecutionContext_IncrementParallelism {
-	c_call := _m.On("IncrementParallelism", matchers...)
-	return &ExecutionContext_IncrementParallelism{Call: c_call}
+	c := _m.On("IncrementParallelism", matchers...)
+	return &ExecutionContext_IncrementParallelism{Call: c}
 }
 
 // IncrementParallelism provides a mock function with given fields:
@@ -718,13 +718,13 @@ func (_m ExecutionContext_IsInterruptible) Return(_a0 bool) *ExecutionContext_Is
 }
 
 func (_m *ExecutionContext) OnIsInterruptible() *ExecutionContext_IsInterruptible {
-	c_call := _m.On("IsInterruptible")
-	return &ExecutionContext_IsInterruptible{Call: c_call}
+	c := _m.On("IsInterruptible")
+	return &ExecutionContext_IsInterruptible{Call: c}
 }
 
 func (_m *ExecutionContext) OnIsInterruptibleMatch(matchers ...interface{}) *ExecutionContext_IsInterruptible {
-	c_call := _m.On("IsInterruptible", matchers...)
-	return &ExecutionContext_IsInterruptible{Call: c_call}
+	c := _m.On("IsInterruptible", matchers...)
+	return &ExecutionContext_IsInterruptible{Call: c}
 }
 
 // IsInterruptible provides a mock function with given fields:

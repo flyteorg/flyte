@@ -21,13 +21,13 @@ func (_m NodeStateReader_GetBranchNode) Return(_a0 handler.BranchNodeState) *Nod
 }
 
 func (_m *NodeStateReader) OnGetBranchNode() *NodeStateReader_GetBranchNode {
-	c_call := _m.On("GetBranchNode")
-	return &NodeStateReader_GetBranchNode{Call: c_call}
+	c := _m.On("GetBranchNode")
+	return &NodeStateReader_GetBranchNode{Call: c}
 }
 
 func (_m *NodeStateReader) OnGetBranchNodeMatch(matchers ...interface{}) *NodeStateReader_GetBranchNode {
-	c_call := _m.On("GetBranchNode", matchers...)
-	return &NodeStateReader_GetBranchNode{Call: c_call}
+	c := _m.On("GetBranchNode", matchers...)
+	return &NodeStateReader_GetBranchNode{Call: c}
 }
 
 // GetBranchNode provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m NodeStateReader_GetDynamicNodeState) Return(_a0 handler.DynamicNodeStat
 }
 
 func (_m *NodeStateReader) OnGetDynamicNodeState() *NodeStateReader_GetDynamicNodeState {
-	c_call := _m.On("GetDynamicNodeState")
-	return &NodeStateReader_GetDynamicNodeState{Call: c_call}
+	c := _m.On("GetDynamicNodeState")
+	return &NodeStateReader_GetDynamicNodeState{Call: c}
 }
 
 func (_m *NodeStateReader) OnGetDynamicNodeStateMatch(matchers ...interface{}) *NodeStateReader_GetDynamicNodeState {
-	c_call := _m.On("GetDynamicNodeState", matchers...)
-	return &NodeStateReader_GetDynamicNodeState{Call: c_call}
+	c := _m.On("GetDynamicNodeState", matchers...)
+	return &NodeStateReader_GetDynamicNodeState{Call: c}
 }
 
 // GetDynamicNodeState provides a mock function with given fields:
@@ -85,13 +85,13 @@ func (_m NodeStateReader_GetGateNodeState) Return(_a0 handler.GateNodeState) *No
 }
 
 func (_m *NodeStateReader) OnGetGateNodeState() *NodeStateReader_GetGateNodeState {
-	c_call := _m.On("GetGateNodeState")
-	return &NodeStateReader_GetGateNodeState{Call: c_call}
+	c := _m.On("GetGateNodeState")
+	return &NodeStateReader_GetGateNodeState{Call: c}
 }
 
 func (_m *NodeStateReader) OnGetGateNodeStateMatch(matchers ...interface{}) *NodeStateReader_GetGateNodeState {
-	c_call := _m.On("GetGateNodeState", matchers...)
-	return &NodeStateReader_GetGateNodeState{Call: c_call}
+	c := _m.On("GetGateNodeState", matchers...)
+	return &NodeStateReader_GetGateNodeState{Call: c}
 }
 
 // GetGateNodeState provides a mock function with given fields:
@@ -117,13 +117,13 @@ func (_m NodeStateReader_GetTaskNodeState) Return(_a0 handler.TaskNodeState) *No
 }
 
 func (_m *NodeStateReader) OnGetTaskNodeState() *NodeStateReader_GetTaskNodeState {
-	c_call := _m.On("GetTaskNodeState")
-	return &NodeStateReader_GetTaskNodeState{Call: c_call}
+	c := _m.On("GetTaskNodeState")
+	return &NodeStateReader_GetTaskNodeState{Call: c}
 }
 
 func (_m *NodeStateReader) OnGetTaskNodeStateMatch(matchers ...interface{}) *NodeStateReader_GetTaskNodeState {
-	c_call := _m.On("GetTaskNodeState", matchers...)
-	return &NodeStateReader_GetTaskNodeState{Call: c_call}
+	c := _m.On("GetTaskNodeState", matchers...)
+	return &NodeStateReader_GetTaskNodeState{Call: c}
 }
 
 // GetTaskNodeState provides a mock function with given fields:
@@ -149,13 +149,13 @@ func (_m NodeStateReader_GetWorkflowNodeState) Return(_a0 handler.WorkflowNodeSt
 }
 
 func (_m *NodeStateReader) OnGetWorkflowNodeState() *NodeStateReader_GetWorkflowNodeState {
-	c_call := _m.On("GetWorkflowNodeState")
-	return &NodeStateReader_GetWorkflowNodeState{Call: c_call}
+	c := _m.On("GetWorkflowNodeState")
+	return &NodeStateReader_GetWorkflowNodeState{Call: c}
 }
 
 func (_m *NodeStateReader) OnGetWorkflowNodeStateMatch(matchers ...interface{}) *NodeStateReader_GetWorkflowNodeState {
-	c_call := _m.On("GetWorkflowNodeState", matchers...)
-	return &NodeStateReader_GetWorkflowNodeState{Call: c_call}
+	c := _m.On("GetWorkflowNodeState", matchers...)
+	return &NodeStateReader_GetWorkflowNodeState{Call: c}
 }
 
 // GetWorkflowNodeState provides a mock function with given fields:

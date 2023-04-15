@@ -23,13 +23,13 @@ func (_m ReferenceConstructor_ConstructReference) Return(_a0 storage.DataReferen
 }
 
 func (_m *ReferenceConstructor) OnConstructReference(ctx context.Context, reference storage.DataReference, nestedKeys ...string) *ReferenceConstructor_ConstructReference {
-	c_call := _m.On("ConstructReference", ctx, reference, nestedKeys)
-	return &ReferenceConstructor_ConstructReference{Call: c_call}
+	c := _m.On("ConstructReference", ctx, reference, nestedKeys)
+	return &ReferenceConstructor_ConstructReference{Call: c}
 }
 
 func (_m *ReferenceConstructor) OnConstructReferenceMatch(matchers ...interface{}) *ReferenceConstructor_ConstructReference {
-	c_call := _m.On("ConstructReference", matchers...)
-	return &ReferenceConstructor_ConstructReference{Call: c_call}
+	c := _m.On("ConstructReference", matchers...)
+	return &ReferenceConstructor_ConstructReference{Call: c}
 }
 
 // ConstructReference provides a mock function with given fields: ctx, reference, nestedKeys

@@ -26,13 +26,13 @@ func (_m NodeEventRecorder_RecordNodeEvent) Return(_a0 error) *NodeEventRecorder
 }
 
 func (_m *NodeEventRecorder) OnRecordNodeEvent(ctx context.Context, _a1 *event.NodeExecutionEvent, eventConfig *config.EventConfig) *NodeEventRecorder_RecordNodeEvent {
-	c_call := _m.On("RecordNodeEvent", ctx, _a1, eventConfig)
-	return &NodeEventRecorder_RecordNodeEvent{Call: c_call}
+	c := _m.On("RecordNodeEvent", ctx, _a1, eventConfig)
+	return &NodeEventRecorder_RecordNodeEvent{Call: c}
 }
 
 func (_m *NodeEventRecorder) OnRecordNodeEventMatch(matchers ...interface{}) *NodeEventRecorder_RecordNodeEvent {
-	c_call := _m.On("RecordNodeEvent", matchers...)
-	return &NodeEventRecorder_RecordNodeEvent{Call: c_call}
+	c := _m.On("RecordNodeEvent", matchers...)
+	return &NodeEventRecorder_RecordNodeEvent{Call: c}
 }
 
 // RecordNodeEvent provides a mock function with given fields: ctx, _a1, eventConfig

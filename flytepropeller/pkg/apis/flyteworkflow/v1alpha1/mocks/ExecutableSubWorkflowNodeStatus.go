@@ -21,13 +21,13 @@ func (_m ExecutableSubWorkflowNodeStatus_GetPhase) Return(_a0 v1alpha1.WorkflowP
 }
 
 func (_m *ExecutableSubWorkflowNodeStatus) OnGetPhase() *ExecutableSubWorkflowNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase")
-	return &ExecutableSubWorkflowNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase")
+	return &ExecutableSubWorkflowNodeStatus_GetPhase{Call: c}
 }
 
 func (_m *ExecutableSubWorkflowNodeStatus) OnGetPhaseMatch(matchers ...interface{}) *ExecutableSubWorkflowNodeStatus_GetPhase {
-	c_call := _m.On("GetPhase", matchers...)
-	return &ExecutableSubWorkflowNodeStatus_GetPhase{Call: c_call}
+	c := _m.On("GetPhase", matchers...)
+	return &ExecutableSubWorkflowNodeStatus_GetPhase{Call: c}
 }
 
 // GetPhase provides a mock function with given fields:
