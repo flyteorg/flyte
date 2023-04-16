@@ -3231,7 +3231,7 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 	assert.Nil(t, resp)
 	s, ok := status.FromError(err)
 	assert.True(t, ok)
-	assert.Equal(t, codes.PermissionDenied, s.Code())
+	assert.Equal(t, codes.FailedPrecondition, s.Code())
 }
 
 func TestGetExecutionData(t *testing.T) {
