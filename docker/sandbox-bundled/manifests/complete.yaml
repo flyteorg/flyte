@@ -432,11 +432,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
-          - flyteplugins-service
+          - external-plugin-system
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - bigquery_query_job_task: flyteplugins-service
+          - bigquery_query_job_task: external-plugin-system
     plugins:
       logs:
         kubernetes-enabled: true
@@ -450,7 +450,7 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      flyteplugins-service:
+      external-plugin-service:
         defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:80
   002-database.yaml: |
     database:
@@ -1193,9 +1193,9 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      - image: docker.io/pingsutw/flyteplugins-service:v2
+      - image: docker.io/pingsutw/external-plugin-service:v2
         imagePullPolicy: IfNotPresent
-        name: flyteplugins-service
+        name: external-plugin-service
         ports:
         - containerPort: 80
           name: plugin-grpc

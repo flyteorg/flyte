@@ -91,9 +91,9 @@ helm install gateway bitnami/contour -n flyte
 | configmap.core.propeller | object | `{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://my-s3-bucket/","workers":4,"workflow-reeval-duration":"30s"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config). |
 | configmap.datacatalogServer | object | `{"application":{"grpcPort":8089,"grpcServerReflection":true,"httpPort":8080},"datacatalog":{"heartbeat-grace-period-multiplier":3,"max-reservation-heartbeat":"30s","metrics-scope":"datacatalog","profiler-port":10254,"storage-prefix":"metadata/datacatalog"}}` | Datacatalog server config |
 | configmap.domain | object | `{"domains":[{"id":"development","name":"development"},{"id":"staging","name":"staging"},{"id":"production","name":"production"}]}` | Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte. |
-| configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"flyteplugins-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","flyteplugins-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
-| configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"flyteplugins-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","flyteplugins-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
-| configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","flyteplugins-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
+| configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
+| configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
+| configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","external-plugin-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
@@ -141,6 +141,27 @@ helm install gateway bitnami/contour -n flyte
 | db.datacatalog.database.username | string | `"postgres"` |  |
 | deployRedoc | bool | `false` |  |
 | external_events | object | `{"aws":{"region":"us-east-2"},"enable":false,"eventsPublisher":{"eventTypes":["all"],"topicName":"arn:aws:sns:us-east-2:123456:123-my-topic"},"type":"aws"}` | **Optional Component** External events are used to send events (unprocessed, as Admin see them) to an SNS topic (or gcp equivalent) The config is here as an example only - if not enabled, it won't be used. |
+| external_plugin_service.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| external_plugin_service.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| external_plugin_service.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| external_plugin_service.affinity | object | `{}` | affinity for external-plugin-service deployment |
+| external_plugin_service.configPath | string | `"/etc/external-plugin-service/config/*.yaml"` | Default regex string for searching configuration files |
+| external_plugin_service.enabled | bool | `true` |  |
+| external_plugin_service.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
+| external_plugin_service.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| external_plugin_service.image.repository | string | `"docker.io/pingsutw/external-plugin-service"` | Docker image for external-plugin-service deployment |
+| external_plugin_service.image.tag | string | `"latest"` | Docker image tag |
+| external_plugin_service.nodeSelector | object | `{}` | nodeSelector for external-plugin-service deployment |
+| external_plugin_service.podAnnotations | object | `{}` | Annotations for external-plugin-service pods |
+| external_plugin_service.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| external_plugin_service.replicaCount | int | `1` | Replicas count for external-plugin-service deployment |
+| external_plugin_service.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for external-plugin-service deployment |
+| external_plugin_service.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for external-plugin-service |
+| external_plugin_service.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for external-plugin-service |
+| external_plugin_service.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to external-plugin-service pods |
+| external_plugin_service.serviceAccount.create | bool | `true` | Should a service account be created for external-plugin-service |
+| external_plugin_service.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| external_plugin_service.tolerations | list | `[]` | tolerations for external-plugin-service deployment |
 | flyteadmin.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flyteadmin.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flyteadmin.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
@@ -181,27 +202,6 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
-| flyteplugins_service.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
-| flyteplugins_service.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
-| flyteplugins_service.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
-| flyteplugins_service.affinity | object | `{}` | affinity for flyteplugins-service deployment |
-| flyteplugins_service.configPath | string | `"/etc/flyteplugins-service/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteplugins_service.enabled | bool | `true` |  |
-| flyteplugins_service.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
-| flyteplugins_service.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| flyteplugins_service.image.repository | string | `"docker.io/pingsutw/flyteplugins-service"` | Docker image for flyteplugins-service deployment |
-| flyteplugins_service.image.tag | string | `"v2"` | Docker image tag |
-| flyteplugins_service.nodeSelector | object | `{}` | nodeSelector for flyteplugins-service deployment |
-| flyteplugins_service.podAnnotations | object | `{}` | Annotations for flyteplugins-service pods |
-| flyteplugins_service.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
-| flyteplugins_service.replicaCount | int | `1` | Replicas count for flyteplugins-service deployment |
-| flyteplugins_service.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteplugins-service deployment |
-| flyteplugins_service.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for flyteplugins-service |
-| flyteplugins_service.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteplugins-service |
-| flyteplugins_service.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteplugins-service pods |
-| flyteplugins_service.serviceAccount.create | bool | `true` | Should a service account be created for flyteplugins-service |
-| flyteplugins_service.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flyteplugins_service.tolerations | list | `[]` | tolerations for flyteplugins-service deployment |
 | flytepropeller.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flytepropeller.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flytepropeller.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
@@ -213,8 +213,8 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.enabled | bool | `true` |  |
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
-| flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.1.69"` |  |
+| flytepropeller.image.repository | string | `"docker.io/pingsutw/flytepropeller"` | Docker image for Flytepropeller deployment |
+| flytepropeller.image.tag | string | `"0a4013187ae4cf6564d4e74b78ba425d00099432"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |

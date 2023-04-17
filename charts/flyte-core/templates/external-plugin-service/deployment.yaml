@@ -1,0 +1,53 @@
+{{- if .Values.external_plugin_service.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "external_plugin_service.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "external_plugin_service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.external_plugin_service.replicaCount }}
+  selector:
+    matchLabels: {{ include "external_plugin_service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.external_plugin_service.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "external_plugin_service.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.external_plugin_service.priorityClassName }}
+      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
+      {{- end }}
+      containers:
+      - command:
+        - pyflyte
+        - serve
+        image: "{{ .Values.external_plugin_service.image.repository }}:{{ .Values.external_plugin_service.image.tag }}"
+        imagePullPolicy: "{{ .Values.external_plugin_service.image.pullPolicy }}"
+        name: external-plugin-service
+        ports:
+        - containerPort: 80
+          name: plugin-grpc
+        resources: {{- toYaml .Values.external_plugin_service.resources | nindent 10 }}
+        {{- with .Values.external_plugin_service.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.external_plugin_service.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
+      serviceAccountName: {{ template "external_plugin_service.name" . }}
+      {{- with .Values.external_plugin_service.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
+      {{- with .Values.external_plugin_service.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.external_plugin_service.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.external_plugin_service.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

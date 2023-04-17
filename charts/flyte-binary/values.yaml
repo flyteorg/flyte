@@ -139,9 +139,9 @@ clusterResourceTemplates:
   # annotations Add annotations to created ConfigMap
   annotations: {}
 
-flytePluginService:
+externalPluginService:
   image:
-    repository: docker.io/pingsutw/flyteplugins-service
+    repository: docker.io/pingsutw/external-plugin-service
     tag: v2
     pullPolicy: IfNotPresent
 

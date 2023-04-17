@@ -51,17 +51,17 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
-          - flyteplugins-service
+          - external-plugin-service
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - bigquery_query_job_task: flyteplugins-service
+          - bigquery_query_job_task: external-plugin-service
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      flyteplugins-service:
+      external-plugin-service:
         defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:80
   002-database.yaml: |
     {{- with .Values.configuration.database }}

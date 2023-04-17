@@ -27,6 +27,18 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-plugin-service
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-core/templates/flytescheduler/sa.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -428,6 +440,78 @@ rules:
   verbs:
   - '*'
 ---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-external-plugin-service
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+# Allow RO accesses to PODS
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# Allow Event recording access
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access All plugin objects
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access to CRD
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+# Allow Access to all resources under flyte.lyft.com
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  - flyteworkflows/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
+---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -445,6 +529,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flyteadmin
+  namespace: flyte
+---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-external-plugin-service
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-external-plugin-service
+subjects:
+- kind: ServiceAccount
+  name: external-plugin-service
   namespace: flyte
 ---
 # Source: flyte-core/templates/admin/service.yaml
@@ -536,14 +639,14 @@ spec:
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-core/templates/flyteplugins-service/service.yaml
+# Source: flyte-core/templates/external-plugin-service/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: datacatalog
+  name: external-plugin-service
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -557,7 +660,7 @@ spec:
     protocol: TCP
     targetPort: plugin-grpc
   selector: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-core/templates/admin/deployment.yaml
@@ -939,14 +1042,14 @@ spec:
                 app.kubernetes.io/name: datacatalog
             topologyKey: kubernetes.io/hostname
 ---
-# Source: flyte-core/templates/flyteplugins-service/deployment.yaml
+# Source: flyte-core/templates/external-plugin-service/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: datacatalog
+  name: external-plugin-service
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -954,28 +1057,24 @@ spec:
   replicas: 1
   selector:
     matchLabels: 
-      app.kubernetes.io/name: datacatalog
+      app.kubernetes.io/name: external-plugin-service
       app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
       labels: 
-        app.kubernetes.io/name: datacatalog
+        app.kubernetes.io/name: external-plugin-service
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
-        fsGroup: 1001
-        runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
       containers:
       - command:
         - pyflyte
         - serve
-        image: "docker.io/pingsutw/flyteplugins-service:v2"
+        image: "docker.io/pingsutw/external-plugin-service:latest"
         imagePullPolicy: "IfNotPresent"
-        name: flyteplugins-service
+        name: external-plugin-service
         ports:
         - containerPort: 80
           name: plugin-grpc
@@ -988,7 +1087,7 @@ spec:
             cpu: 10m
             ephemeral-storage: 50Mi
             memory: 50Mi
-      serviceAccountName: datacatalog
+      serviceAccountName: external-plugin-service
 ---
 # Source: flyte-core/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1

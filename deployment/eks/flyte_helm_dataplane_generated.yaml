@@ -13,6 +13,18 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-plugin-service
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -147,7 +159,7 @@ data:
     tasks:
       task-plugins:
         default-for-task-types:
-          bigquery_query_job_task: flyteplugins-service
+          bigquery_query_job_task: external-plugin-service
           container: container
           container_array: k8s-array
           sidecar: sidecar
@@ -240,6 +252,78 @@ rules:
   - spark-role
   verbs:
   - '*'
+---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-external-plugin-service
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+rules:
+# Allow RO accesses to PODS
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# Allow Event recording access
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access All plugin objects
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+# Allow Access to CRD
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+# Allow Access to all resources under flyte.lyft.com
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  - flyteworkflows/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -354,6 +438,25 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
+# Source: flyte-core/templates/external-plugin-service/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-external-plugin-service
+  labels: 
+    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-external-plugin-service
+subjects:
+- kind: ServiceAccount
+  name: external-plugin-service
+  namespace: flyte
+---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -389,14 +492,14 @@ subjects:
     name: flyte-pod-webhook
     namespace: flyte
 ---
-# Source: flyte-core/templates/flyteplugins-service/service.yaml
+# Source: flyte-core/templates/external-plugin-service/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: datacatalog
+  name: external-plugin-service
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -410,7 +513,7 @@ spec:
     protocol: TCP
     targetPort: plugin-grpc
   selector: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
 ---
 # Source: flyte-core/templates/propeller/webhook.yaml
@@ -431,14 +534,14 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Source: flyte-core/templates/flyteplugins-service/deployment.yaml
+# Source: flyte-core/templates/external-plugin-service/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: datacatalog
+  name: external-plugin-service
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -446,28 +549,24 @@ spec:
   replicas: 1
   selector:
     matchLabels: 
-      app.kubernetes.io/name: datacatalog
+      app.kubernetes.io/name: external-plugin-service
       app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
       labels: 
-        app.kubernetes.io/name: datacatalog
+        app.kubernetes.io/name: external-plugin-service
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
-        fsGroup: 1001
-        runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
       containers:
       - command:
         - pyflyte
         - serve
-        image: "docker.io/pingsutw/flyteplugins-service:v2"
+        image: "docker.io/pingsutw/external-plugin-service:latest"
         imagePullPolicy: "IfNotPresent"
-        name: flyteplugins-service
+        name: external-plugin-service
         ports:
         - containerPort: 80
           name: plugin-grpc
@@ -480,7 +579,7 @@ spec:
             cpu: 10m
             ephemeral-storage: 50Mi
             memory: 50Mi
-      serviceAccountName: datacatalog
+      serviceAccountName: external-plugin-service
 ---
 # Source: flyte-core/templates/propeller/deployment.yaml
 apiVersion: apps/v1
@@ -502,7 +601,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "72672b6c3fadf598becad48fb4274baa7c59cdd92581f95c74e9199c050db79"
+        configChecksum: "d9afd97135266d8a0b4709bf484f6421f9514d83806c091c45ec111d2809a5d"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -528,7 +627,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
+        image: "docker.io/pingsutw/flytepropeller:0a4013187ae4cf6564d4e74b78ba425d00099432"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -582,9 +681,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.69
+        app.kubernetes.io/version: 0a4013187ae4cf6564d4e74b78ba425d00099432
       annotations:
-        configChecksum: "72672b6c3fadf598becad48fb4274baa7c59cdd92581f95c74e9199c050db79"
+        configChecksum: "d9afd97135266d8a0b4709bf484f6421f9514d83806c091c45ec111d2809a5d"
     spec:
       securityContext:
         fsGroup: 65534
@@ -593,7 +692,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
+        image: "docker.io/pingsutw/flytepropeller:0a4013187ae4cf6564d4e74b78ba425d00099432"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -616,7 +715,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.69"
+          image: "docker.io/pingsutw/flytepropeller:0a4013187ae4cf6564d4e74b78ba425d00099432"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

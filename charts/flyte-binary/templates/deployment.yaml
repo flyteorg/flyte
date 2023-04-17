@@ -227,8 +227,8 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
-        - name: flyteplugins-service
-          {{- with .Values.flytePluginService.image }}
+        - name: external-plugin-service
+          {{- with .Values.externalPluginService.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           ports:
