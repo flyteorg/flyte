@@ -432,11 +432,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
-          - external-plugin-system
+          - external-plugin-service
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - bigquery_query_job_task: external-plugin-system
+          - bigquery_query_job_task: external-plugin-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -766,7 +766,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SHZxUzRLYTM1VUV6WnFLeQ==
+  haSharedSecret: aUI0bWJOaUR1WU9oaVdUMw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1145,7 +1145,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: fda12335726ff5daec3763f1fc6a721bf121d44552df93c3af1cd8507b3ce0a4
+        checksum/configuration: 37ce9ba8f5711adb8ca9629b7746701fd7ba2954238ed753526dda0790de91ec
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1193,7 +1193,7 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      - image: docker.io/pingsutw/external-plugin-service:v2
+      - image: docker.io/pingsutw/external-plugin-service:latest
         imagePullPolicy: IfNotPresent
         name: external-plugin-service
         ports:
@@ -1259,7 +1259,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 4ea74feb5a5e75e33ef4ccb2773d6b656cc3d799a7f9ce9595d440aeebe5dc3a
+        checksum/secret: 9144d8070c50253e484601144528f2e57e1f85754b71f4b728bc58aae4c1c7a8
       labels:
         app: docker-registry
         release: flyte-sandbox

@@ -142,7 +142,7 @@ clusterResourceTemplates:
 externalPluginService:
   image:
     repository: docker.io/pingsutw/external-plugin-service
-    tag: v2
+    tag: latest
     pullPolicy: IfNotPresent
 
 # deployment Configure Flyte deployment specification
