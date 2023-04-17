@@ -255,20 +255,20 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
 // involves parsing the raw PodSpec definition and applying all Flyte configuration options.
-func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, string, error) {
 	// build raw PodSpec and ObjectMeta
 	podSpec, objectMeta, primaryContainerName, err := BuildRawPod(ctx, tCtx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
 	// add flyte configuration
 	podSpec, objectMeta, err = ApplyFlytePodConfiguration(ctx, tCtx, podSpec, objectMeta, primaryContainerName)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
-	return podSpec, objectMeta, nil
+	return podSpec, objectMeta, primaryContainerName, nil
 }
 
 // getBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
