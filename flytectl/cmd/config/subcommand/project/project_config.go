@@ -68,6 +68,11 @@ func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
 	projectSpec.Labels = &admin.Labels{
 		Values: c.Labels,
 	}
+	projectState, err := c.MapToAdminState()
+	if err != nil {
+		return nil, err
+	}
+	projectSpec.State = projectState
 	return &projectSpec, nil
 }
 

@@ -27,9 +27,11 @@ func updateProjectSetup() {
 	}
 }
 
-func modifyProjectFlags(archiveProject *bool, newArchiveVal bool, activateProject *bool, newActivateVal bool) {
-	*archiveProject = newArchiveVal
-	*activateProject = newActivateVal
+func modifyProjectFlags(newArchiveVal bool, newActivateVal bool) {
+	project.DefaultProjectConfig.ArchiveProject = newArchiveVal
+	project.DefaultProjectConfig.Archive = newArchiveVal
+	project.DefaultProjectConfig.ActivateProject = newActivateVal
+	project.DefaultProjectConfig.Activate = newActivateVal
 }
 
 func TestActivateProjectFunc(t *testing.T) {
@@ -37,7 +39,7 @@ func TestActivateProjectFunc(t *testing.T) {
 	updateProjectSetup()
 	config.GetConfig().Project = projectValue
 	project.DefaultProjectConfig.Name = projectValue
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
+	modifyProjectFlags(false, true)
 	projectUpdateRequest = &admin.Project{
 		Id:   projectValue,
 		Name: projectValue,
@@ -58,7 +60,7 @@ func TestActivateProjectFuncWithError(t *testing.T) {
 	updateProjectSetup()
 	config.GetConfig().Project = projectValue
 	project.DefaultProjectConfig.Name = projectValue
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
+	modifyProjectFlags(false, true)
 	projectUpdateRequest = &admin.Project{
 		Id:   projectValue,
 		Name: projectValue,
@@ -80,7 +82,7 @@ func TestArchiveProjectFunc(t *testing.T) {
 	config.GetConfig().Project = projectValue
 	project.DefaultProjectConfig = &project.ConfigProject{}
 	project.DefaultProjectConfig.Name = projectValue
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), false)
+	modifyProjectFlags(true, false)
 	projectUpdateRequest = &admin.Project{
 		Id:   projectValue,
 		Name: projectValue,
@@ -101,7 +103,7 @@ func TestArchiveProjectFuncWithError(t *testing.T) {
 	updateProjectSetup()
 	project.DefaultProjectConfig.Name = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), false)
+	modifyProjectFlags(true, false)
 	projectUpdateRequest = &admin.Project{
 		Id:   projectValue,
 		Name: projectValue,
@@ -122,7 +124,7 @@ func TestEmptyProjectInput(t *testing.T) {
 	s := setup()
 	updateProjectSetup()
 	config.GetConfig().Project = ""
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), false, &(project.DefaultProjectConfig.ActivateProject), true)
+	modifyProjectFlags(false, true)
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf(clierrors.ErrProjectNotPassed), err)
@@ -133,7 +135,7 @@ func TestInvalidInput(t *testing.T) {
 	updateProjectSetup()
 	config.GetConfig().Project = projectValue
 	project.DefaultProjectConfig.Name = projectValue
-	modifyProjectFlags(&(project.DefaultProjectConfig.ArchiveProject), true, &(project.DefaultProjectConfig.ActivateProject), true)
+	modifyProjectFlags(true, true)
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf(clierrors.ErrInvalidStateUpdate), err)

@@ -92,11 +92,6 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 		return fmt.Errorf(clierrors.ErrProjectNotPassed)
 	}
 
-	state, err := project.DefaultProjectConfig.MapToAdminState()
-	if err != nil {
-		return err
-	}
-	projectSpec.State = state
 	if project.DefaultProjectConfig.DryRun {
 		logger.Infof(ctx, "skipping UpdateProject request (dryRun)")
 	} else {
