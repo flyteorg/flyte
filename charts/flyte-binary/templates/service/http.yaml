@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "flyte-binary.fullname" . }}
+  name: {{ include "flyte-binary.service.http.name" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "flyte-binary.labels" . | nindent 4 }}
     {{- if .Values.commonLabels }}
@@ -16,6 +16,12 @@ metadata:
     {{- end }}
     {{- if .Values.service.annotations }}
     {{- tpl ( .Values.service.annotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.commonAnnotations }}
+    {{- tpl ( .Values.service.commonAnnotations | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.service.httpAnnotations }}
+    {{- tpl ( .Values.service.httpAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
   type: {{ .Values.service.type }}
@@ -33,7 +39,7 @@ spec:
   {{- end }}
   ports:
     - name: http
-      port: {{ include "flyte-binary.service.httpPort" . }}
+      port: {{ include "flyte-binary.service.http.port" . }}
       targetPort: http
       {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.http)) }}
       nodePort: {{ .Values.service.nodePorts.http }}
@@ -41,7 +47,7 @@ spec:
       nodePort: null
       {{- end }}
     - name: grpc
-      port: {{ include "flyte-binary.service.grpcPort" . }}
+      port: {{ include "flyte-binary.service.grpc.port" . }}
       targetPort: grpc
       {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.grpc)) }}
       nodePort: {{ .Values.service.nodePorts.grpc }}

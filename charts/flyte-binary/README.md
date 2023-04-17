@@ -29,6 +29,8 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.baseUrl | string | `""` |  |
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
+| configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
+| configuration.co-pilot.image.tag | string | `"v0.0.28"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -71,7 +73,7 @@ Chart for basic single Flyte executable deployment
 | deployment.genAdminAuthSecret.args | list | `[]` |  |
 | deployment.genAdminAuthSecret.command | list | `[]` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.image.repository | string | `"ghcr.io/flyteorg/flyte-binary"` |  |
+| deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary"` |  |
 | deployment.image.tag | string | `"latest"` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
@@ -93,7 +95,7 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | externalPluginService.image.pullPolicy | string | `"IfNotPresent"` |  |
 | externalPluginService.image.repository | string | `"docker.io/pingsutw/external-plugin-service"` |  |
-| externalPluginService.image.tag | string | `"v2"` |  |
+| externalPluginService.image.tag | string | `"latest"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
@@ -110,10 +112,12 @@ Chart for basic single Flyte executable deployment
 | rbac.create | bool | `true` |  |
 | rbac.extraRules | list | `[]` |  |
 | rbac.labels | object | `{}` |  |
-| service.annotations | object | `{}` |  |
 | service.clusterIP | string | `""` |  |
+| service.commonAnnotations | object | `{}` |  |
 | service.externalTrafficPolicy | string | `"Cluster"` |  |
 | service.extraPorts | list | `[]` |  |
+| service.grpcAnnotations | object | `{}` |  |
+| service.httpAnnotations | object | `{}` |  |
 | service.labels | object | `{}` |  |
 | service.loadBalancerIP | string | `""` |  |
 | service.loadBalancerSourceRanges | list | `[]` |  |

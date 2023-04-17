@@ -185,7 +185,7 @@ data:
         config:
           json: ""
           project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       container: "<BUCKETNAME>"
       enable-multicontainer: false
       limits:
@@ -609,7 +609,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e44eaf98e1488fc031bf73072e6b85b8a2433090af5df99f50ce2b959d79ba9"
+        configChecksum: "9dd4a987390327927e32e3093d7cb7883cd41c1d91262a41e48ab9795929786"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -690,7 +690,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: 0a4013187ae4cf6564d4e74b78ba425d00099432
       annotations:
-        configChecksum: "e44eaf98e1488fc031bf73072e6b85b8a2433090af5df99f50ce2b959d79ba9"
+        configChecksum: "9dd4a987390327927e32e3093d7cb7883cd41c1d91262a41e48ab9795929786"
     spec:
       securityContext:
         fsGroup: 65534
