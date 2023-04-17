@@ -62,11 +62,11 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
 	slots := mpiTaskExtraArgs.GetSlots()
 
-	podSpec, objectMeta, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
-	common.OverrideDefaultContainerName(taskCtx, podSpec, kubeflowv1.MPIJobDefaultContainerName)
+	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.MPIJobDefaultContainerName)
 
 	// workersPodSpec is deepCopy of podSpec submitted by flyte
 	// WorkerPodSpec doesn't need any Argument & command. It will be trigger from launcher pod

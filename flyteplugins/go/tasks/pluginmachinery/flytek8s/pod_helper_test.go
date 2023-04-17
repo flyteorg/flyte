@@ -324,7 +324,7 @@ func toK8sPodInterruptible(t *testing.T) {
 		},
 	})
 
-	p, _, err := ToK8sPodSpec(ctx, x)
+	p, _, _, err := ToK8sPodSpec(ctx, x)
 	assert.NoError(t, err)
 	assert.Len(t, p.Tolerations, 2)
 	assert.Equal(t, "x/flyte", p.Tolerations[1].Key)
@@ -391,7 +391,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 1)
 	})
@@ -408,7 +408,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 0)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
@@ -435,7 +435,7 @@ func TestToK8sPod(t *testing.T) {
 			DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		}))
 
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(p.NodeSelector))
 		assert.Equal(t, "myScheduler", p.SchedulerName)
@@ -452,7 +452,7 @@ func TestToK8sPod(t *testing.T) {
 		}))
 
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.SecurityContext)
 		assert.Equal(t, *p.SecurityContext.RunAsGroup, v)
@@ -464,7 +464,7 @@ func TestToK8sPod(t *testing.T) {
 			EnableHostNetworkingPod: &enabled,
 		}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.True(t, p.HostNetwork)
 	})
@@ -475,7 +475,7 @@ func TestToK8sPod(t *testing.T) {
 			EnableHostNetworkingPod: &enabled,
 		}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
 	})
@@ -483,7 +483,7 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("skipSettingHostNetwork", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
 	})
@@ -517,7 +517,7 @@ func TestToK8sPod(t *testing.T) {
 		}))
 
 		x := dummyExecContext(&v1.ResourceRequirements{})
-		p, _, err := ToK8sPodSpec(ctx, x)
+		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.DNSConfig)
 		assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, p.DNSConfig.Nameservers)
