@@ -365,12 +365,16 @@ github.com/flyteorg/datacatalog v1.0.42-0.20230418193414-6bf02c2d8481 h1:hrMCS6l
 github.com/flyteorg/datacatalog v1.0.42-0.20230418193414-6bf02c2d8481/go.mod h1:jr1t6x3PDfYsRLS4B3NyYJK97W82T0s5kizFQTg8QkE=
 github.com/flyteorg/flyteadmin v1.1.87-0.20230418193325-ef4f5e7c1909 h1:Tv7VApAk+2tocxLYcaknBwtCbq2vqR49dcSp2V1gwZE=
 github.com/flyteorg/flyteadmin v1.1.87-0.20230418193325-ef4f5e7c1909/go.mod h1:xwtG5muho4Or2qG+8UsRH+TEnjpFq4YvIioYRncslrE=
+github.com/flyteorg/flyteadmin v1.1.87-0.20230418194922-29c702cff0ba h1:O3+Fy/g2BF/nB74jMujjk6kQZXmRJR4nNOHDoyrKeK4=
+github.com/flyteorg/flyteadmin v1.1.87-0.20230418194922-29c702cff0ba/go.mod h1:qwJl482Uu3p9HRqPLzepjz41H5aJmwuupZbe2RhUT48=
 github.com/flyteorg/flyteidl v1.3.14 h1:o5M0g/r6pXTPu5PEurbYxbQmuOu3hqqsaI2M6uvK0N8=
 github.com/flyteorg/flyteidl v1.3.14/go.mod h1:Pkt2skI1LiHs/2ZoekBnyPhuGOFMiuul6HHcKGZBsbM=
 github.com/flyteorg/flyteplugins v1.0.45 h1:I/N4ehOxX6ln8DivyZ9gayp/UYiBcqoizBbG1hfwIXM=
 github.com/flyteorg/flyteplugins v1.0.45/go.mod h1:ztsonku5fKwyxcIg1k69PTiBVjRI6d3nK5DnC+iwx08=
+github.com/flyteorg/flyteplugins v1.0.49/go.mod h1:ztsonku5fKwyxcIg1k69PTiBVjRI6d3nK5DnC+iwx08=
 github.com/flyteorg/flytepropeller v1.1.70 h1:/d1qqz13rdVADM85ST70eerAdBstJJz9UUB/mNSZi0w=
 github.com/flyteorg/flytepropeller v1.1.70/go.mod h1:MezHUJmgPzm4Pu8nIy6LLiEkxNA6buTQ7hInSqCViTY=
+github.com/flyteorg/flytepropeller v1.1.83/go.mod h1:WFIzp4MhTLpco4YLXBqcaz0qeEchnstwOWiXN15AwkI=
 github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a h1:WQTudPI+ysEkMp648YDm8lbrVFh0sE5K5zuwjFNB37Y=
 github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a/go.mod h1:TcKdywJD/EokpPaTeRyn0rY0ErXKPzSsg0JKd4U0xDg=
 github.com/flyteorg/stow v0.3.6 h1:jt50ciM14qhKBaIrB+ppXXY+SXB59FNREFgTJqCyqIk=
