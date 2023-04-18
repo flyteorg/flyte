@@ -181,12 +181,12 @@ Create a file named ``values-override.yaml`` and add the following config to it:
                     - container
                     - sidecar
                     - k8s-array
-                    - Tensorflow
+                    - tensorflow
                   default-for-task-types:
                     container: container
                     sidecar: sidecar
                     container_array: k8s-array
-                    Tensorflow: Tensorflow
+                    tensorflow: tensorflow
    
    .. group-tab:: MPI
    

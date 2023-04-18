@@ -161,7 +161,7 @@ storage:
     config:
       json: ""
       project_id: {{ .Values.storage.gcs.projectId }}
-      scopes: https://www.googleapis.com/auth/devstorage.read_write
+      scopes: https://www.googleapis.com/auth/cloud-platform
   container: {{ .Values.storage.bucketName | quote }}
 {{- else if eq .Values.storage.type "sandbox" }}
   type: minio

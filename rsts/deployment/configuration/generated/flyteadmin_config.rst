@@ -3086,16 +3086,16 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
   batch-size: -1
   batching-interval: 1s
   queue:
-    base-delay: 5s
-    capacity: 1000
+    base-delay: 0s
+    capacity: 10000
     max-delay: 1m0s
-    rate: 100
+    rate: 1000
     type: maxof
   sub-queue:
     base-delay: 0s
-    capacity: 1000
+    capacity: 10000
     max-delay: 0s
-    rate: 100
+    rate: 1000
     type: bucket
   type: batch
   
@@ -3405,10 +3405,10 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
 
 .. code-block:: yaml
 
-  base-delay: 5s
-  capacity: 1000
+  base-delay: 0s
+  capacity: 10000
   max-delay: 1m0s
-  rate: 100
+  rate: 1000
   type: maxof
   
 
@@ -3422,9 +3422,9 @@ SubQueue configuration, affects the way the nodes cause the top-level Work to be
 .. code-block:: yaml
 
   base-delay: 0s
-  capacity: 1000
+  capacity: 10000
   max-delay: 0s
-  rate: 100
+  rate: 1000
   type: bucket
   
 
@@ -3474,7 +3474,7 @@ base backoff delay for failure
 
 .. code-block:: yaml
 
-  5s
+  0s
   
 
 max-delay (`config.Duration`_)
@@ -3498,7 +3498,7 @@ Bucket Refill rate per second
 
 .. code-block:: yaml
 
-  "100"
+  "1000"
   
 
 capacity (int)
@@ -3510,7 +3510,7 @@ Bucket capacity as number of items
 
 .. code-block:: yaml
 
-  "1000"
+  "10000"
   
 
 config.EventConfig
