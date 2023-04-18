@@ -8,9 +8,54 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
-ARTIFACT_TYPE_DECK: ArtifactType
-ARTIFACT_TYPE_UNDEFINED: ArtifactType
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    ARTIFACT_TYPE_UNDEFINED: _ClassVar[ArtifactType]
+    ARTIFACT_TYPE_DECK: _ClassVar[ArtifactType]
+ARTIFACT_TYPE_UNDEFINED: ArtifactType
+ARTIFACT_TYPE_DECK: ArtifactType
+
+class CreateUploadLocationResponse(_message.Message):
+    __slots__ = ["signed_url", "native_url", "expires_at"]
+    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
+    NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    signed_url: str
+    native_url: str
+    expires_at: _timestamp_pb2.Timestamp
+    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class CreateUploadLocationRequest(_message.Message):
+    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_MD5_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    filename: str
+    expires_in: _duration_pb2.Duration
+    content_md5: bytes
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ...) -> None: ...
+
+class CreateDownloadLocationRequest(_message.Message):
+    __slots__ = ["native_url", "expires_in"]
+    NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
+    native_url: str
+    expires_in: _duration_pb2.Duration
+    def __init__(self, native_url: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+
+class CreateDownloadLocationResponse(_message.Message):
+    __slots__ = ["signed_url", "expires_at"]
+    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    signed_url: str
+    expires_at: _timestamp_pb2.Timestamp
+    def __init__(self, signed_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkRequest(_message.Message):
     __slots__ = ["artifact_type", "expires_in", "node_execution_id"]
@@ -23,52 +68,9 @@ class CreateDownloadLinkRequest(_message.Message):
     def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkResponse(_message.Message):
-    __slots__ = ["expires_at", "signed_url"]
-    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["signed_url", "expires_at"]
     SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
-    expires_at: _timestamp_pb2.Timestamp
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
     signed_url: _containers.RepeatedScalarFieldContainer[str]
+    expires_at: _timestamp_pb2.Timestamp
     def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-
-class CreateDownloadLocationRequest(_message.Message):
-    __slots__ = ["expires_in", "native_url"]
-    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
-    NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
-    expires_in: _duration_pb2.Duration
-    native_url: str
-    def __init__(self, native_url: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
-
-class CreateDownloadLocationResponse(_message.Message):
-    __slots__ = ["expires_at", "signed_url"]
-    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
-    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
-    expires_at: _timestamp_pb2.Timestamp
-    signed_url: str
-    def __init__(self, signed_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-
-class CreateUploadLocationRequest(_message.Message):
-    __slots__ = ["content_md5", "domain", "expires_in", "filename", "project"]
-    CONTENT_MD5_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
-    EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    content_md5: bytes
-    domain: str
-    expires_in: _duration_pb2.Duration
-    filename: str
-    project: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ...) -> None: ...
-
-class CreateUploadLocationResponse(_message.Message):
-    __slots__ = ["expires_at", "native_url", "signed_url"]
-    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
-    NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
-    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
-    expires_at: _timestamp_pb2.Timestamp
-    native_url: str
-    signed_url: str
-    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-
-class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
