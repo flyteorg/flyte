@@ -3,10 +3,10 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.43
-	github.com/flyteorg/flyteadmin v1.1.77
-	github.com/flyteorg/flytepropeller v1.1.69
-	github.com/flyteorg/flytestdlib v1.0.16
+	github.com/flyteorg/datacatalog v1.0.42-0.20230418193414-6bf02c2d8481
+	github.com/flyteorg/flyteadmin v1.1.87-0.20230418193325-ef4f5e7c1909
+	github.com/flyteorg/flytepropeller v1.1.70
+	github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -72,7 +72,7 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.3.9 // indirect
+	github.com/flyteorg/flyteidl v1.3.13 // indirect
 	github.com/flyteorg/flyteplugins v1.0.40 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -146,11 +146,11 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncw/swift v1.0.53 // indirect
-	github.com/ory/fosite v0.39.0 // indirect
-	github.com/ory/go-acc v0.2.5 // indirect
+	github.com/ory/fosite v0.42.2 // indirect
+	github.com/ory/go-acc v0.2.6 // indirect
 	github.com/ory/go-convenience v0.1.0 // indirect
 	github.com/ory/viper v1.7.5 // indirect
-	github.com/ory/x v0.0.162 // indirect
+	github.com/ory/x v0.0.214 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
@@ -203,7 +203,7 @@ require (
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0 // indirect
 	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
+	gopkg.in/square/go-jose.v2 v2.5.2-0.20210529014059-a5c7eec3c614 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.4.4 // indirect
@@ -222,9 +222,3 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
-
-replace github.com/flyteorg/flytestdlib => ../flytestdlib
-
-replace github.com/flyteorg/flyteadmin => ../flyteadmin
-
-replace github.com/flyteorg/datacatalog => ../datacatalog
