@@ -7,18 +7,20 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ContainerError(_message.Message):
-    __slots__ = ["code", "kind", "message", "origin"]
+    __slots__ = ["code", "message", "kind", "origin"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
-    CODE_FIELD_NUMBER: _ClassVar[int]
-    KIND_FIELD_NUMBER: _ClassVar[int]
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+        NON_RECOVERABLE: _ClassVar[ContainerError.Kind]
+        RECOVERABLE: _ClassVar[ContainerError.Kind]
     NON_RECOVERABLE: ContainerError.Kind
-    ORIGIN_FIELD_NUMBER: _ClassVar[int]
     RECOVERABLE: ContainerError.Kind
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    ORIGIN_FIELD_NUMBER: _ClassVar[int]
     code: str
-    kind: ContainerError.Kind
     message: str
+    kind: ContainerError.Kind
     origin: _execution_pb2.ExecutionError.ErrorKind
     def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[ContainerError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...
 

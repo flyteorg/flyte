@@ -8,9 +8,9 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WorkflowClosure(_message.Message):
-    __slots__ = ["tasks", "workflow"]
-    TASKS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["workflow", "tasks"]
     WORKFLOW_FIELD_NUMBER: _ClassVar[int]
-    tasks: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.TaskTemplate]
+    TASKS_FIELD_NUMBER: _ClassVar[int]
     workflow: _workflow_pb2.WorkflowTemplate
+    tasks: _containers.RepeatedCompositeFieldContainer[_tasks_pb2.TaskTemplate]
     def __init__(self, workflow: _Optional[_Union[_workflow_pb2.WorkflowTemplate, _Mapping]] = ..., tasks: _Optional[_Iterable[_Union[_tasks_pb2.TaskTemplate, _Mapping]]] = ...) -> None: ...
