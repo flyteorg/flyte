@@ -367,6 +367,8 @@ github.com/flyteorg/flyteadmin v1.1.87-0.20230418193325-ef4f5e7c1909 h1:Tv7VApAk
 github.com/flyteorg/flyteadmin v1.1.87-0.20230418193325-ef4f5e7c1909/go.mod h1:xwtG5muho4Or2qG+8UsRH+TEnjpFq4YvIioYRncslrE=
 github.com/flyteorg/flyteadmin v1.1.87-0.20230418194922-29c702cff0ba h1:O3+Fy/g2BF/nB74jMujjk6kQZXmRJR4nNOHDoyrKeK4=
 github.com/flyteorg/flyteadmin v1.1.87-0.20230418194922-29c702cff0ba/go.mod h1:qwJl482Uu3p9HRqPLzepjz41H5aJmwuupZbe2RhUT48=
+github.com/flyteorg/flyteadmin v1.1.87-0.20230418213147-e8a0349eff02 h1:nC46ARr71uUIr1mE1W31LFxdEwWku9A2dcI7QH8bTAQ=
+github.com/flyteorg/flyteadmin v1.1.87-0.20230418213147-e8a0349eff02/go.mod h1:qwJl482Uu3p9HRqPLzepjz41H5aJmwuupZbe2RhUT48=
 github.com/flyteorg/flyteidl v1.3.14 h1:o5M0g/r6pXTPu5PEurbYxbQmuOu3hqqsaI2M6uvK0N8=
 github.com/flyteorg/flyteidl v1.3.14/go.mod h1:Pkt2skI1LiHs/2ZoekBnyPhuGOFMiuul6HHcKGZBsbM=
 github.com/flyteorg/flyteplugins v1.0.45 h1:I/N4ehOxX6ln8DivyZ9gayp/UYiBcqoizBbG1hfwIXM=
