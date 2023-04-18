@@ -92,6 +92,8 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.package }}
+    outputs:
+      cache_key: ${{ steps.create_cache_key.outputs.cache_key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -104,9 +106,9 @@ jobs:
           restore-keys: |
             /tmp/docker-images-
       - name: Set cache key output
-        id: cache_key
+        id: create_cache_key
         run: |
-          echo ::set-output name=cache_key::/tmp/docker-images-${{ github.run_id }}
+          echo "cache_key=/tmp/docker-images-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
       - name: Prime docker cache
         run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
       - name: Build dockerfile
@@ -150,7 +152,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.cache_key.outputs.cache_key }}
+          key: ${{ needs.docker-build.outputs.cache_key }}
       - name: Create Sandbox Cluster
         run: |
           cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
@@ -209,7 +211,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.cache_key.outputs.cache_key }}
+          key: ${{ needs.docker-build.outputs.cache_key }}
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
       - uses: engineerd/setup-kind@v0.5.0
