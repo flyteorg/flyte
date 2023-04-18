@@ -150,7 +150,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.outputs.cache_key }}
+          key: ${{ needs.docker-build.cache_key.outputs.cache_key }}
       - name: Create Sandbox Cluster
         run: |
           cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
@@ -209,7 +209,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.outputs.cache_key }}
+          key: ${{ needs.docker-build.cache_key.outputs.cache_key }}
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
       - uses: engineerd/setup-kind@v0.5.0
