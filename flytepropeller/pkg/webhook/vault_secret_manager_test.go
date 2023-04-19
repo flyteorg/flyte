@@ -82,11 +82,69 @@ func ExpectedKVv2(uuid string) *corev1.Pod {
 	return expected
 }
 
-func NewInputPod() *corev1.Pod {
+func ExpectedKVv3(uuid string) *corev1.Pod {
+	// Injects uuid into expected output for KV v2 secrets
+	expected := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"vault.hashicorp.com/agent-inject":                                "true",
+				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
+				"vault.hashicorp.com/role":                                        "flyte",
+				"vault.hashicorp.com/agent-pre-populate-only":                     "true",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", uuid):   "foo",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", uuid):     "foo/bar",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", uuid): `{{- with secret "foo" -}}{{ .Data.data.bar }}{{- end -}}`,
+				"vault.hashicorp.com/auth-config-type":                            "gce",
+			},
+		},
+		Spec: PodSpec,
+	}
+	return expected
+}
+
+func ExpectedKVv4(uuid string) *corev1.Pod {
+	// Injects uuid into expected output for KV v2 secrets
+	expected := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"vault.hashicorp.com/agent-inject":                                "true",
+				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
+				"vault.hashicorp.com/role":                                        "my-role",
+				"vault.hashicorp.com/agent-pre-populate-only":                     "true",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", uuid):   "foo",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", uuid):     "foo/bar",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", uuid): `{{- with secret "foo" -}}{{ .Data.data.bar }}{{- end -}}`,
+			},
+		},
+		Spec: PodSpec,
+	}
+	return expected
+}
+
+func ExpectedKVv5(uuid string) *corev1.Pod {
+	// Injects uuid into expected output for KV v2 secrets
+	expected := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"vault.hashicorp.com/agent-inject":                                "true",
+				"vault.hashicorp.com/secret-volume-path":                          "/etc/flyte/secrets",
+				"vault.hashicorp.com/role":                                        "flyte",
+				"vault.hashicorp.com/agent-pre-populate-only":                     "false",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", uuid):   "foo",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", uuid):     "foo/bar",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", uuid): `{{- with secret "foo" -}}{{ .Data.data.bar }}{{- end -}}`,
+			},
+		},
+		Spec: PodSpec,
+	}
+	return expected
+}
+
+func NewInputPod(annotations map[string]string) *corev1.Pod {
 	// Need to create a new Pod for every test since annotations are otherwise appended to original reference object
 	p := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string{},
+			Annotations: annotations,
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
@@ -122,7 +180,7 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 			args: args{
 				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
 				secret: inputSecret,
-				p:      NewInputPod(),
+				p:      NewInputPod(map[string]string{}),
 			},
 			want:    ExpectedKVv1,
 			wantErr: false,
@@ -132,9 +190,45 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 			args: args{
 				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2},
 				secret: inputSecret,
-				p:      NewInputPod(),
+				p:      NewInputPod(map[string]string{}),
 			},
 			want:    ExpectedKVv2,
+			wantErr: false,
+		},
+		{
+			name: "KVv3 Secret - extra annotations",
+			args: args{
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{
+					"vault.hashicorp.com/auth-config-type": "gce",
+				}},
+				secret: inputSecret,
+				p:      NewInputPod(map[string]string{}),
+			},
+			want:    ExpectedKVv3,
+			wantErr: false,
+		},
+		{
+			name: "KVv4 Secret - user override annotation",
+			args: args{
+				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{}},
+				secret: inputSecret,
+				p: NewInputPod(map[string]string{
+					"vault.hashicorp.com/role": "my-role",
+				}),
+			},
+			want:    ExpectedKVv4,
+			wantErr: false,
+		},
+		{
+			name: "KVv5 Secret - system override annotation",
+			args: args{
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{
+					"vault.hashicorp.com/agent-pre-populate-only": "false", // override vault.hashicorp.com/agent-pre-populate-only
+				}},
+				secret: inputSecret,
+				p:      NewInputPod(map[string]string{}),
+			},
+			want:    ExpectedKVv5,
 			wantErr: false,
 		},
 		{
@@ -142,7 +236,7 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 			args: args{
 				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: 3},
 				secret: inputSecret,
-				p:      NewInputPod(),
+				p:      NewInputPod(map[string]string{}),
 			},
 			want:    nil,
 			wantErr: true,
