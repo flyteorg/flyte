@@ -184,7 +184,6 @@ jobs:
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
           flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ github.event.repository.name }}.image.repository=flyteorg/${{ github.event.repository.name }},${{ github.event.repository.name }}.image.tag=latest
-          
           flytectl sandbox exec -- k3s kubectl get pods -n flyte -oyaml
       - name: Post Upgrade Tests
         env:
@@ -257,7 +256,7 @@ jobs:
 
   bump_version:
     needs: changes
-    if: needs.changes.outputs.packages != '[]'
+    if: ${{ needs.changes.outputs.packages != '[]' || github.event_name != 'pull_request' }}
     strategy:
       fail-fast: false
       matrix:
@@ -274,7 +273,7 @@ jobs:
           fetch-depth: '0'
       - name: Set branch name
         id: extract_branch
-        run: echo "::set-output name=branch_name::$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})"
+        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
       - name: Bump version and push tag
         id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
