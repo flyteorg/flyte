@@ -1,6 +1,7 @@
 export REPOSITORY=flytecopilot
 include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:

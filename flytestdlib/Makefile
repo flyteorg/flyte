@@ -1,5 +1,6 @@
 export REPOSITORY=flytestdlib
 include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:

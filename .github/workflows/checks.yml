@@ -184,7 +184,7 @@ jobs:
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
           flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.package }}.image.repository=flyteorg/${{ matrix.package }},${{ matrix.package }}.image.tag=latest
-          flytectl sandbox exec -- k3s kubectl get pods -n flyte -oyaml
+          flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
       - name: Post Upgrade Tests
         env:
           PRIORITIES: ${{ env.PRIORITIES }}
@@ -282,3 +282,26 @@ jobs:
           WITH_V: true
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
+
+  goreleaser:
+    needs: [changes, bump_version]
+    if: ${{ needs.changes.outputs.packages != '[]' }}
+    name: Goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  # TODO: Add push_docker_image, push-docker-image-flytescheduler
