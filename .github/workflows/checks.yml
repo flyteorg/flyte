@@ -257,14 +257,7 @@ jobs:
   bump_version:
     needs: changes
     if: ${{ needs.changes.outputs.packages != '[]' || github.event_name != 'pull_request' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
     outputs:
       version: ${{ steps.bump_version.outputs.tag }}
     steps:
