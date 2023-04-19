@@ -300,6 +300,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           args: release --rm-dist
+          workdir: ${{ matrix.package }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
