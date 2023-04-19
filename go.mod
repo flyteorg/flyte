@@ -1,11 +1,12 @@
-module github.com/pingsutw/flyte
+module github.com/pingsutw/flyte-monorepo
 
 go 1.19
 
 require (
 	github.com/flyteorg/datacatalog v1.0.44
-	github.com/flyteorg/flyteadmin v1.1.84
-	github.com/flyteorg/flytepropeller v1.1.70
+	github.com/flyteorg/flyte v1.5.0
+	github.com/flyteorg/flyteadmin v1.1.88
+	github.com/flyteorg/flytepropeller v1.1.76
 	github.com/flyteorg/flytestdlib v1.0.16
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
@@ -153,7 +154,6 @@ require (
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
-	github.com/pingsutw/flyte-monorepo/flyteadmin v0.0.0-20230419232245-3f73969d4518 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
