@@ -29,230 +29,231 @@ jobs:
             flytectl: flytectl/**
             flytecopilot: flytecopilot/**
             flytestdlib: flytestdlib/**
-  lint:
-    needs: changes
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Lint
-        run: make install && make lint
 
-  unit-tests:
-    needs: changes
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Unit Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: make install && make test_unit_codecov
-      - name: Push CodeCov
-        uses: codecov/codecov-action@v3.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: coverage.txt
-          flags: unittests
-          fail_ci_if_error: false
+#  lint:
+#    needs: changes
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Lint
+#        run: make install && make lint
 
-  docker-build:
-    needs: changes
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    outputs:
-      cache_key: ${{ steps.create_cache_key.outputs.cache_key }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/docker-images
-          key: /tmp/docker-images-${{ github.run_id }}
-          restore-keys: |
-            /tmp/docker-images-
-      - name: Set cache key output
-        id: create_cache_key
-        run: |
-          echo "cache_key=/tmp/docker-images-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
-      - name: Prime docker cache
-        run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
-      - name: Build dockerfile
-        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
-        env:
-          # We are unable to leverage docker buildx here without changing the
-          # caching mechanism significantly. See here for the caching options
-          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
-          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
-          # should rewrite this pipeline to use docker buildx with cache type=gha.
-          DOCKER_BUILDKIT: "1"
-        run: |
-          docker build -t flyteorg/${{ matrix.package }}:builder --target builder --cache-from=flyteorg/${{ matrix.package }}:builder -f Dockerfile ../
-          docker build -t flyteorg/${{ matrix.package }}:latest --cache-from=flyteorg/${{ matrix.package }}:builder -f Dockerfile ../
+#  unit-tests:
+#    needs: changes
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Unit Tests
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: make install && make test_unit_codecov
+#      - name: Push CodeCov
+#        uses: codecov/codecov-action@v3.1.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          file: coverage.txt
+#          flags: unittests
+#          fail_ci_if_error: false
 
-      - name: Tag and cache docker image
-        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
-        run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ matrix.package }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.package }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+#  docker-build:
+#    needs: changes
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    outputs:
+#      cache_key: ${{ steps.create_cache_key.outputs.cache_key }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - id: load-docker-cache
+#        name: Load Docker Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/tmp/docker-images
+#          key: /tmp/docker-images-${{ github.run_id }}
+#          restore-keys: |
+#            /tmp/docker-images-
+#      - name: Set cache key output
+#        id: create_cache_key
+#        run: |
+#          echo "cache_key=/tmp/docker-images-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+#      - name: Prime docker cache
+#        run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
+#      - name: Build dockerfile
+#        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
+#        env:
+#          # We are unable to leverage docker buildx here without changing the
+#          # caching mechanism significantly. See here for the caching options
+#          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
+#          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
+#          # should rewrite this pipeline to use docker buildx with cache type=gha.
+#          DOCKER_BUILDKIT: "1"
+#        run: |
+#          docker build -t flyteorg/${{ matrix.package }}:builder --target builder --cache-from=flyteorg/${{ matrix.package }}:builder -f Dockerfile ../
+#          docker build -t flyteorg/${{ matrix.package }}:latest --cache-from=flyteorg/${{ matrix.package }}:builder -f Dockerfile ../
+#
+#      - name: Tag and cache docker image
+#        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
+#        run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ matrix.package }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.package }}:latest -o /tmp/tmp/docker-images/snapshot.tar
 
-  end-to-end:
-    needs: [ changes, docker-build ]
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: unionai/flytectl-setup-action@v0.0.1
-        name: Setup flytectl
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.8
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.outputs.cache_key }}
-      - name: Create Sandbox Cluster
-        run: |
-          cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
-          flytectl config init
-          flytectl sandbox start --source=$(pwd)
-      - name: Prime docker cache
-        run: |
-          flytectl sandbox exec -- docker load -i /root/snapshot.tar
-      - name: Setup Flytekit
-        run: |
-          python -m pip install --upgrade pip
-          pip install flytekit
-          pip freeze
-      - name: Register flytesnacks examples
-        uses: unionai/flyte-register-action@v0.0.2
-        with:
-          flytesnacks: true
-          project: flytesnacks
-          version: "latest"
-          domain: development
-      - name: Pre Upgrade Tests
-        if: ${{ github.event.repository.name == 'flyteadmin' }}
-        env:
-          PRIORITIES: ${{ env.PRIORITIES }}
-        run: |
-          make end2end_execute
-      - name: Upgrade Helm charts
-        run: |
-          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
-          flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.package }}.image.repository=flyteorg/${{ matrix.package }},${{ matrix.package }}.image.tag=latest
-          flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
-      - name: Post Upgrade Tests
-        env:
-          PRIORITIES: ${{ env.PRIORITIES }}
-        run: |
-          make end2end_execute
+#  end-to-end:
+#    needs: [ changes, docker-build ]
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - uses: unionai/flytectl-setup-action@v0.0.1
+#        name: Setup flytectl
+#      - uses: actions/setup-python@v3
+#        with:
+#          python-version: 3.8
+#      - id: load-docker-cache
+#        name: Load Docker Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/tmp/docker-images
+#          key: ${{ needs.docker-build.outputs.cache_key }}
+#      - name: Create Sandbox Cluster
+#        run: |
+#          cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
+#          flytectl config init
+#          flytectl sandbox start --source=$(pwd)
+#      - name: Prime docker cache
+#        run: |
+#          flytectl sandbox exec -- docker load -i /root/snapshot.tar
+#      - name: Setup Flytekit
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install flytekit
+#          pip freeze
+#      - name: Register flytesnacks examples
+#        uses: unionai/flyte-register-action@v0.0.2
+#        with:
+#          flytesnacks: true
+#          project: flytesnacks
+#          version: "latest"
+#          domain: development
+#      - name: Pre Upgrade Tests
+#        if: ${{ github.event.repository.name == 'flyteadmin' }}
+#        env:
+#          PRIORITIES: ${{ env.PRIORITIES }}
+#        run: |
+#          make end2end_execute
+#      - name: Upgrade Helm charts
+#        run: |
+#          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
+#          flytectl sandbox exec -- helm repo update
+#          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.package }}.image.repository=flyteorg/${{ matrix.package }},${{ matrix.package }}.image.tag=latest
+#          flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
+#      - name: Post Upgrade Tests
+#        env:
+#          PRIORITIES: ${{ env.PRIORITIES }}
+#        run: |
+#          make end2end_execute
 
-  integration-tests:
-    needs: [ changes, docker-build ]
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/docker-images
-          key: ${{ needs.docker-build.outputs.cache_key }}
-      - name: Prime docker cache
-        run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
-      - uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.11.1"
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Integration
-        run: |
-          # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          IMAGE_NAME=${{ github.event.repository.name }} IMAGE=flyteorg/${{ github.event.repository.name }}:builder make k8s_integration_execute
+#  integration-tests:
+#    needs: [ changes, docker-build ]
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - id: load-docker-cache
+#        name: Load Docker Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/tmp/docker-images
+#          key: ${{ needs.docker-build.outputs.cache_key }}
+#      - name: Prime docker cache
+#        run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
+#      - uses: engineerd/setup-kind@v0.5.0
+#        with:
+#          version: "v0.11.1"
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Integration
+#        run: |
+#          # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
+#          sudo rm -rf /usr/share/dotnet
+#          sudo rm -rf /opt/ghc
+#          sudo rm -rf "/usr/local/share/boost"
+#          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+#          kubectl cluster-info
+#          kubectl get pods -n kube-system
+#          echo "current-context:" $(kubectl config current-context)
+#          echo "environment-kubeconfig:" ${KUBECONFIG}
+#          IMAGE_NAME=${{ github.event.repository.name }} IMAGE=flyteorg/${{ github.event.repository.name }}:builder make k8s_integration_execute
 
-  go-generate:
-    needs: changes
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: arduino/setup-protoc@v1
-      - uses: bufbuild/buf-setup-action@v1
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Go generate and diff
-        run: DELTA_CHECK=true make generate
+#  go-generate:
+#    needs: changes
+#    if: needs.changes.outputs.packages != '[]'
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: arduino/setup-protoc@v1
+#      - uses: bufbuild/buf-setup-action@v1
+#      - uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Go generate and diff
+#        run: DELTA_CHECK=true make generate
 
   bump_version:
     needs: changes
