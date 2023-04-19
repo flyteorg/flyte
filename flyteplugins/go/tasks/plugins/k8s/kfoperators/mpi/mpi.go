@@ -3,6 +3,7 @@ package mpi
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -20,6 +21,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+const workerSpecCommandKey = "worker_spec_command"
 
 type mpiOperatorResourceHandler struct {
 }
@@ -45,6 +48,7 @@ func (mpiOperatorResourceHandler) BuildIdentityResource(ctx context.Context, tas
 // Defines a func to create the full resource object that will be posted to k8s.
 func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	taskTemplateConfig := taskTemplate.GetConfig()
 
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
@@ -69,11 +73,19 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.MPIJobDefaultContainerName)
 
 	// workersPodSpec is deepCopy of podSpec submitted by flyte
-	// WorkerPodSpec doesn't need any Argument & command. It will be trigger from launcher pod
 	workersPodSpec := podSpec.DeepCopy()
 
+	// If users don't specify "worker_spec_command" in the task config, the command/args are empty.
+	// However, in some cases, the workers need command/args.
+	// For example, in horovod tasks, each worker runs a command launching ssh daemon.
+
+	workerSpecCommand := []string{}
+	if val, ok := taskTemplateConfig[workerSpecCommandKey]; ok {
+		workerSpecCommand = strings.Split(val, " ")
+	}
+
 	for k := range workersPodSpec.Containers {
-		workersPodSpec.Containers[k].Args = []string{}
+		workersPodSpec.Containers[k].Args = workerSpecCommand
 		workersPodSpec.Containers[k].Command = []string{}
 	}
 
