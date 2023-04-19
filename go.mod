@@ -1,4 +1,4 @@
-module github.com/pingsutw/flyte-monorepo/flyte
+module github.com/pingsutw/flyte-monorepo
 
 go 1.19
 
