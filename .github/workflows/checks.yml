@@ -287,6 +287,10 @@ jobs:
     needs: [changes, bump_version]
     if: ${{ needs.changes.outputs.packages != '[]' }}
     name: Goreleaser
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -305,6 +309,5 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
   # TODO: Add push_docker_image, push-docker-image-flytescheduler
