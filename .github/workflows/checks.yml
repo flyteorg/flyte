@@ -70,12 +70,12 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: Unit Tests
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make install && make test_unit_codecov
       - name: Push CodeCov
         uses: codecov/codecov-action@v3.1.1
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: coverage.txt
           flags: unittests
@@ -183,7 +183,7 @@ jobs:
         run: |
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ github.event.repository.name }}.image.repository=flyteorg/${{ github.event.repository.name }},${{ github.event.repository.name }}.image.tag=latest
+          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.package }}.image.repository=flyteorg/${{ matrix.package }},${{ matrix.package }}.image.tag=latest
           flytectl sandbox exec -- k3s kubectl get pods -n flyte -oyaml
       - name: Post Upgrade Tests
         env:
@@ -278,7 +278,7 @@ jobs:
         id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
