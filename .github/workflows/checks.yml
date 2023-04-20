@@ -257,7 +257,7 @@ jobs:
 
   bump_version:
     needs: changes
-    if: ${{ needs.changes.outputs.packages != '[]' || github.event_name != 'pull_request' }}
+    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump_version.outputs.tag }}
@@ -272,7 +272,7 @@ jobs:
         id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
@@ -307,7 +307,7 @@ jobs:
 
   bump_component_version:
     needs: [ changes, bump_version, goreleaser ]
-    if: ${{ needs.changes.outputs.packages != '[]' || github.event_name != 'pull_request' }}
+    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
