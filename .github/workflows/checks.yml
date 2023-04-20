@@ -326,3 +326,5 @@ jobs:
           git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
 
   # TODO: Add push_docker_image, push-docker-image-flytescheduler
+  # https://github.com/flyteorg/flyteadmin/blob/master/.github/workflows/checks.yml#L74
+  # CodeCov report

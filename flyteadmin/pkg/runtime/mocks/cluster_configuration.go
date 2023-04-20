@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	interfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	interfaces "github.com/pingsutw/flyte-monorepo/flyteadmin/pkg/runtime/interfaces"
 	mock "github.com/stretchr/testify/mock"
 )
 
