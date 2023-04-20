@@ -6,7 +6,7 @@ Troubleshooting Guide
 
 .. tags:: Troubleshoot, Basic
 
-The content in this section will help Flyte users isolate the most possible causes for some of the common issues that could arise while getting started with the project.
+The content in this section will help Flyte users isolate the most probable causes for some of the common issues that could arise while getting started with the project.
 
 Before getting started, collect the following information from the underlying infrastructure:
 
@@ -33,12 +33,12 @@ Debugging common execution errors
 --------------------------------
 
 ``message: '0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.'``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This issue is more common on MacOS devices. Make sure that your Docker daemon has allocated a minimum of 4 CPU cores and 3GB of RAM
 
 ``terminated with exit code (137). Reason [OOMKilled]``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - For single binary environment deployed with Helm chart, make sure you are using `the most recent charts <https://github.com/flyteorg/flyte/tree/master/charts>`_
 
@@ -64,7 +64,7 @@ This issue is more common on MacOS devices. Make sure that your Docker daemon ha
       def your_task(...
 
 ``Error: ImagePullBackOff``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - If your environment requires the use of a network proxy use the ``--env`` option when starting the sandbox and pass the proxy configuration:
 
@@ -78,7 +78,7 @@ Issues running workloads
 -------------------------
 
 ``OPENSSL_internal:WRONG_VERSION_NUMBER`` 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - For ``flyte-binary``: make sure that the endpoint name you have set in your ``config.yaml`` file, is included in the DNS names of the SSL certificate installed (be it self signed or issued by a Certificate Authority)
 -  For ``sandbox``: verify the ``FLYTECTL_CONFIG`` environment variable has the correct value by running:
@@ -88,7 +88,7 @@ Issues running workloads
  $ export FLYTECTL_CONFIG=~/.flyte/config-sandbox.yaml
 
 ``ModuleNotFoundError``
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 - If you're using a custom container image and using Docker, make sure your ``Dockerfile`` is located at the same level of the ``flyte`` directory and that there is an empty ``__init__.py`` file in your project's folder :
 
@@ -105,7 +105,7 @@ Issues running workloads
  └── requirements.txt
 
 ``An error occurred (AccessDenied) when calling the PutObject operation`` in an EKS deployment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Make sure that the Kubernetes service account Flyte is using has the annotation that refers to the IAM Role is connected to:
 
