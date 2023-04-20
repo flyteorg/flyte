@@ -3,8 +3,8 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.42-0.20230418193414-6bf02c2d8481
-	github.com/flyteorg/flyteadmin v1.1.87-0.20230418213147-e8a0349eff02
+	github.com/flyteorg/datacatalog v1.0.47-0.20230420044930-efe9ad89c292
+	github.com/flyteorg/flyteadmin v1.1.91-0.20230420010403-2cb96abcc2c5
 	github.com/flyteorg/flytepropeller v1.1.83
 	github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a
 	github.com/golang/glog v1.0.0
@@ -76,7 +76,7 @@ require (
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/go-gormigrate/gormigrate/v2 v2.0.0 // indirect
+	github.com/go-gormigrate/gormigrate/v2 v2.0.2 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
@@ -165,7 +165,6 @@ require (
 	github.com/ray-project/kuberay/ray-operator v0.0.0-20220728052838-eaa75fa6707c // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -205,9 +204,9 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.2-0.20210529014059-a5c7eec3c614 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.4.4 // indirect
-	gorm.io/driver/sqlite v1.1.1 // indirect
-	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755 // indirect
+	gorm.io/driver/mysql v1.4.7 // indirect
+	gorm.io/driver/sqlite v1.5.0 // indirect
+	gorm.io/gorm v1.25.0 // indirect
 	k8s.io/api v0.24.1 // indirect
 	k8s.io/apiextensions-apiserver v0.24.1 // indirect
 	k8s.io/apimachinery v0.24.1 // indirect
