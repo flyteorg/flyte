@@ -38,6 +38,7 @@ Flyte components are separated into 3 logical planes. The planes are summarized 
 |                   | It sends status events back to the control plane so the information can be stored and surfaced to end-users.  |
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 
+.. figure:: ./images/Flyte-logical-architecture.png
 User Plane
 ----------
 
