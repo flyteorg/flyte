@@ -1,10 +1,9 @@
-module github.com/pingsutw/flyte-monorepo/flyteidl
+module github.com/flyteorg/flyteidl
 
 go 1.19
 
 require (
 	github.com/antihax/optional v1.0.0
-	github.com/flyteorg/flyteidl v1.4.2
 	github.com/flyteorg/flytestdlib v1.0.0
 	github.com/go-test/deep v1.0.7
 	github.com/golang/glog v1.0.0
