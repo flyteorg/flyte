@@ -30,7 +30,7 @@ Where <namespace> will typically correspond to the Flyte <project>-<domain>, e.g
 Depending on the contents of the logs or the `Events`, you can try different things:
 
 Debugging common execution errors
---------------------------------
+----------------------------------
 
 ``message: '0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.'``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
