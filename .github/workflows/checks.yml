@@ -71,12 +71,12 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: Unit Tests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
         run: make install && make test_unit_codecov
       - name: Push CodeCov
         uses: codecov/codecov-action@v3.1.1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
         with:
           file: coverage.txt
           flags: unittests
@@ -272,7 +272,7 @@ jobs:
         id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
@@ -303,7 +303,7 @@ jobs:
           args: release --rm-dist
           workdir: ${{ matrix.package }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
 
   bump_component_version:
     needs: [ changes, bump_version, goreleaser ]
@@ -324,6 +324,49 @@ jobs:
         run: |
           git tag ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
           git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
+          
+  push-github:
+    needs: [ changes, bump_version ]
+    name: Push to Github Registry
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Image Tags
+        id: tags
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/${{ matrix.package }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ matrix.package }}
+            type=sha,format=long,prefix=
+      - name: Build and Push Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ${{ matrix.package }}
+          platforms: linux/arm64,linux/amd64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
 
   # TODO: Add push_docker_image, push-docker-image-flytescheduler
   # https://github.com/flyteorg/flyteadmin/blob/master/.github/workflows/checks.yml#L74

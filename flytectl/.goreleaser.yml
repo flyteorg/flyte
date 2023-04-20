@@ -36,7 +36,7 @@ builds:
     ldflags:
       - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
 archives:
-  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - name_template: 'flytectl_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
       darwin: Darwin
       linux: Linux
