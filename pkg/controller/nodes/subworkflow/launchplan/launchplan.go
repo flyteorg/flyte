@@ -28,6 +28,8 @@ type LaunchContext struct {
 	RawOutputDataConfig *admin.RawOutputDataConfig
 	Annotations         map[string]string
 	Labels              map[string]string
+	Interruptible       *bool
+	OverwriteCache      bool
 }
 
 // Executor interface to be implemented by the remote system that can allow workflow launching capabilities
