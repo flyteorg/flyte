@@ -277,6 +277,31 @@ jobs:
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
 
+  bump_component_version:
+    needs: [changes, bump_version]
+    if: ${{ needs.changes.outputs.packages != '[]' || github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set branch name
+        id: extract_branch
+        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
+      - name: Bump version and push tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+          CUSTOM_TAG: ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
+          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
+
   goreleaser:
     needs: [changes, bump_version]
     if: ${{ needs.changes.outputs.packages != '[]' }}

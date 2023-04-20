@@ -1,4 +1,4 @@
-module github.com/flyteorg/flyteidl
+module github.com/pingsutw/flyte-monorepo/flyteidl
 
 go 1.19
 
