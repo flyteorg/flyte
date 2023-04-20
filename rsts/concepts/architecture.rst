@@ -39,6 +39,7 @@ Flyte components are separated into 3 logical planes. The planes are summarized 
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 
 .. figure:: ./images/Flyte-logical-architecture.png
+
 User Plane
 ----------
 
