@@ -3,7 +3,7 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.47-0.20230420044930-efe9ad89c292
+	github.com/flyteorg/datacatalog v1.0.47-0.20230420194602-54ee58b25027
 	github.com/flyteorg/flyteadmin v1.1.91-0.20230420010403-2cb96abcc2c5
 	github.com/flyteorg/flytepropeller v1.1.83
 	github.com/flyteorg/flytestdlib v1.0.17-0.20230320195919-90331d171e2a
@@ -205,7 +205,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.4.7 // indirect
-	gorm.io/driver/sqlite v1.5.0 // indirect
+	gorm.io/driver/sqlite v1.4.4 // indirect
 	gorm.io/gorm v1.25.0 // indirect
 	k8s.io/api v0.24.1 // indirect
 	k8s.io/apiextensions-apiserver v0.24.1 // indirect
