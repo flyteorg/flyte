@@ -16,6 +16,8 @@ Before getting started, collect the following information from the underlying in
 
  $ kubectl describe pod <PodName> -n <namespace>
 
+Where <PodName> will typically correspond to the node execution string that you can find in the UI.
+
 - Pay close attention to the `Events` section in the output.
 - Also, collect the logs from the Pod:
 
@@ -23,7 +25,12 @@ Before getting started, collect the following information from the underlying in
 
  $ kubectl logs pods -n <namespace>
 
+Where <namespace> will typically correspond to the Flyte <project>-<domain>, e.g. flytesnacks-development.
+
 Depending on the contents of the logs or the `Events`, you can try different things:
+
+Debugging common execution errors
+--------------------------------
 
 ``message: '0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.'``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
