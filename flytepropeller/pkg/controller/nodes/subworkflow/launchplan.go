@@ -73,6 +73,8 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		RawOutputDataConfig: nCtx.ExecutionContext().GetRawOutputDataConfig().RawOutputDataConfig,
 		Labels:              nCtx.ExecutionContext().GetLabels(),
 		Annotations:         nCtx.ExecutionContext().GetAnnotations(),
+		Interruptible:       nCtx.ExecutionContext().GetExecutionConfig().Interruptible,
+		OverwriteCache:      nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache,
 	}
 
 	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {

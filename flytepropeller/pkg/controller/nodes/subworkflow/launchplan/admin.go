@@ -6,23 +6,25 @@ import (
 	"fmt"
 	"time"
 
-	evtErr "github.com/flyteorg/flytepropeller/events/errors"
-
-	"github.com/flyteorg/flytestdlib/cache"
-	"golang.org/x/time/rate"
-	"k8s.io/client-go/util/workqueue"
-
-	stdErr "github.com/flyteorg/flytestdlib/errors"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"github.com/flyteorg/flytestdlib/promutils"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
+	"github.com/flyteorg/flytestdlib/cache"
+	stdErr "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+
+	evtErr "github.com/flyteorg/flytepropeller/events/errors"
+
+	"github.com/golang/protobuf/ptypes/wrappers"
+
+	"golang.org/x/time/rate"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"k8s.io/client-go/util/workqueue"
 )
 
 var isRecovery = true
@@ -93,6 +95,13 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
+	var interruptible *wrappers.BoolValue
+	if launchCtx.Interruptible != nil {
+		interruptible = &wrappers.BoolValue{
+			Value: *launchCtx.Interruptible,
+		}
+	}
+
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
@@ -111,6 +120,8 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			SecurityContext:     &launchCtx.SecurityContext,
 			MaxParallelism:      int32(launchCtx.MaxParallelism),
 			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
+			Interruptible:       interruptible,
+			OverwriteCache:      launchCtx.OverwriteCache,
 		},
 	}
 
