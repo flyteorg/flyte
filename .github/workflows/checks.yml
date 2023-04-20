@@ -293,14 +293,9 @@ jobs:
         id: extract_branch
         run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
       - name: Bump version and push tag
-        id: bump_version
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          DEFAULT_BUMP: patch
-          CUSTOM_TAG: ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
-          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
+        run: |
+          git tag ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
+          git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
 
   goreleaser:
     needs: [changes, bump_version]
