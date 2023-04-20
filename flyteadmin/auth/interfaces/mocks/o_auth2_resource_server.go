@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	interfaces "github.com/pingsutw/flyte-monorepo/flyteadmin/auth/interfaces"
+	interfaces "github.com/flyteorg/flyteadmin/auth/interfaces"
 	mock "github.com/stretchr/testify/mock"
 )
 

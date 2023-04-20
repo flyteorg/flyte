@@ -1,4 +1,4 @@
-module github.com/pingsutw/flyte-monorepo/flyteadmin
+module github.com/flyteorg/flyteadmin
 
 go 1.19
 
