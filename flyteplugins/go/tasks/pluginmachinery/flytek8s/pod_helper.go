@@ -521,7 +521,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 
 							case "ImagePullBackOff":
 								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
 							default:
