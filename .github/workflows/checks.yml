@@ -257,7 +257,7 @@ jobs:
 
   bump_version:
     needs: changes
-    if: ${{ needs.changes.outputs.packages != '[]' }} && False
+    if: ${{ needs.changes.outputs.packages != '[]' && False }}
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump_version.outputs.tag }}
