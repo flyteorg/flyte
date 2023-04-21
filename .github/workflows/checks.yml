@@ -1,6 +1,10 @@
 name: Checks Flyte Components
 
-on: push
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 env:
   GO_VERSION: "1.19"
@@ -257,7 +261,7 @@ jobs:
 
   bump_version:
     needs: changes
-    if: ${{ needs.changes.outputs.packages != '[]' && false }}
+    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump_version.outputs.tag }}
@@ -307,7 +311,7 @@ jobs:
 
   bump_component_version:
     needs: [ changes, bump_version, goreleaser ]
-    if: ${{ needs.changes.outputs.packages != '[]' }} && ${{ github.event_name != 'pull_request' }}
+    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
