@@ -1,7 +1,9 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence.
 
+/datacatalog      @kumare3 @wild-endeavor
 /flyteadmin       @katrogan @wild-endeavor @EngHabu @kumare3 @pmahindrakar-oss @hamersaw @eapolinario
 /flytecopilot     @EngHabu @kumare3
 /flytectl         @kumare3 @enghabu @wild-endeavor
 /flytepropeller   @kumare3 @EngHabu @hamersaw
+/flytestdlib      @EngHabu @katrogan @kumare3 @wild-endeavor

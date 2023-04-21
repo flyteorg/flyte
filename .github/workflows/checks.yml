@@ -197,16 +197,12 @@ jobs:
           make end2end_execute
 
   integration-tests:
-    needs: [ changes, docker-build ]
+    needs: docker-build
     if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ matrix.package }}
+        working-directory: flyteadmin
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -236,7 +232,7 @@ jobs:
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
-          IMAGE_NAME=${{ github.event.repository.name }} IMAGE=flyteorg/${{ github.event.repository.name }}:builder make k8s_integration_execute
+          IMAGE_NAME=flyteadmin IMAGE=flyteorg/flyteadmin:builder make k8s_integration_execute
 
   go-generate:
     needs: changes
