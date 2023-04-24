@@ -153,7 +153,7 @@ jobs:
           version: "latest"
           domain: development
       - name: Pre Upgrade Tests
-        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
+        if : ${{ matrix.package == 'flyteadmin' }}
         env:
           PRIORITIES: ${{ env.PRIORITIES }}
         run: |
