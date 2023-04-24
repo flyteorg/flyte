@@ -107,3 +107,7 @@ build_native_flyte:
 update_boilerplate:
 	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
+
+.PHONY: end2end_execute
+end2end_execute:
+	pass  # TODO: updated it
