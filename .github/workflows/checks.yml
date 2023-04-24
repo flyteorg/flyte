@@ -130,19 +130,23 @@ jobs:
         run: mkdir -p /tmp/tmp/${{ matrix.package }}/docker-images && docker save flyteorg/${{ matrix.package }}:builder -o /tmp/tmp/${{ matrix.package }}/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.package }}:latest -o /tmp/tmp/${{ matrix.package }}/docker-images/snapshot.tar
 
       - name: Create Sandbox Cluster
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         run: |
           cp /tmp/tmp/${{ matrix.package }}/docker-images/snapshot.tar snapshot.tar
           flytectl config init
           flytectl sandbox start --source=$(pwd)
       - name: Prime docker cache
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         run: |
           flytectl sandbox exec -- docker load -i /root/snapshot.tar
       - name: Setup Flytekit
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         run: |
           python -m pip install --upgrade pip
           pip install flytekit
           pip freeze
       - name: Register flytesnacks examples
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         uses: unionai/flyte-register-action@v0.0.2
         with:
           flytesnacks: true
@@ -150,18 +154,20 @@ jobs:
           version: "latest"
           domain: development
       - name: Pre Upgrade Tests
-        if: ${{ github.event.repository.name == 'flyteadmin' }}
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         env:
           PRIORITIES: ${{ env.PRIORITIES }}
         run: |
           make end2end_execute
       - name: Upgrade Helm charts
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         run: |
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
           flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.package }}.image.repository=flyteorg/${{ matrix.package }},${{ matrix.package }}.image.tag=latest
           flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
       - name: Post Upgrade Tests
+        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         env:
           PRIORITIES: ${{ env.PRIORITIES }}
         run: |
