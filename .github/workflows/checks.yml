@@ -112,7 +112,7 @@ jobs:
           restore-keys: |
             /tmp/docker-images-
       - name: Prime docker cache
-        run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
+        run: (docker load -i /tmp/tmp/${{ matrix.package }}/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/${{ matrix.package }}/docker-images/snapshot.tar || true)
       - name: Build dockerfile
         if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         env:
@@ -161,7 +161,7 @@ jobs:
         run: |
           make end2end_execute
       - name: Upgrade Helm charts
-        if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
+        if : ${{ matrix.package == 'flyteadmin' }}
         run: |
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
@@ -206,10 +206,13 @@ jobs:
 
       - name: Tag and cache docker image
         run: mkdir -p /tmp/tmp/flyteadmin/docker-images && docker save flyteorg/flyteadmin:builder -o /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar && docker save flyteorg/flyteadmin:latest -o /tmp/tmp/flyteadmin/docker-images/snapshot.tar
+      - uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.11.1"
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: ${{ inputs.go-version }}
       - name: Integration
         run: |
           # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
@@ -244,75 +247,75 @@ jobs:
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate
 
-  bump_version:
-    needs: changes
-    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.bump_version.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: '0'
-      - name: Set branch name
-        id: extract_branch
-        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
-      - name: Bump version and push tag
-        id: bump_version
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          DEFAULT_BUMP: patch
-          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
+#  bump_version:
+#    needs: changes
+#    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
+#    runs-on: ubuntu-latest
+#    outputs:
+#      version: ${{ steps.bump_version.outputs.tag }}
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: '0'
+#      - name: Set branch name
+#        id: extract_branch
+#        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
+#      - name: Bump version and push tag
+#        id: bump_version
+#        uses: anothrNick/github-tag-action@1.36.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          WITH_V: true
+#          DEFAULT_BUMP: patch
+#          RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
 
-  goreleaser:
-    needs: [changes, bump_version]
-    if: ${{ needs.changes.outputs.packages != '[]' }}
-    name: Goreleaser
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: "0"
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          args: release --rm-dist
-          workdir: ${{ matrix.package }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#  goreleaser:
+#    needs: [changes, bump_version]
+#    if: ${{ needs.changes.outputs.packages != '[]' }}
+#    name: Goreleaser
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.package }}
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: "0"
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Run GoReleaser
+#        uses: goreleaser/goreleaser-action@v2
+#        with:
+#          args: release --rm-dist
+#          workdir: ${{ matrix.package }}
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  bump_component_version:
-    needs: [ changes, bump_version, goreleaser ]
-    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: '0'
-      - name: Set branch name
-        id: extract_branch
-        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
-      - name: Bump version and push tag
-        run: |
-          git tag ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
-          git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
+#  bump_component_version:
+#    needs: [ changes, bump_version, goreleaser ]
+#    if: ${{ needs.changes.outputs.packages != '[]' && github.event_name != 'pull_request' }}
+#    runs-on: ubuntu-latest
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: '0'
+#      - name: Set branch name
+#        id: extract_branch
+#        run: echo "branch_name=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})" >> "$GITHUB_OUTPUT"
+#      - name: Bump version and push tag
+#        run: |
+#          git tag ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
+#          git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
           
   push-github:
     needs: [ changes, bump_version ]
