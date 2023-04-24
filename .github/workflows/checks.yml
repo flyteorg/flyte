@@ -30,8 +30,6 @@ jobs:
             flyteplugins: flyteplugins/**
             flytepropeller: flytepropeller/**
             datacatalog: datacatalog/**
-            flyteidl: flyteidl/**
-            flytectl: flytectl/**
             flytecopilot: flytecopilot/**
             flytestdlib: flytestdlib/**
 
@@ -318,7 +316,7 @@ jobs:
 #          git push origin ${{ matrix.package }}/${{ needs.bump_version.outputs.version }}
           
   push-github:
-    needs: [ changes, bump_version ]
+    needs: [ changes ]
     name: Push to Github Registry
     runs-on: ubuntu-latest
     strategy:
