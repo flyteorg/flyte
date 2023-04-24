@@ -86,7 +86,7 @@ jobs:
           flags: unittests
           fail_ci_if_error: false
 
-  docker-build:
+  end-to-end:
     needs: changes
     if: needs.changes.outputs.packages != '[]'
     strategy:
@@ -97,8 +97,6 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.package }}
-    outputs:
-      cache_key_${{ matrix.package }}: ${{ steps.create_cache_key.outputs.cache_key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -106,14 +104,10 @@ jobs:
         name: Load Docker Cache
         uses: actions/cache@v3
         with:
-          path: /tmp/tmp/docker-images
+          path: /tmp/tmp/${{ matrix.package }}/docker-images
           key: /tmp/docker-images-${{ github.run_id }}
           restore-keys: |
             /tmp/docker-images-
-      - name: Set cache key output
-        id: create_cache_key
-        run: |
-          echo "cache_key_${{ matrix.package }}=/tmp/docker-images-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
       - name: Prime docker cache
         run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
       - name: Build dockerfile
@@ -131,36 +125,11 @@ jobs:
 
       - name: Tag and cache docker image
         if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
-        run: mkdir -p /tmp/tmp/docker-images && docker save flyteorg/${{ matrix.package }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.package }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+        run: mkdir -p /tmp/tmp/${{ matrix.package }}/docker-images && docker save flyteorg/${{ matrix.package }}:builder -o /tmp/tmp/${{ matrix.package }}/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.package }}:latest -o /tmp/tmp/${{ matrix.package }}/docker-images/snapshot.tar
 
-  end-to-end:
-    needs: [ changes, docker-build ]
-    if: needs.changes.outputs.packages != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: unionai/flytectl-setup-action@v0.0.1
-        name: Setup flytectl
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.8
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/docker-images
-          key: ${{ format('needs.docker-build.outputs.cache_key_{0}', matrix.package) }}
       - name: Create Sandbox Cluster
         run: |
-          cp /tmp/tmp/docker-images/snapshot.tar snapshot.tar
+          cp /tmp/tmp/${{ matrix.package }}/docker-images/snapshot.tar snapshot.tar
           flytectl config init
           flytectl sandbox start --source=$(pwd)
       - name: Prime docker cache
@@ -197,8 +166,6 @@ jobs:
           make end2end_execute
 
   integration-tests:
-    needs: docker-build
-    if: needs.changes.outputs.packages != '[]'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -210,13 +177,26 @@ jobs:
         name: Load Docker Cache
         uses: actions/cache@v3
         with:
-          path: /tmp/tmp/docker-images
-          key: ${{ format('needs.docker-build.outputs.cache_key_{0}', matrix.package) }}
+          path: /tmp/tmp/flyteadmin/docker-images
+          key: /tmp/docker-images-${{ github.run_id }}
+          restore-keys: |
+            /tmp/docker-images-
       - name: Prime docker cache
-        run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
-      - uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.11.1"
+        run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
+      - name: Build dockerfile
+        env:
+          # We are unable to leverage docker buildx here without changing the
+          # caching mechanism significantly. See here for the caching options
+          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
+          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
+          # should rewrite this pipeline to use docker buildx with cache type=gha.
+          DOCKER_BUILDKIT: "1"
+        run: |
+          docker build -t flyteorg/flyteadmin:builder --target builder --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
+          docker build -t flyteorg/flyteadmin:latest --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
+
+      - name: Tag and cache docker image
+        run: mkdir -p /tmp/tmp/flyteadmin/docker-images && docker save flyteorg/flyteadmin:builder -o /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar && docker save flyteorg/flyteadmin:latest -o /tmp/tmp/flyteadmin/docker-images/snapshot.tar
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
