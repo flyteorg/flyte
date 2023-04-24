@@ -277,34 +277,33 @@ jobs:
           DEFAULT_BUMP: patch
           RELEASE_BRANCHES: ${{ steps.extract_branch.outputs.branch_name }}
 
-  # Temporarily disable it
-#  goreleaser:
-#    needs: [changes, bump_version]
-#    if: ${{ needs.changes.outputs.packages != '[]' }}
-#    name: Goreleaser
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        package: ${{ fromJSON(needs.changes.outputs.packages) }}
-#    runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        working-directory: ${{ matrix.package }}
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          fetch-depth: "0"
-#      - name: Set up Go
-#        uses: actions/setup-go@v2
-#        with:
-#          go-version: ${{ env.GO_VERSION }}
-#      - name: Run GoReleaser
-#        uses: goreleaser/goreleaser-action@v2
-#        with:
-#          args: release --rm-dist
-#          workdir: ${{ matrix.package }}
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+  goreleaser:
+    needs: [changes, bump_version]
+    if: ${{ needs.changes.outputs.packages != '[]' }}
+    name: Goreleaser
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: release --rm-dist
+          workdir: ${{ matrix.package }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
 
   bump_component_version:
     needs: [ changes, bump_version, goreleaser ]
