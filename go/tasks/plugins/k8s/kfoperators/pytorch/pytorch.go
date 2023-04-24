@@ -73,26 +73,59 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 
-	jobSpec := kubeflowv1.PyTorchJobSpec{
-		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.PyTorchJobReplicaTypeMaster: {
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: *objectMeta,
-					Spec:       *podSpec,
-				},
-				RestartPolicy: commonOp.RestartPolicyNever,
-			},
-			kubeflowv1.PyTorchJobReplicaTypeWorker: {
-				Replicas: &workers,
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: *objectMeta,
-					Spec:       *podSpec,
-				},
-				RestartPolicy: commonOp.RestartPolicyNever,
-			},
-		},
-	}
+	var jobSpec kubeflowv1.PyTorchJobSpec
 
+	elasticConfig := pytorchTaskExtraArgs.GetElasticConfig()
+
+	if elasticConfig != nil {
+		minReplicas := elasticConfig.GetMinReplicas()
+		maxReplicas := elasticConfig.GetMaxReplicas()
+		nProcPerNode := elasticConfig.GetNprocPerNode()
+		maxRestarts := elasticConfig.GetMaxRestarts()
+		rdzvBackend := kubeflowv1.RDZVBackend(elasticConfig.GetRdzvBackend())
+
+		jobSpec = kubeflowv1.PyTorchJobSpec{
+			ElasticPolicy: &kubeflowv1.ElasticPolicy{
+				MinReplicas:  &minReplicas,
+				MaxReplicas:  &maxReplicas,
+				RDZVBackend:  &rdzvBackend,
+				NProcPerNode: &nProcPerNode,
+				MaxRestarts:  &maxRestarts,
+			},
+			PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+				kubeflowv1.PyTorchJobReplicaTypeWorker: {
+					Replicas: &workers,
+					Template: v1.PodTemplateSpec{
+						ObjectMeta: *objectMeta,
+						Spec:       *podSpec,
+					},
+					RestartPolicy: commonOp.RestartPolicyNever,
+				},
+			},
+		}
+
+	} else {
+
+		jobSpec = kubeflowv1.PyTorchJobSpec{
+			PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+				kubeflowv1.PyTorchJobReplicaTypeMaster: {
+					Template: v1.PodTemplateSpec{
+						ObjectMeta: *objectMeta,
+						Spec:       *podSpec,
+					},
+					RestartPolicy: commonOp.RestartPolicyNever,
+				},
+				kubeflowv1.PyTorchJobReplicaTypeWorker: {
+					Replicas: &workers,
+					Template: v1.PodTemplateSpec{
+						ObjectMeta: *objectMeta,
+						Spec:       *podSpec,
+					},
+					RestartPolicy: commonOp.RestartPolicyNever,
+				},
+			},
+		}
+	}
 	job := &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       kubeflowv1.PytorchJobKind,
