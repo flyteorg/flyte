@@ -368,6 +368,6 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
 
-  # TODO: Add push_docker_image, push-docker-image-flytescheduler
+  # TODO: Add push-docker-image-flytescheduler
   # https://github.com/flyteorg/flyteadmin/blob/master/.github/workflows/checks.yml#L74
   # CodeCov report
