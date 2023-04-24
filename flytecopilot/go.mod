@@ -103,6 +103,5 @@ require (
 )
 
 replace (
-	github.com/flyteorg/flyteidl => ../flyteidl
 	github.com/flyteorg/flytestdlib => ../flytestdlib
 )
