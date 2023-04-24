@@ -103,6 +103,22 @@ pub struct PrestoQuery {
     #[prost(string, tag="4")]
     pub statement: ::prost::alloc::string::String,
 }
+/// Custom proto for torch elastic config for distributed training using 
+/// <https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go>
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ElasticConfig {
+    #[prost(string, tag="1")]
+    pub rdzv_backend: ::prost::alloc::string::String,
+    #[prost(int32, tag="2")]
+    pub min_replicas: i32,
+    #[prost(int32, tag="3")]
+    pub max_replicas: i32,
+    #[prost(int32, tag="4")]
+    pub nproc_per_node: i32,
+    #[prost(int32, tag="5")]
+    pub max_restarts: i32,
+}
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/pytorch-operator>
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -110,6 +126,10 @@ pub struct DistributedPyTorchTrainingTask {
     /// number of worker replicas spawned in the cluster for this job
     #[prost(int32, tag="1")]
     pub workers: i32,
+    /// config for an elastic pytorch job
+    /// 
+    #[prost(message, optional, tag="2")]
+    pub elastic_config: ::core::option::Option<ElasticConfig>,
 }
 /// Defines a query to execute on a hive cluster.
 #[allow(clippy::derive_partial_eq_without_eq)]
