@@ -98,7 +98,7 @@ jobs:
       run:
         working-directory: ${{ matrix.package }}
     outputs:
-      cache_key: ${{ steps.create_cache_key.outputs.cache_key }}
+      cache_key_${{ matrix.package }}: ${{ steps.create_cache_key.outputs.cache_key }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
