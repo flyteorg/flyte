@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - monorepo-1
   pull_request:
 
 env:

@@ -1,5 +1,4 @@
 export REPOSITORY=flyte
-include boilerplate/flyte/end2end/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose --resolver=backtracking
