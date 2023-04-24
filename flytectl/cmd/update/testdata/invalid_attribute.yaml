@@ -1,5 +1,0 @@
-InvalidDomain: development
-InvalidProject: flytesnacks
-InvalidWorkflow: ""
-cpu: "1"
-memory: 150Mi

@@ -1,9 +1,0 @@
-project_name: flyteidl
-builds:
-  - skip: true
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'

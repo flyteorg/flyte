@@ -1,5 +1,0 @@
-domain: development
-project: flytesnacks
-attributes:
-  "foo": "bar"
-  "buzz": "lightyear"
