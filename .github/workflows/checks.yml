@@ -192,7 +192,7 @@ jobs:
           restore-keys: |
             /tmp/docker-images-
       - name: Prime docker cache
-        run: (docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/docker-images/snapshot.tar || true)
+        run: (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot.tar || true)
       - name: Build dockerfile
         env:
           # We are unable to leverage docker buildx here without changing the
