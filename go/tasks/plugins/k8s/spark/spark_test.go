@@ -585,8 +585,17 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["foo"], defaultEnvVars["foo"])
 	assert.Equal(t, sparkApp.Spec.Driver.EnvVars["fooEnv"], targetValueFromEnv)
 	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["fooEnv"], targetValueFromEnv)
-	assert.Equal(t, sparkApp.Spec.Driver.Affinity, defaultAffinity)
 
+	assert.Equal(
+		t,
+		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+	)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
+		*nonInterruptibleNodeSelectorRequirement,
+	)
 	assert.Equal(
 		t,
 		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
@@ -639,7 +648,16 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, sparkApp.Spec.Driver.Tolerations[0].Value, "default")
 
 	// Validate correct affinity and nodeselector requirements are set for both Driver and Executors.
-	assert.Equal(t, sparkApp.Spec.Driver.Affinity, defaultAffinity)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+	)
+	assert.Equal(
+		t,
+		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
+		*nonInterruptibleNodeSelectorRequirement,
+	)
 	assert.Equal(
 		t,
 		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
