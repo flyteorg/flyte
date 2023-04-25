@@ -42,7 +42,7 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
   <span> · </span>
   <a href="https://docs.flyte.org/">Documentation</a>
   <span> · </span>
-  <a href="#roadmap">Roadmap</a>
+  <a href="#resources">Resources</a>
 </h3>
 
 <br />
@@ -82,13 +82,17 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 - **Allocate resources dynamically** at the task level.
 - [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution.
 
-## Quickstart
+## Quick start
 
 If you want to try out Flyte, the easiest way to get started is by using the Flyte Hosted Sandbox, available at https://sandbox.union.ai/. It allows you to experiment with Flyte's capabilities without installing anything on your local machine.
 
-However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte and run your first workflow.
+However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
 
-If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/basic_workflow.html) are, be sure to check out our guides on both!
+### Deploy Flyte to production
+
+The [deployment guide](https://docs.flyte.org/en/latest/deployment/index.html) should be helpful to self-host and administer Flyte. 
+
+> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/basic_workflow.html) are, be sure to check out our guides on both!
 
 ## Adopters
 
@@ -100,13 +104,13 @@ Stay up to date with the latest project roadmap by checking out our live [roadma
 
 ## Resources
 
-- [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered.
-- [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions.
-- [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help.
-- [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development.
-- [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. 
-- [Blog](https://flyte.org/blog): Check out the tutorials and feature deep dives.
-- [RFCs](rfc/.): RFCs contain our existing product proposals.
+📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered.
+👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions.
+💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help.
+⚠️ [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development.
+📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. 
+📄 [Blog](https://flyte.org/blog): Check out the tutorials and feature deep dives.
+💡 [RFCs](rfc/.): RFCs contain our existing product proposals.
 
 ## How to Contribute
 
