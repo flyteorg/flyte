@@ -38,4 +38,4 @@ POD_NAME=$(kubectl get pods -n flyte --field-selector=status.phase=Running -o go
 echo $POD_NAME
 
 # launch the integration tests
-kubectl exec -i -n flyte "$POD_NAME" -- make -C /go/src/github.com/flyteorg/flyteadmin integration
+kubectl exec -it -n flyte "$POD_NAME" -- make -C /go/src/github.com/flyteorg/flyte/flyteadmin integration
