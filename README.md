@@ -88,11 +88,11 @@ If you want to try out Flyte, the easiest way to get started is by using the Fly
 
 However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
 
+> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/basic_workflow.html) are, be sure to check out our guides on both!
+
 ### Deploy Flyte to production
 
 The [deployment guide](https://docs.flyte.org/en/latest/deployment/index.html) should be helpful to self-host and administer Flyte. 
-
-> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/basic_workflow.html) are, be sure to check out our guides on both!
 
 ## Adopters
 
@@ -104,12 +104,12 @@ Stay up to date with the latest project roadmap by checking out our live [roadma
 
 ## Resources
 
-📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered.
-👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions.
-💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help.
-⚠️ [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development.
-📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. 
-📄 [Blog](https://flyte.org/blog): Check out the tutorials and feature deep dives.
+📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
+👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
+💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
+⚠️ [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development. <br>
+📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>
+📄 [Blog](https://flyte.org/blog): Check out the tutorials and feature deep dives. <br>
 💡 [RFCs](rfc/.): RFCs contain our existing product proposals.
 
 ## How to Contribute
