@@ -30,7 +30,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.4.3"
+release = "1.5.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -245,6 +245,9 @@ mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "
+
+# prevent css style tags from being copied by the copy button
+copybutton_exclude = 'style[type="text/css"]'
 
 # -- Options for todo extension ----------------------------------------------
 
