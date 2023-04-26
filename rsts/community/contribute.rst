@@ -13,7 +13,7 @@ Here are some guidelines for you to follow, which will make your first and follo
 
 TL;DR: Find the repo-specific contribution guidelines in the `Component Reference <#component-reference>`__ section.
 
-💻 Becoming a Contributor
+💻 Becoming a contributor
 =========================
 
 An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
@@ -47,14 +47,7 @@ For API- and code-related content, it extracts docstrings from the code files.
 
 To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__. 
 
-For minor edits that don’t require a local setup, you can edit the GitHub page in the documentation to propose improvements.
-
-The edit option can be found at the bottom of a page, as shown below.
-
-.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/docs_edit.png
-    :alt: GitHub edit option for Documentation
-    :align: center
-    :figclass: align-center
+For minor edits that don't require a local setup, you can edit the GitHub page in the documentation to propose improvements.
 
 Intersphinx
 ***********
@@ -139,7 +132,7 @@ Output:
 
 :py:meth:`Method <python:pprint.PrettyPrinter.format>`
 
-🧱 Component Reference
+🧱 Component reference
 ======================
 
 To understand how the below components interact with each other, refer to :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`.
@@ -303,7 +296,7 @@ Nonetheless, this setup allows you to run the Flyte binary from your IDE, enabli
 Additionally, this setup connects you to all other resources in the demo environment, such as PostgreSQL and RDS.
 
 Dev mode cluster
-----------------
+****************
 
 To launch the dependencies, teardown any old sandboxes you may have, and then run:
 
@@ -314,32 +307,32 @@ To launch the dependencies, teardown any old sandboxes you may have, and then ru
 This command will launch the demo environment without running Flyte. By doing so, developers can run Flyte later on their host machine.
 
 Set up Flyte configuration
---------------------------
+**************************
 
 #. Copy the file ``flyte-single-binary-local.yaml`` to ``~/.flyte/local-dev-config.yaml``.
 #. Replace occurrences of ``$HOME`` with the actual path of your home directory.
 
 Cluster resources
------------------
+*****************
 
 One of the configuration entries you will notice is ``cluster_resources.templatePath``.
 This folder should contain the templates that the cluster resource controller will use.
 To begin, you can create a file called ``~/.flyte/cluster-resource-templates/00_namespace.yaml`` with the following content:
 
 .. literalinclude:: ../../charts/flyte-binary/eks-production.yaml
-    :lines: 81-85
+    :lines: 81-87
 
 Pull console artifacts
-----------------------
+**********************
 
-Run the following command from the base folder of the Flyte repository to pull in the static assets for Flyteconsole ::
+Run the following command from the base folder of the Flyte repository to pull in the static assets for Flyteconsole:
 
 .. code-block::
 
     make cmd/single/dist
 
 Build and iterate
----------------
+*****************
 
 To bring in the code of the component you are testing, use the command go get ``github.com/flyteorg/<component>&gitsha``.
 Once you have done that, you can run the following command:
@@ -354,7 +347,7 @@ You can also create a build target in your IDE with the same command.
 Once it is up and running, you can access Flyte hosted by your local machine by going to ``localhost:30080/console``.
 The Docker host mapping is used to obtain the correct IP address for your local host.
 
-🐞 File an Issue
+🐞 File an issue
 ================
 
 We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tracking. The following issue types are available for filing an issue:
@@ -369,7 +362,5 @@ We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tr
 
 If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 Also, add relevant labels to your issue. For example, if you are filing a Flytekit plugin request, add the ``flytekit`` label.
-
-|
 
 For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__. 
