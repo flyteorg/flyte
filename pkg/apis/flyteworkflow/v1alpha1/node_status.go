@@ -765,6 +765,7 @@ type TaskNodeStatus struct {
 	BarrierClockTick                    uint32        `json:"tick,omitempty"`
 	LastPhaseUpdatedAt                  time.Time     `json:"updAt,omitempty"`
 	PreviousNodeExecutionCheckpointPath DataReference `json:"checkpointPath,omitempty"`
+	CleanupOnFailure                    bool          `json:"clean,omitempty"`
 }
 
 func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
@@ -792,6 +793,11 @@ func (in *TaskNodeStatus) SetLastPhaseUpdatedAt(updatedAt time.Time) {
 
 func (in *TaskNodeStatus) SetPluginStateVersion(v uint32) {
 	in.PluginStateVersion = v
+	in.SetDirty()
+}
+
+func (in *TaskNodeStatus) SetCleanupOnFailure(cleanupOnFailure bool) {
+	in.CleanupOnFailure = cleanupOnFailure
 	in.SetDirty()
 }
 
@@ -827,6 +833,10 @@ func (in TaskNodeStatus) GetPreviousNodeExecutionCheckpointPath() DataReference 
 
 func (in TaskNodeStatus) GetPhaseVersion() uint32 {
 	return in.PhaseVersion
+}
+
+func (in TaskNodeStatus) GetCleanupOnFailure() bool {
+	return in.CleanupOnFailure
 }
 
 func (in *TaskNodeStatus) UpdatePhase(phase int, phaseVersion uint32) {

@@ -46,6 +46,38 @@ func (_m *MutableTaskNodeStatus) GetBarrierClockTick() uint32 {
 	return r0
 }
 
+type MutableTaskNodeStatus_GetCleanupOnFailure struct {
+	*mock.Call
+}
+
+func (_m MutableTaskNodeStatus_GetCleanupOnFailure) Return(_a0 bool) *MutableTaskNodeStatus_GetCleanupOnFailure {
+	return &MutableTaskNodeStatus_GetCleanupOnFailure{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableTaskNodeStatus) OnGetCleanupOnFailure() *MutableTaskNodeStatus_GetCleanupOnFailure {
+	c_call := _m.On("GetCleanupOnFailure")
+	return &MutableTaskNodeStatus_GetCleanupOnFailure{Call: c_call}
+}
+
+func (_m *MutableTaskNodeStatus) OnGetCleanupOnFailureMatch(matchers ...interface{}) *MutableTaskNodeStatus_GetCleanupOnFailure {
+	c_call := _m.On("GetCleanupOnFailure", matchers...)
+	return &MutableTaskNodeStatus_GetCleanupOnFailure{Call: c_call}
+}
+
+// GetCleanupOnFailure provides a mock function with given fields:
+func (_m *MutableTaskNodeStatus) GetCleanupOnFailure() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type MutableTaskNodeStatus_GetLastPhaseUpdatedAt struct {
 	*mock.Call
 }
@@ -275,6 +307,11 @@ func (_m *MutableTaskNodeStatus) IsDirty() bool {
 // SetBarrierClockTick provides a mock function with given fields: tick
 func (_m *MutableTaskNodeStatus) SetBarrierClockTick(tick uint32) {
 	_m.Called(tick)
+}
+
+// SetCleanupOnFailure provides a mock function with given fields: _a0
+func (_m *MutableTaskNodeStatus) SetCleanupOnFailure(_a0 bool) {
+	_m.Called(_a0)
 }
 
 // SetLastPhaseUpdatedAt provides a mock function with given fields: updatedAt
