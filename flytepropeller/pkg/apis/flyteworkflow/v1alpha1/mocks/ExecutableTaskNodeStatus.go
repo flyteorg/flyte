@@ -46,6 +46,38 @@ func (_m *ExecutableTaskNodeStatus) GetBarrierClockTick() uint32 {
 	return r0
 }
 
+type ExecutableTaskNodeStatus_GetCleanupOnFailure struct {
+	*mock.Call
+}
+
+func (_m ExecutableTaskNodeStatus_GetCleanupOnFailure) Return(_a0 bool) *ExecutableTaskNodeStatus_GetCleanupOnFailure {
+	return &ExecutableTaskNodeStatus_GetCleanupOnFailure{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableTaskNodeStatus) OnGetCleanupOnFailure() *ExecutableTaskNodeStatus_GetCleanupOnFailure {
+	c_call := _m.On("GetCleanupOnFailure")
+	return &ExecutableTaskNodeStatus_GetCleanupOnFailure{Call: c_call}
+}
+
+func (_m *ExecutableTaskNodeStatus) OnGetCleanupOnFailureMatch(matchers ...interface{}) *ExecutableTaskNodeStatus_GetCleanupOnFailure {
+	c_call := _m.On("GetCleanupOnFailure", matchers...)
+	return &ExecutableTaskNodeStatus_GetCleanupOnFailure{Call: c_call}
+}
+
+// GetCleanupOnFailure provides a mock function with given fields:
+func (_m *ExecutableTaskNodeStatus) GetCleanupOnFailure() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type ExecutableTaskNodeStatus_GetLastPhaseUpdatedAt struct {
 	*mock.Call
 }

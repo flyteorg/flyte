@@ -747,6 +747,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		PluginPhaseVersion:                 pluginTrns.pInfo.Version(),
 		LastPhaseUpdatedAt:                 time.Now(),
 		PreviousNodeExecutionCheckpointURI: ts.PreviousNodeExecutionCheckpointURI,
+		CleanupOnFailure:                   ts.CleanupOnFailure || pluginTrns.pInfo.CleanupOnFailure(),
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to store TaskNode state, err :%s", err.Error())
@@ -761,10 +762,11 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 }
 
 func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
-	currentPhase := nCtx.NodeStateReader().GetTaskNodeState().PluginPhase
+	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
+	currentPhase := taskNodeState.PluginPhase
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
-	if currentPhase.IsTerminal() {
+	if currentPhase.IsTerminal() && !(currentPhase.IsFailure() && taskNodeState.CleanupOnFailure) {
 		logger.Debugf(ctx, "Returning immediately from Abort since task is already in terminal phase.", currentPhase)
 		return nil
 	}

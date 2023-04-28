@@ -359,6 +359,7 @@ type ExecutableTaskNodeStatus interface {
 	GetBarrierClockTick() uint32
 	GetLastPhaseUpdatedAt() time.Time
 	GetPreviousNodeExecutionCheckpointPath() DataReference
+	GetCleanupOnFailure() bool
 }
 
 type MutableTaskNodeStatus interface {
@@ -371,6 +372,7 @@ type MutableTaskNodeStatus interface {
 	SetPluginStateVersion(uint32)
 	SetBarrierClockTick(tick uint32)
 	SetPreviousNodeExecutionCheckpointPath(DataReference)
+	SetCleanupOnFailure(bool)
 }
 
 // ExecutableWorkflowNode is an interface for a Child Workflow Node

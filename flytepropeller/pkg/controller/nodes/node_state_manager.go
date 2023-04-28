@@ -53,6 +53,7 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 			PluginState:                        tn.GetPluginState(),
 			LastPhaseUpdatedAt:                 tn.GetLastPhaseUpdatedAt(),
 			PreviousNodeExecutionCheckpointURI: tn.GetPreviousNodeExecutionCheckpointPath(),
+			CleanupOnFailure:                   tn.GetCleanupOnFailure(),
 		}
 	}
 	return handler.TaskNodeState{}
