@@ -7,6 +7,30 @@ commonLabels: {}
 # commonAnnotations Add annotations to all the deployed resources
 commonAnnotations: {}
 
+# flyte-core-components: Configuration of flyte's core components
+flyte-core-components:
+  # admin Configuration to disable FlyteAdmin or any of its components
+  admin:
+    # disabled Disable flyteadmin
+    disabled: false
+    # disableScheduler Disable native scheduler
+    disableScheduler: false
+    # disableClusterResourceManager disables Cluster resource manager
+    disableClusterResourceManager: false
+    # seedProjects flyte projects to create by default
+    seedProjects:
+      - flytesnacks
+  # propeller Configuration to disable propeller or any of its components
+  propeller:
+    # disabled Disables flytepropeller
+    disabled: false
+    # disabledWebhook Disables webhook only
+    disableWebhook: false
+  # dataCatalog Configuration to disable DataCatalog
+  dataCatalog:
+    # disabled Disables datacatalog
+    disabled: false
+
 # configuration Specify configuration for Flyte
 configuration:
   # database Specify configuration for Flyte's database connection

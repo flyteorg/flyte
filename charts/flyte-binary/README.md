@@ -93,6 +93,13 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
+| flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
+| flyte-core-components.admin.disableScheduler | bool | `false` |  |
+| flyte-core-components.admin.disabled | bool | `false` |  |
+| flyte-core-components.admin.seedProjects[0] | string | `"flytesnacks"` |  |
+| flyte-core-components.dataCatalog.disabled | bool | `false` |  |
+| flyte-core-components.propeller.disableWebhook | bool | `false` |  |
+| flyte-core-components.propeller.disabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
