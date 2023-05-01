@@ -82,3 +82,9 @@ require (
 	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847 // indirect
 	k8s.io/klog/v2 v2.5.0 // indirect
 )
+
+// These 2 versions were wrongly published. 
+retract (
+	v1.4.0
+	v1.4.2
+)
