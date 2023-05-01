@@ -5,7 +5,13 @@ import "github.com/flyteorg/flytestdlib/config"
 //go:generate pflags Config --default-var=DefaultConfig
 
 var (
-	DefaultConfig = &Config{}
+	DefaultConfig = &Config{
+		Propeller: Propeller{},
+		Admin: Admin{
+			SeedProjects: []string{"flytesnacks"},
+		},
+		DataCatalog: DataCatalog{},
+	}
 	configSection = config.MustRegisterSection("flyte", DefaultConfig)
 )
 
@@ -24,6 +30,7 @@ type Admin struct {
 	Disabled                      bool `json:"disabled" pflag:",Disables flyteadmin in the single binary mode"`
 	DisableScheduler              bool `json:"disableScheduler" pflag:",Disables Native scheduler in the single binary mode"`
 	DisableClusterResourceManager bool `json:"disableClusterResourceManager" pflag:",Disables Cluster resource manager"`
+	SeedProjects                  []string `json:"seedProjects" pflag:",flyte projects to create by default. The default value is ['flytesnacks']"`
 }
 
 type DataCatalog struct {
