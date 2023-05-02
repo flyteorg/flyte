@@ -96,6 +96,7 @@ Working Groups will be disbanded if either of the following is true:
 
 - There is no longer a Lead (with a 6 week grace period)
 - None of the communication channels for the Working Group have been in use for the goals outlined at the founding of the Working Group (with a 3 month grace period)
+
 ## 4. Drawbacks
 
 At the beginning, it could cause some confusion especially around SIG/WG ownership on repositories, but once those commmunity groups are formed, eventually most (ideally all) subcomponents of the project will be owned by a group.
