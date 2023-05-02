@@ -2,6 +2,7 @@ from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import literals_pb2 as _literals_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -68,9 +69,33 @@ class CreateDownloadLinkRequest(_message.Message):
     def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkResponse(_message.Message):
+    __slots__ = ["signed_url", "expires_at", "pre_signed_urls"]
+    SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
+    signed_url: _containers.RepeatedScalarFieldContainer[str]
+    expires_at: _timestamp_pb2.Timestamp
+    pre_signed_urls: PreSignedURLs
+    def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
+
+class PreSignedURLs(_message.Message):
     __slots__ = ["signed_url", "expires_at"]
     SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
     EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
     signed_url: _containers.RepeatedScalarFieldContainer[str]
     expires_at: _timestamp_pb2.Timestamp
     def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+
+class GetDataRequest(_message.Message):
+    __slots__ = ["flyte_url"]
+    FLYTE_URL_FIELD_NUMBER: _ClassVar[int]
+    flyte_url: str
+    def __init__(self, flyte_url: _Optional[str] = ...) -> None: ...
+
+class GetDataResponse(_message.Message):
+    __slots__ = ["literal_map", "pre_signed_urls"]
+    LITERAL_MAP_FIELD_NUMBER: _ClassVar[int]
+    PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
+    literal_map: _literals_pb2.LiteralMap
+    pre_signed_urls: PreSignedURLs
+    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...

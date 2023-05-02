@@ -301,3 +301,10 @@ message RawOutputDataConfig {
     // e.g. s3://bucket/key or s3://bucket/
     string output_location_prefix = 1;
 }
+
+// These URLs are returned as part of node and task execution data requests.
+message FlyteURLs {
+    string inputs      = 1;
+    string outputs     = 2;
+    string deck        = 3;
+}

@@ -4548,6 +4548,21 @@ definitions:
     - "HOUR"
     - "DAY"
     default: "MINUTE"
+  adminFlyteURLs:
+    type: "object"
+    properties:
+      inputs:
+        type: "string"
+      outputs:
+        type: "string"
+      deck:
+        type: "string"
+    description: "These URLs are returned as part of node and task execution data\
+      \ requests."
+    example:
+      outputs: "outputs"
+      inputs: "inputs"
+      deck: "deck"
   adminGetVersionResponse:
     type: "object"
     properties:
@@ -7614,12 +7629,18 @@ definitions:
           \ in the case this node yields a dynamic workflow we return its structure\
           \ here."
         $ref: "#/definitions/flyteidladminDynamicWorkflowNodeMetadata"
+      flyte_urls:
+        $ref: "#/definitions/adminFlyteURLs"
     description: "Response structure for NodeExecutionGetDataRequest which contains\
       \ inputs and outputs for a node execution."
     example:
       outputs:
         bytes: "bytes"
         url: "url"
+      flyte_urls:
+        outputs: "outputs"
+        inputs: "inputs"
+        deck: "deck"
       full_inputs:
         literals: {}
       dynamic_workflow:
@@ -15912,12 +15933,20 @@ definitions:
         description: "Full_outputs will only be populated if they are under a configured\
           \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
+      flyte_urls:
+        title: "flyte tiny url to fetch a core.LiteralMap of task execution's IO\n\
+          Deck will be empty for task"
+        $ref: "#/definitions/adminFlyteURLs"
     description: "Response structure for TaskExecutionGetDataRequest which contains\
       \ inputs and outputs for a task execution."
     example:
       outputs:
         bytes: "bytes"
         url: "url"
+      flyte_urls:
+        outputs: "outputs"
+        inputs: "inputs"
+        deck: "deck"
       full_inputs:
         literals: {}
       inputs:

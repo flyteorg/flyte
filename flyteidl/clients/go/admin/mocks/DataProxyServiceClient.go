@@ -160,3 +160,51 @@ func (_m *DataProxyServiceClient) CreateUploadLocation(ctx context.Context, in *
 
 	return r0, r1
 }
+
+type DataProxyServiceClient_GetData struct {
+	*mock.Call
+}
+
+func (_m DataProxyServiceClient_GetData) Return(_a0 *service.GetDataResponse, _a1 error) *DataProxyServiceClient_GetData {
+	return &DataProxyServiceClient_GetData{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataProxyServiceClient) OnGetData(ctx context.Context, in *service.GetDataRequest, opts ...grpc.CallOption) *DataProxyServiceClient_GetData {
+	c_call := _m.On("GetData", ctx, in, opts)
+	return &DataProxyServiceClient_GetData{Call: c_call}
+}
+
+func (_m *DataProxyServiceClient) OnGetDataMatch(matchers ...interface{}) *DataProxyServiceClient_GetData {
+	c_call := _m.On("GetData", matchers...)
+	return &DataProxyServiceClient_GetData{Call: c_call}
+}
+
+// GetData provides a mock function with given fields: ctx, in, opts
+func (_m *DataProxyServiceClient) GetData(ctx context.Context, in *service.GetDataRequest, opts ...grpc.CallOption) (*service.GetDataResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *service.GetDataResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *service.GetDataRequest, ...grpc.CallOption) *service.GetDataResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*service.GetDataResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *service.GetDataRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

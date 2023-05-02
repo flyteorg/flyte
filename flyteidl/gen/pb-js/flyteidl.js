@@ -21530,6 +21530,150 @@
                 return RawOutputDataConfig;
             })();
     
+            admin.FlyteURLs = (function() {
+    
+                /**
+                 * Properties of a FlyteURLs.
+                 * @memberof flyteidl.admin
+                 * @interface IFlyteURLs
+                 * @property {string|null} [inputs] FlyteURLs inputs
+                 * @property {string|null} [outputs] FlyteURLs outputs
+                 * @property {string|null} [deck] FlyteURLs deck
+                 */
+    
+                /**
+                 * Constructs a new FlyteURLs.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a FlyteURLs.
+                 * @implements IFlyteURLs
+                 * @constructor
+                 * @param {flyteidl.admin.IFlyteURLs=} [properties] Properties to set
+                 */
+                function FlyteURLs(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * FlyteURLs inputs.
+                 * @member {string} inputs
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @instance
+                 */
+                FlyteURLs.prototype.inputs = "";
+    
+                /**
+                 * FlyteURLs outputs.
+                 * @member {string} outputs
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @instance
+                 */
+                FlyteURLs.prototype.outputs = "";
+    
+                /**
+                 * FlyteURLs deck.
+                 * @member {string} deck
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @instance
+                 */
+                FlyteURLs.prototype.deck = "";
+    
+                /**
+                 * Creates a new FlyteURLs instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @static
+                 * @param {flyteidl.admin.IFlyteURLs=} [properties] Properties to set
+                 * @returns {flyteidl.admin.FlyteURLs} FlyteURLs instance
+                 */
+                FlyteURLs.create = function create(properties) {
+                    return new FlyteURLs(properties);
+                };
+    
+                /**
+                 * Encodes the specified FlyteURLs message. Does not implicitly {@link flyteidl.admin.FlyteURLs.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @static
+                 * @param {flyteidl.admin.IFlyteURLs} message FlyteURLs message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FlyteURLs.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.inputs != null && message.hasOwnProperty("inputs"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.inputs);
+                    if (message.outputs != null && message.hasOwnProperty("outputs"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.outputs);
+                    if (message.deck != null && message.hasOwnProperty("deck"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.deck);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a FlyteURLs message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.FlyteURLs} FlyteURLs
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FlyteURLs.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.FlyteURLs();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.inputs = reader.string();
+                            break;
+                        case 2:
+                            message.outputs = reader.string();
+                            break;
+                        case 3:
+                            message.deck = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a FlyteURLs message.
+                 * @function verify
+                 * @memberof flyteidl.admin.FlyteURLs
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                FlyteURLs.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.inputs != null && message.hasOwnProperty("inputs"))
+                        if (!$util.isString(message.inputs))
+                            return "inputs: string expected";
+                    if (message.outputs != null && message.hasOwnProperty("outputs"))
+                        if (!$util.isString(message.outputs))
+                            return "outputs: string expected";
+                    if (message.deck != null && message.hasOwnProperty("deck"))
+                        if (!$util.isString(message.deck))
+                            return "deck: string expected";
+                    return null;
+                };
+    
+                return FlyteURLs;
+            })();
+    
             admin.DescriptionEntity = (function() {
     
                 /**
@@ -33240,6 +33384,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] NodeExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] NodeExecutionGetDataResponse fullOutputs
                  * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] NodeExecutionGetDataResponse dynamicWorkflow
+                 * @property {flyteidl.admin.IFlyteURLs|null} [flyteUrls] NodeExecutionGetDataResponse flyteUrls
                  */
     
                 /**
@@ -33298,6 +33443,14 @@
                 NodeExecutionGetDataResponse.prototype.dynamicWorkflow = null;
     
                 /**
+                 * NodeExecutionGetDataResponse flyteUrls.
+                 * @member {flyteidl.admin.IFlyteURLs|null|undefined} flyteUrls
+                 * @memberof flyteidl.admin.NodeExecutionGetDataResponse
+                 * @instance
+                 */
+                NodeExecutionGetDataResponse.prototype.flyteUrls = null;
+    
+                /**
                  * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NodeExecutionGetDataResponse
@@ -33331,6 +33484,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
                         $root.flyteidl.admin.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
+                    if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls"))
+                        $root.flyteidl.admin.FlyteURLs.encode(message.flyteUrls, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                     return writer;
                 };
     
@@ -33366,6 +33521,9 @@
                             break;
                         case 16:
                             message.dynamicWorkflow = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 17:
+                            message.flyteUrls = $root.flyteidl.admin.FlyteURLs.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -33410,6 +33568,11 @@
                         var error = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
                         if (error)
                             return "dynamicWorkflow." + error;
+                    }
+                    if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls")) {
+                        var error = $root.flyteidl.admin.FlyteURLs.verify(message.flyteUrls);
+                        if (error)
+                            return "flyteUrls." + error;
                     }
                     return null;
                 };
@@ -39085,6 +39248,7 @@
                  * @property {flyteidl.admin.IUrlBlob|null} [outputs] TaskExecutionGetDataResponse outputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] TaskExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] TaskExecutionGetDataResponse fullOutputs
+                 * @property {flyteidl.admin.IFlyteURLs|null} [flyteUrls] TaskExecutionGetDataResponse flyteUrls
                  */
     
                 /**
@@ -39135,6 +39299,14 @@
                 TaskExecutionGetDataResponse.prototype.fullOutputs = null;
     
                 /**
+                 * TaskExecutionGetDataResponse flyteUrls.
+                 * @member {flyteidl.admin.IFlyteURLs|null|undefined} flyteUrls
+                 * @memberof flyteidl.admin.TaskExecutionGetDataResponse
+                 * @instance
+                 */
+                TaskExecutionGetDataResponse.prototype.flyteUrls = null;
+    
+                /**
                  * Creates a new TaskExecutionGetDataResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionGetDataResponse
@@ -39166,6 +39338,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls"))
+                        $root.flyteidl.admin.FlyteURLs.encode(message.flyteUrls, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -39198,6 +39372,9 @@
                             break;
                         case 4:
                             message.fullOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.flyteUrls = $root.flyteidl.admin.FlyteURLs.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -39237,6 +39414,11 @@
                         var error = $root.flyteidl.core.LiteralMap.verify(message.fullOutputs);
                         if (error)
                             return "fullOutputs." + error;
+                    }
+                    if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls")) {
+                        var error = $root.flyteidl.admin.FlyteURLs.verify(message.flyteUrls);
+                        if (error)
+                            return "flyteUrls." + error;
                     }
                     return null;
                 };
@@ -45052,6 +45234,7 @@
                  * @interface ICreateDownloadLinkResponse
                  * @property {Array.<string>|null} [signedUrl] CreateDownloadLinkResponse signedUrl
                  * @property {google.protobuf.ITimestamp|null} [expiresAt] CreateDownloadLinkResponse expiresAt
+                 * @property {flyteidl.service.IPreSignedURLs|null} [preSignedUrls] CreateDownloadLinkResponse preSignedUrls
                  */
     
                 /**
@@ -45087,6 +45270,14 @@
                 CreateDownloadLinkResponse.prototype.expiresAt = null;
     
                 /**
+                 * CreateDownloadLinkResponse preSignedUrls.
+                 * @member {flyteidl.service.IPreSignedURLs|null|undefined} preSignedUrls
+                 * @memberof flyteidl.service.CreateDownloadLinkResponse
+                 * @instance
+                 */
+                CreateDownloadLinkResponse.prototype.preSignedUrls = null;
+    
+                /**
                  * Creates a new CreateDownloadLinkResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.CreateDownloadLinkResponse
@@ -45115,6 +45306,8 @@
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.signedUrl[i]);
                     if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
                         $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.preSignedUrls != null && message.hasOwnProperty("preSignedUrls"))
+                        $root.flyteidl.service.PreSignedURLs.encode(message.preSignedUrls, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -45143,6 +45336,9 @@
                             break;
                         case 2:
                             message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.preSignedUrls = $root.flyteidl.service.PreSignedURLs.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -45175,10 +45371,416 @@
                         if (error)
                             return "expiresAt." + error;
                     }
+                    if (message.preSignedUrls != null && message.hasOwnProperty("preSignedUrls")) {
+                        var error = $root.flyteidl.service.PreSignedURLs.verify(message.preSignedUrls);
+                        if (error)
+                            return "preSignedUrls." + error;
+                    }
                     return null;
                 };
     
                 return CreateDownloadLinkResponse;
+            })();
+    
+            service.PreSignedURLs = (function() {
+    
+                /**
+                 * Properties of a PreSignedURLs.
+                 * @memberof flyteidl.service
+                 * @interface IPreSignedURLs
+                 * @property {Array.<string>|null} [signedUrl] PreSignedURLs signedUrl
+                 * @property {google.protobuf.ITimestamp|null} [expiresAt] PreSignedURLs expiresAt
+                 */
+    
+                /**
+                 * Constructs a new PreSignedURLs.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a PreSignedURLs.
+                 * @implements IPreSignedURLs
+                 * @constructor
+                 * @param {flyteidl.service.IPreSignedURLs=} [properties] Properties to set
+                 */
+                function PreSignedURLs(properties) {
+                    this.signedUrl = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PreSignedURLs signedUrl.
+                 * @member {Array.<string>} signedUrl
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @instance
+                 */
+                PreSignedURLs.prototype.signedUrl = $util.emptyArray;
+    
+                /**
+                 * PreSignedURLs expiresAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} expiresAt
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @instance
+                 */
+                PreSignedURLs.prototype.expiresAt = null;
+    
+                /**
+                 * Creates a new PreSignedURLs instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @static
+                 * @param {flyteidl.service.IPreSignedURLs=} [properties] Properties to set
+                 * @returns {flyteidl.service.PreSignedURLs} PreSignedURLs instance
+                 */
+                PreSignedURLs.create = function create(properties) {
+                    return new PreSignedURLs(properties);
+                };
+    
+                /**
+                 * Encodes the specified PreSignedURLs message. Does not implicitly {@link flyteidl.service.PreSignedURLs.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @static
+                 * @param {flyteidl.service.IPreSignedURLs} message PreSignedURLs message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PreSignedURLs.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.signedUrl != null && message.signedUrl.length)
+                        for (var i = 0; i < message.signedUrl.length; ++i)
+                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.signedUrl[i]);
+                    if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
+                        $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PreSignedURLs message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.PreSignedURLs} PreSignedURLs
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PreSignedURLs.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.PreSignedURLs();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.signedUrl && message.signedUrl.length))
+                                message.signedUrl = [];
+                            message.signedUrl.push(reader.string());
+                            break;
+                        case 2:
+                            message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PreSignedURLs message.
+                 * @function verify
+                 * @memberof flyteidl.service.PreSignedURLs
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PreSignedURLs.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.signedUrl != null && message.hasOwnProperty("signedUrl")) {
+                        if (!Array.isArray(message.signedUrl))
+                            return "signedUrl: array expected";
+                        for (var i = 0; i < message.signedUrl.length; ++i)
+                            if (!$util.isString(message.signedUrl[i]))
+                                return "signedUrl: string[] expected";
+                    }
+                    if (message.expiresAt != null && message.hasOwnProperty("expiresAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.expiresAt);
+                        if (error)
+                            return "expiresAt." + error;
+                    }
+                    return null;
+                };
+    
+                return PreSignedURLs;
+            })();
+    
+            service.GetDataRequest = (function() {
+    
+                /**
+                 * Properties of a GetDataRequest.
+                 * @memberof flyteidl.service
+                 * @interface IGetDataRequest
+                 * @property {string|null} [flyteUrl] GetDataRequest flyteUrl
+                 */
+    
+                /**
+                 * Constructs a new GetDataRequest.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a GetDataRequest.
+                 * @implements IGetDataRequest
+                 * @constructor
+                 * @param {flyteidl.service.IGetDataRequest=} [properties] Properties to set
+                 */
+                function GetDataRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GetDataRequest flyteUrl.
+                 * @member {string} flyteUrl
+                 * @memberof flyteidl.service.GetDataRequest
+                 * @instance
+                 */
+                GetDataRequest.prototype.flyteUrl = "";
+    
+                /**
+                 * Creates a new GetDataRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.GetDataRequest
+                 * @static
+                 * @param {flyteidl.service.IGetDataRequest=} [properties] Properties to set
+                 * @returns {flyteidl.service.GetDataRequest} GetDataRequest instance
+                 */
+                GetDataRequest.create = function create(properties) {
+                    return new GetDataRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified GetDataRequest message. Does not implicitly {@link flyteidl.service.GetDataRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.GetDataRequest
+                 * @static
+                 * @param {flyteidl.service.IGetDataRequest} message GetDataRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GetDataRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.flyteUrl != null && message.hasOwnProperty("flyteUrl"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.flyteUrl);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GetDataRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.GetDataRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.GetDataRequest} GetDataRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GetDataRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.GetDataRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.flyteUrl = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GetDataRequest message.
+                 * @function verify
+                 * @memberof flyteidl.service.GetDataRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GetDataRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.flyteUrl != null && message.hasOwnProperty("flyteUrl"))
+                        if (!$util.isString(message.flyteUrl))
+                            return "flyteUrl: string expected";
+                    return null;
+                };
+    
+                return GetDataRequest;
+            })();
+    
+            service.GetDataResponse = (function() {
+    
+                /**
+                 * Properties of a GetDataResponse.
+                 * @memberof flyteidl.service
+                 * @interface IGetDataResponse
+                 * @property {flyteidl.core.ILiteralMap|null} [literalMap] GetDataResponse literalMap
+                 * @property {flyteidl.service.IPreSignedURLs|null} [preSignedUrls] GetDataResponse preSignedUrls
+                 */
+    
+                /**
+                 * Constructs a new GetDataResponse.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a GetDataResponse.
+                 * @implements IGetDataResponse
+                 * @constructor
+                 * @param {flyteidl.service.IGetDataResponse=} [properties] Properties to set
+                 */
+                function GetDataResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GetDataResponse literalMap.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} literalMap
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @instance
+                 */
+                GetDataResponse.prototype.literalMap = null;
+    
+                /**
+                 * GetDataResponse preSignedUrls.
+                 * @member {flyteidl.service.IPreSignedURLs|null|undefined} preSignedUrls
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @instance
+                 */
+                GetDataResponse.prototype.preSignedUrls = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * GetDataResponse data.
+                 * @member {"literalMap"|"preSignedUrls"|undefined} data
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @instance
+                 */
+                Object.defineProperty(GetDataResponse.prototype, "data", {
+                    get: $util.oneOfGetter($oneOfFields = ["literalMap", "preSignedUrls"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new GetDataResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @static
+                 * @param {flyteidl.service.IGetDataResponse=} [properties] Properties to set
+                 * @returns {flyteidl.service.GetDataResponse} GetDataResponse instance
+                 */
+                GetDataResponse.create = function create(properties) {
+                    return new GetDataResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified GetDataResponse message. Does not implicitly {@link flyteidl.service.GetDataResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @static
+                 * @param {flyteidl.service.IGetDataResponse} message GetDataResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GetDataResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.literalMap != null && message.hasOwnProperty("literalMap"))
+                        $root.flyteidl.core.LiteralMap.encode(message.literalMap, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.preSignedUrls != null && message.hasOwnProperty("preSignedUrls"))
+                        $root.flyteidl.service.PreSignedURLs.encode(message.preSignedUrls, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GetDataResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.GetDataResponse} GetDataResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GetDataResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.GetDataResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.literalMap = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.preSignedUrls = $root.flyteidl.service.PreSignedURLs.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GetDataResponse message.
+                 * @function verify
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GetDataResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.literalMap != null && message.hasOwnProperty("literalMap")) {
+                        properties.data = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralMap.verify(message.literalMap);
+                            if (error)
+                                return "literalMap." + error;
+                        }
+                    }
+                    if (message.preSignedUrls != null && message.hasOwnProperty("preSignedUrls")) {
+                        if (properties.data === 1)
+                            return "data: multiple values";
+                        properties.data = 1;
+                        {
+                            var error = $root.flyteidl.service.PreSignedURLs.verify(message.preSignedUrls);
+                            if (error)
+                                return "preSignedUrls." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return GetDataResponse;
             })();
     
             service.DataProxyService = (function() {
@@ -45309,6 +45911,39 @@
                  * @instance
                  * @param {flyteidl.service.ICreateDownloadLinkRequest} request CreateDownloadLinkRequest message or plain object
                  * @returns {Promise<flyteidl.service.CreateDownloadLinkResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.DataProxyService#getData}.
+                 * @memberof flyteidl.service.DataProxyService
+                 * @typedef GetDataCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.service.GetDataResponse} [response] GetDataResponse
+                 */
+    
+                /**
+                 * Calls GetData.
+                 * @function getData
+                 * @memberof flyteidl.service.DataProxyService
+                 * @instance
+                 * @param {flyteidl.service.IGetDataRequest} request GetDataRequest message or plain object
+                 * @param {flyteidl.service.DataProxyService.GetDataCallback} callback Node-style callback called with the error, if any, and GetDataResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(DataProxyService.prototype.getData = function getData(request, callback) {
+                    return this.rpcCall(getData, $root.flyteidl.service.GetDataRequest, $root.flyteidl.service.GetDataResponse, request, callback);
+                }, "name", { value: "GetData" });
+    
+                /**
+                 * Calls GetData.
+                 * @function getData
+                 * @memberof flyteidl.service.DataProxyService
+                 * @instance
+                 * @param {flyteidl.service.IGetDataRequest} request GetDataRequest message or plain object
+                 * @returns {Promise<flyteidl.service.GetDataResponse>} Promise
                  * @variation 2
                  */
     

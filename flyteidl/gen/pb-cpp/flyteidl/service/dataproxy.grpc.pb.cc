@@ -23,6 +23,7 @@ static const char* DataProxyService_method_names[] = {
   "/flyteidl.service.DataProxyService/CreateUploadLocation",
   "/flyteidl.service.DataProxyService/CreateDownloadLocation",
   "/flyteidl.service.DataProxyService/CreateDownloadLink",
+  "/flyteidl.service.DataProxyService/GetData",
 };
 
 std::unique_ptr< DataProxyService::Stub> DataProxyService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -35,6 +36,7 @@ DataProxyService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& c
   : channel_(channel), rpcmethod_CreateUploadLocation_(DataProxyService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_CreateDownloadLocation_(DataProxyService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_CreateDownloadLink_(DataProxyService_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetData_(DataProxyService_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status DataProxyService::Stub::CreateUploadLocation(::grpc::ClientContext* context, const ::flyteidl::service::CreateUploadLocationRequest& request, ::flyteidl::service::CreateUploadLocationResponse* response) {
@@ -121,6 +123,34 @@ void DataProxyService::Stub::experimental_async::CreateDownloadLink(::grpc::Clie
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::CreateDownloadLinkResponse>::Create(channel_.get(), cq, rpcmethod_CreateDownloadLink_, context, request, false);
 }
 
+::grpc::Status DataProxyService::Stub::GetData(::grpc::ClientContext* context, const ::flyteidl::service::GetDataRequest& request, ::flyteidl::service::GetDataResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetData_, context, request, response);
+}
+
+void DataProxyService::Stub::experimental_async::GetData(::grpc::ClientContext* context, const ::flyteidl::service::GetDataRequest* request, ::flyteidl::service::GetDataResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetData_, context, request, response, std::move(f));
+}
+
+void DataProxyService::Stub::experimental_async::GetData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::GetDataResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetData_, context, request, response, std::move(f));
+}
+
+void DataProxyService::Stub::experimental_async::GetData(::grpc::ClientContext* context, const ::flyteidl::service::GetDataRequest* request, ::flyteidl::service::GetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetData_, context, request, response, reactor);
+}
+
+void DataProxyService::Stub::experimental_async::GetData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::service::GetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetData_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::GetDataResponse>* DataProxyService::Stub::AsyncGetDataRaw(::grpc::ClientContext* context, const ::flyteidl::service::GetDataRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::GetDataResponse>::Create(channel_.get(), cq, rpcmethod_GetData_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::service::GetDataResponse>* DataProxyService::Stub::PrepareAsyncGetDataRaw(::grpc::ClientContext* context, const ::flyteidl::service::GetDataRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::service::GetDataResponse>::Create(channel_.get(), cq, rpcmethod_GetData_, context, request, false);
+}
+
 DataProxyService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       DataProxyService_method_names[0],
@@ -137,6 +167,11 @@ DataProxyService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< DataProxyService::Service, ::flyteidl::service::CreateDownloadLinkRequest, ::flyteidl::service::CreateDownloadLinkResponse>(
           std::mem_fn(&DataProxyService::Service::CreateDownloadLink), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      DataProxyService_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< DataProxyService::Service, ::flyteidl::service::GetDataRequest, ::flyteidl::service::GetDataResponse>(
+          std::mem_fn(&DataProxyService::Service::GetData), this)));
 }
 
 DataProxyService::Service::~Service() {
@@ -157,6 +192,13 @@ DataProxyService::Service::~Service() {
 }
 
 ::grpc::Status DataProxyService::Service::CreateDownloadLink(::grpc::ServerContext* context, const ::flyteidl::service::CreateDownloadLinkRequest* request, ::flyteidl::service::CreateDownloadLinkResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status DataProxyService::Service::GetData(::grpc::ServerContext* context, const ::flyteidl::service::GetDataRequest* request, ::flyteidl::service::GetDataResponse* response) {
   (void) context;
   (void) request;
   (void) response;

@@ -47,6 +47,7 @@ from flyteadmin.models.admin_execution_update_request import AdminExecutionUpdat
 from flyteadmin.models.admin_execution_update_response import AdminExecutionUpdateResponse
 from flyteadmin.models.admin_fixed_rate import AdminFixedRate
 from flyteadmin.models.admin_fixed_rate_unit import AdminFixedRateUnit
+from flyteadmin.models.admin_flyte_ur_ls import AdminFlyteURLs
 from flyteadmin.models.admin_get_version_response import AdminGetVersionResponse
 from flyteadmin.models.admin_labels import AdminLabels
 from flyteadmin.models.admin_launch_plan import AdminLaunchPlan
