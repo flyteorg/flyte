@@ -6,11 +6,9 @@ import "github.com/flyteorg/flytestdlib/config"
 
 var (
 	DefaultConfig = &Config{
-		Propeller: Propeller{},
 		Admin: Admin{
 			SeedProjects: []string{"flytesnacks"},
 		},
-		DataCatalog: DataCatalog{},
 	}
 	configSection = config.MustRegisterSection("flyte", DefaultConfig)
 )
