@@ -19,8 +19,6 @@ import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/description_entity.proto";
-import "flyteidl/core/identifier.proto";
-import "flyteidl/core/metrics.proto";
 // import "protoc-gen-swagger/options/annotations.proto";
 
 // The following defines an RPC service that is also served over HTTP via grpc-gateway.

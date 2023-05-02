@@ -163,6 +163,7 @@ Class | Method | HTTP request | Description
  - [AdminExecutionUpdateResponse](docs/AdminExecutionUpdateResponse.md)
  - [AdminFixedRate](docs/AdminFixedRate.md)
  - [AdminFixedRateUnit](docs/AdminFixedRateUnit.md)
+ - [AdminFlyteURLs](docs/AdminFlyteURLs.md)
  - [AdminGetVersionResponse](docs/AdminGetVersionResponse.md)
  - [AdminLabels](docs/AdminLabels.md)
  - [AdminLaunchPlan](docs/AdminLaunchPlan.md)

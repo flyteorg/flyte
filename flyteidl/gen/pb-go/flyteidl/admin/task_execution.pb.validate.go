@@ -781,6 +781,16 @@ func (m *TaskExecutionGetDataResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFlyteUrls()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionGetDataResponseValidationError{
+				field:  "FlyteUrls",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

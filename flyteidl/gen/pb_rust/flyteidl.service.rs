@@ -167,11 +167,57 @@ pub mod create_download_link_request {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDownloadLinkResponse {
     /// SignedUrl specifies the url to use to download content from (e.g. <https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...>)
+    #[deprecated]
+    #[prost(string, repeated, tag="1")]
+    pub signed_url: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// ExpiresAt defines when will the signed URL expire.
+    #[deprecated]
+    #[prost(message, optional, tag="2")]
+    pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// New wrapper object containing the signed urls and expiration time
+    #[prost(message, optional, tag="3")]
+    pub pre_signed_urls: ::core::option::Option<PreSignedUrLs>,
+}
+/// Wrapper object since the message is shared across this and the GetDataResponse
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PreSignedUrLs {
+    /// SignedUrl specifies the url to use to download content from (e.g. <https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...>)
     #[prost(string, repeated, tag="1")]
     pub signed_url: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// ExpiresAt defines when will the signed URL expire.
     #[prost(message, optional, tag="2")]
     pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
+}
+/// General request artifact to retrieve data from a Flyte artifact url.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDataRequest {
+    /// A unique identifier in the form of flyte://<something> that uniquely, for a given Flyte
+    /// backend, identifies a Flyte artifact (\[i\]nput, \[o\]utput, flyte \[d\]eck, etc.).
+    /// e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+    ///       flyte://v1/proj/development/execid/n2/i (for node execution input)
+    #[prost(string, tag="1")]
+    pub flyte_url: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDataResponse {
+    #[prost(oneof="get_data_response::Data", tags="1, 2")]
+    pub data: ::core::option::Option<get_data_response::Data>,
+}
+/// Nested message and enum types in `GetDataResponse`.
+pub mod get_data_response {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Data {
+        /// literal map data will be returned
+        #[prost(message, tag="1")]
+        LiteralMap(super::super::core::LiteralMap),
+        /// Flyte deck html will be returned as a signed url users can download
+        #[prost(message, tag="2")]
+        PreSignedUrls(super::PreSignedUrLs),
+    }
 }
 /// ArtifactType
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

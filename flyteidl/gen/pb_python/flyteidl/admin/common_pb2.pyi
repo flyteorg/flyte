@@ -229,3 +229,13 @@ class RawOutputDataConfig(_message.Message):
     OUTPUT_LOCATION_PREFIX_FIELD_NUMBER: _ClassVar[int]
     output_location_prefix: str
     def __init__(self, output_location_prefix: _Optional[str] = ...) -> None: ...
+
+class FlyteURLs(_message.Message):
+    __slots__ = ["inputs", "outputs", "deck"]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    DECK_FIELD_NUMBER: _ClassVar[int]
+    inputs: str
+    outputs: str
+    deck: str
+    def __init__(self, inputs: _Optional[str] = ..., outputs: _Optional[str] = ..., deck: _Optional[str] = ...) -> None: ...

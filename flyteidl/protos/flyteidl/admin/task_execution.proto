@@ -161,4 +161,8 @@ message TaskExecutionGetDataResponse {
 
     // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs               = 4;
+
+    // flyte tiny url to fetch a core.LiteralMap of task execution's IO
+    // Deck will be empty for task
+    FlyteURLs flyte_urls = 5;
 }

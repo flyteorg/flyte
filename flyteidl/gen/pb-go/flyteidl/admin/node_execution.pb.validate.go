@@ -1118,6 +1118,16 @@ func (m *NodeExecutionGetDataResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFlyteUrls()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "FlyteUrls",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

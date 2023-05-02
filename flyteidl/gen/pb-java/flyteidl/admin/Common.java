@@ -20743,6 +20743,837 @@ public final class Common {
 
   }
 
+  public interface FlyteURLsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.FlyteURLs)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    java.lang.String getInputs();
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getInputsBytes();
+
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    java.lang.String getOutputs();
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getOutputsBytes();
+
+    /**
+     * <code>string deck = 3;</code>
+     */
+    java.lang.String getDeck();
+    /**
+     * <code>string deck = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeckBytes();
+  }
+  /**
+   * <pre>
+   * These URLs are returned as part of node and task execution data requests.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.FlyteURLs}
+   */
+  public  static final class FlyteURLs extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.FlyteURLs)
+      FlyteURLsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use FlyteURLs.newBuilder() to construct.
+    private FlyteURLs(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private FlyteURLs() {
+      inputs_ = "";
+      outputs_ = "";
+      deck_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FlyteURLs(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              inputs_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              outputs_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deck_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Common.FlyteURLs.class, flyteidl.admin.Common.FlyteURLs.Builder.class);
+    }
+
+    public static final int INPUTS_FIELD_NUMBER = 1;
+    private volatile java.lang.Object inputs_;
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    public java.lang.String getInputs() {
+      java.lang.Object ref = inputs_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        inputs_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInputsBytes() {
+      java.lang.Object ref = inputs_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        inputs_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OUTPUTS_FIELD_NUMBER = 2;
+    private volatile java.lang.Object outputs_;
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    public java.lang.String getOutputs() {
+      java.lang.Object ref = outputs_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        outputs_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOutputsBytes() {
+      java.lang.Object ref = outputs_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        outputs_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DECK_FIELD_NUMBER = 3;
+    private volatile java.lang.Object deck_;
+    /**
+     * <code>string deck = 3;</code>
+     */
+    public java.lang.String getDeck() {
+      java.lang.Object ref = deck_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deck_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string deck = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeckBytes() {
+      java.lang.Object ref = deck_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deck_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getInputsBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, inputs_);
+      }
+      if (!getOutputsBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, outputs_);
+      }
+      if (!getDeckBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, deck_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getInputsBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, inputs_);
+      }
+      if (!getOutputsBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, outputs_);
+      }
+      if (!getDeckBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, deck_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Common.FlyteURLs)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Common.FlyteURLs other = (flyteidl.admin.Common.FlyteURLs) obj;
+
+      if (!getInputs()
+          .equals(other.getInputs())) return false;
+      if (!getOutputs()
+          .equals(other.getOutputs())) return false;
+      if (!getDeck()
+          .equals(other.getDeck())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+      hash = (53 * hash) + getInputs().hashCode();
+      hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
+      hash = (53 * hash) + getOutputs().hashCode();
+      hash = (37 * hash) + DECK_FIELD_NUMBER;
+      hash = (53 * hash) + getDeck().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Common.FlyteURLs prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * These URLs are returned as part of node and task execution data requests.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.FlyteURLs}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.FlyteURLs)
+        flyteidl.admin.Common.FlyteURLsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Common.FlyteURLs.class, flyteidl.admin.Common.FlyteURLs.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Common.FlyteURLs.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        inputs_ = "";
+
+        outputs_ = "";
+
+        deck_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs getDefaultInstanceForType() {
+        return flyteidl.admin.Common.FlyteURLs.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs build() {
+        flyteidl.admin.Common.FlyteURLs result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs buildPartial() {
+        flyteidl.admin.Common.FlyteURLs result = new flyteidl.admin.Common.FlyteURLs(this);
+        result.inputs_ = inputs_;
+        result.outputs_ = outputs_;
+        result.deck_ = deck_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Common.FlyteURLs) {
+          return mergeFrom((flyteidl.admin.Common.FlyteURLs)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Common.FlyteURLs other) {
+        if (other == flyteidl.admin.Common.FlyteURLs.getDefaultInstance()) return this;
+        if (!other.getInputs().isEmpty()) {
+          inputs_ = other.inputs_;
+          onChanged();
+        }
+        if (!other.getOutputs().isEmpty()) {
+          outputs_ = other.outputs_;
+          onChanged();
+        }
+        if (!other.getDeck().isEmpty()) {
+          deck_ = other.deck_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Common.FlyteURLs parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Common.FlyteURLs) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object inputs_ = "";
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public java.lang.String getInputs() {
+        java.lang.Object ref = inputs_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          inputs_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getInputsBytes() {
+        java.lang.Object ref = inputs_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          inputs_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder setInputs(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        inputs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder clearInputs() {
+        
+        inputs_ = getDefaultInstance().getInputs();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder setInputsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        inputs_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object outputs_ = "";
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public java.lang.String getOutputs() {
+        java.lang.Object ref = outputs_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          outputs_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOutputsBytes() {
+        java.lang.Object ref = outputs_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          outputs_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder setOutputs(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        outputs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder clearOutputs() {
+        
+        outputs_ = getDefaultInstance().getOutputs();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder setOutputsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        outputs_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object deck_ = "";
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public java.lang.String getDeck() {
+        java.lang.Object ref = deck_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deck_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeckBytes() {
+        java.lang.Object ref = deck_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deck_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder setDeck(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deck_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder clearDeck() {
+        
+        deck_ = getDefaultInstance().getDeck();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder setDeckBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deck_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.FlyteURLs)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.FlyteURLs)
+    private static final flyteidl.admin.Common.FlyteURLs DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Common.FlyteURLs();
+    }
+
+    public static flyteidl.admin.Common.FlyteURLs getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FlyteURLs>
+        PARSER = new com.google.protobuf.AbstractParser<FlyteURLs>() {
+      @java.lang.Override
+      public FlyteURLs parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FlyteURLs(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FlyteURLs> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FlyteURLs> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Common.FlyteURLs getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_NamedEntityIdentifier_descriptor;
   private static final 
@@ -20863,6 +21694,11 @@ public final class Common {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_FlyteURLs_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -20934,11 +21770,12 @@ public final class Common {
       "\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001(\t\022\"" +
       "\n\032kubernetes_service_account\030\002 \001(\t:\002\030\001\"5" +
       "\n\023RawOutputDataConfig\022\036\n\026output_location" +
-      "_prefix\030\001 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAM" +
-      "ED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHI" +
-      "VED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/a" +
-      "dminb\006proto3"
+      "_prefix\030\001 \001(\t\":\n\tFlyteURLs\022\016\n\006inputs\030\001 \001" +
+      "(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030\003 \001(\t*\\\n\020Nam" +
+      "edEntityState\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031" +
+      "\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_GENE" +
+      "RATED\020\002B7Z5github.com/flyteorg/flyteidl/" +
+      "gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21099,6 +21936,12 @@ public final class Common {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_RawOutputDataConfig_descriptor,
         new java.lang.String[] { "OutputLocationPrefix", });
+    internal_static_flyteidl_admin_FlyteURLs_descriptor =
+      getDescriptor().getMessageTypes().get(22);
+    internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_FlyteURLs_descriptor,
+        new java.lang.String[] { "Inputs", "Outputs", "Deck", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();

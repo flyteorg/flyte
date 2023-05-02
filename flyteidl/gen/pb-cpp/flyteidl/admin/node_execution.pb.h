@@ -1926,6 +1926,15 @@ class NodeExecutionGetDataResponse final :
   ::flyteidl::admin::DynamicWorkflowNodeMetadata* mutable_dynamic_workflow();
   void set_allocated_dynamic_workflow(::flyteidl::admin::DynamicWorkflowNodeMetadata* dynamic_workflow);
 
+  // .flyteidl.admin.FlyteURLs flyte_urls = 17;
+  bool has_flyte_urls() const;
+  void clear_flyte_urls();
+  static const int kFlyteUrlsFieldNumber = 17;
+  const ::flyteidl::admin::FlyteURLs& flyte_urls() const;
+  ::flyteidl::admin::FlyteURLs* release_flyte_urls();
+  ::flyteidl::admin::FlyteURLs* mutable_flyte_urls();
+  void set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionGetDataResponse)
  private:
   class HasBitSetters;
@@ -1936,6 +1945,7 @@ class NodeExecutionGetDataResponse final :
   ::flyteidl::core::LiteralMap* full_inputs_;
   ::flyteidl::core::LiteralMap* full_outputs_;
   ::flyteidl::admin::DynamicWorkflowNodeMetadata* dynamic_workflow_;
+  ::flyteidl::admin::FlyteURLs* flyte_urls_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -4069,6 +4079,51 @@ inline void NodeExecutionGetDataResponse::set_allocated_dynamic_workflow(::flyte
   }
   dynamic_workflow_ = dynamic_workflow;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.dynamic_workflow)
+}
+
+// .flyteidl.admin.FlyteURLs flyte_urls = 17;
+inline bool NodeExecutionGetDataResponse::has_flyte_urls() const {
+  return this != internal_default_instance() && flyte_urls_ != nullptr;
+}
+inline const ::flyteidl::admin::FlyteURLs& NodeExecutionGetDataResponse::flyte_urls() const {
+  const ::flyteidl::admin::FlyteURLs* p = flyte_urls_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::FlyteURLs*>(
+      &::flyteidl::admin::_FlyteURLs_default_instance_);
+}
+inline ::flyteidl::admin::FlyteURLs* NodeExecutionGetDataResponse::release_flyte_urls() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  
+  ::flyteidl::admin::FlyteURLs* temp = flyte_urls_;
+  flyte_urls_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::FlyteURLs* NodeExecutionGetDataResponse::mutable_flyte_urls() {
+  
+  if (flyte_urls_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::FlyteURLs>(GetArenaNoVirtual());
+    flyte_urls_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  return flyte_urls_;
+}
+inline void NodeExecutionGetDataResponse::set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(flyte_urls_);
+  }
+  if (flyte_urls) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      flyte_urls = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, flyte_urls, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  flyte_urls_ = flyte_urls;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
 }
 
 #ifdef __GNUC__

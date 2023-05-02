@@ -10299,6 +10299,34 @@ public final class TaskExecutionOuterClass {
      * <code>.flyteidl.core.LiteralMap full_outputs = 4;</code>
      */
     flyteidl.core.Literals.LiteralMapOrBuilder getFullOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    boolean hasFlyteUrls();
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    flyteidl.admin.Common.FlyteURLs getFlyteUrls();
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder();
   }
   /**
    * <pre>
@@ -10391,6 +10419,19 @@ public final class TaskExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(fullOutputs_);
                 fullOutputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              flyteidl.admin.Common.FlyteURLs.Builder subBuilder = null;
+              if (flyteUrls_ != null) {
+                subBuilder = flyteUrls_.toBuilder();
+              }
+              flyteUrls_ = input.readMessage(flyteidl.admin.Common.FlyteURLs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(flyteUrls_);
+                flyteUrls_ = subBuilder.buildPartial();
               }
 
               break;
@@ -10565,6 +10606,42 @@ public final class TaskExecutionOuterClass {
       return getFullOutputs();
     }
 
+    public static final int FLYTE_URLS_FIELD_NUMBER = 5;
+    private flyteidl.admin.Common.FlyteURLs flyteUrls_;
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public boolean hasFlyteUrls() {
+      return flyteUrls_ != null;
+    }
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public flyteidl.admin.Common.FlyteURLs getFlyteUrls() {
+      return flyteUrls_ == null ? flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+    }
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder() {
+      return getFlyteUrls();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10591,6 +10668,9 @@ public final class TaskExecutionOuterClass {
       if (fullOutputs_ != null) {
         output.writeMessage(4, getFullOutputs());
       }
+      if (flyteUrls_ != null) {
+        output.writeMessage(5, getFlyteUrls());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10615,6 +10695,10 @@ public final class TaskExecutionOuterClass {
       if (fullOutputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getFullOutputs());
+      }
+      if (flyteUrls_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getFlyteUrls());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10651,6 +10735,11 @@ public final class TaskExecutionOuterClass {
         if (!getFullOutputs()
             .equals(other.getFullOutputs())) return false;
       }
+      if (hasFlyteUrls() != other.hasFlyteUrls()) return false;
+      if (hasFlyteUrls()) {
+        if (!getFlyteUrls()
+            .equals(other.getFlyteUrls())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10677,6 +10766,10 @@ public final class TaskExecutionOuterClass {
       if (hasFullOutputs()) {
         hash = (37 * hash) + FULL_OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getFullOutputs().hashCode();
+      }
+      if (hasFlyteUrls()) {
+        hash = (37 * hash) + FLYTE_URLS_FIELD_NUMBER;
+        hash = (53 * hash) + getFlyteUrls().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -10839,6 +10932,12 @@ public final class TaskExecutionOuterClass {
           fullOutputs_ = null;
           fullOutputsBuilder_ = null;
         }
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = null;
+        } else {
+          flyteUrls_ = null;
+          flyteUrlsBuilder_ = null;
+        }
         return this;
       }
 
@@ -10884,6 +10983,11 @@ public final class TaskExecutionOuterClass {
           result.fullOutputs_ = fullOutputs_;
         } else {
           result.fullOutputs_ = fullOutputsBuilder_.build();
+        }
+        if (flyteUrlsBuilder_ == null) {
+          result.flyteUrls_ = flyteUrls_;
+        } else {
+          result.flyteUrls_ = flyteUrlsBuilder_.build();
         }
         onBuilt();
         return result;
@@ -10944,6 +11048,9 @@ public final class TaskExecutionOuterClass {
         }
         if (other.hasFullOutputs()) {
           mergeFullOutputs(other.getFullOutputs());
+        }
+        if (other.hasFlyteUrls()) {
+          mergeFlyteUrls(other.getFlyteUrls());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11603,6 +11710,168 @@ public final class TaskExecutionOuterClass {
         }
         return fullOutputsBuilder_;
       }
+
+      private flyteidl.admin.Common.FlyteURLs flyteUrls_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder> flyteUrlsBuilder_;
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public boolean hasFlyteUrls() {
+        return flyteUrlsBuilder_ != null || flyteUrls_ != null;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLs getFlyteUrls() {
+        if (flyteUrlsBuilder_ == null) {
+          return flyteUrls_ == null ? flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+        } else {
+          return flyteUrlsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder setFlyteUrls(flyteidl.admin.Common.FlyteURLs value) {
+        if (flyteUrlsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          flyteUrls_ = value;
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder setFlyteUrls(
+          flyteidl.admin.Common.FlyteURLs.Builder builderForValue) {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = builderForValue.build();
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder mergeFlyteUrls(flyteidl.admin.Common.FlyteURLs value) {
+        if (flyteUrlsBuilder_ == null) {
+          if (flyteUrls_ != null) {
+            flyteUrls_ =
+              flyteidl.admin.Common.FlyteURLs.newBuilder(flyteUrls_).mergeFrom(value).buildPartial();
+          } else {
+            flyteUrls_ = value;
+          }
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder clearFlyteUrls() {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = null;
+          onChanged();
+        } else {
+          flyteUrls_ = null;
+          flyteUrlsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLs.Builder getFlyteUrlsBuilder() {
+        
+        onChanged();
+        return getFlyteUrlsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder() {
+        if (flyteUrlsBuilder_ != null) {
+          return flyteUrlsBuilder_.getMessageOrBuilder();
+        } else {
+          return flyteUrls_ == null ?
+              flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+        }
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder> 
+          getFlyteUrlsFieldBuilder() {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrlsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder>(
+                  getFlyteUrls(),
+                  getParentForChildren(),
+                  isClean());
+          flyteUrls_ = null;
+        }
+        return flyteUrlsBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -11745,14 +12014,15 @@ public final class TaskExecutionOuterClass {
       "curred_at\030\001 \001(\0132\032.google.protobuf.Timest" +
       "amp\022\017\n\007message\030\002 \001(\t\"Q\n\033TaskExecutionGet" +
       "DataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
-      "TaskExecutionIdentifier\"\332\001\n\034TaskExecutio" +
+      "TaskExecutionIdentifier\"\211\002\n\034TaskExecutio" +
       "nGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.flyte" +
       "idl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027" +
       ".flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_inpu" +
       "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014f" +
       "ull_outputs\030\004 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapB7Z5github.com/flyteorg/flyteidl/gen" +
-      "/pb-go/flyteidl/adminb\006proto3"
+      "lMap\022-\n\nflyte_urls\030\005 \001(\0132\031.flyteidl.admi" +
+      "n.FlyteURLsB7Z5github.com/flyteorg/flyte" +
+      "idl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11821,7 +12091,7 @@ public final class TaskExecutionOuterClass {
     internal_static_flyteidl_admin_TaskExecutionGetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionGetDataResponse_descriptor,
-        new java.lang.String[] { "Inputs", "Outputs", "FullInputs", "FullOutputs", });
+        new java.lang.String[] { "Inputs", "Outputs", "FullInputs", "FullOutputs", "FlyteUrls", });
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
