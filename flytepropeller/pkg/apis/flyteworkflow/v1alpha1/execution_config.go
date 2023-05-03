@@ -32,6 +32,8 @@ type ExecutionConfig struct {
 	Interruptible *bool
 	// Defines whether a workflow should skip all its cached results and re-compute its output, overwriting any already stored data.
 	OverwriteCache bool
+	// Defines a map of environment varable name / value pairs that are applied to all tasks.
+	EnvironmentVariables map[string]string
 }
 
 type TaskPluginOverride struct {

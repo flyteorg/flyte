@@ -59,10 +59,11 @@ func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string
 
 type taskExecutionMetadata struct {
 	handler.NodeExecutionMetadata
-	taskExecID        taskExecutionID
-	o                 pluginCore.TaskOverrides
-	maxAttempts       uint32
-	platformResources *v1.ResourceRequirements
+	taskExecID           taskExecutionID
+	o                    pluginCore.TaskOverrides
+	maxAttempts          uint32
+	platformResources    *v1.ResourceRequirements
+	environmentVariables map[string]string
 }
 
 func (t taskExecutionMetadata) GetTaskExecutionID() pluginCore.TaskExecutionID {
@@ -79,6 +80,10 @@ func (t taskExecutionMetadata) GetMaxAttempts() uint32 {
 
 func (t taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
 	return t.platformResources
+}
+
+func (t taskExecutionMetadata) GetEnvironmentVariables() map[string]string {
+	return t.environmentVariables
 }
 
 type taskExecutionContext struct {
@@ -289,6 +294,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 			o:                     nCtx.Node(),
 			maxAttempts:           maxAttempts,
 			platformResources:     convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+			environmentVariables:  nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
