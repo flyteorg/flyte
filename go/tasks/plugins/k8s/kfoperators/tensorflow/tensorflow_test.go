@@ -146,6 +146,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 	taskExecutionMetadata.OnGetOverrides().Return(resources)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

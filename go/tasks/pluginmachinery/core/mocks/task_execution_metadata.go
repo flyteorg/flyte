@@ -54,6 +54,40 @@ func (_m *TaskExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetEnvironmentVariables struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetEnvironmentVariables) Return(_a0 map[string]string) *TaskExecutionMetadata_GetEnvironmentVariables {
+	return &TaskExecutionMetadata_GetEnvironmentVariables{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetEnvironmentVariables() *TaskExecutionMetadata_GetEnvironmentVariables {
+	c_call := _m.On("GetEnvironmentVariables")
+	return &TaskExecutionMetadata_GetEnvironmentVariables{Call: c_call}
+}
+
+func (_m *TaskExecutionMetadata) OnGetEnvironmentVariablesMatch(matchers ...interface{}) *TaskExecutionMetadata_GetEnvironmentVariables {
+	c_call := _m.On("GetEnvironmentVariables", matchers...)
+	return &TaskExecutionMetadata_GetEnvironmentVariables{Call: c_call}
+}
+
+// GetEnvironmentVariables provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetEnvironmentVariables() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetInterruptibleFailureThreshold struct {
 	*mock.Call
 }

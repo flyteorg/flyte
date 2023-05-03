@@ -183,4 +183,46 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_remoteClusterConfig.name", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.name", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.name"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Name)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.endpoint", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.endpoint", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Endpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("remoteClusterConfig.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.RemoteClusterConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

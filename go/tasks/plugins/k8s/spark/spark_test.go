@@ -325,6 +325,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	})
 	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
+	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }

@@ -164,6 +164,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
 	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
 	taskExecutionMetadata.OnIsInterruptible().Return(isInterruptible)
+	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)

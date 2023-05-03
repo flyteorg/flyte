@@ -387,6 +387,9 @@ func TestToK8sContainer(t *testing.T) {
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
 	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
 	mockTaskExecMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(map[string]string{
+		"foo": "bar",
+	})
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
@@ -418,6 +421,10 @@ func TestToK8sContainer(t *testing.T) {
 		{
 			Name:  "k",
 			Value: "v",
+		},
+		{
+			Name:  "foo",
+			Value: "bar",
 		},
 	}, container.Env)
 	errs := validation.IsDNS1123Label(container.Name)
@@ -454,6 +461,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockOverrides.OnGetResources().Return(resourceRequirements)
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
 	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
+	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")

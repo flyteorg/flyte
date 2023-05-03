@@ -141,6 +141,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	taskExecutionMetadata.OnGetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: serviceAccount},
 	})
+	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

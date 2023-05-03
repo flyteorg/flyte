@@ -84,7 +84,8 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 	container := taskTemplate.GetContainer()
 
-	envVars := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(container.GetEnv()), taskCtx.TaskExecutionMetadata().GetTaskExecutionID())
+	envVars := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(container.GetEnv()),
+		taskCtx.TaskExecutionMetadata().GetEnvironmentVariables(), taskCtx.TaskExecutionMetadata().GetTaskExecutionID())
 
 	sparkEnvVars := make(map[string]string)
 	for _, envVar := range envVars {
