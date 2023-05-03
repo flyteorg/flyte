@@ -1,6 +1,6 @@
 # flyte-binary
 
-![Version: v0.1.10](https://img.shields.io/badge/Version-v0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: v0.1.11](https://img.shields.io/badge/Version-v0.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 Chart for basic single Flyte executable deployment
 
@@ -39,6 +39,13 @@ Chart for basic single Flyte executable deployment
 | configuration.database.port | int | `5432` |  |
 | configuration.database.username | string | `"postgres"` |  |
 | configuration.externalConfigMap | string | `""` |  |
+| configuration.flyte-binary.admin.disableClusterResourceManager | bool | `false` |  |
+| configuration.flyte-binary.admin.disableScheduler | bool | `false` |  |
+| configuration.flyte-binary.admin.disabled | bool | `false` |  |
+| configuration.flyte-binary.admin.seedProjects[0] | string | `"flytesnacks"` |  |
+| configuration.flyte-binary.dataCatalog.disabled | bool | `false` |  |
+| configuration.flyte-binary.propeller.disableWebhook | bool | `false` |  |
+| configuration.flyte-binary.propeller.disabled | bool | `false` |  |
 | configuration.inline | object | `{}` |  |
 | configuration.inlineConfigMap | string | `""` |  |
 | configuration.labels | object | `{}` |  |
