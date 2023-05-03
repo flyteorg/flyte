@@ -1,5 +1,6 @@
 apiVersion: flyte.lyft.com/v1alpha1
 executionConfig:
+  EnvironmentVariables: null
   Interruptible: null
   MaxParallelism: 0
   OverwriteCache: false
