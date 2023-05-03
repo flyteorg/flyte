@@ -190,6 +190,8 @@ data:
       security:
         useAuth: true
   {{- end }}
+  005-flyte-binary-config.yaml: |
+    flyte:{{ tpl ( index .Values.configuration "flyte-binary" | toYaml ) . | nindent 6 }}
   {{- if .Values.configuration.inline }}
   010-inline-config.yaml: |
     {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
