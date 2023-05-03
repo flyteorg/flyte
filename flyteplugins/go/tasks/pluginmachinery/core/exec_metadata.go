@@ -45,4 +45,5 @@ type TaskExecutionMetadata interface {
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() uint32
+	GetEnvironmentVariables() map[string]string
 }
