@@ -245,6 +245,7 @@ jobs:
 
   push-components-images:
     name: Push to Github Registry
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -293,6 +294,7 @@ jobs:
 
   push-scheduler-images:
     name: Push to Github Registry
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     defaults:
       run:

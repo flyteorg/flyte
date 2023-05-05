@@ -13,7 +13,7 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: docker_build_scheduler
 docker_build_scheduler:
-	docker build -t $$FLYTE_SCHEDULER_REPOSITORY:$(GIT_HASH) -f Dockerfile.scheduler .
+	docker build -t $$FLYTE_SCHEDULER_REPOSITORY:$(GIT_HASH) -f scheduler.Dockerfile .
 
 .PHONY: integration
 integration:
