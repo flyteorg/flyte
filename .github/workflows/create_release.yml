@@ -12,18 +12,29 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
+    strategy:
+      matrix:
+        component:
+          [
+            "flytepropeller/",
+            "flyteadmin/",
+            "datacatalog/",
+            "flytecopilot/",
+            "flyteplugins/",
+            "flytestdlib/",
+            "",
+          ]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.36.0
         env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-          CUSTOM_TAG: ${{ github.event.inputs.version }}
+          CUSTOM_TAG: ${{ matrix.component }}${{ github.event.inputs.version }}
           RELEASE_BRANCHES: master
 
   publish-flyte-binary-image:
@@ -138,7 +149,7 @@ jobs:
         with:
           fetch-depth: "0"
 
-      - name: Preprare Flyte Release
+      - name: Prepare Flyte Release
         env:
           VERSION: ${{ needs.bump-version.outputs.version }}
         run: |
