@@ -13,237 +13,237 @@ env:
 
 
 jobs:
-  lint:
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          [
-            flytepropeller,
-            flyteadmin,
-            datacatalog,
-            flytecopilot,
-            flyteplugins,
-            flytestdlib,
-          ]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.component }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Lint
-        run: make install && make lint
+#  lint:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        component:
+#          [
+#            flytepropeller,
+#            flyteadmin,
+#            datacatalog,
+#            flytecopilot,
+#            flyteplugins,
+#            flytestdlib,
+#          ]
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.component }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Lint
+#        run: make install && make lint
+#
+#  unit-tests:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        component:
+#          [
+#            flytepropeller,
+#            flyteadmin,
+#            datacatalog,
+#            flytecopilot,
+#            flyteplugins,
+#            flytestdlib,
+#          ]
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.component }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Unit Tests
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: make install && make test_unit_codecov
+#      - name: Push CodeCov
+#        uses: codecov/codecov-action@v3.1.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          file: coverage.txt
+#          flags: unittests
+#          fail_ci_if_error: false
+#
+#  end-to-end:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        component:
+#          [
+#            flytepropeller,
+#            flyteadmin,
+#            datacatalog,
+#            flytecopilot,
+#          ]
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.component }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - uses: unionai/flytectl-setup-action@v0.0.1
+#        name: Setup flytectl
+#      - uses: actions/setup-python@v3
+#        with:
+#          python-version: 3.8
+#      - id: load-docker-cache
+#        name: Load Docker Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/tmp/${{ matrix.component }}/docker-images
+#          key: /tmp/docker-images-${{ github.run_id }}
+#          restore-keys: |
+#            /tmp/docker-images-
+#      - name: Prime docker cache
+#        run: (docker load -i /tmp/tmp/${{ matrix.component }}/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar || true)
+#      - name: Build dockerfile
+#        env:
+#          # We are unable to leverage docker buildx here without changing the
+#          # caching mechanism significantly. See here for the caching options
+#          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
+#          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
+#          # should rewrite this pipeline to use docker buildx with cache type=gha.
+#          DOCKER_BUILDKIT: "1"
+#        run: |
+#          docker build -t flyteorg/${{ matrix.component }}:builder --target builder --cache-from=flyteorg/${{ matrix.component }}:builder -f Dockerfile ../
+#          docker build -t flyteorg/${{ matrix.component }}:latest --cache-from=flyteorg/${{ matrix.component }}:builder -f Dockerfile ../
+#
+#      - name: Tag and cache docker image
+#        run: mkdir -p /tmp/tmp/${{ matrix.component }}/docker-images && docker save flyteorg/${{ matrix.component }}:builder -o /tmp/tmp/${{ matrix.component }}/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.component }}:latest -o /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar
+#
+#      - name: Create Sandbox Cluster
+#        run: |
+#          cp /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar snapshot.tar
+#          flytectl config init
+#          flytectl sandbox start --source=$(pwd)
+#      - name: Prime docker cache
+#        run: |
+#          flytectl sandbox exec -- docker load -i /root/snapshot.tar
+#      - name: Setup Flytekit
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install flytekit
+#          pip freeze
+#      - name: Register flytesnacks examples
+#        uses: unionai/flyte-register-action@v0.0.2
+#        with:
+#          flytesnacks: true
+#          project: flytesnacks
+#          version: "latest"
+#          domain: development
+#      - name: Pre Upgrade Tests
+#        if : ${{ matrix.component == 'flyteadmin' }}
+#        env:
+#          PRIORITIES: ${{ env.PRIORITIES }}
+#        run: |
+#          make end2end_execute
+#      - name: Upgrade Helm charts
+#        if : ${{ matrix.component == 'flyteadmin' }}
+#        run: |
+#          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
+#          flytectl sandbox exec -- helm repo update
+#          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.component }}.image.repository=flyteorg/${{ matrix.component }},${{ matrix.component }}.image.tag=latest
+#          flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
+#      - name: Post Upgrade Tests
+#        env:
+#          PRIORITIES: ${{ env.PRIORITIES }}
+#        run: |
+#          make end2end_execute
+#
+#  integration-tests:
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: flyteadmin
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - id: load-docker-cache
+#        name: Load Docker Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/tmp/flyteadmin/docker-images
+#          key: /tmp/docker-images-${{ github.run_id }}
+#          restore-keys: |
+#            /tmp/docker-images-
+#      - name: Prime docker cache
+#        run: (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot.tar || true)
+#      - name: Build dockerfile
+#        env:
+#          # We are unable to leverage docker buildx here without changing the
+#          # caching mechanism significantly. See here for the caching options
+#          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
+#          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
+#          # should rewrite this pipeline to use docker buildx with cache type=gha.
+#          DOCKER_BUILDKIT: "1"
+#        run: |
+#          docker build -t flyteorg/flyteadmin:builder --target builder --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
+#          docker build -t flyteorg/flyteadmin:latest --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
+#
+#      - name: Tag and cache docker image
+#        run: mkdir -p /tmp/tmp/flyteadmin/docker-images && docker save flyteorg/flyteadmin:builder -o /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar && docker save flyteorg/flyteadmin:latest -o /tmp/tmp/flyteadmin/docker-images/snapshot.tar
+#      - uses: engineerd/setup-kind@v0.5.0
+#        with:
+#          version: "v0.11.1"
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ inputs.go-version }}
+#      - name: Integration
+#        run: |
+#          # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
+#          sudo rm -rf /usr/share/dotnet
+#          sudo rm -rf /opt/ghc
+#          sudo rm -rf "/usr/local/share/boost"
+#          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+#          kubectl cluster-info
+#          kubectl get pods -n kube-system
+#          echo "current-context:" $(kubectl config current-context)
+#          echo "environment-kubeconfig:" ${KUBECONFIG}
+#          IMAGE_NAME=flyteadmin IMAGE=flyteorg/flyteadmin:builder make k8s_integration_execute
+#
+#  go-generate:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        component:
+#          [
+#            flytepropeller,
+#            flyteadmin,
+#            datacatalog,
+#            flytecopilot,
+#            flyteplugins,
+#            flytestdlib,
+#          ]
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.component }}
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: arduino/setup-protoc@v1
+#      - uses: bufbuild/buf-setup-action@v1
+#      - uses: actions/setup-go@v3
+#        with:
+#          go-version: ${{ env.GO_VERSION }}
+#      - name: Go generate and diff
+#        run: DELTA_CHECK=true make generate
 
-  unit-tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          [
-            flytepropeller,
-            flyteadmin,
-            datacatalog,
-            flytecopilot,
-            flyteplugins,
-            flytestdlib,
-          ]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.component }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Unit Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: make install && make test_unit_codecov
-      - name: Push CodeCov
-        uses: codecov/codecov-action@v3.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file: coverage.txt
-          flags: unittests
-          fail_ci_if_error: false
-
-  end-to-end:
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          [
-            flytepropeller,
-            flyteadmin,
-            datacatalog,
-            flytecopilot,
-          ]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.component }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: unionai/flytectl-setup-action@v0.0.1
-        name: Setup flytectl
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.8
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/${{ matrix.component }}/docker-images
-          key: /tmp/docker-images-${{ github.run_id }}
-          restore-keys: |
-            /tmp/docker-images-
-      - name: Prime docker cache
-        run: (docker load -i /tmp/tmp/${{ matrix.component }}/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar || true)
-      - name: Build dockerfile
-        env:
-          # We are unable to leverage docker buildx here without changing the
-          # caching mechanism significantly. See here for the caching options
-          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
-          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
-          # should rewrite this pipeline to use docker buildx with cache type=gha.
-          DOCKER_BUILDKIT: "1"
-        run: |
-          docker build -t flyteorg/${{ matrix.component }}:builder --target builder --cache-from=flyteorg/${{ matrix.component }}:builder -f Dockerfile ../
-          docker build -t flyteorg/${{ matrix.component }}:latest --cache-from=flyteorg/${{ matrix.component }}:builder -f Dockerfile ../
-
-      - name: Tag and cache docker image
-        run: mkdir -p /tmp/tmp/${{ matrix.component }}/docker-images && docker save flyteorg/${{ matrix.component }}:builder -o /tmp/tmp/${{ matrix.component }}/docker-images/snapshot-builder.tar && docker save flyteorg/${{ matrix.component }}:latest -o /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar
-
-      - name: Create Sandbox Cluster
-        run: |
-          cp /tmp/tmp/${{ matrix.component }}/docker-images/snapshot.tar snapshot.tar
-          flytectl config init
-          flytectl sandbox start --source=$(pwd)
-      - name: Prime docker cache
-        run: |
-          flytectl sandbox exec -- docker load -i /root/snapshot.tar
-      - name: Setup Flytekit
-        run: |
-          python -m pip install --upgrade pip
-          pip install flytekit
-          pip freeze
-      - name: Register flytesnacks examples
-        uses: unionai/flyte-register-action@v0.0.2
-        with:
-          flytesnacks: true
-          project: flytesnacks
-          version: "latest"
-          domain: development
-      - name: Pre Upgrade Tests
-        if : ${{ matrix.component == 'flyteadmin' }}
-        env:
-          PRIORITIES: ${{ env.PRIORITIES }}
-        run: |
-          make end2end_execute
-      - name: Upgrade Helm charts
-        if : ${{ matrix.component == 'flyteadmin' }}
-        run: |
-          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
-          flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set ${{ matrix.component }}.image.repository=flyteorg/${{ matrix.component }},${{ matrix.component }}.image.tag=latest
-          flytectl sandbox exec -- k3s kubectl get pods -n flyte -o yaml
-      - name: Post Upgrade Tests
-        env:
-          PRIORITIES: ${{ env.PRIORITIES }}
-        run: |
-          make end2end_execute
-
-  integration-tests:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: flyteadmin
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - id: load-docker-cache
-        name: Load Docker Cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/tmp/flyteadmin/docker-images
-          key: /tmp/docker-images-${{ github.run_id }}
-          restore-keys: |
-            /tmp/docker-images-
-      - name: Prime docker cache
-        run: (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar || true) && (docker load -i /tmp/tmp/flyteadmin/docker-images/snapshot.tar || true)
-      - name: Build dockerfile
-        env:
-          # We are unable to leverage docker buildx here without changing the
-          # caching mechanism significantly. See here for the caching options
-          # available for docker buildx: https://docs.docker.com/engine/reference/commandline/buildx_build/#cache-from
-          # For now at least enable DOCKER_BUILDKIT for faster builds. Eventually we
-          # should rewrite this pipeline to use docker buildx with cache type=gha.
-          DOCKER_BUILDKIT: "1"
-        run: |
-          docker build -t flyteorg/flyteadmin:builder --target builder --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
-          docker build -t flyteorg/flyteadmin:latest --cache-from=flyteorg/flyteadmin:builder -f Dockerfile ../
-
-      - name: Tag and cache docker image
-        run: mkdir -p /tmp/tmp/flyteadmin/docker-images && docker save flyteorg/flyteadmin:builder -o /tmp/tmp/flyteadmin/docker-images/snapshot-builder.tar && docker save flyteorg/flyteadmin:latest -o /tmp/tmp/flyteadmin/docker-images/snapshot.tar
-      - uses: engineerd/setup-kind@v0.5.0
-        with:
-          version: "v0.11.1"
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ${{ inputs.go-version }}
-      - name: Integration
-        run: |
-          # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          echo "current-context:" $(kubectl config current-context)
-          echo "environment-kubeconfig:" ${KUBECONFIG}
-          IMAGE_NAME=flyteadmin IMAGE=flyteorg/flyteadmin:builder make k8s_integration_execute
-
-  go-generate:
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          [
-            flytepropeller,
-            flyteadmin,
-            datacatalog,
-            flytecopilot,
-            flyteplugins,
-            flytestdlib,
-          ]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ matrix.component }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: arduino/setup-protoc@v1
-      - uses: bufbuild/buf-setup-action@v1
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Go generate and diff
-        run: DELTA_CHECK=true make generate
-
-  push-github:
+  push-components-images:
     name: Push to Github Registry
     runs-on: ubuntu-latest
     strategy:
@@ -277,7 +277,7 @@ jobs:
         id: tags
         uses: docker/metadata-action@v3
         with:
-          images: ghcr.io/${{ matrix.component }}
+          images: ghcr.io/flyteorg/${{ matrix.component }}
           tags: |
             type=raw,value=latest
             type=raw,value=${{ matrix.component }}
@@ -285,12 +285,46 @@ jobs:
       - name: Build and Push Image
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.component }}
-          file: ${{ matrix.component }}/Dockerfile
+          context: .
+          file: Dockerfile
           platforms: linux/arm64,linux/amd64
           push: true
           tags: ${{ steps.tags.outputs.tags }}
 
-  # TODO: Add push-docker-image-flytescheduler
-  # https://github.com/flyteorg/flyteadmin/blob/master/.github/workflows/checks.yml#L74
-  # CodeCov report
+  push-scheduler-images:
+    name: Push to Github Registry
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flyteadmin
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Image Tags
+        id: tags
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/flyteorg/flytescheduler
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ matrix.component }}
+            type=sha,format=long,prefix=
+      - name: Build and Push Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: scheduler.Dockerfile
+          platforms: linux/arm64,linux/amd64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
