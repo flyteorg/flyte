@@ -1314,5 +1314,10 @@ func TestGetNodeExecutionData(t *testing.T) {
 			Id:               dynamicWorkflowClosure.Primary.Template.Id,
 			CompiledWorkflow: &dynamicWorkflowClosure,
 		},
+		FlyteUrls: &admin.FlyteURLs{
+			Inputs:  "flyte://v1/project/domain/name/node id/i",
+			Outputs: "flyte://v1/project/domain/name/node id/o",
+			Deck:    "flyte://v1/project/domain/name/node id/d",
+		},
 	}, dataResponse))
 }

@@ -331,6 +331,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
+		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
 	}
 
 	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
