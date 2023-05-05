@@ -114,7 +114,7 @@ externalEvents:
     eventTypes: all
 Logger:
   show-source: true
-  level: 6
+  level: 5
 storage:
   type: stow
   stow:
@@ -129,7 +129,7 @@ storage:
       secret_key: miniostorage
   signedUrl:
     stowConfigOverride:
-      endpoint: http://localhost:30084
+      endpoint: http://localhost:30002
   cache:
     max_size_mbs: 10
     target_gc_percent: 100

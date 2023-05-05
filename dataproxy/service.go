@@ -7,7 +7,14 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/flyteorg/flyteadmin/pkg/common"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -37,6 +44,7 @@ type Service struct {
 	dataStore            *storage.DataStore
 	shardSelector        ioutils.ShardSelector
 	nodeExecutionManager interfaces.NodeExecutionInterface
+	taskExecutionManager interfaces.TaskExecutionInterface
 }
 
 // CreateUploadLocation creates a temporary signed url to allow callers to upload content.
@@ -133,9 +141,17 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create a signed url. Error: %v", err)
 	}
 
+	u := []string{signedURLResp.URL.String()}
+	ts := timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration()))
+
+	//
 	return &service.CreateDownloadLinkResponse{
-		SignedUrl: []string{signedURLResp.URL.String()},
-		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
+		SignedUrl: u,
+		ExpiresAt: ts,
+		PreSignedUrls: &service.PreSignedURLs{
+			SignedUrl: []string{signedURLResp.URL.String()},
+			ExpiresAt: ts,
+		},
 	}, nil
 }
 
@@ -231,9 +247,117 @@ func createStorageLocation(ctx context.Context, store *storage.DataStore,
 	return storagePath, nil
 }
 
+func (s Service) validateResolveArtifactRequest(req *service.GetDataRequest) error {
+	if len(req.GetFlyteUrl()) == 0 {
+		return fmt.Errorf("source is required. Provided empty string")
+	}
+	if !strings.HasPrefix(req.GetFlyteUrl(), "flyte://") {
+		return fmt.Errorf("request does not start with the correct prefix")
+	}
+
+	return nil
+}
+
+func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
+		NodeExecutionId: &nodeExecID,
+		Limit:           1,
+		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(attempt)),
+	})
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to list task executions [%v]. Error: %v", nodeExecID, err)
+	}
+	if len(taskExecs.TaskExecutions) == 0 {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "no task executions were listed [%v]. Error: %v", nodeExecID, err)
+	}
+	taskExec := taskExecs.TaskExecutions[0]
+	return taskExec.Id, nil
+}
+
+func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
+	*service.GetDataResponse, error) {
+
+	logger.Debugf(ctx, "resolving flyte url query: %s", req.GetFlyteUrl())
+	err := s.validateResolveArtifactRequest(req)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to validate resolve artifact request. Error: %v", err)
+	}
+
+	nodeExecID, attempt, ioType, err := common.ParseFlyteURL(req.GetFlyteUrl())
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse artifact url Error: %v", err)
+	}
+
+	// Get the data location, then decide how/where to fetch it from
+	if attempt == nil {
+		resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, admin.NodeExecutionGetDataRequest{
+			Id: &nodeExecID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		var lm *core.LiteralMap
+		if ioType == common.ArtifactTypeI {
+			lm = resp.FullInputs
+		} else if ioType == common.ArtifactTypeO {
+			lm = resp.FullOutputs
+		} else {
+			// Assume deck, and create a download link request
+			dlRequest := service.CreateDownloadLinkRequest{
+				ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+				Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: &nodeExecID},
+			}
+			resp, err := s.CreateDownloadLink(ctx, &dlRequest)
+			if err != nil {
+				return nil, err
+			}
+			return &service.GetDataResponse{
+				Data: &service.GetDataResponse_PreSignedUrls{
+					PreSignedUrls: resp.PreSignedUrls,
+				},
+			}, nil
+		}
+
+		return &service.GetDataResponse{
+			Data: &service.GetDataResponse_LiteralMap{
+				LiteralMap: lm,
+			},
+		}, nil
+	}
+	// Rest of the logic handles task attempt lookups
+	var lm *core.LiteralMap
+	taskExecID, err := s.GetTaskExecutionID(ctx, *attempt, nodeExecID)
+	if err != nil {
+		return nil, err
+	}
+
+	reqT := admin.TaskExecutionGetDataRequest{
+		Id: taskExecID,
+	}
+	resp, err := s.taskExecutionManager.GetTaskExecutionData(ctx, reqT)
+	if err != nil {
+		return nil, err
+	}
+
+	if ioType == common.ArtifactTypeI {
+		lm = resp.FullInputs
+	} else if ioType == common.ArtifactTypeO {
+		lm = resp.FullOutputs
+	} else {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "deck type cannot be specified with a retry attempt, just use the node instead")
+	}
+	return &service.GetDataResponse{
+		Data: &service.GetDataResponse_LiteralMap{
+			LiteralMap: lm,
+		},
+	}, nil
+}
+
 func NewService(cfg config.DataProxyConfig,
 	nodeExec interfaces.NodeExecutionInterface,
-	dataStore *storage.DataStore) (Service, error) {
+	dataStore *storage.DataStore,
+	taskExec interfaces.TaskExecutionInterface) (Service, error) {
 
 	// Context is not used in the constructor. Should ideally be removed.
 	selector, err := ioutils.NewBase36PrefixShardSelector(context.TODO())
@@ -246,5 +370,6 @@ func NewService(cfg config.DataProxyConfig,
 		dataStore:            dataStore,
 		shardSelector:        selector,
 		nodeExecutionManager: nodeExec,
+		taskExecutionManager: taskExec,
 	}, nil
 }

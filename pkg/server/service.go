@@ -119,7 +119,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
-	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient)
+	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient, adminServer.TaskExecutionManager)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize dataProxy service. Error: %w", err)
 	}

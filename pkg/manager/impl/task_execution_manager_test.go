@@ -958,5 +958,10 @@ func TestGetTaskExecutionData(t *testing.T) {
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
+		FlyteUrls: &admin.FlyteURLs{
+			Inputs:  "flyte://v1/project/domain/name/node-id/1/i",
+			Outputs: "flyte://v1/project/domain/name/node-id/1/o",
+			Deck:    "",
+		},
 	}, dataResponse))
 }
