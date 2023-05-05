@@ -62,7 +62,7 @@ extensions = [
     "sphinx_panels",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
-    "sphinxcontrib.yt",
+    "sphinxcontrib.youtube",
     "sphinx_tabs.tabs",
     "sphinx_tags",
 ]
