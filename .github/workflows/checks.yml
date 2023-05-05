@@ -356,7 +356,7 @@ jobs:
         if : ${{ matrix.package == 'flyteadmin' || matrix.package == 'flytepropeller' || matrix.package == 'flytecopilot' || matrix.package == 'datacatalog' }}
         uses: docker/build-push-action@v3
         with:
-          context: ../
+          context: ${{ matrix.package }}
           file: Dockerfile
           platforms: linux/arm64,linux/amd64
           push: true
