@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
@@ -344,32 +345,79 @@ func TestComputeResourceCeilings_updateAll(t *testing.T) {
 
 func TestGetComputeResourceAndQuantityRequested(t *testing.T) {
 	type args struct {
-		err error
+		err    error
+		regexp *regexp.Regexp
 	}
 	tests := []struct {
 		name string
 		args args
 		want v1.ResourceList
 	}{
-		{name: "Memory request", args: args{err: apiErrors.NewForbidden(
+		{name: "Limited memory limits", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
-				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
-				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
+				"exceeded quota: project-quota, requested: limits.memory=3Gi, used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
+			regexp: limitedLimitsRegexp},
+			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("8000Gi")}},
+		{name: "Limited CPU limits", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.cpu=3640m, used: limits.cpu=6000m, limited: limits.cpu=8000m")),
+			regexp: limitedLimitsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("8000m")}},
+		{name: "Limited multiple limits ", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi")),
+			regexp: limitedLimitsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("250"), v1.ResourceMemory: resource.MustParse("2000Gi")}},
+		{name: "Limited memory requests", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.memory=3Gi, used: requests.memory=7976Gi, limited: requests.memory=8000Gi")),
+			regexp: limitedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("8000Gi")}},
+		{name: "Limited CPU requests", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=3640m, used: requests.cpu=6000m, limited: requests.cpu=8000m")),
+			regexp: limitedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("8000m")}},
+		{name: "Limited multiple requests ", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=7,requests.memory=64Gi, used: requests.cpu=249,requests.memory=2012730Mi, limited: requests.cpu=250,requests.memory=2000Gi")),
+			regexp: limitedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("250"), v1.ResourceMemory: resource.MustParse("2000Gi")}},
+		{name: "Requested memory limits", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.memory=3Gi, used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
+			regexp: requestedLimitsRegexp},
 			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("3Gi")}},
-		{name: "CPU request", args: args{err: apiErrors.NewForbidden(
+		{name: "Requested CPU limits", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
-				"exceeded quota: project-quota, requested: limits.cpu=3640m, "+
-				"used: limits.cpu=6000m, limited: limits.cpu=8000m"))},
+				"exceeded quota: project-quota, requested: limits.cpu=3640m, used: limits.cpu=6000m, limited: limits.cpu=8000m")),
+			regexp: requestedLimitsRegexp},
 			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3640m")}},
-		{name: "Multiple resources ", args: args{err: apiErrors.NewForbidden(
+		{name: "Requested multiple limits ", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
-				"exceeded quota: project-quota, requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi"))},
+				"exceeded quota: project-quota, requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi")),
+			regexp: requestedLimitsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("7"), v1.ResourceMemory: resource.MustParse("64Gi")}},
+		{name: "Requested memory requests", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.memory=3Gi, used: requests.memory=7976Gi, limited: requests.memory=8000Gi")),
+			regexp: requestedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("3Gi")}},
+		{name: "Requested CPU requests", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=3640m, used: requests.cpu=6000m, limited: requests.cpu=8000m")),
+			regexp: requestedRequestsRegexp},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3640m")}},
+		{name: "Requested multiple requests ", args: args{err: apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: requests.cpu=7,requests.memory=64Gi, used: requests.cpu=249,requests.memory=2012730Mi, limited: requests.cpu=250,requests.memory=2000Gi")),
+			regexp: requestedRequestsRegexp},
 			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("7"), v1.ResourceMemory: resource.MustParse("64Gi")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetComputeResourceAndQuantityRequested(tt.args.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetComputeResourceAndQuantityRequested() = %v, want %v", got, tt.want)
+			if got := GetComputeResourceAndQuantity(tt.args.err, tt.args.regexp); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetComputeResourceAndQuantity() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -390,7 +438,7 @@ func TestIsBackoffError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsBackoffError(tt.args.err); got != tt.want {
+			if got := stdlibErrors.IsCausedBy(tt.args.err, taskErrors.BackOffError); got != tt.want {
 				t.Errorf("IsBackoffError() = %v, want %v", got, tt.want)
 			}
 		})
@@ -515,4 +563,57 @@ func TestErrorTypes(t *testing.T) {
 		res := IsBackOffError(err)
 		assert.True(t, res)
 	})
+}
+
+func TestIsEligible(t *testing.T) {
+	type args struct {
+		requested v1.ResourceList
+		quota     v1.ResourceList
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "CPUElgible",
+			args: args{
+				requested: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1")},
+				quota:     v1.ResourceList{v1.ResourceCPU: resource.MustParse("2")},
+			},
+			want: true,
+		},
+		{
+			name: "CPUInelgible",
+			args: args{
+				requested: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1")},
+				quota:     v1.ResourceList{v1.ResourceCPU: resource.MustParse("200m")},
+			},
+			want: false,
+		},
+		{
+			name: "MemoryElgible",
+			args: args{
+				requested: v1.ResourceList{v1.ResourceMemory: resource.MustParse("32Gi")},
+				quota:     v1.ResourceList{v1.ResourceMemory: resource.MustParse("64Gi")},
+			},
+			want: true,
+		},
+		{
+			name: "MemoryInelgible",
+			args: args{
+				requested: v1.ResourceList{v1.ResourceMemory: resource.MustParse("64Gi")},
+				quota:     v1.ResourceList{v1.ResourceMemory: resource.MustParse("64Gi")},
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isEligible(tt.args.requested, tt.args.quota); got != tt.want {
+				t.Errorf("isEligible() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
