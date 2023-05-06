@@ -206,6 +206,8 @@ func (m *Identity) Validate() error {
 		}
 	}
 
+	// no validation rules for UserIdentifier
+
 	return nil
 }
 

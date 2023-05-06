@@ -14264,6 +14264,7 @@
                  * @property {string|null} [iamRole] Identity iamRole
                  * @property {string|null} [k8sServiceAccount] Identity k8sServiceAccount
                  * @property {flyteidl.core.IOAuth2Client|null} [oauth2Client] Identity oauth2Client
+                 * @property {string|null} [userIdentifier] Identity userIdentifier
                  */
     
                 /**
@@ -14306,6 +14307,14 @@
                 Identity.prototype.oauth2Client = null;
     
                 /**
+                 * Identity userIdentifier.
+                 * @member {string} userIdentifier
+                 * @memberof flyteidl.core.Identity
+                 * @instance
+                 */
+                Identity.prototype.userIdentifier = "";
+    
+                /**
                  * Creates a new Identity instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.Identity
@@ -14335,6 +14344,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.k8sServiceAccount);
                     if (message.oauth2Client != null && message.hasOwnProperty("oauth2Client"))
                         $root.flyteidl.core.OAuth2Client.encode(message.oauth2Client, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.userIdentifier != null && message.hasOwnProperty("userIdentifier"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.userIdentifier);
                     return writer;
                 };
     
@@ -14364,6 +14375,9 @@
                             break;
                         case 3:
                             message.oauth2Client = $root.flyteidl.core.OAuth2Client.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.userIdentifier = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14395,6 +14409,9 @@
                         if (error)
                             return "oauth2Client." + error;
                     }
+                    if (message.userIdentifier != null && message.hasOwnProperty("userIdentifier"))
+                        if (!$util.isString(message.userIdentifier))
+                            return "userIdentifier: string expected";
                     return null;
                 };
     

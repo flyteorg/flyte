@@ -35,21 +35,24 @@ class CoreIdentity(object):
     swagger_types = {
         'iam_role': 'str',
         'k8s_service_account': 'str',
-        'oauth2_client': 'CoreOAuth2Client'
+        'oauth2_client': 'CoreOAuth2Client',
+        'user_identifier': 'str'
     }
 
     attribute_map = {
         'iam_role': 'iam_role',
         'k8s_service_account': 'k8s_service_account',
-        'oauth2_client': 'oauth2_client'
+        'oauth2_client': 'oauth2_client',
+        'user_identifier': 'user_identifier'
     }
 
-    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None):  # noqa: E501
+    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None, user_identifier=None):  # noqa: E501
         """CoreIdentity - a model defined in Swagger"""  # noqa: E501
 
         self._iam_role = None
         self._k8s_service_account = None
         self._oauth2_client = None
+        self._user_identifier = None
         self.discriminator = None
 
         if iam_role is not None:
@@ -58,6 +61,8 @@ class CoreIdentity(object):
             self.k8s_service_account = k8s_service_account
         if oauth2_client is not None:
             self.oauth2_client = oauth2_client
+        if user_identifier is not None:
+            self.user_identifier = user_identifier
 
     @property
     def iam_role(self):
@@ -127,6 +132,29 @@ class CoreIdentity(object):
         """
 
         self._oauth2_client = oauth2_client
+
+    @property
+    def user_identifier(self):
+        """Gets the user_identifier of this CoreIdentity.  # noqa: E501
+
+        user_identifier references the id of the user who executes the task.  # noqa: E501
+
+        :return: The user_identifier of this CoreIdentity.  # noqa: E501
+        :rtype: str
+        """
+        return self._user_identifier
+
+    @user_identifier.setter
+    def user_identifier(self, user_identifier):
+        """Sets the user_identifier of this CoreIdentity.
+
+        user_identifier references the id of the user who executes the task.  # noqa: E501
+
+        :param user_identifier: The user_identifier of this CoreIdentity.  # noqa: E501
+        :type: str
+        """
+
+        self._user_identifier = user_identifier
 
     def to_dict(self):
         """Returns the model properties as a dict"""

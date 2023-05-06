@@ -69,6 +69,9 @@ message Identity {
     // oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when
     // making external calls.
     OAuth2Client oauth2_client = 3;
+
+    // user_identifier references the id of the user who executes the task.
+    string user_identifier = 4;
 }
 
 // OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.
