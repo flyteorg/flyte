@@ -562,6 +562,20 @@ class Identity final :
   ::std::string* release_k8s_service_account();
   void set_allocated_k8s_service_account(::std::string* k8s_service_account);
 
+  // string user_identifier = 4;
+  void clear_user_identifier();
+  static const int kUserIdentifierFieldNumber = 4;
+  const ::std::string& user_identifier() const;
+  void set_user_identifier(const ::std::string& value);
+  #if LANG_CXX11
+  void set_user_identifier(::std::string&& value);
+  #endif
+  void set_user_identifier(const char* value);
+  void set_user_identifier(const char* value, size_t size);
+  ::std::string* mutable_user_identifier();
+  ::std::string* release_user_identifier();
+  void set_allocated_user_identifier(::std::string* user_identifier);
+
   // .flyteidl.core.OAuth2Client oauth2_client = 3;
   bool has_oauth2_client() const;
   void clear_oauth2_client();
@@ -578,6 +592,7 @@ class Identity final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr iam_role_;
   ::google::protobuf::internal::ArenaStringPtr k8s_service_account_;
+  ::google::protobuf::internal::ArenaStringPtr user_identifier_;
   ::flyteidl::core::OAuth2Client* oauth2_client_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fsecurity_2eproto;
@@ -1365,6 +1380,59 @@ inline void Identity::set_allocated_oauth2_client(::flyteidl::core::OAuth2Client
   }
   oauth2_client_ = oauth2_client;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Identity.oauth2_client)
+}
+
+// string user_identifier = 4;
+inline void Identity::clear_user_identifier() {
+  user_identifier_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Identity::user_identifier() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Identity.user_identifier)
+  return user_identifier_.GetNoArena();
+}
+inline void Identity::set_user_identifier(const ::std::string& value) {
+  
+  user_identifier_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Identity.user_identifier)
+}
+#if LANG_CXX11
+inline void Identity::set_user_identifier(::std::string&& value) {
+  
+  user_identifier_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Identity.user_identifier)
+}
+#endif
+inline void Identity::set_user_identifier(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  user_identifier_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Identity.user_identifier)
+}
+inline void Identity::set_user_identifier(const char* value, size_t size) {
+  
+  user_identifier_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Identity.user_identifier)
+}
+inline ::std::string* Identity::mutable_user_identifier() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Identity.user_identifier)
+  return user_identifier_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Identity::release_user_identifier() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Identity.user_identifier)
+  
+  return user_identifier_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Identity::set_allocated_user_identifier(::std::string* user_identifier) {
+  if (user_identifier != nullptr) {
+    
+  } else {
+    
+  }
+  user_identifier_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user_identifier);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Identity.user_identifier)
 }
 
 // -------------------------------------------------------------------

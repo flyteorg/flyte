@@ -5967,6 +5967,9 @@ export namespace flyteidl {
 
             /** Identity oauth2Client */
             oauth2Client?: (flyteidl.core.IOAuth2Client|null);
+
+            /** Identity userIdentifier */
+            userIdentifier?: (string|null);
         }
 
         /** Represents an Identity. */
@@ -5986,6 +5989,9 @@ export namespace flyteidl {
 
             /** Identity oauth2Client. */
             public oauth2Client?: (flyteidl.core.IOAuth2Client|null);
+
+            /** Identity userIdentifier. */
+            public userIdentifier: string;
 
             /**
              * Creates a new Identity instance using the specified properties.

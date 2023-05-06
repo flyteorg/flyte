@@ -2268,6 +2268,24 @@ public final class Security {
      * <code>.flyteidl.core.OAuth2Client oauth2_client = 3;</code>
      */
     flyteidl.core.Security.OAuth2ClientOrBuilder getOauth2ClientOrBuilder();
+
+    /**
+     * <pre>
+     * user_identifier references the id of the user who executes the task.
+     * </pre>
+     *
+     * <code>string user_identifier = 4;</code>
+     */
+    java.lang.String getUserIdentifier();
+    /**
+     * <pre>
+     * user_identifier references the id of the user who executes the task.
+     * </pre>
+     *
+     * <code>string user_identifier = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserIdentifierBytes();
   }
   /**
    * <pre>
@@ -2289,6 +2307,7 @@ public final class Security {
     private Identity() {
       iamRole_ = "";
       k8SServiceAccount_ = "";
+      userIdentifier_ = "";
     }
 
     @java.lang.Override
@@ -2338,6 +2357,12 @@ public final class Security {
                 oauth2Client_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              userIdentifier_ = s;
               break;
             }
             default: {
@@ -2492,6 +2517,48 @@ public final class Security {
       return getOauth2Client();
     }
 
+    public static final int USER_IDENTIFIER_FIELD_NUMBER = 4;
+    private volatile java.lang.Object userIdentifier_;
+    /**
+     * <pre>
+     * user_identifier references the id of the user who executes the task.
+     * </pre>
+     *
+     * <code>string user_identifier = 4;</code>
+     */
+    public java.lang.String getUserIdentifier() {
+      java.lang.Object ref = userIdentifier_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        userIdentifier_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * user_identifier references the id of the user who executes the task.
+     * </pre>
+     *
+     * <code>string user_identifier = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserIdentifierBytes() {
+      java.lang.Object ref = userIdentifier_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userIdentifier_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2515,6 +2582,9 @@ public final class Security {
       if (oauth2Client_ != null) {
         output.writeMessage(3, getOauth2Client());
       }
+      if (!getUserIdentifierBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, userIdentifier_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2533,6 +2603,9 @@ public final class Security {
       if (oauth2Client_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getOauth2Client());
+      }
+      if (!getUserIdentifierBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, userIdentifier_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2558,6 +2631,8 @@ public final class Security {
         if (!getOauth2Client()
             .equals(other.getOauth2Client())) return false;
       }
+      if (!getUserIdentifier()
+          .equals(other.getUserIdentifier())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2577,6 +2652,8 @@ public final class Security {
         hash = (37 * hash) + OAUTH2_CLIENT_FIELD_NUMBER;
         hash = (53 * hash) + getOauth2Client().hashCode();
       }
+      hash = (37 * hash) + USER_IDENTIFIER_FIELD_NUMBER;
+      hash = (53 * hash) + getUserIdentifier().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2725,6 +2802,8 @@ public final class Security {
           oauth2Client_ = null;
           oauth2ClientBuilder_ = null;
         }
+        userIdentifier_ = "";
+
         return this;
       }
 
@@ -2758,6 +2837,7 @@ public final class Security {
         } else {
           result.oauth2Client_ = oauth2ClientBuilder_.build();
         }
+        result.userIdentifier_ = userIdentifier_;
         onBuilt();
         return result;
       }
@@ -2816,6 +2896,10 @@ public final class Security {
         }
         if (other.hasOauth2Client()) {
           mergeOauth2Client(other.getOauth2Client());
+        }
+        if (!other.getUserIdentifier().isEmpty()) {
+          userIdentifier_ = other.userIdentifier_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3184,6 +3268,95 @@ public final class Security {
           oauth2Client_ = null;
         }
         return oauth2ClientBuilder_;
+      }
+
+      private java.lang.Object userIdentifier_ = "";
+      /**
+       * <pre>
+       * user_identifier references the id of the user who executes the task.
+       * </pre>
+       *
+       * <code>string user_identifier = 4;</code>
+       */
+      public java.lang.String getUserIdentifier() {
+        java.lang.Object ref = userIdentifier_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userIdentifier_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * user_identifier references the id of the user who executes the task.
+       * </pre>
+       *
+       * <code>string user_identifier = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUserIdentifierBytes() {
+        java.lang.Object ref = userIdentifier_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userIdentifier_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * user_identifier references the id of the user who executes the task.
+       * </pre>
+       *
+       * <code>string user_identifier = 4;</code>
+       */
+      public Builder setUserIdentifier(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        userIdentifier_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * user_identifier references the id of the user who executes the task.
+       * </pre>
+       *
+       * <code>string user_identifier = 4;</code>
+       */
+      public Builder clearUserIdentifier() {
+        
+        userIdentifier_ = getDefaultInstance().getUserIdentifier();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * user_identifier references the id of the user who executes the task.
+       * </pre>
+       *
+       * <code>string user_identifier = 4;</code>
+       */
+      public Builder setUserIdentifierBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        userIdentifier_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -6609,21 +6782,21 @@ public final class Security {
       "untType\"+\n\tMountType\022\007\n\003ANY\020\000\022\013\n\007ENV_VAR" +
       "\020\001\022\010\n\004FILE\020\002\"O\n\014OAuth2Client\022\021\n\tclient_i" +
       "d\030\001 \001(\t\022,\n\rclient_secret\030\002 \001(\0132\025.flyteid" +
-      "l.core.Secret\"m\n\010Identity\022\020\n\010iam_role\030\001 " +
-      "\001(\t\022\033\n\023k8s_service_account\030\002 \001(\t\0222\n\roaut" +
-      "h2_client\030\003 \001(\0132\033.flyteidl.core.OAuth2Cl" +
-      "ient\"\335\001\n\022OAuth2TokenRequest\022\014\n\004name\030\001 \001(" +
-      "\t\0224\n\004type\030\002 \001(\0162&.flyteidl.core.OAuth2To" +
-      "kenRequest.Type\022+\n\006client\030\003 \001(\0132\033.flytei" +
-      "dl.core.OAuth2Client\022\036\n\026idp_discovery_en" +
-      "dpoint\030\004 \001(\t\022\026\n\016token_endpoint\030\005 \001(\t\"\036\n\004" +
-      "Type\022\026\n\022CLIENT_CREDENTIALS\020\000\"\225\001\n\017Securit" +
-      "yContext\022\'\n\006run_as\030\001 \001(\0132\027.flyteidl.core" +
-      ".Identity\022&\n\007secrets\030\002 \003(\0132\025.flyteidl.co" +
-      "re.Secret\0221\n\006tokens\030\003 \003(\0132!.flyteidl.cor" +
-      "e.OAuth2TokenRequestB6Z4github.com/flyte" +
-      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
-      "oto3"
+      "l.core.Secret\"\206\001\n\010Identity\022\020\n\010iam_role\030\001" +
+      " \001(\t\022\033\n\023k8s_service_account\030\002 \001(\t\0222\n\roau" +
+      "th2_client\030\003 \001(\0132\033.flyteidl.core.OAuth2C" +
+      "lient\022\027\n\017user_identifier\030\004 \001(\t\"\335\001\n\022OAuth" +
+      "2TokenRequest\022\014\n\004name\030\001 \001(\t\0224\n\004type\030\002 \001(" +
+      "\0162&.flyteidl.core.OAuth2TokenRequest.Typ" +
+      "e\022+\n\006client\030\003 \001(\0132\033.flyteidl.core.OAuth2" +
+      "Client\022\036\n\026idp_discovery_endpoint\030\004 \001(\t\022\026" +
+      "\n\016token_endpoint\030\005 \001(\t\"\036\n\004Type\022\026\n\022CLIENT" +
+      "_CREDENTIALS\020\000\"\225\001\n\017SecurityContext\022\'\n\006ru" +
+      "n_as\030\001 \001(\0132\027.flyteidl.core.Identity\022&\n\007s" +
+      "ecrets\030\002 \003(\0132\025.flyteidl.core.Secret\0221\n\006t" +
+      "okens\030\003 \003(\0132!.flyteidl.core.OAuth2TokenR" +
+      "equestB6Z4github.com/flyteorg/flyteidl/g" +
+      "en/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6654,7 +6827,7 @@ public final class Security {
     internal_static_flyteidl_core_Identity_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Identity_descriptor,
-        new java.lang.String[] { "IamRole", "K8SServiceAccount", "Oauth2Client", });
+        new java.lang.String[] { "IamRole", "K8SServiceAccount", "Oauth2Client", "UserIdentifier", });
     internal_static_flyteidl_core_OAuth2TokenRequest_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_OAuth2TokenRequest_fieldAccessorTable = new
