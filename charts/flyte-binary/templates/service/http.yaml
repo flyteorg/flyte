@@ -55,7 +55,7 @@ spec:
       nodePort: null
       {{- end }}
     - name: plugin-grpc
-      port: 80
+      port: {{ include "flyte-binary.external-plugin-service.grpc.port" . }}
       targetPort: plugin-grpc
     {{- if .Values.service.extraPorts }}
     {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}

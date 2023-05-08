@@ -94,8 +94,8 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | externalPluginService.image.pullPolicy | string | `"IfNotPresent"` |  |
-| externalPluginService.image.repository | string | `"docker.io/pingsutw/external-plugin-service"` |  |
-| externalPluginService.image.tag | string | `"latest"` |  |
+| externalPluginService.image.repository | string | `"ghcr.io/flytekit/external-plugin-service"` |  |
+| externalPluginService.image.tag | string | `"v1.6.0b4"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

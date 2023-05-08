@@ -208,9 +208,9 @@ external_plugin_service:
   replicaCount: 1
   image:
     # -- Docker image for external-plugin-service deployment
-    repository: docker.io/pingsutw/external-plugin-service
+    repository: ghcr.io/flytekit/external-plugin-service
     # -- Docker image tag
-    tag: latest
+    tag: v1.6.0b4
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for external-plugin-service deployment
@@ -270,8 +270,8 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: docker.io/pingsutw/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: 0a4013187ae4cf6564d4e74b78ba425d00099432 # FLYTEPROPELLER_TAG
+    repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
+    tag: v1.1.87 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:

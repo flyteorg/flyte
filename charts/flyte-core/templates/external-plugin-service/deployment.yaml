@@ -28,7 +28,7 @@ spec:
         imagePullPolicy: "{{ .Values.external_plugin_service.image.pullPolicy }}"
         name: external-plugin-service
         ports:
-        - containerPort: 80
+        - containerPort: 8000
           name: plugin-grpc
         resources: {{- toYaml .Values.external_plugin_service.resources | nindent 10 }}
         {{- with .Values.external_plugin_service.additionalVolumeMounts -}}

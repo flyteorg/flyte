@@ -149,8 +149,8 @@ helm install gateway bitnami/contour -n flyte
 | external_plugin_service.enabled | bool | `true` |  |
 | external_plugin_service.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | external_plugin_service.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| external_plugin_service.image.repository | string | `"docker.io/pingsutw/external-plugin-service"` | Docker image for external-plugin-service deployment |
-| external_plugin_service.image.tag | string | `"latest"` | Docker image tag |
+| external_plugin_service.image.repository | string | `"ghcr.io/flytekit/external-plugin-service"` | Docker image for external-plugin-service deployment |
+| external_plugin_service.image.tag | string | `"v1.6.0b4"` | Docker image tag |
 | external_plugin_service.nodeSelector | object | `{}` | nodeSelector for external-plugin-service deployment |
 | external_plugin_service.podAnnotations | object | `{}` | Annotations for external-plugin-service pods |
 | external_plugin_service.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
@@ -213,8 +213,8 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.enabled | bool | `true` |  |
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
-| flytepropeller.image.repository | string | `"docker.io/pingsutw/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"0a4013187ae4cf6564d4e74b78ba425d00099432"` |  |
+| flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
+| flytepropeller.image.tag | string | `"v1.1.87"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |

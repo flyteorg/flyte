@@ -167,6 +167,13 @@ Get the Flyte service GRPC port.
 {{- end -}}
 
 {{/*
+Get the Flyte exteran plugin service GRPC port.
+*/}}
+{{- define "flyte-binary.external-plugin-service.grpc.port" -}}
+{{- default 8000 .Values.service.ports.grpc -}}
+{{- end -}}
+
+{{/*
 Get the Flyte webhook service name.
 */}}
 {{- define "flyte-binary.webhook.serviceName" -}}

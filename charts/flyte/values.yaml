@@ -222,9 +222,9 @@ flyte:
     replicaCount: 1
     image:
       # -- Docker image for external-plugin-service deployment
-      repository: docker.io/pingsutw/external-plugin-service
+      repository: ghcr.io/flytekit/external-plugin-service
       # -- Docker image tag
-      tag: latest
+      tag: v1.6.0b4
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for external-plugin-service deployment
@@ -608,6 +608,10 @@ flyte:
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
+      external-plugin-service:
+        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+          - bigquery_query_job_task
 
     # -- Logger configuration
     logger:

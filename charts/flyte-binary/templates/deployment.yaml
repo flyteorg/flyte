@@ -233,7 +233,7 @@ spec:
           imagePullPolicy: {{ .pullPolicy | quote }}
           ports:
           - name: plugin-grpc
-            containerPort: 80
+            containerPort: 8000
           {{- end}}
         {{- if .Values.deployment.sidecars }}
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}

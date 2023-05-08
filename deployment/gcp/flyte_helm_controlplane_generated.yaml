@@ -671,7 +671,7 @@ spec:
   type: NodePort
   ports:
   - name: plugin-grpc
-    port: 80
+    port: 8000
     protocol: TCP
     targetPort: plugin-grpc
   selector: 
@@ -1087,11 +1087,11 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: "docker.io/pingsutw/external-plugin-service:latest"
+        image: "ghcr.io/flytekit/external-plugin-service:v1.6.0b4"
         imagePullPolicy: "IfNotPresent"
         name: external-plugin-service
         ports:
-        - containerPort: 80
+        - containerPort: 8000
           name: plugin-grpc
         resources:
           limits:

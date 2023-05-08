@@ -149,8 +149,8 @@ clusterResourceTemplates:
 
 externalPluginService:
   image:
-    repository: docker.io/pingsutw/external-plugin-service
-    tag: latest
+    repository: ghcr.io/flytekit/external-plugin-service
+    tag: v1.6.0b4
     pullPolicy: IfNotPresent
 
 # deployment Configure Flyte deployment specification

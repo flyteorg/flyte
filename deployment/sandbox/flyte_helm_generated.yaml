@@ -656,6 +656,10 @@ data:
         - k8s-array
         - external-plugin-service
   k8s.yaml: | 
+    external-plugin-service:
+      defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+      supportedTaskTypes:
+      - bigquery_query_job_task
     plugins:
       k8s:
         default-cpus: 100m
@@ -6326,7 +6330,7 @@ spec:
   type: NodePort
   ports:
   - name: plugin-grpc
-    port: 80
+    port: 8000
     protocol: TCP
     targetPort: plugin-grpc
   selector: 
@@ -7175,11 +7179,11 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: "docker.io/pingsutw/external-plugin-service:latest"
+        image: "ghcr.io/flytekit/external-plugin-service:v1.6.0b4"
         imagePullPolicy: "IfNotPresent"
         name: external-plugin-service
         ports:
-        - containerPort: 80
+        - containerPort: 8000
           name: plugin-grpc
         resources:
           limits:
@@ -7296,7 +7300,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0f2b26d6e129f3fa25aa034a0293872c0e02e9690c2e58c2b9b5c9f5fbd8f37"
+        configChecksum: "6f81f8a276891cab57890b93fcec112fc07e49b4303ba5a4b4688b60c639f4f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7370,7 +7374,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.76
       annotations:
-        configChecksum: "0f2b26d6e129f3fa25aa034a0293872c0e02e9690c2e58c2b9b5c9f5fbd8f37"
+        configChecksum: "6f81f8a276891cab57890b93fcec112fc07e49b4303ba5a4b4688b60c639f4f"
     spec:
       securityContext:
         fsGroup: 65534
