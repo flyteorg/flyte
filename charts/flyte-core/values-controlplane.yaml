@@ -1,2 +1,5 @@
 flytepropeller:
   enabled: false
+
+external_plugin_service:
+  enabled: false

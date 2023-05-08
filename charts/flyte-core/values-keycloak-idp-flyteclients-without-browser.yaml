@@ -241,6 +241,12 @@ flytepropeller:
   priorityClassName: ""
 
 #
+# EXTERNAL_PLUGIN_SERVICE
+#
+external_plugin_service:
+  enabled: false
+
+#
 # FLYTECONSOLE SETTINGS
 #
 
