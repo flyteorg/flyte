@@ -19,7 +19,7 @@ type GoCronJob struct {
 	nameOfSchedule   string
 	schedule         models.SchedulableEntity
 	funcWithSchedule TimedFuncWithSchedule
-	lastTime         *time.Time
+	lastExecTime     *time.Time
 	catchupFromTime  *time.Time
 	entryID          cron.EntryID
 }
@@ -34,8 +34,8 @@ func (g *GoCronJob) Run(t time.Time) {
 	if err := g.funcWithSchedule(jobFuncCtxWithLabel, g.schedule, t); err != nil {
 		logger.Errorf(jobFuncCtxWithLabel, "Got error while scheduling %v", err)
 	}
-	// Update the lastTime only if new trigger time t is after lastTime.
-	if g.lastTime == nil || g.lastTime.Before(t) {
-		g.lastTime = &t
+	// Update the lastExecTime only if new trigger time t is after lastExecTime.
+	if g.lastExecTime == nil || g.lastExecTime.Before(t) {
+		g.lastExecTime = &t
 	}
 }
