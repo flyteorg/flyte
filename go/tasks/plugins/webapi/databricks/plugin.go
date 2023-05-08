@@ -168,6 +168,9 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	if err != nil {
 		return nil, err
 	}
+	if data == nil || data["state"] == nil {
+		return nil, errors.Errorf("CorruptedPluginState", "can't get the job state")
+	}
 	jobState := data["state"].(map[string]interface{})
 	message := fmt.Sprintf("%s", jobState["state_message"])
 	jobID := fmt.Sprintf("%.0f", data["job_id"])
