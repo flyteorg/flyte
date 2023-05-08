@@ -14,7 +14,7 @@ type TimedFuncWithSchedule func(ctx context.Context, s models.SchedulableEntity,
 // calculating snapshot of the schedules , bootstrapping the scheduler from the snapshot as well as the catcup functionality
 type Scheduler interface {
 	// ScheduleJob allows to schedule a job using the implemented scheduler
-	ScheduleJob(ctx context.Context, s models.SchedulableEntity, f TimedFuncWithSchedule, lastT *time.Time) error
+	ScheduleJob(ctx context.Context, s models.SchedulableEntity, f TimedFuncWithSchedule, lastExecTime *time.Time) error
 	// DeScheduleJob allows to remove a scheduled job using the implemented scheduler
 	DeScheduleJob(ctx context.Context, s models.SchedulableEntity)
 	// BootStrapSchedulesFromSnapShot allows to initialize the scheduler from a previous snapshot of the schedule executions

@@ -100,8 +100,8 @@ func (g *GoCronScheduler) CalculateSnapshot(ctx context.Context) snapshoter.Snap
 	g.jobStore.Range(func(key, value interface{}) bool {
 		job := value.(*GoCronJob)
 		scheduleIdentifier := key.(string)
-		if job.lastTime != nil {
-			snapshot.UpdateLastExecutionTime(scheduleIdentifier, job.lastTime)
+		if job.lastExecTime != nil {
+			snapshot.UpdateLastExecutionTime(scheduleIdentifier, job.lastExecTime)
 		}
 		return true
 	})
@@ -110,7 +110,7 @@ func (g *GoCronScheduler) CalculateSnapshot(ctx context.Context) snapshoter.Snap
 
 // ScheduleJob allows to schedule a job using the implemented scheduler
 func (g *GoCronScheduler) ScheduleJob(ctx context.Context, schedule models.SchedulableEntity,
-	funcWithSchedule TimedFuncWithSchedule, lastTime *time.Time) error {
+	funcWithSchedule TimedFuncWithSchedule, lastExecTime *time.Time) error {
 
 	nameOfSchedule := identifier.GetScheduleName(ctx, schedule)
 
@@ -120,11 +120,11 @@ func (g *GoCronScheduler) ScheduleJob(ctx context.Context, schedule models.Sched
 		return nil
 	}
 
-	// Update the catchupFrom time as the lastTime.
-	// Here lastTime is passed to this function only from BootStrapSchedulesFromSnapShot which is during bootup
+	// Update the catchupFrom time as the lastExecTime.
+	// Here lastExecTime is passed to this function only from BootStrapSchedulesFromSnapShot which is during bootup
 	// Once initialized we wont be changing the catchupTime until the next boot
 	job := &GoCronJob{nameOfSchedule: nameOfSchedule, schedule: schedule, funcWithSchedule: funcWithSchedule,
-		catchupFromTime: lastTime, ctx: ctx}
+		catchupFromTime: lastExecTime, lastExecTime: lastExecTime, ctx: ctx}
 
 	// Define the timed job function to be used for the callback at the scheduled time
 	//jobFunc := job.GetTimedFunc(ctx, g.metrics)
@@ -271,7 +271,11 @@ func (g *GoCronScheduler) AddFixedIntervalJob(ctx context.Context, job *GoCronJo
 	var jobFunc cron.TimedFuncJob
 	jobFunc = job.Run
 
-	entryID := g.cron.ScheduleTimedJob(cron.ConstantDelaySchedule{Delay: d}, jobFunc)
+	var lastTime time.Time
+	if job.lastExecTime != nil {
+		lastTime = *job.lastExecTime
+	}
+	entryID := g.cron.ScheduleTimedJob(cron.ConstantDelaySchedule{Delay: d}, jobFunc, lastTime)
 	// Update the enttry id in the job which is handle to be used for removal
 	job.entryID = entryID
 	logger.Infof(ctx, "successfully added the fixed rate schedule %s to the scheduler for schedule %+v",

@@ -52,6 +52,7 @@ require (
 	google.golang.org/genproto v0.0.0-20220426171045-31bebdecfb46
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
+	gorm.io/driver/mysql v1.4.4
 	gorm.io/driver/postgres v1.4.5
 	gorm.io/driver/sqlite v1.1.1
 	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755
@@ -185,7 +186,6 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.2-0.20210529014059-a5c7eec3c614 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.4.4 // indirect
 	k8s.io/apiextensions-apiserver v0.24.1 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
@@ -208,4 +208,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
-replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20210825070134-bfc34418fe84
+replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a

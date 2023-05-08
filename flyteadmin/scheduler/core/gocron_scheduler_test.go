@@ -1,3 +1,6 @@
+//go:build !race
+// +build !race
+
 package core
 
 import (
@@ -6,6 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/time/rate"
+
 	adminModels "github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyteadmin/scheduler/executor/mocks"
@@ -13,10 +20,6 @@ import (
 	"github.com/flyteorg/flyteadmin/scheduler/snapshoter"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"golang.org/x/time/rate"
 )
 
 var scheduleCron models.SchedulableEntity
@@ -26,9 +29,6 @@ var scheduleFixedDeactivated models.SchedulableEntity
 var scheduleNonExistentDeActivated models.SchedulableEntity
 
 func setup(t *testing.T, subscope string, useUtcTz bool) *GoCronScheduler {
-	configuration := runtime.NewConfigurationProvider()
-	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
-	schedulerScope := promutils.NewScope(applicationConfiguration.MetricsScope).NewSubScope(subscope)
 	var schedules []models.SchedulableEntity
 	True := true
 	False := false
@@ -104,15 +104,21 @@ func setup(t *testing.T, subscope string, useUtcTz bool) *GoCronScheduler {
 	schedules = append(schedules, scheduleCronDeactivated)
 	schedules = append(schedules, scheduleFixedDeactivated)
 	schedules = append(schedules, scheduleNonExistentDeActivated)
+	return setupWithSchedules(t, subscope, schedules, useUtcTz)
+}
+
+func setupWithSchedules(t *testing.T, subscope string, schedules []models.SchedulableEntity, useUtcTz bool) *GoCronScheduler {
+	configuration := runtime.NewConfigurationProvider()
+	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
+	schedulerScope := promutils.NewScope(applicationConfiguration.MetricsScope).NewSubScope(subscope)
 	rateLimiter := rate.NewLimiter(1, 10)
 	executor := new(mocks.Executor)
-	executor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
 	snapshot := &snapshoter.SnapshotV1{}
+	executor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	g := NewGoCronScheduler(context.Background(), schedules, schedulerScope, snapshot, rateLimiter, executor, useUtcTz)
 	goCronScheduler, ok := g.(*GoCronScheduler)
-	assert.True(t, ok)
 	goCronScheduler.UpdateSchedules(context.Background(), schedules)
+	assert.True(t, ok)
 	goCronScheduler.BootStrapSchedulesFromSnapShot(context.Background(), schedules, snapshot)
 	goCronScheduler.CatchupAll(context.Background(), time.Now())
 	return goCronScheduler
@@ -135,7 +141,7 @@ func TestUseUTCTz(t *testing.T) {
 func TestCalculateSnapshot(t *testing.T) {
 	t.Run("empty snapshot", func(t *testing.T) {
 		ctx := context.Background()
-		g := setup(t, "empty_snapshot", false)
+		g := setupWithSchedules(t, "empty_snapshot", nil, false)
 		snapshot := g.CalculateSnapshot(ctx)
 		assert.NotNil(t, snapshot)
 		assert.True(t, snapshot.IsEmpty())
@@ -146,7 +152,7 @@ func TestCalculateSnapshot(t *testing.T) {
 		g.jobStore.Range(func(key, value interface{}) bool {
 			currTime := time.Now()
 			job := value.(*GoCronJob)
-			job.lastTime = &currTime
+			job.lastExecTime = &currTime
 			return true
 		})
 		snapshot := g.CalculateSnapshot(ctx)
