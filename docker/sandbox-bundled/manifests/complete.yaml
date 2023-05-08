@@ -454,7 +454,9 @@ data:
             cloudwatch-enabled: false
             stackdriver-enabled: false
       external-plugin-service:
-        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:80
+        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+          - bigquery_query_job_task
   002-database.yaml: |
     database:
       postgres:
@@ -769,11 +771,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-<<<<<<< HEAD
-  haSharedSecret: aUI0bWJOaUR1WU9oaVdUMw==
-=======
-  haSharedSecret: aGFYUUZuc0taTnNLNTlRYQ==
->>>>>>> c66d37ca9fce42ffb4a0c1550583665873862b0a
+  haSharedSecret: emtDZnZyRW5LR0ZzVXd2Yw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -859,38 +857,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-<<<<<<< HEAD
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-v0.1.10
-  name: flyte-sandbox
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  - name: plugin-grpc
-    port: 80
-    targetPort: plugin-grpc
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-=======
->>>>>>> c66d37ca9fce42ffb4a0c1550583665873862b0a
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -948,6 +914,13 @@ spec:
     nodePort: null
     port: 8088
     targetPort: http
+  - name: grpc
+    nodePort: null
+    port: 8089
+    targetPort: grpc
+  - name: plugin-grpc
+    port: 8000
+    targetPort: plugin-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
@@ -1199,11 +1172,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-<<<<<<< HEAD
-        checksum/configuration: 37ce9ba8f5711adb8ca9629b7746701fd7ba2954238ed753526dda0790de91ec
-=======
-        checksum/configuration: cb6d3e1eda0d2913ad4a594e28137dd790892054856f74583344f7abaf00a11d
->>>>>>> c66d37ca9fce42ffb4a0c1550583665873862b0a
+        checksum/configuration: a86a9ec94c28a4692696019ee6a01e824fe59926d3ad8ede8a9c594a36d2c773
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1251,11 +1220,11 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      - image: docker.io/pingsutw/external-plugin-service:latest
+      - image: ghcr.io/flytekit/external-plugin-service:v1.6.0b4
         imagePullPolicy: IfNotPresent
         name: external-plugin-service
         ports:
-        - containerPort: 80
+        - containerPort: 8000
           name: plugin-grpc
       initContainers:
       - args:
@@ -1317,11 +1286,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-<<<<<<< HEAD
-        checksum/secret: 9144d8070c50253e484601144528f2e57e1f85754b71f4b728bc58aae4c1c7a8
-=======
-        checksum/secret: 4567c2202516b7dc8bd3c42c748a4805ab7f614e37befd326f18b74ea59f6a4b
->>>>>>> c66d37ca9fce42ffb4a0c1550583665873862b0a
+        checksum/secret: bfe7cbf7542d907a7c95a080e982cf3964bf45fbafc83158b3a266ff4351bd39
       labels:
         app: docker-registry
         release: flyte-sandbox
