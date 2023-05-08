@@ -6,7 +6,7 @@ metadata:
   name: flyte-flyte-binary
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -20,7 +20,7 @@ metadata:
   name: flyte-flyte-binary-cluster-resource-templates
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -40,7 +40,7 @@ metadata:
   name: flyte-flyte-binary-config
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -69,6 +69,18 @@ data:
       secretName: flyte-flyte-binary-webhook-secret
       serviceName: flyte-flyte-binary-webhook
       servicePort: 443
+    flyte: 
+      admin:
+        disableClusterResourceManager: false
+        disableScheduler: false
+        disabled: false
+        seedProjects:
+        - flytesnacks
+      dataCatalog:
+        disabled: false
+      propeller:
+        disableWebhook: false
+        disabled: false
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -115,19 +127,6 @@ data:
           v2_signing: false
           auth_type: iam
       container: my-organization-flyte-container
-  005-flyte-binary-config.yaml: |
-    flyte:
-      admin:
-        disableClusterResourceManager: false
-        disableScheduler: false
-        disabled: false
-        seedProjects:
-        - flytesnacks
-      dataCatalog:
-        disabled: false
-      propeller:
-        disableWebhook: false
-        disabled: false
 ---
 # Source: flyte-binary/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -136,7 +135,7 @@ metadata:
   name: flyte-flyte-binary-cluster-role
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -224,7 +223,7 @@ metadata:
   name: flyte-flyte-binary-cluster-role-binding
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -246,7 +245,7 @@ metadata:
   name: flyte-flyte-binary-grpc
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -270,7 +269,7 @@ metadata:
   name: flyte-flyte-binary-http
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -294,7 +293,7 @@ metadata:
   name: flyte-flyte-binary-webhook
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -317,7 +316,7 @@ metadata:
   name: flyte-flyte-binary
   namespace: "flyte"
   labels:
-    helm.sh/chart: flyte-binary-v0.1.11
+    helm.sh/chart: flyte-binary-v0.1.10
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/version: "1.16.0"
@@ -337,8 +336,8 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: b6b54df8cda1903d31651c83be12c40786c2203317a697a8290c94a720d68f00
-        checksum/cluster-resource-templates: 7a157d07f8eda5dbea0f903cebd639fee89dab6f7ad2fb0add978f497593e594
+        checksum/configuration: b6900ea956e6df246c8d7e347e8a912569dc90127f63381a673f84b83a95f712
+        checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
       initContainers:
