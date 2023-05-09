@@ -84,8 +84,8 @@ require (
 	k8s.io/klog/v2 v2.5.0 // indirect
 )
 
-// These 2 versions were wrongly published. 
+// These 2 versions were wrongly published.
 retract (
-	v1.4.0
 	v1.4.2
+	v1.4.0
 )
