@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
@@ -56,23 +57,109 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
-	tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs)
-	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
-	}
-
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.TFJobDefaultContainerName)
 
-	workers := tensorflowTaskExtraArgs.GetWorkers()
-	psReplicas := tensorflowTaskExtraArgs.GetPsReplicas()
-	chiefReplicas := tensorflowTaskExtraArgs.GetChiefReplicas()
+	replicaSpecMap := map[commonOp.ReplicaType]*common.ReplicaEntry{
+		kubeflowv1.TFJobReplicaTypeChief: {
+			ReplicaNum:    int32(0),
+			PodSpec:       podSpec.DeepCopy(),
+			RestartPolicy: commonOp.RestartPolicyNever,
+		},
+		kubeflowv1.TFJobReplicaTypeWorker: {
+			ReplicaNum:    int32(0),
+			PodSpec:       podSpec.DeepCopy(),
+			RestartPolicy: commonOp.RestartPolicyNever,
+		},
+		kubeflowv1.TFJobReplicaTypePS: {
+			ReplicaNum:    int32(0),
+			PodSpec:       podSpec.DeepCopy(),
+			RestartPolicy: commonOp.RestartPolicyNever,
+		},
+	}
+	runPolicy := commonOp.RunPolicy{}
 
-	if workers == 0 {
+	if taskTemplate.TaskTypeVersion == 0 {
+		tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
+
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		replicaSpecMap[kubeflowv1.TFJobReplicaTypeChief].ReplicaNum = tensorflowTaskExtraArgs.GetChiefReplicas()
+		replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].ReplicaNum = tensorflowTaskExtraArgs.GetWorkers()
+		replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].ReplicaNum = tensorflowTaskExtraArgs.GetPsReplicas()
+
+	} else if taskTemplate.TaskTypeVersion == 1 {
+		kfTensorflowTaskExtraArgs := kfplugins.DistributedTensorflowTrainingTask{}
+
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfTensorflowTaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		chiefReplicaSpec := kfTensorflowTaskExtraArgs.GetChiefReplicas()
+		if chiefReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				replicaSpecMap[kubeflowv1.TFJobReplicaTypeChief].PodSpec,
+				kubeflowv1.TFJobDefaultContainerName,
+				chiefReplicaSpec.GetImage(),
+				chiefReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeChief].RestartPolicy = common.ParseRestartPolicy(chiefReplicaSpec.GetRestartPolicy())
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeChief].ReplicaNum = chiefReplicaSpec.GetReplicas()
+		}
+
+		workerReplicaSpec := kfTensorflowTaskExtraArgs.GetWorkerReplicas()
+		if workerReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				replicaSpecMap[kubeflowv1.MPIJobReplicaTypeWorker].PodSpec,
+				kubeflowv1.TFJobDefaultContainerName,
+				workerReplicaSpec.GetImage(),
+				workerReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].RestartPolicy = common.ParseRestartPolicy(workerReplicaSpec.GetRestartPolicy())
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].ReplicaNum = workerReplicaSpec.GetReplicas()
+		}
+
+		psReplicaSpec := kfTensorflowTaskExtraArgs.GetPsReplicas()
+		if psReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].PodSpec,
+				kubeflowv1.TFJobDefaultContainerName,
+				psReplicaSpec.GetImage(),
+				psReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].RestartPolicy = common.ParseRestartPolicy(psReplicaSpec.GetRestartPolicy())
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].ReplicaNum = psReplicaSpec.GetReplicas()
+		}
+
+		if kfTensorflowTaskExtraArgs.GetRunPolicy() != nil {
+			runPolicy = common.ParseRunPolicy(*kfTensorflowTaskExtraArgs.GetRunPolicy())
+		}
+
+	} else {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+	}
+
+	if replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].ReplicaNum == 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 
@@ -80,26 +167,20 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		TFReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{},
 	}
 
-	for _, t := range []struct {
-		podSpec     v1.PodSpec
-		replicaNum  *int32
-		replicaType commonOp.ReplicaType
-	}{
-		{*podSpec, &workers, kubeflowv1.TFJobReplicaTypeWorker},
-		{*podSpec, &psReplicas, kubeflowv1.TFJobReplicaTypePS},
-		{*podSpec, &chiefReplicas, kubeflowv1.TFJobReplicaTypeChief},
-	} {
-		if *t.replicaNum > 0 {
-			jobSpec.TFReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
-				Replicas: t.replicaNum,
+	for replicaType, replicaEntry := range replicaSpecMap {
+		if replicaEntry.ReplicaNum > 0 {
+			jobSpec.TFReplicaSpecs[replicaType] = &commonOp.ReplicaSpec{
+				Replicas: &replicaEntry.ReplicaNum,
 				Template: v1.PodTemplateSpec{
 					ObjectMeta: *objectMeta,
-					Spec:       t.podSpec,
+					Spec:       *replicaEntry.PodSpec,
 				},
-				RestartPolicy: commonOp.RestartPolicyNever,
+				RestartPolicy: replicaEntry.RestartPolicy,
 			}
 		}
 	}
+
+	jobSpec.RunPolicy = runPolicy
 
 	job := &kubeflowv1.TFJob{
 		TypeMeta: metav1.TypeMeta{

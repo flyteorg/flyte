@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
+
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -48,7 +50,6 @@ func (mpiOperatorResourceHandler) BuildIdentityResource(ctx context.Context, tas
 // Defines a func to create the full resource object that will be posted to k8s.
 func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
-	taskTemplateConfig := taskTemplate.GetConfig()
 
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "unable to fetch task specification [%v]", err.Error())
@@ -56,69 +57,127 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
-	mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
-	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
-	}
-
-	workers := mpiTaskExtraArgs.GetNumWorkers()
-	launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
-	slots := mpiTaskExtraArgs.GetSlots()
-
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
 	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.MPIJobDefaultContainerName)
 
-	// workersPodSpec is deepCopy of podSpec submitted by flyte
-	workersPodSpec := podSpec.DeepCopy()
+	var launcherReplica = common.ReplicaEntry{
+		ReplicaNum:    int32(1),
+		PodSpec:       podSpec.DeepCopy(),
+		RestartPolicy: commonOp.RestartPolicyNever,
+	}
+	var workerReplica = common.ReplicaEntry{
+		ReplicaNum:    int32(0),
+		PodSpec:       podSpec.DeepCopy(),
+		RestartPolicy: commonOp.RestartPolicyNever,
+	}
+	slots := int32(1)
+	runPolicy := commonOp.RunPolicy{}
 
-	// If users don't specify "worker_spec_command" in the task config, the command/args are empty.
-	// However, in some cases, the workers need command/args.
-	// For example, in horovod tasks, each worker runs a command launching ssh daemon.
+	if taskTemplate.TaskTypeVersion == 0 {
+		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
 
-	workerSpecCommand := []string{}
-	if val, ok := taskTemplateConfig[workerSpecCommandKey]; ok {
-		workerSpecCommand = strings.Split(val, " ")
+		workerReplica.ReplicaNum = mpiTaskExtraArgs.GetNumWorkers()
+		launcherReplica.ReplicaNum = mpiTaskExtraArgs.GetNumLauncherReplicas()
+		slots = mpiTaskExtraArgs.GetSlots()
+
+		// V1 requires passing worker command as template config parameter
+		taskTemplateConfig := taskTemplate.GetConfig()
+		workerSpecCommand := []string{}
+		if val, ok := taskTemplateConfig[workerSpecCommandKey]; ok {
+			workerSpecCommand = strings.Split(val, " ")
+		}
+
+		for k := range workerReplica.PodSpec.Containers {
+			if workerReplica.PodSpec.Containers[k].Name == kubeflowv1.MPIJobDefaultContainerName {
+				workerReplica.PodSpec.Containers[k].Args = workerSpecCommand
+				workerReplica.PodSpec.Containers[k].Command = []string{}
+			}
+		}
+
+	} else if taskTemplate.TaskTypeVersion == 1 {
+		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
+
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		launcherReplicaSpec := kfMPITaskExtraArgs.GetLauncherReplicas()
+		if launcherReplicaSpec != nil {
+			// flyte commands will be passed as args to the container
+			err = common.OverrideContainerSpec(
+				launcherReplica.PodSpec,
+				kubeflowv1.MPIJobDefaultContainerName,
+				launcherReplicaSpec.GetImage(),
+				launcherReplicaSpec.GetResources(),
+				launcherReplicaSpec.GetCommand(),
+			)
+			if err != nil {
+				return nil, err
+			}
+			launcherReplica.RestartPolicy = common.ParseRestartPolicy(launcherReplicaSpec.GetRestartPolicy())
+		}
+
+		workerReplicaSpec := kfMPITaskExtraArgs.GetWorkerReplicas()
+		if workerReplicaSpec != nil {
+			err = common.OverrideContainerSpec(
+				workerReplica.PodSpec,
+				kubeflowv1.MPIJobDefaultContainerName,
+				workerReplicaSpec.GetImage(),
+				workerReplicaSpec.GetResources(),
+				workerReplicaSpec.GetCommand(),
+			)
+			if err != nil {
+				return nil, err
+			}
+			workerReplica.RestartPolicy = common.ParseRestartPolicy(workerReplicaSpec.GetRestartPolicy())
+			workerReplica.ReplicaNum = workerReplicaSpec.GetReplicas()
+		}
+
+		if kfMPITaskExtraArgs.GetRunPolicy() != nil {
+			runPolicy = common.ParseRunPolicy(*kfMPITaskExtraArgs.GetRunPolicy())
+		}
+
+	} else {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
-	for k := range workersPodSpec.Containers {
-		workersPodSpec.Containers[k].Args = workerSpecCommand
-		workersPodSpec.Containers[k].Command = []string{}
-	}
-
-	if workers == 0 {
+	if workerReplica.ReplicaNum == 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
-	if launcherReplicas == 0 {
+	if launcherReplica.ReplicaNum == 0 {
 		return nil, fmt.Errorf("number of launch worker should be more then 0")
 	}
 
 	jobSpec := kubeflowv1.MPIJobSpec{
-		SlotsPerWorker:  &slots,
-		MPIReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{},
-	}
-
-	for _, t := range []struct {
-		podSpec     v1.PodSpec
-		replicaNum  *int32
-		replicaType commonOp.ReplicaType
-	}{
-		{*podSpec, &launcherReplicas, kubeflowv1.MPIJobReplicaTypeLauncher},
-		{*workersPodSpec, &workers, kubeflowv1.MPIJobReplicaTypeWorker},
-	} {
-		if *t.replicaNum > 0 {
-			jobSpec.MPIReplicaSpecs[t.replicaType] = &commonOp.ReplicaSpec{
-				Replicas: t.replicaNum,
+		SlotsPerWorker: &slots,
+		RunPolicy:      runPolicy,
+		MPIReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+			kubeflowv1.MPIJobReplicaTypeLauncher: {
+				Replicas: &launcherReplica.ReplicaNum,
 				Template: v1.PodTemplateSpec{
 					ObjectMeta: *objectMeta,
-					Spec:       t.podSpec,
+					Spec:       *launcherReplica.PodSpec,
 				},
-				RestartPolicy: commonOp.RestartPolicyNever,
-			}
-		}
+				RestartPolicy: launcherReplica.RestartPolicy,
+			},
+			kubeflowv1.MPIJobReplicaTypeWorker: {
+				Replicas: &workerReplica.ReplicaNum,
+				Template: v1.PodTemplateSpec{
+					ObjectMeta: *objectMeta,
+					Spec:       *workerReplica.PodSpec,
+				},
+				RestartPolicy: workerReplica.RestartPolicy,
+			},
+		},
 	}
 
 	job := &kubeflowv1.MPIJob{

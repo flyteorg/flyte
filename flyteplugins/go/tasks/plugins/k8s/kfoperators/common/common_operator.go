@@ -5,9 +5,11 @@ import (
 	"sort"
 	"time"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -20,6 +22,12 @@ const (
 	MPITaskType        = "mpi"
 	PytorchTaskType    = "pytorch"
 )
+
+type ReplicaEntry struct {
+	PodSpec       *v1.PodSpec
+	ReplicaNum    int32
+	RestartPolicy commonOp.RestartPolicy
+}
 
 // ExtractMPICurrentCondition will return the first job condition for MPI
 func ExtractMPICurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
@@ -179,4 +187,73 @@ func OverridePrimaryContainerName(podSpec *v1.PodSpec, primaryContainerName stri
 			return
 		}
 	}
+}
+
+// ParseRunPolicy converts a kubeflow plugin RunPolicy object to a k8s RunPolicy object.
+func ParseRunPolicy(flyteRunPolicy kfplugins.RunPolicy) commonOp.RunPolicy {
+	runPolicy := commonOp.RunPolicy{}
+	if flyteRunPolicy.GetBackoffLimit() != 0 {
+		var backoffLimit = flyteRunPolicy.GetBackoffLimit()
+		runPolicy.BackoffLimit = &backoffLimit
+	}
+	var cleanPodPolicy = ParseCleanPodPolicy(flyteRunPolicy.GetCleanPodPolicy())
+	runPolicy.CleanPodPolicy = &cleanPodPolicy
+	if flyteRunPolicy.GetActiveDeadlineSeconds() != 0 {
+		var ddlSeconds = int64(flyteRunPolicy.GetActiveDeadlineSeconds())
+		runPolicy.ActiveDeadlineSeconds = &ddlSeconds
+	}
+	if flyteRunPolicy.GetTtlSecondsAfterFinished() != 0 {
+		var ttl = flyteRunPolicy.GetTtlSecondsAfterFinished()
+		runPolicy.TTLSecondsAfterFinished = &ttl
+	}
+
+	return runPolicy
+}
+
+// Get k8s clean pod policy from flyte kubeflow plugins clean pod policy.
+func ParseCleanPodPolicy(flyteCleanPodPolicy kfplugins.CleanPodPolicy) commonOp.CleanPodPolicy {
+	cleanPodPolicyMap := map[kfplugins.CleanPodPolicy]commonOp.CleanPodPolicy{
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_NONE:    commonOp.CleanPodPolicyNone,
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL:     commonOp.CleanPodPolicyAll,
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_RUNNING: commonOp.CleanPodPolicyRunning,
+	}
+	return cleanPodPolicyMap[flyteCleanPodPolicy]
+}
+
+// Get k8s restart policy from flyte kubeflow plugins restart policy.
+func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) commonOp.RestartPolicy {
+	restartPolicyMap := map[kfplugins.RestartPolicy]commonOp.RestartPolicy{
+		kfplugins.RestartPolicy_RESTART_POLICY_NEVER:      commonOp.RestartPolicyNever,
+		kfplugins.RestartPolicy_RESTART_POLICY_ON_FAILURE: commonOp.RestartPolicyOnFailure,
+		kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS:     commonOp.RestartPolicyAlways,
+	}
+	return restartPolicyMap[flyteRestartPolicy]
+}
+
+// OverrideContainerSpec overrides the specified container's properties in the given podSpec. The function
+// updates the image, resources and command arguments of the container that matches the given containerName.
+func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, resources *core.Resources, args []string) error {
+	for idx, c := range podSpec.Containers {
+		if c.Name == containerName {
+			if image != "" {
+				podSpec.Containers[idx].Image = image
+			}
+			if resources != nil {
+				// if resources requests and limits both not set, we will not override the resources
+				if len(resources.Requests) >= 1 || len(resources.Limits) >= 1 {
+					resources, err := flytek8s.ToK8sResourceRequirements(resources)
+					if err != nil {
+						return flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecificat ion on Resources [%v], Err: [%v]", resources, err.Error())
+					}
+					podSpec.Containers[idx].Resources = *resources
+				}
+			} else {
+				podSpec.Containers[idx].Resources = v1.ResourceRequirements{}
+			}
+			if len(args) != 0 {
+				podSpec.Containers[idx].Args = args
+			}
+		}
+	}
+	return nil
 }

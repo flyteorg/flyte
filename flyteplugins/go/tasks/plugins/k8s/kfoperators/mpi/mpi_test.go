@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -68,9 +69,24 @@ func dummyMPICustomObj(workers int32, launcher int32, slots int32) *plugins.Dist
 	}
 }
 
-func dummyMPITaskTemplate(id string, mpiCustomObj *plugins.DistributedMPITrainingTask) *core.TaskTemplate {
+func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 
-	mpiObjJSON, err := utils.MarshalToString(mpiCustomObj)
+	var mpiObjJSON string
+	var err error
+
+	for _, arg := range args {
+		switch t := arg.(type) {
+		case *kfplugins.DistributedMPITrainingTask:
+			var mpiCustomObj = t
+			mpiObjJSON, err = utils.MarshalToString(mpiCustomObj)
+		case *plugins.DistributedMPITrainingTask:
+			var mpiCustomObj = t
+			mpiObjJSON, err = utils.MarshalToString(mpiCustomObj)
+		default:
+			err = fmt.Errorf("Unkonw input type %T", t)
+		}
+	}
+
 	if err != nil {
 		panic(err)
 	}
@@ -427,4 +443,120 @@ func TestReplicaCounts(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestBuildResourceMPIV1(t *testing.T) {
+	launcherCommand := []string{"python", "launcher.py"}
+	workerCommand := []string{"/usr/sbin/sshd", "/.sshd_config"}
+	taskConfig := &kfplugins.DistributedMPITrainingTask{
+		LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+			Image: testImage,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "500m"},
+				},
+			},
+			Command: launcherCommand,
+		},
+		WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+			Replicas: 100,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1024m"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "2048m"},
+				},
+			},
+			Command: workerCommand,
+		},
+		Slots: int32(1),
+	}
+
+	launcherResourceRequirements := &corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("250m"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("500m"),
+		},
+	}
+
+	workerResourceRequirements := &corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("1024m"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("2048m"),
+		},
+	}
+
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+
+	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
+	taskTemplate.TaskTypeVersion = 1
+
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+
+	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
+	assert.True(t, ok)
+	assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
+	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
+	assert.Equal(t, *launcherResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Resources)
+	assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
+	assert.Equal(t, launcherCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
+	assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
+}
+
+func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
+	workerCommand := []string{"/usr/sbin/sshd", "/.sshd_config"}
+
+	taskConfig := &kfplugins.DistributedMPITrainingTask{
+		WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+			Replicas: 100,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1024m"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "2048m"},
+				},
+			},
+			Command: []string{"/usr/sbin/sshd", "/.sshd_config"},
+		},
+		Slots: int32(1),
+	}
+
+	workerResourceRequirements := &corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("1024m"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU: resource.MustParse("2048m"),
+		},
+	}
+
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+
+	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
+	taskTemplate.TaskTypeVersion = 1
+
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+
+	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
+	assert.True(t, ok)
+	assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
+	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
+	assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
+	assert.Equal(t, testArgs, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
+	assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 }
