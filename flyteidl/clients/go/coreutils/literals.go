@@ -299,6 +299,28 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 		return MakeLiteralForType(typ, nil)
 	case *core.LiteralType_Schema:
 		return MakeLiteralForType(typ, nil)
+	case *core.LiteralType_UnionType:
+		if len(t.UnionType.Variants) == 0 {
+			return nil, errors.Errorf("Union type must have at least one variant")
+		}
+		// For union types, we just return the default for the first variant
+		val, err := MakeDefaultLiteralForType(t.UnionType.Variants[0])
+		if err != nil {
+			return nil, errors.Errorf("Failed to create default literal for first union type variant [%v]", t.UnionType.Variants[0])
+		}
+		res := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Union{
+						Union: &core.Union{
+							Type:  t.UnionType.Variants[0],
+							Value: val,
+						},
+					},
+				},
+			},
+		}
+		return res, nil
 	}
 
 	return nil, fmt.Errorf("failed to convert to a known Literal. Input Type [%v] not supported", typ.String())
@@ -587,6 +609,32 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			}
 		}
 		return MakePrimitiveLiteral(newV)
+
+	case *core.LiteralType_UnionType:
+		// Try different types in the variants, return the first one matched
+		found := false
+		for _, subType := range newT.UnionType.Variants {
+			lv, err := MakeLiteralForType(subType, v)
+			if err == nil {
+				l = &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Union{
+								Union: &core.Union{
+									Value: lv,
+									Type:  subType,
+								},
+							},
+						},
+					},
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
+		}
 
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
