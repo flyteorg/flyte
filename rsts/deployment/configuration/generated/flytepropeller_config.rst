@@ -4673,20 +4673,6 @@ Maximum number of plugin phase versions allowed for one phase.
   "100000"
   
 
-barrier (`config.BarrierConfig`_)
---------------------------------------------------------------------------------
-
-Config for Barrier implementation
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  cache-size: 10000
-  cache-ttl: 30m0s
-  enabled: true
-  
-
 backoff (`config.BackOffConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4737,45 +4723,6 @@ The cap of the backoff duration
 .. code-block:: yaml
 
   20s
-  
-
-config.BarrierConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Barrier transitions using inmemory context
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "true"
-  
-
-cache-size (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max number of barrier to preserve in memory
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "10000"
-  
-
-cache-ttl (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max duration that a barrier would be respected if the process is not restarted. This should account for time required to store the record into persistent storage (across multiple rounds.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  30m0s
   
 
 config.TaskPluginConfig
@@ -4947,6 +4894,7 @@ Vault Secret Manager config.
 
 .. code-block:: yaml
 
+  annotations: null
   kvVersion: "2"
   role: flyte
   
@@ -5059,5 +5007,15 @@ kvVersion (int)
 .. code-block:: yaml
 
   "2"
+  
+
+annotations (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 

@@ -23,23 +23,23 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v1.1.88 # FLYTEADMIN_TAG override the tag
+    newTag: v1.1.92 # FLYTEADMIN_TAG override the tag
     newName: cr.flyte.org/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v1.5.4 # FLYTECONSOLE_TAG  the tag
+    newTag: v1.6.2 # FLYTECONSOLE_TAG  the tag
     newName: cr.flyte.org/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
-    newTag: v1.0.44 # DATACATALOG_TAG override the tag
+    newTag: v1.0.46 # DATACATALOG_TAG override the tag
     newName: cr.flyte.org/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v1.1.76 # FLYTEPROPELLER_TAG override the tag
+    newTag: v1.1.88 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name
   # Webhook
   - name: webhook # match images with this name
-    newTag: v1.1.76 # FLYTEPROPELLER_TAG override the tag
+    newTag: v1.1.88 # FLYTEPROPELLER_TAG override the tag
     newName: cr.flyte.org/flyteorg/flytepropeller # override the name
   # Override postgres image to use alpine based (rather smaller) docker image
   - name: postgres
