@@ -5,12 +5,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func TestExtractMPICurrentCondition(t *testing.T) {
@@ -182,4 +185,102 @@ func TestGetLogs(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[1].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[2].Uri)
 
+}
+
+func dummyPodSpec() v1.PodSpec {
+	return v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary container",
+				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+				Resources: v1.ResourceRequirements{
+					Limits: v1.ResourceList{
+						"cpu":    resource.MustParse("2"),
+						"memory": resource.MustParse("200Mi"),
+						"gpu":    resource.MustParse("1"),
+					},
+					Requests: v1.ResourceList{
+						"cpu":    resource.MustParse("1"),
+						"memory": resource.MustParse("100Mi"),
+						"gpu":    resource.MustParse("1"),
+					},
+				},
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name: "volume mount",
+					},
+				},
+			},
+			{
+				Name: "secondary container",
+				Resources: v1.ResourceRequirements{
+					Limits: v1.ResourceList{
+						"gpu": resource.MustParse("2"),
+					},
+					Requests: v1.ResourceList{
+						"gpu": resource.MustParse("2"),
+					},
+				},
+			},
+		},
+		Volumes: []v1.Volume{
+			{
+				Name: "dshm",
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:   "my toleration key",
+				Value: "my toleration value",
+			},
+		},
+	}
+}
+
+func TestOverrideContainerSpec(t *testing.T) {
+	podSpec := dummyPodSpec()
+	err := OverrideContainerSpec(
+		&podSpec, "primary container", "testing-image",
+		&core.Resources{
+			Requests: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_CPU, Value: "250m"},
+			},
+			Limits: []*core.Resources_ResourceEntry{
+				{Name: core.Resources_CPU, Value: "500m"},
+			},
+		},
+		[]string{"python", "-m", "run.py"},
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(podSpec.Containers))
+	assert.Equal(t, "testing-image", podSpec.Containers[0].Image)
+	assert.NotNil(t, podSpec.Containers[0].Resources.Limits)
+	assert.NotNil(t, podSpec.Containers[0].Resources.Requests)
+	// verify resources not overridden if empty resources
+	assert.True(t, podSpec.Containers[0].Resources.Requests.Cpu().Equal(resource.MustParse("250m")))
+	assert.True(t, podSpec.Containers[0].Resources.Limits.Cpu().Equal(resource.MustParse("500m")))
+	assert.Equal(t, []string{"python", "-m", "run.py"}, podSpec.Containers[0].Args)
+}
+
+func TestOverrideContainerSpecEmptyFields(t *testing.T) {
+	podSpec := dummyPodSpec()
+	err := OverrideContainerSpec(&podSpec, "primary container", "", &core.Resources{}, []string{})
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(podSpec.Containers))
+	assert.NotNil(t, podSpec.Containers[0].Resources.Limits)
+	assert.NotNil(t, podSpec.Containers[0].Resources.Requests)
+	// verify resources not overridden if empty resources
+	assert.True(t, podSpec.Containers[0].Resources.Requests.Cpu().Equal(resource.MustParse("1")))
+	assert.True(t, podSpec.Containers[0].Resources.Requests.Memory().Equal(resource.MustParse("100Mi")))
+	assert.True(t, podSpec.Containers[0].Resources.Limits.Cpu().Equal(resource.MustParse("2")))
+	assert.True(t, podSpec.Containers[0].Resources.Limits.Memory().Equal(resource.MustParse("200Mi")))
+}
+
+func TestOverrideContainerNilResources(t *testing.T) {
+	podSpec := dummyPodSpec()
+	err := OverrideContainerSpec(&podSpec, "primary container", "", nil, []string{})
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(podSpec.Containers))
+	assert.Nil(t, podSpec.Containers[0].Resources.Limits)
+	assert.Nil(t, podSpec.Containers[0].Resources.Requests)
 }

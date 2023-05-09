@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
 	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
@@ -68,64 +69,121 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	}
 	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.PytorchJobDefaultContainerName)
 
-	workers := pytorchTaskExtraArgs.GetWorkers()
-	if workers == 0 {
+	var masterReplica = common.ReplicaEntry{
+		ReplicaNum:    int32(1),
+		PodSpec:       podSpec.DeepCopy(),
+		RestartPolicy: commonOp.RestartPolicyNever,
+	}
+	var workerReplica = common.ReplicaEntry{
+		ReplicaNum:    int32(0),
+		PodSpec:       podSpec.DeepCopy(),
+		RestartPolicy: commonOp.RestartPolicyNever,
+	}
+	runPolicy := commonOp.RunPolicy{}
+
+	if taskTemplate.TaskTypeVersion == 0 {
+		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
+
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		workerReplica.ReplicaNum = pytorchTaskExtraArgs.GetWorkers()
+	} else if taskTemplate.TaskTypeVersion == 1 {
+		kfPytorchTaskExtraArgs := kfplugins.DistributedPyTorchTrainingTask{}
+
+		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
+		}
+
+		// Replace specs of master replica, master should always have 1 replica
+		masterReplicaSpec := kfPytorchTaskExtraArgs.GetMasterReplicas()
+		if masterReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				masterReplica.PodSpec,
+				kubeflowv1.PytorchJobDefaultContainerName,
+				masterReplicaSpec.GetImage(),
+				masterReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			masterReplica.RestartPolicy = common.ParseRestartPolicy(masterReplicaSpec.GetRestartPolicy())
+		}
+
+		// Replace specs of worker replica
+		workerReplicaSpec := kfPytorchTaskExtraArgs.GetWorkerReplicas()
+		if workerReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				workerReplica.PodSpec,
+				kubeflowv1.PytorchJobDefaultContainerName,
+				workerReplicaSpec.GetImage(),
+				workerReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			workerReplica.RestartPolicy = common.ParseRestartPolicy(workerReplicaSpec.GetRestartPolicy())
+			workerReplica.ReplicaNum = workerReplicaSpec.GetReplicas()
+		}
+
+		if kfPytorchTaskExtraArgs.GetRunPolicy() != nil {
+			runPolicy = common.ParseRunPolicy(*kfPytorchTaskExtraArgs.GetRunPolicy())
+		}
+	} else {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+	}
+
+	if workerReplica.ReplicaNum == 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 
-	var jobSpec kubeflowv1.PyTorchJobSpec
+	jobSpec := kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+			kubeflowv1.PyTorchJobReplicaTypeMaster: {
+				Template: v1.PodTemplateSpec{
+					ObjectMeta: *objectMeta,
+					Spec:       *masterReplica.PodSpec,
+				},
+				RestartPolicy: masterReplica.RestartPolicy,
+			},
+			kubeflowv1.PyTorchJobReplicaTypeWorker: {
+				Replicas: &workerReplica.ReplicaNum,
+				Template: v1.PodTemplateSpec{
+					ObjectMeta: *objectMeta,
+					Spec:       *workerReplica.PodSpec,
+				},
+				RestartPolicy: workerReplica.RestartPolicy,
+			},
+		},
+		RunPolicy: runPolicy,
+	}
 
+	// Set elastic config
 	elasticConfig := pytorchTaskExtraArgs.GetElasticConfig()
-
 	if elasticConfig != nil {
 		minReplicas := elasticConfig.GetMinReplicas()
 		maxReplicas := elasticConfig.GetMaxReplicas()
 		nProcPerNode := elasticConfig.GetNprocPerNode()
 		maxRestarts := elasticConfig.GetMaxRestarts()
 		rdzvBackend := kubeflowv1.RDZVBackend(elasticConfig.GetRdzvBackend())
-
-		jobSpec = kubeflowv1.PyTorchJobSpec{
-			ElasticPolicy: &kubeflowv1.ElasticPolicy{
-				MinReplicas:  &minReplicas,
-				MaxReplicas:  &maxReplicas,
-				RDZVBackend:  &rdzvBackend,
-				NProcPerNode: &nProcPerNode,
-				MaxRestarts:  &maxRestarts,
-			},
-			PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-				kubeflowv1.PyTorchJobReplicaTypeWorker: {
-					Replicas: &workers,
-					Template: v1.PodTemplateSpec{
-						ObjectMeta: *objectMeta,
-						Spec:       *podSpec,
-					},
-					RestartPolicy: commonOp.RestartPolicyNever,
-				},
-			},
+		elasticPolicy := kubeflowv1.ElasticPolicy{
+			MinReplicas:  &minReplicas,
+			MaxReplicas:  &maxReplicas,
+			RDZVBackend:  &rdzvBackend,
+			NProcPerNode: &nProcPerNode,
+			MaxRestarts:  &maxRestarts,
 		}
-
-	} else {
-
-		jobSpec = kubeflowv1.PyTorchJobSpec{
-			PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-				kubeflowv1.PyTorchJobReplicaTypeMaster: {
-					Template: v1.PodTemplateSpec{
-						ObjectMeta: *objectMeta,
-						Spec:       *podSpec,
-					},
-					RestartPolicy: commonOp.RestartPolicyNever,
-				},
-				kubeflowv1.PyTorchJobReplicaTypeWorker: {
-					Replicas: &workers,
-					Template: v1.PodTemplateSpec{
-						ObjectMeta: *objectMeta,
-						Spec:       *podSpec,
-					},
-					RestartPolicy: commonOp.RestartPolicyNever,
-				},
-			},
-		}
+		jobSpec.ElasticPolicy = &elasticPolicy
+		// Remove master replica if elastic policy is set
+		delete(jobSpec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
 	}
+
 	job := &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       kubeflowv1.PytorchJobKind,
