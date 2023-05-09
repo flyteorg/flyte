@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
 from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_cluster_assignment import AdminClusterAssignment  # noqa: F401,E501
+from flyteadmin.models.admin_envs import AdminEnvs  # noqa: F401,E501
 from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
@@ -57,7 +58,8 @@ class AdminExecutionSpec(object):
         'raw_output_data_config': 'AdminRawOutputDataConfig',
         'cluster_assignment': 'AdminClusterAssignment',
         'interruptible': 'bool',
-        'overwrite_cache': 'bool'
+        'overwrite_cache': 'bool',
+        'envs': 'AdminEnvs'
     }
 
     attribute_map = {
@@ -75,10 +77,11 @@ class AdminExecutionSpec(object):
         'raw_output_data_config': 'raw_output_data_config',
         'cluster_assignment': 'cluster_assignment',
         'interruptible': 'interruptible',
-        'overwrite_cache': 'overwrite_cache'
+        'overwrite_cache': 'overwrite_cache',
+        'envs': 'envs'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None, envs=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -96,6 +99,7 @@ class AdminExecutionSpec(object):
         self._cluster_assignment = None
         self._interruptible = None
         self._overwrite_cache = None
+        self._envs = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -128,6 +132,8 @@ class AdminExecutionSpec(object):
             self.interruptible = interruptible
         if overwrite_cache is not None:
             self.overwrite_cache = overwrite_cache
+        if envs is not None:
+            self.envs = envs
 
     @property
     def launch_plan(self):
@@ -465,6 +471,29 @@ class AdminExecutionSpec(object):
         """
 
         self._overwrite_cache = overwrite_cache
+
+    @property
+    def envs(self):
+        """Gets the envs of this AdminExecutionSpec.  # noqa: E501
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :return: The envs of this AdminExecutionSpec.  # noqa: E501
+        :rtype: AdminEnvs
+        """
+        return self._envs
+
+    @envs.setter
+    def envs(self, envs):
+        """Sets the envs of this AdminExecutionSpec.
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :param envs: The envs of this AdminExecutionSpec.  # noqa: E501
+        :type: AdminEnvs
+        """
+
+        self._envs = envs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -1,5 +1,6 @@
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import literals_pb2 as _literals_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -215,6 +216,12 @@ class Annotations(_message.Message):
     VALUES_FIELD_NUMBER: _ClassVar[int]
     values: _containers.ScalarMap[str, str]
     def __init__(self, values: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class Envs(_message.Message):
+    __slots__ = ["values"]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    values: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
+    def __init__(self, values: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class AuthRole(_message.Message):
     __slots__ = ["assumable_iam_role", "kubernetes_service_account"]

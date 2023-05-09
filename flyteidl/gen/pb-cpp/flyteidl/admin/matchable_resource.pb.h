@@ -1302,6 +1302,15 @@ class WorkflowExecutionConfig final :
   ::google::protobuf::BoolValue* mutable_interruptible();
   void set_allocated_interruptible(::google::protobuf::BoolValue* interruptible);
 
+  // .flyteidl.admin.Envs envs = 8;
+  bool has_envs() const;
+  void clear_envs();
+  static const int kEnvsFieldNumber = 8;
+  const ::flyteidl::admin::Envs& envs() const;
+  ::flyteidl::admin::Envs* release_envs();
+  ::flyteidl::admin::Envs* mutable_envs();
+  void set_allocated_envs(::flyteidl::admin::Envs* envs);
+
   // int32 max_parallelism = 1;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 1;
@@ -1324,6 +1333,7 @@ class WorkflowExecutionConfig final :
   ::flyteidl::admin::Labels* labels_;
   ::flyteidl::admin::Annotations* annotations_;
   ::google::protobuf::BoolValue* interruptible_;
+  ::flyteidl::admin::Envs* envs_;
   ::google::protobuf::int32 max_parallelism_;
   bool overwrite_cache_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2915,6 +2925,51 @@ inline void WorkflowExecutionConfig::set_overwrite_cache(bool value) {
   
   overwrite_cache_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowExecutionConfig.overwrite_cache)
+}
+
+// .flyteidl.admin.Envs envs = 8;
+inline bool WorkflowExecutionConfig::has_envs() const {
+  return this != internal_default_instance() && envs_ != nullptr;
+}
+inline const ::flyteidl::admin::Envs& WorkflowExecutionConfig::envs() const {
+  const ::flyteidl::admin::Envs* p = envs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.envs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Envs*>(
+      &::flyteidl::admin::_Envs_default_instance_);
+}
+inline ::flyteidl::admin::Envs* WorkflowExecutionConfig::release_envs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionConfig.envs)
+  
+  ::flyteidl::admin::Envs* temp = envs_;
+  envs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Envs* WorkflowExecutionConfig::mutable_envs() {
+  
+  if (envs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Envs>(GetArenaNoVirtual());
+    envs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.envs)
+  return envs_;
+}
+inline void WorkflowExecutionConfig::set_allocated_envs(::flyteidl::admin::Envs* envs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(envs_);
+  }
+  if (envs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      envs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, envs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  envs_ = envs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.envs)
 }
 
 // -------------------------------------------------------------------

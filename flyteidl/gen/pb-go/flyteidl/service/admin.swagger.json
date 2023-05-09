@@ -3709,6 +3709,19 @@
       },
       "description": "Defines an email notification specification."
     },
+    "adminEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
     "adminExecution": {
       "type": "object",
       "properties": {
@@ -4005,6 +4018,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -4290,6 +4307,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -5435,6 +5456,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."

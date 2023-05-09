@@ -100,7 +100,7 @@ class PluginOverrides(_message.Message):
     def __init__(self, overrides: _Optional[_Iterable[_Union[PluginOverride, _Mapping]]] = ...) -> None: ...
 
 class WorkflowExecutionConfig(_message.Message):
-    __slots__ = ["max_parallelism", "security_context", "raw_output_data_config", "labels", "annotations", "interruptible", "overwrite_cache"]
+    __slots__ = ["max_parallelism", "security_context", "raw_output_data_config", "labels", "annotations", "interruptible", "overwrite_cache", "envs"]
     MAX_PARALLELISM_FIELD_NUMBER: _ClassVar[int]
     SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER: _ClassVar[int]
@@ -108,6 +108,7 @@ class WorkflowExecutionConfig(_message.Message):
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     INTERRUPTIBLE_FIELD_NUMBER: _ClassVar[int]
     OVERWRITE_CACHE_FIELD_NUMBER: _ClassVar[int]
+    ENVS_FIELD_NUMBER: _ClassVar[int]
     max_parallelism: int
     security_context: _security_pb2.SecurityContext
     raw_output_data_config: _common_pb2.RawOutputDataConfig
@@ -115,7 +116,8 @@ class WorkflowExecutionConfig(_message.Message):
     annotations: _common_pb2.Annotations
     interruptible: _wrappers_pb2.BoolValue
     overwrite_cache: bool
-    def __init__(self, max_parallelism: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ...) -> None: ...
+    envs: _common_pb2.Envs
+    def __init__(self, max_parallelism: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ...) -> None: ...
 
 class MatchingAttributes(_message.Message):
     __slots__ = ["task_resource_attributes", "cluster_resource_attributes", "execution_queue_attributes", "execution_cluster_label", "quality_of_service", "plugin_overrides", "workflow_execution_config", "cluster_assignment"]

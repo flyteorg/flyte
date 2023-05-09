@@ -1376,6 +1376,16 @@ func (m *ExecutionSpec) Validate() error {
 
 	// no validation rules for OverwriteCache
 
+	if v, ok := interface{}(m.GetEnvs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionSpecValidationError{
+				field:  "Envs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.NotificationOverrides.(type) {
 
 	case *ExecutionSpec_Notifications:
