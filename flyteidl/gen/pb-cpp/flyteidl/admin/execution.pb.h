@@ -2364,6 +2364,15 @@ class ExecutionSpec final :
   ::google::protobuf::BoolValue* mutable_interruptible();
   void set_allocated_interruptible(::google::protobuf::BoolValue* interruptible);
 
+  // .flyteidl.admin.Envs envs = 23;
+  bool has_envs() const;
+  void clear_envs();
+  static const int kEnvsFieldNumber = 23;
+  const ::flyteidl::admin::Envs& envs() const;
+  ::flyteidl::admin::Envs* release_envs();
+  ::flyteidl::admin::Envs* mutable_envs();
+  void set_allocated_envs(::flyteidl::admin::Envs* envs);
+
   // int32 max_parallelism = 18;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 18;
@@ -2417,6 +2426,7 @@ class ExecutionSpec final :
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
   ::flyteidl::admin::ClusterAssignment* cluster_assignment_;
   ::google::protobuf::BoolValue* interruptible_;
+  ::flyteidl::admin::Envs* envs_;
   ::google::protobuf::int32 max_parallelism_;
   bool overwrite_cache_;
   union NotificationOverridesUnion {
@@ -6231,6 +6241,51 @@ inline void ExecutionSpec::set_overwrite_cache(bool value) {
   
   overwrite_cache_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionSpec.overwrite_cache)
+}
+
+// .flyteidl.admin.Envs envs = 23;
+inline bool ExecutionSpec::has_envs() const {
+  return this != internal_default_instance() && envs_ != nullptr;
+}
+inline const ::flyteidl::admin::Envs& ExecutionSpec::envs() const {
+  const ::flyteidl::admin::Envs* p = envs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.envs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Envs*>(
+      &::flyteidl::admin::_Envs_default_instance_);
+}
+inline ::flyteidl::admin::Envs* ExecutionSpec::release_envs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionSpec.envs)
+  
+  ::flyteidl::admin::Envs* temp = envs_;
+  envs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Envs* ExecutionSpec::mutable_envs() {
+  
+  if (envs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Envs>(GetArenaNoVirtual());
+    envs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.envs)
+  return envs_;
+}
+inline void ExecutionSpec::set_allocated_envs(::flyteidl::admin::Envs* envs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(envs_);
+  }
+  if (envs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      envs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, envs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  envs_ = envs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.envs)
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {

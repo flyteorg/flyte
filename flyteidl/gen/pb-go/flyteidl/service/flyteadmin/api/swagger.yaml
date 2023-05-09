@@ -3405,6 +3405,24 @@ definitions:
       recipients_email:
       - "recipients_email"
       - "recipients_email"
+  adminEnvs:
+    type: "object"
+    properties:
+      values:
+        type: "array"
+        description: "Map of custom environment variables to be applied to the execution\
+          \ resource."
+        items:
+          $ref: "#/definitions/coreKeyValuePair"
+    description: "Environment variable values to be applied to an execution resource.\n\
+      In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify\
+      \ how to merge environment variables defined at registration and execution time."
+    example:
+      values:
+      - value: "value"
+        key: "key"
+      - value: "value"
+        key: "key"
   adminExecution:
     type: "object"
     properties:
@@ -3515,6 +3533,12 @@ definitions:
           values:
             key: "values"
         max_parallelism: 6
+        envs:
+          values:
+          - value: "value"
+            key: "key"
+          - value: "value"
+            key: "key"
         interruptible: true
         labels:
           values:
@@ -3890,6 +3914,12 @@ definitions:
             values:
               key: "values"
           max_parallelism: 6
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           labels:
             values:
@@ -4081,6 +4111,12 @@ definitions:
             values:
               key: "values"
           max_parallelism: 6
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           labels:
             values:
@@ -4349,6 +4385,9 @@ definitions:
           \ be overwritten for a single execution.\nIf enabled, all calculations are\
           \ performed even if cached results would be available, overwriting the stored\n\
           data once execution finishes successfully."
+      envs:
+        description: "Environment variables to be set for the execution."
+        $ref: "#/definitions/adminEnvs"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes."
@@ -4377,6 +4416,12 @@ definitions:
         values:
           key: "values"
       max_parallelism: 6
+      envs:
+        values:
+        - value: "value"
+          key: "key"
+        - value: "value"
+          key: "key"
       interruptible: true
       labels:
         values:
@@ -4903,6 +4948,12 @@ definitions:
           values:
             key: "values"
         max_parallelism: 5
+        envs:
+          values:
+          - value: "value"
+            key: "key"
+          - value: "value"
+            key: "key"
         interruptible: true
         labels:
           values:
@@ -5703,6 +5754,12 @@ definitions:
             values:
               key: "values"
           max_parallelism: 5
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           labels:
             values:
@@ -6218,6 +6275,12 @@ definitions:
             values:
               key: "values"
           max_parallelism: 5
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           labels:
             values:
@@ -6563,6 +6626,9 @@ definitions:
           \ be overwritten for a single execution.\nIf enabled, all calculations are\
           \ performed even if cached results would be available, overwriting the stored\n\
           data once execution finishes successfully."
+      envs:
+        description: "Environment variables to be set for the execution."
+        $ref: "#/definitions/adminEnvs"
     description: "User-provided launch plan definition and configuration values."
     example:
       workflow_id:
@@ -6622,6 +6688,12 @@ definitions:
         values:
           key: "values"
       max_parallelism: 5
+      envs:
+        values:
+        - value: "value"
+          key: "key"
+        - value: "value"
+          key: "key"
       interruptible: true
       labels:
         values:
@@ -6902,6 +6974,12 @@ definitions:
             annotations:
               values:
                 key: "values"
+            envs:
+              values:
+              - value: "value"
+                key: "key"
+              - value: "value"
+                key: "key"
             interruptible: true
             security_context:
               run_as:
@@ -7003,6 +7081,12 @@ definitions:
             annotations:
               values:
                 key: "values"
+            envs:
+              values:
+              - value: "value"
+                key: "key"
+              - value: "value"
+                key: "key"
             interruptible: true
             security_context:
               run_as:
@@ -7137,6 +7221,12 @@ definitions:
           annotations:
             values:
               key: "values"
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           security_context:
             run_as:
@@ -7278,6 +7368,12 @@ definitions:
         annotations:
           values:
             key: "values"
+        envs:
+          values:
+          - value: "value"
+            key: "key"
+          - value: "value"
+            key: "key"
         interruptible: true
         security_context:
           run_as:
@@ -14591,6 +14687,12 @@ definitions:
           annotations:
             values:
               key: "values"
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           security_context:
             run_as:
@@ -14712,6 +14814,12 @@ definitions:
             annotations:
               values:
                 key: "values"
+            envs:
+              values:
+              - value: "value"
+                key: "key"
+              - value: "value"
+                key: "key"
             interruptible: true
             security_context:
               run_as:
@@ -14836,6 +14944,12 @@ definitions:
           annotations:
             values:
               key: "values"
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           security_context:
             run_as:
@@ -14961,6 +15075,12 @@ definitions:
             annotations:
               values:
                 key: "values"
+            envs:
+              values:
+              - value: "value"
+                key: "key"
+              - value: "value"
+                key: "key"
             interruptible: true
             security_context:
               run_as:
@@ -23453,6 +23573,12 @@ definitions:
           annotations:
             values:
               key: "values"
+          envs:
+            values:
+            - value: "value"
+              key: "key"
+            - value: "value"
+              key: "key"
           interruptible: true
           security_context:
             run_as:
@@ -23581,6 +23707,12 @@ definitions:
             annotations:
               values:
                 key: "values"
+            envs:
+              values:
+              - value: "value"
+                key: "key"
+              - value: "value"
+                key: "key"
             interruptible: true
             security_context:
               run_as:
@@ -30303,6 +30435,9 @@ definitions:
           \ be overwritten for a single execution.\nIf enabled, all calculations are\
           \ performed even if cached results would be available, overwriting the stored\n\
           data once execution finishes successfully."
+      envs:
+        description: "Environment variables to be set for the execution."
+        $ref: "#/definitions/adminEnvs"
     description: "Adds defaults for customizable workflow-execution specifications\
       \ and overrides."
     example:
@@ -30313,6 +30448,12 @@ definitions:
       annotations:
         values:
           key: "values"
+      envs:
+        values:
+        - value: "value"
+          key: "key"
+        - value: "value"
+          key: "key"
       interruptible: true
       security_context:
         run_as:

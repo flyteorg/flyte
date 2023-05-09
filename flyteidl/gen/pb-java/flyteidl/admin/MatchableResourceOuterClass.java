@@ -6262,6 +6262,31 @@ public final class MatchableResourceOuterClass {
      * <code>bool overwrite_cache = 7;</code>
      */
     boolean getOverwriteCache();
+
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    boolean hasEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    flyteidl.admin.Common.Envs getEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder();
   }
   /**
    * <pre>
@@ -6379,6 +6404,19 @@ public final class MatchableResourceOuterClass {
             case 56: {
 
               overwriteCache_ = input.readBool();
+              break;
+            }
+            case 66: {
+              flyteidl.admin.Common.Envs.Builder subBuilder = null;
+              if (envs_ != null) {
+                subBuilder = envs_.toBuilder();
+              }
+              envs_ = input.readMessage(flyteidl.admin.Common.Envs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(envs_);
+                envs_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -6615,6 +6653,39 @@ public final class MatchableResourceOuterClass {
       return overwriteCache_;
     }
 
+    public static final int ENVS_FIELD_NUMBER = 8;
+    private flyteidl.admin.Common.Envs envs_;
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    public boolean hasEnvs() {
+      return envs_ != null;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    public flyteidl.admin.Common.Envs getEnvs() {
+      return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 8;</code>
+     */
+    public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+      return getEnvs();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6649,6 +6720,9 @@ public final class MatchableResourceOuterClass {
       }
       if (overwriteCache_ != false) {
         output.writeBool(7, overwriteCache_);
+      }
+      if (envs_ != null) {
+        output.writeMessage(8, getEnvs());
       }
       unknownFields.writeTo(output);
     }
@@ -6686,6 +6760,10 @@ public final class MatchableResourceOuterClass {
       if (overwriteCache_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(7, overwriteCache_);
+      }
+      if (envs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, getEnvs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6731,6 +6809,11 @@ public final class MatchableResourceOuterClass {
       }
       if (getOverwriteCache()
           != other.getOverwriteCache()) return false;
+      if (hasEnvs() != other.hasEnvs()) return false;
+      if (hasEnvs()) {
+        if (!getEnvs()
+            .equals(other.getEnvs())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6767,6 +6850,10 @@ public final class MatchableResourceOuterClass {
       hash = (37 * hash) + OVERWRITE_CACHE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getOverwriteCache());
+      if (hasEnvs()) {
+        hash = (37 * hash) + ENVS_FIELD_NUMBER;
+        hash = (53 * hash) + getEnvs().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6938,6 +7025,12 @@ public final class MatchableResourceOuterClass {
         }
         overwriteCache_ = false;
 
+        if (envsBuilder_ == null) {
+          envs_ = null;
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
         return this;
       }
 
@@ -6991,6 +7084,11 @@ public final class MatchableResourceOuterClass {
           result.interruptible_ = interruptibleBuilder_.build();
         }
         result.overwriteCache_ = overwriteCache_;
+        if (envsBuilder_ == null) {
+          result.envs_ = envs_;
+        } else {
+          result.envs_ = envsBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -7059,6 +7157,9 @@ public final class MatchableResourceOuterClass {
         }
         if (other.getOverwriteCache() != false) {
           setOverwriteCache(other.getOverwriteCache());
+        }
+        if (other.hasEnvs()) {
+          mergeEnvs(other.getEnvs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7961,6 +8062,159 @@ public final class MatchableResourceOuterClass {
         overwriteCache_ = false;
         onChanged();
         return this;
+      }
+
+      private flyteidl.admin.Common.Envs envs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> envsBuilder_;
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public boolean hasEnvs() {
+        return envsBuilder_ != null || envs_ != null;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public flyteidl.admin.Common.Envs getEnvs() {
+        if (envsBuilder_ == null) {
+          return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        } else {
+          return envsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public Builder setEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          envs_ = value;
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public Builder setEnvs(
+          flyteidl.admin.Common.Envs.Builder builderForValue) {
+        if (envsBuilder_ == null) {
+          envs_ = builderForValue.build();
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public Builder mergeEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (envs_ != null) {
+            envs_ =
+              flyteidl.admin.Common.Envs.newBuilder(envs_).mergeFrom(value).buildPartial();
+          } else {
+            envs_ = value;
+          }
+          onChanged();
+        } else {
+          envsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public Builder clearEnvs() {
+        if (envsBuilder_ == null) {
+          envs_ = null;
+          onChanged();
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public flyteidl.admin.Common.Envs.Builder getEnvsBuilder() {
+        
+        onChanged();
+        return getEnvsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+        if (envsBuilder_ != null) {
+          return envsBuilder_.getMessageOrBuilder();
+        } else {
+          return envs_ == null ?
+              flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 8;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> 
+          getEnvsFieldBuilder() {
+        if (envsBuilder_ == null) {
+          envsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder>(
+                  getEnvs(),
+                  getParentForChildren(),
+                  isClean());
+          envs_ = null;
+        }
+        return envsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -12848,7 +13102,7 @@ public final class MatchableResourceOuterClass {
       "\"2\n\025MissingPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013U" +
       "SE_DEFAULT\020\001\"D\n\017PluginOverrides\0221\n\toverr" +
       "ides\030\001 \003(\0132\036.flyteidl.admin.PluginOverri" +
-      "de\"\327\002\n\027WorkflowExecutionConfig\022\027\n\017max_pa" +
+      "de\"\373\002\n\027WorkflowExecutionConfig\022\027\n\017max_pa" +
       "rallelism\030\001 \001(\005\0228\n\020security_context\030\002 \001(" +
       "\0132\036.flyteidl.core.SecurityContext\022C\n\026raw" +
       "_output_data_config\030\003 \001(\0132#.flyteidl.adm" +
@@ -12856,39 +13110,40 @@ public final class MatchableResourceOuterClass {
       ".flyteidl.admin.Labels\0220\n\013annotations\030\005 " +
       "\001(\0132\033.flyteidl.admin.Annotations\0221\n\rinte" +
       "rruptible\030\006 \001(\0132\032.google.protobuf.BoolVa" +
-      "lue\022\027\n\017overwrite_cache\030\007 \001(\010\"\341\004\n\022Matchin" +
-      "gAttributes\022J\n\030task_resource_attributes\030" +
-      "\001 \001(\0132&.flyteidl.admin.TaskResourceAttri" +
-      "butesH\000\022P\n\033cluster_resource_attributes\030\002" +
-      " \001(\0132).flyteidl.admin.ClusterResourceAtt" +
-      "ributesH\000\022N\n\032execution_queue_attributes\030" +
-      "\003 \001(\0132(.flyteidl.admin.ExecutionQueueAtt" +
-      "ributesH\000\022H\n\027execution_cluster_label\030\004 \001" +
-      "(\0132%.flyteidl.admin.ExecutionClusterLabe" +
-      "lH\000\022=\n\022quality_of_service\030\005 \001(\0132\037.flytei" +
-      "dl.core.QualityOfServiceH\000\022;\n\020plugin_ove" +
-      "rrides\030\006 \001(\0132\037.flyteidl.admin.PluginOver" +
-      "ridesH\000\022L\n\031workflow_execution_config\030\007 \001" +
-      "(\0132\'.flyteidl.admin.WorkflowExecutionCon" +
-      "figH\000\022?\n\022cluster_assignment\030\010 \001(\0132!.flyt" +
-      "eidl.admin.ClusterAssignmentH\000B\010\n\006target" +
-      "\"\242\001\n MatchableAttributesConfiguration\0226\n" +
-      "\nattributes\030\001 \001(\0132\".flyteidl.admin.Match" +
-      "ingAttributes\022\016\n\006domain\030\002 \001(\t\022\017\n\007project" +
-      "\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023\n\013launch_plan\030" +
-      "\005 \001(\t\"Z\n\036ListMatchableAttributesRequest\022" +
-      "8\n\rresource_type\030\001 \001(\0162!.flyteidl.admin." +
-      "MatchableResource\"k\n\037ListMatchableAttrib" +
-      "utesResponse\022H\n\016configurations\030\001 \003(\01320.f" +
-      "lyteidl.admin.MatchableAttributesConfigu" +
-      "ration*\340\001\n\021MatchableResource\022\021\n\rTASK_RES" +
-      "OURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTI" +
-      "ON_QUEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022" +
-      "$\n QUALITY_OF_SERVICE_SPECIFICATION\020\004\022\023\n" +
-      "\017PLUGIN_OVERRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION" +
-      "_CONFIG\020\006\022\026\n\022CLUSTER_ASSIGNMENT\020\007B7Z5git" +
-      "hub.com/flyteorg/flyteidl/gen/pb-go/flyt" +
-      "eidl/adminb\006proto3"
+      "lue\022\027\n\017overwrite_cache\030\007 \001(\010\022\"\n\004envs\030\010 \001" +
+      "(\0132\024.flyteidl.admin.Envs\"\341\004\n\022MatchingAtt" +
+      "ributes\022J\n\030task_resource_attributes\030\001 \001(" +
+      "\0132&.flyteidl.admin.TaskResourceAttribute" +
+      "sH\000\022P\n\033cluster_resource_attributes\030\002 \001(\013" +
+      "2).flyteidl.admin.ClusterResourceAttribu" +
+      "tesH\000\022N\n\032execution_queue_attributes\030\003 \001(" +
+      "\0132(.flyteidl.admin.ExecutionQueueAttribu" +
+      "tesH\000\022H\n\027execution_cluster_label\030\004 \001(\0132%" +
+      ".flyteidl.admin.ExecutionClusterLabelH\000\022" +
+      "=\n\022quality_of_service\030\005 \001(\0132\037.flyteidl.c" +
+      "ore.QualityOfServiceH\000\022;\n\020plugin_overrid" +
+      "es\030\006 \001(\0132\037.flyteidl.admin.PluginOverride" +
+      "sH\000\022L\n\031workflow_execution_config\030\007 \001(\0132\'" +
+      ".flyteidl.admin.WorkflowExecutionConfigH" +
+      "\000\022?\n\022cluster_assignment\030\010 \001(\0132!.flyteidl" +
+      ".admin.ClusterAssignmentH\000B\010\n\006target\"\242\001\n" +
+      " MatchableAttributesConfiguration\0226\n\natt" +
+      "ributes\030\001 \001(\0132\".flyteidl.admin.MatchingA" +
+      "ttributes\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001" +
+      "(\t\022\020\n\010workflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(" +
+      "\t\"Z\n\036ListMatchableAttributesRequest\0228\n\rr" +
+      "esource_type\030\001 \001(\0162!.flyteidl.admin.Matc" +
+      "hableResource\"k\n\037ListMatchableAttributes" +
+      "Response\022H\n\016configurations\030\001 \003(\01320.flyte" +
+      "idl.admin.MatchableAttributesConfigurati" +
+      "on*\340\001\n\021MatchableResource\022\021\n\rTASK_RESOURC" +
+      "E\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_Q" +
+      "UEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n Q" +
+      "UALITY_OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLU" +
+      "GIN_OVERRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION_CON" +
+      "FIG\020\006\022\026\n\022CLUSTER_ASSIGNMENT\020\007B7Z5github." +
+      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
+      "/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12960,7 +13215,7 @@ public final class MatchableResourceOuterClass {
     internal_static_flyteidl_admin_WorkflowExecutionConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowExecutionConfig_descriptor,
-        new java.lang.String[] { "MaxParallelism", "SecurityContext", "RawOutputDataConfig", "Labels", "Annotations", "Interruptible", "OverwriteCache", });
+        new java.lang.String[] { "MaxParallelism", "SecurityContext", "RawOutputDataConfig", "Labels", "Annotations", "Interruptible", "OverwriteCache", "Envs", });
     internal_static_flyteidl_admin_MatchingAttributes_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new

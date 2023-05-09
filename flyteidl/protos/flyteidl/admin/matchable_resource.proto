@@ -128,6 +128,9 @@ message WorkflowExecutionConfig {
   // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
   // data once execution finishes successfully.
   bool overwrite_cache = 7;
+
+  // Environment variables to be set for the execution.
+  Envs envs = 8;
 }
 
 // Generic container for encapsulating all types of the above attributes messages.

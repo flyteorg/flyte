@@ -130,6 +130,9 @@ message LaunchPlanSpec {
     // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     // data once execution finishes successfully.
     bool overwrite_cache = 20;
+
+    // Environment variables to be set for the execution.
+    Envs envs = 21;
 }
 
 // Values computed by the flyte platform after launch plan registration.

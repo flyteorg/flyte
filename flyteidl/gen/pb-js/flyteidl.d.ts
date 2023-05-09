@@ -8782,6 +8782,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an Envs. */
+        interface IEnvs {
+
+            /** Envs values */
+            values?: (flyteidl.core.IKeyValuePair[]|null);
+        }
+
+        /** Represents an Envs. */
+        class Envs implements IEnvs {
+
+            /**
+             * Constructs a new Envs.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IEnvs);
+
+            /** Envs values. */
+            public values: flyteidl.core.IKeyValuePair[];
+
+            /**
+             * Creates a new Envs instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Envs instance
+             */
+            public static create(properties?: flyteidl.admin.IEnvs): flyteidl.admin.Envs;
+
+            /**
+             * Encodes the specified Envs message. Does not implicitly {@link flyteidl.admin.Envs.verify|verify} messages.
+             * @param message Envs message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IEnvs, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Envs message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Envs
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Envs;
+
+            /**
+             * Verifies an Envs message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an AuthRole. */
         interface IAuthRole {
 
@@ -10716,6 +10768,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec overwriteCache */
             overwriteCache?: (boolean|null);
+
+            /** ExecutionSpec envs */
+            envs?: (flyteidl.admin.IEnvs|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -10771,6 +10826,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec overwriteCache. */
             public overwriteCache: boolean;
+
+            /** ExecutionSpec envs. */
+            public envs?: (flyteidl.admin.IEnvs|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -11655,6 +11713,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec overwriteCache */
             overwriteCache?: (boolean|null);
+
+            /** LaunchPlanSpec envs */
+            envs?: (flyteidl.admin.IEnvs|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -11710,6 +11771,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec overwriteCache. */
             public overwriteCache: boolean;
+
+            /** LaunchPlanSpec envs. */
+            public envs?: (flyteidl.admin.IEnvs|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
@@ -12756,6 +12820,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig overwriteCache */
             overwriteCache?: (boolean|null);
+
+            /** WorkflowExecutionConfig envs */
+            envs?: (flyteidl.admin.IEnvs|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -12787,6 +12854,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig overwriteCache. */
             public overwriteCache: boolean;
+
+            /** WorkflowExecutionConfig envs. */
+            public envs?: (flyteidl.admin.IEnvs|null);
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.

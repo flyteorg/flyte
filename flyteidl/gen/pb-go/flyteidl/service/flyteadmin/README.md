@@ -95,6 +95,7 @@ Class | Method | HTTP request | Description
  - [AdminDescriptionFormat](docs/AdminDescriptionFormat.md)
  - [AdminDomain](docs/AdminDomain.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
+ - [AdminEnvs](docs/AdminEnvs.md)
  - [AdminExecution](docs/AdminExecution.md)
  - [AdminExecutionClosure](docs/AdminExecutionClosure.md)
  - [AdminExecutionClusterLabel](docs/AdminExecutionClusterLabel.md)

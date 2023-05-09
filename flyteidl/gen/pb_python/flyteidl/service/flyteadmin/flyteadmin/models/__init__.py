@@ -28,6 +28,7 @@ from flyteadmin.models.admin_description_entity_list import AdminDescriptionEnti
 from flyteadmin.models.admin_description_format import AdminDescriptionFormat
 from flyteadmin.models.admin_domain import AdminDomain
 from flyteadmin.models.admin_email_notification import AdminEmailNotification
+from flyteadmin.models.admin_envs import AdminEnvs
 from flyteadmin.models.admin_execution import AdminExecution
 from flyteadmin.models.admin_execution_closure import AdminExecutionClosure
 from flyteadmin.models.admin_execution_cluster_label import AdminExecutionClusterLabel

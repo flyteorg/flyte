@@ -4751,6 +4751,31 @@ public final class LaunchPlanOuterClass {
      * <code>bool overwrite_cache = 20;</code>
      */
     boolean getOverwriteCache();
+
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    boolean hasEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    flyteidl.admin.Common.Envs getEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder();
   }
   /**
    * <pre>
@@ -4966,6 +4991,19 @@ public final class LaunchPlanOuterClass {
             case 160: {
 
               overwriteCache_ = input.readBool();
+              break;
+            }
+            case 170: {
+              flyteidl.admin.Common.Envs.Builder subBuilder = null;
+              if (envs_ != null) {
+                subBuilder = envs_.toBuilder();
+              }
+              envs_ = input.readMessage(flyteidl.admin.Common.Envs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(envs_);
+                envs_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -5471,6 +5509,39 @@ public final class LaunchPlanOuterClass {
       return overwriteCache_;
     }
 
+    public static final int ENVS_FIELD_NUMBER = 21;
+    private flyteidl.admin.Common.Envs envs_;
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    public boolean hasEnvs() {
+      return envs_ != null;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    public flyteidl.admin.Common.Envs getEnvs() {
+      return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 21;</code>
+     */
+    public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+      return getEnvs();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5529,6 +5600,9 @@ public final class LaunchPlanOuterClass {
       }
       if (overwriteCache_ != false) {
         output.writeBool(20, overwriteCache_);
+      }
+      if (envs_ != null) {
+        output.writeMessage(21, getEnvs());
       }
       unknownFields.writeTo(output);
     }
@@ -5597,6 +5671,10 @@ public final class LaunchPlanOuterClass {
       if (overwriteCache_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(20, overwriteCache_);
+      }
+      if (envs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, getEnvs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5679,6 +5757,11 @@ public final class LaunchPlanOuterClass {
       }
       if (getOverwriteCache()
           != other.getOverwriteCache()) return false;
+      if (hasEnvs() != other.hasEnvs()) return false;
+      if (hasEnvs()) {
+        if (!getEnvs()
+            .equals(other.getEnvs())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5745,6 +5828,10 @@ public final class LaunchPlanOuterClass {
       hash = (37 * hash) + OVERWRITE_CACHE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getOverwriteCache());
+      if (hasEnvs()) {
+        hash = (37 * hash) + ENVS_FIELD_NUMBER;
+        hash = (53 * hash) + getEnvs().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5960,6 +6047,12 @@ public final class LaunchPlanOuterClass {
         }
         overwriteCache_ = false;
 
+        if (envsBuilder_ == null) {
+          envs_ = null;
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
         return this;
       }
 
@@ -6049,6 +6142,11 @@ public final class LaunchPlanOuterClass {
           result.interruptible_ = interruptibleBuilder_.build();
         }
         result.overwriteCache_ = overwriteCache_;
+        if (envsBuilder_ == null) {
+          result.envs_ = envs_;
+        } else {
+          result.envs_ = envsBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -6142,6 +6240,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.getOverwriteCache() != false) {
           setOverwriteCache(other.getOverwriteCache());
+        }
+        if (other.hasEnvs()) {
+          mergeEnvs(other.getEnvs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -8192,6 +8293,159 @@ public final class LaunchPlanOuterClass {
         overwriteCache_ = false;
         onChanged();
         return this;
+      }
+
+      private flyteidl.admin.Common.Envs envs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> envsBuilder_;
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public boolean hasEnvs() {
+        return envsBuilder_ != null || envs_ != null;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public flyteidl.admin.Common.Envs getEnvs() {
+        if (envsBuilder_ == null) {
+          return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        } else {
+          return envsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public Builder setEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          envs_ = value;
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public Builder setEnvs(
+          flyteidl.admin.Common.Envs.Builder builderForValue) {
+        if (envsBuilder_ == null) {
+          envs_ = builderForValue.build();
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public Builder mergeEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (envs_ != null) {
+            envs_ =
+              flyteidl.admin.Common.Envs.newBuilder(envs_).mergeFrom(value).buildPartial();
+          } else {
+            envs_ = value;
+          }
+          onChanged();
+        } else {
+          envsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public Builder clearEnvs() {
+        if (envsBuilder_ == null) {
+          envs_ = null;
+          onChanged();
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public flyteidl.admin.Common.Envs.Builder getEnvsBuilder() {
+        
+        onChanged();
+        return getEnvsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+        if (envsBuilder_ != null) {
+          return envsBuilder_.getMessageOrBuilder();
+        } else {
+          return envs_ == null ?
+              flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 21;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> 
+          getEnvsFieldBuilder() {
+        if (envsBuilder_ == null) {
+          envsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder>(
+                  getEnvs(),
+                  getParentForChildren(),
+                  isClean());
+          envs_ = null;
+        }
+        return envsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14322,7 +14576,7 @@ public final class LaunchPlanOuterClass {
       "0\n\014launch_plans\030\001 \003(\0132\032.flyteidl.admin.L" +
       "aunchPlan\022\r\n\005token\030\002 \001(\t\"J\n\004Auth\022\032\n\022assu" +
       "mable_iam_role\030\001 \001(\t\022\"\n\032kubernetes_servi" +
-      "ce_account\030\002 \001(\t:\002\030\001\"\311\005\n\016LaunchPlanSpec\022" +
+      "ce_account\030\002 \001(\t:\002\030\001\"\355\005\n\016LaunchPlanSpec\022" +
       ".\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core.Ide" +
       "ntifier\022;\n\017entity_metadata\030\002 \001(\0132\".flyte" +
       "idl.admin.LaunchPlanMetadata\0223\n\016default_" +
@@ -14340,28 +14594,29 @@ public final class LaunchPlanOuterClass {
       ".flyteidl.admin.RawOutputDataConfig\022\027\n\017m" +
       "ax_parallelism\030\022 \001(\005\0221\n\rinterruptible\030\023 " +
       "\001(\0132\032.google.protobuf.BoolValue\022\027\n\017overw" +
-      "rite_cache\030\024 \001(\010\"\217\002\n\021LaunchPlanClosure\022." +
-      "\n\005state\030\001 \001(\0162\037.flyteidl.admin.LaunchPla" +
-      "nState\0224\n\017expected_inputs\030\002 \001(\0132\033.flytei" +
-      "dl.core.ParameterMap\0224\n\020expected_outputs" +
-      "\030\003 \001(\0132\032.flyteidl.core.VariableMap\022.\n\ncr" +
-      "eated_at\030\004 \001(\0132\032.google.protobuf.Timesta" +
-      "mp\022.\n\nupdated_at\030\005 \001(\0132\032.google.protobuf" +
-      ".Timestamp\"u\n\022LaunchPlanMetadata\022*\n\010sche" +
-      "dule\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\r" +
-      "notifications\030\002 \003(\0132\034.flyteidl.admin.Not" +
-      "ification\"p\n\027LaunchPlanUpdateRequest\022%\n\002" +
-      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022.\n\005s" +
-      "tate\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanSt" +
-      "ate\"\032\n\030LaunchPlanUpdateResponse\"L\n\027Activ" +
-      "eLaunchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteid" +
-      "l.admin.NamedEntityIdentifier\"\203\001\n\033Active" +
-      "LaunchPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016" +
-      "\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004" +
-      " \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.S" +
-      "ort*+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006" +
-      "ACTIVE\020\001B7Z5github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "rite_cache\030\024 \001(\010\022\"\n\004envs\030\025 \001(\0132\024.flyteid" +
+      "l.admin.Envs\"\217\002\n\021LaunchPlanClosure\022.\n\005st" +
+      "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta" +
+      "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c" +
+      "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001" +
+      "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate" +
+      "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022." +
+      "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim" +
+      "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule" +
+      "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti" +
+      "fications\030\002 \003(\0132\034.flyteidl.admin.Notific" +
+      "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001" +
+      " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state" +
+      "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\"" +
+      "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau" +
+      "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad" +
+      "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun" +
+      "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
+      "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t" +
+      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*" +
+      "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI" +
+      "VE\020\001B7Z5github.com/flyteorg/flyteidl/gen" +
+      "/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14419,7 +14674,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", "Envs", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new
