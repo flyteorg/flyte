@@ -3,10 +3,10 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.44
-	github.com/flyteorg/flyteadmin v1.1.88
-	github.com/flyteorg/flytepropeller v1.1.77
-	github.com/flyteorg/flytestdlib v1.0.16
+	github.com/flyteorg/datacatalog v1.0.46
+	github.com/flyteorg/flyteadmin v1.1.92
+	github.com/flyteorg/flytepropeller v1.1.88
+	github.com/flyteorg/flytestdlib v1.0.17
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -71,8 +71,8 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.3.14 // indirect
-	github.com/flyteorg/flyteplugins v1.0.45 // indirect
+	github.com/flyteorg/flyteidl v1.5.0 // indirect
+	github.com/flyteorg/flyteplugins v1.0.56 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
