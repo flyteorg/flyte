@@ -70,17 +70,17 @@ data:
       serviceName: flyte-flyte-binary-webhook
       servicePort: 443
     flyte: 
-      admin:
-        disableClusterResourceManager: false
-        disableScheduler: false
-        disabled: false
-        seedProjects:
-        - flytesnacks
-      dataCatalog:
-        disabled: false
-      propeller:
-        disableWebhook: false
-        disabled: false
+    admin:
+      disableClusterResourceManager: false
+      disableScheduler: false
+      disabled: false
+      seedProjects:
+      - flytesnacks
+    dataCatalog:
+      disabled: false
+    propeller:
+      disableWebhook: false
+      disabled: false
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -336,7 +336,7 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: b6900ea956e6df246c8d7e347e8a912569dc90127f63381a673f84b83a95f712
+        checksum/configuration: 6f0ad76c8f64687a4b7ee41423ccba7e96574bb94d8680e88620e20709d580d6
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
