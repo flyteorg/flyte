@@ -60,7 +60,11 @@ spec:
       securityContext: {{- omit .Values.deployment.podSecurityContext "enabled" | toYaml | nindent 12 }}
       {{- end }}
       serviceAccountName: {{ include "flyte-binary.serviceAccountName" . }}
+      {{- if .Values.deployment.nodeSelector }}
+      nodeSelector: {{- .Values.deployment.nodeSelector | toYaml | nindent 8 }}
+      {{- end }}
       {{- if or .Values.deployment.initContainers (not .Values.configuration.externalConfigMap) }}
+      
       initContainers:
         {{- if not .Values.configuration.externalConfigMap }}
         - name: wait-for-db

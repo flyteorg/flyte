@@ -176,6 +176,10 @@ deployment:
   startupProbe: {}
   # lifecycleHooks Specify hooks to run in Flyte container before or after startup
   lifecycleHooks: {}
+  # Uncomment if you want to use a nodeselector
+  nodeSelector: {}
+  # example:
+  # nodeSelector: {nodegroup: mygroup}
   # resources Resource limits and requests for Flyte container
   # Uncomment and update to specify resources for deployment
   # resources:
