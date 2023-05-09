@@ -463,7 +463,6 @@ metadata:
 data: 
   BASE_URL: /console
   CONFIG_DIR: /etc/flyte/config
-  DISABLE_AUTH: "1"
 ---
 # Source: flyte/charts/flyte/templates/datacatalog/configmap.yaml
 apiVersion: v1
@@ -6898,7 +6897,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "31c9b63c5d5979ec6d9c6bf1d6deaa1128117c74a50ad417820d7896e7eb7fd"
+        configChecksum: "010d3a314ae7d7d1f0489e9ed328e96ae3f0d61619e6f2bd3893fd71cb3436e"
       labels: 
         app.kubernetes.io/name: flyteconsole
         app.kubernetes.io/instance: flyte
