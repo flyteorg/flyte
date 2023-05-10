@@ -1,7 +1,7 @@
 # Out of Core Plugin [RFC]
 
 ## Motivation
-Currently it is hard to implement backend plugins, especially for data-scientists & MLE’s who do not have working knowledge of Golang. Also, performance requirements, maintenance and development is cumbersome.
+Currently, it is hard to implement backend plugins, especially for data-scientists & MLE’s who do not have working knowledge of Golang. Also, performance requirements, maintenance and development is cumbersome.
 
 The document here proposes a path to make it possible to write plugins rapidly, while decoupling them from the core flytepropeller engine.
 
@@ -16,7 +16,7 @@ The document here proposes a path to make it possible to write plugins rapidly, 
 * Plugins should show up in the UI (extra details)
 
 ## Overview
-**Flytekit Backend Plugin** is a plugin registry written by fastAPI. Both users and Propeller can send the request to it to run the jobs (Bigquery, Databricks). Moreover, this registry should be stateless, so we can easily to scale up to multiple machines.
+**Flytekit Backend Plugin** is a plugin registry written by FastAPI. Both users and Propeller can send the request to it to run the jobs (Bigquery, Databricks). Moreover, this registry should be stateless, so we can easily to scale up to multiple machines.
 
 ![](https://i.imgur.com/3FQcW99.png)
 
@@ -50,7 +50,7 @@ It should be  possible to implement this using a Web Service framework like `Fas
 
 **Note**: It should be possible to implement multiple **resource** plugins per python library. Thus each resource should be delimited.
 
-```python=
+```python
 from fastapi import FastAPI
 from flytekit.backend.plugins import TaskInfo, IO, PollResultSuccess,
                PollResultFailure, OperationInProgress, PollResult
@@ -104,7 +104,7 @@ async def delete_res(resource_id: str):
 ```
 **Ideally**, we should provide a simplified interface to this in flytekit. This would mean that the flytekit plugin can simply use this interface to create a local plugin and a backendplugin.
 
-```python=
+```python
 class BackendPluginBase:
 
     def __init__(self, task_type: str, version: str = "v1"):
@@ -135,7 +135,7 @@ BackendPluginRegistry.register(BQPlugin())
 ```
 
 ### (Alternative) GRPC Backend Server
-```python=
+```python
 class BackendPluginServer(BackendPluginServiceServicer):
     def CreateTask(self, request: plugin_system_pb2.TaskCreateRequest, context) -> plugin_system_pb2.TaskCreateResponse:
         req = TaskCreateRequest.from_flyte_idl(request)
@@ -154,10 +154,10 @@ class BackendPluginServer(BackendPluginServiceServicer):
 
 
 ### Run a Flytekit Backend Plugin
-The workflow code running Snowflake, Databricks should not be changed. We can add a new config `enable_backend_flytekit_plugin_system`. If it's true, the job will be handled by plugin system. If can't find the plugin in the registry, falling back to use the default web api plugin in the propeller.
+The workflow code running Snowflake, Databricks should not be changed. We can add a new config `enable_backend_flytekit_plugin_system`. If it's true, the job will be handled by plugin system. If it can't find the plugin in the registry, it falls back to use the default web api plugin in the propeller.
 
-### Secrets Mmanagement
-Secrets management should not be imposed using Flyte’s convention, though we should provide a simplified secrets reader using flytekits secret system?
+### Secrets Management
+Secrets management should not be imposed using Flyte’s convention, though we should provide a simplified secrets reader using flytekit secret system?
 
 ## Backend Plugin System Deployment
 There are two options to deploy backend plugin system. 
@@ -168,13 +168,13 @@ Pros:
 * One image, and one deployment yaml file.
 
 Cons: 
-* Dependecy conflict between two plugins.
+* Dependency conflict between two plugins.
 * Need to restart the deployment and rebuild the image when we add a new backend plugin to flytekit.
 
 ### 2. One plugin per deployment
 
 Pros:
-* We can scale up the specific plugin deployments when the reqeusts increase in some plugins.
+* We can scale up the specific plugin deployments when the requests increase in some plugins.
 * Only need to deploy the plugins that people will use.
 
 Cons:
@@ -185,7 +185,7 @@ Backend plugin system can be run in the deployment independently. Because it's s
 
 This yaml file can be added into the Flyte helm chart (`flyte-core`).
 
-```ymal=
+```ymal
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -222,7 +222,7 @@ spec:
       targetPort: 8000
 ```
 ### Docker Image
-```dockerfile=
+```dockerfile
 FROM python:3.9-slim-buster
 
 MAINTAINER Flyte Team <users@flyte.org>
@@ -244,12 +244,12 @@ CMD uvicorn flytekit.extend.backend.fastapi:app --host 0.0.0.0 --port 8000
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
 ## Phase 1 (POC)
-- **Flytekit**: Use Fast api to create a beckend plugin service that can submit the job to Bigquery or Databricks.
+- **Flytekit**: Use Fast api to create a backend plugin service that can submit the job to Bigquery or Databricks.
 - **FlytePropeller**: Add a web api plugin that can talk to flytekit backend plugin service.
 
 ## Phase 2
-- **Authentication** - only propeller and users having access token can submit the job to beckend plugin system.
-- **Deployment**: Add beckend plugin system deployment to the helm chart.
+- **Authentication** - only propeller and users having access token can submit the job to backend plugin system.
+- **Deployment**: Add backend plugin system deployment to the helm chart.
 - **Benchmark**: Measure the overhead, and improve the performance.
 
 ## Open Question:
@@ -262,7 +262,7 @@ CMD uvicorn flytekit.extend.backend.fastapi:app --host 0.0.0.0 --port 8000
 Compare the memory and CPU consumption of the FastAPI server with that of the current Propeller server.
 ![](https://i.imgur.com/EXXmdyt.png)
 
-The round latency between grpc and fastAPI server.
+The round latency between grpc and FastAPI server.
 ![](https://i.imgur.com/hp8wss4.png =50%x)
 
 The round latency between grpc and current propeller.
