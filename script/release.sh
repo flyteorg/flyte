@@ -2,11 +2,11 @@
 
 set -ex
 
-FLYTEADMIN_TAG=v1.1.88.1
-DATACATALOG_TAG=v1.0.44
-FLYTECONSOLE_TAG=v1.5.4
-FLYTEPROPELLER_TAG=v1.1.76
-FLYTECOPILOT_TAG=v0.0.28
+FLYTEADMIN_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteadmin/releases/latest" | jq -r .tag_name)
+DATACATALOG_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/datacatalog/releases/latest" | jq -r .tag_name)
+FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
+FLYTEPROPELLER_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytepropeller/releases/latest" | jq -r .tag_name)
+FLYTECOPILOT_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytecopilot/releases/latest" | jq -r .tag_name)
 FLYTESTDLIB_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytestdlib/releases/latest" | jq -r .tag_name)
 
 # bump latest release of flyte component in kustomize
