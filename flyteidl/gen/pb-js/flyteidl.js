@@ -14264,7 +14264,7 @@
                  * @property {string|null} [iamRole] Identity iamRole
                  * @property {string|null} [k8sServiceAccount] Identity k8sServiceAccount
                  * @property {flyteidl.core.IOAuth2Client|null} [oauth2Client] Identity oauth2Client
-                 * @property {string|null} [userIdentifier] Identity userIdentifier
+                 * @property {string|null} [executionIdentity] Identity executionIdentity
                  */
     
                 /**
@@ -14307,12 +14307,12 @@
                 Identity.prototype.oauth2Client = null;
     
                 /**
-                 * Identity userIdentifier.
-                 * @member {string} userIdentifier
+                 * Identity executionIdentity.
+                 * @member {string} executionIdentity
                  * @memberof flyteidl.core.Identity
                  * @instance
                  */
-                Identity.prototype.userIdentifier = "";
+                Identity.prototype.executionIdentity = "";
     
                 /**
                  * Creates a new Identity instance using the specified properties.
@@ -14344,8 +14344,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.k8sServiceAccount);
                     if (message.oauth2Client != null && message.hasOwnProperty("oauth2Client"))
                         $root.flyteidl.core.OAuth2Client.encode(message.oauth2Client, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.userIdentifier != null && message.hasOwnProperty("userIdentifier"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.userIdentifier);
+                    if (message.executionIdentity != null && message.hasOwnProperty("executionIdentity"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.executionIdentity);
                     return writer;
                 };
     
@@ -14377,7 +14377,7 @@
                             message.oauth2Client = $root.flyteidl.core.OAuth2Client.decode(reader, reader.uint32());
                             break;
                         case 4:
-                            message.userIdentifier = reader.string();
+                            message.executionIdentity = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14409,9 +14409,9 @@
                         if (error)
                             return "oauth2Client." + error;
                     }
-                    if (message.userIdentifier != null && message.hasOwnProperty("userIdentifier"))
-                        if (!$util.isString(message.userIdentifier))
-                            return "userIdentifier: string expected";
+                    if (message.executionIdentity != null && message.hasOwnProperty("executionIdentity"))
+                        if (!$util.isString(message.executionIdentity))
+                            return "executionIdentity: string expected";
                     return null;
                 };
     
