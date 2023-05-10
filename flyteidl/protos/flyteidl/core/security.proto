@@ -70,8 +70,8 @@ message Identity {
     // making external calls.
     OAuth2Client oauth2_client = 3;
 
-    // user_identifier references the id of the user who executes the task.
-    string user_identifier = 4;
+    // execution_identity references the subject who makes the execution
+    string execution_identity = 4;
 }
 
 // OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.

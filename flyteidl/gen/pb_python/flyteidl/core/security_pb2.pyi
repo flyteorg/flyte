@@ -35,16 +35,16 @@ class OAuth2Client(_message.Message):
     def __init__(self, client_id: _Optional[str] = ..., client_secret: _Optional[_Union[Secret, _Mapping]] = ...) -> None: ...
 
 class Identity(_message.Message):
-    __slots__ = ["iam_role", "k8s_service_account", "oauth2_client", "user_identifier"]
+    __slots__ = ["iam_role", "k8s_service_account", "oauth2_client", "execution_identity"]
     IAM_ROLE_FIELD_NUMBER: _ClassVar[int]
     K8S_SERVICE_ACCOUNT_FIELD_NUMBER: _ClassVar[int]
     OAUTH2_CLIENT_FIELD_NUMBER: _ClassVar[int]
-    USER_IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    EXECUTION_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     iam_role: str
     k8s_service_account: str
     oauth2_client: OAuth2Client
-    user_identifier: str
-    def __init__(self, iam_role: _Optional[str] = ..., k8s_service_account: _Optional[str] = ..., oauth2_client: _Optional[_Union[OAuth2Client, _Mapping]] = ..., user_identifier: _Optional[str] = ...) -> None: ...
+    execution_identity: str
+    def __init__(self, iam_role: _Optional[str] = ..., k8s_service_account: _Optional[str] = ..., oauth2_client: _Optional[_Union[OAuth2Client, _Mapping]] = ..., execution_identity: _Optional[str] = ...) -> None: ...
 
 class OAuth2TokenRequest(_message.Message):
     __slots__ = ["name", "type", "client", "idp_discovery_endpoint", "token_endpoint"]

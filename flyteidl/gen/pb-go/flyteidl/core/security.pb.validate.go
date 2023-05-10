@@ -206,7 +206,7 @@ func (m *Identity) Validate() error {
 		}
 	}
 
-	// no validation rules for UserIdentifier
+	// no validation rules for ExecutionIdentity
 
 	return nil
 }

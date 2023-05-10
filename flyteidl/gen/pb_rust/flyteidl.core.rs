@@ -1292,9 +1292,9 @@ pub struct Identity {
     /// making external calls.
     #[prost(message, optional, tag="3")]
     pub oauth2_client: ::core::option::Option<OAuth2Client>,
-    /// user_identifier references the id of the user who executes the task.
+    /// execution_identity references the subject who makes the execution
     #[prost(string, tag="4")]
-    pub user_identifier: ::prost::alloc::string::String,
+    pub execution_identity: ::prost::alloc::string::String,
 }
 /// OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.
 /// FLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if
