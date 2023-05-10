@@ -42,5 +42,8 @@ COPY --from=bootstrap /flyteorg/build/dist/flyte-sandbox-bootstrap /bin/
 
 VOLUME /var/lib/flyte/storage
 
+# Set environment variable for picking up additional CA certificates
+ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
+
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
 CMD [ "server", "--disable=traefik", "--disable=servicelb" ]

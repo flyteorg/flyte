@@ -443,7 +443,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
       k8s-array:
         logs:
           config:
@@ -682,7 +682,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox
+                                          address: flyte-sandbox-http
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -696,7 +696,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox
+                                          address: flyte-sandbox-grpc
                                           port_value: 8089
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
@@ -765,7 +765,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VnBOU0tUSU41Q2xCcnlQeA==
+  haSharedSecret: TzB0a0RpZFdIazM3clRsTw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -851,32 +851,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-v0.1.10
-  name: flyte-sandbox
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -894,6 +868,50 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-grpc
+  namespace: flyte
+spec:
+  ports:
+  - name: grpc
+    nodePort: null
+    port: 8089
+    targetPort: grpc
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-http
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 8088
+    targetPort: http
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1141,7 +1159,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: cb6d3e1eda0d2913ad4a594e28137dd790892054856f74583344f7abaf00a11d
+        checksum/configuration: 7ef5ef618ebb04f965552e2e4814dc053ef5338fee3ada32517e4e4b1695989b
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1249,7 +1267,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 91c457e16b511b53b62ae35de8ee25922d4f6bdd9314080917d35a4371913dfe
+        checksum/secret: 47c4695069d69171eaf85c66a392f785ce310c1c81afb96a2a3d59a296b0b5c0
       labels:
         app: docker-registry
         release: flyte-sandbox

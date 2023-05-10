@@ -989,6 +989,13 @@ ray (`ray.Config`_)
   dashboardHost: 0.0.0.0
   includeDashboard: true
   nodeIPAddress: $MY_POD_IP
+  remoteClusterConfig:
+    auth:
+      caCertPath: ""
+      tokenPath: ""
+    enabled: false
+    endpoint: ""
+    name: ""
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -2947,6 +2954,100 @@ nodeIPAddress (string)
   $MY_POD_IP
   
 
+remoteClusterConfig (`k8s.ClusterConfig (remoteClusterConfig)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Configuration of remote K8s cluster for ray jobs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  auth:
+    caCertPath: ""
+    tokenPath: ""
+  enabled: false
+  endpoint: ""
+  name: ""
+  
+
+k8s.ClusterConfig (remoteClusterConfig)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Friendly name of the remote cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Remote K8s cluster endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+auth (`k8s.Auth (auth)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caCertPath: ""
+  tokenPath: ""
+  
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Boolean flag to enable or disable
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+k8s.Auth (auth)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tokenPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Token path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+caCertPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Certificate path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 snowflake.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4572,20 +4673,6 @@ Maximum number of plugin phase versions allowed for one phase.
   "100000"
   
 
-barrier (`config.BarrierConfig`_)
---------------------------------------------------------------------------------
-
-Config for Barrier implementation
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  cache-size: 10000
-  cache-ttl: 30m0s
-  enabled: true
-  
-
 backoff (`config.BackOffConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4636,45 +4723,6 @@ The cap of the backoff duration
 .. code-block:: yaml
 
   20s
-  
-
-config.BarrierConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Barrier transitions using inmemory context
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "true"
-  
-
-cache-size (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max number of barrier to preserve in memory
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "10000"
-  
-
-cache-ttl (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max duration that a barrier would be respected if the process is not restarted. This should account for time required to store the record into persistent storage (across multiple rounds.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  30m0s
   
 
 config.TaskPluginConfig
@@ -4818,6 +4866,25 @@ AWS Secret Manager config.
   sidecarImage: docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
   
 
+gcpSecretManager (`config.GCPSecretManagerConfig`_)
+--------------------------------------------------------------------------------
+
+GCP Secret Manager config.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 500Mi
+  sidecarImage: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
 vaultSecretManager (`config.VaultSecretManagerConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4827,6 +4894,7 @@ Vault Secret Manager config.
 
 .. code-block:: yaml
 
+  annotations: null
   kvVersion: "2"
   role: flyte
   
@@ -4886,6 +4954,36 @@ requests (v1.ResourceList)
   memory: 500Mi
   
 
+config.GCPSecretManagerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sidecarImage (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Specifies the sidecar docker image to use
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
+resources (`v1.ResourceRequirements`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  limits:
+    cpu: 200m
+    memory: 500Mi
+  requests:
+    cpu: 200m
+    memory: 500Mi
+  
+
 config.VaultSecretManagerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4909,5 +5007,15 @@ kvVersion (int)
 .. code-block:: yaml
 
   "2"
+  
+
+annotations (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
