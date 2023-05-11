@@ -45,7 +45,6 @@ func RetrieveUUID(annotations map[string]string) string {
 }
 
 func ExpectedKVv1(uuid string) *corev1.Pod {
-	// Injects uuid into expected output for KV v1 secrets
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
@@ -64,7 +63,6 @@ func ExpectedKVv1(uuid string) *corev1.Pod {
 }
 
 func ExpectedKVv2(uuid string) *corev1.Pod {
-	// Injects uuid into expected output for KV v2 secrets
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
@@ -82,8 +80,7 @@ func ExpectedKVv2(uuid string) *corev1.Pod {
 	return expected
 }
 
-func ExpectedKVv3(uuid string) *corev1.Pod {
-	// Injects uuid into expected output for KV v2 secrets
+func ExpectedExtraAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
@@ -102,8 +99,7 @@ func ExpectedKVv3(uuid string) *corev1.Pod {
 	return expected
 }
 
-func ExpectedKVv4(uuid string) *corev1.Pod {
-	// Injects uuid into expected output for KV v2 secrets
+func ExpectedExistingRoleAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
@@ -121,8 +117,7 @@ func ExpectedKVv4(uuid string) *corev1.Pod {
 	return expected
 }
 
-func ExpectedKVv5(uuid string) *corev1.Pod {
-	// Injects uuid into expected output for KV v2 secrets
+func ExpectedConfigAnnotation(uuid string) *corev1.Pod {
 	expected := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
@@ -133,6 +128,23 @@ func ExpectedKVv5(uuid string) *corev1.Pod {
 				fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", uuid):   "foo",
 				fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", uuid):     "foo/bar",
 				fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", uuid): `{{- with secret "foo" -}}{{ .Data.data.bar }}{{- end -}}`,
+			},
+		},
+		Spec: PodSpec,
+	}
+	return expected
+}
+
+func ExpectedDB(uuid string) *corev1.Pod {
+	expected := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"vault.hashicorp.com/agent-inject":                              "true",
+				"vault.hashicorp.com/secret-volume-path":                        "/etc/flyte/secrets",
+				"vault.hashicorp.com/role":                                      "flyte",
+				"vault.hashicorp.com/agent-pre-populate-only":                   "true",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", uuid): "foo",
+				fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", uuid):   "foo/bar",
 			},
 		},
 		Spec: PodSpec,
@@ -176,27 +188,35 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "KVv1 Secret",
+			name: "KVv1 Secret Group Version argument overwrites config",
 			args: args{
-				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
-				secret: inputSecret,
-				p:      NewInputPod(map[string]string{}),
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2},
+				secret: &coreIdl.Secret{
+					Group:        "foo",
+					Key:          "bar",
+					GroupVersion: "kv1",
+				},
+				p: NewInputPod(map[string]string{}),
 			},
 			want:    ExpectedKVv1,
 			wantErr: false,
 		},
 		{
-			name: "KVv2 Secret",
+			name: "KVv2 Secret Group Version argument overwrites config",
 			args: args{
-				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2},
-				secret: inputSecret,
-				p:      NewInputPod(map[string]string{}),
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
+				secret: &coreIdl.Secret{
+					Group:        "foo",
+					Key:          "bar",
+					GroupVersion: "kv2",
+				},
+				p: NewInputPod(map[string]string{}),
 			},
 			want:    ExpectedKVv2,
 			wantErr: false,
 		},
 		{
-			name: "KVv3 Secret - extra annotations",
+			name: "Extra annotations from config are added",
 			args: args{
 				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{
 					"vault.hashicorp.com/auth-config-type": "gce",
@@ -204,11 +224,11 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 				secret: inputSecret,
 				p:      NewInputPod(map[string]string{}),
 			},
-			want:    ExpectedKVv3,
+			want:    ExpectedExtraAnnotation,
 			wantErr: false,
 		},
 		{
-			name: "KVv4 Secret - user override annotation",
+			name: "Already present annotation is not overwritten",
 			args: args{
 				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{}},
 				secret: inputSecret,
@@ -216,11 +236,11 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 					"vault.hashicorp.com/role": "my-role",
 				}),
 			},
-			want:    ExpectedKVv4,
+			want:    ExpectedExistingRoleAnnotation,
 			wantErr: false,
 		},
 		{
-			name: "KVv5 Secret - system override annotation",
+			name: "Config annotation overwrites system default annotation",
 			args: args{
 				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2, Annotations: map[string]string{
 					"vault.hashicorp.com/agent-pre-populate-only": "false", // override vault.hashicorp.com/agent-pre-populate-only
@@ -228,18 +248,48 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 				secret: inputSecret,
 				p:      NewInputPod(map[string]string{}),
 			},
-			want:    ExpectedKVv5,
+			want:    ExpectedConfigAnnotation,
 			wantErr: false,
 		},
 		{
-			name: "Unsupported KV version",
+			name: "DB Secret backend enginge is supported",
 			args: args{
-				cfg:    config.VaultSecretManagerConfig{Role: "flyte", KVVersion: 3},
-				secret: inputSecret,
-				p:      NewInputPod(map[string]string{}),
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
+				secret: &coreIdl.Secret{
+					Group:        "foo",
+					Key:          "bar",
+					GroupVersion: "db",
+				},
+				p: NewInputPod(map[string]string{}),
 			},
-			want:    nil,
-			wantErr: true,
+			want:    ExpectedDB,
+			wantErr: false,
+		},
+		{
+			name: "Legacy config option V1 is still supported",
+			args: args{
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
+				secret: &coreIdl.Secret{
+					Group: "foo",
+					Key:   "bar",
+				},
+				p: NewInputPod(map[string]string{}),
+			},
+			want:    ExpectedKVv1,
+			wantErr: false,
+		},
+		{
+			name: "Legacy config option V2 is still supported",
+			args: args{
+				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion2},
+				secret: &coreIdl.Secret{
+					Group: "foo",
+					Key:   "bar",
+				},
+				p: NewInputPod(map[string]string{}),
+			},
+			want:    ExpectedKVv2,
+			wantErr: false,
 		},
 	}
 
