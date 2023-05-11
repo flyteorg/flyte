@@ -30,7 +30,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.5.0"
+release = "1.5.1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -62,7 +62,7 @@ extensions = [
     "sphinx_panels",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
-    "sphinxcontrib.yt",
+    "sphinxcontrib.youtube",
     "sphinx_tabs.tabs",
     "sphinx_tags",
 ]
