@@ -114,7 +114,7 @@ type GCPSecretManagerConfig struct {
 
 type VaultSecretManagerConfig struct {
 	Role        string            `json:"role" pflag:",Specifies the vault role to use"`
-	KVVersion   KVVersion         `json:"kvVersion" pflag:"-,The KV Engine Version. Defaults to 2. Use 1 for unversioned secrets. Refer to - https://www.vaultproject.io/docs/secrets/kv#kv-secrets-engine."`
+	KVVersion   KVVersion         `json:"kvVersion" pflag:"-,DEPRECATED! Use the GroupVersion field of the Secret request instead. The KV Engine Version. Defaults to 2. Use 1 for unversioned secrets. Refer to - https://www.vaultproject.io/docs/secrets/kv#kv-secrets-engine."`
 	Annotations map[string]string `json:"annotations" pflag:"-,Annotation to be added to user task pod. The annotation can also be used to override default annotations added by Flyte. Useful to customize Vault integration (https://developer.hashicorp.com/vault/docs/platform/k8s/injector/annotations)"`
 }
 

@@ -123,30 +123,44 @@ func AppendVolume(volumes []corev1.Volume, volume corev1.Volume) []corev1.Volume
 	return append(volumes, volume)
 }
 
-func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVersion) (map[string]string, error) {
+func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVersion) map[string]string {
 	// Creates three grouped annotations "agent-inject-secret", "agent-inject-file" and "agent-inject-template"
 	// for a given secret request and KV engine version. The annotations respectively handle: 1. retrieving the
 	// secret from a vault path specified in secret.Group, 2. storing it in a file named after secret.Group/secret.Key
 	// and 3. creating a template that retrieves only secret.Key from the multiple k:v pairs present in a vault secret.
 	id := string(uuid.NewUUID())
 
+	secretVaultAnnotations := map[string]string{
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", id): secret.Group,
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):   fmt.Sprintf("%s/%s", secret.Group, secret.Key),
+	}
+
 	// Set the consul template language query depending on the KV Secrets Engine version.
 	// Version 1 stores plain k:v pairs under .Data, version 2 supports versioned secrets
 	// and wraps the k:v pairs into an additional subfield.
 	var query string
-	if kvversion == config.KVVersion1 {
+	switch secret.GroupVersion {
+	case "kv1":
 		query = ".Data"
-	} else if kvversion == config.KVVersion2 {
+	case "kv2":
 		query = ".Data.data"
-	} else {
-		err := fmt.Errorf("unsupported KV Version %v, supported versions are 1 and 2", kvversion)
-		return nil, err
+	case "db":
+		// For the database secrets engine backend we do not want to use the templating
+	default:
+		// Deprecated: The config setting KVVersion is deprecated and will be removed in a future release.
+		// You should instead use the GroupVersion field in the secret definition.
+		// Support using the legacy KVVersion config if GroupVersion is not set
+		switch kvversion {
+		case config.KVVersion1:
+			query = ".Data"
+		case config.KVVersion2:
+			query = ".Data.data"
+		}
 	}
-	template := fmt.Sprintf(`{{- with secret "%s" -}}{{ %s.%s }}{{- end -}}`, secret.Group, query, secret.Key)
-	secretVaultAnnotations := map[string]string{
-		fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", id):   secret.Group,
-		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):     fmt.Sprintf("%s/%s", secret.Group, secret.Key),
-		fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", id): template,
+	if query != "" {
+		template := fmt.Sprintf(`{{- with secret "%s" -}}{{ %s.%s }}{{- end -}}`, secret.Group, query, secret.Key)
+		secretVaultAnnotations[fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", id)] = template
+
 	}
-	return secretVaultAnnotations, nil
+	return secretVaultAnnotations
 }
