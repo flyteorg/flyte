@@ -283,6 +283,8 @@ To set up an external OAuth2 Authorization Server, follow the instructions below
       8. Navigate to tab **Token configuration**, click ``+Add optional claim`` and create email claims for both ID and Access Token
       9.  Navigate to tab **API permissions**, add ``email``, ``offline_access``, ``openid``, ``profile``, ``User.Read``
       10. Navigate to tab **Expose an API**, Click ``+Add a scope`` and ``+Add a client application`` to create ``<custom scope>``
+
+
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
