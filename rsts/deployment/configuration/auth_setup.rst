@@ -271,45 +271,132 @@ To set up an external OAuth2 Authorization Server, follow the instructions below
        5. Flytectl should be created with `Access Type Public` and standard flow enabled.
        6. FlytePropeller should be created as an `Access Type Confidential`, standard flow enabled, and note the client ID and client Secrets provided.
 
+   .. group-tab:: Azure AD
+   
+      1. Navigate to tab **Overview**, obtain ``<client id>`` and ``<tenant id>``
+      2. Navigate to tab **Authentication**, click ``+Add a platform``
+      3. Add **Web** for flyteconsole and flytepropeller, **Mobile and desktop applications** for flytectl.
+      4. Add URL ``https://<console-url>/callback`` as the callback for Web
+      5. Add URL ``http://localhost:53593/callback`` as the callback for flytectl
+      6. In **Advanced settings**, set ``Enable the following mobile and desktop flows`` to **Yes** to enable deviceflow
+      7. Navigate to tab **Certificates & secrets**, click ``+New client secret`` to create ``<client secret>``
+      8. Navigate to tab **Token configuration**, click ``+Add optional claim`` and create email claims for both ID and Access Token
+      9.  Navigate to tab **API permissions**, add ``email``, ``offline_access``, ``openid``, ``profile``, ``User.Read``
+      10. Navigate to tab **Expose an API**, Click ``+Add a scope`` and ``+Add a client application`` to create ``<custom scope>``
 Apply Configuration
 ^^^^^^^^^^^^^^^^^^^
 
 It is possible to direct FlyteAdmin to use an external authorization server. To do so, edit the same config map once
 more and follow these changes:
 
-.. code-block:: yaml
+.. tabs::
+   .. group-tab:: Okta
+      .. code-block:: yaml
 
-     auth:
-         appAuth:
-             # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
-             #    Choose Self (or omit the value) to use FlyteAdmin's internal (albeit limited) Authorization Server.
-             authServerType: External
+         auth:
+            appAuth:
+               # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
+               #    Choose Self (or omit the value) to use FlyteAdmin's internal (albeit limited) Authorization Server.
+               authServerType: External
 
-             # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
-             externalAuthServer:
-                 baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
-                 #baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for keycloak
-                 #metadataUrl: .well-known/openid-configuration #Uncomment for keycloak
+               # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+               externalAuthServer:
+                  baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
 
-             thirdPartyConfig:
-                 flyteClient:
-                     # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                     clientId: flytectl
-                     # This should not change
-                     redirectUri: http://localhost:53593/callback
-                     # 4. "all" is a required scope and must be configured in the custom authorization server.
+               thirdPartyConfig:
+                  flyteClient:
+                        # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                        clientId: flytectl
+                        # This should not change
+                        redirectUri: http://localhost:53593/callback
+                        # 4. "all" is a required scope and must be configured in the custom authorization server.
+                        scopes:
+                        - offline
+                        - all
+
+            userAuth:
+               openId:
+                  baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
+                  scopes:
+                  - profile
+                  - openid
+                  # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                  clientId: <client id>
+   .. group-tab:: Keycloak
+      .. code-block:: yaml
+
+         auth:
+               appAuth:
+                  # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
+                  #    Choose Self (or omit the value) to use FlyteAdmin's internal (albeit limited) Authorization Server.
+                  authServerType: External
+
+                  # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+                  externalAuthServer:
+                     baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm>
+                     metadataUrl: .well-known/openid-configuration
+
+                  thirdPartyConfig:
+                     flyteClient:
+                           # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                           clientId: flytectl
+                           # This should not change
+                           redirectUri: http://localhost:53593/callback
+                           # 4. "all" is a required scope and must be configured in the custom authorization server.
+                           scopes:
+                           - offline
+                           - all
+
+               userAuth:
+                  openId:
+                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
                      scopes:
-                     - offline
-                     - all
+                     - profile
+                     - openid
+                     # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                     clientId: <client id>
+   .. group-tab:: Azure AD
+      .. code-block:: yaml
 
-         userAuth:
-             openId:
-                 baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
-                 scopes:
-                 - profile
-                 - openid
-                 # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-                 clientId: 0oakkheteNjCMERst5d6
+         secrets:
+         adminOauthClientCredentials:
+            enabled: true
+            clientSecret: <client secret>
+            clientId: <client id>
+         ---
+         configmap:
+         admin:
+            admin:
+               endpoint: <admin endpoint>
+               insecure: true
+               clientId: <client id>
+               clientSecretLocation: /etc/secrets/client_secret
+               scopes:
+               - api://<client id>/.default
+               useAudienceFromAdmin: true
+         ---
+         auth:
+            appAuth:
+               authServerType: External
+               externalAuthServer:
+                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0/
+                  metadataUrl: .well-known/openid-configuration
+                  AllowedAudience:
+                     - api://<client id>
+               thirdPartyConfig:
+                  flyteClient:
+                     clientId: <client id>
+                     redirectUri: http://localhost:53593/callback
+                     scopes:
+                     - api://<client id>/<custom-scope>
+
+            userAuth:
+               openId:
+                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0
+                  scopes:
+                     - openid
+                     - profile
+                  clientId: <client id>
 
 .. tabs::
 
