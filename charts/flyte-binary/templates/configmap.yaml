@@ -26,6 +26,9 @@ data:
       {{- end }}
       endpoint: localhost:8089
       insecure: true
+      {{- if .Values.configuration.auth.internal.audience }}
+      audience: {{ .Values.configuration.auth.internal.audience }}
+      {{- end}}
     catalog-cache:
       endpoint: localhost:8081
       insecure: true
