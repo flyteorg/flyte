@@ -94,6 +94,9 @@ type ApplicationConfig struct {
 
 	// Enabling will use Storage (s3/gcs/etc) to offload static parts of CRDs.
 	UseOffloadedWorkflowClosure bool `json:"useOffloadedWorkflowClosure"`
+
+	// Environment variables to be set for the execution.
+	Envs map[string]string `json:"envs,omitempty"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -164,6 +167,19 @@ func (a *ApplicationConfig) GetInterruptible() *wrappers.BoolValue {
 
 func (a *ApplicationConfig) GetOverwriteCache() bool {
 	return a.OverwriteCache
+}
+
+func (a *ApplicationConfig) GetEnvs() *admin.Envs {
+	var envs []*core.KeyValuePair
+	for k, v := range a.Envs {
+		envs = append(envs, &core.KeyValuePair{
+			Key:   k,
+			Value: v,
+		})
+	}
+	return &admin.Envs{
+		Values: envs,
+	}
 }
 
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object

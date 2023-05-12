@@ -1083,6 +1083,90 @@ func TestCreateExecutionOverwriteCache(t *testing.T) {
 	}
 }
 
+func TestCreateExecutionWithEnvs(t *testing.T) {
+	tests := []struct {
+		name string
+		task bool
+		envs []*core.KeyValuePair
+		want []*core.KeyValuePair
+	}{
+		{
+			name: "LaunchPlanDefault",
+			task: false,
+			envs: nil,
+			want: nil,
+		},
+		{
+			name: "LaunchPlanEnable",
+			task: false,
+			envs: []*core.KeyValuePair{{Key: "foo", Value: "bar"}},
+			want: []*core.KeyValuePair{{Key: "foo", Value: "bar"}},
+		},
+		{
+			name: "TaskDefault",
+			task: false,
+			envs: nil,
+			want: nil,
+		},
+		{
+			name: "TaskEnable",
+			task: true,
+			envs: []*core.KeyValuePair{{Key: "foo", Value: "bar"}},
+			want: []*core.KeyValuePair{{Key: "foo", Value: "bar"}},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			request := testutils.GetExecutionRequest()
+			if tt.task {
+				request.Spec.LaunchPlan.ResourceType = core.ResourceType_TASK
+			}
+			request.Spec.Envs.Values = tt.envs
+
+			repository := getMockRepositoryForExecTest()
+			setDefaultLpCallbackForExecTest(repository)
+			setDefaultTaskCallbackForExecTest(repository)
+
+			exCreateFunc := func(ctx context.Context, input models.Execution) error {
+				var spec admin.ExecutionSpec
+				err := proto.Unmarshal(input.Spec, &spec)
+				assert.Nil(t, err)
+
+				if tt.task {
+					assert.Equal(t, uint(0), input.LaunchPlanID)
+					assert.NotEqual(t, uint(0), input.TaskID)
+				} else {
+					assert.NotEqual(t, uint(0), input.LaunchPlanID)
+					assert.Equal(t, uint(0), input.TaskID)
+				}
+				if len(tt.envs) != 0 {
+					assert.Equal(t, tt.envs[0].Key, spec.GetEnvs().Values[0].Key)
+					assert.Equal(t, tt.envs[0].Value, spec.GetEnvs().Values[0].Value)
+				} else {
+					assert.Nil(t, spec.GetEnvs().GetValues())
+				}
+
+				return nil
+			}
+
+			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+			mockExecutor := workflowengineMocks.WorkflowExecutor{}
+			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+			mockExecutor.OnID().Return("testMockExecutor")
+			r := plugins.NewRegistry()
+			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func makeExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -1181,6 +1265,39 @@ func makeExecutionOverwriteCacheGetFunc(
 
 		request := testutils.GetExecutionRequest()
 		request.Spec.OverwriteCache = overwriteCache
+
+		specBytes, err := proto.Marshal(request.Spec)
+		assert.Nil(t, err)
+
+		return models.Execution{
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			BaseModel: models.BaseModel{
+				ID: uint(8),
+			},
+			Spec:         specBytes,
+			Phase:        core.WorkflowExecution_QUEUED.String(),
+			Closure:      closureBytes,
+			LaunchPlanID: uint(1),
+			WorkflowID:   uint(2),
+			StartedAt:    startTime,
+			Cluster:      testCluster,
+		}, nil
+	}
+}
+
+func makeExecutionWithEnvs(
+	t *testing.T, closureBytes []byte, startTime *time.Time, envs []*core.KeyValuePair) repositoryMocks.GetExecutionFunc {
+	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "name", input.Name)
+
+		request := testutils.GetExecutionRequest()
+		request.Spec.Envs.Values = envs
 
 		specBytes, err := proto.Marshal(request.Spec)
 		assert.Nil(t, err)
@@ -1516,6 +1633,58 @@ func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
 		assert.NotNil(t, asd)
 		assert.True(t, createCalled)
 	})
+}
+
+func TestRelaunchExecutionEnvsOverride(t *testing.T) {
+	// Set up mocks.
+	repository := getMockRepositoryForExecTest()
+	setDefaultLpCallbackForExecTest(repository)
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.OnID().Return("testMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	startTime := time.Now()
+	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	existingClosure := admin.ExecutionClosure{
+		Phase:     core.WorkflowExecution_RUNNING,
+		StartedAt: startTimeProto,
+	}
+	existingClosureBytes, _ := proto.Marshal(&existingClosure)
+	env := []*core.KeyValuePair{{Key: "foo", Value: "bar"}}
+	executionGetFunc := makeExecutionWithEnvs(t, existingClosureBytes, &startTime, env)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+
+	var createCalled bool
+	exCreateFunc := func(ctx context.Context, input models.Execution) error {
+		createCalled = true
+		assert.Equal(t, "relaunchy", input.Name)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, uint(8), input.SourceExecutionID)
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(input.Spec, &spec)
+		assert.Nil(t, err)
+		assert.Equal(t, admin.ExecutionMetadata_RELAUNCH, spec.Metadata.Mode)
+		assert.Equal(t, int32(admin.ExecutionMetadata_RELAUNCH), input.Mode)
+		assert.NotNil(t, spec.GetEnvs())
+		assert.Equal(t, spec.GetEnvs().Values[0].Key, env[0].Key)
+		assert.Equal(t, spec.GetEnvs().Values[0].Value, env[0].Value)
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+
+	_, err := execManager.RelaunchExecution(context.Background(), admin.ExecutionRelaunchRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Name: "relaunchy",
+	}, requestedAt)
+	assert.Nil(t, err)
+	assert.True(t, createCalled)
 }
 
 func TestRecoverExecution(t *testing.T) {
@@ -1876,6 +2045,67 @@ func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
+	assert.True(t, proto.Equal(expectedResponse, response))
+}
+
+func TestRecoverExecutionEnvsOverride(t *testing.T) {
+	// Set up mocks.
+	repository := getMockRepositoryForExecTest()
+	setDefaultLpCallbackForExecTest(repository)
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.OnID().Return("testMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	startTime := time.Now()
+	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	existingClosure := admin.ExecutionClosure{
+		Phase:     core.WorkflowExecution_SUCCEEDED,
+		StartedAt: startTimeProto,
+	}
+	existingClosureBytes, _ := proto.Marshal(&existingClosure)
+	env := []*core.KeyValuePair{{Key: "foo", Value: "bar"}}
+	executionGetFunc := makeExecutionWithEnvs(t, existingClosureBytes, &startTime, env)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+
+	exCreateFunc := func(ctx context.Context, input models.Execution) error {
+		assert.Equal(t, "recovered", input.Name)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, uint(8), input.SourceExecutionID)
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(input.Spec, &spec)
+		assert.Nil(t, err)
+		assert.Equal(t, admin.ExecutionMetadata_RECOVERED, spec.Metadata.Mode)
+		assert.Equal(t, int32(admin.ExecutionMetadata_RECOVERED), input.Mode)
+		assert.NotNil(t, spec.GetEnvs())
+		assert.Equal(t, spec.GetEnvs().GetValues()[0].Key, env[0].Key)
+		assert.Equal(t, spec.GetEnvs().GetValues()[0].Value, env[0].Value)
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+
+	// Issue request.
+	response, err := execManager.RecoverExecution(context.Background(), admin.ExecutionRecoverRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Name: "recovered",
+	}, requestedAt)
+
+	// And verify response.
+	assert.Nil(t, err)
+
+	expectedResponse := &admin.ExecutionCreateResponse{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "recovered",
+		},
+	}
 	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
@@ -4208,6 +4438,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	requestMaxParallelism := int32(10)
 	requestInterruptible := false
 	requestOverwriteCache := false
+	requestEnvironmentVariables := []*core.KeyValuePair{{Key: "hello", Value: "world"}}
 
 	launchPlanLabels := map[string]string{"launchPlanLabelKey": "launchPlanLabelValue"}
 	launchPlanAnnotations := map[string]string{"launchPlanAnnotationKey": "launchPlanAnnotationValue"}
@@ -4217,6 +4448,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	launchPlanMaxParallelism := int32(50)
 	launchPlanInterruptible := true
 	launchPlanOverwriteCache := true
+	launchPlanEnvironmentVariables := []*core.KeyValuePair{{Key: "foo", Value: "bar"}}
 
 	applicationConfig := runtime.NewConfigurationProvider()
 
@@ -4305,6 +4537,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				MaxParallelism: requestMaxParallelism,
 				Interruptible:  &wrappers.BoolValue{Value: requestInterruptible},
 				OverwriteCache: requestOverwriteCache,
+				Envs:           &admin.Envs{Values: requestEnvironmentVariables},
 			},
 		}
 		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, nil)
@@ -4316,6 +4549,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, requestOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, requestLabels, execConfig.GetLabels().Values)
 		assert.Equal(t, requestAnnotations, execConfig.GetAnnotations().Values)
+		assert.Equal(t, requestEnvironmentVariables, execConfig.GetEnvs().Values)
 	})
 	t.Run("request with partial config", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
@@ -4343,6 +4577,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				MaxParallelism: launchPlanMaxParallelism,
 				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
+				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
 		}
 		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
@@ -4354,6 +4589,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.True(t, proto.Equal(launchPlan.Spec.Annotations, execConfig.Annotations))
 		assert.Equal(t, requestOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, requestLabels, execConfig.GetLabels().Values)
+		assert.Equal(t, launchPlanEnvironmentVariables, execConfig.GetEnvs().Values)
 	})
 	t.Run("request with empty security context", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
@@ -4381,6 +4617,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				MaxParallelism: launchPlanMaxParallelism,
 				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
+				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
 		}
 		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
@@ -4391,6 +4628,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, launchPlanK8sServiceAccount, execConfig.SecurityContext.RunAs.K8SServiceAccount)
 		assert.Equal(t, launchPlanOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, launchPlanLabels, execConfig.GetLabels().Values)
+		assert.Equal(t, launchPlanEnvironmentVariables, execConfig.GetEnvs().Values)
 	})
 	t.Run("request with no config", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
@@ -4413,6 +4651,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				MaxParallelism: launchPlanMaxParallelism,
 				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
+				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
 		}
 		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, launchPlan)
@@ -4424,6 +4663,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, launchPlanOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, launchPlanLabels, execConfig.GetLabels().Values)
 		assert.Equal(t, launchPlanAnnotations, execConfig.GetAnnotations().Values)
+		assert.Equal(t, launchPlanEnvironmentVariables, execConfig.GetEnvs().Values)
 	})
 	t.Run("launchplan with partial config", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
@@ -4474,6 +4714,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, rmOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, rmLabels, execConfig.GetLabels().Values)
 		assert.Equal(t, rmAnnotations, execConfig.GetAnnotations().Values)
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource partial config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4520,6 +4761,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetRawOutputDataConfig())
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Equal(t, rmAnnotations, execConfig.GetAnnotations().Values)
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource with no config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4557,6 +4799,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetRawOutputDataConfig())
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("fetch security context from deprecated config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4599,6 +4842,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetRawOutputDataConfig())
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource workflow resource", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4652,6 +4896,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetRawOutputDataConfig())
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource failure", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4682,6 +4927,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetRawOutputDataConfig())
 		assert.Nil(t, execConfig.GetLabels())
 		assert.Nil(t, execConfig.GetAnnotations())
+		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("application configuration", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -4790,6 +5036,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			launchPlan := &admin.LaunchPlan{
 				Spec: &admin.LaunchPlanSpec{
 					Interruptible: &wrappers.BoolValue{Value: true},
+					Envs:          &admin.Envs{Values: []*core.KeyValuePair{{Key: "foo", Value: "bar"}}},
 				},
 			}
 
@@ -4801,6 +5048,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetRawOutputDataConfig())
 			assert.Nil(t, execConfig.GetLabels())
 			assert.Nil(t, execConfig.GetAnnotations())
+			assert.Equal(t, 1, len(execConfig.Envs.Values))
+			assert.Equal(t, "foo", execConfig.Envs.Values[0].Key)
+			assert.Equal(t, "bar", execConfig.Envs.Values[0].Value)
 		})
 		t.Run("launch plan with no interruptible override specified", func(t *testing.T) {
 			request := &admin.ExecutionCreateRequest{
