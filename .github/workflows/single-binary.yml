@@ -102,6 +102,7 @@ jobs:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
       - name: Login to GitHub Container Registry
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'workflow_dispatch' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
