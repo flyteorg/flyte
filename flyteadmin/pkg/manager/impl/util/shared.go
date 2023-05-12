@@ -325,5 +325,10 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 		workflowExecConfig.OverwriteCache = spec.GetOverwriteCache()
 	}
 
+	if (workflowExecConfig.GetEnvs() == nil || len(workflowExecConfig.GetEnvs().Values) == 0) &&
+		(spec.GetEnvs() != nil && len(spec.GetEnvs().Values) > 0) {
+		workflowExecConfig.Envs = spec.GetEnvs()
+	}
+
 	return workflowExecConfig
 }

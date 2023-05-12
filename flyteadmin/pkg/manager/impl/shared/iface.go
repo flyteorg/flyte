@@ -24,4 +24,6 @@ type WorkflowExecutionConfigInterface interface {
 	GetInterruptible() *wrappers.BoolValue
 	// GetOverwriteCache indicates a workflow should skip all its cached results and re-compute its output, overwriting any already stored data.
 	GetOverwriteCache() bool
+	// GetEnvs defines environment variables to be set for the execution.
+	GetEnvs() *admin.Envs
 }
