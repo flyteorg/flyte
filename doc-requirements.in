@@ -10,7 +10,7 @@ sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
 sphinxcontrib-video
-sphinxcontrib-yt
+sphinxcontrib-youtube
 sphinx-tabs
 sphinx-tags
 grpcio<1.49.0

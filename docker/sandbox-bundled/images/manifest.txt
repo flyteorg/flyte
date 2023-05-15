@@ -9,4 +9,4 @@ docker.io/rancher/mirrored-coredns-coredns:1.9.1
 docker.io/rancher/mirrored-library-busybox:1.34.1
 docker.io/rancher/mirrored-metrics-server:v0.5.2
 docker.io/rancher/mirrored-pause:3.6
-ghcr.io/flytekit/external-plugin-service:v1.6.0b4
+ghcr.io/flyteorg/external-plugin-service:1.6.0

@@ -30,7 +30,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v0.0.28"` |  |
+| configuration.co-pilot.image.tag | string | `"v0.0.30"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -94,8 +94,15 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | externalPluginService.image.pullPolicy | string | `"IfNotPresent"` |  |
-| externalPluginService.image.repository | string | `"ghcr.io/flytekit/external-plugin-service"` |  |
-| externalPluginService.image.tag | string | `"v1.6.0b4"` |  |
+| externalPluginService.image.repository | string | `"ghcr.io/flyteorg/external-plugin-service"` |  |
+| externalPluginService.image.tag | string | `"1.6.0"` |  |
+| flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
+| flyte-core-components.admin.disableScheduler | bool | `false` |  |
+| flyte-core-components.admin.disabled | bool | `false` |  |
+| flyte-core-components.admin.seedProjects[0] | string | `"flytesnacks"` |  |
+| flyte-core-components.dataCatalog.disabled | bool | `false` |  |
+| flyte-core-components.propeller.disableWebhook | bool | `false` |  |
+| flyte-core-components.propeller.disabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

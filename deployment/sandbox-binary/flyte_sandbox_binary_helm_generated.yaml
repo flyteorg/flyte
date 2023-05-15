@@ -69,6 +69,18 @@ data:
       secretName: flyte-flyte-binary-webhook-secret
       serviceName: flyte-flyte-binary-webhook
       servicePort: 443
+    flyte: 
+      admin:
+        disableClusterResourceManager: false
+        disableScheduler: false
+        disabled: false
+        seedProjects:
+        - flytesnacks
+      dataCatalog:
+        disabled: false
+      propeller:
+        disableWebhook: false
+        disabled: false
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -88,7 +100,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
       k8s-array:
         logs:
           config:
@@ -337,7 +349,7 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: bf11baa92badacceb665aced2cc8983547a60e5f0aaf1f9d0b2b9ba194ad1597
+        checksum/configuration: 0182c2f5a39166351d00aa36a5abfe84189fe96022adce5967562f168df1b2c7
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
@@ -398,7 +410,7 @@ spec:
             - name: state
               mountPath: /var/run/flyte
         - name: external-plugin-service
-          image: "ghcr.io/flytekit/external-plugin-service:v1.6.0b4"
+          image: "ghcr.io/flyteorg/external-plugin-service:1.6.0"
           imagePullPolicy: "IfNotPresent"
           ports:
           - name: plugin-grpc
