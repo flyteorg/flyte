@@ -403,6 +403,18 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 			RunAs: &core.Identity{},
 		}
 	}
+
+	if workflowExecConfig.GetSecurityContext().GetRunAs() == nil {
+		workflowExecConfig.SecurityContext.RunAs = &core.Identity{}
+	}
+
+	// In the case of reference_launch_plan subworkflow, the context comes from flytepropeller instead of the user side, so user auth is missing.
+	// We skip getUserIdentityFromContext but can still get ExecUserId because flytepropeller passes it in the execution request.
+	// https://github.com/flyteorg/flytepropeller/blob/03a6672960ed04e7687ba4f790fee9a02a4057fb/pkg/controller/nodes/subworkflow/launchplan/admin.go#L114
+	if workflowExecConfig.GetSecurityContext().GetRunAs().GetExecutionIdentity() == "" {
+		workflowExecConfig.SecurityContext.RunAs.ExecutionIdentity = auth.IdentityContextFromContext(ctx).ExecutionIdentity()
+	}
+
 	logger.Infof(ctx, "getting the workflow execution config from application configuration")
 	// Defaults to one from the application config
 	return &workflowExecConfig, nil
@@ -676,7 +688,8 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 	// Use security context from the executionConfigSecurityCtx if its set and non empty or else resolve from authRole
 	if executionConfigSecurityCtx != nil && executionConfigSecurityCtx.RunAs != nil &&
 		(len(executionConfigSecurityCtx.RunAs.K8SServiceAccount) > 0 ||
-			len(executionConfigSecurityCtx.RunAs.IamRole) > 0) {
+			len(executionConfigSecurityCtx.RunAs.IamRole) > 0 ||
+			len(executionConfigSecurityCtx.RunAs.ExecutionIdentity) > 0) {
 		return executionConfigSecurityCtx
 	}
 	logger.Warn(ctx, "Setting security context from auth Role")

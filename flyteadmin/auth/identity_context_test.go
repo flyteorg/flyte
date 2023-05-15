@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func TestGetClaims(t *testing.T) {
@@ -22,4 +23,13 @@ func TestGetClaims(t *testing.T) {
 	assert.EqualValues(t, claims, withClaimsCtx.Claims())
 
 	assert.NotEmpty(t, withClaimsCtx.UserInfo().AdditionalClaims)
+}
+
+func TestWithExecutionUserIdentifier(t *testing.T) {
+	idctx, err := NewIdentityContext("", "", "", time.Now(), sets.String{}, nil, nil)
+	assert.NoError(t, err)
+	newIDCtx := idctx.WithExecutionUserIdentifier("byhsu")
+	// make sure the original one is intact
+	assert.Equal(t, "", idctx.ExecutionIdentity())
+	assert.Equal(t, "byhsu", newIDCtx.ExecutionIdentity())
 }
