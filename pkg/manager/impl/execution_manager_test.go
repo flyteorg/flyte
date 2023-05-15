@@ -4540,7 +4540,11 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				Envs:           &admin.Envs{Values: requestEnvironmentVariables},
 			},
 		}
-		execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, nil)
+		identityContext, err := auth.NewIdentityContext("", "", "", time.Now(), sets.String{}, nil, nil)
+		assert.NoError(t, err)
+		identityContext = identityContext.WithExecutionUserIdentifier("yeee")
+		ctx := identityContext.WithContext(context.Background())
+		execConfig, err := executionManager.getExecutionConfig(ctx, request, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, requestMaxParallelism, execConfig.MaxParallelism)
 		assert.Equal(t, requestK8sServiceAccount, execConfig.SecurityContext.RunAs.K8SServiceAccount)
@@ -4549,6 +4553,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, requestOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, requestLabels, execConfig.GetLabels().Values)
 		assert.Equal(t, requestAnnotations, execConfig.GetAnnotations().Values)
+		assert.Equal(t, "yeee", execConfig.GetSecurityContext().GetRunAs().GetExecutionIdentity())
 		assert.Equal(t, requestEnvironmentVariables, execConfig.GetEnvs().Values)
 	})
 	t.Run("request with partial config", func(t *testing.T) {

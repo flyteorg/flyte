@@ -22,3 +22,12 @@ func BlanketAuthorization(ctx context.Context, req interface{}, _ *grpc.UnarySer
 
 	return handler(ctx, req)
 }
+
+// ExecutionUserIdentifierInterceptor injects identityContext.UserID() to identityContext.executionIdentity
+func ExecutionUserIdentifierInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (
+	resp interface{}, err error) {
+	identityContext := IdentityContextFromContext(ctx)
+	identityContext = identityContext.WithExecutionUserIdentifier(identityContext.UserID())
+	ctx = identityContext.WithContext(ctx)
+	return handler(ctx, req)
+}

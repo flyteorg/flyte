@@ -59,3 +59,21 @@ func TestBlanketAuthorization(t *testing.T) {
 		assert.False(t, handlerCalled)
 	})
 }
+
+func TestGetUserIdentityFromContext(t *testing.T) {
+	identityContext := IdentityContext{
+		userID: "yeee",
+	}
+
+	ctx := identityContext.WithContext(context.Background())
+
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		identityContext := IdentityContextFromContext(ctx)
+		euid := identityContext.ExecutionIdentity()
+		assert.Equal(t, euid, "yeee")
+		return nil, nil
+	}
+
+	_, err := ExecutionUserIdentifierInterceptor(ctx, nil, nil, handler)
+	assert.NoError(t, err)
+}
