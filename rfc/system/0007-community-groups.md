@@ -94,6 +94,7 @@ In the event that the SIG is unable to regularly establish consistent quorum or 
 
 Working Groups will be disbanded if either of the following is true:
 
+- Its original goal was accomplished and results were communicated
 - There is no longer a Lead (with a 6 week grace period)
 - None of the communication channels for the Working Group have been in use for the goals outlined at the founding of the Working Group (with a 3 month grace period)
 
