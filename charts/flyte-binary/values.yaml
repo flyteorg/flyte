@@ -92,7 +92,7 @@ configuration:
       clientSecret: ""
     # internal Configuration for internal authentication
     internal:
-      # clientId Client ID for internal authentication
+      # clientId Client ID for internal authentication - set to flytepropeller or external auth server
       clientId: flytepropeller
       # clientSecret Client secret for internal authentication
       clientSecret: ""
@@ -107,8 +107,8 @@ configuration:
       # scopes Scopes for Flyte client authentication
       scopes:
         - all
-      # audience Audience for Flyte client authentication
-      audience: ""
+      # Uncomment next line if needed - set this field if your external Auth server (ex. Auth0) requires an audience parameter
+      # audience: ""
     # authorizedUris Set of URIs that clients are allowed to visit the service on
     authorizedUris: []
   # co-pilot Configuration for Flyte CoPilot
