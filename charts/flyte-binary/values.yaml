@@ -91,6 +91,8 @@ configuration:
       # clientSecret Flyte application client secret
       clientSecret: ""
     # internal Configuration for internal authentication
+    # The settings for internal still need to be defined if you wish to use an external auth server
+    # These credentials are used during communication beteween the FlyteAdmin and Propeller microservices
     internal:
       # clientId Client ID for internal authentication - set to flytepropeller or external auth server
       clientId: flytepropeller
@@ -98,6 +100,8 @@ configuration:
       clientSecret: ""
       # clientSecretHash Bcrypt hash of clientSecret
       clientSecretHash: ""
+      # Uncomment next line if needed - set this field if your external Auth server (ex. Auth0) requires an audience parameter
+      # audience: ""
     # flyteClient Configuration for Flyte client authentication
     flyteClient:
       # clientId Client ID for Flyte client authentication
@@ -107,8 +111,8 @@ configuration:
       # scopes Scopes for Flyte client authentication
       scopes:
         - all
-      # Uncomment next line if needed - set this field if your external Auth server (ex. Auth0) requires an audience parameter
-      # audience: ""
+      # audience Audience for Flyte client authentication
+      audience: ""
     # authorizedUris Set of URIs that clients are allowed to visit the service on
     authorizedUris: []
   # co-pilot Configuration for Flyte CoPilot
