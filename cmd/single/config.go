@@ -24,6 +24,7 @@ type Admin struct {
 	Disabled                      bool `json:"disabled" pflag:",Disables flyteadmin in the single binary mode"`
 	DisableScheduler              bool `json:"disableScheduler" pflag:",Disables Native scheduler in the single binary mode"`
 	DisableClusterResourceManager bool `json:"disableClusterResourceManager" pflag:",Disables Cluster resource manager"`
+	SeedProjects                  []string `json:"seedProjects" pflag:",flyte projects to create by default."`
 }
 
 type DataCatalog struct {

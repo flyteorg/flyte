@@ -65,7 +65,7 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	}
 
 	logger.Infof(ctx, "Seeding default projects...")
-	if err := adminServer.SeedProjects(ctx, []string{"flytesnacks"}); err != nil {
+	if err := adminServer.SeedProjects(ctx, cfg.SeedProjects); err != nil {
 		return err
 	}
 
