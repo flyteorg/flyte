@@ -6703,7 +6703,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -6719,7 +6719,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -6732,7 +6732,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -6744,7 +6744,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -6767,7 +6767,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -6858,7 +6858,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.92"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -6908,7 +6908,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.6.2"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.8.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -7052,7 +7052,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.92"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.95"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -7067,7 +7067,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.92"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.1.95"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -7144,7 +7144,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.88"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -7191,7 +7191,7 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.88
+        app.kubernetes.io/version: v1.1.89
       annotations:
         configChecksum: "77a1becb51025621fbbeb95c7bca83b0efbb96baa355f13333b94d7de0e7071"
     spec:
@@ -7202,7 +7202,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.88"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -7225,7 +7225,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.88"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
