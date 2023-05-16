@@ -58,6 +58,13 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		}
 	}
 
+	EmailKey := "email"
+	// In some cases, "user_info" field doesn't exist in the raw claim,
+	// but we can get email from "email" field
+	if emailClaim, found := claimsRaw[EmailKey]; found {
+		email := emailClaim.(string)
+		userInfo.Email = email
+	}
 	// If this is a user-only access token with no scopes defined then add `all` scope by default because it's equivalent
 	// to having a user's login cookie or an ID Token as means of accessing the service.
 	if len(clientID) == 0 && scopes.Len() == 0 {

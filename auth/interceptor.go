@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 
+	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,6 +18,7 @@ func BlanketAuthorization(ctx context.Context, req interface{}, _ *grpc.UnarySer
 	}
 
 	if !identityContext.Scopes().Has(ScopeAll) {
+		logger.Debugf(ctx, "authenticated user doesn't have required scope")
 		return nil, status.Errorf(codes.Unauthenticated, "authenticated user doesn't have required scope")
 	}
 

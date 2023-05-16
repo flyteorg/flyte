@@ -23,6 +23,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// External auth server implementation
+
 // ResourceServer authorizes access requests issued by an external Authorization Server.
 type ResourceServer struct {
 	signatureVerifier oidc.KeySet
@@ -68,7 +70,9 @@ func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
 	return fmt.Errorf("expected Content-Type = application/json, got %q: %v", ct, err)
 }
 
-func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, customMetadataURL url.URL) (keySet oidc.KeySet, err error) {
+func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, cfg authConfig.ExternalAuthorizationServer) (keySet oidc.KeySet, err error) {
+	customMetadataURL := cfg.MetadataEndpointURL.URL
+
 	issuerBaseURL.Path = strings.TrimSuffix(issuerBaseURL.Path, "/") + "/"
 	var wellKnown *url.URL
 	if len(customMetadataURL.String()) > 0 {
@@ -77,12 +81,22 @@ func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, customMetadata
 		wellKnown = issuerBaseURL.ResolveReference(oauth2MetadataEndpoint)
 	}
 
+	httpClient := &http.Client{}
+
+	if len(cfg.HTTPProxyURL.String()) > 0 {
+		// create a transport that uses the proxy
+		transport := &http.Transport{
+			Proxy: http.ProxyURL(&cfg.HTTPProxyURL.URL),
+		}
+		httpClient.Transport = transport
+	}
+
 	req, err := http.NewRequest(http.MethodGet, wellKnown.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := doRequest(ctx, req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +118,7 @@ func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, customMetadata
 		return nil, fmt.Errorf("failed to decode provider discovery object: %v", err)
 	}
 
-	return oidc.NewRemoteKeySet(ctx, p.JwksUri), nil
+	return oidc.NewRemoteKeySet(oidc.ClientContext(ctx, httpClient), p.JwksUri), nil
 }
 
 // NewOAuth2ResourceServer initializes a new OAuth2ResourceServer.
@@ -114,7 +128,7 @@ func NewOAuth2ResourceServer(ctx context.Context, cfg authConfig.ExternalAuthori
 		u = fallbackBaseURL
 	}
 
-	verifier, err := getJwksForIssuer(ctx, u.URL, cfg.MetadataEndpointURL.URL)
+	verifier, err := getJwksForIssuer(ctx, u.URL, cfg)
 	if err != nil {
 		return ResourceServer{}, err
 	}
