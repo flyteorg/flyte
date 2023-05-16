@@ -15,6 +15,7 @@ import (
 
 // RegisterHandlers registers http endpoints for handling OAuth2 flow (/authorize,
 func RegisterHandlers(handler interfaces.HandlerRegisterer, authCtx interfaces.AuthenticationContext) {
+	// If using flyte self auth server, OAuth2Provider != nil
 	if authCtx.OAuth2Provider() != nil {
 		// Set up oauthserver endpoints. You could also use gorilla/mux or any other router.
 		handler.HandleFunc(authorizeRelativeURL.String(), getAuthEndpoint(authCtx))

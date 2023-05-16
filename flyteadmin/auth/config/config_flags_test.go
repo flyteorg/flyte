@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_httpProxyURL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.HTTPProxyURL.String()
+
+			cmdFlags.Set("httpProxyURL", testValue)
+			if vString, err := cmdFlags.GetString("httpProxyURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.HTTPProxyURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_userAuth.redirectUrl", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -443,6 +457,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("appAuth.externalAuthServer.metadataUrl", testValue)
 			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.metadataUrl"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ExternalAuthServer.MetadataEndpointURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_appAuth.externalAuthServer.httpProxyURL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.AppAuth.ExternalAuthServer.HTTPProxyURL.String()
+
+			cmdFlags.Set("appAuth.externalAuthServer.httpProxyURL", testValue)
+			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.httpProxyURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ExternalAuthServer.HTTPProxyURL)
 
 			} else {
 				assert.FailNow(t, err.Error())

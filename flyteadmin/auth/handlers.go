@@ -309,6 +309,7 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			return nil
 		}
 
+		// IDtoken is injected into grpc authorization metadata
 		meta := metadata.MD{
 			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", IDTokenScheme, idToken)},
 		}
@@ -396,6 +397,7 @@ func QueryUserInfo(ctx context.Context, identityContext interfaces.IdentityConte
 	return QueryUserInfoUsingAccessToken(ctx, request, authCtx, accessToken)
 }
 
+// Extract User info from access token for HTTP request
 func QueryUserInfoUsingAccessToken(ctx context.Context, originalRequest *http.Request, authCtx interfaces.AuthenticationContext, accessToken string) (
 	*service.UserInfoResponse, error) {
 

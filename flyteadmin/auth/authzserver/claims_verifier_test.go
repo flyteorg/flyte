@@ -22,6 +22,7 @@ func Test_verifyClaims(t *testing.T) {
 			"sub":       "123",
 			"client_id": "my-client",
 			"scp":       []interface{}{"all", "offline"},
+			"email":     "byhsu@linkedin.com",
 		})
 
 		assert.NoError(t, err)
@@ -29,6 +30,7 @@ func Test_verifyClaims(t *testing.T) {
 		assert.Equal(t, "my-client", identityCtx.AppID())
 		assert.Equal(t, "123", identityCtx.UserID())
 		assert.Equal(t, "https://myserver", identityCtx.Audience())
+		assert.Equal(t, "byhsu@linkedin.com", identityCtx.UserInfo().Email)
 	})
 
 	t.Run("Multiple audience", func(t *testing.T) {
