@@ -56,7 +56,7 @@ Designed to facilitate discussions/work regarding topics that are short-lived or
   - [ ] Non-goals or Out of scope items
   - [ ] Roles
     - [ ] SIG Chair(s)
-        - Should be at least "Community members" as defined in GOVERNANCE
+        - Should be at least "Community members" as defined in [GOVERNANCE](https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership)
         - Should define how priorities and commitments are managed
         - Leads taking an extended leave of 1 or more months SHOULD coordinate with other leads to ensure the role is adequately staffed during their leave
         - Leads MAY decide to step down at anytime and propose a replacement.
@@ -77,8 +77,8 @@ Designed to facilitate discussions/work regarding topics that are short-lived or
     - [ ] Repo ownership (if any)
 - [ ] Roles
     - [ ] Lead(s)
-        - [ ] Should be at least “Community members” as defined in [GOVERNANCE](https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership)
-        - [ ] Must coordinate projects updates to the wider community.
+        - [ ] Should be at least “Community member” as defined in [GOVERNANCE](https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership)
+        - [ ] Must coordinate project updates to the wider community.
 - [ ] Submit a PR to [/community](https://github.com/flyteorg/community) with the charter and request reviews from [Technical Steering Committee](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md) Members
 -  A new WG is approved by a supermajority of TSC active members
 
