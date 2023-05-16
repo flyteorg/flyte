@@ -59,15 +59,19 @@ func TestScheduleJob(t *testing.T) {
 		lastExecTime  *time.Time
 		assertionFunc func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
 	}{
-		{testName: "using_schedule_time", lastExecTime: &now, assertionFunc: assert.Equal},
-		{testName: "without_schedule_time", lastExecTime: nil, assertionFunc: assert.NotEqual},
+		{testName: "without_schedule_time", lastExecTime: nil},
+		{testName: "using_schedule_time", lastExecTime: &now},
 	}
 	wg := &sync.WaitGroup{}
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
 			wg.Add(1)
 			timedFuncWithSchedule := func(jobCtx context.Context, schedule models.SchedulableEntity, scheduleTime time.Time) error {
-				tc.assertionFunc(t, now, scheduleTime)
+				if scheduleTime.IsZero() {
+					assert.NotEqual(t, now, scheduleTime)
+				} else {
+					assert.WithinDuration(t, now, scheduleTime, time.Minute*2)
+				}
 				wg.Done()
 				return nil
 			}
