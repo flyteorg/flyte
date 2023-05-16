@@ -17,5 +17,6 @@ import (
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/athena"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/bigquery"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/databricks"
+	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/grpc"
 	_ "github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/snowflake"
 )
