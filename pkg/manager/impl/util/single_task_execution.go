@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -17,7 +16,6 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 )
 
@@ -26,7 +24,6 @@ const maxNodeIDLength = 63
 var defaultRetryStrategy = core.RetryStrategy{
 	Retries: 3,
 }
-var defaultTimeout = ptypes.DurationProto(24 * time.Hour)
 
 const systemNamePrefix = ".flytegen.%s"
 
@@ -102,7 +99,6 @@ func CreateOrGetWorkflowModel(
 						Metadata: &core.NodeMetadata{
 							Name:    generateNodeNameFromTask(taskIdentifier.Name),
 							Retries: &defaultRetryStrategy,
-							Timeout: defaultTimeout,
 						},
 						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
 						Target: &core.Node_TaskNode{
