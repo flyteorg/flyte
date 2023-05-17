@@ -72,8 +72,8 @@ func SetupFlyteDir() error {
 	return nil
 }
 
-// PrintDemoMessage will print sandbox success message
-func PrintDemoMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
+// PrintDemoStartMessage will print demo start success message
+func PrintDemoStartMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
 	kubeconfig := strings.Join([]string{
 		"$KUBECONFIG",
 		kubeconfigLocation,
@@ -84,10 +84,9 @@ func PrintDemoMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bo
 		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessagePending, flyteConsolePort)
 	} else {
 		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessage, flyteConsolePort)
-
 	}
 	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, successMsg, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
-	fmt.Printf("%v Run the following command to export sandbox environment variables for accessing flytectl\n", emoji.Sparkle)
+	fmt.Printf("%v Run the following command to export demo environment variables for accessing flytectl\n", emoji.Sparkle)
 	fmt.Printf("	export FLYTECTL_CONFIG=%v \n", configutil.FlytectlConfig)
 	if dryRun {
 		fmt.Printf("%v Run the following command to export kubeconfig variables for accessing flyte pods locally\n", emoji.Sparkle)
@@ -97,8 +96,8 @@ func PrintDemoMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bo
 	fmt.Printf("%s The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console\n", emoji.OpenFileFolder)
 }
 
-// PrintSandboxMessage will print sandbox success message
-func PrintSandboxMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
+// PrintSandboxStartMessage will print sandbox start success message
+func PrintSandboxStartMessage(flyteConsolePort int, kubeconfigLocation string, dryRun bool) {
 	kubeconfig := strings.Join([]string{
 		"$KUBECONFIG",
 		kubeconfigLocation,
@@ -109,7 +108,6 @@ func PrintSandboxMessage(flyteConsolePort int, kubeconfigLocation string, dryRun
 		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessagePending, flyteConsolePort)
 	} else {
 		successMsg = fmt.Sprintf("%v http://localhost:%v/console", ProgressSuccessMessage, flyteConsolePort)
-
 	}
 	fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, successMsg, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
 	fmt.Printf("%v Run the following command to export sandbox environment variables for accessing flytectl\n", emoji.Sparkle)
@@ -118,6 +116,12 @@ func PrintSandboxMessage(flyteConsolePort int, kubeconfigLocation string, dryRun
 		fmt.Printf("%v Run the following command to export kubeconfig variables for accessing flyte pods locally\n", emoji.Sparkle)
 		fmt.Printf("	export KUBECONFIG=%v \n", kubeconfig)
 	}
+}
+
+// PrintSandboxTeardownMessage will print sandbox teardown success message
+func PrintSandboxTeardownMessage(flyteConsolePort int, kubeconfigLocation string) {
+	fmt.Printf("%v Run the following command to unset sandbox environment variables for accessing flytectl\n", emoji.Sparkle)
+	fmt.Printf("	unset FLYTECTL_CONFIG \n")
 }
 
 // SendRequest will create request and return the response

@@ -27,9 +27,15 @@ func TestSetupFlyteDir(t *testing.T) {
 	assert.Nil(t, SetupFlyteDir())
 }
 
-func TestPrintSandboxMessage(t *testing.T) {
+func TestPrintSandboxStartMessage(t *testing.T) {
 	t.Run("Print Sandbox Message", func(t *testing.T) {
-		PrintSandboxMessage(SandBoxConsolePort, docker.SandboxKubeconfig, false)
+		PrintSandboxStartMessage(SandBoxConsolePort, docker.SandboxKubeconfig, false)
+	})
+}
+
+func TestPrintSandboxTeardownMessage(t *testing.T) {
+	t.Run("Print Sandbox Message", func(t *testing.T) {
+		PrintSandboxTeardownMessage(SandBoxConsolePort, docker.SandboxKubeconfig)
 	})
 }
 

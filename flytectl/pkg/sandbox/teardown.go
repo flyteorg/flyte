@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/configutil"
 	"github.com/flyteorg/flytectl/pkg/docker"
 	"github.com/flyteorg/flytectl/pkg/k8s"
+	"github.com/flyteorg/flytectl/pkg/util"
 )
 
 func Teardown(ctx context.Context, cli docker.Docker, teardownFlags *sandboxCmdConfig.TeardownFlags) error {
@@ -38,6 +39,7 @@ func Teardown(ctx context.Context, cli docker.Docker, teardownFlags *sandboxCmdC
 	}
 
 	fmt.Printf("%v %v Sandbox cluster is removed successfully.\n", emoji.Broom, emoji.Broom)
+	util.PrintSandboxTeardownMessage(util.SandBoxConsolePort, docker.SandboxKubeconfig)
 	return nil
 }
 

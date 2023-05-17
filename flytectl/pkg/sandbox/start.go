@@ -162,7 +162,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 				return nil, err
 			}
 			fmt.Printf("Existing details of your sandbox")
-			util.PrintSandboxMessage(consolePort, docker.Kubeconfig, sandboxConfig.DryRun)
+			util.PrintSandboxStartMessage(consolePort, docker.Kubeconfig, sandboxConfig.DryRun)
 			return nil, nil
 		}
 	}
@@ -429,7 +429,7 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 	if err != nil {
 		return err
 	}
-	util.PrintDemoMessage(util.DemoConsolePort, docker.Kubeconfig, sandboxConfig.DryRun)
+	util.PrintDemoStartMessage(util.DemoConsolePort, docker.Kubeconfig, sandboxConfig.DryRun)
 	return nil
 }
 
@@ -444,6 +444,6 @@ func StartSandboxCluster(ctx context.Context, args []string, sandboxConfig *sand
 	if err != nil {
 		return err
 	}
-	util.PrintSandboxMessage(util.SandBoxConsolePort, docker.SandboxKubeconfig, sandboxConfig.DryRun)
+	util.PrintSandboxStartMessage(util.SandBoxConsolePort, docker.SandboxKubeconfig, sandboxConfig.DryRun)
 	return nil
 }
