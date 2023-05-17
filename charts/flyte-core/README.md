@@ -94,7 +94,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
 | configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","external-plugin-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
-| configmap.k8s | object | `{"external-plugin-service":{"defaultGrpcEndpoint":"external-plugin-service.flyte.svc.cluster.local:8000","supportedTaskTypes":["bigquery_query_job_task"]},"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
+| configmap.k8s | object | `{"plugins":{"external-plugin-service":{"defaultGrpcEndpoint":"external-plugin-service.flyte.svc.cluster.local:8000","supportedTaskTypes":["bigquery_query_job_task"]},"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
@@ -214,7 +214,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.1.89"` |  |
+| flytepropeller.image.tag | string | `"v1.1.90"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |

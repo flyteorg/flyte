@@ -655,11 +655,11 @@ data:
         - k8s-array
         - external-plugin-service
   k8s.yaml: | 
-    external-plugin-service:
-      defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
-      supportedTaskTypes:
-      - bigquery_query_job_task
     plugins:
+      external-plugin-service:
+        defaultGrpcEndpoint: external-plugin-service.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+        - bigquery_query_job_task
       k8s:
         default-cpus: 100m
         default-env-vars:
@@ -7299,7 +7299,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e1c7a250e192af81230f1a387d1b0d7126f7ec83fc135394482a6a9b2b1738"
+        configChecksum: "77ffac20998e702be9f023231d9e73db278079664e0c7375298b94c34bb7c0c"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7324,7 +7324,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.90"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -7371,9 +7371,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.89
+        app.kubernetes.io/version: v1.1.90
       annotations:
-        configChecksum: "2e1c7a250e192af81230f1a387d1b0d7126f7ec83fc135394482a6a9b2b1738"
+        configChecksum: "77ffac20998e702be9f023231d9e73db278079664e0c7375298b94c34bb7c0c"
     spec:
       securityContext:
         fsGroup: 65534
@@ -7382,7 +7382,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.90"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -7405,7 +7405,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.89"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.90"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

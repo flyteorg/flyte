@@ -271,7 +271,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.1.89 # FLYTEPROPELLER_TAG
+    tag: v1.1.90 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -731,10 +731,10 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-    external-plugin-service:
-      defaultGrpcEndpoint: external-plugin-service.flyte.svc.cluster.local:8000
-      supportedTaskTypes:
-        - bigquery_query_job_task
+      external-plugin-service:
+        defaultGrpcEndpoint: external-plugin-service.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+          - bigquery_query_job_task
 
   remoteData:
     remoteData:

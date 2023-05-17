@@ -178,7 +178,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.1.89 # FLYTEPROPELLER_TAG
+      tag: v1.1.90 # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -607,10 +607,10 @@ flyte:
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
-      external-plugin-service:
-        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-          - bigquery_query_job_task
+        external-plugin-service:
+          defaultGrpcEndpoint: external-plugin-service.flyte.svc.cluster.local:8000
+          supportedTaskTypes:
+            - bigquery_query_job_task
 
     # -- Logger configuration
     logger:
