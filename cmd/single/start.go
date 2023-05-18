@@ -2,6 +2,7 @@ package single
 
 import (
 	"context"
+
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -65,7 +66,12 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	}
 
 	logger.Infof(ctx, "Seeding default projects...")
-	if err := adminServer.SeedProjects(ctx, cfg.SeedProjects); err != nil {
+	projects := []string{"flytesnacks"}
+	if len(cfg.SeedProjects) != 0 {
+		projects = cfg.SeedProjects
+	}
+	logger.Infof(ctx, "Seeding default projects...",projects)
+	if err := adminServer.SeedProjects(ctx, projects); err != nil {
 		return err
 	}
 
