@@ -4430,7 +4430,6 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 }
 
 func TestGetExecutionConfigOverrides(t *testing.T) {
-
 	requestLabels := map[string]string{"requestLabelKey": "requestLabelValue"}
 	requestAnnotations := map[string]string{"requestAnnotationKey": "requestAnnotationValue"}
 	requestOutputLocationPrefix := "requestOutputLocationPrefix"
@@ -4934,6 +4933,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetAnnotations())
 		assert.Nil(t, execConfig.GetEnvs())
 	})
+
 	t.Run("application configuration", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
@@ -5200,6 +5200,19 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetRawOutputDataConfig())
 			assert.Nil(t, execConfig.GetLabels())
 			assert.Nil(t, execConfig.GetAnnotations())
+		})
+
+		t.Run("test pick up security context from admin system config", func(t *testing.T) {
+			executionManager.config.ApplicationConfiguration().GetTopLevelConfig().K8SServiceAccount = "flyte-test"
+			request := &admin.ExecutionCreateRequest{
+				Project: workflowIdentifier.Project,
+				Domain:  workflowIdentifier.Domain,
+				Spec:    &admin.ExecutionSpec{},
+			}
+			execConfig, err := executionManager.getExecutionConfig(context.TODO(), request, nil)
+			assert.NoError(t, err)
+			assert.Equal(t, "flyte-test", execConfig.SecurityContext.RunAs.K8SServiceAccount)
+			executionManager.config.ApplicationConfiguration().GetTopLevelConfig().K8SServiceAccount = defaultK8sServiceAccount
 		})
 	})
 }
