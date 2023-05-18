@@ -7538,6 +7538,7 @@ public final class Dataproxy {
      * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
      * </pre>
      *
      * <code>string flyte_url = 1;</code>
@@ -7549,6 +7550,7 @@ public final class Dataproxy {
      * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
      * </pre>
      *
      * <code>string flyte_url = 1;</code>
@@ -7646,6 +7648,7 @@ public final class Dataproxy {
      * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
      * </pre>
      *
      * <code>string flyte_url = 1;</code>
@@ -7668,6 +7671,7 @@ public final class Dataproxy {
      * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
      * </pre>
      *
      * <code>string flyte_url = 1;</code>
@@ -7999,6 +8003,7 @@ public final class Dataproxy {
        * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
        * </pre>
        *
        * <code>string flyte_url = 1;</code>
@@ -8021,6 +8026,7 @@ public final class Dataproxy {
        * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
        * </pre>
        *
        * <code>string flyte_url = 1;</code>
@@ -8044,6 +8050,7 @@ public final class Dataproxy {
        * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
        * </pre>
        *
        * <code>string flyte_url = 1;</code>
@@ -8064,6 +8071,7 @@ public final class Dataproxy {
        * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
        * </pre>
        *
        * <code>string flyte_url = 1;</code>
@@ -8080,6 +8088,7 @@ public final class Dataproxy {
        * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
        * </pre>
        *
        * <code>string flyte_url = 1;</code>
@@ -8202,6 +8211,34 @@ public final class Dataproxy {
      */
     flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder();
 
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    boolean hasLiteral();
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    flyteidl.core.Literals.Literal getLiteral();
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder();
+
     public flyteidl.service.Dataproxy.GetDataResponse.DataCase getDataCase();
   }
   /**
@@ -8271,6 +8308,20 @@ public final class Dataproxy {
               dataCase_ = 2;
               break;
             }
+            case 26: {
+              flyteidl.core.Literals.Literal.Builder subBuilder = null;
+              if (dataCase_ == 3) {
+                subBuilder = ((flyteidl.core.Literals.Literal) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.core.Literals.Literal.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.Literal) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 3;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -8309,6 +8360,7 @@ public final class Dataproxy {
         implements com.google.protobuf.Internal.EnumLite {
       LITERAL_MAP(1),
       PRE_SIGNED_URLS(2),
+      LITERAL(3),
       DATA_NOT_SET(0);
       private final int value;
       private DataCase(int value) {
@@ -8326,6 +8378,7 @@ public final class Dataproxy {
         switch (value) {
           case 1: return LITERAL_MAP;
           case 2: return PRE_SIGNED_URLS;
+          case 3: return LITERAL;
           case 0: return DATA_NOT_SET;
           default: return null;
         }
@@ -8417,6 +8470,47 @@ public final class Dataproxy {
       return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
     }
 
+    public static final int LITERAL_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public boolean hasLiteral() {
+      return dataCase_ == 3;
+    }
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public flyteidl.core.Literals.Literal getLiteral() {
+      if (dataCase_ == 3) {
+         return (flyteidl.core.Literals.Literal) data_;
+      }
+      return flyteidl.core.Literals.Literal.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder() {
+      if (dataCase_ == 3) {
+         return (flyteidl.core.Literals.Literal) data_;
+      }
+      return flyteidl.core.Literals.Literal.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8437,6 +8531,9 @@ public final class Dataproxy {
       if (dataCase_ == 2) {
         output.writeMessage(2, (flyteidl.service.Dataproxy.PreSignedURLs) data_);
       }
+      if (dataCase_ == 3) {
+        output.writeMessage(3, (flyteidl.core.Literals.Literal) data_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -8453,6 +8550,10 @@ public final class Dataproxy {
       if (dataCase_ == 2) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, (flyteidl.service.Dataproxy.PreSignedURLs) data_);
+      }
+      if (dataCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, (flyteidl.core.Literals.Literal) data_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8479,6 +8580,10 @@ public final class Dataproxy {
           if (!getPreSignedUrls()
               .equals(other.getPreSignedUrls())) return false;
           break;
+        case 3:
+          if (!getLiteral()
+              .equals(other.getLiteral())) return false;
+          break;
         case 0:
         default:
       }
@@ -8501,6 +8606,10 @@ public final class Dataproxy {
         case 2:
           hash = (37 * hash) + PRE_SIGNED_URLS_FIELD_NUMBER;
           hash = (53 * hash) + getPreSignedUrls().hashCode();
+          break;
+        case 3:
+          hash = (37 * hash) + LITERAL_FIELD_NUMBER;
+          hash = (53 * hash) + getLiteral().hashCode();
           break;
         case 0:
         default:
@@ -8680,6 +8789,13 @@ public final class Dataproxy {
             result.data_ = preSignedUrlsBuilder_.build();
           }
         }
+        if (dataCase_ == 3) {
+          if (literalBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = literalBuilder_.build();
+          }
+        }
         result.dataCase_ = dataCase_;
         onBuilt();
         return result;
@@ -8736,6 +8852,10 @@ public final class Dataproxy {
           }
           case PRE_SIGNED_URLS: {
             mergePreSignedUrls(other.getPreSignedUrls());
+            break;
+          }
+          case LITERAL: {
+            mergeLiteral(other.getLiteral());
             break;
           }
           case DATA_NOT_SET: {
@@ -9129,6 +9249,187 @@ public final class Dataproxy {
         onChanged();;
         return preSignedUrlsBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder> literalBuilder_;
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public boolean hasLiteral() {
+        return dataCase_ == 3;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.Literal getLiteral() {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3) {
+            return (flyteidl.core.Literals.Literal) data_;
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        } else {
+          if (dataCase_ == 3) {
+            return literalBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder setLiteral(flyteidl.core.Literals.Literal value) {
+        if (literalBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          literalBuilder_.setMessage(value);
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder setLiteral(
+          flyteidl.core.Literals.Literal.Builder builderForValue) {
+        if (literalBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          literalBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder mergeLiteral(flyteidl.core.Literals.Literal value) {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3 &&
+              data_ != flyteidl.core.Literals.Literal.getDefaultInstance()) {
+            data_ = flyteidl.core.Literals.Literal.newBuilder((flyteidl.core.Literals.Literal) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 3) {
+            literalBuilder_.mergeFrom(value);
+          }
+          literalBuilder_.setMessage(value);
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder clearLiteral() {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 3) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          literalBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.Literal.Builder getLiteralBuilder() {
+        return getLiteralFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder() {
+        if ((dataCase_ == 3) && (literalBuilder_ != null)) {
+          return literalBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 3) {
+            return (flyteidl.core.Literals.Literal) data_;
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder> 
+          getLiteralFieldBuilder() {
+        if (literalBuilder_ == null) {
+          if (!(dataCase_ == 3)) {
+            data_ = flyteidl.core.Literals.Literal.getDefaultInstance();
+          }
+          literalBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder>(
+                  (flyteidl.core.Literals.Literal) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 3;
+        onChanged();;
+        return literalBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -9265,29 +9566,30 @@ public final class Dataproxy {
       "eidl.service.PreSignedURLs\"S\n\rPreSignedU" +
       "RLs\022\022\n\nsigned_url\030\001 \003(\t\022.\n\nexpires_at\030\002 " +
       "\001(\0132\032.google.protobuf.Timestamp\"#\n\016GetDa" +
-      "taRequest\022\021\n\tflyte_url\030\001 \001(\t\"\207\001\n\017GetData" +
+      "taRequest\022\021\n\tflyte_url\030\001 \001(\t\"\262\001\n\017GetData" +
       "Response\0220\n\013literal_map\030\001 \001(\0132\031.flyteidl" +
       ".core.LiteralMapH\000\022:\n\017pre_signed_urls\030\002 " +
-      "\001(\0132\037.flyteidl.service.PreSignedURLsH\000B\006" +
-      "\n\004data*C\n\014ArtifactType\022\033\n\027ARTIFACT_TYPE_" +
-      "UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020" +
-      "DataProxyService\022\240\001\n\024CreateUploadLocatio" +
-      "n\022-.flyteidl.service.CreateUploadLocatio" +
-      "nRequest\032..flyteidl.service.CreateUpload" +
-      "LocationResponse\")\202\323\344\223\002#\"\036/api/v1/datapr" +
-      "oxy/artifact_urn:\001*\022\246\001\n\026CreateDownloadLo" +
-      "cation\022/.flyteidl.service.CreateDownload" +
-      "LocationRequest\0320.flyteidl.service.Creat" +
-      "eDownloadLocationResponse\")\210\002\001\202\323\344\223\002 \022\036/a" +
-      "pi/v1/dataproxy/artifact_urn\022\233\001\n\022CreateD" +
-      "ownloadLink\022+.flyteidl.service.CreateDow" +
-      "nloadLinkRequest\032,.flyteidl.service.Crea" +
-      "teDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api/v1/" +
-      "dataproxy/artifact_link:\001*\022d\n\007GetData\022 ." +
-      "flyteidl.service.GetDataRequest\032!.flytei" +
-      "dl.service.GetDataResponse\"\024\202\323\344\223\002\016\022\014/api" +
-      "/v1/dataB9Z7github.com/flyteorg/flyteidl" +
-      "/gen/pb-go/flyteidl/serviceb\006proto3"
+      "\001(\0132\037.flyteidl.service.PreSignedURLsH\000\022)" +
+      "\n\007literal\030\003 \001(\0132\026.flyteidl.core.LiteralH" +
+      "\000B\006\n\004data*C\n\014ArtifactType\022\033\n\027ARTIFACT_TY" +
+      "PE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012\342" +
+      "\004\n\020DataProxyService\022\240\001\n\024CreateUploadLoca" +
+      "tion\022-.flyteidl.service.CreateUploadLoca" +
+      "tionRequest\032..flyteidl.service.CreateUpl" +
+      "oadLocationResponse\")\202\323\344\223\002#\"\036/api/v1/dat" +
+      "aproxy/artifact_urn:\001*\022\246\001\n\026CreateDownloa" +
+      "dLocation\022/.flyteidl.service.CreateDownl" +
+      "oadLocationRequest\0320.flyteidl.service.Cr" +
+      "eateDownloadLocationResponse\")\210\002\001\202\323\344\223\002 \022" +
+      "\036/api/v1/dataproxy/artifact_urn\022\233\001\n\022Crea" +
+      "teDownloadLink\022+.flyteidl.service.Create" +
+      "DownloadLinkRequest\032,.flyteidl.service.C" +
+      "reateDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api/" +
+      "v1/dataproxy/artifact_link:\001*\022d\n\007GetData" +
+      "\022 .flyteidl.service.GetDataRequest\032!.fly" +
+      "teidl.service.GetDataResponse\"\024\202\323\344\223\002\016\022\014/" +
+      "api/v1/dataB9Z7github.com/flyteorg/flyte" +
+      "idl/gen/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9359,7 +9661,7 @@ public final class Dataproxy {
     internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_GetDataResponse_descriptor,
-        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Data", });
+        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "Data", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
