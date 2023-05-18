@@ -876,6 +876,7 @@ func TestPluginManager_CustomKubeClient(t *testing.T) {
 	mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
 	fakeClient := fake.NewClientBuilder().Build()
 	newFakeClient := &pluginsCoreMock.KubeClient{}
+	newFakeClient.On("GetCache").Return(&mocks.FakeInformers{})
 	pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 		ID:              "x",
 		ResourceToWatch: &v1.Pod{},
@@ -978,16 +979,14 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 func TestResourceManagerConstruction(t *testing.T) {
 	ctx := context.Background()
-	sCtx := &pluginsCoreMock.SetupContext{}
 	fakeKubeClient := mocks.NewFakeKubeClient()
-	sCtx.On("KubeClient").Return(fakeKubeClient)
 
 	scope := promutils.NewScope("test:plugin_manager")
 	index := NewResourceMonitorIndex()
 	gvk, err := getPluginGvk(&v1.Pod{})
 	assert.NoError(t, err)
 	assert.Equal(t, gvk.Kind, "Pod")
-	si, err := getPluginSharedInformer(ctx, sCtx, &v1.Pod{})
+	si, err := getPluginSharedInformer(ctx, fakeKubeClient, &v1.Pod{})
 	assert.NotNil(t, si)
 	assert.NoError(t, err)
 	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, si, gvk)
