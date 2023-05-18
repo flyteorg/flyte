@@ -543,7 +543,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return false
 	}
 
-	if err := src.InjectCache(iCtx.KubeClient().GetCache()); err != nil {
+	if err := src.InjectCache(kubeClient.GetCache()); err != nil {
 		logger.Errorf(ctx, "failed to set informers for ObjectType %s", src.String())
 		return nil, err
 	}
@@ -624,7 +624,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	if err != nil {
 		return nil, err
 	}
-	sharedInformer, err := getPluginSharedInformer(ctx, iCtx, entry.ResourceToWatch)
+	sharedInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
 	if err != nil {
 		return nil, err
 	}
@@ -650,8 +650,8 @@ func getPluginGvk(resourceToWatch runtime.Object) (schema.GroupVersionKind, erro
 	return kinds[0], nil
 }
 
-func getPluginSharedInformer(ctx context.Context, iCtx pluginsCore.SetupContext, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
-	i, err := iCtx.KubeClient().GetCache().GetInformer(ctx, resourceToWatch)
+func getPluginSharedInformer(ctx context.Context, kubeClient pluginsCore.KubeClient, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
+	i, err := kubeClient.GetCache().GetInformer(ctx, resourceToWatch)
 	if err != nil {
 		return nil, errors.Wrapf(errors.PluginInitializationFailed, err, "Error getting informer for %s", reflect.TypeOf(i))
 	}
