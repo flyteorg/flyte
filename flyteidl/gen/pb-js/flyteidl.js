@@ -45831,6 +45831,7 @@
                  * @interface IGetDataResponse
                  * @property {flyteidl.core.ILiteralMap|null} [literalMap] GetDataResponse literalMap
                  * @property {flyteidl.service.IPreSignedURLs|null} [preSignedUrls] GetDataResponse preSignedUrls
+                 * @property {flyteidl.core.ILiteral|null} [literal] GetDataResponse literal
                  */
     
                 /**
@@ -45864,17 +45865,25 @@
                  */
                 GetDataResponse.prototype.preSignedUrls = null;
     
+                /**
+                 * GetDataResponse literal.
+                 * @member {flyteidl.core.ILiteral|null|undefined} literal
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @instance
+                 */
+                GetDataResponse.prototype.literal = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * GetDataResponse data.
-                 * @member {"literalMap"|"preSignedUrls"|undefined} data
+                 * @member {"literalMap"|"preSignedUrls"|"literal"|undefined} data
                  * @memberof flyteidl.service.GetDataResponse
                  * @instance
                  */
                 Object.defineProperty(GetDataResponse.prototype, "data", {
-                    get: $util.oneOfGetter($oneOfFields = ["literalMap", "preSignedUrls"]),
+                    get: $util.oneOfGetter($oneOfFields = ["literalMap", "preSignedUrls", "literal"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -45906,6 +45915,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.literalMap, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.preSignedUrls != null && message.hasOwnProperty("preSignedUrls"))
                         $root.flyteidl.service.PreSignedURLs.encode(message.preSignedUrls, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.literal != null && message.hasOwnProperty("literal"))
+                        $root.flyteidl.core.Literal.encode(message.literal, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -45932,6 +45943,9 @@
                             break;
                         case 2:
                             message.preSignedUrls = $root.flyteidl.service.PreSignedURLs.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.literal = $root.flyteidl.core.Literal.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -45969,6 +45983,16 @@
                             var error = $root.flyteidl.service.PreSignedURLs.verify(message.preSignedUrls);
                             if (error)
                                 return "preSignedUrls." + error;
+                        }
+                    }
+                    if (message.literal != null && message.hasOwnProperty("literal")) {
+                        if (properties.data === 1)
+                            return "data: multiple values";
+                        properties.data = 1;
+                        {
+                            var error = $root.flyteidl.core.Literal.verify(message.literal);
+                            if (error)
+                                return "literal." + error;
                         }
                     }
                     return null;

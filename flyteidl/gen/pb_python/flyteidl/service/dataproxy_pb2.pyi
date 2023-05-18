@@ -93,9 +93,11 @@ class GetDataRequest(_message.Message):
     def __init__(self, flyte_url: _Optional[str] = ...) -> None: ...
 
 class GetDataResponse(_message.Message):
-    __slots__ = ["literal_map", "pre_signed_urls"]
+    __slots__ = ["literal_map", "pre_signed_urls", "literal"]
     LITERAL_MAP_FIELD_NUMBER: _ClassVar[int]
     PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
+    LITERAL_FIELD_NUMBER: _ClassVar[int]
     literal_map: _literals_pb2.LiteralMap
     pre_signed_urls: PreSignedURLs
-    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
+    literal: _literals_pb2.Literal
+    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., literal: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...

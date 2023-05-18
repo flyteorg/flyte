@@ -19626,6 +19626,9 @@ export namespace flyteidl {
 
             /** GetDataResponse preSignedUrls */
             preSignedUrls?: (flyteidl.service.IPreSignedURLs|null);
+
+            /** GetDataResponse literal */
+            literal?: (flyteidl.core.ILiteral|null);
         }
 
         /** Represents a GetDataResponse. */
@@ -19643,8 +19646,11 @@ export namespace flyteidl {
             /** GetDataResponse preSignedUrls. */
             public preSignedUrls?: (flyteidl.service.IPreSignedURLs|null);
 
+            /** GetDataResponse literal. */
+            public literal?: (flyteidl.core.ILiteral|null);
+
             /** GetDataResponse data. */
-            public data?: ("literalMap"|"preSignedUrls");
+            public data?: ("literalMap"|"preSignedUrls"|"literal");
 
             /**
              * Creates a new GetDataResponse instance using the specified properties.

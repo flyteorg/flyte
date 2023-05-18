@@ -1293,6 +1293,7 @@ class GetDataResponse final :
   enum DataCase {
     kLiteralMap = 1,
     kPreSignedUrls = 2,
+    kLiteral = 3,
     DATA_NOT_SET = 0,
   };
 
@@ -1377,6 +1378,15 @@ class GetDataResponse final :
   ::flyteidl::service::PreSignedURLs* mutable_pre_signed_urls();
   void set_allocated_pre_signed_urls(::flyteidl::service::PreSignedURLs* pre_signed_urls);
 
+  // .flyteidl.core.Literal literal = 3;
+  bool has_literal() const;
+  void clear_literal();
+  static const int kLiteralFieldNumber = 3;
+  const ::flyteidl::core::Literal& literal() const;
+  ::flyteidl::core::Literal* release_literal();
+  ::flyteidl::core::Literal* mutable_literal();
+  void set_allocated_literal(::flyteidl::core::Literal* literal);
+
   void clear_data();
   DataCase data_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.service.GetDataResponse)
@@ -1384,6 +1394,7 @@ class GetDataResponse final :
   class HasBitSetters;
   void set_has_literal_map();
   void set_has_pre_signed_urls();
+  void set_has_literal();
 
   inline bool has_data() const;
   inline void clear_has_data();
@@ -1393,6 +1404,7 @@ class GetDataResponse final :
     DataUnion() {}
     ::flyteidl::core::LiteralMap* literal_map_;
     ::flyteidl::service::PreSignedURLs* pre_signed_urls_;
+    ::flyteidl::core::Literal* literal_;
   } data_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -2562,6 +2574,41 @@ inline ::flyteidl::service::PreSignedURLs* GetDataResponse::mutable_pre_signed_u
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.service.GetDataResponse.pre_signed_urls)
   return data_.pre_signed_urls_;
+}
+
+// .flyteidl.core.Literal literal = 3;
+inline bool GetDataResponse::has_literal() const {
+  return data_case() == kLiteral;
+}
+inline void GetDataResponse::set_has_literal() {
+  _oneof_case_[0] = kLiteral;
+}
+inline ::flyteidl::core::Literal* GetDataResponse::release_literal() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.GetDataResponse.literal)
+  if (has_literal()) {
+    clear_has_data();
+      ::flyteidl::core::Literal* temp = data_.literal_;
+    data_.literal_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::Literal& GetDataResponse::literal() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.GetDataResponse.literal)
+  return has_literal()
+      ? *data_.literal_
+      : *reinterpret_cast< ::flyteidl::core::Literal*>(&::flyteidl::core::_Literal_default_instance_);
+}
+inline ::flyteidl::core::Literal* GetDataResponse::mutable_literal() {
+  if (!has_literal()) {
+    clear_data();
+    set_has_literal();
+    data_.literal_ = CreateMaybeMessage< ::flyteidl::core::Literal >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.GetDataResponse.literal)
+  return data_.literal_;
 }
 
 inline bool GetDataResponse::has_data() const {

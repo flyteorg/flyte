@@ -29,7 +29,7 @@
         "parameters": [
           {
             "name": "flyte_url",
-            "description": "A unique identifier in the form of flyte://\u003csomething\u003e that uniquely, for a given Flyte\nbackend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).\ne.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)\n     flyte://v1/proj/development/execid/n2/i (for node execution input).",
+            "description": "A unique identifier in the form of flyte://\u003csomething\u003e that uniquely, for a given Flyte\nbackend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).\ne.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)\n     flyte://v1/proj/development/execid/n2/i (for node execution input)\n     flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node).",
             "in": "query",
             "required": false,
             "type": "string"
@@ -754,6 +754,10 @@
         "pre_signed_urls": {
           "$ref": "#/definitions/servicePreSignedURLs",
           "title": "Flyte deck html will be returned as a signed url users can download"
+        },
+        "literal": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Single literal will be returned. This is returned when the user/url requests a specific output or input\nby name. See the o3 example above."
         }
       }
     },
