@@ -443,7 +443,7 @@ data:
       external-plugin-service:
         defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
         supportedTaskTypes:
-          - bigquery_query_job_task
+        - bigquery_query_job_task
   002-database.yaml: |
     database:
       postgres:
@@ -758,7 +758,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZnoxUHBUcVdBZXJ2OG45UQ==
+  haSharedSecret: ckhqOWdIaWpXT2JyOHRobg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1159,7 +1159,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: adc9a5ca7e9d55b0c0a1f5ce45ed8901a1de26eda5fab30a0a6737796d879875
+        checksum/configuration: 8fe9fd62f0ca1fdc94b7203edc921b53c6076dca75f6b44307bbf0de3a3ad948
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1273,7 +1273,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: effbe41292229a505cc6f60dc3cd616977dc52493abac1421ebb1d3a9168d370
+        checksum/secret: 4a7cf60cc61cf34231607a1968239991daed8ba149c121f230c5eb14d0f0d5d7
       labels:
         app: docker-registry
         release: flyte-sandbox

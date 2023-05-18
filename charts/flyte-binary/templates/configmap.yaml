@@ -73,7 +73,7 @@ data:
       external-plugin-service:
         defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
         supportedTaskTypes:
-          - bigquery_query_job_task
+        - bigquery_query_job_task
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:
