@@ -48,7 +48,25 @@ Check it out, subscribe to the `calendar <https://www.addevent.com/calendar/kE35
 Office Hours
 ------------
 
-`Book a 30 minutes session <https://calendly.com/flyte-office-hours-01/30min>`_ with a Flyte maintainer and get your questions answered!
+`Book a 30 minutes session <https://calendly.com/flyte-office-hours-01/30min>`_ with a Flyte maintainer and get your questions answered!   
+
+Schedule your session depending on the topic to secure the availability of a maintainer with expertise in the area:
+
+- **7:00a.m. PT**: 
+   - Anything flytekit-related
+   - Flyte releases
+   - flytepropeller features
+   - Plugin implementation
+   - Platform configuration
+- **1:00p.m. PT**:
+   - Flyte deployment on cloud
+- **9:00p.m. PT**:
+   - Flytekit-related
+   - Use cases 
+   - Getting started (workflow onboarding)
+   - Integrations
+
+
 
 Newsletter
 ----------
