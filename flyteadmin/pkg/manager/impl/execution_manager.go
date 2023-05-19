@@ -32,6 +32,7 @@ import (
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	webhookInterface "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/executions"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
@@ -90,6 +91,7 @@ type ExecutionManager struct {
 	systemMetrics             executionSystemMetrics
 	userMetrics               executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
+	webhooks                  []webhookInterface.Webhook
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
 	namedEntityManager        interfaces.NamedEntityInterface
@@ -1295,6 +1297,15 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 	}
 
 	go func() {
+		for _, client := range m.webhooks {
+			if err := client.Post(ctx, proto.MessageName(&request), &request); err != nil {
+				m.systemMetrics.PublishEventError.Inc()
+				logger.Infof(ctx, "error publishing webhook event [%+v] with err: [%v]", request.RequestId, err)
+			}
+		}
+	}()
+
+	go func() {
 		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
@@ -1625,7 +1636,8 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
-	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
+	publisher notificationInterfaces.Publisher, webhooks []webhookInterface.Webhook,
+	urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
@@ -1652,6 +1664,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		systemMetrics:             systemMetrics,
 		userMetrics:               userMetrics,
 		notificationClient:        publisher,
+		webhooks:                  webhooks,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
 		namedEntityManager:        namedEntityManager,

@@ -552,6 +552,12 @@ type NotificationsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
+// WebhookConfig defines the configuration for the webhook service.
+type WebhookConfig struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
+}
+
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.
 type Domain struct {
 	// Unique identifier for a domain.
@@ -572,4 +578,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
+	GetWebhookConfig() *WebhookConfig
 }

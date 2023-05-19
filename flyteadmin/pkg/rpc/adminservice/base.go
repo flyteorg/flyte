@@ -20,6 +20,7 @@ import (
 
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule"
+	"github.com/flyteorg/flyteadmin/pkg/async/webhook"
 	"github.com/flyteorg/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyteadmin/pkg/manager/impl"
@@ -102,6 +103,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
+	webhooks := webhook.NewWebhooks(ctx, *configuration.ApplicationConfiguration().GetWebhookConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
@@ -143,7 +145,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, webhooks, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
