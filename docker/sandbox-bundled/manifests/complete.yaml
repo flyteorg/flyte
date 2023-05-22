@@ -403,28 +403,15 @@ metadata:
 ---
 apiVersion: v1
 data:
-  000-core.yaml: |
-    admin:
-      endpoint: localhost:8089
-      insecure: true
-    catalog-cache:
-      endpoint: localhost:8081
-      insecure: true
-      type: datacatalog
-    cluster_resources:
-      standaloneDeployment: false
-      templatePath: /etc/flyte/cluster-resource-templates
-    logger:
-      show-source: true
-      level: 6
-    propeller:
-      create-flyteworkflow-crd: true
-    webhook:
-      certDir: /var/run/flyte/certs
-      localCert: true
-      secretName: flyte-sandbox-webhook-secret
-      serviceName: flyte-sandbox-webhook
-      servicePort: 443
+  000-core.yaml: "admin:\n  endpoint: localhost:8089\n  insecure: true\ncatalog-cache:\n
+    \ endpoint: localhost:8081\n  insecure: true\n  type: datacatalog\ncluster_resources:\n
+    \ standaloneDeployment: false\n  templatePath: /etc/flyte/cluster-resource-templates\nlogger:\n
+    \ show-source: true\n  level: 6\npropeller:\n  create-flyteworkflow-crd: true\nwebhook:\n
+    \ certDir: /var/run/flyte/certs\n  localCert: true\n  secretName: flyte-sandbox-webhook-secret\n
+    \ serviceName: flyte-sandbox-webhook\n  servicePort: 443\nflyte: \n  admin:\n
+    \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
+    false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
+    \ propeller:\n    disableWebhook: false\n    disabled: false\n"
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -765,7 +752,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: V0p5M2h6UlVLMlByeEQ5cw==
+  haSharedSecret: dWY3VEZlVmt2QTE1M1R3Ng==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1159,7 +1146,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 7ef5ef618ebb04f965552e2e4814dc053ef5338fee3ada32517e4e4b1695989b
+        checksum/configuration: af73555ceafa450e1e534169aeb7fffcab7726754f8802ab1d3edbb75d65969d
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1267,7 +1254,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 933c7a046482fc6cfbe3bfe5b32b6727c547797a1500f79962d1a2864223a96c
+        checksum/secret: 9ad79e33eb4e690161845923abdae7d461fd7b71a6c34ebe59cabb99356a0d9b
       labels:
         app: docker-registry
         release: flyte-sandbox
