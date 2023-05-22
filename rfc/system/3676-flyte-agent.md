@@ -88,16 +88,7 @@ To begin, the messaging protocol expects that each Agent will only execute a sin
 
 Component failures, for both Agent and Flyte Agent Plugin, are handled by using a configurable grace period and tracking the last successful state sync. If there has not been a successful sync in the configured threshold it will failover. In case of the Flyte Agent Plugin, it will attempt to retry the task, in case of the Agent, it will attempt to retrieve a new task.
 
-@hamersaw TODO
-persistence vs retries?
-    two 2-phase commit-ish solutions:
-    useful if there are execute exactly once semantics required
-        may not be the case for millisecond runtime tasks - very inexpensive to recompute
-    propeller assigns work and doesn't persist agent to pluginStateBytes before failing
-        can use a 2-phase commit to start as well - pluginStateBytes phase - overhead is calculated by the difference between 1st and 2nd time plugin.Handle()
-    task completes and propeller fails between agent success reporting and state persistence
-        protocol mitigates using (essentially) 2-phase commit with `finalized` field on `ReportTaskStatusResponse`
-
+Perhaps the most difficult aspect of this implementation is handling failures between gRPC communication and state persistence in the Flyte Agent Plugin. For example, the Flyte Agent Plugin assigns a task to Flyte Agent A, before persisting state FlytePropeller fails, then when FlytePropeller restarts it assigns the same task to Flyte Agent B and we have two Agents executing the same task. There are (at least) two approaches to handle this (1) allow these minor inconsistencies, task executions should be measurable in milliseconds and the relatively infrequent occurrence of duplicate executions (only on failures) is a non-issue or (2) introduce additional process to ensure exactly once execution semantics. In the latter case, we could add additional phases in the Flyte Agent Plugin (which are stored in `pluginStateBytes`) where assigning the task to a Flyte Agent is done in one step, and then in another step the Flyte Agent Plugin confirms state persistence (through another plugin phase transition) and approves the Agent to begin executing the task. A similar protocol could be used for consistently reporting task completions, where the Agent will not proceed to the next task until Flyte Agent Plugin confirms task completion state persistence. The obvious trade-off is allowing duplicate executions vs. the additional overhead.
 
 ### Deployment Model
 The proposed model can support a variety of diverse deployment patterns. Presumably, Flyte Agents will be deployed as k8s Pods and therefore the resource availability will be the container requests / limits. Similarly, the python dependencies available for task execution will need to be included in the container. This is all amenable to k8s autoscaling, so essentially there can be multiple autoscaling worker groups that are each identified using queue topics so Flyte can direct task execution to the correct workerpool.
