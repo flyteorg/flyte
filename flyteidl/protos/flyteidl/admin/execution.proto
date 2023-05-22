@@ -190,6 +190,9 @@ message SystemMetadata {
 
     // Which execution cluster this execution ran on.
     string execution_cluster = 1;
+
+    // Which kubernetes namespace the execution ran under.
+    string namespace = 2;
 }
 
 // Represents attributes about an execution which are not required to launch the execution but are useful to record.

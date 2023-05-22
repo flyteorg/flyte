@@ -1004,6 +1004,8 @@ func (m *SystemMetadata) Validate() error {
 
 	// no validation rules for ExecutionCluster
 
+	// no validation rules for Namespace
+
 	return nil
 }
 

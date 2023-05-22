@@ -3526,6 +3526,7 @@ definitions:
           nesting: 0
           system_metadata:
             execution_cluster: "execution_cluster"
+            namespace: "namespace"
         disable_all: true
         inputs:
           literals: {}
@@ -3907,6 +3908,7 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
+              namespace: "namespace"
           disable_all: true
           inputs:
             literals: {}
@@ -4104,6 +4106,7 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
+              namespace: "namespace"
           disable_all: true
           inputs:
             literals: {}
@@ -4270,6 +4273,7 @@ definitions:
       nesting: 0
       system_metadata:
         execution_cluster: "execution_cluster"
+        namespace: "namespace"
   adminExecutionQueueAttributes:
     type: "object"
     properties:
@@ -4409,6 +4413,7 @@ definitions:
         nesting: 0
         system_metadata:
           execution_cluster: "execution_cluster"
+          namespace: "namespace"
       disable_all: true
       inputs:
         literals: {}
@@ -15324,9 +15329,13 @@ definitions:
       execution_cluster:
         type: "string"
         description: "Which execution cluster this execution ran on."
+      namespace:
+        type: "string"
+        description: "Which kubernetes namespace the execution ran under."
     description: "Represents system, rather than user-facing, metadata about an execution."
     example:
       execution_cluster: "execution_cluster"
+      namespace: "namespace"
   adminTask:
     type: "object"
     properties:

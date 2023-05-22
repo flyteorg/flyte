@@ -13256,6 +13256,24 @@ public final class ExecutionOuterClass {
      */
     com.google.protobuf.ByteString
         getExecutionClusterBytes();
+
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    java.lang.String getNamespace();
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getNamespaceBytes();
   }
   /**
    * <pre>
@@ -13275,6 +13293,7 @@ public final class ExecutionOuterClass {
     }
     private SystemMetadata() {
       executionCluster_ = "";
+      namespace_ = "";
     }
 
     @java.lang.Override
@@ -13305,6 +13324,12 @@ public final class ExecutionOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               executionCluster_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              namespace_ = s;
               break;
             }
             default: {
@@ -13381,6 +13406,48 @@ public final class ExecutionOuterClass {
       }
     }
 
+    public static final int NAMESPACE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object namespace_;
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public java.lang.String getNamespace() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        namespace_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNamespaceBytes() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        namespace_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13398,6 +13465,9 @@ public final class ExecutionOuterClass {
       if (!getExecutionClusterBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, executionCluster_);
       }
+      if (!getNamespaceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, namespace_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13409,6 +13479,9 @@ public final class ExecutionOuterClass {
       size = 0;
       if (!getExecutionClusterBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, executionCluster_);
+      }
+      if (!getNamespaceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, namespace_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13427,6 +13500,8 @@ public final class ExecutionOuterClass {
 
       if (!getExecutionCluster()
           .equals(other.getExecutionCluster())) return false;
+      if (!getNamespace()
+          .equals(other.getNamespace())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -13440,6 +13515,8 @@ public final class ExecutionOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + EXECUTION_CLUSTER_FIELD_NUMBER;
       hash = (53 * hash) + getExecutionCluster().hashCode();
+      hash = (37 * hash) + NAMESPACE_FIELD_NUMBER;
+      hash = (53 * hash) + getNamespace().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13579,6 +13656,8 @@ public final class ExecutionOuterClass {
         super.clear();
         executionCluster_ = "";
 
+        namespace_ = "";
+
         return this;
       }
 
@@ -13606,6 +13685,7 @@ public final class ExecutionOuterClass {
       public flyteidl.admin.ExecutionOuterClass.SystemMetadata buildPartial() {
         flyteidl.admin.ExecutionOuterClass.SystemMetadata result = new flyteidl.admin.ExecutionOuterClass.SystemMetadata(this);
         result.executionCluster_ = executionCluster_;
+        result.namespace_ = namespace_;
         onBuilt();
         return result;
       }
@@ -13656,6 +13736,10 @@ public final class ExecutionOuterClass {
         if (other == flyteidl.admin.ExecutionOuterClass.SystemMetadata.getDefaultInstance()) return this;
         if (!other.getExecutionCluster().isEmpty()) {
           executionCluster_ = other.executionCluster_;
+          onChanged();
+        }
+        if (!other.getNamespace().isEmpty()) {
+          namespace_ = other.namespace_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -13772,6 +13856,95 @@ public final class ExecutionOuterClass {
   checkByteStringIsUtf8(value);
         
         executionCluster_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object namespace_ = "";
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public java.lang.String getNamespace() {
+        java.lang.Object ref = namespace_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          namespace_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNamespaceBytes() {
+        java.lang.Object ref = namespace_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          namespace_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespace(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        namespace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder clearNamespace() {
+        
+        namespace_ = getDefaultInstance().getNamespace();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespaceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        namespace_ = value;
         onChanged();
         return this;
       }
@@ -28052,68 +28225,69 @@ public final class ExecutionOuterClass {
       "\0132\031.flyteidl.core.Identifier\022I\n\024state_ch" +
       "ange_details\030\016 \001(\0132+.flyteidl.admin.Exec" +
       "utionStateChangeDetailsB\017\n\routput_result" +
-      "\"+\n\016SystemMetadata\022\031\n\021execution_cluster\030" +
-      "\001 \001(\t\"\332\003\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(" +
-      "\0162/.flyteidl.admin.ExecutionMetadata.Exe" +
-      "cutionMode\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting" +
-      "\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp\022E\n\025parent_node_executio" +
-      "n\030\005 \001(\0132&.flyteidl.core.NodeExecutionIde" +
-      "ntifier\022G\n\023reference_execution\030\020 \001(\0132*.f" +
-      "lyteidl.core.WorkflowExecutionIdentifier" +
-      "\0227\n\017system_metadata\030\021 \001(\0132\036.flyteidl.adm" +
-      "in.SystemMetadata\"g\n\rExecutionMode\022\n\n\006MA" +
-      "NUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010REL" +
-      "AUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r\n\tRECOVERED" +
-      "\020\005\"G\n\020NotificationList\0223\n\rnotifications\030" +
-      "\001 \003(\0132\034.flyteidl.admin.Notification\"\244\006\n\r" +
-      "ExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.fly" +
-      "teidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031." +
-      "flyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata" +
-      "\030\003 \001(\0132!.flyteidl.admin.ExecutionMetadat" +
-      "a\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admi" +
-      "n.NotificationListH\000\022\025\n\013disable_all\030\006 \001(" +
-      "\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Lab" +
-      "els\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admi" +
-      "n.Annotations\0228\n\020security_context\030\n \001(\0132" +
-      "\036.flyteidl.core.SecurityContext\022/\n\tauth_" +
-      "role\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001" +
-      "\022;\n\022quality_of_service\030\021 \001(\0132\037.flyteidl." +
-      "core.QualityOfService\022\027\n\017max_parallelism" +
-      "\030\022 \001(\005\022C\n\026raw_output_data_config\030\023 \001(\0132#" +
-      ".flyteidl.admin.RawOutputDataConfig\022=\n\022c" +
-      "luster_assignment\030\024 \001(\0132!.flyteidl.admin" +
-      ".ClusterAssignment\0221\n\rinterruptible\030\025 \001(" +
-      "\0132\032.google.protobuf.BoolValue\022\027\n\017overwri" +
-      "te_cache\030\026 \001(\010\022\"\n\004envs\030\027 \001(\0132\024.flyteidl." +
-      "admin.EnvsB\030\n\026notification_overridesJ\004\010\004" +
-      "\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id\030\001 " +
-      "\001(\0132*.flyteidl.core.WorkflowExecutionIde" +
-      "ntifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTermi" +
-      "nateResponse\"Y\n\037WorkflowExecutionGetData" +
-      "Request\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Work" +
-      "flowExecutionIdentifier\"\336\001\n WorkflowExec" +
-      "utionGetDataResponse\022,\n\007outputs\030\001 \001(\0132\027." +
-      "flyteidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001" +
-      "(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_" +
-      "inputs\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022" +
-      "/\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Li" +
-      "teralMap\"\177\n\026ExecutionUpdateRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.adm" +
-      "in.ExecutionState\"\220\001\n\033ExecutionStateChan" +
-      "geDetails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admi" +
-      "n.ExecutionState\022/\n\013occurred_at\030\002 \001(\0132\032." +
-      "google.protobuf.Timestamp\022\021\n\tprincipal\030\003" +
-      " \001(\t\"\031\n\027ExecutionUpdateResponse\"k\n\"Workf" +
-      "lowExecutionGetMetricsRequest\0226\n\002id\030\001 \001(" +
-      "\0132*.flyteidl.core.WorkflowExecutionIdent" +
-      "ifier\022\r\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutio" +
-      "nGetMetricsResponse\022!\n\004span\030\001 \001(\0132\023.flyt" +
-      "eidl.core.Span*>\n\016ExecutionState\022\024\n\020EXEC" +
-      "UTION_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7" +
-      "Z5github.com/flyteorg/flyteidl/gen/pb-go" +
-      "/flyteidl/adminb\006proto3"
+      "\">\n\016SystemMetadata\022\031\n\021execution_cluster\030" +
+      "\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\332\003\n\021ExecutionMe" +
+      "tadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.admin.Ex" +
+      "ecutionMetadata.ExecutionMode\022\021\n\tprincip" +
+      "al\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014scheduled_a" +
+      "t\030\004 \001(\0132\032.google.protobuf.Timestamp\022E\n\025p" +
+      "arent_node_execution\030\005 \001(\0132&.flyteidl.co" +
+      "re.NodeExecutionIdentifier\022G\n\023reference_" +
+      "execution\030\020 \001(\0132*.flyteidl.core.Workflow" +
+      "ExecutionIdentifier\0227\n\017system_metadata\030\021" +
+      " \001(\0132\036.flyteidl.admin.SystemMetadata\"g\n\r" +
+      "ExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001" +
+      "\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORK" +
+      "FLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationLis" +
+      "t\0223\n\rnotifications\030\001 \003(\0132\034.flyteidl.admi" +
+      "n.Notification\"\244\006\n\rExecutionSpec\022.\n\013laun" +
+      "ch_plan\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core.Literal" +
+      "MapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.adm" +
+      "in.ExecutionMetadata\0229\n\rnotifications\030\005 " +
+      "\001(\0132 .flyteidl.admin.NotificationListH\000\022" +
+      "\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026" +
+      ".flyteidl.admin.Labels\0220\n\013annotations\030\010 " +
+      "\001(\0132\033.flyteidl.admin.Annotations\0228\n\020secu" +
+      "rity_context\030\n \001(\0132\036.flyteidl.core.Secur" +
+      "ityContext\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl" +
+      ".admin.AuthRoleB\002\030\001\022;\n\022quality_of_servic" +
+      "e\030\021 \001(\0132\037.flyteidl.core.QualityOfService" +
+      "\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw_output_" +
+      "data_config\030\023 \001(\0132#.flyteidl.admin.RawOu" +
+      "tputDataConfig\022=\n\022cluster_assignment\030\024 \001" +
+      "(\0132!.flyteidl.admin.ClusterAssignment\0221\n" +
+      "\rinterruptible\030\025 \001(\0132\032.google.protobuf.B" +
+      "oolValue\022\027\n\017overwrite_cache\030\026 \001(\010\022\"\n\004env" +
+      "s\030\027 \001(\0132\024.flyteidl.admin.EnvsB\030\n\026notific" +
+      "ation_overridesJ\004\010\004\020\005\"b\n\031ExecutionTermin" +
+      "ateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
+      "orkflowExecutionIdentifier\022\r\n\005cause\030\002 \001(" +
+      "\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037Workf" +
+      "lowExecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*" +
+      ".flyteidl.core.WorkflowExecutionIdentifi" +
+      "er\"\336\001\n WorkflowExecutionGetDataResponse\022" +
+      ",\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlo" +
+      "bB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.U" +
+      "rlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flytei" +
+      "dl.core.LiteralMap\022/\n\014full_outputs\030\004 \001(\013" +
+      "2\031.flyteidl.core.LiteralMap\"\177\n\026Execution" +
+      "UpdateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.cor" +
+      "e.WorkflowExecutionIdentifier\022-\n\005state\030\002" +
+      " \001(\0162\036.flyteidl.admin.ExecutionState\"\220\001\n" +
+      "\033ExecutionStateChangeDetails\022-\n\005state\030\001 " +
+      "\001(\0162\036.flyteidl.admin.ExecutionState\022/\n\013o" +
+      "ccurred_at\030\002 \001(\0132\032.google.protobuf.Times" +
+      "tamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpda" +
+      "teResponse\"k\n\"WorkflowExecutionGetMetric" +
+      "sRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wor" +
+      "kflowExecutionIdentifier\022\r\n\005depth\030\002 \001(\005\"" +
+      "H\n#WorkflowExecutionGetMetricsResponse\022!" +
+      "\n\004span\030\001 \001(\0132\023.flyteidl.core.Span*>\n\016Exe" +
+      "cutionState\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXE" +
+      "CUTION_ARCHIVED\020\001B7Z5github.com/flyteorg" +
+      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -28202,7 +28376,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_SystemMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_SystemMetadata_descriptor,
-        new java.lang.String[] { "ExecutionCluster", });
+        new java.lang.String[] { "ExecutionCluster", "Namespace", });
     internal_static_flyteidl_admin_ExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_admin_ExecutionMetadata_fieldAccessorTable = new

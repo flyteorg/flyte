@@ -136,10 +136,12 @@ class ExecutionClosure(_message.Message):
     def __init__(self, outputs: _Optional[_Union[LiteralMapBlob, _Mapping]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., abort_cause: _Optional[str] = ..., abort_metadata: _Optional[_Union[AbortMetadata, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., computed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., state_change_details: _Optional[_Union[ExecutionStateChangeDetails, _Mapping]] = ...) -> None: ...
 
 class SystemMetadata(_message.Message):
-    __slots__ = ["execution_cluster"]
+    __slots__ = ["execution_cluster", "namespace"]
     EXECUTION_CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     execution_cluster: str
-    def __init__(self, execution_cluster: _Optional[str] = ...) -> None: ...
+    namespace: str
+    def __init__(self, execution_cluster: _Optional[str] = ..., namespace: _Optional[str] = ...) -> None: ...
 
 class ExecutionMetadata(_message.Message):
     __slots__ = ["mode", "principal", "nesting", "scheduled_at", "parent_node_execution", "reference_execution", "system_metadata"]
