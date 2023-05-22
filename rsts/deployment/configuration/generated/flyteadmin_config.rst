@@ -604,6 +604,18 @@ authorizedUris ([]config.URL)
   null
   
 
+httpProxyURL (`config.URL`_)
+--------------------------------------------------------------------------------
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 userAuth (`config.UserAuthConfig`_)
 --------------------------------------------------------------------------------
 
@@ -643,6 +655,7 @@ Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
   externalAuthServer:
     allowedAudience: []
     baseUrl: ""
+    httpProxyURL: ""
     metadataUrl: ""
   selfAuthServer:
     accessTokenLifespan: 30m0s
@@ -806,6 +819,7 @@ External Authorization Server config.
 
   allowedAudience: []
   baseUrl: ""
+  httpProxyURL: ""
   metadataUrl: ""
   
 
@@ -1004,6 +1018,18 @@ metadataUrl (`config.URL`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+httpProxyURL (`config.URL`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
 
 **Default Value**: 
 

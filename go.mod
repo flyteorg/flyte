@@ -4,13 +4,13 @@ go 1.19
 
 require (
 	github.com/flyteorg/datacatalog v1.0.46
-	github.com/flyteorg/flyteadmin v1.1.95
-	github.com/flyteorg/flytepropeller v1.1.89
+	github.com/flyteorg/flyteadmin v1.1.100
+	github.com/flyteorg/flytepropeller v1.1.90
 	github.com/flyteorg/flytestdlib v1.0.17
 	github.com/golang/glog v1.0.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+	golang.org/x/sync v0.1.0
 	gorm.io/driver/postgres v1.4.5
 	k8s.io/client-go v0.24.1
 	sigs.k8s.io/controller-runtime v0.12.1
@@ -71,7 +71,7 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.5.3 // indirect
+	github.com/flyteorg/flyteidl v1.5.5 // indirect
 	github.com/flyteorg/flyteplugins v1.0.56 // indirect
 	github.com/flyteorg/stow v0.3.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
@@ -186,8 +186,8 @@ require (
 	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
-	golang.org/x/tools v0.1.12 // indirect
-	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
+	golang.org/x/tools v0.4.0 // indirect
+	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	google.golang.org/api v0.76.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
