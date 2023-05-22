@@ -13,4 +13,6 @@ package flyteadmin
 type AdminSystemMetadata struct {
 	// Which execution cluster this execution ran on.
 	ExecutionCluster string `json:"execution_cluster,omitempty"`
+	// Which kubernetes namespace the execution ran under.
+	Namespace string `json:"namespace,omitempty"`
 }

@@ -5035,6 +5035,10 @@
         "execution_cluster": {
           "type": "string",
           "description": "Which execution cluster this execution ran on."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Which kubernetes namespace the execution ran under."
         }
       },
       "description": "Represents system, rather than user-facing, metadata about an execution."

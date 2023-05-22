@@ -1827,12 +1827,27 @@ class SystemMetadata final :
   ::std::string* release_execution_cluster();
   void set_allocated_execution_cluster(::std::string* execution_cluster);
 
+  // string namespace = 2;
+  void clear_namespace_();
+  static const int kNamespaceFieldNumber = 2;
+  const ::std::string& namespace_() const;
+  void set_namespace_(const ::std::string& value);
+  #if LANG_CXX11
+  void set_namespace_(::std::string&& value);
+  #endif
+  void set_namespace_(const char* value);
+  void set_namespace_(const char* value, size_t size);
+  ::std::string* mutable_namespace_();
+  ::std::string* release_namespace_();
+  void set_allocated_namespace_(::std::string* namespace_);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.SystemMetadata)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr execution_cluster_;
+  ::google::protobuf::internal::ArenaStringPtr namespace__;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
 };
@@ -5334,6 +5349,59 @@ inline void SystemMetadata::set_allocated_execution_cluster(::std::string* execu
   }
   execution_cluster_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), execution_cluster);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+
+// string namespace = 2;
+inline void SystemMetadata::clear_namespace_() {
+  namespace__.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& SystemMetadata::namespace_() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.SystemMetadata.namespace)
+  return namespace__.GetNoArena();
+}
+inline void SystemMetadata::set_namespace_(const ::std::string& value) {
+  
+  namespace__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.SystemMetadata.namespace)
+}
+#if LANG_CXX11
+inline void SystemMetadata::set_namespace_(::std::string&& value) {
+  
+  namespace__.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.SystemMetadata.namespace)
+}
+#endif
+inline void SystemMetadata::set_namespace_(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  namespace__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.SystemMetadata.namespace)
+}
+inline void SystemMetadata::set_namespace_(const char* value, size_t size) {
+  
+  namespace__.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.SystemMetadata.namespace)
+}
+inline ::std::string* SystemMetadata::mutable_namespace_() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.SystemMetadata.namespace)
+  return namespace__.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* SystemMetadata::release_namespace_() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.SystemMetadata.namespace)
+  
+  return namespace__.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void SystemMetadata::set_allocated_namespace_(::std::string* namespace_) {
+  if (namespace_ != nullptr) {
+    
+  } else {
+    
+  }
+  namespace__.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), namespace_);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.SystemMetadata.namespace)
 }
 
 // -------------------------------------------------------------------

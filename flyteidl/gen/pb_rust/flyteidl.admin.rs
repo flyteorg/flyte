@@ -857,6 +857,9 @@ pub struct SystemMetadata {
     /// Which execution cluster this execution ran on.
     #[prost(string, tag="1")]
     pub execution_cluster: ::prost::alloc::string::String,
+    /// Which kubernetes namespace the execution ran under.
+    #[prost(string, tag="2")]
+    pub namespace: ::prost::alloc::string::String,
 }
 /// Represents attributes about an execution which are not required to launch the execution but are useful to record.
 /// These attributes are assigned at launch time and do not change.
