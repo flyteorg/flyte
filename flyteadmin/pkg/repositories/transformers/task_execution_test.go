@@ -19,12 +19,13 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 
+	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
 )
 
 var taskEventOccurredAt = time.Now().UTC()
@@ -73,23 +74,50 @@ func transformMapToStructPB(t *testing.T, thing map[string]string) *structpb.Str
 }
 
 func TestAddTaskStartedState(t *testing.T) {
-	var startedAt = time.Now().UTC()
-	var startedAtProto, _ = ptypes.TimestampProto(startedAt)
-	request := admin.TaskExecutionEventRequest{
-		Event: &event.TaskExecutionEvent{
-			Phase:      core.TaskExecution_RUNNING,
-			OccurredAt: startedAtProto,
-		},
-	}
-	taskExecutionModel := models.TaskExecution{}
-	closure := &admin.TaskExecutionClosure{}
-	err := addTaskStartedState(&request, &taskExecutionModel, closure)
-	assert.Nil(t, err)
+	t.Run("model with unset started At ", func(t *testing.T) {
+		var startedAt = time.Now().UTC()
+		var startedAtProto, _ = ptypes.TimestampProto(startedAt)
+		request := admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				Phase:      core.TaskExecution_RUNNING,
+				OccurredAt: startedAtProto,
+			},
+		}
+		taskExecutionModel := models.TaskExecution{}
+		closure := &admin.TaskExecutionClosure{}
+		err := addTaskStartedState(&request, &taskExecutionModel, closure)
+		assert.Nil(t, err)
 
-	timestamp, err := ptypes.Timestamp(closure.StartedAt)
-	assert.Nil(t, err)
-	assert.Equal(t, startedAt, timestamp)
-	assert.Equal(t, &startedAt, taskExecutionModel.StartedAt)
+		timestamp, err := ptypes.Timestamp(closure.StartedAt)
+		assert.Nil(t, err)
+		assert.Equal(t, startedAt, timestamp)
+		assert.Equal(t, &startedAt, taskExecutionModel.StartedAt)
+	})
+	t.Run("model with set started At ", func(t *testing.T) {
+		var oldStartedAt = time.Now().UTC()
+		var newStartedAt = time.Now().UTC().Add(time.Minute * -10)
+		var startedAtProto, _ = ptypes.TimestampProto(newStartedAt)
+		request := admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				Phase:      core.TaskExecution_RUNNING,
+				OccurredAt: startedAtProto,
+			},
+		}
+		taskExecutionModel := models.TaskExecution{
+			StartedAt: &oldStartedAt,
+		}
+		closure := &admin.TaskExecutionClosure{
+			StartedAt: startedAtProto,
+		}
+		err := addTaskStartedState(&request, &taskExecutionModel, closure)
+		assert.Nil(t, err)
+
+		timestamp, err := ptypes.Timestamp(closure.StartedAt)
+		assert.Nil(t, err)
+		assert.NotEqual(t, oldStartedAt, timestamp)
+		assert.Equal(t, &oldStartedAt, taskExecutionModel.StartedAt)
+	})
+
 }
 
 func TestAddTaskTerminalState_Error(t *testing.T) {
@@ -106,6 +134,7 @@ func TestAddTaskTerminalState_Error(t *testing.T) {
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
+
 	startedAtProto, _ := ptypes.TimestampProto(startedAt)
 	taskExecutionModel := models.TaskExecution{
 		StartedAt: &startedAt,
