@@ -839,6 +839,40 @@ databricks (`databricks.Config`_)
       qps: 10
   
 
+external-plugin-service (`grpc.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  defaultGrpcEndpoint: dns:///external-plugin-service.flyte.svc.cluster.local:80
+  endpointForTaskTypes: null
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  supportedTaskTypes:
+  - task_type_1
+  - task_type_2
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
+  
+
 k8s (`config.K8sPluginConfig`_)
 --------------------------------------------------------------------------------
 
@@ -2308,6 +2342,80 @@ databricksEndpoint (string)
 .. code-block:: yaml
 
   ""
+  
+
+grpc.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultGrpcEndpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The default grpc endpoint of external plugin service.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dns:///external-plugin-service.flyte.svc.cluster.local:80
+  
+
+endpointForTaskTypes (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_1
+  - task_type_2
   
 
 k8s.Config
