@@ -10,6 +10,5 @@ import (
 )
 
 func NewWebhooks(ctx context.Context, config runtimeInterfaces.WebhookConfig, scope promutils.Scope) []interfaces.Webhook {
-
 	return []interfaces.Webhook{implementations.NewSlackWebhook(config, scope)}
 }

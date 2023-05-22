@@ -15,6 +15,7 @@ const notifications = "notifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
+const webhook = "webhook"
 const metricPort = 10254
 
 const KB = 1024
@@ -84,7 +85,7 @@ var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.Clou
 	Type: common.Local,
 })
 
-var webhooksConfig = config.MustRegisterSection("webhooks", &interfaces.WebhookConfig{
+var webhooksConfig = config.MustRegisterSection(webhook, &interfaces.WebhookConfig{
 	Type: "slack",
 })
 
