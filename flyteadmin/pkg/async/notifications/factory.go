@@ -163,6 +163,7 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 		if err != nil {
 			panic(err)
 		}
+		logger.Infof(context.Background(), "Using aws publisher implementation for config type [%s]", config.Type)
 		return implementations.NewPublisher(publisher, scope)
 	case common.GCP:
 		pubsubConfig := gizmoGCP.Config{
