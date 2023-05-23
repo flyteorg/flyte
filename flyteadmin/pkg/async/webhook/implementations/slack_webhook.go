@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/flyteorg/flytestdlib/logger"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
@@ -21,7 +22,7 @@ type SlackWebhook struct {
 func (s *SlackWebhook) Post(ctx context.Context, message string) error {
 	// curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
 	logger.Infof(ctx, "Posting to Slack with message: [%v]", message)
-	webhookURL := "https://hooks.slack.com/services/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"
+	webhookURL := s.config.URL
 	data := []byte(fmt.Sprintf("{'text': %s}", message))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
 	if err != nil {

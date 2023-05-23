@@ -546,6 +546,7 @@ type NotificationsConfig struct {
 	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
 	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
 	NotificationsEmailerConfig   NotificationsEmailerConfig   `json:"emailer"`
+	WebhooksConfig               []WebhooksConfig             `json:"webhook"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
@@ -554,13 +555,16 @@ type NotificationsConfig struct {
 
 // WebhooksConfig defines the configuration for the webhook service.
 type WebhooksConfig struct {
-	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
-	// scheme is used.
-	Type      string    `json:"type"`
-	Region    string    `json:"region"`
-	AWSConfig AWSConfig `json:"aws"`
-	GCPConfig GCPConfig `json:"gcp"`
-	URL       string    `json:"url"`
+	// Type of webhook service to use. Currently only "slack" is supported.
+	Type                         string                       `json:"type"`
+	URL                          string                       `json:"url"`
+	AWSConfig                    AWSConfig                    `json:"aws"`
+	GCPConfig                    GCPConfig                    `json:"gcp"`
+	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
+	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.

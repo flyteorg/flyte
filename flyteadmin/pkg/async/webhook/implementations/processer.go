@@ -9,25 +9,20 @@ import (
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/flyteorg/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	webhookInterfaces "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
 )
 
-// TODO: Add a counter that encompasses the publisher stats grouped by project and domain.
 type Processor struct {
 	sub           pubsub.Subscriber
-	email         interfaces.Emailer
+	webhook       webhookInterfaces.Webhook
 	systemMetrics processorSystemMetrics
 }
 
-// Currently only email is the supported notification because slack and pagerduty both use
-// email client to trigger those notifications.
-// When Pagerduty and other notifications are supported, a publisher per type should be created.
 func (p *Processor) StartProcessing() {
 	for {
-		logger.Warningf(context.Background(), "Starting notifications processor")
+		logger.Warningf(context.Background(), "Starting webhook processor")
 		err := p.run()
 		logger.Errorf(context.Background(), "error with running processor err: [%v] ", err)
 		time.Sleep(async.RetryDelay)
@@ -35,8 +30,8 @@ func (p *Processor) StartProcessing() {
 }
 
 func (p *Processor) run() error {
-	var emailMessage admin.EmailMessage
 	var err error
+
 	for msg := range p.sub.Start() {
 		p.systemMetrics.MessageTotal.Inc()
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
@@ -74,7 +69,7 @@ func (p *Processor) run() error {
 
 		// The Publish method for SNS Encodes the notification using Base64 then stringifies it before
 		// setting that as the message body for SNS. Do the inverse to retrieve the notification.
-		notificationBytes, err := base64.StdEncoding.DecodeString(valueString)
+		messageBytes, err := base64.StdEncoding.DecodeString(valueString)
 		if err != nil {
 			logger.Errorf(context.Background(), "failed to Base64 decode from message string [%s] from message [%s] with err: %v", valueString, stringMsg, err)
 			p.systemMetrics.MessageDecodingError.Inc()
@@ -82,33 +77,23 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		if err = proto.Unmarshal(notificationBytes, &emailMessage); err != nil {
-			logger.Debugf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
-			p.systemMetrics.MessageDecodingError.Inc()
-			p.markMessageDone(msg)
-			continue
+		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
+		// Send message to webhook
+		if err = p.webhook.Post(context.Background(), string(messageBytes)); err != nil {
+			p.systemMetrics.MessageProcessorError.Inc()
+			logger.Errorf(context.Background(), "Error sending an message [%s] to webhook endpoint with err: %v", string(messageBytes), err)
+		} else {
+			p.systemMetrics.MessageSuccess.Inc()
 		}
 
-		//if err = p.email.SendEmail(context.Background(), emailMessage); err != nil {
-		//	p.systemMetrics.MessageProcessorError.Inc()
-		//	logger.Errorf(context.Background(), "Error sending an email message for message [%s] with emailM with err: %v", emailMessage.String(), err)
-		//} else {
-		//	p.systemMetrics.MessageSuccess.Inc()
-		//}
-
 		p.markMessageDone(msg)
-
 	}
 
-	// According to https://github.com/NYTimes/gizmo/blob/f2b3deec03175b11cdfb6642245a49722751357f/pubsub/pubsub.go#L36-L39,
-	// the channel backing the subscriber will just close if there is an error. The call to Err() is needed to identify
-	// there was an error in the channel or there are no more messages left (resulting in no errors when calling Err()).
 	if err = p.sub.Err(); err != nil {
 		p.systemMetrics.ChannelClosedError.Inc()
 		logger.Warningf(context.Background(), "The stream for the subscriber channel closed with err: %v", err)
 	}
 
-	// If there are no errors, nil will be returned.
 	return err
 }
 
@@ -129,10 +114,10 @@ func (p *Processor) StopProcessing() error {
 	return err
 }
 
-func NewProcessor(sub pubsub.Subscriber, emailer interfaces.Emailer, scope promutils.Scope) interfaces.Processor {
+func NewWebhookProcessor(sub pubsub.Subscriber, webhook webhookInterfaces.Webhook, scope promutils.Scope) interfaces.Processor {
 	return &Processor{
 		sub:           sub,
-		email:         emailer,
-		systemMetrics: newProcessorSystemMetrics(scope.NewSubScope("processor")),
+		webhook:       webhook,
+		systemMetrics: newProcessorSystemMetrics(scope.NewSubScope("webhook_processor")),
 	}
 }

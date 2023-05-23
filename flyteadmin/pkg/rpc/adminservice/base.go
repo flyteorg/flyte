@@ -3,8 +3,9 @@ package adminservice
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"runtime/debug"
+
+	"github.com/flyteorg/flyteadmin/pkg/async/webhook"
 
 	"github.com/flyteorg/flyteadmin/plugins"
 
@@ -21,7 +22,6 @@ import (
 
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule"
-	"github.com/flyteorg/flyteadmin/pkg/async/webhook"
 	"github.com/flyteorg/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyteadmin/pkg/manager/impl"
@@ -100,17 +100,21 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
 
-	logger.Infof(ctx, "notifier config: %v", *configuration.ApplicationConfiguration().GetNotificationsConfig())
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
-	logger.Infof(ctx, "publisher: %v", reflect.TypeOf(publisher))
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
-	logger.Infof(ctx, "processor: %v", reflect.TypeOf(processor))
+	webhookProcessors := webhook.NewWebhookProcessors(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
-	webhooks := webhook.NewWebhooks(ctx, *configuration.ApplicationConfiguration().GetWebhookConfig(), adminScope)
+
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
+	}()
+
+	go func() {
+		logger.Info(ctx, "Started processing webhook events.")
+		webhookProcessors[0].StartProcessing()
 	}()
 
 	// Configure workflow scheduler async processes.
@@ -149,7 +153,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, webhooks, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
