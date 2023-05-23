@@ -75,6 +75,10 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 }
 
 func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Processor {
+	if len(config.NotificationsProcessorConfig.QueueName) == 0 {
+		return implementations.NewNoopProcess()
+	}
+
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber

@@ -1293,7 +1293,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		m.systemMetrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
-	
+
 	go func() {
 		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
