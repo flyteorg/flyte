@@ -89,12 +89,12 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		//if err = p.email.SendEmail(context.Background(), emailMessage); err != nil {
-		//	p.systemMetrics.MessageProcessorError.Inc()
-		//	logger.Errorf(context.Background(), "Error sending an email message for message [%s] with emailM with err: %v", emailMessage.String(), err)
-		//} else {
-		//	p.systemMetrics.MessageSuccess.Inc()
-		//}
+		if err = p.email.SendEmail(context.Background(), emailMessage); err != nil {
+			p.systemMetrics.MessageProcessorError.Inc()
+			logger.Errorf(context.Background(), "Error sending an email message for message [%s] with emailM with err: %v", emailMessage.String(), err)
+		} else {
+			p.systemMetrics.MessageSuccess.Inc()
+		}
 
 		p.markMessageDone(msg)
 

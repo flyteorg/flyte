@@ -147,7 +147,6 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 		var err error
 		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 			publisher, err = gizmoAWS.NewPublisher(snsConfig)
-			logger.Errorf(context.Background(), "Failed to initialize aws publisher with config [%+v] and err: %v", snsConfig, err)
 			return err
 		})
 
@@ -155,7 +154,6 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 		if err != nil {
 			panic(err)
 		}
-		logger.Infof(context.Background(), "Using aws publisher implementation for config type [%s]", config.Type)
 		return implementations.NewPublisher(publisher, scope)
 	case common.GCP:
 		pubsubConfig := gizmoGCP.Config{
