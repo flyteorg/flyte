@@ -21,7 +21,7 @@ type SlackWebhook struct {
 func (s *SlackWebhook) Post(ctx context.Context, message string) error {
 	// curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
 	logger.Infof(ctx, "Posting to Slack with message: [%v]", message)
-	webhookURL := "https://hooks.slack.com/services/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"
+	webhookURL := "https://hooks.slack.com/services/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"
 	data := []byte(fmt.Sprintf("{'text': %s}", message))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
 	if err != nil {
