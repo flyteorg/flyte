@@ -22,7 +22,9 @@ const (
 	ArtifactTypeD                      // deck
 )
 
-var re = regexp.MustCompile("flyte://v1/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<artifactType>[iod])$")
+var re = regexp.MustCompile("flyte://v1/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<ioType>[iod])$")
+
+var reSpecificOutput = regexp.MustCompile("flyte://v1/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<ioType>[io])/(?P<literalName>[a-zA-Z0-9_-]+)$")
 
 func MatchRegex(reg *regexp.Regexp, input string) map[string]string {
 	names := reg.SubexpNames()
@@ -37,36 +39,90 @@ func MatchRegex(reg *regexp.Regexp, input string) map[string]string {
 	return dict
 }
 
-func ParseFlyteURL(flyteURL string) (core.NodeExecutionIdentifier, *int, ArtifactType, error) {
-	// flyteURL is of the form flyte://v1/project/domain/execution_id/node_id/attempt/[iod]
+type ParsedExecution struct {
+	// Returned when the user does not request a specific attempt
+	NodeExecID *core.NodeExecutionIdentifier
+
+	// This is returned in the case where the user requested a specific attempt. But the TaskID portion of this
+	// will be empty since that information is not encapsulated in the flyte url.
+	PartialTaskExecID *core.TaskExecutionIdentifier
+
+	// The name of the input or output in the literal map
+	LiteralName string
+
+	IOType ArtifactType
+}
+
+func tryMatches(flyteURL string) map[string]string {
+	var matches map[string]string
+
+	if matches = MatchRegex(re, flyteURL); len(matches) > 0 {
+		return matches
+	} else if matches = MatchRegex(reSpecificOutput, flyteURL); len(matches) > 0 {
+		return matches
+	}
+	return nil
+}
+
+func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
+	// flyteURL can be of the following forms
+	//  flyte://v1/project/domain/execution_id/node_id/attempt/[iod]
+	//  flyte://v1/project/domain/execution_id/node_id/attempt/[io]/output_name
+	//  flyte://v1/project/domain/execution_id/node_id/[io]/output_name
+	//  flyte://v1/project/domain/execution_id/node_id/[iod]
+
 	// where i stands for inputs.pb o for outputs.pb and d for the flyte deck
 	// If the retry attempt is missing, the io requested is assumed to be for the node instead of the task execution
-	matches := MatchRegex(re, flyteURL)
+
+	matches := tryMatches(flyteURL)
+	if matches == nil {
+		return ParsedExecution{}, fmt.Errorf("failed to parse [%s]", flyteURL)
+	}
+
 	proj := matches["project"]
 	domain := matches["domain"]
 	executionID := matches["exec"]
 	nodeID := matches["node"]
-	var attemptPtr *int // nil means node execution, not a task execution
-	if attempt := matches["attempt"]; len(attempt) > 0 {
-		a, err := strconv.Atoi(attempt)
-		if err != nil {
-			return core.NodeExecutionIdentifier{}, nil, ArtifactTypeUndefined, fmt.Errorf("failed to parse attempt [%v], %v", attempt, err)
-		}
-		attemptPtr = &a
-	}
-	ioType, err := ArtifactTypeString(matches["artifactType"])
+	ioType, err := ArtifactTypeString(matches["ioType"])
 	if err != nil {
-		return core.NodeExecutionIdentifier{}, nil, ArtifactTypeUndefined, err
+		return ParsedExecution{}, err
 	}
+	literalName := matches["literalName"] // may be empty
 
-	return core.NodeExecutionIdentifier{
+	// node and task level outputs
+	nodeExecID := core.NodeExecutionIdentifier{
 		NodeId: nodeID,
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: proj,
 			Domain:  domain,
 			Name:    executionID,
 		},
-	}, attemptPtr, ioType, nil
+	}
+
+	// if attempt is there, that means a task execution
+	if attempt := matches["attempt"]; len(attempt) > 0 {
+		a, err := strconv.Atoi(attempt)
+		if err != nil {
+			return ParsedExecution{}, fmt.Errorf("failed to parse attempt [%v], %v", attempt, err)
+		}
+		taskExecID := core.TaskExecutionIdentifier{
+			NodeExecutionId: &nodeExecID,
+			// checking for overflow here is probably unreasonable
+			RetryAttempt: uint32(a),
+		}
+		return ParsedExecution{
+			PartialTaskExecID: &taskExecID,
+			IOType:            ioType,
+			LiteralName:       literalName,
+		}, nil
+	}
+
+	return ParsedExecution{
+		NodeExecID:  &nodeExecID,
+		IOType:      ioType,
+		LiteralName: literalName,
+	}, nil
+
 }
 
 func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
