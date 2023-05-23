@@ -85,7 +85,7 @@ var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.Clou
 	Type: common.Local,
 })
 
-var webhooksConfig = config.MustRegisterSection(webhook, &interfaces.WebhookConfig{
+var webhooksConfig = config.MustRegisterSection(webhook, &interfaces.WebhooksConfig{
 	Type: "slack",
 })
 
@@ -124,8 +124,8 @@ func (p *ApplicationConfigurationProvider) GetCloudEventsConfig() *interfaces.Cl
 	return cloudEventsConfig.GetConfig().(*interfaces.CloudEventsConfig)
 }
 
-func (p *ApplicationConfigurationProvider) GetWebhookConfig() *interfaces.WebhookConfig {
-	return webhooksConfig.GetConfig().(*interfaces.WebhookConfig)
+func (p *ApplicationConfigurationProvider) GetWebhookConfig() *interfaces.WebhooksConfig {
+	return webhooksConfig.GetConfig().(*interfaces.WebhooksConfig)
 }
 
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {

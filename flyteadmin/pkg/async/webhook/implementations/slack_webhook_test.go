@@ -9,7 +9,7 @@ import (
 )
 
 func TestSlackWebhook(t *testing.T) {
-	webhook := NewSlackWebhook(runtimeInterfaces.WebhookConfig{}, promutils.NewTestScope())
-	err := webhook.Post(context.Background(), "workflowExecution", nil)
+	webhook := NewSlackWebhook(runtimeInterfaces.WebhooksConfig{}, promutils.NewTestScope())
+	err := webhook.Post(context.Background(), "message")
 	assert.Nil(t, err)
 }

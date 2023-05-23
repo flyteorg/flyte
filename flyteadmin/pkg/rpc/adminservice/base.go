@@ -3,7 +3,7 @@ package adminservice
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
+	"reflect"
 	"runtime/debug"
 
 	"github.com/flyteorg/flyteadmin/plugins"
@@ -100,8 +100,11 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
 
+	logger.Infof(ctx, "notifier config: %v", *configuration.ApplicationConfiguration().GetNotificationsConfig())
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
-	processor := implementations.NewNoopProcess()
+	logger.Infof(ctx, "publisher: %v", reflect.TypeOf(publisher))
+	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	logger.Infof(ctx, "processor: %v", reflect.TypeOf(processor))
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 	webhooks := webhook.NewWebhooks(ctx, *configuration.ApplicationConfiguration().GetWebhookConfig(), adminScope)

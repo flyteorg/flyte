@@ -9,6 +9,8 @@ import (
 
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	webhookImplementations "github.com/flyteorg/flyteadmin/pkg/async/webhook/implementations"
+	webhookInterface "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/logger"
 
@@ -74,11 +76,16 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 	}
 }
 
+func GetWebhook(config runtimeInterfaces.WebhooksConfig, scope promutils.Scope) webhookInterface.Webhook {
+	return webhookImplementations.NewSlackWebhook(config, scope)
+}
+
 func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Processor {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
 	var emailer interfaces.Emailer
+	var webhook webhookInterface.Webhook
 	switch config.Type {
 	case common.AWS:
 		sqsConfig := gizmoAWS.SQSConfig{
@@ -103,7 +110,8 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 			panic(err)
 		}
 		emailer = GetEmailer(config, scope)
-		return implementations.NewProcessor(sub, emailer, scope)
+		webhook = GetWebhook(runtimeInterfaces.WebhooksConfig{}, scope)
+		return implementations.NewProcessor(sub, emailer, webhook, scope)
 	case common.GCP:
 		projectID := config.GCPConfig.ProjectID
 		subscription := config.NotificationsProcessorConfig.QueueName

@@ -9,6 +9,7 @@ import (
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/flyteorg/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	webhookInterfaces "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -19,6 +20,7 @@ import (
 type Processor struct {
 	sub           pubsub.Subscriber
 	email         interfaces.Emailer
+	webhook       webhookInterfaces.Webhook
 	systemMetrics processorSystemMetrics
 }
 
@@ -89,9 +91,18 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		if err = p.email.SendEmail(context.Background(), emailMessage); err != nil {
+		//if err = p.email.SendEmail(context.Background(), emailMessage); err != nil {
+		//	p.systemMetrics.MessageProcessorError.Inc()
+		//	logger.Errorf(context.Background(), "Error sending an email message for message [%s] with emailM with err: %v", emailMessage.String(), err)
+		//} else {
+		//	p.systemMetrics.MessageSuccess.Inc()
+		//}
+
+		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
+		// Send message to webhook
+		if err = p.webhook.Post(context.Background(), emailMessage.Body); err != nil {
 			p.systemMetrics.MessageProcessorError.Inc()
-			logger.Errorf(context.Background(), "Error sending an email message for message [%s] with emailM with err: %v", emailMessage.String(), err)
+			logger.Errorf(context.Background(), "Error sending an message [%s] to webhook endpoint with err: %v", emailMessage.Body, err)
 		} else {
 			p.systemMetrics.MessageSuccess.Inc()
 		}
@@ -129,10 +140,11 @@ func (p *Processor) StopProcessing() error {
 	return err
 }
 
-func NewProcessor(sub pubsub.Subscriber, emailer interfaces.Emailer, scope promutils.Scope) interfaces.Processor {
+func NewProcessor(sub pubsub.Subscriber, emailer interfaces.Emailer, webhook webhookInterfaces.Webhook, scope promutils.Scope) interfaces.Processor {
 	return &Processor{
 		sub:           sub,
 		email:         emailer,
+		webhook:       webhook,
 		systemMetrics: newProcessorSystemMetrics(scope.NewSubScope("processor")),
 	}
 }

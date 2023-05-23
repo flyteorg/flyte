@@ -552,10 +552,15 @@ type NotificationsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
-// WebhookConfig defines the configuration for the webhook service.
-type WebhookConfig struct {
-	Type string `json:"type"`
-	URL  string `json:"url"`
+// WebhooksConfig defines the configuration for the webhook service.
+type WebhooksConfig struct {
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type      string    `json:"type"`
+	Region    string    `json:"region"`
+	AWSConfig AWSConfig `json:"aws"`
+	GCPConfig GCPConfig `json:"gcp"`
+	URL       string    `json:"url"`
 }
 
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.
@@ -578,5 +583,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
-	GetWebhookConfig() *WebhookConfig
+	GetWebhookConfig() *WebhooksConfig
 }
