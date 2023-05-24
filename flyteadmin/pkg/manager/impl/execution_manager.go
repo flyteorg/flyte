@@ -1512,36 +1512,48 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 			continue
 		}
 
-		// Currently all three supported notifications use email underneath to send the notification.
-		// Convert Slack and PagerDuty into an EmailNotification type.
-		var emailNotification admin.EmailNotification
-		if notification.GetEmail() != nil {
-			emailNotification.RecipientsEmail = notification.GetEmail().GetRecipientsEmail()
-		} else if notification.GetPagerDuty() != nil {
-			emailNotification.RecipientsEmail = notification.GetPagerDuty().GetRecipientsEmail()
-		} else if notification.GetSlack() != nil {
-			emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
-		} else {
-			logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
-			m.systemMetrics.UnexpectedDataError.Inc()
-			// Unsupported notification types should have been caught when the launch plan was being created.
-			return errors.NewFlyteAdminErrorf(codes.Internal, "Unsupported notification type [%v] for execution [%+v]",
-				notification.Type, request.Event.ExecutionId)
-		}
+		payload, err := m.getPayload(ctx, request, notification, adminExecution)
 
-		// Convert the email Notification into an email message to be published.
-		// Currently there are no possible errors while creating an email message.
-		// Once customizable content is specified, errors are possible.
-		email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
-			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
-		if err = m.notificationClient.Publish(ctx, proto.MessageName(&emailNotification), email); err != nil {
+		if err = m.notificationClient.Publish(ctx, proto.MessageName(payload), payload); err != nil {
 			m.systemMetrics.PublishNotificationError.Inc()
 			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
 		}
 	}
 	return nil
+}
+
+func (m *ExecutionManager) getPayload(ctx context.Context, request admin.WorkflowExecutionEventRequest,
+	notification *admin.Notification, adminExecution *admin.Execution) (proto.Message, error) {
+	// Currently all three supported notifications use email underneath to send the notification.
+	// Convert Slack and PagerDuty into an EmailNotification type.
+	var emailNotification admin.EmailNotification
+	if notification.GetEmail() != nil {
+		emailNotification.RecipientsEmail = notification.GetEmail().GetRecipientsEmail()
+	} else if notification.GetPagerDuty() != nil {
+		emailNotification.RecipientsEmail = notification.GetPagerDuty().GetRecipientsEmail()
+	} else if notification.GetSlack() != nil {
+		emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
+	} else if notification.GetWebhook() != nil {
+		var msg proto.Message
+		payload := notifications.SubstituteParameters(notification.GetWebhook().Payload, request, adminExecution)
+		err := proto.UnmarshalText(payload, msg)
+		return msg, err
+	} else {
+		logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
+		m.systemMetrics.UnexpectedDataError.Inc()
+		// Unsupported notification types should have been caught when the launch plan was being created.
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Unsupported notification type [%v] for execution [%+v]",
+			notification.Type, request.Event.ExecutionId)
+	}
+
+	// Convert the email Notification into an email message to be published.
+	// Currently, there are no possible errors while creating an email message.
+	// Once customizable content is specified, errors are possible.
+	email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
+		*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
+	return email, nil
 }
 
 func (m *ExecutionManager) TerminateExecution(
