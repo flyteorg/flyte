@@ -89,7 +89,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		nextState, err = array.DetermineDiscoverability(ctx, tCtx, pluginConfig.MaxArrayJobSize, pluginState)
 
 		nextPhase, _ := nextState.GetPhase()
-		if err == nil && nextPhase != arrayCore.PhaseStart {
+		if err == nil && nextPhase != arrayCore.PhaseStart && nextPhase != arrayCore.PhasePermanentFailure {
 			// we wait to transition out of PhaseStart to InitializeExternalResources because then the array
 			// job configuration has then been validated and all of the metadata necessary to report subtask
 			// status (ie. cache hit / etc) is available.
