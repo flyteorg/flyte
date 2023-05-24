@@ -1580,7 +1580,8 @@ func (m *ExecutionManager) publishWebhookNotifications(ctx context.Context, requ
 		}
 
 		var msg proto.Message
-		payload := notifications.SubstituteParameters(notification.GetWebhook().Payload, request, adminExecution)
+		// TODO: Add message attributes
+		payload := notifications.SubstituteParameters("hello world", request, adminExecution)
 		err := proto.UnmarshalText(payload, msg)
 
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result

@@ -75,10 +75,6 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 }
 
 func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Processor {
-	if len(config.NotificationsProcessorConfig.QueueName) == 0 {
-		return implementations.NewNoopProcess()
-	}
-
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
@@ -134,6 +130,7 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 }
 
 func NewWebhookNotificationsPublisher(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) interfaces.Publisher {
+	logger.Infof(context.Background(), "Starting webhook notification publisher  [%s]", config.Type)
 	cfg := runtimeInterfaces.NotificationsConfig{
 		Type: config.Type,
 		NotificationsPublisherConfig: runtimeInterfaces.NotificationsPublisherConfig{
