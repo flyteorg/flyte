@@ -111,7 +111,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 
 	publisher := notifications.NewWebhookNotificationsPublisher(*configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
-	webhookProcessors := webhook.NewWebhookProcessors(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	webhookProcessors := webhook.NewWebhookProcessors(*configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing webhook events.")
 		webhookProcessors[0].StartProcessing()
