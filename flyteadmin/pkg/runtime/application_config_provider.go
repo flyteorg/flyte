@@ -12,6 +12,7 @@ const flyteAdmin = "flyteadmin"
 const scheduler = "scheduler"
 const remoteData = "remoteData"
 const notifications = "notifications"
+const webhookNotifications = "webhookNotifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
@@ -63,6 +64,9 @@ var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.Remote
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
 })
+var webhookNotificationsConfig = config.MustRegisterSection(webhookNotifications, &interfaces.WebhooksNotificationConfig{
+	Type: common.Local,
+})
 var domainsConfig = config.MustRegisterSection(domains, &interfaces.DomainsConfig{
 	{
 		ID:   "development",
@@ -83,10 +87,6 @@ var externalEventsConfig = config.MustRegisterSection(externalEvents, &interface
 
 var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.CloudEventsConfig{
 	Type: common.Local,
-})
-
-var webhooksConfig = config.MustRegisterSection(webhook, &interfaces.WebhooksNotificationConfig{
-	Type: "slack",
 })
 
 // Implementation of an interfaces.ApplicationConfiguration
@@ -125,7 +125,7 @@ func (p *ApplicationConfigurationProvider) GetCloudEventsConfig() *interfaces.Cl
 }
 
 func (p *ApplicationConfigurationProvider) GetWebhookNotificationConfig() *interfaces.WebhooksNotificationConfig {
-	return webhooksConfig.GetConfig().(*interfaces.WebhooksNotificationConfig)
+	return webhookNotificationsConfig.GetConfig().(*interfaces.WebhooksNotificationConfig)
 }
 
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {
