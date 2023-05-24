@@ -18,7 +18,7 @@ import (
 
 var enable64decoding = false
 
-func GetWebhook(config runtimeInterfaces.WebhooksConfig, scope promutils.Scope) webhookInterfaces.Webhook {
+func GetWebhook(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) webhookInterfaces.Webhook {
 	// TODO: Get others webhooks
 	return implementations.NewSlackWebhook(config, scope)
 }

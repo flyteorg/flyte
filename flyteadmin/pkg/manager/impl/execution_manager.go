@@ -90,6 +90,7 @@ type ExecutionManager struct {
 	systemMetrics             executionSystemMetrics
 	userMetrics               executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
+	webhookClient             notificationInterfaces.Publisher
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
 	namedEntityManager        interfaces.NamedEntityInterface
@@ -1287,6 +1288,14 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 				request, err)
 			return nil, err
 		}
+		err = m.publishWebhookNotifications(ctx, request, *executionModel)
+		if err != nil {
+			// The only errors that publishNotifications will forward are those related
+			// to unexpected data and transformation errors.
+			logger.Debugf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
+				request, err)
+			return nil, err
+		}
 	}
 
 	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
@@ -1512,11 +1521,32 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 			continue
 		}
 
-		payload, err := m.getPayload(ctx, request, notification, adminExecution)
+		// Currently all three supported notifications use email underneath to send the notification.
+		// Convert Slack and PagerDuty into an EmailNotification type.
+		var emailNotification admin.EmailNotification
+		if notification.GetEmail() != nil {
+			emailNotification.RecipientsEmail = notification.GetEmail().GetRecipientsEmail()
+		} else if notification.GetPagerDuty() != nil {
+			emailNotification.RecipientsEmail = notification.GetPagerDuty().GetRecipientsEmail()
+		} else if notification.GetSlack() != nil {
+			emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
+		} else {
+			logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
+			m.systemMetrics.UnexpectedDataError.Inc()
+			// Unsupported notification types should have been caught when the launch plan was being created.
+			return errors.NewFlyteAdminErrorf(codes.Internal, "Unsupported notification type [%v] for execution [%+v]",
+				notification.Type, request.Event.ExecutionId)
+		}
+
+		// Convert the email Notification into an email message to be published.
+		// Currently, there are no possible errors while creating an email message.
+		// Once customizable content is specified, errors are possible.
+		email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
+			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
 
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
-		if err = m.notificationClient.Publish(ctx, proto.MessageName(payload), payload); err != nil {
+		if err = m.notificationClient.Publish(ctx, proto.MessageName(email), email); err != nil {
 			m.systemMetrics.PublishNotificationError.Inc()
 			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
 		}
@@ -1524,36 +1554,43 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 	return nil
 }
 
-func (m *ExecutionManager) getPayload(ctx context.Context, request admin.WorkflowExecutionEventRequest,
-	notification *admin.Notification, adminExecution *admin.Execution) (proto.Message, error) {
-	// Currently all three supported notifications use email underneath to send the notification.
-	// Convert Slack and PagerDuty into an EmailNotification type.
-	var emailNotification admin.EmailNotification
-	if notification.GetEmail() != nil {
-		emailNotification.RecipientsEmail = notification.GetEmail().GetRecipientsEmail()
-	} else if notification.GetPagerDuty() != nil {
-		emailNotification.RecipientsEmail = notification.GetPagerDuty().GetRecipientsEmail()
-	} else if notification.GetSlack() != nil {
-		emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
-	} else if notification.GetWebhook() != nil {
+func (m *ExecutionManager) publishWebhookNotifications(ctx context.Context, request admin.WorkflowExecutionEventRequest,
+	execution models.Execution) error {
+	adminExecution, err := transformers.FromExecutionModel(execution, transformers.DefaultExecutionTransformerOptions)
+	if err != nil {
+		// This shouldn't happen because execution manager marshaled the data into models.Execution.
+		m.systemMetrics.TransformerError.Inc()
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to transform execution [%+v] with err: %v", request.Event.ExecutionId, err)
+	}
+	var notificationsList = adminExecution.Closure.Notifications
+	logger.Debugf(ctx, "publishing notifications for execution [%+v] in state [%+v] for notifications [%+v]",
+		request.Event.ExecutionId, request.Event.Phase, notificationsList)
+	for _, notification := range notificationsList {
+		// Check if the notification phase matches the current one.
+		var matchPhase = false
+		for _, phase := range notification.Phases {
+			if phase == request.Event.Phase {
+				matchPhase = true
+			}
+		}
+
+		// The current phase doesn't match; no notifications will be sent for the current notification option.
+		if !matchPhase {
+			continue
+		}
+
 		var msg proto.Message
 		payload := notifications.SubstituteParameters(notification.GetWebhook().Payload, request, adminExecution)
 		err := proto.UnmarshalText(payload, msg)
-		return msg, err
-	} else {
-		logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
-		m.systemMetrics.UnexpectedDataError.Inc()
-		// Unsupported notification types should have been caught when the launch plan was being created.
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Unsupported notification type [%v] for execution [%+v]",
-			notification.Type, request.Event.ExecutionId)
-	}
 
-	// Convert the email Notification into an email message to be published.
-	// Currently, there are no possible errors while creating an email message.
-	// Once customizable content is specified, errors are possible.
-	email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
-		*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
-	return email, nil
+		// Errors seen while publishing a message are considered non-fatal to the method and will not result
+		// in the method returning an error.
+		if err = m.webhookClient.Publish(ctx, proto.MessageName(msg), msg); err != nil {
+			m.systemMetrics.PublishNotificationError.Inc()
+			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
+		}
+	}
+	return nil
 }
 
 func (m *ExecutionManager) TerminateExecution(
@@ -1637,7 +1674,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
-	publisher notificationInterfaces.Publisher,
+	notificationPublisher notificationInterfaces.Publisher, publisher notificationInterfaces.Publisher,
 	urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
@@ -1664,7 +1701,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		_clock:                    clock.New(),
 		systemMetrics:             systemMetrics,
 		userMetrics:               userMetrics,
-		notificationClient:        publisher,
+		notificationClient:        notificationPublisher,
+		webhookClient:             publisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
 		namedEntityManager:        namedEntityManager,

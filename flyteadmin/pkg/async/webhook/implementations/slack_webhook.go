@@ -15,7 +15,7 @@ import (
 )
 
 type SlackWebhook struct {
-	config        runtimeInterfaces.WebhooksConfig
+	config        runtimeInterfaces.WebhooksNotificationConfig
 	systemMetrics webhookMetrics
 }
 
@@ -48,7 +48,7 @@ func (s *SlackWebhook) Post(ctx context.Context, message string) error {
 	return nil
 }
 
-func NewSlackWebhook(config runtimeInterfaces.WebhooksConfig, scope promutils.Scope) interfaces.Webhook {
+func NewSlackWebhook(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) interfaces.Webhook {
 
 	return &SlackWebhook{
 		config:        config,

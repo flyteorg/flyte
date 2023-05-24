@@ -546,21 +546,30 @@ type NotificationsConfig struct {
 	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
 	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
 	NotificationsEmailerConfig   NotificationsEmailerConfig   `json:"emailer"`
-	WebhooksConfig               []WebhooksConfig             `json:"webhook"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
-// WebhooksConfig defines the configuration for the webhook service.
-type WebhooksConfig struct {
+type WebHookConfig struct {
 	// Type of webhook service to use. Currently only "slack" is supported.
-	Type                         string                       `json:"type"`
+	Name                         string                       `json:"name"`
 	URL                          string                       `json:"url"`
+	Payload                      string                       `json:"payload"`
+	SecretName                   string                       `json:"secret"`
+	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
+}
+
+// WebhooksNotificationConfig defines the configuration for the webhook service.
+type WebhooksNotificationConfig struct {
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type                         string                       `json:"type"`
 	AWSConfig                    AWSConfig                    `json:"aws"`
 	GCPConfig                    GCPConfig                    `json:"gcp"`
-	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
+	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
+	WebhooksConfig               []WebHookConfig              `json:"webhooks"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
@@ -587,5 +596,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
-	GetWebhookConfig() *WebhooksConfig
+	GetWebhookNotificationConfig() *WebhooksNotificationConfig
 }

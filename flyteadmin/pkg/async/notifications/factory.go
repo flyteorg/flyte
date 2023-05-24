@@ -133,6 +133,20 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 	}
 }
 
+func NewWebhookNotificationsPublisher(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) interfaces.Publisher {
+	cfg := runtimeInterfaces.NotificationsConfig{
+		Type: config.Type,
+		NotificationsPublisherConfig: runtimeInterfaces.NotificationsPublisherConfig{
+			TopicName: config.NotificationsPublisherConfig.TopicName,
+		},
+		AWSConfig:             config.AWSConfig,
+		GCPConfig:             config.GCPConfig,
+		ReconnectAttempts:     config.ReconnectAttempts,
+		ReconnectDelaySeconds: config.ReconnectDelaySeconds,
+	}
+	return NewNotificationsPublisher(cfg, scope)
+}
+
 func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Publisher {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
