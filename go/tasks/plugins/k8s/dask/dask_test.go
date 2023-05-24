@@ -49,6 +49,10 @@ var (
 			v1.ResourceMemory: resource.MustParse("17G"),
 		},
 	}
+	defaultResources = v1.ResourceRequirements{
+		Requests: testPlatformResources.Requests,
+		Limits:   testPlatformResources.Requests,
+	}
 )
 
 func dummyDaskJob(status daskAPI.JobStatus) *daskAPI.DaskJob {
@@ -199,7 +203,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	assert.Equal(t, "job-runner", jobSpec.Containers[0].Name)
 	assert.Equal(t, defaultTestImage, jobSpec.Containers[0].Image)
 	assert.Equal(t, testArgs, jobSpec.Containers[0].Args)
-	assert.Equal(t, testPlatformResources, jobSpec.Containers[0].Resources)
+	assert.Equal(t, defaultResources, jobSpec.Containers[0].Resources)
 	assert.Equal(t, defaultTolerations, jobSpec.Tolerations)
 	assert.Equal(t, defaultNodeSelector, jobSpec.NodeSelector)
 	assert.Equal(t, defaultAffinity, jobSpec.Affinity)
@@ -226,7 +230,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	}
 	assert.Equal(t, v1.RestartPolicyNever, schedulerSpec.RestartPolicy)
 	assert.Equal(t, defaultTestImage, schedulerSpec.Containers[0].Image)
-	assert.Equal(t, testPlatformResources, schedulerSpec.Containers[0].Resources)
+	assert.Equal(t, defaultResources, schedulerSpec.Containers[0].Resources)
 	assert.Equal(t, []string{"dask-scheduler"}, schedulerSpec.Containers[0].Args)
 	assert.Equal(t, expectedPorts, schedulerSpec.Containers[0].Ports)
 	assert.Equal(t, testEnvVars, schedulerSpec.Containers[0].Env)
@@ -263,7 +267,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	assert.Equal(t, "dask-worker", workerSpec.Containers[0].Name)
 	assert.Equal(t, v1.PullIfNotPresent, workerSpec.Containers[0].ImagePullPolicy)
 	assert.Equal(t, defaultTestImage, workerSpec.Containers[0].Image)
-	assert.Equal(t, testPlatformResources, workerSpec.Containers[0].Resources)
+	assert.Equal(t, defaultResources, workerSpec.Containers[0].Resources)
 	assert.Equal(t, testEnvVars, workerSpec.Containers[0].Env)
 	assert.Equal(t, defaultTolerations, workerSpec.Tolerations)
 	assert.Equal(t, defaultNodeSelector, workerSpec.NodeSelector)
@@ -273,9 +277,9 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 		"--name",
 		"$(DASK_WORKER_NAME)",
 		"--nthreads",
-		"5",
+		"4",
 		"--memory-limit",
-		"17G",
+		"1Gi",
 	}, workerSpec.Containers[0].Args)
 }
 

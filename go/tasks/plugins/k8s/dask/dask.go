@@ -60,9 +60,9 @@ func getDefaults(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, 
 		}
 	}
 
-	defaultResources := executionMetadata.GetPlatformResources()
-	if executionMetadata.GetOverrides() != nil && executionMetadata.GetOverrides().GetResources() != nil {
-		defaultResources = executionMetadata.GetOverrides().GetResources()
+	containerResources, err := flytek8s.ToK8sResourceRequirements(defaultContainerSpec.GetResources())
+	if err != nil {
+		return nil, err
 	}
 
 	jobRunnerContainer := v1.Container{
@@ -70,7 +70,7 @@ func getDefaults(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, 
 		Image:     defaultImage,
 		Args:      defaultContainerSpec.GetArgs(),
 		Env:       defaultEnvVars,
-		Resources: *defaultResources,
+		Resources: *containerResources,
 	}
 
 	templateParameters := template.Parameters{
@@ -79,15 +79,16 @@ func getDefaults(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, 
 		OutputPath:       taskCtx.OutputWriter(),
 		Task:             taskCtx.TaskReader(),
 	}
-	err := flytek8s.AddFlyteCustomizationsToContainer(ctx, templateParameters, flytek8s.ResourceCustomizationModeAssignResources, &jobRunnerContainer)
-	if err != nil {
+	if err = flytek8s.AddFlyteCustomizationsToContainer(ctx, templateParameters,
+		flytek8s.ResourceCustomizationModeMergeExistingResources, &jobRunnerContainer); err != nil {
+
 		return nil, err
 	}
 
 	return &defaults{
 		Image:              defaultImage,
 		JobRunnerContainer: jobRunnerContainer,
-		Resources:          defaultResources,
+		Resources:          &jobRunnerContainer.Resources,
 		Env:                defaultEnvVars,
 		Annotations:        executionMetadata.GetAnnotations(),
 		IsInterruptible:    executionMetadata.IsInterruptible(),

@@ -298,27 +298,39 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 
 	container.Env = DecorateEnvVars(ctx, container.Env, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID())
 
-	if parameters.TaskExecMetadata.GetOverrides() != nil && parameters.TaskExecMetadata.GetOverrides().GetResources() != nil {
-		res := parameters.TaskExecMetadata.GetOverrides().GetResources()
-		platformResources := parameters.TaskExecMetadata.GetPlatformResources()
-		if platformResources == nil {
-			platformResources = &v1.ResourceRequirements{}
-		}
-
-		logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
-			" Resources [%v] with mode [%v]", res, platformResources, container.Resources, mode)
-
-		switch mode {
-		case ResourceCustomizationModeAssignResources:
-			container.Resources = ApplyResourceOverrides(*res, *platformResources, assignIfUnset)
-		case ResourceCustomizationModeMergeExistingResources:
-			MergeResources(*res, &container.Resources)
-			container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, assignIfUnset)
-		case ResourceCustomizationModeEnsureExistingResourcesInRange:
-			container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
-		}
-
-		logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)
+	// retrieve platformResources and overrideResources to use when aggregating container resources
+	platformResources := parameters.TaskExecMetadata.GetPlatformResources()
+	if platformResources == nil {
+		platformResources = &v1.ResourceRequirements{}
 	}
+
+	var overrideResources *v1.ResourceRequirements
+	if parameters.TaskExecMetadata.GetOverrides() != nil && parameters.TaskExecMetadata.GetOverrides().GetResources() != nil {
+		overrideResources = parameters.TaskExecMetadata.GetOverrides().GetResources()
+	}
+	if overrideResources == nil {
+		overrideResources = &v1.ResourceRequirements{}
+	}
+
+	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
+		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)
+
+	switch mode {
+	case ResourceCustomizationModeAssignResources:
+		// this will use overrideResources to set container resources and fallback to the platformResource values.
+		// it is important to note that this ignores the existing container.Resources values.
+		container.Resources = ApplyResourceOverrides(*overrideResources, *platformResources, assignIfUnset)
+	case ResourceCustomizationModeMergeExistingResources:
+		// this merges the overrideResources on top of the existing container.Resources to apply the overrides, then it
+		// uses the platformResource values to set defaults for any missing resource.
+		MergeResources(*overrideResources, &container.Resources)
+		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, assignIfUnset)
+	case ResourceCustomizationModeEnsureExistingResourcesInRange:
+		// this use the platformResources defaults to ensure that the container.Resources values are within the
+		// platformResources limits. it will not override any existing container.Resources values.
+		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
+	}
+
+	logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)
 	return nil
 }
