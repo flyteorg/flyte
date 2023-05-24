@@ -79,6 +79,9 @@ type Config struct {
 	// find the full schema here https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto#L625
 	// Note that required packages may need to be preloaded to support certain service config. For example "google.golang.org/grpc/balancer/roundrobin" should be preloaded to have round-robin policy supported.
 	DefaultServiceConfig string `json:"defaultServiceConfig" pdflag:",Set the default service config for the admin gRPC client"`
+
+	// HTTPProxyURL allows operators to access external OAuth2 servers using an external HTTP Proxy
+	HTTPProxyURL config.URL `json:"httpProxyURL" pflag:",OPTIONAL: HTTP Proxy to be used for OAuth requests."`
 }
 
 var (

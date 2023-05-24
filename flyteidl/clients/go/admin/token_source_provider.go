@@ -227,13 +227,14 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 
 	token, err := s.new.Token()
 	if err != nil {
+		logger.Warnf(s.ctx, "failed to get token: %w", err)
 		return nil, fmt.Errorf("failed to get token: %w", err)
 	}
 	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
 
 	err = s.tokenCache.SaveToken(token)
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to cache token")
+		logger.Warnf(s.ctx, "failed to cache token: %w", err)
 	}
 
 	return token, nil
