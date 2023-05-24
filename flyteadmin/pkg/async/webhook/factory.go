@@ -18,19 +18,19 @@ import (
 
 var enable64decoding = false
 
-func GetWebhook(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) webhookInterfaces.Webhook {
+func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) webhookInterfaces.Webhook {
 	// TODO: Get others webhooks
 	return implementations.NewSlackWebhook(config, scope)
 }
 
-func NewWebhookProcessors(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) []interfaces.Processor {
+func NewWebhookProcessors(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) []interfaces.Processor {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
 	var processors []interfaces.Processor
 
 	for _, cfg := range config.WebhooksConfig {
-		if len(cfg.AWSConfig.Region) != 0 {
+		if len(config.AWSConfig.Region) != 0 {
 			sqsConfig := gizmoAWS.SQSConfig{
 				QueueName:           cfg.NotificationsProcessorConfig.QueueName,
 				QueueOwnerAccountID: cfg.NotificationsProcessorConfig.AccountID,
@@ -39,7 +39,7 @@ func NewWebhookProcessors(config runtimeInterfaces.NotificationsConfig, scope pr
 				// However, the message body of SQS is the SNS message format which isn't Base64 encoded.
 				ConsumeBase64: &enable64decoding,
 			}
-			sqsConfig.Region = cfg.AWSConfig.Region
+			sqsConfig.Region = config.AWSConfig.Region
 			var err error
 			err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 				sub, err = gizmoAWS.NewSubscriber(sqsConfig)
