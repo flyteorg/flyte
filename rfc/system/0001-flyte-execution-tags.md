@@ -18,12 +18,13 @@ motivation of how this feature could further improve other ecosystem projects.
 ## 2 Motivation
 
 As a User I want to
- - Group a certain number of executions into an experiment group - for ease of debugging and discovery.
+ - Group a certain number of executions into an experiment group - for ease of debugging and discovery - when launching the workflows or after they have already finished.
  - I want to mark certain executions as “blessed” or “released”. This could be done through providing a semantic version after the execution is successful 
  - I want to group all “sub launchplan” executions with the parent execution.  
  - External systems could group executions based on some identifiers.  
  - Users could name their executions without having to worry about the character limits, uniqueness constraints and limited characterset.
  - Simplify filtering of certain executions
+ - Be able to remove tags from an execution after it has been started or after it has finished.
 
 ## 3 Proposed Implementation
 
@@ -58,19 +59,11 @@ flytectl get execution -p flytesnacks -d development --filter.labels="k:v"
 ```
 
 ### UI Interface
+All labels are treated the same way and allow search/filter and click based grouping.
+Users will get the regular executions view with all the labels available on each execution.
+The users are allowed to filter an exection simply by clicking on a label and then all
+executions are filtered by that label. 
 
-Two approaches
-
-#### Approach 1: Treat all labels the same way and allow search/filter and click based grouping
-In this approach users will get the regular executions view with all the labels
-available on each execution. The users are allowed to filter an exection simply
-by clicking on a label and then all executions are filtered by that label. 
-
-#### Approach 2: Certain label keys are treated special
- - “group” will group everything
- - “experiment” will also group everything with higher priority. 
- - “name” will override the execution id with the name?
- 
 ![Grouping / Filtering UX](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/rfc/tags/labels-filter.png)
 
 
