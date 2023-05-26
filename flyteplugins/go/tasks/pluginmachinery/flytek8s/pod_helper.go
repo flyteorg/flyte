@@ -622,7 +622,9 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	//         startTime: "2022-01-30T14:24:07Z"
 	//     }
 	// }
-	if code == "Shutdown" {
+	//
+	// In some versions of GKE the reason can also be "Terminated"
+	if code == "Shutdown" || code == "Terminated" {
 		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
 	}
 
