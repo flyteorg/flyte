@@ -900,6 +900,17 @@ func TestDemystifyFailure(t *testing.T) {
 		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
 	})
+
+	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+			Message: "Foobar",
+			Reason:  "Terminated",
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+	})
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
