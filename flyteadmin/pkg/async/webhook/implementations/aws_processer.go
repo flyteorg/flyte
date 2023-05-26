@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/golang/protobuf/proto"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
@@ -30,8 +32,8 @@ func (p *Processor) StartProcessing() {
 }
 
 func (p *Processor) run() error {
+	var payload admin.WebhookPayload
 	var err error
-
 	for msg := range p.sub.Start() {
 		p.systemMetrics.MessageTotal.Inc()
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
@@ -69,7 +71,7 @@ func (p *Processor) run() error {
 
 		// The Publish method for SNS Encodes the notification using Base64 then stringifies it before
 		// setting that as the message body for SNS. Do the inverse to retrieve the notification.
-		messageBytes, err := base64.StdEncoding.DecodeString(valueString)
+		notificationBytes, err := base64.StdEncoding.DecodeString(valueString)
 		if err != nil {
 			logger.Errorf(context.Background(), "failed to Base64 decode from message string [%s] from message [%s] with err: %v", valueString, stringMsg, err)
 			p.systemMetrics.MessageDecodingError.Inc()
@@ -77,11 +79,18 @@ func (p *Processor) run() error {
 			continue
 		}
 
+		if err = proto.Unmarshal(notificationBytes, &payload); err != nil {
+			logger.Debugf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
+			p.systemMetrics.MessageDecodingError.Inc()
+			p.markMessageDone(msg)
+			continue
+		}
+
 		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
 		// Send message to webhook
-		if err = p.webhook.Post(context.Background(), string(messageBytes)); err != nil {
+		if err = p.webhook.Post(context.Background(), payload); err != nil {
 			p.systemMetrics.MessageProcessorError.Inc()
-			logger.Errorf(context.Background(), "Error sending an message [%s] to webhook endpoint with err: %v", string(messageBytes), err)
+			logger.Errorf(context.Background(), "Error sending an message [%v] to webhook endpoint with err: %v", payload, err)
 		} else {
 			p.systemMetrics.MessageSuccess.Inc()
 		}

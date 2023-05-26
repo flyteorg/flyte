@@ -1565,6 +1565,12 @@ func (m *ExecutionManager) publishWebhookNotifications(ctx context.Context, requ
 	var notificationsList = adminExecution.Closure.Notifications
 	logger.Debugf(ctx, "publishing notifications for execution [%+v] in state [%+v] for notifications [%+v]",
 		request.Event.ExecutionId, request.Event.Phase, notificationsList)
+	// payloads[phase][name] = body
+	payloads := make(map[string]string)
+	for _, w := range m.config.ApplicationConfiguration().GetWebhookNotificationConfig().WebhooksConfig {
+		payloads[w.Name] = w.Payload
+	}
+
 	for _, notification := range notificationsList {
 		// Check if the notification phase matches the current one.
 		var matchPhase = false
@@ -1579,14 +1585,12 @@ func (m *ExecutionManager) publishWebhookNotifications(ctx context.Context, requ
 			continue
 		}
 
-		var msg proto.Message
+		payload := &admin.WebhookPayload{Message: notifications.SubstituteParameters(payloads["slack"], request, adminExecution)}
 		// TODO: Add message attributes
-		payload := notifications.SubstituteParameters("hello world", request, adminExecution)
-		err := proto.UnmarshalText(payload, msg)
 
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
-		if err = m.webhookClient.Publish(ctx, proto.MessageName(msg), msg); err != nil {
+		if err = m.webhookClient.Publish(ctx, "slack ", payload); err != nil {
 			m.systemMetrics.PublishNotificationError.Inc()
 			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
 		}

@@ -23,7 +23,7 @@ func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) w
 	return implementations.NewSlackWebhook(config, scope)
 }
 
-func NewWebhookProcessors(config runtimeInterfaces.WebhooksNotificationConfig, scope promutils.Scope) []interfaces.Processor {
+func NewWebhookProcessors(config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) []interfaces.Processor {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber

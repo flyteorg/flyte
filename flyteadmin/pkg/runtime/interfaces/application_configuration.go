@@ -561,8 +561,8 @@ type WebHookConfig struct {
 	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
 }
 
-// WebhooksNotificationConfig defines the configuration for the webhook service.
-type WebhooksNotificationConfig struct {
+// WebhookNotificationsConfig defines the configuration for the webhook service.
+type WebhookNotificationsConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
 	// scheme is used.
 	Type                         string                       `json:"type"`
@@ -596,5 +596,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
-	GetWebhookNotificationConfig() *WebhooksNotificationConfig
+	GetWebhookNotificationConfig() *WebhookNotificationsConfig
 }
