@@ -123,10 +123,11 @@ func GetSandboxImageSha(tag string, pre bool, g GHRepoService) (string, string, 
 			return "", release.GetTagName(), err
 		}
 		for _, v := range releases {
-			if *v.Prerelease && pre {
+			// When pre-releases are allowed, simply choose the latest release
+			if pre {
 				release = v
 				break
-			} else if !*v.Prerelease && !pre {
+			} else if !*v.Prerelease {
 				release = v
 				break
 			}
