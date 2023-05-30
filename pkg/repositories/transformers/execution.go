@@ -344,9 +344,8 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	}
 	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
 		trimmedErrOutputResult := closure.GetError()
-		if len(trimmedErrOutputResult.Message) > trimmedErrMessageLen {
-			trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
-		}
+		trimmedErrMessage := TrimErrorMessage(trimmedErrOutputResult.GetMessage())
+		trimmedErrOutputResult.Message = trimmedErrMessage
 		closure.OutputResult = &admin.ExecutionClosure_Error{
 			Error: trimmedErrOutputResult,
 		}
@@ -408,4 +407,12 @@ func FromExecutionModels(ctx context.Context, executionModels []models.Execution
 		executions[idx] = execution
 	}
 	return executions, nil
+}
+
+// TrimErrorMessage return the smallest possible trimmed error message >= trimmedErrMessageLen bytes in length that still forms a valid utf-8 string
+func TrimErrorMessage(errMsg string) string {
+	if len(errMsg) <= trimmedErrMessageLen {
+		return errMsg
+	}
+	return strings.ToValidUTF8(errMsg[:trimmedErrMessageLen], "")
 }
