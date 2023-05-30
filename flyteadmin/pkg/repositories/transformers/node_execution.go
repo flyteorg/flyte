@@ -321,11 +321,11 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution, opts *Execu
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
+
 	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
 		trimmedErrOutputResult := closure.GetError()
-		if len(trimmedErrOutputResult.Message) > trimmedErrMessageLen {
-			trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
-		}
+		trimmedErrMessage := TrimErrorMessage(trimmedErrOutputResult.GetMessage())
+		trimmedErrOutputResult.Message = trimmedErrMessage
 		closure.OutputResult = &admin.NodeExecutionClosure_Error{
 			Error: trimmedErrOutputResult,
 		}

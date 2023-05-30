@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 
@@ -602,6 +603,30 @@ func TestFromExecutionModel_Error(t *testing.T) {
 	assert.True(t, proto.Equal(expectedExecErr, execution.Closure.GetError()))
 }
 
+func TestFromExecutionModel_ValidUTF8TrimmedErrorMsg(t *testing.T) {
+	errMsg := "[1/1] currentAttempt done. Last Error: USER::                   │\n│ ❱  760 │   │   │   │   return __callback(*args, **kwargs)                    │\n││"
+
+	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: &core.ExecutionError{Message: errMsg}},
+	})
+	executionModel := models.Execution{
+		ExecutionKey: models.ExecutionKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Phase:   core.WorkflowExecution_FAILED.String(),
+		Closure: executionClosureBytes,
+	}
+	execution, err := FromExecutionModel(context.TODO(), executionModel, &ExecutionTransformerOptions{
+		TrimErrorMessage: true,
+	})
+	assert.NoError(t, err)
+	errMsgAreValidUTF8 := utf8.Valid([]byte(execution.GetClosure().GetError().GetMessage()))
+	assert.True(t, errMsgAreValidUTF8)
+}
+
 func TestFromExecutionModel_OverwriteNamespace(t *testing.T) {
 	abortCause := "abort cause"
 	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
@@ -874,4 +899,11 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.False(t, strings.Contains(err.Error(), "Failed to unmarshal execution closure"))
 	})
+}
+
+func TestTrimErrorMessage(t *testing.T) {
+	errMsg := "[1/1] currentAttempt done. Last Error: USER::                   │\n│ ❱  760 │   │   │   │   return __callback(*args, **kwargs)                    │\n││"
+	trimmedErrMessage := TrimErrorMessage(errMsg)
+	errMsgAreValidUTF8 := utf8.Valid([]byte(trimmedErrMessage))
+	assert.True(t, errMsgAreValidUTF8)
 }
