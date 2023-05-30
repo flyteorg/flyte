@@ -18775,6 +18775,438 @@ export namespace flyteidl {
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
         }
 
+        /** Represents an AgentService */
+        class AgentService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new AgentService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new AgentService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AgentService;
+
+            /**
+             * Calls CreateTask.
+             * @param request TaskCreateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and TaskCreateResponse
+             */
+            public createTask(request: flyteidl.service.ITaskCreateRequest, callback: flyteidl.service.AgentService.CreateTaskCallback): void;
+
+            /**
+             * Calls CreateTask.
+             * @param request TaskCreateRequest message or plain object
+             * @returns Promise
+             */
+            public createTask(request: flyteidl.service.ITaskCreateRequest): Promise<flyteidl.service.TaskCreateResponse>;
+
+            /**
+             * Calls GetTask.
+             * @param request TaskGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and TaskGetResponse
+             */
+            public getTask(request: flyteidl.service.ITaskGetRequest, callback: flyteidl.service.AgentService.GetTaskCallback): void;
+
+            /**
+             * Calls GetTask.
+             * @param request TaskGetRequest message or plain object
+             * @returns Promise
+             */
+            public getTask(request: flyteidl.service.ITaskGetRequest): Promise<flyteidl.service.TaskGetResponse>;
+
+            /**
+             * Calls DeleteTask.
+             * @param request TaskDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and TaskDeleteResponse
+             */
+            public deleteTask(request: flyteidl.service.ITaskDeleteRequest, callback: flyteidl.service.AgentService.DeleteTaskCallback): void;
+
+            /**
+             * Calls DeleteTask.
+             * @param request TaskDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteTask(request: flyteidl.service.ITaskDeleteRequest): Promise<flyteidl.service.TaskDeleteResponse>;
+        }
+
+        namespace AgentService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.AgentService#createTask}.
+             * @param error Error, if any
+             * @param [response] TaskCreateResponse
+             */
+            type CreateTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskCreateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AgentService#getTask}.
+             * @param error Error, if any
+             * @param [response] TaskGetResponse
+             */
+            type GetTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AgentService#deleteTask}.
+             * @param error Error, if any
+             * @param [response] TaskDeleteResponse
+             */
+            type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskDeleteResponse) => void;
+        }
+
+        /** State enum. */
+        enum State {
+            RETRYABLE_FAILURE = 0,
+            PERMANENT_FAILURE = 1,
+            PENDING = 2,
+            RUNNING = 3,
+            SUCCEEDED = 4
+        }
+
+        /** Properties of a TaskCreateRequest. */
+        interface ITaskCreateRequest {
+
+            /** TaskCreateRequest inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskCreateRequest template */
+            template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** TaskCreateRequest outputPrefix */
+            outputPrefix?: (string|null);
+        }
+
+        /** Represents a TaskCreateRequest. */
+        class TaskCreateRequest implements ITaskCreateRequest {
+
+            /**
+             * Constructs a new TaskCreateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskCreateRequest);
+
+            /** TaskCreateRequest inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskCreateRequest template. */
+            public template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** TaskCreateRequest outputPrefix. */
+            public outputPrefix: string;
+
+            /**
+             * Creates a new TaskCreateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskCreateRequest instance
+             */
+            public static create(properties?: flyteidl.service.ITaskCreateRequest): flyteidl.service.TaskCreateRequest;
+
+            /**
+             * Encodes the specified TaskCreateRequest message. Does not implicitly {@link flyteidl.service.TaskCreateRequest.verify|verify} messages.
+             * @param message TaskCreateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskCreateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskCreateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskCreateRequest;
+
+            /**
+             * Verifies a TaskCreateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskCreateResponse. */
+        interface ITaskCreateResponse {
+
+            /** TaskCreateResponse jobId */
+            jobId?: (string|null);
+        }
+
+        /** Represents a TaskCreateResponse. */
+        class TaskCreateResponse implements ITaskCreateResponse {
+
+            /**
+             * Constructs a new TaskCreateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskCreateResponse);
+
+            /** TaskCreateResponse jobId. */
+            public jobId: string;
+
+            /**
+             * Creates a new TaskCreateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskCreateResponse instance
+             */
+            public static create(properties?: flyteidl.service.ITaskCreateResponse): flyteidl.service.TaskCreateResponse;
+
+            /**
+             * Encodes the specified TaskCreateResponse message. Does not implicitly {@link flyteidl.service.TaskCreateResponse.verify|verify} messages.
+             * @param message TaskCreateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskCreateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskCreateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskCreateResponse;
+
+            /**
+             * Verifies a TaskCreateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskGetRequest. */
+        interface ITaskGetRequest {
+
+            /** TaskGetRequest taskType */
+            taskType?: (string|null);
+
+            /** TaskGetRequest jobId */
+            jobId?: (string|null);
+        }
+
+        /** Represents a TaskGetRequest. */
+        class TaskGetRequest implements ITaskGetRequest {
+
+            /**
+             * Constructs a new TaskGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskGetRequest);
+
+            /** TaskGetRequest taskType. */
+            public taskType: string;
+
+            /** TaskGetRequest jobId. */
+            public jobId: string;
+
+            /**
+             * Creates a new TaskGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskGetRequest instance
+             */
+            public static create(properties?: flyteidl.service.ITaskGetRequest): flyteidl.service.TaskGetRequest;
+
+            /**
+             * Encodes the specified TaskGetRequest message. Does not implicitly {@link flyteidl.service.TaskGetRequest.verify|verify} messages.
+             * @param message TaskGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskGetRequest;
+
+            /**
+             * Verifies a TaskGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskGetResponse. */
+        interface ITaskGetResponse {
+
+            /** TaskGetResponse state */
+            state?: (flyteidl.service.State|null);
+
+            /** TaskGetResponse outputs */
+            outputs?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents a TaskGetResponse. */
+        class TaskGetResponse implements ITaskGetResponse {
+
+            /**
+             * Constructs a new TaskGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskGetResponse);
+
+            /** TaskGetResponse state. */
+            public state: flyteidl.service.State;
+
+            /** TaskGetResponse outputs. */
+            public outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /**
+             * Creates a new TaskGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskGetResponse instance
+             */
+            public static create(properties?: flyteidl.service.ITaskGetResponse): flyteidl.service.TaskGetResponse;
+
+            /**
+             * Encodes the specified TaskGetResponse message. Does not implicitly {@link flyteidl.service.TaskGetResponse.verify|verify} messages.
+             * @param message TaskGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskGetResponse;
+
+            /**
+             * Verifies a TaskGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskDeleteRequest. */
+        interface ITaskDeleteRequest {
+
+            /** TaskDeleteRequest taskType */
+            taskType?: (string|null);
+
+            /** TaskDeleteRequest jobId */
+            jobId?: (string|null);
+        }
+
+        /** Represents a TaskDeleteRequest. */
+        class TaskDeleteRequest implements ITaskDeleteRequest {
+
+            /**
+             * Constructs a new TaskDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskDeleteRequest);
+
+            /** TaskDeleteRequest taskType. */
+            public taskType: string;
+
+            /** TaskDeleteRequest jobId. */
+            public jobId: string;
+
+            /**
+             * Creates a new TaskDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.service.ITaskDeleteRequest): flyteidl.service.TaskDeleteRequest;
+
+            /**
+             * Encodes the specified TaskDeleteRequest message. Does not implicitly {@link flyteidl.service.TaskDeleteRequest.verify|verify} messages.
+             * @param message TaskDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskDeleteRequest;
+
+            /**
+             * Verifies a TaskDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskDeleteResponse. */
+        interface ITaskDeleteResponse {
+        }
+
+        /** Represents a TaskDeleteResponse. */
+        class TaskDeleteResponse implements ITaskDeleteResponse {
+
+            /**
+             * Constructs a new TaskDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.ITaskDeleteResponse);
+
+            /**
+             * Creates a new TaskDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.service.ITaskDeleteResponse): flyteidl.service.TaskDeleteResponse;
+
+            /**
+             * Encodes the specified TaskDeleteResponse message. Does not implicitly {@link flyteidl.service.TaskDeleteResponse.verify|verify} messages.
+             * @param message TaskDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.ITaskDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskDeleteResponse;
+
+            /**
+             * Verifies a TaskDeleteResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a OAuth2MetadataRequest. */
         interface IOAuth2MetadataRequest {
         }
@@ -19797,438 +20229,6 @@ export namespace flyteidl {
              * @param [response] GetDataResponse
              */
             type GetDataCallback = (error: (Error|null), response?: flyteidl.service.GetDataResponse) => void;
-        }
-
-        /** Represents an ExternalPluginService */
-        class ExternalPluginService extends $protobuf.rpc.Service {
-
-            /**
-             * Constructs a new ExternalPluginService service.
-             * @param rpcImpl RPC implementation
-             * @param [requestDelimited=false] Whether requests are length-delimited
-             * @param [responseDelimited=false] Whether responses are length-delimited
-             */
-            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
-
-            /**
-             * Creates new ExternalPluginService service using the specified rpc implementation.
-             * @param rpcImpl RPC implementation
-             * @param [requestDelimited=false] Whether requests are length-delimited
-             * @param [responseDelimited=false] Whether responses are length-delimited
-             * @returns RPC service. Useful where requests and/or responses are streamed.
-             */
-            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): ExternalPluginService;
-
-            /**
-             * Calls CreateTask.
-             * @param request TaskCreateRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and TaskCreateResponse
-             */
-            public createTask(request: flyteidl.service.ITaskCreateRequest, callback: flyteidl.service.ExternalPluginService.CreateTaskCallback): void;
-
-            /**
-             * Calls CreateTask.
-             * @param request TaskCreateRequest message or plain object
-             * @returns Promise
-             */
-            public createTask(request: flyteidl.service.ITaskCreateRequest): Promise<flyteidl.service.TaskCreateResponse>;
-
-            /**
-             * Calls GetTask.
-             * @param request TaskGetRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and TaskGetResponse
-             */
-            public getTask(request: flyteidl.service.ITaskGetRequest, callback: flyteidl.service.ExternalPluginService.GetTaskCallback): void;
-
-            /**
-             * Calls GetTask.
-             * @param request TaskGetRequest message or plain object
-             * @returns Promise
-             */
-            public getTask(request: flyteidl.service.ITaskGetRequest): Promise<flyteidl.service.TaskGetResponse>;
-
-            /**
-             * Calls DeleteTask.
-             * @param request TaskDeleteRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and TaskDeleteResponse
-             */
-            public deleteTask(request: flyteidl.service.ITaskDeleteRequest, callback: flyteidl.service.ExternalPluginService.DeleteTaskCallback): void;
-
-            /**
-             * Calls DeleteTask.
-             * @param request TaskDeleteRequest message or plain object
-             * @returns Promise
-             */
-            public deleteTask(request: flyteidl.service.ITaskDeleteRequest): Promise<flyteidl.service.TaskDeleteResponse>;
-        }
-
-        namespace ExternalPluginService {
-
-            /**
-             * Callback as used by {@link flyteidl.service.ExternalPluginService#createTask}.
-             * @param error Error, if any
-             * @param [response] TaskCreateResponse
-             */
-            type CreateTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskCreateResponse) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.service.ExternalPluginService#getTask}.
-             * @param error Error, if any
-             * @param [response] TaskGetResponse
-             */
-            type GetTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskGetResponse) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.service.ExternalPluginService#deleteTask}.
-             * @param error Error, if any
-             * @param [response] TaskDeleteResponse
-             */
-            type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.service.TaskDeleteResponse) => void;
-        }
-
-        /** State enum. */
-        enum State {
-            RETRYABLE_FAILURE = 0,
-            PERMANENT_FAILURE = 1,
-            PENDING = 2,
-            RUNNING = 3,
-            SUCCEEDED = 4
-        }
-
-        /** Properties of a TaskCreateRequest. */
-        interface ITaskCreateRequest {
-
-            /** TaskCreateRequest inputs */
-            inputs?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskCreateRequest template */
-            template?: (flyteidl.core.ITaskTemplate|null);
-
-            /** TaskCreateRequest outputPrefix */
-            outputPrefix?: (string|null);
-        }
-
-        /** Represents a TaskCreateRequest. */
-        class TaskCreateRequest implements ITaskCreateRequest {
-
-            /**
-             * Constructs a new TaskCreateRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskCreateRequest);
-
-            /** TaskCreateRequest inputs. */
-            public inputs?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskCreateRequest template. */
-            public template?: (flyteidl.core.ITaskTemplate|null);
-
-            /** TaskCreateRequest outputPrefix. */
-            public outputPrefix: string;
-
-            /**
-             * Creates a new TaskCreateRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskCreateRequest instance
-             */
-            public static create(properties?: flyteidl.service.ITaskCreateRequest): flyteidl.service.TaskCreateRequest;
-
-            /**
-             * Encodes the specified TaskCreateRequest message. Does not implicitly {@link flyteidl.service.TaskCreateRequest.verify|verify} messages.
-             * @param message TaskCreateRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskCreateRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskCreateRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskCreateRequest;
-
-            /**
-             * Verifies a TaskCreateRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskCreateResponse. */
-        interface ITaskCreateResponse {
-
-            /** TaskCreateResponse jobId */
-            jobId?: (string|null);
-        }
-
-        /** Represents a TaskCreateResponse. */
-        class TaskCreateResponse implements ITaskCreateResponse {
-
-            /**
-             * Constructs a new TaskCreateResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskCreateResponse);
-
-            /** TaskCreateResponse jobId. */
-            public jobId: string;
-
-            /**
-             * Creates a new TaskCreateResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskCreateResponse instance
-             */
-            public static create(properties?: flyteidl.service.ITaskCreateResponse): flyteidl.service.TaskCreateResponse;
-
-            /**
-             * Encodes the specified TaskCreateResponse message. Does not implicitly {@link flyteidl.service.TaskCreateResponse.verify|verify} messages.
-             * @param message TaskCreateResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskCreateResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskCreateResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskCreateResponse;
-
-            /**
-             * Verifies a TaskCreateResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskGetRequest. */
-        interface ITaskGetRequest {
-
-            /** TaskGetRequest taskType */
-            taskType?: (string|null);
-
-            /** TaskGetRequest jobId */
-            jobId?: (string|null);
-        }
-
-        /** Represents a TaskGetRequest. */
-        class TaskGetRequest implements ITaskGetRequest {
-
-            /**
-             * Constructs a new TaskGetRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskGetRequest);
-
-            /** TaskGetRequest taskType. */
-            public taskType: string;
-
-            /** TaskGetRequest jobId. */
-            public jobId: string;
-
-            /**
-             * Creates a new TaskGetRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskGetRequest instance
-             */
-            public static create(properties?: flyteidl.service.ITaskGetRequest): flyteidl.service.TaskGetRequest;
-
-            /**
-             * Encodes the specified TaskGetRequest message. Does not implicitly {@link flyteidl.service.TaskGetRequest.verify|verify} messages.
-             * @param message TaskGetRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskGetRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskGetRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskGetRequest;
-
-            /**
-             * Verifies a TaskGetRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskGetResponse. */
-        interface ITaskGetResponse {
-
-            /** TaskGetResponse state */
-            state?: (flyteidl.service.State|null);
-
-            /** TaskGetResponse outputs */
-            outputs?: (flyteidl.core.ILiteralMap|null);
-        }
-
-        /** Represents a TaskGetResponse. */
-        class TaskGetResponse implements ITaskGetResponse {
-
-            /**
-             * Constructs a new TaskGetResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskGetResponse);
-
-            /** TaskGetResponse state. */
-            public state: flyteidl.service.State;
-
-            /** TaskGetResponse outputs. */
-            public outputs?: (flyteidl.core.ILiteralMap|null);
-
-            /**
-             * Creates a new TaskGetResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskGetResponse instance
-             */
-            public static create(properties?: flyteidl.service.ITaskGetResponse): flyteidl.service.TaskGetResponse;
-
-            /**
-             * Encodes the specified TaskGetResponse message. Does not implicitly {@link flyteidl.service.TaskGetResponse.verify|verify} messages.
-             * @param message TaskGetResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskGetResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskGetResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskGetResponse;
-
-            /**
-             * Verifies a TaskGetResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskDeleteRequest. */
-        interface ITaskDeleteRequest {
-
-            /** TaskDeleteRequest taskType */
-            taskType?: (string|null);
-
-            /** TaskDeleteRequest jobId */
-            jobId?: (string|null);
-        }
-
-        /** Represents a TaskDeleteRequest. */
-        class TaskDeleteRequest implements ITaskDeleteRequest {
-
-            /**
-             * Constructs a new TaskDeleteRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskDeleteRequest);
-
-            /** TaskDeleteRequest taskType. */
-            public taskType: string;
-
-            /** TaskDeleteRequest jobId. */
-            public jobId: string;
-
-            /**
-             * Creates a new TaskDeleteRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskDeleteRequest instance
-             */
-            public static create(properties?: flyteidl.service.ITaskDeleteRequest): flyteidl.service.TaskDeleteRequest;
-
-            /**
-             * Encodes the specified TaskDeleteRequest message. Does not implicitly {@link flyteidl.service.TaskDeleteRequest.verify|verify} messages.
-             * @param message TaskDeleteRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskDeleteRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskDeleteRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskDeleteRequest;
-
-            /**
-             * Verifies a TaskDeleteRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskDeleteResponse. */
-        interface ITaskDeleteResponse {
-        }
-
-        /** Represents a TaskDeleteResponse. */
-        class TaskDeleteResponse implements ITaskDeleteResponse {
-
-            /**
-             * Constructs a new TaskDeleteResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.service.ITaskDeleteResponse);
-
-            /**
-             * Creates a new TaskDeleteResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskDeleteResponse instance
-             */
-            public static create(properties?: flyteidl.service.ITaskDeleteResponse): flyteidl.service.TaskDeleteResponse;
-
-            /**
-             * Encodes the specified TaskDeleteResponse message. Does not implicitly {@link flyteidl.service.TaskDeleteResponse.verify|verify} messages.
-             * @param message TaskDeleteResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.service.ITaskDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskDeleteResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskDeleteResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.TaskDeleteResponse;
-
-            /**
-             * Verifies a TaskDeleteResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a UserInfoRequest. */

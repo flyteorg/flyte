@@ -6,9 +6,9 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/interface.proto";
 
-// ExternalPluginService defines an RPC Service that allows propeller to send the request to the backend plugin server.
-service ExternalPluginService {
-  // Send a task create request to the backend plugin server.
+// AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+service AgentService {
+  // Send a task create request to the agent server.
   rpc CreateTask (TaskCreateRequest) returns (TaskCreateResponse){};
   // Get job status.
   rpc GetTask (TaskGetRequest) returns (TaskGetResponse){};
@@ -42,7 +42,7 @@ message TaskCreateResponse {
   string job_id = 1;
 }
 
-// A message used to fetch a job state from backend plugin server.
+// A message used to fetch a job state from flyte agent server.
 message TaskGetRequest {
   // A predefined yet extensible Task type identifier.
   string task_type = 1;
@@ -54,7 +54,7 @@ message TaskGetRequest {
 message TaskGetResponse {
   // The state of the execution is used to control its visibility in the UI/CLI.
   State state = 1;
-  // The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
+  // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
   core.LiteralMap outputs = 2;

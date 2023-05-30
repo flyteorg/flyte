@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl/service/external_plugin_service.proto",
+    "title": "flyteidl/service/agent_service.proto",
     "version": "version not set"
   },
   "schemes": [
@@ -1149,7 +1149,7 @@
         },
         "outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a\nStructured dataset pointing to the query result table.\n+optional"
+          "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
         }
       },
       "description": "Response to get an individual task state."

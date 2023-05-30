@@ -1,4 +1,103 @@
 // @generated
+/// Represents a request structure to create task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskCreateRequest {
+    /// The inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="1")]
+    pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// Template of the task that encapsulates all the metadata of the task.
+    #[prost(message, optional, tag="2")]
+    pub template: ::core::option::Option<super::core::TaskTemplate>,
+    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+    #[prost(string, tag="3")]
+    pub output_prefix: ::prost::alloc::string::String,
+}
+/// Represents a create response structure.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskCreateResponse {
+    #[prost(string, tag="1")]
+    pub job_id: ::prost::alloc::string::String,
+}
+/// A message used to fetch a job state from flyte agent server.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskGetRequest {
+    /// A predefined yet extensible Task type identifier.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+    /// The unique id identifying the job.
+    #[prost(string, tag="2")]
+    pub job_id: ::prost::alloc::string::String,
+}
+/// Response to get an individual task state.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskGetResponse {
+    /// The state of the execution is used to control its visibility in the UI/CLI.
+    #[prost(enumeration="State", tag="1")]
+    pub state: i32,
+    /// The outputs of the execution. It's typically used by sql task. Agent service will create a
+    /// Structured dataset pointing to the query result table.
+    /// +optional
+    #[prost(message, optional, tag="2")]
+    pub outputs: ::core::option::Option<super::core::LiteralMap>,
+}
+/// A message used to delete a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskDeleteRequest {
+    /// A predefined yet extensible Task type identifier.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+    /// The unique id identifying the job.
+    #[prost(string, tag="2")]
+    pub job_id: ::prost::alloc::string::String,
+}
+/// Response to delete a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskDeleteResponse {
+}
+/// The state of the execution is used to control its visibility in the UI/CLI.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum State {
+    RetryableFailure = 0,
+    PermanentFailure = 1,
+    Pending = 2,
+    Running = 3,
+    Succeeded = 4,
+}
+impl State {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            State::RetryableFailure => "RETRYABLE_FAILURE",
+            State::PermanentFailure => "PERMANENT_FAILURE",
+            State::Pending => "PENDING",
+            State::Running => "RUNNING",
+            State::Succeeded => "SUCCEEDED",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "RETRYABLE_FAILURE" => Some(Self::RetryableFailure),
+            "PERMANENT_FAILURE" => Some(Self::PermanentFailure),
+            "PENDING" => Some(Self::Pending),
+            "RUNNING" => Some(Self::Running),
+            "SUCCEEDED" => Some(Self::Succeeded),
+            _ => None,
+        }
+    }
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OAuth2MetadataRequest {
@@ -250,105 +349,6 @@ impl ArtifactType {
         match value {
             "ARTIFACT_TYPE_UNDEFINED" => Some(Self::Undefined),
             "ARTIFACT_TYPE_DECK" => Some(Self::Deck),
-            _ => None,
-        }
-    }
-}
-/// Represents a request structure to create task.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskCreateRequest {
-    /// The inputs required to start the execution. All required inputs must be
-    /// included in this map. If not required and not provided, defaults apply.
-    /// +optional
-    #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<super::core::LiteralMap>,
-    /// Template of the task that encapsulates all the metadata of the task.
-    #[prost(message, optional, tag="2")]
-    pub template: ::core::option::Option<super::core::TaskTemplate>,
-    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
-    #[prost(string, tag="3")]
-    pub output_prefix: ::prost::alloc::string::String,
-}
-/// Represents a create response structure.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskCreateResponse {
-    #[prost(string, tag="1")]
-    pub job_id: ::prost::alloc::string::String,
-}
-/// A message used to fetch a job state from backend plugin server.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskGetRequest {
-    /// A predefined yet extensible Task type identifier.
-    #[prost(string, tag="1")]
-    pub task_type: ::prost::alloc::string::String,
-    /// The unique id identifying the job.
-    #[prost(string, tag="2")]
-    pub job_id: ::prost::alloc::string::String,
-}
-/// Response to get an individual task state.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskGetResponse {
-    /// The state of the execution is used to control its visibility in the UI/CLI.
-    #[prost(enumeration="State", tag="1")]
-    pub state: i32,
-    /// The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
-    /// Structured dataset pointing to the query result table.
-    /// +optional
-    #[prost(message, optional, tag="2")]
-    pub outputs: ::core::option::Option<super::core::LiteralMap>,
-}
-/// A message used to delete a task.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskDeleteRequest {
-    /// A predefined yet extensible Task type identifier.
-    #[prost(string, tag="1")]
-    pub task_type: ::prost::alloc::string::String,
-    /// The unique id identifying the job.
-    #[prost(string, tag="2")]
-    pub job_id: ::prost::alloc::string::String,
-}
-/// Response to delete a task.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskDeleteResponse {
-}
-/// The state of the execution is used to control its visibility in the UI/CLI.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum State {
-    RetryableFailure = 0,
-    PermanentFailure = 1,
-    Pending = 2,
-    Running = 3,
-    Succeeded = 4,
-}
-impl State {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            State::RetryableFailure => "RETRYABLE_FAILURE",
-            State::PermanentFailure => "PERMANENT_FAILURE",
-            State::Pending => "PENDING",
-            State::Running => "RUNNING",
-            State::Succeeded => "SUCCEEDED",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "RETRYABLE_FAILURE" => Some(Self::RetryableFailure),
-            "PERMANENT_FAILURE" => Some(Self::PermanentFailure),
-            "PENDING" => Some(Self::Pending),
-            "RUNNING" => Some(Self::Running),
-            "SUCCEEDED" => Some(Self::Succeeded),
             _ => None,
         }
     }
