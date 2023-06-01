@@ -278,7 +278,7 @@ Configuring K8s Pod
 ===================
 
 There are two approaches to applying the K8s Pod configuration. The **recommended**
-method is to use Flyte's default PodTemplate scheme. You can do this by creating
+method is to use Flyte's Compile-time and Runtime PodTemplate schemes. You can do this by creating
 K8s PodTemplate resource/s that serves as the base configuration for all the
 task Pods that Flyte initializes. This solution ensures completeness regarding
 support configuration options and maintainability as new features are added to K8s. 
@@ -306,19 +306,13 @@ in future versions.
 
 Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__:
 1. Compile-time PodTemplate defined at the task level
-2. Runtime PodeTemplates, defined via ``default-pod-template-name`` in FlytePropeller
+2. Runtime PodTemplates
 
 
 Compile-time PodTemplate usage
-=======================================
+==============================
 
-To define a static PodTemplate we have two options: (1) use the ``pod_template`` field in the Task (TODO: link to the task),
-or (2) ``pod_template_name`` in the Task. Let's discuss the options separately.
-
-Defining ``pod_template`` in a Task
-------------------------------------
-
-We can define a pod template inline, as part of the definition of a Task, for example:
+We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
 
 .. code-block:: python
 
@@ -357,22 +351,7 @@ Notice how in this example we are defining a new PodTemplate inline, which allow
 `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodSpec.md>`__ and also define
 the name of the primary container, labels, and annotations.
 
-Using ``pod_template_name`` in a Task
---------------------------------------
-
-It's also possible to apply a PodTemplate to a task definition by specifying ``pod_template_name`` in the task definition.
-For example:
-
-.. code-block:: python
-
-    @task(
-        pod_template_name="a_pod_template",
-    )
-    def t1() -> int:
-        ...
-
-In this example we're specifying that a PodTemplate name ``a_pod_template`` is going to be applied according to
-the runtime PodTemplate rules explained in the next section.
+The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
 Runtime PodTemplate
 ====================
@@ -435,6 +414,23 @@ during Pod construction. Similarly, each k8s container is required to have an
 set to anything. However, we recommend using a real image, for example
 ``docker.io/rwgrim/docker-noop``.
 
+Using ``pod_template_name`` in a Task
+--------------------------------------
+
+It's also possible to use PodTemplate in tasks by specifying ``pod_template_name`` in the task definition. For example:
+
+.. code-block:: python
+
+    @task(
+        pod_template_name="a_pod_template",
+    )
+    def t1() -> int:
+        ...
+
+In this example we're specifying that a previously created Runtime PodTemplate resource named ``a_pod_template`` is going to be applied.
+The only requirement is that this PodTemplate exists at the moment this task is about to be executed.
+
+
 *********************************
 Flyte's K8s Plugin Configuration
 *********************************
@@ -445,14 +441,28 @@ which are applied when constructing a Pod. Typically, these options map one-to-o
 with K8s Pod fields. This makes it difficult to maintain configuration options as K8s
 versions change and fields are added/deprecated.
 
-*******************
-Example PodTemplate
-*******************
+*********************************
+Evaluation Order in PodTemplates
+*********************************
 
-To better understand how Flyte constructs task execution Pods based on the default
-PodTemplate and K8s plugin configuration options, let's take an example. 
+The following diagram shows the precedence in evaluation order between the different types of PodTemplates and K8s Plugin Configuration.
 
-If you have the default PodTemplate defined in the ``flyte`` namespace
+.. mermaid::
+   :alt: Evaluation order of PodTemplates
+
+   graph BT
+     B["@task pod_template"] --> A["k8s plugin"]
+     C["runtime PodTemplate"] --> B
+     D["@task pod_template_name"] --> B
+
+
+To better understand how Flyte constructs task execution Pods based on Compile-time and Runtime PodTemplates,
+and K8s plugin configuration options, let's take a few examples.
+
+Example 1: Runtime PodTemplate and K8s Plugin Configuration
+===========================================================
+
+If you have a Runtime PodTemplate defined in the ``flyte`` namespace
 (where FlytePropeller instance is running), then it is applied to all Pods that
 Flyte creates, unless a **more specific** PodTemplate is defined in the namespace
 where you start the Pod.
@@ -528,3 +538,193 @@ Plugin configuration (that is, list appends and map overrides). Task-specific
 options are intentionally robust to provide fine-grained control over task
 execution in diverse use-cases. Therefore, exploration is beyond this scope
 and has therefore been omitted from this documentation.
+
+Example 2: A Runtime and Compile-time PodTemplates
+==================================================
+
+In this example we're going to have a Runtime PodTemplate and a Compile-time PodTemplate defined in a task.
+
+Let's say we have this Runtime PodTemplate defined in the same namespace as the one used to kick off an execution
+of the task. For example:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-template
+      namespace: flytesnacks-development
+    template:
+      metadata:
+        annotations:
+          - annotation_1: initial-value
+          - bar: initial-value
+      spec:
+        containers:
+          - name: default
+            image: docker.io/rwgrim/docker-noop
+            terminationMessagePath: "/dev/foo"
+
+And the definition of the Compile-time PodTemplate in a task:
+
+.. code-block:: python
+
+    @task(
+        pod_template=PodTemplate(
+            primary_container_name="primary",
+            labels={
+              "label_1": "value-1",
+              "label_2": "value-2",
+            },
+            annotations={
+              "annotation_1": "value-1",
+              "annotation_2": "value-2",
+            },
+            pod_spec=V1PodSpec(
+                containers=[
+                    V1Container(
+                        name="primary",
+                        image="a.b.c/image:v1",
+                        command="cmd",
+                        args=[],
+                    ),
+                ],
+            )
+        )
+    )
+    def t1() -> int:
+        ...
+
+The resultant Pod is as follows:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: example-pod
+      namespace: flytesnacks-development
+      labels:
+        - label_1: value-1  # from Compile-time value
+        - label_2: value-2  # from Compile-time value
+      annotations:
+        - annotation_1: value-1  # value overridden by Compile-time PodTemplate
+        - annotation_2: value-2  # from Compile-time PodTemplate
+        - bar: initial-value  # from Runtime PodTemplate
+    spec:
+      containers:
+        - name: default
+          image: docker.io/rwgrim/docker-noop
+          terminationMessagePath: "/dev/foo"
+        - name: primary
+          image: a.b.c/image:v1
+          command: cmd
+          args: []
+          // remaining container configuration omitted
+
+Notice how options follow the same merging rules, i.e. lists append and maps override.
+
+
+Example 3: Runtime and Compile-time PodTemplates and K8s Plugin Configuration
+=============================================================================
+
+Now let's make a slightly more complicated example where now we have both Compile-time and Runtime PodTemplates being combined
+with K8s Configuration.
+
+Here's the definition of a Compile-time PodTemplate:
+
+.. code-block:: python
+
+    @task(
+        pod_template=PodTemplate(
+            primary_container_name="primary",
+            labels={
+              "label_1": "value-compile",
+              "label_2": "value-compile",
+            },
+            annotations={
+              "annotation_1": "value-compile",
+              "annotation_2": "value-compile",
+            },
+            pod_spec=V1PodSpec(
+                containers=[
+                    V1Container(
+                        name="primary",
+                        image="a.b.c/image:v1",
+                        command="cmd",
+                        args=[],
+                    ),
+                ],
+                host_network=True,
+            )
+        )
+    )
+    def t1() -> int:
+        ...
+
+
+And a Runtime PodTemplate:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: PodTemplate
+    metadata:
+      name: flyte-template
+      namespace: flyte
+    template:
+      metadata:
+        labels:
+          - label_1: value-runtime
+          - label_2: value-runtime
+          - label_3: value-runtime
+        annotations:
+          - foo: value-runtime
+          - bar: value-runtime
+      spec:
+        containers:
+          - name: default
+            image: docker.io/rwgrim/docker-noop
+            terminationMessagePath: "/dev/foo"
+        hostNetwork: false
+
+And the following K8s Plugin Configuration:
+
+.. code-block:: yaml
+
+    plugins:
+       k8s:
+        default-labels:
+          - label_1: value-plugin
+        default-annotations:
+          - annotation_1: value-plugin
+          - baz: value-plugin
+
+The resultant pod for that task is as follows:
+
+.. code-block:: yaml
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: example-pod
+      namespace: flytesnacks-development
+      labels:
+        - label_1: value-plugin
+        - label_2: value-compile
+      annotations:
+        - annotation_1: value-plugin
+        - annotation_2: value-compile
+        - foo: value-runtime
+        - bar: value-runtime
+        - baz: value-plugin
+    spec:
+      containers:
+        - name: default
+          image: docker.io/rwgrim/docker-noop
+          terminationMessagePath: "/dev/foo"
+        - name: primary
+          image: a.b.c/image:v1
+          command: cmd
+          args: []
+          // remaining container configuration omitted
