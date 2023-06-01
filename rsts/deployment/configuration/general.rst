@@ -1,7 +1,8 @@
 .. _deployment-configuration-general:
 
+#################################
 Configuring Custom K8s Resources
-----------------------------------
+#################################
 
 ***************************
 Configurable Resource Types
