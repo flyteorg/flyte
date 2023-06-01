@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"strconv"
 	"time"
 
@@ -1195,6 +1197,63 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 	watch.Observe(*executionModel.ExecutionCreatedAt, terminalEventTime)
 }
 
+func (m *ExecutionManager) tempHandleArtifactEventEmitting(ctx context.Context, request admin.WorkflowExecutionEventRequest) {
+	// Print out what the catalog service will eventually do. Can all this be retrieved just from the raw event? No.
+	// Missing: Artifact name and other info declared in the wf decorator.
+	var outputs *core.LiteralMap
+	var err error
+	if request.Event.GetOutputData() != nil {
+		fmt.Printf("Got output data")
+		outputs = request.Event.GetOutputData()
+	} else if len(request.Event.GetOutputUri()) > 0 {
+		fmt.Printf("Got output URI")
+		// GetInputs actually fetches the data, even though this is an output
+		outputs, _, err = util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, request.Event.GetOutputUri())
+		if err != nil {
+			fmt.Printf("Error fetching output literal map %v", request.Event)
+		}
+	} else {
+		fmt.Printf("No output data found for %v\n", request.Event)
+	}
+	if outputs != nil {
+		nodeExecutionID := core.NodeExecutionIdentifier{
+			NodeId:      "end-node",
+			ExecutionId: request.Event.ExecutionId,
+		}
+		urls := common.FlyteURLsFromNodeExecutionID(nodeExecutionID, false)
+		outputURLs := common.AppendLinksForLiteralMap(urls.GetInputs(), *outputs)
+
+		for k, v := range outputs.Literals {
+			as := artifact.ArtifactSpec{
+				Value: v,
+				// Type, tags and aliases will need to be filled in later
+				Source: &artifact.ArtifactSpec_Execution{
+					Execution: request.Event.ExecutionId,
+				},
+			}
+			ak := core.ArtifactKey{
+				Project: request.Event.ExecutionId.Project,
+				Domain:  request.Event.ExecutionId.Domain,
+				// This will need to be filled in later, will need to pull from task template, or set to
+				// something pretty unique, like the task ID.
+				Name: "",
+			}
+
+			a := artifact.CreateArtifactRequest{
+				ArtifactKey: &ak,
+				Version:     request.Event.ExecutionId.Name,
+				Uri:         outputURLs[k],
+				Spec:        &as,
+			}
+			e := event.ArtifactCreateEvent{
+				CreateRequest: &a,
+			}
+			print(fmt.Sprintf("Output %s, becomes artifact request: %v\n", k, e))
+		}
+	}
+}
+
 func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
 	*admin.WorkflowExecutionEventResponse, error) {
 	err := validation.ValidateCreateWorkflowEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes)
@@ -1280,6 +1339,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		if request.Event.GetOutputData() != nil {
 			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
 		}
+		m.tempHandleArtifactEventEmitting(ctx, request)
 
 		err = m.publishNotifications(ctx, request, *executionModel)
 		if err != nil {

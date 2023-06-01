@@ -152,3 +152,12 @@ func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, 
 	}
 	return res
 }
+
+// AppendLinksForLiteralMap returns a map of URLs for each output in the supplied literal map.
+func AppendLinksForLiteralMap(baseOutputURL string, literalMap core.LiteralMap) map[string]string {
+	res := make(map[string]string, len(literalMap.Literals))
+	for k, _ := range literalMap.Literals {
+		res[k] = fmt.Sprintf("%s/%s", baseOutputURL, k)
+	}
+	return res
+}
