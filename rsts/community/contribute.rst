@@ -13,15 +13,15 @@ Here are some guidelines for you to follow, which will make your first and follo
 
 TL;DR: Find the repo-specific contribution guidelines in the `Component Reference <#component-reference>`__ section.
 
-💻 Becoming a Contributor
+💻 Becoming a contributor
 =========================
 
-An issue tagged with ``good first issue`` is the best place to start for first-time contributors. You can find them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__.
+An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
 
 **Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.** 
 
 .. note::
-    To open a pull request, follow `this guide <https://guides.github.com/activities/forking/>`__. 
+    To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions. 
 
 Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__. 
 A couple of checks are introduced to help maintain the robustness of the project. 
@@ -34,7 +34,8 @@ On a side note, format your Go code with ``golangci-lint`` followed by ``goimpor
 If make targets are not available, you can manually format the code.
 Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
-As you become more involved with the project you may be able to be added as a contributor to the repos you're working on, but there is a medium term effort to move all development to forks ✨.
+As you become more involved with the project, you may be able to be added as a contributor to the repos you're working on,
+but there is a medium term effort to move all development to forks.
 
 📃 Documentation
 ================
@@ -46,14 +47,7 @@ For API- and code-related content, it extracts docstrings from the code files.
 
 To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__. 
 
-For minor edits that don’t require a local setup, you can edit the GitHub page in the documentation to propose improvements.
-
-The edit option can be found at the bottom of a page, as shown below.
-
-.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/docs_edit.png
-    :alt: GitHub edit option for Documentation
-    :align: center
-    :figclass: align-center
+For minor edits that don't require a local setup, you can edit the GitHub page in the documentation to propose improvements.
 
 Intersphinx
 ***********
@@ -138,18 +132,17 @@ Output:
 
 :py:meth:`Method <python:pprint.PrettyPrinter.format>`
 
-🧱 Component Reference
+🧱 Component reference
 ======================
 
-To understand how the below components interact with each other, refer to :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`
+To understand how the below components interact with each other, refer to :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`.
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
     :align: center
     :figclass: align-center
 
-    The dependency graph between various flyte.org repos
-
+    The dependency graph between various flyte repos
 
 ``flyte``
 *********
@@ -291,54 +284,73 @@ To understand how the below components interact with each other, refer to :ref:`
     * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/projects/flytectl/en/stable/contribute.html>`__    
 
 
-🔮 Recommended Iteration Cycle
+🔮 Recommended iteration cycle
 ==============================
-As you may have read in other parts of the documentation, this repo contains go code as well that pulls in all the backend components (admin, propeller, data catalog, console) into one executable.
-The Flyte team is also working on migrating the core backend repositories into one repo, some time in 2023. For the time being, you can still contribute by making changes to the individual repos, and then bringing them into this ``flyte`` repo. This setup works well for backend golang development, but is not tested for ``flyteconsole`` development. That development cycle will look a bit different. This setup here will allow you to run the Flyte binary from your IDE, hitting any breakpoints you may have, but will connect you to all the other resources of the demo environment (like postgres, rds).
 
-Setup
-*****
+As you may have already read in other parts of the documentation, the `Flyte repository <https://github.com/flyteorg/flyte>`__ includes Go code
+that integrates all backend components (admin, propeller, data catalog, console) into a single executable.
+The Flyte team is currently working on consolidating the core backend repositories into one repository, which is expected to be completed by 2023.
+In the meantime, you can contribute to the individual repositories and then merge your changes into the `Flyte repository <https://github.com/flyteorg/flyte>`__.
+This setup is suitable for Go-based backend development, but it has not been tested for Flyteconsole development, which has a different development cycle.
+Nonetheless, this setup allows you to run the Flyte binary from your IDE, enabling you to debug your code effectively by setting breakpoints.
+Additionally, this setup connects you to all other resources in the demo environment, such as PostgreSQL and RDS.
 
-Dev Mode Cluster
-----------------
-To launch the dependencies, teardown any old sandboxes you may have, and then run ::
+Dev mode cluster
+****************
 
-    ``flytectl demo start --dev``
+To launch the dependencies, teardown any old sandboxes you may have, and then run:
 
-This will run the demo environment but without Flyte itself. This makes it so that you the developer can run it later, on your host machine.
+.. code-block::
+
+    flytectl demo start --dev
+
+This command will launch the demo environment without running Flyte. By doing so, developers can run Flyte later on their host machine.
 
 Set up Flyte configuration
---------------------------
-#. Copy the file ``flyte-single-binary-local.yaml`` to ``~/.flyte/local-dev-config.yaml``
-#. Replace instances of ``$HOME`` with the real path of your home directory.
+**************************
 
-Cluster Resources
------------------
-You'll notice one of the entries in the config is ``cluster_resources.templatePath``. In this folder you should put the templates for the cluster resource controller to use. For now, it's okay to just start with the namespace one. Create a file called ``~/.flyte/cluster-resource-templates/00_namespace.yaml`` with the following ::
+#. Copy the file ``flyte-single-binary-local.yaml`` to ``~/.flyte/local-dev-config.yaml``.
+#. Replace occurrences of ``$HOME`` with the actual path of your home directory.
 
-    .. literalinclude:: ../../charts/flyte-binary/eks-production.yaml
-       :lines: 81-85
+Cluster resources
+*****************
 
-Pull Console Artifacts
-----------------------
-Run the following command from the base folder of this repo to pull in the static assets for Flyteconsole ::
+One of the configuration entries you will notice is ``cluster_resources.templatePath``.
+This folder should contain the templates that the cluster resource controller will use.
+To begin, you can create a file called ``~/.flyte/cluster-resource-templates/00_namespace.yaml`` with the following content:
+
+.. literalinclude:: ../../charts/flyte-binary/eks-production.yaml
+    :lines: 81-87
+
+Pull console artifacts
+**********************
+
+Run the following command from the base folder of the Flyte repository to pull in the static assets for Flyteconsole:
+
+.. code-block::
 
     make cmd/single/dist
 
-Build & Iterate
----------------
-Update using ``go get github.com/flyteorg/<component>&gitsha`` to bring in the code of the component you're testing. From there, you can run ::
+Build and iterate
+*****************
+
+To bring in the code of the component you are testing, use the command go get ``github.com/flyteorg/<component>&gitsha``.
+Once you have done that, you can run the following command:
+
+.. code-block::
 
     POD_NAMESPACE=flyte go run -tags console cmd/main.go start --config ~/.flyte/local-dev-config.yaml
 
-The ``POD_NAMESPACE`` environment is required for the webhook to work. Of course you can create a build target in your IDE with the same effective command as well.
+The ``POD_NAMESPACE`` environment variable is necessary for the webhook to function correctly.
+You can also create a build target in your IDE with the same command.
 
-After it's running, you should still be able to go to ``localhost:30080/console`` to see Flyte but now hosted by your host computer. It relies on a Docker host mapping to get the correct IP for your local host.
+Once it is up and running, you can access Flyte hosted by your local machine by going to ``localhost:30080/console``.
+The Docker host mapping is used to obtain the correct IP address for your local host.
 
-🐞 File an Issue
+🐞 File an issue
 ================
 
-`GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ is used for issue tracking. The following are available issue types that you could use for filing an issue.
+We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tracking. The following issue types are available for filing an issue:
 
 * `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`__
 * `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`__
@@ -351,7 +363,4 @@ After it's running, you should still be able to go to ``localhost:30080/console`
 If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 Also, add relevant labels to your issue. For example, if you are filing a Flytekit plugin request, add the ``flytekit`` label.
 
-|
-
 For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__. 
-

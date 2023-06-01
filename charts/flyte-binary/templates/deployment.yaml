@@ -27,10 +27,10 @@ spec:
     metadata:
       labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
         {{- if .Values.commonLabels }}
-        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podLabels }}
-        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 8 }}
         {{- end }}
       annotations:
         {{- if not .Values.configuration.existingConfigmap }}
@@ -82,7 +82,7 @@ spec:
             {{- with .Values.configuration.database }}
             - |
               until pg_isready \
-                -h {{ .host }} \
+                -h {{ tpl .host $ }} \
                 -p {{ .port }} \
                 -U {{ .username }}
               do
