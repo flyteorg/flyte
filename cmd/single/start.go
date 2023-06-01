@@ -67,7 +67,12 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	}
 
 	logger.Infof(ctx, "Seeding default projects...")
-	if err := adminServer.SeedProjects(ctx, []string{"flytesnacks"}); err != nil {
+	projects := []string{"flytesnacks"}
+	if len(cfg.SeedProjects) != 0 {
+		projects = cfg.SeedProjects
+	}
+	logger.Infof(ctx, "Seeding default projects...",projects)
+	if err := adminServer.SeedProjects(ctx, projects); err != nil {
 		return err
 	}
 
@@ -139,6 +144,16 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		g.Go(func() error {
 			logger.Infof(childCtx, "Starting Flyte Propeller...")
 			return propellerEntrypoint.StartController(childCtx, propellerCfg, defaultNamespace, mgr, &propellerScope)
+		})
+	}
+
+	if !cfg.DisableWebhook || !cfg.Disabled {
+		g.Go(func() error {
+			err := propellerEntrypoint.StartControllerManager(childCtx, mgr)
+			if err != nil {
+				logger.Fatalf(childCtx, "Failed to start controller manager. Error: %v", err)
+			}
+			return err
 		})
 	}
 

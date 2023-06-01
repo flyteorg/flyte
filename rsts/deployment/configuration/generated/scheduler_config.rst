@@ -604,6 +604,18 @@ authorizedUris ([]config.URL)
   null
   
 
+httpProxyURL (`config.URL`_)
+--------------------------------------------------------------------------------
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 userAuth (`config.UserAuthConfig`_)
 --------------------------------------------------------------------------------
 
@@ -643,6 +655,7 @@ Defines Auth options for apps. UserAuth must be enabled for AppAuth to work.
   externalAuthServer:
     allowedAudience: []
     baseUrl: ""
+    httpProxyURL: ""
     metadataUrl: ""
   selfAuthServer:
     accessTokenLifespan: 30m0s
@@ -806,6 +819,7 @@ External Authorization Server config.
 
   allowedAudience: []
   baseUrl: ""
+  httpProxyURL: ""
   metadataUrl: ""
   
 
@@ -1004,6 +1018,18 @@ metadataUrl (`config.URL`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+httpProxyURL (`config.URL`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
 
 **Default Value**: 
 
@@ -2027,6 +2053,16 @@ useOffloadedWorkflowClosure (bool)
 .. code-block:: yaml
 
   "false"
+  
+
+envs (map[string]string)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 Section: logger
@@ -3086,16 +3122,16 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
   batch-size: -1
   batching-interval: 1s
   queue:
-    base-delay: 5s
-    capacity: 1000
+    base-delay: 0s
+    capacity: 10000
     max-delay: 1m0s
-    rate: 100
+    rate: 1000
     type: maxof
   sub-queue:
     base-delay: 0s
-    capacity: 1000
+    capacity: 10000
     max-delay: 0s
-    rate: 100
+    rate: 1000
     type: bucket
   type: batch
   
@@ -3405,10 +3441,10 @@ Workflow workqueue configuration, affects the way the work is consumed from the 
 
 .. code-block:: yaml
 
-  base-delay: 5s
-  capacity: 1000
+  base-delay: 0s
+  capacity: 10000
   max-delay: 1m0s
-  rate: 100
+  rate: 1000
   type: maxof
   
 
@@ -3422,9 +3458,9 @@ SubQueue configuration, affects the way the nodes cause the top-level Work to be
 .. code-block:: yaml
 
   base-delay: 0s
-  capacity: 1000
+  capacity: 10000
   max-delay: 0s
-  rate: 100
+  rate: 1000
   type: bucket
   
 
@@ -3474,7 +3510,7 @@ base backoff delay for failure
 
 .. code-block:: yaml
 
-  5s
+  0s
   
 
 max-delay (`config.Duration`_)
@@ -3498,7 +3534,7 @@ Bucket Refill rate per second
 
 .. code-block:: yaml
 
-  "100"
+  "1000"
   
 
 capacity (int)
@@ -3510,7 +3546,7 @@ Bucket capacity as number of items
 
 .. code-block:: yaml
 
-  "1000"
+  "10000"
   
 
 config.EventConfig

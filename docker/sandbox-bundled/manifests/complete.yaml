@@ -403,28 +403,15 @@ metadata:
 ---
 apiVersion: v1
 data:
-  000-core.yaml: |
-    admin:
-      endpoint: localhost:8089
-      insecure: true
-    catalog-cache:
-      endpoint: localhost:8081
-      insecure: true
-      type: datacatalog
-    cluster_resources:
-      standaloneDeployment: false
-      templatePath: /etc/flyte/cluster-resource-templates
-    logger:
-      show-source: true
-      level: 6
-    propeller:
-      create-flyteworkflow-crd: true
-    webhook:
-      certDir: /var/run/flyte/certs
-      localCert: true
-      secretName: flyte-sandbox-webhook-secret
-      serviceName: flyte-sandbox-webhook
-      servicePort: 443
+  000-core.yaml: "admin:\n  endpoint: localhost:8089\n  insecure: true\ncatalog-cache:\n
+    \ endpoint: localhost:8081\n  insecure: true\n  type: datacatalog\ncluster_resources:\n
+    \ standaloneDeployment: false\n  templatePath: /etc/flyte/cluster-resource-templates\nlogger:\n
+    \ show-source: true\n  level: 6\npropeller:\n  create-flyteworkflow-crd: true\nwebhook:\n
+    \ certDir: /var/run/flyte/certs\n  localCert: true\n  secretName: flyte-sandbox-webhook-secret\n
+    \ serviceName: flyte-sandbox-webhook\n  servicePort: 443\nflyte: \n  admin:\n
+    \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
+    false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
+    \ propeller:\n    disableWebhook: false\n    disabled: false\n"
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -441,6 +428,9 @@ data:
         kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
         cloudwatch-enabled: false
         stackdriver-enabled: false
+      k8s:
+        co-pilot:
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
       k8s-array:
         logs:
           config:
@@ -453,8 +443,8 @@ data:
       postgres:
         username: postgres
         passwordPath: /var/run/secrets/flyte/db-pass
-        host: 127.0.0.1
-        port: 30001
+        host: flyte-sandbox-postgresql
+        port: 5432
         dbname: flyte
         options: "sslmode=disable"
   003-storage.yaml: |
@@ -468,7 +458,7 @@ data:
           region: us-east-1
           disable_ssl: true
           v2_signing: true
-          endpoint: http://localhost:30002
+          endpoint: http://flyte-sandbox-minio.flyte:9000
           auth_type: accesskey
           access_key_id: minio
           secret_key: miniostorage
@@ -480,6 +470,10 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    storage:
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
 kind: ConfigMap
 metadata:
   labels:
@@ -675,7 +669,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox
+                                          address: flyte-sandbox-http
                                           port_value: 8088
             - name: flyte_grpc
               connect_timeout: 0.25s
@@ -689,7 +683,7 @@ data:
                             - endpoint:
                                   address:
                                       socket_address:
-                                          address: flyte-sandbox
+                                          address: flyte-sandbox-grpc
                                           port_value: 8089
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
@@ -758,7 +752,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UVZmZkJkU3BERDNNcXRjWQ==
+  haSharedSecret: dWY3VEZlVmt2QTE1M1R3Ng==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -844,32 +838,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: flyte-binary-v0.1.10
-  name: flyte-sandbox
-  namespace: flyte
-spec:
-  ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  selector:
-    app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyte-sandbox
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -887,6 +855,50 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-grpc
+  namespace: flyte
+spec:
+  ports:
+  - name: grpc
+    nodePort: null
+    port: 8089
+    targetPort: grpc
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-http
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 8088
+    targetPort: http
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1134,7 +1146,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: f0f48d160687e6dc7e76001fdc5277ed44d814c9fc17a8484b9af09d8e47449a
+        checksum/configuration: af73555ceafa450e1e534169aeb7fffcab7726754f8802ab1d3edbb75d65969d
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1182,13 +1194,12 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      hostNetwork: true
       initContainers:
       - args:
         - |
           until pg_isready \
-            -h 127.0.0.1 \
-            -p 30001 \
+            -h flyte-sandbox-postgresql \
+            -p 5432 \
             -U postgres
           do
             echo waiting for database
@@ -1243,7 +1254,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 85b387bc793cdb8978dcd891da651b518c32b0c0e9da50e37439ad6b8bf6391a
+        checksum/secret: 9ad79e33eb4e690161845923abdae7d461fd7b71a6c34ebe59cabb99356a0d9b
       labels:
         app: docker-registry
         release: flyte-sandbox

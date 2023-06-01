@@ -106,7 +106,7 @@ Define an attributes file, ``cra.yaml``:
 
     attributes:
         projectQuotaCpu: "1000"
-        projectQuotaMemory: 5TB
+        projectQuotaMemory: 5Ti
     domain: development
     project: flyteexamples
 
