@@ -359,8 +359,10 @@ Runtime PodTemplates
 
 Runtime PodTemplates, as the name suggests, are applied during runtime, as part of building the resultant Pod. In terms of how
 they are applied, you have two choices: (1) you either elect one specific PodTemplate to be considered as default, or (2) you
-define a PodTemplate and use that in the declaration of the task. It's worth noting that they are exclusive, in other words, in case (1) is active and FlytePropeller is building a Pod where (2) was used as part of the definition of the task, then
-only the values of the PodTemplate mentioned in (2) will be used to build the Pod.
+define a PodTemplate name and use that in the declaration of the task. Those two options are mutually exclusive, meaning that
+in the situation where a default PodTemplate is set and a PodTemplate name is present in the task definition, only the
+PodTemplate name will be used.
+
 
 Set the ``default-pod-template-name`` in FlytePropeller
 --------------------------------------------------------
