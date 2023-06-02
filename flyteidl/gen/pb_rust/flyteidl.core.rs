@@ -1,439 +1,4 @@
 // @generated
-/// Indicates various phases of Workflow Execution
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowExecution {
-}
-/// Nested message and enum types in `WorkflowExecution`.
-pub mod workflow_execution {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Phase {
-        Undefined = 0,
-        Queued = 1,
-        Running = 2,
-        Succeeding = 3,
-        Succeeded = 4,
-        Failing = 5,
-        Failed = 6,
-        Aborted = 7,
-        TimedOut = 8,
-        Aborting = 9,
-    }
-    impl Phase {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Phase::Undefined => "UNDEFINED",
-                Phase::Queued => "QUEUED",
-                Phase::Running => "RUNNING",
-                Phase::Succeeding => "SUCCEEDING",
-                Phase::Succeeded => "SUCCEEDED",
-                Phase::Failing => "FAILING",
-                Phase::Failed => "FAILED",
-                Phase::Aborted => "ABORTED",
-                Phase::TimedOut => "TIMED_OUT",
-                Phase::Aborting => "ABORTING",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNDEFINED" => Some(Self::Undefined),
-                "QUEUED" => Some(Self::Queued),
-                "RUNNING" => Some(Self::Running),
-                "SUCCEEDING" => Some(Self::Succeeding),
-                "SUCCEEDED" => Some(Self::Succeeded),
-                "FAILING" => Some(Self::Failing),
-                "FAILED" => Some(Self::Failed),
-                "ABORTED" => Some(Self::Aborted),
-                "TIMED_OUT" => Some(Self::TimedOut),
-                "ABORTING" => Some(Self::Aborting),
-                _ => None,
-            }
-        }
-    }
-}
-/// Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NodeExecution {
-}
-/// Nested message and enum types in `NodeExecution`.
-pub mod node_execution {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Phase {
-        Undefined = 0,
-        Queued = 1,
-        Running = 2,
-        Succeeded = 3,
-        Failing = 4,
-        Failed = 5,
-        Aborted = 6,
-        Skipped = 7,
-        TimedOut = 8,
-        DynamicRunning = 9,
-        Recovered = 10,
-    }
-    impl Phase {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Phase::Undefined => "UNDEFINED",
-                Phase::Queued => "QUEUED",
-                Phase::Running => "RUNNING",
-                Phase::Succeeded => "SUCCEEDED",
-                Phase::Failing => "FAILING",
-                Phase::Failed => "FAILED",
-                Phase::Aborted => "ABORTED",
-                Phase::Skipped => "SKIPPED",
-                Phase::TimedOut => "TIMED_OUT",
-                Phase::DynamicRunning => "DYNAMIC_RUNNING",
-                Phase::Recovered => "RECOVERED",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNDEFINED" => Some(Self::Undefined),
-                "QUEUED" => Some(Self::Queued),
-                "RUNNING" => Some(Self::Running),
-                "SUCCEEDED" => Some(Self::Succeeded),
-                "FAILING" => Some(Self::Failing),
-                "FAILED" => Some(Self::Failed),
-                "ABORTED" => Some(Self::Aborted),
-                "SKIPPED" => Some(Self::Skipped),
-                "TIMED_OUT" => Some(Self::TimedOut),
-                "DYNAMIC_RUNNING" => Some(Self::DynamicRunning),
-                "RECOVERED" => Some(Self::Recovered),
-                _ => None,
-            }
-        }
-    }
-}
-/// Phases that task plugins can go through. Not all phases may be applicable to a specific plugin task,
-/// but this is the cumulative list that customers may want to know about for their task.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskExecution {
-}
-/// Nested message and enum types in `TaskExecution`.
-pub mod task_execution {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Phase {
-        Undefined = 0,
-        Queued = 1,
-        Running = 2,
-        Succeeded = 3,
-        Aborted = 4,
-        Failed = 5,
-        /// To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
-        Initializing = 6,
-        /// To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
-        WaitingForResources = 7,
-    }
-    impl Phase {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Phase::Undefined => "UNDEFINED",
-                Phase::Queued => "QUEUED",
-                Phase::Running => "RUNNING",
-                Phase::Succeeded => "SUCCEEDED",
-                Phase::Aborted => "ABORTED",
-                Phase::Failed => "FAILED",
-                Phase::Initializing => "INITIALIZING",
-                Phase::WaitingForResources => "WAITING_FOR_RESOURCES",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNDEFINED" => Some(Self::Undefined),
-                "QUEUED" => Some(Self::Queued),
-                "RUNNING" => Some(Self::Running),
-                "SUCCEEDED" => Some(Self::Succeeded),
-                "ABORTED" => Some(Self::Aborted),
-                "FAILED" => Some(Self::Failed),
-                "INITIALIZING" => Some(Self::Initializing),
-                "WAITING_FOR_RESOURCES" => Some(Self::WaitingForResources),
-                _ => None,
-            }
-        }
-    }
-}
-/// Represents the error message from the execution.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ExecutionError {
-    /// Error code indicates a grouping of a type of error.
-    /// More Info: <Link>
-    #[prost(string, tag="1")]
-    pub code: ::prost::alloc::string::String,
-    /// Detailed description of the error - including stack trace.
-    #[prost(string, tag="2")]
-    pub message: ::prost::alloc::string::String,
-    /// Full error contents accessible via a URI
-    #[prost(string, tag="3")]
-    pub error_uri: ::prost::alloc::string::String,
-    #[prost(enumeration="execution_error::ErrorKind", tag="4")]
-    pub kind: i32,
-}
-/// Nested message and enum types in `ExecutionError`.
-pub mod execution_error {
-    /// Error type: System or User
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum ErrorKind {
-        Unknown = 0,
-        User = 1,
-        System = 2,
-    }
-    impl ErrorKind {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                ErrorKind::Unknown => "UNKNOWN",
-                ErrorKind::User => "USER",
-                ErrorKind::System => "SYSTEM",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNKNOWN" => Some(Self::Unknown),
-                "USER" => Some(Self::User),
-                "SYSTEM" => Some(Self::System),
-                _ => None,
-            }
-        }
-    }
-}
-/// Log information for the task that is specific to a log sink
-/// When our log story is flushed out, we may have more metadata here like log link expiry
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskLog {
-    #[prost(string, tag="1")]
-    pub uri: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub name: ::prost::alloc::string::String,
-    #[prost(enumeration="task_log::MessageFormat", tag="3")]
-    pub message_format: i32,
-    #[prost(message, optional, tag="4")]
-    pub ttl: ::core::option::Option<::prost_types::Duration>,
-}
-/// Nested message and enum types in `TaskLog`.
-pub mod task_log {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum MessageFormat {
-        Unknown = 0,
-        Csv = 1,
-        Json = 2,
-    }
-    impl MessageFormat {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                MessageFormat::Unknown => "UNKNOWN",
-                MessageFormat::Csv => "CSV",
-                MessageFormat::Json => "JSON",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNKNOWN" => Some(Self::Unknown),
-                "CSV" => Some(Self::Csv),
-                "JSON" => Some(Self::Json),
-                _ => None,
-            }
-        }
-    }
-}
-/// Represents customized execution run-time attributes.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QualityOfServiceSpec {
-    /// Indicates how much queueing delay an execution can tolerate.
-    #[prost(message, optional, tag="1")]
-    pub queueing_budget: ::core::option::Option<::prost_types::Duration>,
-}
-/// Indicates the priority of an execution.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QualityOfService {
-    #[prost(oneof="quality_of_service::Designation", tags="1, 2")]
-    pub designation: ::core::option::Option<quality_of_service::Designation>,
-}
-/// Nested message and enum types in `QualityOfService`.
-pub mod quality_of_service {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Tier {
-        /// Default: no quality of service specified.
-        Undefined = 0,
-        High = 1,
-        Medium = 2,
-        Low = 3,
-    }
-    impl Tier {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Tier::Undefined => "UNDEFINED",
-                Tier::High => "HIGH",
-                Tier::Medium => "MEDIUM",
-                Tier::Low => "LOW",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "UNDEFINED" => Some(Self::Undefined),
-                "HIGH" => Some(Self::High),
-                "MEDIUM" => Some(Self::Medium),
-                "LOW" => Some(Self::Low),
-                _ => None,
-            }
-        }
-    }
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Designation {
-        #[prost(enumeration="Tier", tag="1")]
-        Tier(i32),
-        #[prost(message, tag="2")]
-        Spec(super::QualityOfServiceSpec),
-    }
-}
-/// Encapsulation of fields that uniquely identifies a Flyte resource.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Identifier {
-    /// Identifies the specific type of resource that this identifier corresponds to.
-    #[prost(enumeration="ResourceType", tag="1")]
-    pub resource_type: i32,
-    /// Name of the project the resource belongs to.
-    #[prost(string, tag="2")]
-    pub project: ::prost::alloc::string::String,
-    /// Name of the domain the resource belongs to.
-    /// A domain can be considered as a subset within a specific project.
-    #[prost(string, tag="3")]
-    pub domain: ::prost::alloc::string::String,
-    /// User provided value for the resource.
-    #[prost(string, tag="4")]
-    pub name: ::prost::alloc::string::String,
-    /// Specific version of the resource.
-    #[prost(string, tag="5")]
-    pub version: ::prost::alloc::string::String,
-}
-/// Encapsulation of fields that uniquely identifies a Flyte workflow execution
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowExecutionIdentifier {
-    /// Name of the project the resource belongs to.
-    #[prost(string, tag="1")]
-    pub project: ::prost::alloc::string::String,
-    /// Name of the domain the resource belongs to.
-    /// A domain can be considered as a subset within a specific project.
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-    /// User or system provided value for the resource.
-    #[prost(string, tag="4")]
-    pub name: ::prost::alloc::string::String,
-}
-/// Encapsulation of fields that identify a Flyte node execution entity.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NodeExecutionIdentifier {
-    #[prost(string, tag="1")]
-    pub node_id: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="2")]
-    pub execution_id: ::core::option::Option<WorkflowExecutionIdentifier>,
-}
-/// Encapsulation of fields that identify a Flyte task execution entity.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskExecutionIdentifier {
-    #[prost(message, optional, tag="1")]
-    pub task_id: ::core::option::Option<Identifier>,
-    #[prost(message, optional, tag="2")]
-    pub node_execution_id: ::core::option::Option<NodeExecutionIdentifier>,
-    #[prost(uint32, tag="3")]
-    pub retry_attempt: u32,
-}
-/// Encapsulation of fields the uniquely identify a signal.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SignalIdentifier {
-    /// Unique identifier for a signal.
-    #[prost(string, tag="1")]
-    pub signal_id: ::prost::alloc::string::String,
-    /// Identifies the Flyte workflow execution this signal belongs to.
-    #[prost(message, optional, tag="2")]
-    pub execution_id: ::core::option::Option<WorkflowExecutionIdentifier>,
-}
-/// Indicates a resource type within Flyte.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum ResourceType {
-    Unspecified = 0,
-    Task = 1,
-    Workflow = 2,
-    LaunchPlan = 3,
-    /// A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
-    /// Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
-    /// in a similar manner to other Flyte objects
-    Dataset = 4,
-}
-impl ResourceType {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            ResourceType::Unspecified => "UNSPECIFIED",
-            ResourceType::Task => "TASK",
-            ResourceType::Workflow => "WORKFLOW",
-            ResourceType::LaunchPlan => "LAUNCH_PLAN",
-            ResourceType::Dataset => "DATASET",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "UNSPECIFIED" => Some(Self::Unspecified),
-            "TASK" => Some(Self::Task),
-            "WORKFLOW" => Some(Self::Workflow),
-            "LAUNCH_PLAN" => Some(Self::LaunchPlan),
-            "DATASET" => Some(Self::Dataset),
-            _ => None,
-        }
-    }
-}
 /// Defines schema columns and types to strongly type-validate schemas interoperability.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -996,141 +561,109 @@ pub struct RetryStrategy {
     #[prost(uint32, tag="5")]
     pub retries: u32,
 }
-/// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
-/// Each expression results in a boolean result.
+/// Encapsulation of fields that uniquely identifies a Flyte resource.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ComparisonExpression {
-    #[prost(enumeration="comparison_expression::Operator", tag="1")]
-    pub operator: i32,
+pub struct Identifier {
+    /// Identifies the specific type of resource that this identifier corresponds to.
+    #[prost(enumeration="ResourceType", tag="1")]
+    pub resource_type: i32,
+    /// Name of the project the resource belongs to.
+    #[prost(string, tag="2")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the resource belongs to.
+    /// A domain can be considered as a subset within a specific project.
+    #[prost(string, tag="3")]
+    pub domain: ::prost::alloc::string::String,
+    /// User provided value for the resource.
+    #[prost(string, tag="4")]
+    pub name: ::prost::alloc::string::String,
+    /// Specific version of the resource.
+    #[prost(string, tag="5")]
+    pub version: ::prost::alloc::string::String,
+}
+/// Encapsulation of fields that uniquely identifies a Flyte workflow execution
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowExecutionIdentifier {
+    /// Name of the project the resource belongs to.
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the resource belongs to.
+    /// A domain can be considered as a subset within a specific project.
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    /// User or system provided value for the resource.
+    #[prost(string, tag="4")]
+    pub name: ::prost::alloc::string::String,
+}
+/// Encapsulation of fields that identify a Flyte node execution entity.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NodeExecutionIdentifier {
+    #[prost(string, tag="1")]
+    pub node_id: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
-    pub left_value: ::core::option::Option<Operand>,
-    #[prost(message, optional, tag="3")]
-    pub right_value: ::core::option::Option<Operand>,
+    pub execution_id: ::core::option::Option<WorkflowExecutionIdentifier>,
 }
-/// Nested message and enum types in `ComparisonExpression`.
-pub mod comparison_expression {
-    /// Binary Operator for each expression
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Operator {
-        Eq = 0,
-        Neq = 1,
-        /// Greater Than
-        Gt = 2,
-        Gte = 3,
-        /// Less Than
-        Lt = 4,
-        Lte = 5,
-    }
-    impl Operator {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Operator::Eq => "EQ",
-                Operator::Neq => "NEQ",
-                Operator::Gt => "GT",
-                Operator::Gte => "GTE",
-                Operator::Lt => "LT",
-                Operator::Lte => "LTE",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "EQ" => Some(Self::Eq),
-                "NEQ" => Some(Self::Neq),
-                "GT" => Some(Self::Gt),
-                "GTE" => Some(Self::Gte),
-                "LT" => Some(Self::Lt),
-                "LTE" => Some(Self::Lte),
-                _ => None,
-            }
-        }
-    }
-}
-/// Defines an operand to a comparison expression.
+/// Encapsulation of fields that identify a Flyte task execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Operand {
-    #[prost(oneof="operand::Val", tags="1, 2")]
-    pub val: ::core::option::Option<operand::Val>,
+pub struct TaskExecutionIdentifier {
+    #[prost(message, optional, tag="1")]
+    pub task_id: ::core::option::Option<Identifier>,
+    #[prost(message, optional, tag="2")]
+    pub node_execution_id: ::core::option::Option<NodeExecutionIdentifier>,
+    #[prost(uint32, tag="3")]
+    pub retry_attempt: u32,
 }
-/// Nested message and enum types in `Operand`.
-pub mod operand {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Val {
-        /// Can be a constant
-        #[prost(message, tag="1")]
-        Primitive(super::Primitive),
-        /// Or one of this node's input variables
-        #[prost(string, tag="2")]
-        Var(::prost::alloc::string::String),
-    }
-}
-/// Defines a boolean expression tree. It can be a simple or a conjunction expression.
-/// Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
+/// Encapsulation of fields the uniquely identify a signal.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct BooleanExpression {
-    #[prost(oneof="boolean_expression::Expr", tags="1, 2")]
-    pub expr: ::core::option::Option<boolean_expression::Expr>,
+pub struct SignalIdentifier {
+    /// Unique identifier for a signal.
+    #[prost(string, tag="1")]
+    pub signal_id: ::prost::alloc::string::String,
+    /// Identifies the Flyte workflow execution this signal belongs to.
+    #[prost(message, optional, tag="2")]
+    pub execution_id: ::core::option::Option<WorkflowExecutionIdentifier>,
 }
-/// Nested message and enum types in `BooleanExpression`.
-pub mod boolean_expression {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Expr {
-        #[prost(message, tag="1")]
-        Conjunction(::prost::alloc::boxed::Box<super::ConjunctionExpression>),
-        #[prost(message, tag="2")]
-        Comparison(super::ComparisonExpression),
-    }
+/// Indicates a resource type within Flyte.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ResourceType {
+    Unspecified = 0,
+    Task = 1,
+    Workflow = 2,
+    LaunchPlan = 3,
+    /// A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
+    /// Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
+    /// in a similar manner to other Flyte objects
+    Dataset = 4,
 }
-/// Defines a conjunction expression of two boolean expressions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ConjunctionExpression {
-    #[prost(enumeration="conjunction_expression::LogicalOperator", tag="1")]
-    pub operator: i32,
-    #[prost(message, optional, boxed, tag="2")]
-    pub left_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
-    #[prost(message, optional, boxed, tag="3")]
-    pub right_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
-}
-/// Nested message and enum types in `ConjunctionExpression`.
-pub mod conjunction_expression {
-    /// Nested conditions. They can be conjoined using AND / OR
-    /// Order of evaluation is not important as the operators are Commutative
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum LogicalOperator {
-        /// Conjunction
-        And = 0,
-        Or = 1,
-    }
-    impl LogicalOperator {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                LogicalOperator::And => "AND",
-                LogicalOperator::Or => "OR",
-            }
+impl ResourceType {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            ResourceType::Unspecified => "UNSPECIFIED",
+            ResourceType::Task => "TASK",
+            ResourceType::Workflow => "WORKFLOW",
+            ResourceType::LaunchPlan => "LAUNCH_PLAN",
+            ResourceType::Dataset => "DATASET",
         }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "AND" => Some(Self::And),
-                "OR" => Some(Self::Or),
-                _ => None,
-            }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "UNSPECIFIED" => Some(Self::Unspecified),
+            "TASK" => Some(Self::Task),
+            "WORKFLOW" => Some(Self::Workflow),
+            "LAUNCH_PLAN" => Some(Self::LaunchPlan),
+            "DATASET" => Some(Self::Dataset),
+            _ => None,
         }
     }
 }
@@ -1932,6 +1465,473 @@ pub mod sql {
                 "ANSI" => Some(Self::Ansi),
                 "HIVE" => Some(Self::Hive),
                 "OTHER" => Some(Self::Other),
+                _ => None,
+            }
+        }
+    }
+}
+/// Indicates various phases of Workflow Execution
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowExecution {
+}
+/// Nested message and enum types in `WorkflowExecution`.
+pub mod workflow_execution {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Phase {
+        Undefined = 0,
+        Queued = 1,
+        Running = 2,
+        Succeeding = 3,
+        Succeeded = 4,
+        Failing = 5,
+        Failed = 6,
+        Aborted = 7,
+        TimedOut = 8,
+        Aborting = 9,
+    }
+    impl Phase {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Phase::Undefined => "UNDEFINED",
+                Phase::Queued => "QUEUED",
+                Phase::Running => "RUNNING",
+                Phase::Succeeding => "SUCCEEDING",
+                Phase::Succeeded => "SUCCEEDED",
+                Phase::Failing => "FAILING",
+                Phase::Failed => "FAILED",
+                Phase::Aborted => "ABORTED",
+                Phase::TimedOut => "TIMED_OUT",
+                Phase::Aborting => "ABORTING",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNDEFINED" => Some(Self::Undefined),
+                "QUEUED" => Some(Self::Queued),
+                "RUNNING" => Some(Self::Running),
+                "SUCCEEDING" => Some(Self::Succeeding),
+                "SUCCEEDED" => Some(Self::Succeeded),
+                "FAILING" => Some(Self::Failing),
+                "FAILED" => Some(Self::Failed),
+                "ABORTED" => Some(Self::Aborted),
+                "TIMED_OUT" => Some(Self::TimedOut),
+                "ABORTING" => Some(Self::Aborting),
+                _ => None,
+            }
+        }
+    }
+}
+/// Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NodeExecution {
+}
+/// Nested message and enum types in `NodeExecution`.
+pub mod node_execution {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Phase {
+        Undefined = 0,
+        Queued = 1,
+        Running = 2,
+        Succeeded = 3,
+        Failing = 4,
+        Failed = 5,
+        Aborted = 6,
+        Skipped = 7,
+        TimedOut = 8,
+        DynamicRunning = 9,
+        Recovered = 10,
+    }
+    impl Phase {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Phase::Undefined => "UNDEFINED",
+                Phase::Queued => "QUEUED",
+                Phase::Running => "RUNNING",
+                Phase::Succeeded => "SUCCEEDED",
+                Phase::Failing => "FAILING",
+                Phase::Failed => "FAILED",
+                Phase::Aborted => "ABORTED",
+                Phase::Skipped => "SKIPPED",
+                Phase::TimedOut => "TIMED_OUT",
+                Phase::DynamicRunning => "DYNAMIC_RUNNING",
+                Phase::Recovered => "RECOVERED",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNDEFINED" => Some(Self::Undefined),
+                "QUEUED" => Some(Self::Queued),
+                "RUNNING" => Some(Self::Running),
+                "SUCCEEDED" => Some(Self::Succeeded),
+                "FAILING" => Some(Self::Failing),
+                "FAILED" => Some(Self::Failed),
+                "ABORTED" => Some(Self::Aborted),
+                "SKIPPED" => Some(Self::Skipped),
+                "TIMED_OUT" => Some(Self::TimedOut),
+                "DYNAMIC_RUNNING" => Some(Self::DynamicRunning),
+                "RECOVERED" => Some(Self::Recovered),
+                _ => None,
+            }
+        }
+    }
+}
+/// Phases that task plugins can go through. Not all phases may be applicable to a specific plugin task,
+/// but this is the cumulative list that customers may want to know about for their task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskExecution {
+}
+/// Nested message and enum types in `TaskExecution`.
+pub mod task_execution {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Phase {
+        Undefined = 0,
+        Queued = 1,
+        Running = 2,
+        Succeeded = 3,
+        Aborted = 4,
+        Failed = 5,
+        /// To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
+        Initializing = 6,
+        /// To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
+        WaitingForResources = 7,
+    }
+    impl Phase {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Phase::Undefined => "UNDEFINED",
+                Phase::Queued => "QUEUED",
+                Phase::Running => "RUNNING",
+                Phase::Succeeded => "SUCCEEDED",
+                Phase::Aborted => "ABORTED",
+                Phase::Failed => "FAILED",
+                Phase::Initializing => "INITIALIZING",
+                Phase::WaitingForResources => "WAITING_FOR_RESOURCES",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNDEFINED" => Some(Self::Undefined),
+                "QUEUED" => Some(Self::Queued),
+                "RUNNING" => Some(Self::Running),
+                "SUCCEEDED" => Some(Self::Succeeded),
+                "ABORTED" => Some(Self::Aborted),
+                "FAILED" => Some(Self::Failed),
+                "INITIALIZING" => Some(Self::Initializing),
+                "WAITING_FOR_RESOURCES" => Some(Self::WaitingForResources),
+                _ => None,
+            }
+        }
+    }
+}
+/// Represents the error message from the execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionError {
+    /// Error code indicates a grouping of a type of error.
+    /// More Info: <Link>
+    #[prost(string, tag="1")]
+    pub code: ::prost::alloc::string::String,
+    /// Detailed description of the error - including stack trace.
+    #[prost(string, tag="2")]
+    pub message: ::prost::alloc::string::String,
+    /// Full error contents accessible via a URI
+    #[prost(string, tag="3")]
+    pub error_uri: ::prost::alloc::string::String,
+    #[prost(enumeration="execution_error::ErrorKind", tag="4")]
+    pub kind: i32,
+}
+/// Nested message and enum types in `ExecutionError`.
+pub mod execution_error {
+    /// Error type: System or User
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum ErrorKind {
+        Unknown = 0,
+        User = 1,
+        System = 2,
+    }
+    impl ErrorKind {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                ErrorKind::Unknown => "UNKNOWN",
+                ErrorKind::User => "USER",
+                ErrorKind::System => "SYSTEM",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNKNOWN" => Some(Self::Unknown),
+                "USER" => Some(Self::User),
+                "SYSTEM" => Some(Self::System),
+                _ => None,
+            }
+        }
+    }
+}
+/// Log information for the task that is specific to a log sink
+/// When our log story is flushed out, we may have more metadata here like log link expiry
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskLog {
+    #[prost(string, tag="1")]
+    pub uri: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(enumeration="task_log::MessageFormat", tag="3")]
+    pub message_format: i32,
+    #[prost(message, optional, tag="4")]
+    pub ttl: ::core::option::Option<::prost_types::Duration>,
+}
+/// Nested message and enum types in `TaskLog`.
+pub mod task_log {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum MessageFormat {
+        Unknown = 0,
+        Csv = 1,
+        Json = 2,
+    }
+    impl MessageFormat {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                MessageFormat::Unknown => "UNKNOWN",
+                MessageFormat::Csv => "CSV",
+                MessageFormat::Json => "JSON",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNKNOWN" => Some(Self::Unknown),
+                "CSV" => Some(Self::Csv),
+                "JSON" => Some(Self::Json),
+                _ => None,
+            }
+        }
+    }
+}
+/// Represents customized execution run-time attributes.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QualityOfServiceSpec {
+    /// Indicates how much queueing delay an execution can tolerate.
+    #[prost(message, optional, tag="1")]
+    pub queueing_budget: ::core::option::Option<::prost_types::Duration>,
+}
+/// Indicates the priority of an execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QualityOfService {
+    #[prost(oneof="quality_of_service::Designation", tags="1, 2")]
+    pub designation: ::core::option::Option<quality_of_service::Designation>,
+}
+/// Nested message and enum types in `QualityOfService`.
+pub mod quality_of_service {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Tier {
+        /// Default: no quality of service specified.
+        Undefined = 0,
+        High = 1,
+        Medium = 2,
+        Low = 3,
+    }
+    impl Tier {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Tier::Undefined => "UNDEFINED",
+                Tier::High => "HIGH",
+                Tier::Medium => "MEDIUM",
+                Tier::Low => "LOW",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNDEFINED" => Some(Self::Undefined),
+                "HIGH" => Some(Self::High),
+                "MEDIUM" => Some(Self::Medium),
+                "LOW" => Some(Self::Low),
+                _ => None,
+            }
+        }
+    }
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Designation {
+        #[prost(enumeration="Tier", tag="1")]
+        Tier(i32),
+        #[prost(message, tag="2")]
+        Spec(super::QualityOfServiceSpec),
+    }
+}
+/// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
+/// Each expression results in a boolean result.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ComparisonExpression {
+    #[prost(enumeration="comparison_expression::Operator", tag="1")]
+    pub operator: i32,
+    #[prost(message, optional, tag="2")]
+    pub left_value: ::core::option::Option<Operand>,
+    #[prost(message, optional, tag="3")]
+    pub right_value: ::core::option::Option<Operand>,
+}
+/// Nested message and enum types in `ComparisonExpression`.
+pub mod comparison_expression {
+    /// Binary Operator for each expression
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Operator {
+        Eq = 0,
+        Neq = 1,
+        /// Greater Than
+        Gt = 2,
+        Gte = 3,
+        /// Less Than
+        Lt = 4,
+        Lte = 5,
+    }
+    impl Operator {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Operator::Eq => "EQ",
+                Operator::Neq => "NEQ",
+                Operator::Gt => "GT",
+                Operator::Gte => "GTE",
+                Operator::Lt => "LT",
+                Operator::Lte => "LTE",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "EQ" => Some(Self::Eq),
+                "NEQ" => Some(Self::Neq),
+                "GT" => Some(Self::Gt),
+                "GTE" => Some(Self::Gte),
+                "LT" => Some(Self::Lt),
+                "LTE" => Some(Self::Lte),
+                _ => None,
+            }
+        }
+    }
+}
+/// Defines an operand to a comparison expression.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Operand {
+    #[prost(oneof="operand::Val", tags="1, 2")]
+    pub val: ::core::option::Option<operand::Val>,
+}
+/// Nested message and enum types in `Operand`.
+pub mod operand {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Val {
+        /// Can be a constant
+        #[prost(message, tag="1")]
+        Primitive(super::Primitive),
+        /// Or one of this node's input variables
+        #[prost(string, tag="2")]
+        Var(::prost::alloc::string::String),
+    }
+}
+/// Defines a boolean expression tree. It can be a simple or a conjunction expression.
+/// Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BooleanExpression {
+    #[prost(oneof="boolean_expression::Expr", tags="1, 2")]
+    pub expr: ::core::option::Option<boolean_expression::Expr>,
+}
+/// Nested message and enum types in `BooleanExpression`.
+pub mod boolean_expression {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Expr {
+        #[prost(message, tag="1")]
+        Conjunction(::prost::alloc::boxed::Box<super::ConjunctionExpression>),
+        #[prost(message, tag="2")]
+        Comparison(super::ComparisonExpression),
+    }
+}
+/// Defines a conjunction expression of two boolean expressions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConjunctionExpression {
+    #[prost(enumeration="conjunction_expression::LogicalOperator", tag="1")]
+    pub operator: i32,
+    #[prost(message, optional, boxed, tag="2")]
+    pub left_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
+    #[prost(message, optional, boxed, tag="3")]
+    pub right_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
+}
+/// Nested message and enum types in `ConjunctionExpression`.
+pub mod conjunction_expression {
+    /// Nested conditions. They can be conjoined using AND / OR
+    /// Order of evaluation is not important as the operators are Commutative
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum LogicalOperator {
+        /// Conjunction
+        And = 0,
+        Or = 1,
+    }
+    impl LogicalOperator {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                LogicalOperator::And => "AND",
+                LogicalOperator::Or => "OR",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "AND" => Some(Self::And),
+                "OR" => Some(Self::Or),
                 _ => None,
             }
         }

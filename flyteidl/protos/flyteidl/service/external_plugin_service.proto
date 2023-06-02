@@ -6,18 +6,19 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/interface.proto";
 
-// AgentService defines an RPC Service that allows propeller to send the request to the agent server.
-service AgentService {
-  // Send a task create request to the agent server.
-  rpc CreateTask (TaskCreateRequest) returns (TaskCreateResponse){};
+// ExternalPluginService defines an RPC Service that allows propeller to send the request to the backend plugin server.
+service ExternalPluginService {
+  // Send a task create request to the backend plugin server.
+  rpc CreateTask (TaskCreateRequest) returns (TaskCreateResponse){option deprecated = true;};
   // Get job status.
-  rpc GetTask (TaskGetRequest) returns (TaskGetResponse){};
+  rpc GetTask (TaskGetRequest) returns (TaskGetResponse){option deprecated = true;};
   // Delete the task resource.
-  rpc DeleteTask (TaskDeleteRequest) returns (TaskDeleteResponse){};
+  rpc DeleteTask (TaskDeleteRequest) returns (TaskDeleteResponse){option deprecated = true;};
 }
 
 // The state of the execution is used to control its visibility in the UI/CLI.
 enum State {
+  option deprecated = true;
   RETRYABLE_FAILURE = 0;
   PERMANENT_FAILURE = 1;
   PENDING = 2;
@@ -27,6 +28,7 @@ enum State {
 
 // Represents a request structure to create task.
 message TaskCreateRequest {
+  option deprecated = true;
   // The inputs required to start the execution. All required inputs must be
   // included in this map. If not required and not provided, defaults apply.
   // +optional
@@ -39,11 +41,13 @@ message TaskCreateRequest {
 
 // Represents a create response structure.
 message TaskCreateResponse {
+  option deprecated = true;
   string job_id = 1;
 }
 
-// A message used to fetch a job state from flyte agent server.
+// A message used to fetch a job state from backend plugin server.
 message TaskGetRequest {
+  option deprecated = true;
   // A predefined yet extensible Task type identifier.
   string task_type = 1;
   // The unique id identifying the job.
@@ -52,9 +56,10 @@ message TaskGetRequest {
 
 // Response to get an individual task state.
 message TaskGetResponse {
+  option deprecated = true;
   // The state of the execution is used to control its visibility in the UI/CLI.
   State state = 1;
-  // The outputs of the execution. It's typically used by sql task. Agent service will create a
+  // The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
   // Structured dataset pointing to the query result table.
   // +optional
   core.LiteralMap outputs = 2;
@@ -62,6 +67,7 @@ message TaskGetResponse {
 
 // A message used to delete a task.
 message TaskDeleteRequest {
+  option deprecated = true;
   // A predefined yet extensible Task type identifier.
   string task_type = 1;
   // The unique id identifying the job.
@@ -70,5 +76,5 @@ message TaskDeleteRequest {
 
 // Response to delete a task.
 message TaskDeleteResponse {
+  option deprecated = true;
 }
-
