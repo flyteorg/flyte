@@ -1,4 +1,110 @@
 // @generated
+/// Represents a request structure to create task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateTaskRequest {
+    /// The inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="1")]
+    pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// Template of the task that encapsulates all the metadata of the task.
+    #[prost(message, optional, tag="2")]
+    pub template: ::core::option::Option<super::core::TaskTemplate>,
+    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+    #[prost(string, tag="3")]
+    pub output_prefix: ::prost::alloc::string::String,
+}
+/// Represents a create response structure.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateTaskResponse {
+    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    #[prost(bytes="vec", tag="1")]
+    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+}
+/// A message used to fetch a job resource from flyte agent server.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTaskRequest {
+    /// A predefined yet extensible Task type identifier.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+    /// Metadata about the resource to be pass to the agent.
+    #[prost(bytes="vec", tag="2")]
+    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+}
+/// Response to get an individual task resource.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTaskResponse {
+    #[prost(message, optional, tag="1")]
+    pub resource: ::core::option::Option<Resource>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Resource {
+    /// The state of the execution is used to control its visibility in the UI/CLI.
+    #[prost(enumeration="State", tag="1")]
+    pub state: i32,
+    /// The outputs of the execution. It's typically used by sql task. Agent service will create a
+    /// Structured dataset pointing to the query result table.
+    /// +optional
+    #[prost(message, optional, tag="2")]
+    pub outputs: ::core::option::Option<super::core::LiteralMap>,
+}
+/// A message used to delete a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteTaskRequest {
+    /// A predefined yet extensible Task type identifier.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+    /// Metadata about the resource to be pass to the agent.
+    #[prost(bytes="vec", tag="2")]
+    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+}
+/// Response to delete a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteTaskResponse {
+}
+/// The state of the execution is used to control its visibility in the UI/CLI.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum State {
+    RetryableFailure = 0,
+    PermanentFailure = 1,
+    Pending = 2,
+    Running = 3,
+    Succeeded = 4,
+}
+impl State {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            State::RetryableFailure => "RETRYABLE_FAILURE",
+            State::PermanentFailure => "PERMANENT_FAILURE",
+            State::Pending => "PENDING",
+            State::Running => "RUNNING",
+            State::Succeeded => "SUCCEEDED",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "RETRYABLE_FAILURE" => Some(Self::RetryableFailure),
+            "PERMANENT_FAILURE" => Some(Self::PermanentFailure),
+            "PENDING" => Some(Self::Pending),
+            "RUNNING" => Some(Self::Running),
+            "SUCCEEDED" => Some(Self::Succeeded),
+            _ => None,
+        }
+    }
+}
 /// Encapsulates specifications for routing an execution onto a specific cluster.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
