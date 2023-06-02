@@ -452,7 +452,7 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
-	context.Context, *models.Execution, error) {
+	context.Context, *models.Execution, map[string]*core.ArtifactID, error) {
 
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: request.Spec.LaunchPlan.Project,
@@ -461,11 +461,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Version: request.Spec.LaunchPlan.Version,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	task, err := transformers.FromTaskModel(taskModel)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Prepare a skeleton workflow
@@ -474,15 +474,15 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to created skeleton workflow for [%+v] with err: %v", taskIdentifier, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	workflow, err := transformers.FromWorkflowModel(*workflowModel)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	closure.CreatedAt = workflow.Closure.CreatedAt
 	workflow.Closure = closure
@@ -490,10 +490,10 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
 		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	executionInputs, err := validation.CheckAndFetchInputsForExecution(
+	executionInputs, resolvedArtifactMap, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
 		launchPlan.Closure.ExpectedInputs,
@@ -502,7 +502,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
 			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	name := util.GetExecutionName(request)
@@ -520,13 +520,14 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
+	requestSpec.Metadata.ArtifactIds = resolvedArtifactMap
 
 	// Get the node execution (if any) that launched this execution
 	var parentNodeExecutionID uint
 	var sourceExecutionID uint
 	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, &workflowExecutionID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Dynamically assign task resource defaults.
@@ -540,15 +541,15 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	executionConfig, err := m.getExecutionConfig(ctx, &request, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var labels map[string]string
@@ -558,7 +559,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	labels, err = m.addProjectLabels(ctx, request.Project, labels)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	var annotations map[string]string
@@ -573,7 +574,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, &request)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
@@ -591,7 +592,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, workflowExecutionID.Name, "")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if overrides != nil {
 		executionParameters.TaskPluginOverrides = overrides
@@ -616,7 +617,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
 			request, workflowExecutionID, request.Inputs, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
@@ -657,10 +658,10 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.Inputs)))
-	return ctx, executionModel, nil
+	return ctx, executionModel, resolvedArtifactMap, nil
 }
 
 func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
@@ -710,11 +711,17 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
-	context.Context, *models.Execution, error) {
+	context.Context, *models.Execution, map[string]*core.ArtifactID, error) {
+
+	// Resolve artifacts.
+	// two sources of artifacts: launch plan and create execute request.
+	//   - within the launch plan, the artifact will be in the Parameter map, and can come in the Literal,
+	//     or as an ArtifactQuery.
+
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
@@ -724,14 +731,16 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Spec.LaunchPlan)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get launch plan model for ExecutionCreateRequest %+v with err %v", request, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	executionInputs, err := validation.CheckAndFetchInputsForExecution(
+	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
+	// in the future, and also to make sure that relaunch and recover can use it if necessary.
+	executionInputs, resolvedArtifactMap, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
 		launchPlan.Closure.ExpectedInputs,
@@ -741,23 +750,23 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
 			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	workflowModel, err := util.GetWorkflowModel(ctx, m.db, *launchPlan.Spec.WorkflowId)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	workflow, err := transformers.FromWorkflowModel(workflowModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	closure.CreatedAt = workflow.Closure.CreatedAt
 	workflow.Closure = closure
@@ -774,13 +783,14 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
+	requestSpec.Metadata.ArtifactIds = resolvedArtifactMap
 
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
 	var sourceExecutionID uint
 	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, &workflowExecutionID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Dynamically assign task resource defaults.
@@ -794,16 +804,16 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	executionConfig, err := m.getExecutionConfig(ctx, &request, launchPlan)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	namespace := common.GetNamespaceName(
@@ -811,15 +821,15 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	labels, err := resolveStringMap(executionConfig.GetLabels(), launchPlan.Spec.Labels, "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	labels, err = m.addProjectLabels(ctx, request.Project, labels)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	annotations, err := resolveStringMap(executionConfig.GetAnnotations(), launchPlan.Spec.Annotations, "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	var rawOutputDataConfig *admin.RawOutputDataConfig
 	if executionConfig.RawOutputDataConfig != nil {
@@ -828,7 +838,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, &request)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
@@ -846,7 +856,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if overrides != nil {
 		executionParameters.TaskPluginOverrides = overrides
@@ -872,7 +882,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
 			request, workflowExecutionID, executionInputs, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
@@ -913,9 +923,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return ctx, executionModel, nil
+	return ctx, executionModel, resolvedArtifactMap, nil
 }
 
 // Inserts an execution model into the database store and emits platform metrics.
@@ -939,6 +949,17 @@ func (m *ExecutionManager) createExecutionModel(
 	return &workflowExecutionIdentifier, nil
 }
 
+func (m *ExecutionManager) handleArtifactEvents(artifactIDs map[string]*core.ArtifactID, wfExecID core.WorkflowExecutionIdentifier) {
+	if artifactIDs != nil {
+		fmt.Printf("WF exec used %v", wfExecID.String())
+		for _, artifactID := range artifactIDs {
+			if artifactID != nil {
+				fmt.Printf("artifactID: %v\n", artifactID)
+			}
+		}
+	}
+}
+
 func (m *ExecutionManager) CreateExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
@@ -948,7 +969,8 @@ func (m *ExecutionManager) CreateExecution(
 	}
 	var executionModel *models.Execution
 	var err error
-	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, request, requestedAt)
+	var artifactIDs map[string]*core.ArtifactID
+	ctx, executionModel, artifactIDs, err = m.launchExecutionAndPrepareModel(ctx, request, requestedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -956,6 +978,7 @@ func (m *ExecutionManager) CreateExecution(
 	if err != nil {
 		return nil, err
 	}
+	m.handleArtifactEvents(artifactIDs, *workflowExecutionIdentifier)
 	return &admin.ExecutionCreateResponse{
 		Id: workflowExecutionIdentifier,
 	}, nil
@@ -997,7 +1020,7 @@ func (m *ExecutionManager) RelaunchExecution(
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	executionSpec.OverwriteCache = request.GetOverwriteCache()
 	var executionModel *models.Execution
-	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+	ctx, executionModel, artifactIDs, err := m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -1012,6 +1035,7 @@ func (m *ExecutionManager) RelaunchExecution(
 	if err != nil {
 		return nil, err
 	}
+	m.handleArtifactEvents(artifactIDs, *workflowExecutionIdentifier)
 	logger.Debugf(ctx, "Successfully relaunched [%+v] as [%+v]", request.Id, workflowExecutionIdentifier)
 	return &admin.ExecutionCreateResponse{
 		Id: workflowExecutionIdentifier,
@@ -1048,7 +1072,7 @@ func (m *ExecutionManager) RecoverExecution(
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RECOVERED
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	var executionModel *models.Execution
-	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+	ctx, executionModel, _, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,

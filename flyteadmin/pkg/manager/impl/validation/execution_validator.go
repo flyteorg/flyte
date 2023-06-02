@@ -76,11 +76,14 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 	return nil
 }
 
+// CheckAndFetchInputsForExecution will merge inputs and also resolve any artifacts that are required.
+// A map will be returned for all artifacts used.
 func CheckAndFetchInputsForExecution(
-	userInputs *core.LiteralMap, fixedInputs *core.LiteralMap, expectedInputs *core.ParameterMap) (*core.LiteralMap, error) {
+	userInputs *core.LiteralMap, fixedInputs *core.LiteralMap, expectedInputs *core.ParameterMap) (*core.LiteralMap, map[string]*core.ArtifactID, error) {
 
 	executionInputMap := map[string]*core.Literal{}
 	expectedInputMap := map[string]*core.Parameter{}
+	resolvedArtifactMap := map[string]*core.ArtifactID{}
 
 	if expectedInputs != nil && len(expectedInputs.GetParameters()) > 0 {
 		expectedInputMap = expectedInputs.GetParameters()
@@ -89,7 +92,7 @@ func CheckAndFetchInputsForExecution(
 	if userInputs != nil && len(userInputs.GetLiterals()) > 0 {
 		for name, value := range userInputs.GetLiterals() {
 			if _, ok := expectedInputMap[name]; !ok {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input %s", name)
+				return nil, resolvedArtifactMap, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input %s", name)
 			}
 			executionInputMap[name] = value
 		}
@@ -98,13 +101,20 @@ func CheckAndFetchInputsForExecution(
 	for name, expectedInput := range expectedInputMap {
 		if _, ok := executionInputMap[name]; !ok {
 			if expectedInput.GetRequired() {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s missing", shared.ExpectedInputs, name)
+				return nil, resolvedArtifactMap, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s missing", shared.ExpectedInputs, name)
 			}
-			executionInputMap[name] = expectedInput.GetDefault()
+			// Look up from Artifact service if necessary
+			if expectedInput.GetArtifactQuery() != nil {
+				// should be executionInputMap[name] = artifactService.query(expectedInput.GetArtifactQuery())
+				executionInputMap[name] = expectedInput.GetDefault()
+			} else {
+				// At this point, the Literal returned by GetDefault might still be an ArtifactID
+				executionInputMap[name] = expectedInput.GetDefault()
+			}
 		} else {
 			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
+				return nil, resolvedArtifactMap, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
 			}
 		}
 	}
@@ -112,15 +122,24 @@ func CheckAndFetchInputsForExecution(
 	if fixedInputs != nil && len(fixedInputs.GetLiterals()) > 0 {
 		for name, fixedInput := range fixedInputs.GetLiterals() {
 			if _, ok := executionInputMap[name]; ok {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s cannot be overridden", shared.FixedInputs, name)
+				return nil, resolvedArtifactMap, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s cannot be overridden", shared.FixedInputs, name)
 			}
 			executionInputMap[name] = fixedInput
 		}
 	}
 
+	// Resolve any artifacts that are required.
+	for name, input := range executionInputMap {
+		if input.GetArtifactId() != nil {
+			resolvedArtifactMap[name] = input.GetArtifactId()
+			// Replace the reference with the actual literal
+			// executionInputMap[name] = artifactService.GetArtifact(input.GetArtifactId())
+		}
+	}
+
 	return &core.LiteralMap{
 		Literals: executionInputMap,
-	}, nil
+	}, resolvedArtifactMap, nil
 }
 
 func CheckValidExecutionID(executionID, fieldName string) error {
