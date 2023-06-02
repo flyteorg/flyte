@@ -310,8 +310,8 @@ Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate
 2. Runtime PodTemplates
 
 
-Compile-time PodTemplate usage
-==============================
+Compile-time PodTemplates
+=========================
 
 We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
 
@@ -354,8 +354,13 @@ the name of the primary container, labels, and annotations.
 
 The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
-Runtime PodTemplate
+Runtime PodTemplates
 ====================
+
+Runtime PodTemplates, as the name suggests, are applied during runtime, as part of building the resultant Pod. In terms of how
+they are applied, you have two choices: (1) you either elect one specific PodTemplate to be considered as default, or (2) you
+define a PodTemplate and use that in the declaration of the task. It's worth noting that they are exclusive, in other words, in case (1) is active and FlytePropeller is building a Pod where (2) was used as part of the definition of the task, then
+only the values of the PodTemplate mentioned in (2) will be used to build the Pod.
 
 Set the ``default-pod-template-name`` in FlytePropeller
 --------------------------------------------------------
@@ -446,7 +451,7 @@ versions change and fields are added/deprecated.
 Evaluation Order in PodTemplates
 *********************************
 
-The following diagram shows the precedence in evaluation order between the different types of PodTemplates and K8s Plugin Configuration.
+The following diagram shows the precedence in evaluation order between the different types of PodTemplates and K8s Plugin Configuration. The precedence is higher at the top and decreases as the height of the tree increases.
 
 .. mermaid::
    :alt: Evaluation order of PodTemplates
