@@ -1,4 +1,4 @@
-package grpc
+package agent
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func TestPlugin(t *testing.T) {
 		cfg := defaultConfig
 		cfg.WebAPI.Caching.Workers = 1
 		cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-		cfg.DefaultGrpcEndpoint = "test-service.flyte.svc.cluster.local:80"
+		cfg.DefaultGrpcEndpoint = "test-agent.flyte.svc.cluster.local:80"
 		cfg.EndpointForTaskTypes = map[string]string{"spark": "localhost:80"}
 		err := SetConfig(&cfg)
 		assert.NoError(t, err)
@@ -38,10 +38,10 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, plugin.cfg.ResourceConstraints, constraints)
 	})
 
-	t.Run("tet newGrpcPlugin", func(t *testing.T) {
-		p := newGrpcPlugin()
+	t.Run("tet newAgentPlugin", func(t *testing.T) {
+		p := newAgentPlugin()
 		assert.NotNil(t, p)
-		assert.Equal(t, p.ID, "external-plugin-service")
+		assert.Equal(t, p.ID, "agent-service")
 		assert.NotNil(t, p.PluginLoader)
 	})
 
