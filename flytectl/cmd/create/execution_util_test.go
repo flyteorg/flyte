@@ -91,6 +91,30 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 	})
+	t.Run("successful with envs", func(t *testing.T) {
+		s := setup()
+		createExecutionUtilSetup()
+		launchPlan := &admin.LaunchPlan{}
+		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
+		var executionConfigWithEnvs = &ExecutionConfig{
+			Envs: map[string]string{"foo": "bar"},
+		}
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
+		assert.Nil(t, err)
+		assert.NotNil(t, execCreateRequest)
+	})
+	t.Run("successful with empty envs", func(t *testing.T) {
+		s := setup()
+		createExecutionUtilSetup()
+		launchPlan := &admin.LaunchPlan{}
+		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
+		var executionConfigWithEnvs = &ExecutionConfig{
+			Envs: map[string]string{},
+		}
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
+		assert.Nil(t, err)
+		assert.NotNil(t, execCreateRequest)
+	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
 		createExecutionUtilSetup()
@@ -141,6 +165,38 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		}
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
 		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
+		assert.Nil(t, err)
+		assert.NotNil(t, execCreateRequest)
+	})
+	t.Run("successful with envs", func(t *testing.T) {
+		s := setup()
+		createExecutionUtilSetup()
+		task := &admin.Task{
+			Id: &core.Identifier{
+				Name: "taskName",
+			},
+		}
+		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
+		var executionConfigWithEnvs = &ExecutionConfig{
+			Envs: map[string]string{"foo": "bar"},
+		}
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
+		assert.Nil(t, err)
+		assert.NotNil(t, execCreateRequest)
+	})
+	t.Run("successful with empty envs", func(t *testing.T) {
+		s := setup()
+		createExecutionUtilSetup()
+		task := &admin.Task{
+			Id: &core.Identifier{
+				Name: "taskName",
+			},
+		}
+		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(task, nil)
+		var executionConfigWithEnvs = &ExecutionConfig{
+			Envs: map[string]string{},
+		}
+		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 	})

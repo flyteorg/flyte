@@ -19,6 +19,7 @@ import (
 type ExecutionConfig struct {
 	IamRoleARN      string               `yaml:"iamRoleARN"`
 	Inputs          map[string]yaml.Node `yaml:"inputs"`
+	Envs            map[string]string    `yaml:"envs"`
 	KubeServiceAcct string               `yaml:"kubeServiceAcct"`
 	TargetDomain    string               `yaml:"targetDomain"`
 	TargetProject   string               `yaml:"targetProject"`

@@ -184,6 +184,7 @@ func (s *createSuite) Test_CreateTaskExecution() {
 				},
 			},
 			ClusterAssignment: &admin.ClusterAssignment{ClusterPoolName: "gpu"},
+			Envs:              &admin.Envs{},
 		},
 	}
 	s.MockAdminClient.

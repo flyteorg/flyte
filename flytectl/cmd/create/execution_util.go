@@ -35,6 +35,8 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		Literals: paramLiterals,
 	}
 
+	envs := makeEnvs(executionConfig)
+
 	// Set both deprecated field and new field for security identity passing
 	var securityContext *core.SecurityContext
 	var authRole *admin.AuthRole
@@ -52,7 +54,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, securityContext, authRole, targetExecName), nil
+	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
@@ -72,6 +74,8 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 	var inputs = &core.LiteralMap{
 		Literals: variableLiterals,
 	}
+
+	envs := makeEnvs(executionConfig)
 
 	// Set both deprecated field and new field for security identity passing
 	var securityContext *core.SecurityContext
@@ -98,7 +102,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Version:      task.Id.Version,
 	}
 
-	return createExecutionRequest(id, inputs, securityContext, authRole, targetExecName), nil
+	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
@@ -144,8 +148,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 	return nil
 }
 
-func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securityContext *core.SecurityContext,
-	authRole *admin.AuthRole, targetExecName string) *admin.ExecutionCreateRequest {
+func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string) *admin.ExecutionCreateRequest {
 
 	if len(targetExecName) == 0 {
 		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
@@ -169,6 +172,7 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securi
 			SecurityContext:   securityContext,
 			ClusterAssignment: clusterAssignment,
 			OverwriteCache:    executionConfig.OverwriteCache,
+			Envs:              envs,
 		},
 		Inputs: inputs,
 	}
@@ -250,4 +254,12 @@ func readConfigAndValidate(project string, domain string) (ExecutionParams, erro
 		execType = Workflow
 	}
 	return ExecutionParams{name: name, execType: execType}, nil
+}
+
+func makeEnvs(executionConfig *ExecutionConfig) *admin.Envs {
+	var values []*core.KeyValuePair
+	for key, value := range executionConfig.Envs {
+		values = append(values, &core.KeyValuePair{Key: key, Value: value})
+	}
+	return &admin.Envs{Values: values}
 }
