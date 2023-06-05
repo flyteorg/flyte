@@ -1,4 +1,4 @@
-package grpc
+package agent
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
@@ -38,27 +39,27 @@ type MockPlugin struct {
 type MockClient struct {
 }
 
-func (m *MockClient) CreateTask(_ context.Context, _ *service.TaskCreateRequest, _ ...grpc.CallOption) (*service.TaskCreateResponse, error) {
-	return &service.TaskCreateResponse{JobId: "job-id"}, nil
+func (m *MockClient) CreateTask(_ context.Context, _ *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+	return &admin.CreateTaskResponse{ResourceMeta: []byte{1, 2, 3, 4}}, nil
 }
 
-func (m *MockClient) GetTask(_ context.Context, _ *service.TaskGetRequest, _ ...grpc.CallOption) (*service.TaskGetResponse, error) {
-	return &service.TaskGetResponse{State: service.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
+func (m *MockClient) GetTask(_ context.Context, _ *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
 		Literals: map[string]*flyteIdlCore.Literal{
 			"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 		},
-	}}, nil
+	}}}, nil
 }
 
-func (m *MockClient) DeleteTask(_ context.Context, _ *service.TaskDeleteRequest, _ ...grpc.CallOption) (*service.TaskDeleteResponse, error) {
-	return &service.TaskDeleteResponse{}, nil
+func (m *MockClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+	return &admin.DeleteTaskResponse{}, nil
 }
 
-func mockGetClientFunc(_ context.Context, _ string, _ map[string]*grpc.ClientConn) (service.ExternalPluginServiceClient, error) {
+func mockGetClientFunc(_ context.Context, _ string, _ map[string]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	return &MockClient{}, nil
 }
 
-func mockGetBadClientFunc(_ context.Context, _ string, _ map[string]*grpc.ClientConn) (service.ExternalPluginServiceClient, error) {
+func mockGetBadClientFunc(_ context.Context, _ string, _ map[string]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	return nil, fmt.Errorf("error")
 }
 
@@ -98,7 +99,7 @@ func TestEndToEnd(t *testing.T) {
 	basePrefix := storage.DataReference("fake://bucket/prefix/")
 
 	t.Run("run a job", func(t *testing.T) {
-		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockGrpcPlugin())
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAgentPlugin())
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test1"))
 		assert.NoError(t, err)
 
@@ -107,8 +108,8 @@ func TestEndToEnd(t *testing.T) {
 	})
 
 	t.Run("failed to create a job", func(t *testing.T) {
-		grpcPlugin := newMockGrpcPlugin()
-		grpcPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		agentPlugin := newMockAgentPlugin()
+		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
@@ -117,7 +118,7 @@ func TestEndToEnd(t *testing.T) {
 				},
 			}, nil
 		}
-		pluginEntry := pluginmachinery.CreateRemotePlugin(grpcPlugin)
+		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test2"))
 		assert.NoError(t, err)
 
@@ -144,8 +145,8 @@ func TestEndToEnd(t *testing.T) {
 		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnTaskReader().Return(tr)
 
-		grpcPlugin := newMockGrpcPlugin()
-		pluginEntry := pluginmachinery.CreateRemotePlugin(grpcPlugin)
+		agentPlugin := newAgentPlugin()
+		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test3"))
 		assert.NoError(t, err)
 
@@ -165,8 +166,8 @@ func TestEndToEnd(t *testing.T) {
 		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnInputReader().Return(inputReader)
 
-		grpcPlugin := newMockGrpcPlugin()
-		pluginEntry := pluginmachinery.CreateRemotePlugin(grpcPlugin)
+		agentPlugin := newMockAgentPlugin()
+		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test4"))
 		assert.NoError(t, err)
 
@@ -239,9 +240,9 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	return tCtx
 }
 
-func newMockGrpcPlugin() webapi.PluginEntry {
+func newMockAgentPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
-		ID:                 "external-plugin-service",
+		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{

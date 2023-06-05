@@ -1,4 +1,4 @@
-package grpc
+package agent
 
 import (
 	"time"
@@ -39,14 +39,14 @@ var (
 				Value: 50,
 			},
 		},
-		DefaultGrpcEndpoint: "dns:///external-plugin-service.flyte.svc.cluster.local:80",
+		DefaultGrpcEndpoint: "dns:///flyte-agent.flyte.svc.cluster.local:80",
 		SupportedTaskTypes:  []string{"task_type_1", "task_type_2"},
 	}
 
-	configSection = pluginsConfig.MustRegisterSubSection("external-plugin-service", &defaultConfig)
+	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
 )
 
-// Config is config for 'databricks' plugin
+// Config is config for 'agent' plugin
 type Config struct {
 	// WebAPI defines config for the base WebAPI plugin
 	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
@@ -54,7 +54,7 @@ type Config struct {
 	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
 	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
-	DefaultGrpcEndpoint string `json:"defaultGrpcEndpoint" pflag:",The default grpc endpoint of external plugin service."`
+	DefaultGrpcEndpoint string `json:"defaultGrpcEndpoint" pflag:",The default grpc endpoint of agent service."`
 
 	// Maps endpoint to their plugin handler. {TaskType: Endpoint}
 	EndpointForTaskTypes map[string]string `json:"endpointForTaskTypes" pflag:"-,"`
