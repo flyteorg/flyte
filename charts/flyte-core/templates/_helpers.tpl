@@ -104,6 +104,17 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flytepropeller.lockconfigmap" -}}
+propeller:
+  leader-election:
+    lock-config-map:
+      namespace: {{ include "flyte.namespace" . | quote }}
+{{- end -}}
+
+{{- define "flytepropeller.coreconfig" -}}
+{{ merge (default .Values.configmap.core dict) (include "flytepropeller.lockconfigmap" . | fromYaml) | toYaml }}
+{{- end -}}
+
 {{- define "flytepropeller-manager.name" -}}
 flytepropeller-manager
 {{- end -}}
@@ -118,6 +129,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
 
 {{- define "flyte-pod-webhook.name" -}}
 flyte-pod-webhook

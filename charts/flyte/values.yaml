@@ -551,7 +551,6 @@ flyte:
         leader-election:
           lock-config-map:
             name: propeller-leader
-            namespace: flyte
           enabled: true
           lease-duration: 15s
           renew-deadline: 10s

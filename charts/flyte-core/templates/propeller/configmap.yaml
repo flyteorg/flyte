@@ -18,8 +18,8 @@ data:
 {{- with .Values.configmap.copilot }}
   copilot.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
-{{- with .Values.configmap.core }}
-  core.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- with (include "flytepropeller.coreconfig" . ) }}
+  core.yaml: | {{ tpl . $ | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.enabled_plugins }}
   enabled_plugins.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
