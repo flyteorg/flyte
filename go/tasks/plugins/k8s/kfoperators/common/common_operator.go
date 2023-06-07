@@ -104,7 +104,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 }
 
 // GetLogs will return the logs for kubeflow job
-func GetLogs(taskType string, name string, namespace string,
+func GetLogs(taskType string, name string, namespace string, hasMaster bool,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
 	taskLogs := make([]*core.TaskLog, 0, 10)
 
@@ -118,7 +118,7 @@ func GetLogs(taskType string, name string, namespace string,
 		return nil, nil
 	}
 
-	if taskType == PytorchTaskType {
+	if taskType == PytorchTaskType && hasMaster {
 		masterTaskLog, masterErr := logPlugin.GetTaskLogs(
 			tasklog.Input{
 				PodName:   name + "-master-0",
