@@ -29,7 +29,9 @@ The first change is to move the application header that contains the branding an
 
 The second change is to introduce breadcrumb and page title elements consistently on all pages. This change is expected to have a positive usability and a11y impact.
 
-![comparison of new proposed changes with exisiting](../img/ui-upgrade-pageHeaderAnatomy.png)
+![shows the structure of the breadcrumb and page header components](../img/ui-upgrade-pageHeaderAnatomy.png)
+
+![shows how the breadcrumb varies with respect to view case](../img/ui-upgrade-consistency.png)
 
 In addition to providing a consistent orientation mechanism, the bread crumb and page header elements will also double function as navigational affordances. This is expected to reduce the cognitive load and the clicks required to traverse the application information structure and switch focus between different instanced objects.
 
@@ -37,65 +39,32 @@ In addition to providing a consistent orientation mechanism, the bread crumb and
 
 ![breadcrumb menus to instanced objects](../img/ui-upgrade-headerMenus2.png)
 
+Finally, note that current tab-based method of switching between domains will be replaced with the breadcrumb affordance. This provides two benefits:
+1. It communicates more clearly to new users the reason for the domain concept
+1. It removes the conceptual mismatch between the standard use of tabs as a way to partition information within an application view and the current Flyte use of domain tabs as a way to change runtime context.
+
 ## 4 Metrics & Dashboards
 
-*What are the main metrics we should be measuring? For example, when interacting with an external system, it might be the external system latency. When adding a new table, how fast would it fill up?*
+The primary metric to be evaluated is user testimony as to impact of the changes. If a more objective measure is required it would be possible to identify 1 or more navigational journeys through the application and count the number of mouse actions required to achieve them with and without the newly proposed components.
 
 ## 5 Drawbacks
 
-*Are there any reasons why we should not do this? Here we aim to evaluate risk and check ourselves.*
+Drawbacks would largely be to do with aesthetic preferences and a small amount of required re-learning for existing users regarding how to switch between domains.
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+Other visual and stylistic treatments are possible and such suggestions are welcome.
 
 ## 7 Potential Impact and Dependencies
 
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
-
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
+The functional impact of these changes is expected to be neutral to positive. The addition of an `h1` page header element on each page is an absolute positive because it will create compliance with one standard a11y requirement. The impact to navigation will be of the opt-in variety because all current navigational affordances are conserved  (with the exception of the domain tabs). This forced change in behavior is not expected to be a huge burden because domain switching is not a high frequency action for users.
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
+NA
 
 ## 9 Conclusion
 
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+Initial user research has uncovered one consistent theme: people love Flyte but find the Flyte console UX to be awkward, idiosyncratic and inconvenient. The changes proposed here will have a small but positive impact on this bimodal user experience, and are also foundational step for creating a UX for the Flyte console that will be loved as much as the underlying engine. 
 
-## 10 RFC Process Guide, remove this section when done
 
-*By writing an RFC, you're giving insight to your team on the direction you're taking. There may not be a right or better decision in many cases, but we will likely learn from it. By authoring, you're making a decision on where you want us to go and are looking for feedback on this direction from your team members, but ultimately the decision is yours.*
-
-This document is a:
-
-- thinking exercise, prototype with words.
-- historical record, its value may decrease over time.
-- way to broadcast information.
-- mechanism to build trust.
-- tool to empower.
-- communication channel.
-
-This document is not:
-
-- a request for permission.
-- the most up to date representation of any process or system
-
-**Checklist:**
-
-- [ ]  Copy template
-- [ ]  Draft RFC (think of it as a wireframe)
-- [ ]  Share as WIP with folks you trust to gut-check
-- [ ]  Send pull request when comfortable
-- [ ]  Label accordingly
-- [ ]  Assign reviewers
-- [ ]  Merge PR
-
-**Recommendations**
-
-- Tag RFC title with [WIP] if you're still ironing out details.
-- Tag RFC title with [Newbie] if you're trying out something experimental or you're not entirely convinced of what you're proposing.
-- Tag RFC title with [RR] if you'd like to schedule a review request to discuss the RFC.
-- If there are areas that you're not convinced on, tag people who you consider may know about this and ask for their input.
-- If you have doubts, ask on [#feature-discussions](https://slack.com/app_redirect?channel=CPQ3ZFQ84&team=TN89P6GGK) for help moving something forward.
