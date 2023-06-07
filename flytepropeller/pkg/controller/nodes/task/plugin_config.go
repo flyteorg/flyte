@@ -4,21 +4,27 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flytestdlib/logger"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/agent"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 )
+
+var once sync.Once
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")
 	}
 
+	// Register the GRPC plugin after the config is loaded
+	once.Do(func() { agent.RegisterAgentPlugin() })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
 	if err != nil {
 		return nil, nil, err
