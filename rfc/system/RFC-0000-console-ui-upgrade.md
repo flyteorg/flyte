@@ -2,28 +2,32 @@
 
 **Authors:**
 
-- @nickname
-- @nickname
+- @tsheiner
 
 ## 1 Executive Summary
 
-*A short paragraph or bullet list that quickly explains what you're trying to do.*
+The proposal is to do a modest branding, orientation & navigation enhancement to the Flyte Console:
+1. move the application header to the left side of the viewport
+1. introduce consistent bread crumb element on all pages
+1. introduce consistent page header on all pages
+1. enable the bread crumb & page header elements to also function as navigation controls
+
 
 ## 2 Motivation
 
-*What motivates this proposal, and why is it important?*
-
-*Here, we aim to get comfortable articulating the value of our actions.*
+The motivation is to respond with usability improvements to the Flyte console in response feedback received from a program of user research that has been initiated by Union.ai. In particular, this proposal introduces initial remediation for 2 specific issues that have been raised:
+1.  that the console be more efficient with vertical real estate
+1. that it be easier to orient and navigate between node objects and their executions.
 
 ## 3 Proposed Implementation
 
-*This is the core of your proposal, and its purpose is to help you think through the problem because [writing is thinking](https://medium.learningbyshipping.com/writing-is-thinking-an-annotated-twitter-thread-2a75fe07fade).*
+This proposal includes 2 distinct and independent sets of changes. They are bound together here because taken together they create a foundation for further positive change in line with the usability feedback that has been gathered.
 
-*Consider:*
+The first change is to move the application header that contains the branding and user identity elements from the top of the application window to the left rail. Doing this brings the appearance of the Flyte console more inline with the _de facto_ standard for developer console applications and also frees up ~75px of vertical real estate. The following illustrates this change.
 
-- *using diagrams to help illustrate your ideas.*
-- *including code examples if you're proposing an interface or system contract.*
-- *linking to project briefs or wireframes that are relevant.*
+
+
+The second change will have a m
 
 ## 4 Metrics & Dashboards
 
