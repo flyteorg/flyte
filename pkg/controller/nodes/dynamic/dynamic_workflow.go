@@ -196,9 +196,9 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to read futures file, maybe corrupted")
 	}
 
-	closure, dynamicWf, workflowContext, err := d.buildDynamicWorkflow(ctx, nCtx, djSpec, dynamicNodeStatus)
+	closure, dynamicWf, err := d.buildDynamicWorkflow(ctx, nCtx, djSpec, dynamicNodeStatus)
 	if err != nil {
-		return workflowContext, err
+		return dynamicWorkflowContext{}, err
 	}
 
 	if err := f.Cache(ctx, dynamicWf, closure); err != nil {
@@ -222,28 +222,28 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 }
 
 func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext,
-	djSpec *core.DynamicJobSpec, dynamicNodeStatus v1alpha1.ExecutableNodeStatus) (*core.CompiledWorkflowClosure, *v1alpha1.FlyteWorkflow, dynamicWorkflowContext, error) {
+	djSpec *core.DynamicJobSpec, dynamicNodeStatus v1alpha1.ExecutableNodeStatus) (*core.CompiledWorkflowClosure, *v1alpha1.FlyteWorkflow, error) {
 	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, dynamicNodeStatus)
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build dynamic workflow template")
+		return nil, nil, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build dynamic workflow template")
 	}
 
 	compiledTasks, err := compileTasks(ctx, djSpec.Tasks)
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeUser, err, "failed to compile dynamic tasks")
+		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "failed to compile dynamic tasks")
 	}
 
 	// Get the requirements, that is, a list of all the task IDs and the launch plan IDs that will be called as part of this dynamic task.
 	// The definition of these will need to be fetched from Admin (in order to get the interface).
 	requirements, err := compiler.GetRequirements(wf, djSpec.Subworkflows)
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeUser, err, "failed to Get requirements for subworkflows")
+		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "failed to Get requirements for subworkflows")
 	}
 
 	// This method handles user vs system errors internally
 	launchPlanInterfaces, err := d.getLaunchPlanInterfaces(ctx, requirements.GetRequiredLaunchPlanIds())
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, err
+		return nil, nil, err
 	}
 
 	// TODO: In addition to querying Admin for launch plans, we also need to get all the tasks that are missing from the dynamic job spec.
@@ -253,15 +253,15 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nC
 	var closure *core.CompiledWorkflowClosure
 	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeUser, err, "malformed dynamic workflow")
+		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "malformed dynamic workflow")
 	}
 
 	dynamicWf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
 	if err != nil {
-		return nil, nil, dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build workflow")
+		return nil, nil, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build workflow")
 	}
 
-	return closure, dynamicWf, dynamicWorkflowContext{}, nil
+	return closure, dynamicWf, nil
 }
 
 func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, execContext executors.ExecutionContext, dynamicWorkflow v1alpha1.ExecutableWorkflow, nl executors.NodeLookup,

@@ -240,6 +240,7 @@ func TestStripTypeMetadata(t *testing.T) {
 									Type: &core.LiteralType_Simple{
 										Simple: core.SimpleType_STRING,
 									},
+									Structure: &core.TypeStructure{Tag: "str"},
 								},
 							},
 						},

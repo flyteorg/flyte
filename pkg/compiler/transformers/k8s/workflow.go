@@ -88,7 +88,7 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 	if n := wf.Template.GetFailureNode(); n != nil {
 		nodes, ok := buildNodeSpec(n, tasks, errs.NewScope())
 		if !ok {
-			return
+			return nil, errs
 		}
 		failureN = nodes[0]
 	}
