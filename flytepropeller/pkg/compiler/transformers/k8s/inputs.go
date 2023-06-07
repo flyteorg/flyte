@@ -11,12 +11,12 @@ import (
 func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs core.LiteralMap, errs errors.CompileErrors) (ok bool) {
 	if iface == nil {
 		errs.Collect(errors.NewValueRequiredErr(nodeID, "interface"))
-		return
+		return false
 	}
 
 	if iface.Inputs == nil {
 		errs.Collect(errors.NewValueRequiredErr(nodeID, "interface.InputsRef"))
-		return
+		return false
 	}
 
 	varMap := make(map[string]*core.Variable, len(iface.Inputs.Variables))

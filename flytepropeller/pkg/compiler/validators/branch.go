@@ -14,22 +14,22 @@ func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs error
 
 	if branch := node.GetBranchNode(); branch == nil {
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Branch"))
-		return
+		return nil, false
 	}
 
 	if ifBlock := node.GetBranchNode().IfElse; ifBlock == nil {
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Branch.IfElse"))
-		return
+		return nil, false
 	}
 
 	if ifCase := node.GetBranchNode().IfElse.Case; ifCase == nil {
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Branch.IfElse.Case"))
-		return
+		return nil, false
 	}
 
 	if thenNode := node.GetBranchNode().IfElse.Case.ThenNode; thenNode == nil {
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Branch.IfElse.Case.ThenNode"))
-		return
+		return nil, false
 	}
 
 	var outputs map[string]*flyte.Variable
