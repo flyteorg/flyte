@@ -49,7 +49,7 @@ The primary metric to be evaluated is user testimony as to impact of the changes
 
 ## 5 Drawbacks
 
-Drawbacks would largely be to do with aesthetic preferences and a small amount of required re-learning for existing users regarding how to switch between domains.
+Drawbacks are minor and are to do with aesthetic preferences and a small amount of required re-learning for existing users regarding how to switch between domains.
 
 ## 6 Alternatives
 
@@ -57,7 +57,7 @@ Other visual and stylistic treatments are possible and such suggestions are welc
 
 ## 7 Potential Impact and Dependencies
 
-The functional impact of these changes is expected to be neutral to positive. The addition of an `h1` page header element on each page is an absolute positive because it will create compliance with one standard a11y requirement. The impact to navigation will be of the opt-in variety because all current navigational affordances are conserved  (with the exception of the domain tabs). This forced change in behavior is not expected to be a huge burden because domain switching is not a high frequency action for users.
+The functional impact of these changes is expected to be neutral to positive. The addition of an `h1` page header element on each page is an absolute positive because it creates compliance with a basic a11y requirement. The impact to navigation will be of the opt-in variety because all current navigational affordances are conserved  (with the exception of the domain tabs). Howevere, this forced change in behavior is not expected to be a significant inconvenience because domain switching is not a high frequency action for most users.
 
 ## 8 Unresolved questions
 
@@ -65,6 +65,6 @@ NA
 
 ## 9 Conclusion
 
-Initial user research has uncovered one consistent theme: people love Flyte but find the Flyte console UX to be awkward, idiosyncratic and inconvenient. The changes proposed here will have a small but positive impact on this bimodal user experience, and are also foundational step for creating a UX for the Flyte console that will be loved as much as the underlying engine. 
+Usability research for Flyte has uncovered one consistent theme: people love the capabilities of the Flyte engine but experience the Flyte console as awkward, idiosyncratic and inconvenient to navigate. The changes proposed here are expected to have a small but positive impact toward reducing the bimodal nature of the user experience and are also foundational steps on a journey to make the Flyte console as beloved as the underlying engine. 
 
 
