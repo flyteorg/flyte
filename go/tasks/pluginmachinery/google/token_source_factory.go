@@ -17,9 +17,17 @@ type TokenSourceFactory interface {
 }
 
 func NewTokenSourceFactory(config TokenSourceFactoryConfig) (TokenSourceFactory, error) {
-	if config.Type == TokenSourceTypeDefault {
+	switch config.Type {
+	case TokenSourceTypeDefault:
 		return NewDefaultTokenSourceFactory()
+	case TokenSourceTypeGkeTaskWorkloadIdentity:
+		return NewGkeTaskWorkloadIdentityTokenSourceFactory(
+			&config.GkeTaskWorkloadIdentityTokenSourceFactoryConfig,
+		)
 	}
 
-	return nil, errors.Errorf("unknown token source type [%v], possible values are: 'default'", config.Type)
+	return nil, errors.Errorf(
+		"unknown token source type [%v], possible values are: 'default' and 'gke-task-workload-identity'",
+		config.Type,
+	)
 }

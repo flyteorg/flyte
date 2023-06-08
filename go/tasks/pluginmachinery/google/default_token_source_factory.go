@@ -9,7 +9,10 @@ import (
 
 type defaultTokenSource struct{}
 
-func (m *defaultTokenSource) GetTokenSource(ctx context.Context, identity Identity) (oauth2.TokenSource, error) {
+func (m *defaultTokenSource) GetTokenSource(
+	ctx context.Context,
+	identity Identity,
+) (oauth2.TokenSource, error) {
 	return google.DefaultTokenSource(ctx)
 }
 
