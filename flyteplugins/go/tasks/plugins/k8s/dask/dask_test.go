@@ -491,7 +491,14 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	daskResourceHandler := daskResourceHandler{}
 	ctx := context.TODO()
 
-	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, nil, dummyDaskJob(daskAPI.DaskJobCreated))
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, nil, dummyDaskJob(""))
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
+	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, taskPhase.Info().Logs)
+	assert.Nil(t, err)
+
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, nil, dummyDaskJob(daskAPI.DaskJobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
