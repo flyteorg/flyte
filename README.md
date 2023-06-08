@@ -55,6 +55,11 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 
 We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
 
+|   |   |
+| ------------- | ------------- |
+| 🚀 **Strongly typed interfaces**  | Validate your data at every step of the workflow by defining data guardrails using Flyte types.  |
+| 🌐 **Any language**  | Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows.  |
+
 🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types. <br />
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
 📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html). <br />
