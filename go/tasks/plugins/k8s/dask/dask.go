@@ -320,7 +320,10 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		OccurredAt: &occurredAt,
 	}
 
-	isQueued := status == daskAPI.DaskJobCreated ||
+	// There is a short period between the `DaskJob` resource being created and `Status.JobStatus` being set by the `dask-operator`.
+	// In that period, the `JobStatus` will be an empty string. We're treating this as Initializing/Queuing.
+	isQueued := status == "" ||
+		status == daskAPI.DaskJobCreated ||
 		status == daskAPI.DaskJobClusterCreated
 
 	if !isQueued {
@@ -337,6 +340,8 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	}
 
 	switch status {
+	case "":
+		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info), nil
 	case daskAPI.DaskJobCreated:
 		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job created", &info), nil
 	case daskAPI.DaskJobClusterCreated:
