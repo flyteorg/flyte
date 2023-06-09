@@ -39,6 +39,18 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte/charts/flyte/templates/agent/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte/charts/flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -47,18 +59,6 @@ metadata:
   namespace: flyte
   labels: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
----
-# Source: flyte/charts/flyte/templates/external-plugin-service/rbac.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: external-plugin-service
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -5520,13 +5520,13 @@ rules:
   verbs:
   - '*'
 ---
-# Source: flyte/charts/flyte/templates/external-plugin-service/rbac.yaml
+# Source: flyte/charts/flyte/templates/agent/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: flyte-external-plugin-service
+  name: flyte-flyteagent
   labels: 
-    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/name: flyteagent
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
@@ -5905,23 +5905,23 @@ subjects:
   name: flyteadmin
   namespace: flyte
 ---
-# Source: flyte/charts/flyte/templates/external-plugin-service/rbac.yaml
+# Source: flyte/charts/flyte/templates/agent/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: flyte-external-plugin-service
+  name: flyte-flyteagent
   labels: 
-    app.kubernetes.io/name: external-plugin-service
+    app.kubernetes.io/name: flyteagent
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flyte-external-plugin-service
+  name: flyte-flyteagent
 subjects:
 - kind: ServiceAccount
-  name: external-plugin-service
+  name: flyteagent
   namespace: flyte
 ---
 # Source: flyte/charts/flyte/templates/propeller/rbac.yaml
@@ -6258,6 +6258,30 @@ spec:
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte/charts/flyte/templates/agent/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: NodePort
+  ports:
+  - name: agent-grpc
+    port: 8000
+    protocol: TCP
+    targetPort: agent-grpc
+  selector: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte/charts/flyte/templates/console/service.yaml
 apiVersion: v1
 kind: Service
@@ -6310,30 +6334,6 @@ spec:
     targetPort: 8089
   selector: 
     app.kubernetes.io/name: datacatalog
-    app.kubernetes.io/instance: flyte
----
-# Source: flyte/charts/flyte/templates/external-plugin-service/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: external-plugin-service
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: external-plugin-service
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
-spec:
-  type: NodePort
-  ports:
-  - name: plugin-grpc
-    port: 8000
-    protocol: TCP
-    targetPort: plugin-grpc
-  selector: 
-    app.kubernetes.io/name: external-plugin-service
     app.kubernetes.io/instance: flyte
 ---
 # Source: flyte/charts/flyte/templates/propeller/webhook.yaml
@@ -6957,6 +6957,53 @@ spec:
         secret:
           secretName: flyte-admin-secrets
 ---
+# Source: flyte/charts/flyte/templates/agent/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyteagent
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+      labels: 
+        app.kubernetes.io/name: flyteagent
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+      - command:
+        - pyflyte
+        - serve
+        image: "ghcr.io/flyteorg/external-plugin-service:1.6.0"
+        imagePullPolicy: "IfNotPresent"
+        name: flyteagent
+        ports:
+        - containerPort: 8000
+          name: agent-grpc
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+      serviceAccountName: flyteagent
+---
 # Source: flyte/charts/flyte/templates/clusterresourcesync/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -7147,53 +7194,6 @@ spec:
       - configMap:
           name: datacatalog-config
         name: config-volume
----
-# Source: flyte/charts/flyte/templates/external-plugin-service/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: external-plugin-service
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: external-plugin-service
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  replicas: 1
-  selector:
-    matchLabels: 
-      app.kubernetes.io/name: external-plugin-service
-      app.kubernetes.io/instance: flyte
-  template:
-    metadata:
-      annotations:
-      labels: 
-        app.kubernetes.io/name: external-plugin-service
-        app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyte-v0.1.10
-        app.kubernetes.io/managed-by: Helm
-    spec:
-      containers:
-      - command:
-        - pyflyte
-        - serve
-        image: "ghcr.io/flyteorg/external-plugin-service:1.6.0"
-        imagePullPolicy: "IfNotPresent"
-        name: external-plugin-service
-        ports:
-        - containerPort: 8000
-          name: plugin-grpc
-        resources:
-          limits:
-            cpu: 500m
-            ephemeral-storage: 100Mi
-            memory: 500Mi
-          requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
-      serviceAccountName: external-plugin-service
 ---
 # Source: flyte/charts/flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1

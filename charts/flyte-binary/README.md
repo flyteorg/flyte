@@ -93,9 +93,6 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
-| externalPluginService.image.pullPolicy | string | `"IfNotPresent"` |  |
-| externalPluginService.image.repository | string | `"ghcr.io/flyteorg/external-plugin-service"` |  |
-| externalPluginService.image.tag | string | `"1.6.0"` |  |
 | flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
 | flyte-core-components.admin.disableScheduler | bool | `false` |  |
 | flyte-core-components.admin.disabled | bool | `false` |  |
@@ -103,6 +100,9 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |
+| flyteagent.image.pullPolicy | string | `"IfNotPresent"` |  |
+| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` |  |
+| flyteagent.image.tag | string | `"1.6.2b1"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

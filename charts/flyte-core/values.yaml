@@ -199,18 +199,18 @@ datacatalog:
   priorityClassName: ""
 
 #
-# EXTERNAL_PLUGIN_SERVICE SETTINGS
+# FLYTE_AGENT SETTINGS
 #
 
-external_plugin_service:
+flyteagent:
   enabled: true
   # -- Replicas count for external-plugin-service deployment
   replicaCount: 1
   image:
     # -- Docker image for external-plugin-service deployment
-    repository: ghcr.io/flyteorg/external-plugin-service
+    repository: ghcr.io/flyteorg/flyteagent
     # -- Docker image tag
-    tag: 1.6.0
+    tag: 1.6.2b1
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for external-plugin-service deployment

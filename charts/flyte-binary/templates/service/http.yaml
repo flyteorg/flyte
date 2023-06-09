@@ -54,9 +54,9 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
-    - name: plugin-grpc
-      port: {{ include "flyte-binary.external-plugin-service.grpc.port" . }}
-      targetPort: plugin-grpc
+    - name: agent-grpc
+      port: {{ include "flyte-binary.flyteagent.grpc.port" . }}
+      targetPort: agent-grpc
     {{- if .Values.service.extraPorts }}
     {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}
     {{- end }}

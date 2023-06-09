@@ -419,11 +419,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
-          - external-plugin-service
+          - agent-service
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - bigquery_query_job_task: external-plugin-service
+          - bigquery_query_job_task: agent-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -440,8 +440,8 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      external-plugin-service:
-        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+      agent-service:
+        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
         supportedTaskTypes:
         - bigquery_query_job_task
   002-database.yaml: |
@@ -758,7 +758,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ckhqOWdIaWpXT2JyOHRobg==
+  haSharedSecret: aGxRWGE0aFNVY2ltcFlDMA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -905,9 +905,9 @@ spec:
     nodePort: null
     port: 8089
     targetPort: grpc
-  - name: plugin-grpc
+  - name: agent-grpc
     port: 8000
-    targetPort: plugin-grpc
+    targetPort: agent-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
@@ -1159,7 +1159,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 8fe9fd62f0ca1fdc94b7203edc921b53c6076dca75f6b44307bbf0de3a3ad948
+        checksum/configuration: 4bce389169ecb61e554b751c419671bc9af45c476b2303b060bad8b91bafee4d
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1207,12 +1207,12 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
-      - image: ghcr.io/flyteorg/external-plugin-service:1.6.0
+      - image: ghcr.io/flyteorg/flyteagent:1.6.2b1
         imagePullPolicy: IfNotPresent
-        name: external-plugin-service
+        name: flyteagent
         ports:
         - containerPort: 8000
-          name: plugin-grpc
+          name: agent-grpc
       initContainers:
       - args:
         - |
@@ -1273,7 +1273,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 4a7cf60cc61cf34231607a1968239991daed8ba149c121f230c5eb14d0f0d5d7
+        checksum/secret: 4031c689cee305f76d4c18edd33154a634292c0935c6ef28cd9faaed4fa18fce
       labels:
         app: docker-registry
         release: flyte-sandbox

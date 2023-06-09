@@ -19,5 +19,5 @@ datacatalog:
 flyteconsole:
   enabled: false
 
-external_plugin_service:
+flyteagent:
   enabled: false

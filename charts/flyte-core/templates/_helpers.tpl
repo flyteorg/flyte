@@ -74,17 +74,17 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "external_plugin_service.name" -}}
-external-plugin-service
+{{- define "flyteagent.name" -}}
+flyteagent
 {{- end -}}
 
-{{- define "external_plugin_service.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "external_plugin_service.name" . }}
+{{- define "flyteagent.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flyteagent.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "external_plugin_service.labels" -}}
-{{ include "external_plugin_service.selectorLabels" . }}
+{{- define "flyteagent.labels" -}}
+{{ include "flyteagent.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}

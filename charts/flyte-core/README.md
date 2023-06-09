@@ -141,27 +141,6 @@ helm install gateway bitnami/contour -n flyte
 | db.datacatalog.database.username | string | `"postgres"` |  |
 | deployRedoc | bool | `false` |  |
 | external_events | object | `{"aws":{"region":"us-east-2"},"enable":false,"eventsPublisher":{"eventTypes":["all"],"topicName":"arn:aws:sns:us-east-2:123456:123-my-topic"},"type":"aws"}` | **Optional Component** External events are used to send events (unprocessed, as Admin see them) to an SNS topic (or gcp equivalent) The config is here as an example only - if not enabled, it won't be used. |
-| external_plugin_service.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
-| external_plugin_service.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
-| external_plugin_service.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
-| external_plugin_service.affinity | object | `{}` | affinity for external-plugin-service deployment |
-| external_plugin_service.configPath | string | `"/etc/external-plugin-service/config/*.yaml"` | Default regex string for searching configuration files |
-| external_plugin_service.enabled | bool | `true` |  |
-| external_plugin_service.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
-| external_plugin_service.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| external_plugin_service.image.repository | string | `"ghcr.io/flyteorg/external-plugin-service"` | Docker image for external-plugin-service deployment |
-| external_plugin_service.image.tag | string | `"1.6.0"` | Docker image tag |
-| external_plugin_service.nodeSelector | object | `{}` | nodeSelector for external-plugin-service deployment |
-| external_plugin_service.podAnnotations | object | `{}` | Annotations for external-plugin-service pods |
-| external_plugin_service.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
-| external_plugin_service.replicaCount | int | `1` | Replicas count for external-plugin-service deployment |
-| external_plugin_service.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for external-plugin-service deployment |
-| external_plugin_service.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for external-plugin-service |
-| external_plugin_service.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for external-plugin-service |
-| external_plugin_service.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to external-plugin-service pods |
-| external_plugin_service.serviceAccount.create | bool | `true` | Should a service account be created for external-plugin-service |
-| external_plugin_service.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| external_plugin_service.tolerations | list | `[]` | tolerations for external-plugin-service deployment |
 | flyteadmin.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flyteadmin.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flyteadmin.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
@@ -188,6 +167,27 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
+| flyteagent.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| flyteagent.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| flyteagent.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| flyteagent.affinity | object | `{}` | affinity for external-plugin-service deployment |
+| flyteagent.configPath | string | `"/etc/external-plugin-service/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteagent.enabled | bool | `true` |  |
+| flyteagent.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
+| flyteagent.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for external-plugin-service deployment |
+| flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
+| flyteagent.nodeSelector | object | `{}` | nodeSelector for external-plugin-service deployment |
+| flyteagent.podAnnotations | object | `{}` | Annotations for external-plugin-service pods |
+| flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| flyteagent.replicaCount | int | `1` | Replicas count for external-plugin-service deployment |
+| flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for external-plugin-service deployment |
+| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for external-plugin-service |
+| flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for external-plugin-service |
+| flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to external-plugin-service pods |
+| flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for external-plugin-service |
+| flyteagent.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flyteagent.tolerations | list | `[]` | tolerations for external-plugin-service deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |

@@ -227,12 +227,12 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
-        - name: external-plugin-service
-          {{- with .Values.externalPluginService.image }}
+        - name: flyteagent
+          {{- with .Values.flyteagent.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
           imagePullPolicy: {{ .pullPolicy | quote }}
           ports:
-          - name: plugin-grpc
+          - name: agent-grpc
             containerPort: 8000
           {{- end}}
         {{- if .Values.deployment.sidecars }}

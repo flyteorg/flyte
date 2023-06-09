@@ -88,11 +88,11 @@ data:
           - container
           - sidecar
           - K8S-ARRAY
-          - external-plugin-service
+          - agent-service
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - bigquery_query_job_task: external-plugin-service
+          - bigquery_query_job_task: agent-service
     plugins:
       logs:
         kubernetes-enabled: false
@@ -107,8 +107,8 @@ data:
             kubernetes-enabled: false
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      external-plugin-service:
-        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+      agent-service:
+        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
         supportedTaskTypes:
         - bigquery_query_job_task
   002-database.yaml: |
@@ -292,9 +292,9 @@ spec:
       port: 8089
       targetPort: grpc
       nodePort: null
-    - name: plugin-grpc
+    - name: agent-grpc
       port: 8000
-      targetPort: plugin-grpc
+      targetPort: agent-grpc
   selector:
     app.kubernetes.io/name: flyte-binary
     app.kubernetes.io/instance: flyte
@@ -349,7 +349,7 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: 5476875018e3dfe722f538b5f2de47ceaeff99be31997f8b529d226f29d2a5c9
+        checksum/configuration: f43961394be857680d9408015d30438dd6e95294707b0ff6841ea64642704ba5
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
@@ -409,11 +409,11 @@ spec:
               mountPath: /etc/flyte/config.d
             - name: state
               mountPath: /var/run/flyte
-        - name: external-plugin-service
-          image: "ghcr.io/flyteorg/external-plugin-service:1.6.0"
+        - name: flyteagent
+          image: "ghcr.io/flyteorg/flyteagent:1.6.2b1"
           imagePullPolicy: "IfNotPresent"
           ports:
-          - name: plugin-grpc
+          - name: agent-grpc
             containerPort: 8000
       volumes:
         - name: cluster-resource-templates

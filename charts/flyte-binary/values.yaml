@@ -175,10 +175,10 @@ clusterResourceTemplates:
   # annotations Add annotations to created ConfigMap
   annotations: {}
 
-externalPluginService:
+flyteagent:
   image:
-    repository: ghcr.io/flyteorg/external-plugin-service
-    tag: 1.6.0
+    repository: ghcr.io/flyteorg/flyteagent
+    tag: 1.6.2b1
     pullPolicy: IfNotPresent
 
 # deployment Configure Flyte deployment specification

@@ -109,9 +109,9 @@ flytepropeller:
           topologyKey: kubernetes.io/hostname
 
 #
-# EXTERNAL_PLUGIN_SERVICE
+# FLYTE_AGENT
 #
-external_plugin_service:
+flyteagent:
   enabled: false
 
 #
