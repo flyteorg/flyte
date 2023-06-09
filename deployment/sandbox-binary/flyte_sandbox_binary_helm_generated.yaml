@@ -415,8 +415,8 @@ spec:
           image: "ghcr.io/flyteorg/flyteagent:1.6.2b1"
           imagePullPolicy: "IfNotPresent"
           ports:
-          - name: "agent-grpc"
-            containerPort: "8000"
+          - name: agent-grpc
+            containerPort: 8000
       volumes:
         - name: cluster-resource-templates
           configMap:

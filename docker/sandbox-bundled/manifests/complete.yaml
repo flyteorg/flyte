@@ -748,7 +748,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MW85aG5yQUhWSnBmdzVsVQ==
+  haSharedSecret: Z0pualJGV2RJTE54YnB3VQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1201,7 +1201,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:
-        - containerPort: "8000"
+        - containerPort: 8000
           name: agent-grpc
       initContainers:
       - args:
@@ -1263,7 +1263,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: b806fef31ff23a87106ce26df01d24cb82a24dadec4f835d7772a09479c15539
+        checksum/secret: b95328d3fafce33512f40826ac1ecb9bcd6bf0c9b69d185772233e84f78f4409
       labels:
         app: docker-registry
         release: flyte-sandbox

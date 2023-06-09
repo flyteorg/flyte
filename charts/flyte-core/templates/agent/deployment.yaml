@@ -28,8 +28,8 @@ spec:
         imagePullPolicy: "{{ .Values.flyteagent.image.pullPolicy }}"
         name: flyteagent
         ports:
-        - containerPort: "{{ .Values.flyteagent.ports.containerPort }}"
-          name: "{{ .Values.flyteagent.ports.name }}"
+        - containerPort: {{ .Values.flyteagent.ports.containerPort }}
+          name: {{ .Values.flyteagent.ports.name }}
         resources: {{- toYaml .Values.flyteagent.resources | nindent 10 }}
         {{- with .Values.flyteagent.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}

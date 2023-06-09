@@ -6171,10 +6171,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: "agent-grpc"
-    port: "8000"
+  - name: agent-grpc
+    port: 8000
     protocol: TCP
-    targetPort: "agent-grpc"
+    targetPort: agent-grpc
   selector: 
     app.kubernetes.io/name: flyteagent
     app.kubernetes.io/instance: flyte
@@ -6888,8 +6888,8 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         ports:
-        - containerPort: "8000"
-          name: "agent-grpc"
+        - containerPort: 8000
+          name: agent-grpc
         resources:
           limits:
             cpu: 500m
