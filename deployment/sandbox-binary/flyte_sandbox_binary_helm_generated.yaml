@@ -108,7 +108,7 @@ data:
             cloudwatch-enabled: false
             stackdriver-enabled: false
       agent-service:
-        defaultGrpcEndpoint: flyte-sandbox.flyte.svc.cluster.local:8000
+        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
         supportedTaskTypes:
         - bigquery_query_job_task
   002-database.yaml: |
@@ -349,7 +349,7 @@ spec:
         app.kubernetes.io/name: flyte-binary
         app.kubernetes.io/instance: flyte
       annotations:
-        checksum/configuration: cb0a79c1c6e120d6058362028758b2beca0bbf6c049e536fe0a1e74a0af5cfa0
+        checksum/configuration: 21b56dabe8b6c55991df06912cea40426346997a660f3372a5d34864d13c0bd3
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
       serviceAccountName: flyte-flyte-binary
