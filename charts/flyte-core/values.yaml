@@ -732,7 +732,7 @@ configmap:
         default-cpus: 100m
         default-memory: 100Mi
       agent-service:
-        defaultGrpcEndpoint: agent-service.flyte.svc.cluster.local:8000
+        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
         supportedTaskTypes:
           - bigquery_query_job_task
 
