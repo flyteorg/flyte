@@ -48,18 +48,10 @@ data:
       serviceName: {{ include "flyte-binary.webhook.serviceName" . }}
       servicePort: 443
     flyte: {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
+{{- with .Values.enabled_plugins }}
+  enabled_plugins.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
   001-plugins.yaml: |
-    tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
-          - agent-service
-        default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
-          - bigquery_query_job_task: agent-service
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s:

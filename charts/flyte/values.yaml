@@ -243,7 +243,7 @@ flyte:
     service:
       annotations:
         projectcontour.io/upstream-protocol.h2c: grpc
-      type: NodePort
+      type: ClusterIP
     # -- Configuration for service accounts for flyteagent
     serviceAccount:
       # -- Should a service account be created for flyteagent

@@ -170,7 +170,7 @@ datacatalog:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
-    type: ClusterIP
+    type: NodePort
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog

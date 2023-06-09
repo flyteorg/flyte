@@ -6169,7 +6169,7 @@ metadata:
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: "agent-grpc"
     port: "8000"

@@ -799,7 +799,7 @@ metadata:
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - name: grpc-2
     port: 8089

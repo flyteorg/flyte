@@ -412,10 +412,7 @@ data:
     \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
     false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
     \ propeller:\n    disableWebhook: false\n    disabled: false\n"
-  001-plugins.yaml: "tasks:\n  task-plugins:\n    enabled-plugins:\n      - container\n
-    \     - sidecar\n      - K8S-ARRAY\n      - agent-service\n    default-for-task-types:\n
-    \     - container: container\n      - container_array: K8S-ARRAY\n      - bigquery_query_job_task:
-    agent-service\nplugins:\n  logs:\n    kubernetes-enabled: true\n    kubernetes-template-uri:
+  001-plugins.yaml: "plugins:\n  logs:\n    kubernetes-enabled: true\n    kubernetes-template-uri:
     http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName
     }}/pod?namespace={{ .namespace }}\n    cloudwatch-enabled: false\n    stackdriver-enabled:
     false\n  k8s:\n    co-pilot:\n      image: \"cr.flyte.org/flyteorg/flytecopilot:v0.0.30\"\n
@@ -460,6 +457,19 @@ data:
       signedURL:
         stowConfigOverride:
           endpoint: http://localhost:30002
+  enabled_plugins.yaml: |
+    tasks:
+      task-plugins:
+        default-for-task-types:
+          bigquery_query_job_task: agent-service
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+        - agent-service
 kind: ConfigMap
 metadata:
   labels:
@@ -738,7 +748,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: d0g1d3JHQW5ERzBSSHpTNQ==
+  haSharedSecret: SlRyVXRORkZTYWx2SXJWYw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1139,7 +1149,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: d0632f14f0403f005fa7d737f2192968371ae47e206b2ff5d91c1433f911df06
+        checksum/configuration: 7be77d4b77d12c541ba3f36d2d1777e2fc777130d5387ac17929a1a93a370c2f
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1253,7 +1263,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 307a85830234b9c488fa076c023d27ab9b4456e36a9332febadc1a2aac6b2783
+        checksum/secret: 44fc72b49458dec43fde9b871b1a1772fcaf03f8cbb0f07a29c5f47c1839446c
       labels:
         app: docker-registry
         release: flyte-sandbox
