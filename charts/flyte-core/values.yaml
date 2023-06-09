@@ -204,16 +204,16 @@ datacatalog:
 
 flyteagent:
   enabled: true
-  # -- Replicas count for external-plugin-service deployment
+  # -- Replicas count for flyteagent deployment
   replicaCount: 1
   image:
-    # -- Docker image for external-plugin-service deployment
+    # -- Docker image for flyteagent deployment
     repository: ghcr.io/flyteorg/flyteagent
     # -- Docker image tag
     tag: 1.6.2b1
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for external-plugin-service deployment
+  # -- Default resources requests and limits for flyteagent deployment
   resources:
     limits:
       cpu: 500m
@@ -224,27 +224,27 @@ flyteagent:
       ephemeral-storage: 50Mi
       memory: 50Mi
   # -- Default regex string for searching configuration files
-  configPath: /etc/external-plugin-service/config/*.yaml
-  # -- Service settings for external-plugin-service
+  configPath: /etc/flyteagent/config/*.yaml
+  # -- Service settings for flyteagent
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
-  # -- Configuration for service accounts for external-plugin-service
+  # -- Configuration for service accounts for flyteagent
   serviceAccount:
-    # -- Should a service account be created for external-plugin-service
+    # -- Should a service account be created for flyteagent
     create: true
-    # -- Annotations for ServiceAccount attached to external-plugin-service pods
+    # -- Annotations for ServiceAccount attached to flyteagent pods
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
-  # -- Annotations for external-plugin-service pods
+  # -- Annotations for flyteagent pods
   podAnnotations: {}
-  # -- nodeSelector for external-plugin-service deployment
+  # -- nodeSelector for flyteagent deployment
   nodeSelector: {}
-  # -- tolerations for external-plugin-service deployment
+  # -- tolerations for flyteagent deployment
   tolerations: []
-  # -- affinity for external-plugin-service deployment
+  # -- affinity for flyteagent deployment
   affinity: {}
   # -- Appends additional volumes to the deployment spec. May include template values.
   additionalVolumes: []
@@ -715,12 +715,12 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - external-plugin-service
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
-          bigquery_query_job_task: external-plugin-service
+          bigquery_query_job_task: agent-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:
@@ -731,8 +731,8 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      external-plugin-service:
-        defaultGrpcEndpoint: external-plugin-service.flyte.svc.cluster.local:8000
+      agent-service:
+        defaultGrpcEndpoint: agent-service.flyte.svc.cluster.local:8000
         supportedTaskTypes:
           - bigquery_query_job_task
 

@@ -18,7 +18,7 @@ spec:
       labels: {{ include "flyteagent.labels" . | nindent 8 }}
     spec:
       {{- if .Values.flyteagent.priorityClassName }}
-      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
+      priorityClassName: {{ .Values.flyteagent.priorityClassName }}
       {{- end }}
       containers:
       - command:

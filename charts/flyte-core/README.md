@@ -91,10 +91,10 @@ helm install gateway bitnami/contour -n flyte
 | configmap.core.propeller | object | `{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://my-s3-bucket/","workers":4,"workflow-reeval-duration":"30s"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config). |
 | configmap.datacatalogServer | object | `{"application":{"grpcPort":8089,"grpcServerReflection":true,"httpPort":8080},"datacatalog":{"heartbeat-grace-period-multiplier":3,"max-reservation-heartbeat":"30s","metrics-scope":"datacatalog","profiler-port":10254,"storage-prefix":"metadata/datacatalog"}}` | Datacatalog server config |
 | configmap.domain | object | `{"domains":[{"id":"development","name":"development"},{"id":"staging","name":"staging"},{"id":"production","name":"production"}]}` | Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte. |
-| configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
-| configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"external-plugin-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","external-plugin-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
-| configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","external-plugin-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
-| configmap.k8s | object | `{"plugins":{"external-plugin-service":{"defaultGrpcEndpoint":"external-plugin-service.flyte.svc.cluster.local:8000","supportedTaskTypes":["bigquery_query_job_task"]},"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
+| configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
+| configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
+| configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
+| configmap.k8s | object | `{"plugins":{"agent-service":{"defaultGrpcEndpoint":"agent-service.flyte.svc.cluster.local:8000","supportedTaskTypes":["bigquery_query_job_task"]},"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
@@ -170,24 +170,24 @@ helm install gateway bitnami/contour -n flyte
 | flyteagent.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flyteagent.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flyteagent.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
-| flyteagent.affinity | object | `{}` | affinity for external-plugin-service deployment |
-| flyteagent.configPath | string | `"/etc/external-plugin-service/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteagent.affinity | object | `{}` | affinity for flyteagent deployment |
+| flyteagent.configPath | string | `"/etc/flyteagent/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteagent.enabled | bool | `true` |  |
 | flyteagent.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flyteagent.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for external-plugin-service deployment |
+| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
 | flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
-| flyteagent.nodeSelector | object | `{}` | nodeSelector for external-plugin-service deployment |
-| flyteagent.podAnnotations | object | `{}` | Annotations for external-plugin-service pods |
+| flyteagent.nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
+| flyteagent.podAnnotations | object | `{}` | Annotations for flyteagent pods |
 | flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
-| flyteagent.replicaCount | int | `1` | Replicas count for external-plugin-service deployment |
-| flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for external-plugin-service deployment |
-| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for external-plugin-service |
-| flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for external-plugin-service |
-| flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to external-plugin-service pods |
-| flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for external-plugin-service |
+| flyteagent.replicaCount | int | `1` | Replicas count for flyteagent deployment |
+| flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteagent deployment |
+| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for flyteagent |
+| flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
+| flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |
+| flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |
 | flyteagent.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flyteagent.tolerations | list | `[]` | tolerations for external-plugin-service deployment |
+| flyteagent.tolerations | list | `[]` | tolerations for flyteagent deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
