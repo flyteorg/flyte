@@ -13,9 +13,9 @@ spec:
   type: {{ . }}
   {{- end }}
   ports:
-  - name: agent-grpc
-    port: 8000
+  - name: "{{ .Values.flyteagent.ports.name }}"
+    port: "{{ .Values.flyteagent.ports.containerPort }}"
     protocol: TCP
-    targetPort: agent-grpc
+    targetPort: "{{ .Values.flyteagent.ports.name }}"
   selector: {{ include "flyteagent.selectorLabels" . | nindent 4 }}
 {{- end }}

@@ -15,6 +15,8 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
+| configuration.agentService.defaultGrpcEndpoint | string | `"flyte-sandbox-http.flyte.svc.cluster.local:8000"` |  |
+| configuration.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.enableAuthServer | bool | `true` |  |
@@ -103,6 +105,8 @@ Chart for basic single Flyte executable deployment
 | flyteagent.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` |  |
 | flyteagent.image.tag | string | `"1.6.2b1"` |  |
+| flyteagent.ports.containerPort | int | `8000` |  |
+| flyteagent.ports.name | string | `"agent-grpc"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

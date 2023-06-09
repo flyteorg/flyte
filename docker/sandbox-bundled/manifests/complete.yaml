@@ -412,38 +412,18 @@ data:
     \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
     false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
     \ propeller:\n    disableWebhook: false\n    disabled: false\n"
-  001-plugins.yaml: |
-    tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
-          - agent-service
-        default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
-          - bigquery_query_job_task: agent-service
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-        cloudwatch-enabled: false
-        stackdriver-enabled: false
-      k8s:
-        co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
-      k8s-array:
-        logs:
-          config:
-            kubernetes-enabled: true
-            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
-            cloudwatch-enabled: false
-            stackdriver-enabled: false
-      agent-service:
-        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-        - bigquery_query_job_task
+  001-plugins.yaml: "tasks:\n  task-plugins:\n    enabled-plugins:\n      - container\n
+    \     - sidecar\n      - K8S-ARRAY\n      - agent-service\n    default-for-task-types:\n
+    \     - container: container\n      - container_array: K8S-ARRAY\n      - bigquery_query_job_task:
+    agent-service\nplugins:\n  logs:\n    kubernetes-enabled: true\n    kubernetes-template-uri:
+    http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}\n    cloudwatch-enabled: false\n    stackdriver-enabled:
+    false\n  k8s:\n    co-pilot:\n      image: \"cr.flyte.org/flyteorg/flytecopilot:v0.0.30\"\n
+    \ k8s-array:\n    logs:\n      config:\n        kubernetes-enabled: true\n        kubernetes-template-uri:
+    http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}\n        cloudwatch-enabled: false\n        stackdriver-enabled:
+    false\n  agent-service: \n        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000\n
+    \       supportedTaskTypes:\n        - bigquery_query_job_task\n"
   002-database.yaml: |
     database:
       postgres:
@@ -758,7 +738,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Z3pnQ093RUdFcjZkYU5tNA==
+  haSharedSecret: d0g1d3JHQW5ERzBSSHpTNQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1159,7 +1139,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 78a665575cce701e2fdb1b7f43995f353d52364b9ac3f2dab823b3bee0784662
+        checksum/configuration: d0632f14f0403f005fa7d737f2192968371ae47e206b2ff5d91c1433f911df06
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1211,7 +1191,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:
-        - containerPort: 8000
+        - containerPort: "8000"
           name: agent-grpc
       initContainers:
       - args:
@@ -1273,7 +1253,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ce67aade5da91ef87dacc17b04e7ff8c203ebcb8cbda8ca1661962975df916e4
+        checksum/secret: 307a85830234b9c488fa076c023d27ab9b4456e36a9332febadc1a2aac6b2783
       labels:
         app: docker-registry
         release: flyte-sandbox

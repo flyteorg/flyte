@@ -125,7 +125,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
 | datacatalog.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
-| datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
+| datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for Datacatalog |
 | datacatalog.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Datacatalog |
 | datacatalog.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
@@ -179,10 +179,12 @@ helm install gateway bitnami/contour -n flyte
 | flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
 | flyteagent.nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | flyteagent.podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| flyteagent.ports.containerPort | int | `8000` |  |
+| flyteagent.ports.name | string | `"agent-grpc"` |  |
 | flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
 | flyteagent.replicaCount | int | `1` | Replicas count for flyteagent deployment |
 | flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteagent deployment |
-| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for flyteagent |
+| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
 | flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
 | flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |
 | flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |

@@ -853,7 +853,7 @@ metadata:
     cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: grpc-2
     port: 8089

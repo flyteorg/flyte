@@ -70,10 +70,7 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      agent-service:
-        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-        - bigquery_query_job_task
+      agent-service: {{ .Values.configuration.agentService | toYaml | nindent 12 }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:

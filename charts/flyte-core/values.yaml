@@ -170,7 +170,7 @@ datacatalog:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
-    type: NodePort
+    type: ClusterIP
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog
@@ -213,6 +213,9 @@ flyteagent:
     tag: 1.6.2b1
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
+  ports:
+    containerPort: 8000
+    name: agent-grpc
   # -- Default resources requests and limits for flyteagent deployment
   resources:
     limits:
@@ -229,7 +232,7 @@ flyteagent:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
-    type: NodePort
+    type: ClusterIP
   # -- Configuration for service accounts for flyteagent
   serviceAccount:
     # -- Should a service account be created for flyteagent
