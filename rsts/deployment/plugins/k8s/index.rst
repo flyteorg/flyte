@@ -46,22 +46,7 @@ Install the K8S Operator
 
 .. tabs::
 
-  .. group-tab:: PyTorch
-  
-     Clone the training-operator repository:
-   
-     .. code-block:: bash
-   
-        git clone https://github.com/kubeflow/training-operator.git
-   
-     Build and apply the training-operator:
-   
-     .. code-block:: bash
-   
-        export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-        kustomize build training-operator/manifests/overlays/kubeflow | kubectl apply -f -
-  
-  .. group-tab:: TensorFlow
+  .. group-tab:: PyTorch and TensorFlow
   
      Clone the training-operator repository:
    
