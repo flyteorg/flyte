@@ -47,11 +47,9 @@ data:
       secretName: {{ include "flyte-binary.webhook.secretName" . }}
       serviceName: {{ include "flyte-binary.webhook.serviceName" . }}
       servicePort: 443
-    flyte: {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
-{{- with .Values.enabled_plugins }}
-  enabled_plugins.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
+    flyte:{{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
   001-plugins.yaml: |
+    enabled_plugins:{{ .Values.enabled_plugins | toYaml | nindent 6 }}
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s:
@@ -62,7 +60,7 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      agent-service: {{ .Values.configuration.agentService | toYaml | nindent 12 }}
+      agent-service:{{ .Values.configuration.agentService | toYaml | nindent 8 }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:

@@ -403,24 +403,74 @@ metadata:
 ---
 apiVersion: v1
 data:
-  000-core.yaml: "admin:\n  endpoint: localhost:8089\n  insecure: true\ncatalog-cache:\n
-    \ endpoint: localhost:8081\n  insecure: true\n  type: datacatalog\ncluster_resources:\n
-    \ standaloneDeployment: false\n  templatePath: /etc/flyte/cluster-resource-templates\nlogger:\n
-    \ show-source: true\n  level: 6\npropeller:\n  create-flyteworkflow-crd: true\nwebhook:\n
-    \ certDir: /var/run/flyte/certs\n  localCert: true\n  secretName: flyte-sandbox-webhook-secret\n
-    \ serviceName: flyte-sandbox-webhook\n  servicePort: 443\nflyte: \n  admin:\n
-    \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
-    false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
-    \ propeller:\n    disableWebhook: false\n    disabled: false\n"
-  001-plugins.yaml: "plugins:\n  logs:\n    kubernetes-enabled: true\n    kubernetes-template-uri:
-    http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName
-    }}/pod?namespace={{ .namespace }}\n    cloudwatch-enabled: false\n    stackdriver-enabled:
-    false\n  k8s:\n    co-pilot:\n      image: \"cr.flyte.org/flyteorg/flytecopilot:v0.0.30\"\n
-    \ k8s-array:\n    logs:\n      config:\n        kubernetes-enabled: true\n        kubernetes-template-uri:
-    http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName
-    }}/pod?namespace={{ .namespace }}\n        cloudwatch-enabled: false\n        stackdriver-enabled:
-    false\n  agent-service: \n        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000\n
-    \       supportedTaskTypes:\n        - bigquery_query_job_task\n"
+  000-core.yaml: |
+    admin:
+      endpoint: localhost:8089
+      insecure: true
+    catalog-cache:
+      endpoint: localhost:8081
+      insecure: true
+      type: datacatalog
+    cluster_resources:
+      standaloneDeployment: false
+      templatePath: /etc/flyte/cluster-resource-templates
+    logger:
+      show-source: true
+      level: 6
+    propeller:
+      create-flyteworkflow-crd: true
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
+    flyte:
+      admin:
+        disableClusterResourceManager: false
+        disableScheduler: false
+        disabled: false
+        seedProjects:
+        - flytesnacks
+      dataCatalog:
+        disabled: false
+      propeller:
+        disableWebhook: false
+        disabled: false
+  001-plugins.yaml: |
+    enabled_plugins:
+      tasks:
+        task-plugins:
+          default-for-task-types:
+            bigquery_query_job_task: agent-service
+            container: container
+            container_array: k8s-array
+            sidecar: sidecar
+          enabled-plugins:
+          - container
+          - sidecar
+          - k8s-array
+          - agent-service
+    plugins:
+      logs:
+        kubernetes-enabled: true
+        kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        cloudwatch-enabled: false
+        stackdriver-enabled: false
+      k8s:
+        co-pilot:
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
+      k8s-array:
+        logs:
+          config:
+            kubernetes-enabled: true
+            kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+            cloudwatch-enabled: false
+            stackdriver-enabled: false
+      agent-service:
+        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+        - bigquery_query_job_task
   002-database.yaml: |
     database:
       postgres:
@@ -457,19 +507,6 @@ data:
       signedURL:
         stowConfigOverride:
           endpoint: http://localhost:30002
-  enabled_plugins.yaml: |
-    tasks:
-      task-plugins:
-        default-for-task-types:
-          bigquery_query_job_task: agent-service
-          container: container
-          container_array: k8s-array
-          sidecar: sidecar
-        enabled-plugins:
-        - container
-        - sidecar
-        - k8s-array
-        - agent-service
 kind: ConfigMap
 metadata:
   labels:
@@ -748,7 +785,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZFRSNnlBNXFCS0IwTmVkNQ==
+  haSharedSecret: UkZiZHV3WUhZaGJ3d2RMOQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1149,7 +1186,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 7be77d4b77d12c541ba3f36d2d1777e2fc777130d5387ac17929a1a93a370c2f
+        checksum/configuration: d54a5f9177c85b8012ad19d042e83b49add184d477caa482b17c2c35ee1b8270
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1263,7 +1300,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0194cc36409ae198d9b0a153c955f4688b361e00e0a067a56013efe10fe5806f
+        checksum/secret: a2ad0ca18f2bf84dac975cf8841877bb86bd06cea69a90e2d42a9f2ac12f8bfe
       labels:
         app: docker-registry
         release: flyte-sandbox
