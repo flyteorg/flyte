@@ -49,7 +49,7 @@ data:
       servicePort: 443
     flyte:{{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
   001-plugins.yaml: |
-    enabled_plugins:{{ .Values.enabled_plugins | toYaml | nindent 6 }}
+    tasks:{{ .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s:

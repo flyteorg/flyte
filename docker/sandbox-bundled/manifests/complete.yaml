@@ -438,19 +438,18 @@ data:
         disableWebhook: false
         disabled: false
   001-plugins.yaml: |
-    enabled_plugins:
-      tasks:
-        task-plugins:
-          default-for-task-types:
-            bigquery_query_job_task: agent-service
-            container: container
-            container_array: k8s-array
-            sidecar: sidecar
-          enabled-plugins:
-          - container
-          - sidecar
-          - k8s-array
-          - agent-service
+    tasks:
+      task-plugins:
+        default-for-task-types:
+          bigquery_query_job_task: agent-service
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+        - agent-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -785,7 +784,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UkZiZHV3WUhZaGJ3d2RMOQ==
+  haSharedSecret: Wm9NZkpoUExVeHRIZVFXdQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1186,7 +1185,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: d54a5f9177c85b8012ad19d042e83b49add184d477caa482b17c2c35ee1b8270
+        checksum/configuration: 8118b13cf076cdede0f232d5c1babb77d378cc2aa486840ed46a21b5ab4480ea
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1300,7 +1299,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a2ad0ca18f2bf84dac975cf8841877bb86bd06cea69a90e2d42a9f2ac12f8bfe
+        checksum/secret: 1877f7ae4570a2829bc6ddeccc1fe2e2908839e31778233f2c94cc9ed5945f5b
       labels:
         app: docker-registry
         release: flyte-sandbox
