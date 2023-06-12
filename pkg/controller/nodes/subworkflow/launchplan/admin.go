@@ -2,7 +2,6 @@ package launchplan
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -188,11 +187,8 @@ func (a *adminLaunchPlanExecutor) Kill(ctx context.Context, executionID *core.Wo
 		}
 
 		err = evtErr.WrapError(err)
-		eventErr := &evtErr.EventError{}
-		if errors.As(err, eventErr) {
-			if eventErr.Code == evtErr.EventAlreadyInTerminalStateError {
-				return nil
-			}
+		if evtErr.IsEventAlreadyInTerminalStateError(err) {
+			return nil
 		}
 
 		return stdErr.Wrapf(RemoteErrorSystem, err, "system error")
