@@ -109,6 +109,12 @@ flytepropeller:
           topologyKey: kubernetes.io/hostname
 
 #
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
+
+#
 # FLYTECONSOLE
 #
 

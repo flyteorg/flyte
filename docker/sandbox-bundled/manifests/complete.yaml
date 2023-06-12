@@ -403,25 +403,53 @@ metadata:
 ---
 apiVersion: v1
 data:
-  000-core.yaml: "admin:\n  endpoint: localhost:8089\n  insecure: true\ncatalog-cache:\n
-    \ endpoint: localhost:8081\n  insecure: true\n  type: datacatalog\ncluster_resources:\n
-    \ standaloneDeployment: false\n  templatePath: /etc/flyte/cluster-resource-templates\nlogger:\n
-    \ show-source: true\n  level: 6\npropeller:\n  create-flyteworkflow-crd: true\nwebhook:\n
-    \ certDir: /var/run/flyte/certs\n  localCert: true\n  secretName: flyte-sandbox-webhook-secret\n
-    \ serviceName: flyte-sandbox-webhook\n  servicePort: 443\nflyte: \n  admin:\n
-    \   disableClusterResourceManager: false\n    disableScheduler: false\n    disabled:
-    false\n    seedProjects:\n    - flytesnacks\n  dataCatalog:\n    disabled: false\n
-    \ propeller:\n    disableWebhook: false\n    disabled: false\n"
+  000-core.yaml: |
+    admin:
+      endpoint: localhost:8089
+      insecure: true
+    catalog-cache:
+      endpoint: localhost:8081
+      insecure: true
+      type: datacatalog
+    cluster_resources:
+      standaloneDeployment: false
+      templatePath: /etc/flyte/cluster-resource-templates
+    logger:
+      show-source: true
+      level: 6
+    propeller:
+      create-flyteworkflow-crd: true
+    webhook:
+      certDir: /var/run/flyte/certs
+      localCert: true
+      secretName: flyte-sandbox-webhook-secret
+      serviceName: flyte-sandbox-webhook
+      servicePort: 443
+    flyte:
+      admin:
+        disableClusterResourceManager: false
+        disableScheduler: false
+        disabled: false
+        seedProjects:
+        - flytesnacks
+      dataCatalog:
+        disabled: false
+      propeller:
+        disableWebhook: false
+        disabled: false
   001-plugins.yaml: |
     tasks:
       task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
         default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
+          bigquery_query_job_task: agent-service
+          container: container
+          container_array: k8s-array
+          sidecar: sidecar
+        enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+        - agent-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -438,6 +466,10 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
+      agent-service:
+        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+        - bigquery_query_job_task
   002-database.yaml: |
     database:
       postgres:
@@ -752,7 +784,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Q0NxRUxyMHdoV3cwWGFUYw==
+  haSharedSecret: Wm9NZkpoUExVeHRIZVFXdQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -895,6 +927,13 @@ spec:
     nodePort: null
     port: 8088
     targetPort: http
+  - name: grpc
+    nodePort: null
+    port: 8089
+    targetPort: grpc
+  - name: agent-grpc
+    port: 8000
+    targetPort: agent-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
@@ -1146,7 +1185,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: af73555ceafa450e1e534169aeb7fffcab7726754f8802ab1d3edbb75d65969d
+        checksum/configuration: 8118b13cf076cdede0f232d5c1babb77d378cc2aa486840ed46a21b5ab4480ea
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1194,6 +1233,12 @@ spec:
           subPath: db-pass
         - mountPath: /var/run/flyte
           name: state
+      - image: ghcr.io/flyteorg/flyteagent:1.6.2b1
+        imagePullPolicy: IfNotPresent
+        name: flyteagent
+        ports:
+        - containerPort: 8000
+          name: agent-grpc
       initContainers:
       - args:
         - |
@@ -1254,7 +1299,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0488d24bf58944fda2bed74f8681cb973a80a5419722bad83d5f1d716a877d4d
+        checksum/secret: 1877f7ae4570a2829bc6ddeccc1fe2e2908839e31778233f2c94cc9ed5945f5b
       labels:
         app: docker-registry
         release: flyte-sandbox

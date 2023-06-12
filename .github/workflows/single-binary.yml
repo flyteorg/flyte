@@ -163,6 +163,11 @@ jobs:
               memory: "0"
           EOF
           flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flytekit
+          pip freeze
       - name: Register examples
         uses: unionai/flyte-register-action@v0.0.2
         with:
@@ -171,11 +176,6 @@ jobs:
           project: flytesnacks
           domain: development
           version: "latest"
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flytekit
-          pip freeze
       - name: End2End
         env:
           PRIORITIES: "P0"
