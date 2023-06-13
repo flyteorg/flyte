@@ -12,7 +12,7 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 	ctx := context.TODO()
 	f := NewFailFastLaunchPlanExecutor()
 	t.Run("getStatus", func(t *testing.T) {
-		a, err := f.GetStatus(ctx, &core.WorkflowExecutionIdentifier{
+		a, _, err := f.GetStatus(ctx, &core.WorkflowExecutionIdentifier{
 			Project: "p",
 			Domain:  "d",
 			Name:    "n",

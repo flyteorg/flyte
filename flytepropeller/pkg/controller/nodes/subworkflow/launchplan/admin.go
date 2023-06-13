@@ -44,6 +44,7 @@ type executionCacheItem struct {
 	core.WorkflowExecutionIdentifier
 	ExecutionClosure *admin.ExecutionClosure
 	SyncError        error
+	ExecutionOutputs *core.LiteralMap
 }
 
 func (e executionCacheItem) ID() string {
@@ -140,19 +141,19 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, error) {
+func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
 	if executionID == nil {
-		return nil, fmt.Errorf("nil executionID")
+		return nil, nil, fmt.Errorf("nil executionID")
 	}
 
 	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	item := obj.(executionCacheItem)
 
-	return item.ExecutionClosure, item.SyncError
+	return item.ExecutionClosure, item.ExecutionOutputs, item.SyncError
 }
 
 func (a *adminLaunchPlanExecutor) GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error) {
@@ -246,12 +247,38 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			continue
 		}
 
+		var outputs *core.LiteralMap
+		// Retrieve potential outputs only when the workflow succeeded.
+		// TODO: We can optimize further by only retrieving the outputs when the workflow has output variables in the
+		// 	interface.
+		if res.GetClosure().GetPhase() == core.WorkflowExecution_SUCCEEDED {
+			execData, err := a.adminClient.GetExecutionData(ctx, &admin.WorkflowExecutionGetDataRequest{
+				Id: &exec.WorkflowExecutionIdentifier,
+			})
+
+			if err != nil {
+				resp = append(resp, cache.ItemSyncResponse{
+					ID: obj.GetID(),
+					Item: executionCacheItem{
+						WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+						SyncError:                   err,
+					},
+					Action: cache.Update,
+				})
+
+				continue
+			}
+
+			outputs = execData.GetFullOutputs()
+		}
+
 		// Update the cache with the retrieved status
 		resp = append(resp, cache.ItemSyncResponse{
 			ID: obj.GetID(),
 			Item: executionCacheItem{
 				WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 				ExecutionClosure:            res.Closure,
+				ExecutionOutputs:            outputs,
 			},
 			Action: cache.Update,
 		})
