@@ -19,6 +19,8 @@ func TestTemplateLog(t *testing.T) {
 		"spark-kubernetes-driver",
 		"cri-o://abc",
 		"main_logs",
+		"2015-03-14T17:08:14+01:00",
+		"2021-06-15T20:47:57+02:00",
 		1426349294,
 		1623782877,
 	)
@@ -41,14 +43,16 @@ func Test_templateLogPlugin_Regression(t *testing.T) {
 		messageFormat core.TaskLog_MessageFormat
 	}
 	type args struct {
-		podName           string
-		podUID            string
-		namespace         string
-		containerName     string
-		containerID       string
-		logName           string
-		podUnixStartTime  int64
-		podUnixFinishTime int64
+		podName              string
+		podUID               string
+		namespace            string
+		containerName        string
+		containerID          string
+		logName              string
+		podRFC3339StartTime  string
+		podRFC3339FinishTime string
+		podUnixStartTime     int64
+		podUnixFinishTime    int64
 	}
 	tests := []struct {
 		name    string
@@ -64,14 +68,16 @@ func Test_templateLogPlugin_Regression(t *testing.T) {
 				messageFormat: core.TaskLog_JSON,
 			},
 			args{
-				podName:           "f-uuid-driver",
-				podUID:            "pod-uid",
-				namespace:         "flyteexamples-production",
-				containerName:     "spark-kubernetes-driver",
-				containerID:       "cri-o://abc",
-				logName:           "main_logs",
-				podUnixStartTime:  123,
-				podUnixFinishTime: 12345,
+				podName:              "f-uuid-driver",
+				podUID:               "pod-uid",
+				namespace:            "flyteexamples-production",
+				containerName:        "spark-kubernetes-driver",
+				containerID:          "cri-o://abc",
+				logName:              "main_logs",
+				podRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				podRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				podUnixStartTime:     123,
+				podUnixFinishTime:    12345,
 			},
 			core.TaskLog{
 				Uri:           "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.f-uuid-driver_flyteexamples-production_spark-kubernetes-driver-abc.log",
@@ -87,14 +93,16 @@ func Test_templateLogPlugin_Regression(t *testing.T) {
 				messageFormat: core.TaskLog_JSON,
 			},
 			args{
-				podName:           "podName",
-				podUID:            "pod-uid",
-				namespace:         "flyteexamples-production",
-				containerName:     "spark-kubernetes-driver",
-				containerID:       "cri-o://abc",
-				logName:           "main_logs",
-				podUnixStartTime:  123,
-				podUnixFinishTime: 12345,
+				podName:              "podName",
+				podUID:               "pod-uid",
+				namespace:            "flyteexamples-production",
+				containerName:        "spark-kubernetes-driver",
+				containerID:          "cri-o://abc",
+				logName:              "main_logs",
+				podRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				podRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				podUnixStartTime:     123,
+				podUnixFinishTime:    12345,
 			},
 			core.TaskLog{
 				Uri:           "https://console.cloud.google.com/logs/viewer?project=test-gcp-project&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3Dtest-gcp-project&resource=aws_ec2_instance&advancedFilter=resource.labels.pod_name%3DpodName",
@@ -110,14 +118,16 @@ func Test_templateLogPlugin_Regression(t *testing.T) {
 				messageFormat: core.TaskLog_JSON,
 			},
 			args{
-				podName:           "flyteexamples-development-task-name",
-				podUID:            "pod-uid",
-				namespace:         "flyteexamples-development",
-				containerName:     "ignore",
-				containerID:       "ignore",
-				logName:           "main_logs",
-				podUnixStartTime:  123,
-				podUnixFinishTime: 12345,
+				podName:              "flyteexamples-development-task-name",
+				podUID:               "pod-uid",
+				namespace:            "flyteexamples-development",
+				containerName:        "ignore",
+				containerID:          "ignore",
+				logName:              "main_logs",
+				podRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+				podRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+				podUnixStartTime:     123,
+				podUnixFinishTime:    12345,
 			},
 			core.TaskLog{
 				Uri:           "https://dashboard.k8s.net/#!/log/flyteexamples-development/flyteexamples-development-task-name/pod?namespace=flyteexamples-development",
@@ -134,7 +144,7 @@ func Test_templateLogPlugin_Regression(t *testing.T) {
 				messageFormat: tt.fields.messageFormat,
 			}
 
-			got, err := s.GetTaskLog(tt.args.podName, tt.args.podUID, tt.args.namespace, tt.args.containerName, tt.args.containerID, tt.args.logName, tt.args.podUnixStartTime, tt.args.podUnixFinishTime)
+			got, err := s.GetTaskLog(tt.args.podName, tt.args.podUID, tt.args.namespace, tt.args.containerName, tt.args.containerID, tt.args.logName, tt.args.podRFC3339FinishTime, tt.args.podRFC3339FinishTime, tt.args.podUnixStartTime, tt.args.podUnixFinishTime)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetTaskLog() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -170,14 +180,16 @@ func TestTemplateLogPlugin_NewTaskLog(t *testing.T) {
 			},
 			args{
 				input: Input{
-					HostName:          "my-host",
-					PodName:           "my-pod",
-					Namespace:         "my-namespace",
-					ContainerName:     "my-container",
-					ContainerID:       "ignore",
-					LogName:           "main_logs",
-					PodUnixStartTime:  123,
-					PodUnixFinishTime: 12345,
+					HostName:             "my-host",
+					PodName:              "my-pod",
+					Namespace:            "my-namespace",
+					ContainerName:        "my-container",
+					ContainerID:          "ignore",
+					LogName:              "main_logs",
+					PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+					PodUnixStartTime:     123,
+					PodUnixFinishTime:    12345,
 				},
 			},
 			Output{
@@ -199,20 +211,53 @@ func TestTemplateLogPlugin_NewTaskLog(t *testing.T) {
 			},
 			args{
 				input: Input{
-					HostName:          "my-host",
-					PodName:           "my-pod",
-					Namespace:         "my-namespace",
-					ContainerName:     "my-container",
-					ContainerID:       "ignore",
-					LogName:           "main_logs",
-					PodUnixStartTime:  123,
-					PodUnixFinishTime: 12345,
+					HostName:             "my-host",
+					PodName:              "my-pod",
+					Namespace:            "my-namespace",
+					ContainerName:        "my-container",
+					ContainerID:          "ignore",
+					LogName:              "main_logs",
+					PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+					PodUnixStartTime:     123,
+					PodUnixFinishTime:    12345,
 				},
 			},
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
 						Uri:           "https://app.datadoghq.com/logs?event&from_ts=123&live=true&query=pod_name%3Amy-pod&to_ts=12345",
+						MessageFormat: core.TaskLog_JSON,
+						Name:          "main_logs",
+					},
+				},
+			},
+			false,
+		},
+		{
+			"stackdriver-with-rfc3339-timestamp",
+			fields{
+				templateURI:   "https://console.cloud.google.com/logs/viewer?project=test-gcp-project&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3Dtest-gcp-project&resource=aws_ec2_instance&advancedFilter=resource.labels.pod_name%3D{{.podName}}%20%22{{.podRFC3339StartTime}}%22",
+				messageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					HostName:             "my-host",
+					PodName:              "my-pod",
+					Namespace:            "my-namespace",
+					ContainerName:        "my-container",
+					ContainerID:          "ignore",
+					LogName:              "main_logs",
+					PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+					PodUnixStartTime:     123,
+					PodUnixFinishTime:    12345,
+				},
+			},
+			Output{
+				TaskLogs: []*core.TaskLog{
+					{
+						Uri:           "https://console.cloud.google.com/logs/viewer?project=test-gcp-project&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3Dtest-gcp-project&resource=aws_ec2_instance&advancedFilter=resource.labels.pod_name%3Dmy-pod%20%221970-01-01T01:02:03+01:00%22",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},

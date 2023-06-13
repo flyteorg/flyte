@@ -17,6 +17,8 @@ import (
 // {{ .containerId }}: The container id docker/crio generated at run time,
 // {{ .logName }}: A deployment specific name where to expect the logs to be.
 // {{ .hostname }}: The hostname where the pod is running and where logs reside.
+// {{ .PodRFC3339StartTime }}: The pod creation time in RFC3339 format
+// {{ .PodRFC3339FinishTime }}: Don't have a good mechanism for this yet, but approximating with time.Now for now
 // {{ .podUnixStartTime }}: The pod creation time (in unix seconds, not millis)
 // {{ .podUnixFinishTime }}: Don't have a good mechanism for this yet, but approximating with time.Now for now
 type TemplateLogPlugin struct {
@@ -30,28 +32,32 @@ type regexValPair struct {
 }
 
 type templateRegexes struct {
-	PodName           *regexp.Regexp
-	PodUID            *regexp.Regexp
-	Namespace         *regexp.Regexp
-	ContainerName     *regexp.Regexp
-	ContainerID       *regexp.Regexp
-	LogName           *regexp.Regexp
-	Hostname          *regexp.Regexp
-	PodUnixStartTime  *regexp.Regexp
-	PodUnixFinishTime *regexp.Regexp
+	PodName              *regexp.Regexp
+	PodUID               *regexp.Regexp
+	Namespace            *regexp.Regexp
+	ContainerName        *regexp.Regexp
+	ContainerID          *regexp.Regexp
+	LogName              *regexp.Regexp
+	Hostname             *regexp.Regexp
+	PodRFC3339StartTime  *regexp.Regexp
+	PodRFC3339FinishTime *regexp.Regexp
+	PodUnixStartTime     *regexp.Regexp
+	PodUnixFinishTime    *regexp.Regexp
 }
 
 func mustInitTemplateRegexes() templateRegexes {
 	return templateRegexes{
-		PodName:           mustCreateRegex("podName"),
-		PodUID:            mustCreateRegex("podUID"),
-		Namespace:         mustCreateRegex("namespace"),
-		ContainerName:     mustCreateRegex("containerName"),
-		ContainerID:       mustCreateRegex("containerID"),
-		LogName:           mustCreateRegex("logName"),
-		Hostname:          mustCreateRegex("hostname"),
-		PodUnixStartTime:  mustCreateRegex("podUnixStartTime"),
-		PodUnixFinishTime: mustCreateRegex("podUnixFinishTime"),
+		PodName:              mustCreateRegex("podName"),
+		PodUID:               mustCreateRegex("podUID"),
+		Namespace:            mustCreateRegex("namespace"),
+		ContainerName:        mustCreateRegex("containerName"),
+		ContainerID:          mustCreateRegex("containerID"),
+		LogName:              mustCreateRegex("logName"),
+		Hostname:             mustCreateRegex("hostname"),
+		PodRFC3339StartTime:  mustCreateRegex("podRFC3339StartTime"),
+		PodRFC3339FinishTime: mustCreateRegex("podRFC3339FinishTime"),
+		PodUnixStartTime:     mustCreateRegex("podUnixStartTime"),
+		PodUnixFinishTime:    mustCreateRegex("podUnixFinishTime"),
 	}
 }
 
@@ -69,16 +75,18 @@ func replaceAll(template string, values []regexValPair) string {
 	return template
 }
 
-func (s TemplateLogPlugin) GetTaskLog(podName, podUID, namespace, containerName, containerID, logName string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
+func (s TemplateLogPlugin) GetTaskLog(podName, podUID, namespace, containerName, containerID, logName string, podRFC3339StartTime string, podRFC3339FinishTime string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
 	o, err := s.GetTaskLogs(Input{
-		LogName:           logName,
-		Namespace:         namespace,
-		PodName:           podName,
-		PodUID:            podUID,
-		ContainerName:     containerName,
-		ContainerID:       containerID,
-		PodUnixStartTime:  podUnixStartTime,
-		PodUnixFinishTime: podUnixFinishTime,
+		LogName:              logName,
+		Namespace:            namespace,
+		PodName:              podName,
+		PodUID:               podUID,
+		ContainerName:        containerName,
+		ContainerID:          containerID,
+		PodRFC3339StartTime:  podRFC3339StartTime,
+		PodRFC3339FinishTime: podRFC3339FinishTime,
+		PodUnixStartTime:     podUnixStartTime,
+		PodUnixFinishTime:    podUnixFinishTime,
 	})
 
 	if err != nil || len(o.TaskLogs) == 0 {
@@ -132,6 +140,14 @@ func (s TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 						val:   input.HostName,
 					},
 					{
+						regex: regexes.PodRFC3339StartTime,
+						val:   input.PodRFC3339StartTime,
+					},
+					{
+						regex: regexes.PodRFC3339FinishTime,
+						val:   input.PodRFC3339FinishTime,
+					},
+					{
 						regex: regexes.PodUnixStartTime,
 						val:   strconv.FormatInt(input.PodUnixStartTime, 10),
 					},
@@ -160,6 +176,8 @@ func (s TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 // {{ .containerId }}: The container id docker/crio generated at run time,
 // {{ .logName }}: A deployment specific name where to expect the logs to be.
 // {{ .hostname }}: The hostname where the pod is running and where logs reside.
+// {{ .PodRFC3339StartTime }}: The pod creation time in RFC3339 format
+// {{ .PodRFC3339FinishTime }}: Don't have a good mechanism for this yet, but approximating with time.Now for now
 // {{ .podUnixStartTime }}: The pod creation time (in unix seconds, not millis)
 // {{ .podUnixFinishTime }}: Don't have a good mechanism for this yet, but approximating with time.Now for now
 func NewTemplateLogPlugin(templateUris []string, messageFormat core.TaskLog_MessageFormat) TemplateLogPlugin {

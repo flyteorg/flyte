@@ -38,16 +38,21 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, pod
 		return nil, nil
 	}
 
+	startTime := pod.CreationTimestamp.Unix()
+	finishTime := time.Now().Unix()
+
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
-			PodName:           pod.Name,
-			PodUID:            string(pod.GetUID()),
-			Namespace:         pod.Namespace,
-			ContainerName:     pod.Spec.Containers[index].Name,
-			ContainerID:       pod.Status.ContainerStatuses[index].ContainerID,
-			LogName:           nameSuffix,
-			PodUnixStartTime:  pod.CreationTimestamp.Unix(),
-			PodUnixFinishTime: time.Now().Unix(),
+			PodName:              pod.Name,
+			PodUID:               string(pod.GetUID()),
+			Namespace:            pod.Namespace,
+			ContainerName:        pod.Spec.Containers[index].Name,
+			ContainerID:          pod.Status.ContainerStatuses[index].ContainerID,
+			LogName:              nameSuffix,
+			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
 		},
 	)
 
