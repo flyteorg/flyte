@@ -314,7 +314,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -337,7 +337,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
-		}, nil)
+		}, nil, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -379,7 +379,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, nil)
+		}, op, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
@@ -421,7 +421,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, nil)
+		}, op, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
@@ -457,7 +457,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					Code:    "code",
 				},
 			},
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -481,7 +481,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -505,7 +505,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_ABORTED,
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -527,7 +527,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-		).Return(nil, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
+		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -549,7 +549,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-		).Return(nil, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
+		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -586,47 +586,13 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
-	})
-
-	t.Run("outputURINotFound", func(t *testing.T) {
-
-		mockStore := createInmemoryStore(t)
-		mockLPExec := &mocks.Executor{}
-		uri := storage.DataReference("uri")
-
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-			OutputResult: &admin.ExecutionClosure_Outputs{
-				Outputs: &admin.LiteralMapBlob{
-					Data: &admin.LiteralMapBlob_Uri{
-						Uri: uri.String(),
-					},
-				},
-			},
-		}, nil)
-
-		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
-		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
-		assert.NotNil(t, err)
-		assert.Equal(t, handler.EPhaseUndefined, s.Info().GetPhase())
 	})
 
 	t.Run("outputURISystemError", func(t *testing.T) {
@@ -654,7 +620,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)

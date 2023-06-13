@@ -39,7 +39,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			mock.MatchedBy(func(o *admin.WorkflowExecutionGetRequest) bool { return true }),
 		).Return(result, nil)
 		assert.NoError(t, err)
-		s, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id)
 		assert.NoError(t, err)
 		assert.Equal(t, result, s)
 	})
@@ -103,7 +103,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.True(t, IsNotFound(err))
@@ -149,7 +149,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.False(t, IsNotFound(err))

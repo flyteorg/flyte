@@ -250,7 +250,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)
@@ -271,7 +271,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, nil)
+		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)

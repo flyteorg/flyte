@@ -23,8 +23,8 @@ type Executor_GetStatus struct {
 	*mock.Call
 }
 
-func (_m Executor_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 error) *Executor_GetStatus {
-	return &Executor_GetStatus{Call: _m.Call.Return(_a0, _a1)}
+func (_m Executor_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 *core.LiteralMap, _a2 error) *Executor_GetStatus {
+	return &Executor_GetStatus{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
 func (_m *Executor) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *Executor_GetStatus {
@@ -38,7 +38,7 @@ func (_m *Executor) OnGetStatusMatch(matchers ...interface{}) *Executor_GetStatu
 }
 
 // GetStatus provides a mock function with given fields: ctx, executionID
-func (_m *Executor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, error) {
+func (_m *Executor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
 	ret := _m.Called(ctx, executionID)
 
 	var r0 *admin.ExecutionClosure
@@ -50,14 +50,23 @@ func (_m *Executor) GetStatus(ctx context.Context, executionID *core.WorkflowExe
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
+	var r1 *core.LiteralMap
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier) *core.LiteralMap); ok {
 		r1 = rf(ctx, executionID)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*core.LiteralMap)
+		}
 	}
 
-	return r0, r1
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
+		r2 = rf(ctx, executionID)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 type Executor_Initialize struct {
