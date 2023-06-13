@@ -46,6 +46,10 @@ flyte-binary:
             - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        agentService:
+          defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+          supportedTaskTypes:
+            - bigquery_query_job_task
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'

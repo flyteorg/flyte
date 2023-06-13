@@ -27,6 +27,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
+| flyte-binary.configuration.inline.plugins.agentService.defaultGrpcEndpoint | string | `"flyte-sandbox-http.flyte.svc.cluster.local:8000"` |  |
+| flyte-binary.configuration.inline.plugins.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |

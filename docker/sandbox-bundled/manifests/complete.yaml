@@ -497,6 +497,10 @@ data:
       container: my-s3-bucket
   010-inline-config.yaml: |
     plugins:
+      agentService:
+        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+        - bigquery_query_job_task
       k8s:
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
@@ -784,7 +788,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Qk9kOWtEdFR0NzVjZkJnWA==
+  haSharedSecret: TnJNTzhiRzNieEkwNmZCNw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1185,7 +1189,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: e524324511bf87922af7ed2a40969eb6001a44c4c7e1fcc6615259fd8db47033
+        checksum/configuration: c5f24428e10d43d84135c3ffe6d0bb97f7dab36d50077803211777aa99b42923
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/instance: flyte-sandbox
@@ -1299,7 +1303,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 09832e1239c84a5f530f859e9950e450ae6650461acec4e772b765f5e355362f
+        checksum/secret: 3312ef01e4824ad02b5b3adcab357482f29bb6f1e888be6ce09699a21981e99e
       labels:
         app: docker-registry
         release: flyte-sandbox
