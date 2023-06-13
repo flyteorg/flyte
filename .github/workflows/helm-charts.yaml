@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - "rc/*"
+      - rc/*
   workflow_dispatch:
 
 jobs:
