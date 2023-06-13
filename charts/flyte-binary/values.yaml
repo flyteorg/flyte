@@ -149,7 +149,7 @@ configuration:
       tag: v0.0.30 # FLYTECOPILOT_TAG
   # Flyteagent Configuration
   agentService:
-    defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+    defaultGrpcEndpoint: flyte-binary-http.flyte.svc.cluster.local:8000
     supportedTaskTypes:
       - bigquery_query_job_task
   # externalConfigMap Specify an existing, external ConfigMap to use as configuration for Flyte

@@ -15,7 +15,7 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
-| configuration.agentService.defaultGrpcEndpoint | string | `"flyte-sandbox-http.flyte.svc.cluster.local:8000"` |  |
+| configuration.agentService.defaultGrpcEndpoint | string | `"flyte-binary-http.flyte.svc.cluster.local:8000"` |  |
 | configuration.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
