@@ -152,5 +152,3 @@ sandbox:
       repository: envoyproxy/envoy
       tag: sandbox
       pullPolicy: Never
-
-configuration:

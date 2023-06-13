@@ -18,7 +18,6 @@ A Helm chart for the Flyte local sandbox
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| configuration | string | `nil` |  |
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |
