@@ -17,7 +17,7 @@ flyte-binary:
       host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
       password: postgres
     agentService:
-      defaultGrpcEndpoint: flyte-binary-http.flyte.svc.cluster.local:8000
+      defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
       supportedTaskTypes:
         - bigquery_query_job_task
     storage:

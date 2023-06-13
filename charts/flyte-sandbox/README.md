@@ -26,7 +26,7 @@ A Helm chart for the Flyte local sandbox
 | docker-registry.service.nodePort | int | `30000` |  |
 | docker-registry.service.type | string | `"NodePort"` |  |
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
-| flyte-binary.configuration.agentService.defaultGrpcEndpoint | string | `"flyte-binary-http.flyte.svc.cluster.local:8000"` |  |
+| flyte-binary.configuration.agentService.defaultGrpcEndpoint | string | `"flyte-sandbox-http.flyte.svc.cluster.local:8000"` |  |
 | flyte-binary.configuration.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
 | flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
