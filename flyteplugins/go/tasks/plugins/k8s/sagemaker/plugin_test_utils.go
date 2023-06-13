@@ -169,6 +169,7 @@ func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTem
 	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
+
 	if outputReaderPutError {
 		outputReader.OnPutMatch(mock.Anything, mock.Anything).Return(errors.Errorf("err"))
 	} else {
@@ -365,6 +366,7 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
 	outputReader.OnGetOutputPrefixPath().Return("/data/")
 	outputReader.OnGetRawOutputPrefix().Return("/raw/")
+	
 
 	taskCtx.OnOutputWriter().Return(outputReader)
 

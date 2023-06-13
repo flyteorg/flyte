@@ -81,6 +81,8 @@ type OutputFilePaths interface {
 	GetOutputPath() storage.DataReference
 	// GetDeckPath returns a fully qualified path (URN) to where the framework expects the deck.html to exist in the configured storage backend
 	GetDeckPath() storage.DataReference
+	
+	GetSpanPath() storage.DataReference
 	// GetErrorPath returns a fully qualified path (URN) where the error information should be placed as a protobuf core.ErrorDocument. It is not directly
 	// used by the framework, but could be used in the future
 	GetErrorPath() storage.DataReference
