@@ -23,7 +23,7 @@ const (
 	// deckSuffix specifies that deck file are assumed to be written to this "file"/"suffix" under the given prefix
 	// The deck file has a format of HTML
 	deckSuffix = "deck.html"
-
+	// spanSuffix specifies that span file are assumed to be written to this "file"/"suffix" under the given prefix
 	spanSuffix = "span.pb"
 	// ErrorsSuffix specifies that the errors are written to this prefix/file under the given prefix. The Error File
 	// has a format of core.ErrorDocument

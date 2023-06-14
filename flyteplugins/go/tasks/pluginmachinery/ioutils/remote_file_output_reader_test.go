@@ -32,7 +32,7 @@ func TestReadOrigin(t *testing.T) {
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.OnGetErrorPath().Return("")
 	deckPath := "deck.html"
-	spanPath := "span.html"
+	spanPath := "span.pb"
 	opath.OnGetDeckPath().Return(storage.DataReference(deckPath))
 	opath.OnGetSpanPath().Return(storage.DataReference(spanPath))
 
@@ -53,10 +53,10 @@ func TestReadOrigin(t *testing.T) {
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
-		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference(deckPath)).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
-		store.OnHead(ctx, storage.DataReference("span.html")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference(spanPath)).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
