@@ -124,12 +124,10 @@ func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 }
 
 func (r RemoteFileOutputReader) SpanExists(ctx context.Context) (bool, error) {
-	fmt.Println("SpanExists: ", r.outPath.GetSpanPath())
 	md, err := r.store.Head(ctx, r.outPath.GetSpanPath())
 	if err != nil {
 		return false, err
 	}
-	fmt.Println("SpanExists: ", md)
 	return md.Exists(), nil
 }
 

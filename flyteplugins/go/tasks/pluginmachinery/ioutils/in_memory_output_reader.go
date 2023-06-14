@@ -49,7 +49,6 @@ func (r InMemoryOutputReader) DeckExists(_ context.Context) (bool, error) {
 }
 
 func (r InMemoryOutputReader) SpanExists(_ context.Context) (bool, error) {
-	fmt.Printf("InMemoryOutputReader SpanPath: %v\n", r.SpanPath)
 	return r.SpanPath != nil, nil
 }
 
