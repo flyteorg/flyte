@@ -10,7 +10,8 @@ import (
 )
 
 func TestInMemoryOutputReader(t *testing.T) {
-	deckPath := storage.DataReference("s3://bucket/key")
+	deckPath := storage.DataReference("s3://bucket/key/deck.html")
+	spanPath := storage.DataReference("s3://bucket/key/span.pb")
 	lt := map[string]*flyteIdlCore.Literal{
 		"results": {
 			Value: &flyteIdlCore.Literal_Scalar{
@@ -22,9 +23,10 @@ func TestInMemoryOutputReader(t *testing.T) {
 			},
 		},
 	}
-	or := NewInMemoryOutputReader(&flyteIdlCore.LiteralMap{Literals: lt}, &deckPath, nil)
+	or := NewInMemoryOutputReader(&flyteIdlCore.LiteralMap{Literals: lt}, &deckPath, &spanPath, nil)
 
 	assert.Equal(t, &deckPath, or.DeckPath)
+	assert.Equal(t, &spanPath, or.SpanPath)
 	ctx := context.TODO()
 
 	ok, err := or.IsError(ctx)

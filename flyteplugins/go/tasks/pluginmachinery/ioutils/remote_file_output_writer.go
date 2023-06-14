@@ -36,14 +36,10 @@ func (w RemoteFileOutputPaths) GetOutputPath() storage.DataReference {
 }
 
 func (w RemoteFileOutputPaths) GetDeckPath() storage.DataReference {
-	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GetDeckPath!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	fmt.Println(w.store, w.outputPrefix, deckSuffix)
 	return constructPath(w.store, w.outputPrefix, deckSuffix)
 }
 
 func (w RemoteFileOutputPaths) GetSpanPath() storage.DataReference {
-	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GetSpanPath!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	fmt.Println(w.store, w.outputPrefix, spanSuffix)
 	return constructPath(w.store, w.outputPrefix, spanSuffix)
 }
 
