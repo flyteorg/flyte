@@ -48,7 +48,7 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 					},
 				},
 			},
-		}, nil, nil))
+		}, nil, nil, nil))
 }
 
 type QueryInfo struct {

@@ -351,7 +351,7 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation 
 					},
 				},
 			},
-		}, nil, nil))
+		}, nil, nil, nil))
 }
 
 func handleCreateError(createError *googleapi.Error, taskInfo *core.TaskInfo) core.PhaseInfo {

@@ -530,7 +530,7 @@ func WriteOutputs(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 							},
 						},
 					},
-				}, nil, nil))
+				}, nil, nil, nil))
 			if err != nil {
 				logger.Errorf(ctx, "Error writing outputs file: [%s]", err)
 				return currentState, err

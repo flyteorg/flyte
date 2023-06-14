@@ -43,6 +43,8 @@ type OutputReader interface {
 	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
 	// DeckExists checks if the deck file has been generated.
 	DeckExists(ctx context.Context) (bool, error)
+	// SpanExists checks if the span file has been generated.
+	SpanExists(ctx context.Context) (bool, error)
 }
 
 // CheckpointPaths provides the paths / keys to input Checkpoints directory and an output checkpoints directory.

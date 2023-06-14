@@ -253,3 +253,42 @@ func (_m *OutputReader) ReadError(ctx context.Context) (io.ExecutionError, error
 
 	return r0, r1
 }
+
+type OutputReader_SpanExists struct {
+	*mock.Call
+}
+
+func (_m OutputReader_SpanExists) Return(_a0 bool, _a1 error) *OutputReader_SpanExists {
+	return &OutputReader_SpanExists{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *OutputReader) OnSpanExists(ctx context.Context) *OutputReader_SpanExists {
+	c_call := _m.On("SpanExists", ctx)
+	return &OutputReader_SpanExists{Call: c_call}
+}
+
+func (_m *OutputReader) OnSpanExistsMatch(matchers ...interface{}) *OutputReader_SpanExists {
+	c_call := _m.On("SpanExists", matchers...)
+	return &OutputReader_SpanExists{Call: c_call}
+}
+
+// SpanExists provides a mock function with given fields: ctx
+func (_m *OutputReader) SpanExists(ctx context.Context) (bool, error) {
+	ret := _m.Called(ctx)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(context.Context) bool); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

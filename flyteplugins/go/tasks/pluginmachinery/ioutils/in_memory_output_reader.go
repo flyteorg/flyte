@@ -13,6 +13,7 @@ import (
 type InMemoryOutputReader struct {
 	literals *core.LiteralMap
 	DeckPath *storage.DataReference
+	SpanPath *storage.DataReference
 	err      *io.ExecutionError
 }
 
@@ -47,10 +48,16 @@ func (r InMemoryOutputReader) DeckExists(_ context.Context) (bool, error) {
 	return r.DeckPath != nil, nil
 }
 
-func NewInMemoryOutputReader(literals *core.LiteralMap, DeckPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
+func (r InMemoryOutputReader) SpanExists(_ context.Context) (bool, error) {
+	fmt.Printf("InMemoryOutputReader SpanPath: %v\n", r.SpanPath)
+	return r.SpanPath != nil, nil
+}
+
+func NewInMemoryOutputReader(literals *core.LiteralMap, DeckPath *storage.DataReference, SpanPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
 	return InMemoryOutputReader{
 		literals: literals,
 		DeckPath: DeckPath,
+		SpanPath: SpanPath,
 		err:      err,
 	}
 }
