@@ -15,6 +15,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	v1 "k8s.io/api/core/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -104,8 +105,11 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 }
 
 // GetLogs will return the logs for kubeflow job
-func GetLogs(taskType string, name string, namespace string, hasMaster bool,
+func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
+	name := objectMeta.Name
+	namespace := objectMeta.Namespace
+
 	taskLogs := make([]*core.TaskLog, 0, 10)
 
 	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
@@ -118,12 +122,23 @@ func GetLogs(taskType string, name string, namespace string, hasMaster bool,
 		return nil, nil
 	}
 
+	// We use the creation timestamp of the Kubeflow Job as a proxy for the start time of the pods
+	startTime := objectMeta.CreationTimestamp.Time.Unix()
+	// Don't have a good mechanism for this yet, but approximating with time.Now for now
+	finishTime := time.Now().Unix()
+	RFC3999StartTime := time.Unix(startTime, 0).Format(time.RFC3339)
+	RFC3999FinishTime := time.Unix(finishTime, 0).Format(time.RFC3339)
+
 	if taskType == PytorchTaskType && hasMaster {
 		masterTaskLog, masterErr := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				PodName:   name + "-master-0",
-				Namespace: namespace,
-				LogName:   "master",
+				PodName:              name + "-master-0",
+				Namespace:            namespace,
+				LogName:              "master",
+				PodRFC3339StartTime:  RFC3999StartTime,
+				PodRFC3339FinishTime: RFC3999FinishTime,
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
 			},
 		)
 		if masterErr != nil {
@@ -135,8 +150,12 @@ func GetLogs(taskType string, name string, namespace string, hasMaster bool,
 	// get all workers log
 	for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
 		workerLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:   name + fmt.Sprintf("-worker-%d", workerIndex),
-			Namespace: namespace,
+			PodName:              name + fmt.Sprintf("-worker-%d", workerIndex),
+			Namespace:            namespace,
+			PodRFC3339StartTime:  RFC3999StartTime,
+			PodRFC3339FinishTime: RFC3999FinishTime,
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
 		})
 		if err != nil {
 			return nil, err

@@ -203,7 +203,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 	psReplicasCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas
 	chiefCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas
 
-	taskLogs, err := common.GetLogs(common.TensorflowTaskType, app.Name, app.Namespace, false,
+	taskLogs, err := common.GetLogs(common.TensorflowTaskType, app.ObjectMeta, false,
 		*workersCount, *psReplicasCount, *chiefCount)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
