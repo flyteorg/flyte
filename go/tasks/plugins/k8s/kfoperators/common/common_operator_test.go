@@ -14,6 +14,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestExtractMPICurrentCondition(t *testing.T) {
@@ -167,24 +168,57 @@ func TestGetLogs(t *testing.T) {
 	workers := int32(1)
 	launcher := int32(1)
 
-	jobLogs, err := GetLogs(MPITaskType, "test", "mpi-namespace", false, workers, launcher, 0)
+	mpiJobObjectMeta := meta_v1.ObjectMeta{
+		Name:      "test",
+		Namespace: "mpi-namespace",
+	}
+	jobLogs, err := GetLogs(MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].Uri)
 
-	jobLogs, err = GetLogs(PytorchTaskType, "test", "pytorch-namespace", true, workers, launcher, 0)
+	pytorchJobObjectMeta := meta_v1.ObjectMeta{
+		Name:      "test",
+		Namespace: "pytorch-namespace",
+	}
+	jobLogs, err = GetLogs(PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[1].Uri)
 
-	jobLogs, err = GetLogs(TensorflowTaskType, "test", "tensorflow-namespace", false, workers, launcher, 1)
+	tensorflowJobObjectMeta := meta_v1.ObjectMeta{
+		Name:      "test",
+		Namespace: "tensorflow-namespace",
+	}
+
+	jobLogs, err = GetLogs(TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[1].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[2].Uri)
 
+}
+
+func TestGetLogsTemplateUri(t *testing.T) {
+	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
+		IsStackDriverEnabled:   true,
+		StackDriverTemplateURI: "https://console.cloud.google.com/logs/query;query=resource.labels.pod_name={{.podName}}&timestamp>{{.podRFC3339StartTime}}",
+	}))
+
+	pytorchJobObjectMeta := meta_v1.ObjectMeta{
+		Name:      "test",
+		Namespace: "pytorch-namespace",
+		CreationTimestamp: meta_v1.Time{
+			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
+		},
+	}
+	jobLogs, err := GetLogs(PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobLogs))
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[1].Uri)
 }
 
 func dummyPodSpec() v1.PodSpec {

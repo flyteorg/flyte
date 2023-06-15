@@ -204,7 +204,7 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 	numWorkers = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas
 	numLauncherReplicas = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas
 
-	taskLogs, err := common.GetLogs(common.MPITaskType, app.Name, app.Namespace, false,
+	taskLogs, err := common.GetLogs(common.MPITaskType, app.ObjectMeta, false,
 		*numWorkers, *numLauncherReplicas, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
