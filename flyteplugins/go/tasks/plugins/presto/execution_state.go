@@ -447,7 +447,7 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 
 	results := taskTemplate.Interface.Outputs.Variables["results"]
 
-	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(
 		&pb.LiteralMap{
 			Literals: map[string]*pb.Literal{
 				"results": {

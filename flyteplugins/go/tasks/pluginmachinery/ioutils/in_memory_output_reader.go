@@ -52,7 +52,16 @@ func (r InMemoryOutputReader) SpanExists(_ context.Context) (bool, error) {
 	return r.SpanPath != nil, nil
 }
 
-func NewInMemoryOutputReader(literals *core.LiteralMap, DeckPath *storage.DataReference, SpanPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
+// Deprecated: NewInMemoryOutputReader is deprecated. Use NewInMemoryOutputReaderWithSpan instead.
+// func NewInMemoryOutputReader(literals *core.LiteralMap, DeckPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
+// 	return InMemoryOutputReader{
+// 		literals: literals,
+// 		DeckPath: DeckPath,
+// 		err:      err,
+// 	}
+// }
+
+func NewInMemoryOutputReaderWithSpan(literals *core.LiteralMap, DeckPath *storage.DataReference, SpanPath *storage.DataReference, err *io.ExecutionError) InMemoryOutputReader {
 	return InMemoryOutputReader{
 		literals: literals,
 		DeckPath: DeckPath,

@@ -333,7 +333,7 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation 
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
 	}
-	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(
 		&flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
 				"results": {

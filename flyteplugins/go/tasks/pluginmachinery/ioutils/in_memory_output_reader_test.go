@@ -23,7 +23,7 @@ func TestInMemoryOutputReader(t *testing.T) {
 			},
 		},
 	}
-	or := NewInMemoryOutputReader(&flyteIdlCore.LiteralMap{Literals: lt}, &deckPath, &spanPath, nil)
+	or := NewInMemoryOutputReaderWithSpan(&flyteIdlCore.LiteralMap{Literals: lt}, &deckPath, &spanPath, nil)
 
 	assert.Equal(t, &deckPath, or.DeckPath)
 	assert.Equal(t, &spanPath, or.SpanPath)

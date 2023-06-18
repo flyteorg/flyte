@@ -257,7 +257,7 @@ func (m awsSagemakerPlugin) getTaskPhaseForHyperparameterTuningJob(
 			logger.Errorf(ctx, "Failed to create outputs, err: %s", err)
 			return pluginsCore.PhaseInfoUndefined, pluginErrors.Wrapf(pluginErrors.BadTaskSpecification, err, "failed to create outputs for the task")
 		}
-		if err := pluginContext.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(out, nil, nil, nil)); err != nil {
+		if err := pluginContext.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(out, nil, nil, nil)); err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
 		}
 		logger.Debugf(ctx, "Successfully produced and returned outputs")

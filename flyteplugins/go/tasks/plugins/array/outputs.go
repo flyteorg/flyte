@@ -107,7 +107,7 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 	}
 
 	ow := ioutils.NewRemoteFileOutputWriter(ctx, i.dataStore, i.outputPaths)
-	if err = ow.Put(ctx, ioutils.NewInMemoryOutputReader(finalOutputs, nil, nil, nil)); err != nil {
+	if err = ow.Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(finalOutputs, nil, nil, nil)); err != nil {
 		return workqueue.WorkStatusNotDone, err
 	}
 
@@ -313,7 +313,7 @@ func (a assembleErrorsWorker) Process(ctx context.Context, workItem workqueue.Wo
 	}
 
 	ow := ioutils.NewRemoteFileOutputWriter(ctx, w.dataStore, w.outputPaths)
-	if err = ow.Put(ctx, ioutils.NewInMemoryOutputReader(nil, nil, nil, &io.ExecutionError{
+	if err = ow.Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(nil, nil, nil, &io.ExecutionError{
 		ExecutionError: &core.ExecutionError{
 			Code:     "",
 			Message:  msg,
