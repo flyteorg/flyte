@@ -1251,10 +1251,38 @@ public final class Dataproxy {
      * <code>bytes content_md5 = 5;</code>
      */
     com.google.protobuf.ByteString getContentMd5();
+
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    java.lang.String getFilenameRoot();
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getFilenameRootBytes();
   }
   /**
    * <pre>
    * CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+   * The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+   * and then:
+   *   - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+   *   - project/domain/filename_root (if present)/filename (if present).
    * </pre>
    *
    * Protobuf type {@code flyteidl.service.CreateUploadLocationRequest}
@@ -1273,6 +1301,7 @@ public final class Dataproxy {
       domain_ = "";
       filename_ = "";
       contentMd5_ = com.google.protobuf.ByteString.EMPTY;
+      filenameRoot_ = "";
     }
 
     @java.lang.Override
@@ -1333,6 +1362,12 @@ public final class Dataproxy {
             case 42: {
 
               contentMd5_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              filenameRoot_ = s;
               break;
             }
             default: {
@@ -1553,6 +1588,54 @@ public final class Dataproxy {
       return contentMd5_;
     }
 
+    public static final int FILENAME_ROOT_FIELD_NUMBER = 6;
+    private volatile java.lang.Object filenameRoot_;
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    public java.lang.String getFilenameRoot() {
+      java.lang.Object ref = filenameRoot_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        filenameRoot_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFilenameRootBytes() {
+      java.lang.Object ref = filenameRoot_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filenameRoot_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1582,6 +1665,9 @@ public final class Dataproxy {
       if (!contentMd5_.isEmpty()) {
         output.writeBytes(5, contentMd5_);
       }
+      if (!getFilenameRootBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, filenameRoot_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1607,6 +1693,9 @@ public final class Dataproxy {
       if (!contentMd5_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(5, contentMd5_);
+      }
+      if (!getFilenameRootBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, filenameRoot_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1636,6 +1725,8 @@ public final class Dataproxy {
       }
       if (!getContentMd5()
           .equals(other.getContentMd5())) return false;
+      if (!getFilenameRoot()
+          .equals(other.getFilenameRoot())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1659,6 +1750,8 @@ public final class Dataproxy {
       }
       hash = (37 * hash) + CONTENT_MD5_FIELD_NUMBER;
       hash = (53 * hash) + getContentMd5().hashCode();
+      hash = (37 * hash) + FILENAME_ROOT_FIELD_NUMBER;
+      hash = (53 * hash) + getFilenameRoot().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1757,6 +1850,10 @@ public final class Dataproxy {
     /**
      * <pre>
      * CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+     * The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+     * and then:
+     *   - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+     *   - project/domain/filename_root (if present)/filename (if present).
      * </pre>
      *
      * Protobuf type {@code flyteidl.service.CreateUploadLocationRequest}
@@ -1810,6 +1907,8 @@ public final class Dataproxy {
         }
         contentMd5_ = com.google.protobuf.ByteString.EMPTY;
 
+        filenameRoot_ = "";
+
         return this;
       }
 
@@ -1845,6 +1944,7 @@ public final class Dataproxy {
           result.expiresIn_ = expiresInBuilder_.build();
         }
         result.contentMd5_ = contentMd5_;
+        result.filenameRoot_ = filenameRoot_;
         onBuilt();
         return result;
       }
@@ -1910,6 +2010,10 @@ public final class Dataproxy {
         }
         if (other.getContentMd5() != com.google.protobuf.ByteString.EMPTY) {
           setContentMd5(other.getContentMd5());
+        }
+        if (!other.getFilenameRoot().isEmpty()) {
+          filenameRoot_ = other.filenameRoot_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2436,6 +2540,110 @@ public final class Dataproxy {
       public Builder clearContentMd5() {
         
         contentMd5_ = getDefaultInstance().getContentMd5();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object filenameRoot_ = "";
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public java.lang.String getFilenameRoot() {
+        java.lang.Object ref = filenameRoot_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          filenameRoot_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFilenameRootBytes() {
+        java.lang.Object ref = filenameRoot_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filenameRoot_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder setFilenameRoot(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        filenameRoot_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder clearFilenameRoot() {
+        
+        filenameRoot_ = getDefaultInstance().getFilenameRoot();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder setFilenameRootBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        filenameRoot_ = value;
         onChanged();
         return this;
       }
@@ -9545,51 +9753,52 @@ public final class Dataproxy {
       "als.proto\"v\n\034CreateUploadLocationRespons" +
       "e\022\022\n\nsigned_url\030\001 \001(\t\022\022\n\nnative_url\030\002 \001(" +
       "\t\022.\n\nexpires_at\030\003 \001(\0132\032.google.protobuf." +
-      "Timestamp\"\224\001\n\033CreateUploadLocationReques" +
+      "Timestamp\"\253\001\n\033CreateUploadLocationReques" +
       "t\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010fi" +
       "lename\030\003 \001(\t\022-\n\nexpires_in\030\004 \001(\0132\031.googl" +
       "e.protobuf.Duration\022\023\n\013content_md5\030\005 \001(\014" +
-      "\"f\n\035CreateDownloadLocationRequest\022\022\n\nnat" +
-      "ive_url\030\001 \001(\t\022-\n\nexpires_in\030\002 \001(\0132\031.goog" +
-      "le.protobuf.Duration:\002\030\001\"h\n\036CreateDownlo" +
-      "adLocationResponse\022\022\n\nsigned_url\030\001 \001(\t\022." +
-      "\n\nexpires_at\030\002 \001(\0132\032.google.protobuf.Tim" +
-      "estamp:\002\030\001\"\320\001\n\031CreateDownloadLinkRequest" +
-      "\0225\n\rartifact_type\030\001 \001(\0162\036.flyteidl.servi" +
-      "ce.ArtifactType\022-\n\nexpires_in\030\002 \001(\0132\031.go" +
-      "ogle.protobuf.Duration\022C\n\021node_execution" +
-      "_id\030\003 \001(\0132&.flyteidl.core.NodeExecutionI" +
-      "dentifierH\000B\010\n\006source\"\242\001\n\032CreateDownload" +
-      "LinkResponse\022\026\n\nsigned_url\030\001 \003(\tB\002\030\001\0222\n\n" +
-      "expires_at\030\002 \001(\0132\032.google.protobuf.Times" +
-      "tampB\002\030\001\0228\n\017pre_signed_urls\030\003 \001(\0132\037.flyt" +
-      "eidl.service.PreSignedURLs\"S\n\rPreSignedU" +
-      "RLs\022\022\n\nsigned_url\030\001 \003(\t\022.\n\nexpires_at\030\002 " +
-      "\001(\0132\032.google.protobuf.Timestamp\"#\n\016GetDa" +
-      "taRequest\022\021\n\tflyte_url\030\001 \001(\t\"\262\001\n\017GetData" +
-      "Response\0220\n\013literal_map\030\001 \001(\0132\031.flyteidl" +
-      ".core.LiteralMapH\000\022:\n\017pre_signed_urls\030\002 " +
-      "\001(\0132\037.flyteidl.service.PreSignedURLsH\000\022)" +
-      "\n\007literal\030\003 \001(\0132\026.flyteidl.core.LiteralH" +
-      "\000B\006\n\004data*C\n\014ArtifactType\022\033\n\027ARTIFACT_TY" +
-      "PE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012\342" +
-      "\004\n\020DataProxyService\022\240\001\n\024CreateUploadLoca" +
-      "tion\022-.flyteidl.service.CreateUploadLoca" +
-      "tionRequest\032..flyteidl.service.CreateUpl" +
-      "oadLocationResponse\")\202\323\344\223\002#\"\036/api/v1/dat" +
-      "aproxy/artifact_urn:\001*\022\246\001\n\026CreateDownloa" +
-      "dLocation\022/.flyteidl.service.CreateDownl" +
-      "oadLocationRequest\0320.flyteidl.service.Cr" +
-      "eateDownloadLocationResponse\")\210\002\001\202\323\344\223\002 \022" +
-      "\036/api/v1/dataproxy/artifact_urn\022\233\001\n\022Crea" +
-      "teDownloadLink\022+.flyteidl.service.Create" +
-      "DownloadLinkRequest\032,.flyteidl.service.C" +
-      "reateDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api/" +
-      "v1/dataproxy/artifact_link:\001*\022d\n\007GetData" +
-      "\022 .flyteidl.service.GetDataRequest\032!.fly" +
-      "teidl.service.GetDataResponse\"\024\202\323\344\223\002\016\022\014/" +
-      "api/v1/dataB9Z7github.com/flyteorg/flyte" +
-      "idl/gen/pb-go/flyteidl/serviceb\006proto3"
+      "\022\025\n\rfilename_root\030\006 \001(\t\"f\n\035CreateDownloa" +
+      "dLocationRequest\022\022\n\nnative_url\030\001 \001(\t\022-\n\n" +
+      "expires_in\030\002 \001(\0132\031.google.protobuf.Durat" +
+      "ion:\002\030\001\"h\n\036CreateDownloadLocationRespons" +
+      "e\022\022\n\nsigned_url\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(" +
+      "\0132\032.google.protobuf.Timestamp:\002\030\001\"\320\001\n\031Cr" +
+      "eateDownloadLinkRequest\0225\n\rartifact_type" +
+      "\030\001 \001(\0162\036.flyteidl.service.ArtifactType\022-" +
+      "\n\nexpires_in\030\002 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022C\n\021node_execution_id\030\003 \001(\0132&.flyte" +
+      "idl.core.NodeExecutionIdentifierH\000B\010\n\006so" +
+      "urce\"\242\001\n\032CreateDownloadLinkResponse\022\026\n\ns" +
+      "igned_url\030\001 \003(\tB\002\030\001\0222\n\nexpires_at\030\002 \001(\0132" +
+      "\032.google.protobuf.TimestampB\002\030\001\0228\n\017pre_s" +
+      "igned_urls\030\003 \001(\0132\037.flyteidl.service.PreS" +
+      "ignedURLs\"S\n\rPreSignedURLs\022\022\n\nsigned_url" +
+      "\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\"#\n\016GetDataRequest\022\021\n\tflyt" +
+      "e_url\030\001 \001(\t\"\262\001\n\017GetDataResponse\0220\n\013liter" +
+      "al_map\030\001 \001(\0132\031.flyteidl.core.LiteralMapH" +
+      "\000\022:\n\017pre_signed_urls\030\002 \001(\0132\037.flyteidl.se" +
+      "rvice.PreSignedURLsH\000\022)\n\007literal\030\003 \001(\0132\026" +
+      ".flyteidl.core.LiteralH\000B\006\n\004data*C\n\014Arti" +
+      "factType\022\033\n\027ARTIFACT_TYPE_UNDEFINED\020\000\022\026\n" +
+      "\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020DataProxyServi" +
+      "ce\022\240\001\n\024CreateUploadLocation\022-.flyteidl.s" +
+      "ervice.CreateUploadLocationRequest\032..fly" +
+      "teidl.service.CreateUploadLocationRespon" +
+      "se\")\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact_u" +
+      "rn:\001*\022\246\001\n\026CreateDownloadLocation\022/.flyte" +
+      "idl.service.CreateDownloadLocationReques" +
+      "t\0320.flyteidl.service.CreateDownloadLocat" +
+      "ionResponse\")\210\002\001\202\323\344\223\002 \022\036/api/v1/dataprox" +
+      "y/artifact_urn\022\233\001\n\022CreateDownloadLink\022+." +
+      "flyteidl.service.CreateDownloadLinkReque" +
+      "st\032,.flyteidl.service.CreateDownloadLink" +
+      "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
+      "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
+      "ce.GetDataRequest\032!.flyteidl.service.Get" +
+      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB9Z7gi" +
+      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
+      "teidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9619,7 +9828,7 @@ public final class Dataproxy {
     internal_static_flyteidl_service_CreateUploadLocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", });
+        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", "FilenameRoot", });
     internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable = new

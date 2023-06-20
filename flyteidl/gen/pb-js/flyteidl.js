@@ -45833,6 +45833,7 @@
                  * @property {string|null} [filename] CreateUploadLocationRequest filename
                  * @property {google.protobuf.IDuration|null} [expiresIn] CreateUploadLocationRequest expiresIn
                  * @property {Uint8Array|null} [contentMd5] CreateUploadLocationRequest contentMd5
+                 * @property {string|null} [filenameRoot] CreateUploadLocationRequest filenameRoot
                  */
     
                 /**
@@ -45891,6 +45892,14 @@
                 CreateUploadLocationRequest.prototype.contentMd5 = $util.newBuffer([]);
     
                 /**
+                 * CreateUploadLocationRequest filenameRoot.
+                 * @member {string} filenameRoot
+                 * @memberof flyteidl.service.CreateUploadLocationRequest
+                 * @instance
+                 */
+                CreateUploadLocationRequest.prototype.filenameRoot = "";
+    
+                /**
                  * Creates a new CreateUploadLocationRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.CreateUploadLocationRequest
@@ -45924,6 +45933,8 @@
                         $root.google.protobuf.Duration.encode(message.expiresIn, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.contentMd5 != null && message.hasOwnProperty("contentMd5"))
                         writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.contentMd5);
+                    if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.filenameRoot);
                     return writer;
                 };
     
@@ -45959,6 +45970,9 @@
                             break;
                         case 5:
                             message.contentMd5 = reader.bytes();
+                            break;
+                        case 6:
+                            message.filenameRoot = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -45996,6 +46010,9 @@
                     if (message.contentMd5 != null && message.hasOwnProperty("contentMd5"))
                         if (!(message.contentMd5 && typeof message.contentMd5.length === "number" || $util.isString(message.contentMd5)))
                             return "contentMd5: buffer expected";
+                    if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
+                        if (!$util.isString(message.filenameRoot))
+                            return "filenameRoot: string expected";
                     return null;
                 };
     
