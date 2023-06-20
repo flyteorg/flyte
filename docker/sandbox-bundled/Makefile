@@ -58,7 +58,7 @@ start:
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE)
-		export KUBECONFIG=.kube/kubeconfig
+		export KUBECONFIG=$(PWD)/.kube/kubeconfig
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:

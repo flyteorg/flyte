@@ -241,6 +241,12 @@ flytepropeller:
   priorityClassName: ""
 
 #
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
+
+#
 # FLYTECONSOLE SETTINGS
 #
 

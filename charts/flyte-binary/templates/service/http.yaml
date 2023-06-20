@@ -46,6 +46,17 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
+    - name: grpc
+      port: {{ include "flyte-binary.service.grpc.port" . }}
+      targetPort: grpc
+      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePorts.grpc)) }}
+      nodePort: {{ .Values.service.nodePorts.grpc }}
+      {{- else if eq .Values.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    - name: agent-grpc
+      port: {{ include "flyte-binary.flyteagent.grpc.port" . }}
+      targetPort: agent-grpc
     {{- if .Values.service.extraPorts }}
     {{- tpl ( .Values.service.extraPorts | toYaml ) . | nindent 4 }}
     {{- end }}

@@ -16,6 +16,10 @@ flyte-binary:
     database:
       host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
       password: postgres
+    agentService:
+      defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
+      supportedTaskTypes:
+        - bigquery_query_job_task
     storage:
       metadataContainer: my-s3-bucket
       userDataContainer: my-s3-bucket
