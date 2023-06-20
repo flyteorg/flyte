@@ -2,14 +2,14 @@
 ## Background
 Flyte comes with a rich set of overridable defaults ([matchable resources](https://docs.flyte.org/en/latest/deployment/configuration/general.html#deployment-configuration-general)) from everything to default task resource requests, project resource quota, kubernetes labels and annotations for executions and default service accounts.
 
-These can be configured to have default levels across a Flyte installation, on a per-domain basis, on a per-project basis and event at a per-workflow basis.
+These can be configured to have default levels across a Flyte installation, on a per-domain basis, on a per-project basis and even at a per-workflow basis.
 
 Managing these requires setting the defaults at a level of specifity using a variety of [message types](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L14,L38). Furthermore it's difficult to holistically reason about what overrides exist at say, the project level. Updating these overrides is error-prone because there is no existing merge logic and requires understanding the data model to even know what specific matchable resource to specifically update.
 
 Importantly, the current mechanism for applying application overrides is driven imperatively using flytectl and hard to reason about across revisions or manage using [Infrastructure as Code](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code).
 
 ## Proposal
-We should be able to make it simple to view, edit and update defaults for domains, projects and workflows. It should be difficult to unintentionally overwrite changes and easy to understand what is currently applied.
+pdate defaults for domains, e should be able to make it simple to view, edit and update defaults for  the entire platform, domains, projects and workflows. It should be difficult to unintentionally overwrite changes and easy to understand what is currently applied.
 
 ## Overview
 
@@ -42,7 +42,7 @@ project: flytesnacks
 workflow: MyExampleWorkflow
 kind: overrides
 spec:
-  task_resources:
+  taskResources:
     defaults:
       cpu: "1"
       memory: "500Mi"
@@ -50,14 +50,14 @@ spec:
       cpu: "3"
       memory: "2Gi"
       gpu: "4"
-  workflow_execution_config:
+  workflowExecutionConfig:
     inherited: true
     source: project
     labels:
       my-key: "my-value"
-    security_context:
-      core_identity:
-        iam_role: "my_iam_role"
+    securityContext:
+      coreIdentity:
+        iamRole: "my_iam_role"
 status:
   version: 1 # Version for the entire overrides document
 ```
@@ -140,35 +140,35 @@ And the corresponding ConfigMap which gets mounted as a volume mount in the Flyt
 ```
 kind: ConfigMap
 metadata:
-    name: defaults
-    namespace: flyte
-    apiVersion: v1
-    data:
-      defaults.yaml: |
-        # MyExampleWorkflow overrides
-        - project: flytesnacks
-          domain: development
-          workflow: MyExampleWorkflow
-          overrides:
-              task_resources:
-                  defaults:
-                      cpu: "1"
-                      memory: "500Mi"
-                  limits:
-                      cpu: "3"
-                      memory: "2Gi"
-                      gpu: "4"
-              ...         
-        # Flytesnacks/development level overrides            
-        - project: flytesnacks
-          domain: development
-          overrides:
-               workflow_execution_config:
-                    labels:
-                        my-key: "my-value"
-                    security_context:
-                        core_identity:
-                            iam_role: "my_iam_role"
+  name: defaults
+  namespace: flyte
+  apiVersion: v1
+  data:
+    defaults.yaml: |
+      # MyExampleWorkflow overrides
+      - project: flytesnacks
+        domain: development
+        workflow: MyExampleWorkflow
+        overrides:
+          taskResources:
+            defaults:
+              cpu: "1" 
+              memory: "500Mi"
+            limits:
+              cpu: "3" 
+              memory: "2Gi"
+              gpu: "4" 
+            ...    
+      # Flytesnacks/development level overrides    
+      - project: flytesnacks
+        domain: development
+        overrides:
+          workflowExecutionConfig:
+            labels:
+              my-key: "my-value"
+            securityContext:
+              coreIdentity:
+                iamRole: "my_iam_role"
         ...                             
 
 ```
@@ -184,7 +184,7 @@ Getting overrides at a super specific level, for example at the workflow level, 
 That is, the workflow-level document should include all applicable workflow overrides, any project overrides and any domain overrides in one document with inherited overrides marked as such.
 
 ##### Single ConfigMap
-When the FlyteAdmin application starts, it can load the overridable defaults configmap and create an in-memory the mapping of per-project, per-domain and per-workflow overrides.
+When the FlyteAdmin application starts, it can load the overridable defaults configmap and create an in-memory mapping of per-project, per-domain and per-workflow overrides.
 
 At execution time when overrides need to be applied or when a reader calls the `GetOverrides` API directly, the mapping can be queried for the applicable per-project, per-domain and per-workflow overrides, much like the logic currently applied at execution time.
 
