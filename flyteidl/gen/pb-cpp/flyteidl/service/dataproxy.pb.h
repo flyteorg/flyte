@@ -420,6 +420,20 @@ class CreateUploadLocationRequest final :
   ::std::string* release_content_md5();
   void set_allocated_content_md5(::std::string* content_md5);
 
+  // string filename_root = 6;
+  void clear_filename_root();
+  static const int kFilenameRootFieldNumber = 6;
+  const ::std::string& filename_root() const;
+  void set_filename_root(const ::std::string& value);
+  #if LANG_CXX11
+  void set_filename_root(::std::string&& value);
+  #endif
+  void set_filename_root(const char* value);
+  void set_filename_root(const char* value, size_t size);
+  ::std::string* mutable_filename_root();
+  ::std::string* release_filename_root();
+  void set_allocated_filename_root(::std::string* filename_root);
+
   // .google.protobuf.Duration expires_in = 4;
   bool has_expires_in() const;
   void clear_expires_in();
@@ -438,6 +452,7 @@ class CreateUploadLocationRequest final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr filename_;
   ::google::protobuf::internal::ArenaStringPtr content_md5_;
+  ::google::protobuf::internal::ArenaStringPtr filename_root_;
   ::google::protobuf::Duration* expires_in_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fdataproxy_2eproto;
@@ -1834,6 +1849,59 @@ inline void CreateUploadLocationRequest::set_allocated_content_md5(::std::string
   }
   content_md5_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content_md5);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateUploadLocationRequest.content_md5)
+}
+
+// string filename_root = 6;
+inline void CreateUploadLocationRequest::clear_filename_root() {
+  filename_root_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CreateUploadLocationRequest::filename_root() const {
+  // @@protoc_insertion_point(field_get:flyteidl.service.CreateUploadLocationRequest.filename_root)
+  return filename_root_.GetNoArena();
+}
+inline void CreateUploadLocationRequest::set_filename_root(const ::std::string& value) {
+  
+  filename_root_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.service.CreateUploadLocationRequest.filename_root)
+}
+#if LANG_CXX11
+inline void CreateUploadLocationRequest::set_filename_root(::std::string&& value) {
+  
+  filename_root_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.service.CreateUploadLocationRequest.filename_root)
+}
+#endif
+inline void CreateUploadLocationRequest::set_filename_root(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  filename_root_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.service.CreateUploadLocationRequest.filename_root)
+}
+inline void CreateUploadLocationRequest::set_filename_root(const char* value, size_t size) {
+  
+  filename_root_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.service.CreateUploadLocationRequest.filename_root)
+}
+inline ::std::string* CreateUploadLocationRequest::mutable_filename_root() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.CreateUploadLocationRequest.filename_root)
+  return filename_root_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CreateUploadLocationRequest::release_filename_root() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.CreateUploadLocationRequest.filename_root)
+  
+  return filename_root_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CreateUploadLocationRequest::set_allocated_filename_root(::std::string* filename_root) {
+  if (filename_root != nullptr) {
+    
+  } else {
+    
+  }
+  filename_root_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filename_root);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.CreateUploadLocationRequest.filename_root)
 }
 
 // -------------------------------------------------------------------

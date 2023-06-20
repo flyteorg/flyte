@@ -87,6 +87,10 @@ pub struct CreateUploadLocationResponse {
     pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
 }
 /// CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+/// The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+/// and then:
+///    - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+///    - project/domain/filename_root (if present)/filename (if present).
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUploadLocationRequest {
@@ -112,6 +116,12 @@ pub struct CreateUploadLocationRequest {
     /// +required
     #[prost(bytes="vec", tag="5")]
     pub content_md5: ::prost::alloc::vec::Vec<u8>,
+    /// If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+    /// this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+    /// in data proxy config. This option is useful when uploading multiple files.
+    /// +optional
+    #[prost(string, tag="6")]
+    pub filename_root: ::prost::alloc::string::String,
 }
 /// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
 #[allow(clippy::derive_partial_eq_without_eq)]
