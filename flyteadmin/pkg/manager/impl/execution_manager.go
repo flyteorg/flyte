@@ -90,7 +90,6 @@ type ExecutionManager struct {
 	systemMetrics             executionSystemMetrics
 	userMetrics               executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
-	webhookClient             notificationInterfaces.Publisher
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
 	namedEntityManager        interfaces.NamedEntityInterface
@@ -1284,24 +1283,18 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		if err != nil {
 			// The only errors that publishNotifications will forward are those related
 			// to unexpected data and transformation errors.
-			logger.Debugf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
-				request, err)
-			return nil, err
-		}
-		err = m.publishWebhookNotifications(ctx, request, *executionModel)
-		if err != nil {
-			// The only errors that publishNotifications will forward are those related
-			// to unexpected data and transformation errors.
-			logger.Debugf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
+			logger.Errorf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
 				request, err)
 			return nil, err
 		}
 	}
 
-	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
-		m.systemMetrics.PublishEventError.Inc()
-		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
-	}
+	go func() {
+		if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+			m.systemMetrics.PublishEventError.Inc()
+			logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+		}
+	}()
 
 	go func() {
 		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
@@ -1539,58 +1532,13 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 		}
 
 		// Convert the email Notification into an email message to be published.
-		// Currently, there are no possible errors while creating an email message.
+		// Currently there are no possible errors while creating an email message.
 		// Once customizable content is specified, errors are possible.
 		email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
 			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
-
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
-		if err = m.notificationClient.Publish(ctx, proto.MessageName(email), email); err != nil {
-			m.systemMetrics.PublishNotificationError.Inc()
-			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
-		}
-	}
-	return nil
-}
-
-func (m *ExecutionManager) publishWebhookNotifications(ctx context.Context, request admin.WorkflowExecutionEventRequest,
-	execution models.Execution) error {
-	adminExecution, err := transformers.FromExecutionModel(execution, transformers.DefaultExecutionTransformerOptions)
-	if err != nil {
-		// This shouldn't happen because execution manager marshaled the data into models.Execution.
-		m.systemMetrics.TransformerError.Inc()
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to transform execution [%+v] with err: %v", request.Event.ExecutionId, err)
-	}
-	var notificationsList = adminExecution.Closure.Notifications
-	logger.Debugf(ctx, "publishing notifications for execution [%+v] in state [%+v] for notifications [%+v]",
-		request.Event.ExecutionId, request.Event.Phase, notificationsList)
-	// payloads[phase][name] = body
-	payloads := make(map[string]string)
-	for _, w := range m.config.ApplicationConfiguration().GetWebhookNotificationConfig().WebhooksConfig {
-		payloads[w.Name] = w.Payload
-	}
-
-	for _, notification := range notificationsList {
-		// Check if the notification phase matches the current one.
-		var matchPhase = false
-		for _, phase := range notification.Phases {
-			if phase == request.Event.Phase {
-				matchPhase = true
-			}
-		}
-
-		// The current phase doesn't match; no notifications will be sent for the current notification option.
-		if !matchPhase {
-			continue
-		}
-
-		payload := &admin.WebhookPayload{Message: notifications.SubstituteParameters(payloads["slack"], request, adminExecution)}
-		// TODO: Add message attributes
-
-		// Errors seen while publishing a message are considered non-fatal to the method and will not result
-		// in the method returning an error.
-		if err = m.webhookClient.Publish(ctx, "slack ", payload); err != nil {
+		if err = m.notificationClient.Publish(ctx, proto.MessageName(&emailNotification), email); err != nil {
 			m.systemMetrics.PublishNotificationError.Inc()
 			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
 		}
@@ -1679,8 +1627,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
-	notificationPublisher notificationInterfaces.Publisher, publisher notificationInterfaces.Publisher,
-	urlData dataInterfaces.RemoteURLInterface,
+	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
@@ -1706,8 +1653,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		_clock:                    clock.New(),
 		systemMetrics:             systemMetrics,
 		userMetrics:               userMetrics,
-		notificationClient:        notificationPublisher,
-		webhookClient:             publisher,
+		notificationClient:        publisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
 		namedEntityManager:        namedEntityManager,

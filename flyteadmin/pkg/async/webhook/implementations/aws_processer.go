@@ -4,12 +4,17 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
+	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/flyteorg/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	webhookInterfaces "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -19,6 +24,7 @@ import (
 type Processor struct {
 	sub           pubsub.Subscriber
 	webhook       webhookInterfaces.Webhook
+	db            repoInterfaces.Repository
 	systemMetrics processorSystemMetrics
 }
 
@@ -33,12 +39,12 @@ func (p *Processor) StartProcessing() {
 
 func (p *Processor) run() error {
 	var payload admin.WebhookPayload
+	var request admin.WorkflowExecutionEventRequest
 	var err error
 	for msg := range p.sub.Start() {
 		p.systemMetrics.MessageTotal.Inc()
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
 		stringMsg := string(msg.Message())
-
 		var snsJSONFormat map[string]interface{}
 
 		// At Lyft, SNS populates SQS. This results in the message body of SQS having the SNS message format.
@@ -54,6 +60,9 @@ func (p *Processor) run() error {
 		var value interface{}
 		var ok bool
 		var valueString string
+		var messageType string
+
+		logger.Warningf(context.Background(), "snsJSONFormat: [%v]", snsJSONFormat)
 
 		if value, ok = snsJSONFormat["Message"]; !ok {
 			logger.Errorf(context.Background(), "failed to retrieve message from unmarshalled JSON object [%s]", stringMsg)
@@ -69,9 +78,31 @@ func (p *Processor) run() error {
 			continue
 		}
 
+		if value, ok = snsJSONFormat["Subject"]; !ok {
+			logger.Errorf(context.Background(), "failed to retrieve message type from unmarshalled JSON object [%s]", stringMsg)
+			p.systemMetrics.MessageDataError.Inc()
+			p.markMessageDone(msg)
+			continue
+		}
+
+		if messageType, ok = value.(string); !ok {
+			p.systemMetrics.MessageDataError.Inc()
+			logger.Errorf(context.Background(), "failed to retrieve notification message type (in string format) from unmarshalled JSON object for message [%s]", stringMsg)
+			p.markMessageDone(msg)
+			continue
+		}
+		logger.Warningf(context.Background(), "Message Subject is [%s]", messageType)
+
+		// flyteidl.admin.WorkflowExecutionEventRequest
+		if messageType != proto.MessageName(&admin.WorkflowExecutionEventRequest{}) {
+			p.markMessageDone(msg)
+			logger.Warningf(context.Background(), "Message Subject [%v] is not flyteidl.admin.WorkflowExecutionEventRequest", messageType)
+			continue
+		}
+
 		// The Publish method for SNS Encodes the notification using Base64 then stringifies it before
 		// setting that as the message body for SNS. Do the inverse to retrieve the notification.
-		notificationBytes, err := base64.StdEncoding.DecodeString(valueString)
+		requestBytes, err := base64.StdEncoding.DecodeString(valueString)
 		if err != nil {
 			logger.Errorf(context.Background(), "failed to Base64 decode from message string [%s] from message [%s] with err: %v", valueString, stringMsg, err)
 			p.systemMetrics.MessageDecodingError.Inc()
@@ -79,15 +110,22 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		if err = proto.Unmarshal(notificationBytes, &payload); err != nil {
-			logger.Debugf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
+		if err = proto.Unmarshal(requestBytes, &request); err != nil {
+			logger.Errorf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
 			p.systemMetrics.MessageDecodingError.Inc()
 			p.markMessageDone(msg)
 			continue
 		}
 
+		if common.IsExecutionTerminal(request.Event.Phase) == false {
+			p.markMessageDone(msg)
+			continue
+		}
+
+		executionModel, err := util.GetExecutionModel(context.Background(), p.db, *request.Event.ExecutionId)
+		adminExecution, err := transformers.FromExecutionModel(*executionModel, transformers.DefaultExecutionTransformerOptions)
+		payload.Message = notifications.SubstituteParameters(p.webhook.GetConfig().Payload, request, adminExecution)
 		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
-		// Send message to webhook
 		if err = p.webhook.Post(context.Background(), payload); err != nil {
 			p.systemMetrics.MessageProcessorError.Inc()
 			logger.Errorf(context.Background(), "Error sending an message [%v] to webhook endpoint with err: %v", payload, err)
@@ -123,10 +161,11 @@ func (p *Processor) StopProcessing() error {
 	return err
 }
 
-func NewWebhookProcessor(sub pubsub.Subscriber, webhook webhookInterfaces.Webhook, scope promutils.Scope) interfaces.Processor {
+func NewWebhookProcessor(sub pubsub.Subscriber, webhook webhookInterfaces.Webhook, db repoInterfaces.Repository, scope promutils.Scope) interfaces.Processor {
 	return &Processor{
 		sub:           sub,
 		webhook:       webhook,
+		db:            db,
 		systemMetrics: newProcessorSystemMetrics(scope.NewSubScope("webhook_processor")),
 	}
 }

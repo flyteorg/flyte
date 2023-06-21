@@ -100,21 +100,21 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
 
-	notificationPublisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
+	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
 	}()
 
-	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
-	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
-
-	publisher := notifications.NewWebhookNotificationsPublisher(*configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
-	webhookProcessors := webhook.NewWebhookProcessors(*configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
+	webhookProcessors := webhook.NewWebhookProcessors(repo, *configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing webhook events.")
-		webhookProcessors[0].StartProcessing()
+		for _, webhookProcessor := range webhookProcessors {
+			webhookProcessor.StartProcessing()
+		}
 	}()
 
 	// Configure workflow scheduler async processes.
@@ -153,7 +153,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		notificationPublisher, publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)

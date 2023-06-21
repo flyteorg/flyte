@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
@@ -20,10 +21,13 @@ var enable64decoding = false
 
 func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) webhookInterfaces.Webhook {
 	// TODO: Get others webhooks
+	if config.Name == "slack" {
+		return implementations.NewSlackWebhook(config, scope)
+	}
 	return implementations.NewSlackWebhook(config, scope)
 }
 
-func NewWebhookProcessors(config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) []interfaces.Processor {
+func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) []interfaces.Processor {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
@@ -44,7 +48,7 @@ func NewWebhookProcessors(config runtimeInterfaces.WebhookNotificationsConfig, s
 			err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 				sub, err = gizmoAWS.NewSubscriber(sqsConfig)
 				if err != nil {
-					logger.Warnf(context.TODO(), "Failed to initialize new gizmo aws subscriber with config [%+v] and err: %v", sqsConfig, err)
+					logger.Errorf(context.TODO(), "Failed to initialize new gizmo aws subscriber with config [%+v] and err: %v", sqsConfig, err)
 				}
 				return err
 			})
@@ -54,7 +58,7 @@ func NewWebhookProcessors(config runtimeInterfaces.WebhookNotificationsConfig, s
 		}
 
 		webhook := GetWebhook(cfg, scope)
-		processors = append(processors, implementations.NewWebhookProcessor(sub, webhook, scope))
+		processors = append(processors, implementations.NewWebhookProcessor(sub, webhook, db, scope))
 	}
 	return processors
 }

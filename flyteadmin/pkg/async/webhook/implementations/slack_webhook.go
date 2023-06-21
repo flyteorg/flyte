@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"io/ioutil"
 	"net/http"
 
@@ -16,14 +17,19 @@ import (
 )
 
 type SlackWebhook struct {
-	config        runtimeInterfaces.WebHookConfig
+	Config        runtimeInterfaces.WebHookConfig
 	systemMetrics webhookMetrics
+}
+
+func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
+	//TODO implement me
+	return s.Config
 }
 
 func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) error {
 	// curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
 	logger.Infof(ctx, "Posting to Slack with message: [%v]", payload.Message)
-	webhookURL := s.config.URL
+	webhookURL := s.Config.URL
 	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Message))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
 	if err != nil {
@@ -31,6 +37,16 @@ func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) e
 		return err
 	}
 	request.Header.Add("Content-Type", "application/json")
+	if len(s.Config.SecretName) != 0 {
+		sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+		token, err := sm.Get(ctx, s.Config.SecretName)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get secret from secret manager with error: %v", err)
+			return err
+		}
+		request.Header.Add("Authorization", "Bearer "+token)
+	}
+
 	client := &http.Client{}
 	resp, err := client.Do(request)
 	if err != nil {
@@ -52,7 +68,7 @@ func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) e
 func NewSlackWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) interfaces.Webhook {
 
 	return &SlackWebhook{
-		config:        config,
+		Config:        config,
 		systemMetrics: newWebhookMetrics(scope.NewSubScope("slack_webhook")),
 	}
 }

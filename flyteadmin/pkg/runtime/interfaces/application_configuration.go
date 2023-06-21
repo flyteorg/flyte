@@ -563,13 +563,10 @@ type WebHookConfig struct {
 
 // WebhookNotificationsConfig defines the configuration for the webhook service.
 type WebhookNotificationsConfig struct {
-	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
-	// scheme is used.
-	Type                         string                       `json:"type"`
-	AWSConfig                    AWSConfig                    `json:"aws"`
-	GCPConfig                    GCPConfig                    `json:"gcp"`
-	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
-	WebhooksConfig               []WebHookConfig              `json:"webhooks"`
+	AWSConfig AWSConfig `json:"aws"`
+	GCPConfig GCPConfig `json:"gcp"`
+	// Defines the list of webhooks to be configured.
+	WebhooksConfig []WebHookConfig `json:"webhooks"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
