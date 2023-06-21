@@ -17,14 +17,16 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
+const Slack = "slack"
+
 var enable64decoding = false
 
 func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) webhookInterfaces.Webhook {
 	// TODO: Get others webhooks
-	if config.Name == "slack" {
+	if config.Name == Slack {
 		return implementations.NewSlackWebhook(config, scope)
 	}
-	return implementations.NewSlackWebhook(config, scope)
+	return nil
 }
 
 func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) []interfaces.Processor {
@@ -58,7 +60,9 @@ func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces
 		}
 
 		webhook := GetWebhook(cfg, scope)
-		processors = append(processors, implementations.NewWebhookProcessor(sub, webhook, db, scope))
+		if webhook != nil {
+			processors = append(processors, implementations.NewWebhookProcessor(sub, webhook, db, scope))
+		}
 	}
 	return processors
 }
