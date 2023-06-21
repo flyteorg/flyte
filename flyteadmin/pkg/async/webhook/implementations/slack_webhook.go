@@ -27,8 +27,6 @@ func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
 }
 
 func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) error {
-	// curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
-	logger.Infof(ctx, "Posting to Slack with message: [%v]", payload.Message)
 	webhookURL := s.Config.URL
 	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Message))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))

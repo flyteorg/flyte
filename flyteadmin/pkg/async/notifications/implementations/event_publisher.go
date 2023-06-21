@@ -54,6 +54,7 @@ func (p *EventPublisher) Publish(ctx context.Context, notificationType string, m
 		return nil
 	}
 	p.systemMetrics.PublishTotal.Inc()
+
 	logger.Debugf(ctx, "Publishing the following message [%+v]", msg)
 	err := p.pub.Publish(ctx, notificationType, msg)
 	if err != nil {

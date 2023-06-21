@@ -12,7 +12,7 @@ type Payload struct {
 	Value string `protobuf:"bytes,1,opt,value=value"`
 }
 
-// Webhook Defines the interface for Publishing execution event to other services (Slack).
+// Webhook Defines the interface for Publishing execution event to other services, such as slack.
 type Webhook interface {
 	// Post The notificationType is inferred from the Notification object in the Execution Spec.
 	Post(ctx context.Context, payload admin.WebhookPayload) error

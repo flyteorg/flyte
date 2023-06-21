@@ -47,9 +47,6 @@ func (p *Processor) run() error {
 		stringMsg := string(msg.Message())
 		var snsJSONFormat map[string]interface{}
 
-		// At Lyft, SNS populates SQS. This results in the message body of SQS having the SNS message format.
-		// The message format is documented here: https://docs.aws.amazon.com/sns/latest/dg/sns-message-and-json-formats.html
-		// The notification published is stored in the message field after unmarshalling the SQS message.
 		if err := json.Unmarshal(msg.Message(), &snsJSONFormat); err != nil {
 			p.systemMetrics.MessageDecodingError.Inc()
 			logger.Errorf(context.Background(), "failed to unmarshall JSON message [%s] from processor with err: %v", stringMsg, err)
@@ -61,8 +58,6 @@ func (p *Processor) run() error {
 		var ok bool
 		var valueString string
 		var messageType string
-
-		logger.Warningf(context.Background(), "snsJSONFormat: [%v]", snsJSONFormat)
 
 		if value, ok = snsJSONFormat["Message"]; !ok {
 			logger.Errorf(context.Background(), "failed to retrieve message from unmarshalled JSON object [%s]", stringMsg)
@@ -91,12 +86,9 @@ func (p *Processor) run() error {
 			p.markMessageDone(msg)
 			continue
 		}
-		logger.Warningf(context.Background(), "Message Subject is [%s]", messageType)
 
-		// flyteidl.admin.WorkflowExecutionEventRequest
 		if messageType != proto.MessageName(&admin.WorkflowExecutionEventRequest{}) {
 			p.markMessageDone(msg)
-			logger.Warningf(context.Background(), "Message Subject [%v] is not flyteidl.admin.WorkflowExecutionEventRequest", messageType)
 			continue
 		}
 
@@ -138,7 +130,7 @@ func (p *Processor) run() error {
 
 	if err = p.sub.Err(); err != nil {
 		p.systemMetrics.ChannelClosedError.Inc()
-		logger.Warningf(context.Background(), "The stream for the subscriber channel closed with err: %v", err)
+		logger.Errorf(context.Background(), "The stream for the subscriber channel closed with err: %v", err)
 	}
 
 	return err
