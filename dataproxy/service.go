@@ -77,10 +77,16 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	}
 
 	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
-	urlSafeMd5 := base32.StdEncoding.EncodeToString(req.ContentMd5)
 
+	var prefix string
+	if len(req.FilenameRoot) > 0 {
+		prefix = req.FilenameRoot
+	} else {
+		// url safe base32 encoding
+		prefix = base32.StdEncoding.EncodeToString(req.ContentMd5)
+	}
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-		req.Project, req.Domain, urlSafeMd5, req.Filename)
+		req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
 	}
