@@ -9,7 +9,7 @@ Managing these requires setting the defaults at a level of specifity using a var
 Importantly, the current mechanism for applying application overrides is driven imperatively using flytectl and hard to reason about across revisions or manage using [Infrastructure as Code](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code).
 
 ## Proposal
-pdate defaults for domains, e should be able to make it simple to view, edit and update defaults for  the entire platform, domains, projects and workflows. It should be difficult to unintentionally overwrite changes and easy to understand what is currently applied.
+We should be able to make it simple to view, edit and update defaults for the entire platform, domains, projects and workflows. It should be difficult to unintentionally overwrite changes and easy to understand what is currently applied.
 
 ## Overview
 
