@@ -67,14 +67,15 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	}
 
 	launchCtx := launchplan.LaunchContext{
-		ParentNodeExecution: parentNodeExecutionID,
-		MaxParallelism:      nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism,
-		SecurityContext:     nCtx.ExecutionContext().GetSecurityContext(),
-		RawOutputDataConfig: nCtx.ExecutionContext().GetRawOutputDataConfig().RawOutputDataConfig,
-		Labels:              nCtx.ExecutionContext().GetLabels(),
-		Annotations:         nCtx.ExecutionContext().GetAnnotations(),
-		Interruptible:       nCtx.ExecutionContext().GetExecutionConfig().Interruptible,
-		OverwriteCache:      nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache,
+		ParentNodeExecution:  parentNodeExecutionID,
+		MaxParallelism:       nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism,
+		SecurityContext:      nCtx.ExecutionContext().GetSecurityContext(),
+		RawOutputDataConfig:  nCtx.ExecutionContext().GetRawOutputDataConfig().RawOutputDataConfig,
+		Labels:               nCtx.ExecutionContext().GetLabels(),
+		Annotations:          nCtx.ExecutionContext().GetAnnotations(),
+		Interruptible:        nCtx.ExecutionContext().GetExecutionConfig().Interruptible,
+		OverwriteCache:       nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache,
+		EnvironmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 	}
 
 	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
