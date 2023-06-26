@@ -251,7 +251,7 @@ spec:
                 name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
             {{- if .Values.configuration.auth.clientSecretsExternalSecretRef }}
             - secret:
-                name: {{ .Values.configuration.auth.clientSecretsExternalSecretRef }}
+                name: {{ tpl .Values.configuration.auth.clientSecretsExternalSecretRef . }}
             {{- else }}
             - secret:
                 name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
