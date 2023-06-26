@@ -35,12 +35,10 @@ spec:
       annotations:
         {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
         checksum/configuration: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/configuration-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
         {{- end }}
         {{- if not .Values.clusterResourceTemplates.externalConfigMap }}
         checksum/cluster-resource-templates: {{ include (print $.Template.BasePath "/cluster-resource-templates.yaml") . | sha256sum }}
-        {{- end }}
-        {{- if and .Values.configuration.database.password (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
-        checksum/db-password-secret: {{ include (print $.Template.BasePath "/db-password-secret.yaml") . | sha256sum }}
         {{- end }}
         {{- if .Values.configuration.auth.enabled }}
         checksum/admin-auth-secret: {{ include (print $.Template.BasePath "/admin-auth-secret.yaml") . | sha256sum }}
@@ -219,11 +217,6 @@ spec:
               mountPath: /etc/flyte/cluster-resource-templates
             - name: config
               mountPath: /etc/flyte/config.d
-            {{- if and .Values.configuration.database.password (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
-            - name: db-pass
-              mountPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . }}
-              subPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . | base }}
-            {{- end }}
             - name: state
               mountPath: /var/run/flyte
             {{- if .Values.deployment.extraVolumeMounts }}
@@ -288,6 +281,8 @@ spec:
             sources:
             - configMap:
                 name: {{ include "flyte-binary.configuration.configMapName" . }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.configSecretName" . }}
             {{- if .Values.configuration.inlineConfigMap }}
             - configMap:
                 name: {{ tpl .Values.configuration.inlineConfigMap . }}
@@ -297,11 +292,6 @@ spec:
                 name: {{ tpl .Values.configuration.inlineSecretRef . }}
             {{- end }}
           {{- end }}
-        {{- if and .Values.configuration.database.password (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
-        - name: db-pass
-          secret:
-            secretName: {{ include "flyte-binary.configuration.database.passwordSecretName" . }}
-        {{- end }}
         - name: state
           emptyDir: {}
         {{- if .Values.deployment.extraVolumes }}

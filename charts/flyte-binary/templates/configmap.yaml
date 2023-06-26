@@ -66,11 +66,6 @@ data:
     database:
       postgres:
         username: {{ .username }}
-        {{- if .password }}
-        passwordPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" $ }}
-        {{- else }}
-        passwordPath: {{ .passwordPath | quote }}
-        {{- end }}
         host: {{ tpl .host $ }}
         port: {{ .port }}
         dbname: {{ .dbname }}
@@ -97,8 +92,6 @@ data:
           auth_type: iam
           {{- else if eq "accesskey" .authType }}
           auth_type: accesskey
-          access_key_id: {{ required "Access key required for S3 storage provider" .accessKey }}
-          secret_key: {{ required "Secret key required for S3 storage provider" .secretKey }}
           {{- else }}
           {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
           {{- end }}
@@ -122,7 +115,6 @@ data:
         selfAuthServer:
           staticClients:
             flytepropeller:
-              client_secret: {{ .Values.configuration.auth.internal.clientSecretHash | quote }}
               grant_types:
               - refresh_token
               - client_credentials
@@ -188,7 +180,7 @@ data:
         useAuth: true
   {{- end }}
   {{- if .Values.configuration.inline }}
-  010-inline-config.yaml: |
+  100-inline-config.yaml: |
     {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
   {{- end }}
 {{- end }}
