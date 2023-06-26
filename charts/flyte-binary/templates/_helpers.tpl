@@ -62,6 +62,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Flag to use external configuration.
+*/}}
+{{- define "flyte-binary.configuration.externalConfiguration" -}}
+{{- or .Values.configuration.externalConfigMap .Values.configuration.externalSecretRef -}}
+{{- end -}}
+
+{{/*
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
