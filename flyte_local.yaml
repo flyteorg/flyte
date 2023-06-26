@@ -7,7 +7,7 @@
 # flyte start --config flyte_local.yaml
 propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
-  kube-config: "/root/.kube/config"
+  kube-config: "$HOME/.flyte/sandbox/kubeconfig"
   create-flyteworkflow-crd: true
 webhook:
   certDir: /tmp/k8s-webhook-server/serving-certs
@@ -24,7 +24,7 @@ tasks:
       - container: container
       - container_array: K8S-ARRAY
 server:
-  kube-config: "/root/.kube/config"
+  kube-config: "$HOME/.flyte/sandbox/kubeconfig"
 flyteadmin:
   runScheduler: false
 database:
@@ -108,5 +108,3 @@ catalog-cache:
   endpoint: localhost:8081
   insecure: true
   type: datacatalog
-
-
