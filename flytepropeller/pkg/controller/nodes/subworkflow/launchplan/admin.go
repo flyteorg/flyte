@@ -102,6 +102,14 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
+	environmentVariables := make([]*core.KeyValuePair, 0, len(launchCtx.EnvironmentVariables))
+	for k, v := range launchCtx.EnvironmentVariables {
+		environmentVariables = append(environmentVariables, &core.KeyValuePair{
+			Key:   k,
+			Value: v,
+		})
+	}
+
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
@@ -122,6 +130,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
 			Interruptible:       interruptible,
 			OverwriteCache:      launchCtx.OverwriteCache,
+			Envs:                &admin.Envs{Values: environmentVariables},
 		},
 	}
 

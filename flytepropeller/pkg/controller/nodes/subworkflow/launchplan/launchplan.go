@@ -25,11 +25,12 @@ type LaunchContext struct {
 	// MaxParallelism
 	MaxParallelism uint32
 	// RawOutputDataConfig
-	RawOutputDataConfig *admin.RawOutputDataConfig
-	Annotations         map[string]string
-	Labels              map[string]string
-	Interruptible       *bool
-	OverwriteCache      bool
+	RawOutputDataConfig  *admin.RawOutputDataConfig
+	Annotations          map[string]string
+	Labels               map[string]string
+	Interruptible        *bool
+	OverwriteCache       bool
+	EnvironmentVariables map[string]string
 }
 
 // Executor interface to be implemented by the remote system that can allow workflow launching capabilities
