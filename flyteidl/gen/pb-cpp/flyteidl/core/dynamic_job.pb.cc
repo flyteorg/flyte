@@ -19,7 +19,7 @@
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Binding_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_BranchNode_flyteidl_2fcore_2fworkflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_ArrayNode_flyteidl_2fcore_2fworkflow_2eproto;
 namespace flyteidl {
 namespace core {
 class DynamicJobSpecDefaultTypeInternal {
@@ -41,7 +41,7 @@ static void InitDefaultsDynamicJobSpec_flyteidl_2fcore_2fdynamic_5fjob_2eproto()
 
 ::google::protobuf::internal::SCCInfo<4> scc_info_DynamicJobSpec_flyteidl_2fcore_2fdynamic_5fjob_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 4, InitDefaultsDynamicJobSpec_flyteidl_2fcore_2fdynamic_5fjob_2eproto}, {
-      &scc_info_BranchNode_flyteidl_2fcore_2fworkflow_2eproto.base,
+      &scc_info_ArrayNode_flyteidl_2fcore_2fworkflow_2eproto.base,
       &scc_info_Binding_flyteidl_2fcore_2fliterals_2eproto.base,
       &scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto.base,
       &scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto.base,}};

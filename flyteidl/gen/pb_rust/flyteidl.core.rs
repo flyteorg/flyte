@@ -2078,6 +2078,41 @@ pub mod gate_node {
         Sleep(super::SleepCondition),
     }
 }
+/// ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input
+/// values. An ArrayNode can be executed with configurable parallelism (separate from the parent
+/// workflow) and can be configured to succeed when a certain number of sub-nodes succeed.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArrayNode {
+    /// node is the sub-node that will be executed for each element in the array.
+    #[prost(message, optional, boxed, tag="1")]
+    pub node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
+    /// parallelism defines the minimum number of instances to bring up concurrently at any given
+    /// point. Note that this is an optimistic restriction and that, due to network partitioning or
+    /// other failures, the actual number of currently running instances might be more. This has to
+    /// be a positive number if assigned. Default value is size.
+    #[prost(uint32, tag="2")]
+    pub parallelism: u32,
+    #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
+    pub success_criteria: ::core::option::Option<array_node::SuccessCriteria>,
+}
+/// Nested message and enum types in `ArrayNode`.
+pub mod array_node {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum SuccessCriteria {
+        /// min_successes is an absolute number of the minimum number of successful completions of
+        /// sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+        /// and outputs will be computed. This has to be a non-negative number if assigned. Default
+        /// value is size (if specified).
+        #[prost(uint32, tag="3")]
+        MinSuccesses(u32),
+        /// If the array job size is not known beforehand, the min_success_ratio can instead be used
+        /// to determine when an ArrayNode can be marked successful.
+        #[prost(float, tag="4")]
+        MinSuccessRatio(f32),
+    }
+}
 /// Defines extra information about the Node.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2143,7 +2178,7 @@ pub struct Node {
     #[prost(message, repeated, tag="5")]
     pub output_aliases: ::prost::alloc::vec::Vec<Alias>,
     /// Information about the target to execute in this node.
-    #[prost(oneof="node::Target", tags="6, 7, 8, 9")]
+    #[prost(oneof="node::Target", tags="6, 7, 8, 9, 10")]
     pub target: ::core::option::Option<node::Target>,
 }
 /// Nested message and enum types in `Node`.
@@ -2164,6 +2199,10 @@ pub mod node {
         /// Information about the condition to evaluate in this node.
         #[prost(message, tag="9")]
         GateNode(super::GateNode),
+        /// Information about the sub-node executions for each value in the list of this nodes
+        /// inputs values.
+        #[prost(message, tag="10")]
+        ArrayNode(::prost::alloc::boxed::Box<super::ArrayNode>),
     }
 }
 /// This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not

@@ -89,6 +89,18 @@ class GateNode(_message.Message):
     sleep: SleepCondition
     def __init__(self, approve: _Optional[_Union[ApproveCondition, _Mapping]] = ..., signal: _Optional[_Union[SignalCondition, _Mapping]] = ..., sleep: _Optional[_Union[SleepCondition, _Mapping]] = ...) -> None: ...
 
+class ArrayNode(_message.Message):
+    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio"]
+    NODE_FIELD_NUMBER: _ClassVar[int]
+    PARALLELISM_FIELD_NUMBER: _ClassVar[int]
+    MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
+    MIN_SUCCESS_RATIO_FIELD_NUMBER: _ClassVar[int]
+    node: Node
+    parallelism: int
+    min_successes: int
+    min_success_ratio: float
+    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ...) -> None: ...
+
 class NodeMetadata(_message.Message):
     __slots__ = ["name", "timeout", "retries", "interruptible"]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -110,7 +122,7 @@ class Alias(_message.Message):
     def __init__(self, var: _Optional[str] = ..., alias: _Optional[str] = ...) -> None: ...
 
 class Node(_message.Message):
-    __slots__ = ["id", "metadata", "inputs", "upstream_node_ids", "output_aliases", "task_node", "workflow_node", "branch_node", "gate_node"]
+    __slots__ = ["id", "metadata", "inputs", "upstream_node_ids", "output_aliases", "task_node", "workflow_node", "branch_node", "gate_node", "array_node"]
     ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
@@ -120,6 +132,7 @@ class Node(_message.Message):
     WORKFLOW_NODE_FIELD_NUMBER: _ClassVar[int]
     BRANCH_NODE_FIELD_NUMBER: _ClassVar[int]
     GATE_NODE_FIELD_NUMBER: _ClassVar[int]
+    ARRAY_NODE_FIELD_NUMBER: _ClassVar[int]
     id: str
     metadata: NodeMetadata
     inputs: _containers.RepeatedCompositeFieldContainer[_literals_pb2.Binding]
@@ -129,7 +142,8 @@ class Node(_message.Message):
     workflow_node: WorkflowNode
     branch_node: BranchNode
     gate_node: GateNode
-    def __init__(self, id: _Optional[str] = ..., metadata: _Optional[_Union[NodeMetadata, _Mapping]] = ..., inputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., upstream_node_ids: _Optional[_Iterable[str]] = ..., output_aliases: _Optional[_Iterable[_Union[Alias, _Mapping]]] = ..., task_node: _Optional[_Union[TaskNode, _Mapping]] = ..., workflow_node: _Optional[_Union[WorkflowNode, _Mapping]] = ..., branch_node: _Optional[_Union[BranchNode, _Mapping]] = ..., gate_node: _Optional[_Union[GateNode, _Mapping]] = ...) -> None: ...
+    array_node: ArrayNode
+    def __init__(self, id: _Optional[str] = ..., metadata: _Optional[_Union[NodeMetadata, _Mapping]] = ..., inputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., upstream_node_ids: _Optional[_Iterable[str]] = ..., output_aliases: _Optional[_Iterable[_Union[Alias, _Mapping]]] = ..., task_node: _Optional[_Union[TaskNode, _Mapping]] = ..., workflow_node: _Optional[_Union[WorkflowNode, _Mapping]] = ..., branch_node: _Optional[_Union[BranchNode, _Mapping]] = ..., gate_node: _Optional[_Union[GateNode, _Mapping]] = ..., array_node: _Optional[_Union[ArrayNode, _Mapping]] = ...) -> None: ...
 
 class WorkflowMetadata(_message.Message):
     __slots__ = ["quality_of_service", "on_failure", "tags"]

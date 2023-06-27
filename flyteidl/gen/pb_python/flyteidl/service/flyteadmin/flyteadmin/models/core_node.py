@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_alias import CoreAlias  # noqa: F401,E501
+from flyteadmin.models.core_array_node import CoreArrayNode  # noqa: F401,E501
 from flyteadmin.models.core_binding import CoreBinding  # noqa: F401,E501
 from flyteadmin.models.core_branch_node import CoreBranchNode  # noqa: F401,E501
 from flyteadmin.models.core_gate_node import CoreGateNode  # noqa: F401,E501
@@ -47,7 +48,8 @@ class CoreNode(object):
         'task_node': 'CoreTaskNode',
         'workflow_node': 'CoreWorkflowNode',
         'branch_node': 'CoreBranchNode',
-        'gate_node': 'CoreGateNode'
+        'gate_node': 'CoreGateNode',
+        'array_node': 'CoreArrayNode'
     }
 
     attribute_map = {
@@ -59,10 +61,11 @@ class CoreNode(object):
         'task_node': 'task_node',
         'workflow_node': 'workflow_node',
         'branch_node': 'branch_node',
-        'gate_node': 'gate_node'
+        'gate_node': 'gate_node',
+        'array_node': 'array_node'
     }
 
-    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None, gate_node=None):  # noqa: E501
+    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None, gate_node=None, array_node=None):  # noqa: E501
         """CoreNode - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -74,6 +77,7 @@ class CoreNode(object):
         self._workflow_node = None
         self._branch_node = None
         self._gate_node = None
+        self._array_node = None
         self.discriminator = None
 
         if id is not None:
@@ -94,6 +98,8 @@ class CoreNode(object):
             self.branch_node = branch_node
         if gate_node is not None:
             self.gate_node = gate_node
+        if array_node is not None:
+            self.array_node = array_node
 
     @property
     def id(self):
@@ -301,6 +307,29 @@ class CoreNode(object):
         """
 
         self._gate_node = gate_node
+
+    @property
+    def array_node(self):
+        """Gets the array_node of this CoreNode.  # noqa: E501
+
+        Information about the sub-node executions for each value in the list of this nodes inputs values.  # noqa: E501
+
+        :return: The array_node of this CoreNode.  # noqa: E501
+        :rtype: CoreArrayNode
+        """
+        return self._array_node
+
+    @array_node.setter
+    def array_node(self, array_node):
+        """Sets the array_node of this CoreNode.
+
+        Information about the sub-node executions for each value in the list of this nodes inputs values.  # noqa: E501
+
+        :param array_node: The array_node of this CoreNode.  # noqa: E501
+        :type: CoreArrayNode
+        """
+
+        self._array_node = array_node
 
     def to_dict(self):
         """Returns the model properties as a dict"""
