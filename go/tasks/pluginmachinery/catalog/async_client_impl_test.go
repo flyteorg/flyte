@@ -5,13 +5,61 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
+
+var exampleInterface = &core.TypedInterface{
+	Inputs: &core.VariableMap{
+		Variables: map[string]*core.Variable{
+			"a": {
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_INTEGER,
+					},
+				},
+			},
+		},
+	},
+}
+var input1 = &core.LiteralMap{
+	Literals: map[string]*core.Literal{
+		"a": {
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_Integer{
+								Integer: 1,
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+}
+var input2 = &core.LiteralMap{
+	Literals: map[string]*core.Literal{
+		"a": {
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_Integer{
+								Integer: 2,
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+}
 
 func TestAsyncClientImpl_Download(t *testing.T) {
 	ctx := context.Background()
@@ -61,12 +109,21 @@ func TestAsyncClientImpl_Download(t *testing.T) {
 func TestAsyncClientImpl_Upload(t *testing.T) {
 	ctx := context.Background()
 
+	inputHash1 := "{UNSPECIFIED     {} [] 0}:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
+	inputHash2 := "{UNSPECIFIED     {} [] 0}:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
+
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}
 	info.OnItem().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
 	info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-	q.OnGet("{UNSPECIFIED     {} [] 0}:-0-").Return(info, true, nil)
+	q.OnGet(inputHash1).Return(info, true, nil)
+	q.OnGet(inputHash2).Return(info, true, nil)
 	q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+	inputReader1 := &mocks2.InputReader{}
+	inputReader1.OnGetMatch(mock.Anything).Return(input1, nil)
+	inputReader2 := &mocks2.InputReader{}
+	inputReader2.OnGetMatch(mock.Anything).Return(input2, nil)
 
 	tests := []struct {
 		name          string
@@ -74,11 +131,28 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 		wantPutFuture UploadFuture
 		wantErr       bool
 	}{
-		{"UploadSucceeded", []UploadRequest{
-			{
-				Key: Key{},
+		{
+			"UploadSucceeded",
+			// The second request has the same Key.Identifier and Key.Cache version but a different
+			// Key.InputReader. This should lead to a different WorkItemID in the queue.
+			// See https://github.com/flyteorg/flyte/issues/3787 for more details
+			[]UploadRequest{
+				{
+					Key: Key{
+						TypedInterface: *exampleInterface,
+						InputReader:    inputReader1,
+					},
+				},
+				{
+					Key: Key{
+						TypedInterface: *exampleInterface,
+						InputReader:    inputReader2,
+					},
+				},
 			},
-		}, newUploadFuture(ResponseStatusReady, nil), false},
+			newUploadFuture(ResponseStatusReady, nil),
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -92,6 +166,16 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotPutFuture, tt.wantPutFuture) {
 				t.Errorf("AsyncClientImpl.Sidecar() = %v, want %v", gotPutFuture, tt.wantPutFuture)
+			}
+			expectedWorkItemIDs := []string{inputHash1, inputHash2}
+			gottenWorkItemIDs := make([]string, 0)
+			for _, mockCall := range q.Calls {
+				if mockCall.Method == "Get" {
+					gottenWorkItemIDs = append(gottenWorkItemIDs, mockCall.Arguments[0].(string))
+				}
+			}
+			if !reflect.DeepEqual(gottenWorkItemIDs, expectedWorkItemIDs) {
+				t.Errorf("Retrieved workitem IDs = %v, want %v", gottenWorkItemIDs, expectedWorkItemIDs)
 			}
 		})
 	}
