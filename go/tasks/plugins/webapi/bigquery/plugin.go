@@ -220,7 +220,7 @@ func (p Plugin) getImpl(ctx context.Context, taskCtx webapi.GetContext) (wrapper
 		return nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err, "unable to get client")
 	}
 
-	job, err := client.Jobs.Get(resourceMeta.JobReference.ProjectId, resourceMeta.JobReference.JobId).Do()
+	job, err := client.Jobs.Get(resourceMeta.JobReference.ProjectId, resourceMeta.JobReference.JobId).Location(resourceMeta.JobReference.Location).Do()
 
 	if err != nil {
 		err := pluginErrors.Wrapf(
@@ -256,7 +256,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 
-	_, err = client.Jobs.Cancel(resourceMeta.JobReference.ProjectId, resourceMeta.JobReference.JobId).Do()
+	_, err = client.Jobs.Cancel(resourceMeta.JobReference.ProjectId, resourceMeta.JobReference.JobId).Location(resourceMeta.JobReference.Location).Do()
 
 	if err != nil {
 		return err
