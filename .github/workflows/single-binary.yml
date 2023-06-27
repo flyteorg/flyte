@@ -162,6 +162,9 @@ jobs:
             defaults:
               cpu: "0"
               memory: "0"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
           EOF
           flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
       - name: Install Python dependencies
