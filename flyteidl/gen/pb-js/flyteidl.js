@@ -3200,6 +3200,190 @@
                 return GateNode;
             })();
     
+            core.ArrayNode = (function() {
+    
+                /**
+                 * Properties of an ArrayNode.
+                 * @memberof flyteidl.core
+                 * @interface IArrayNode
+                 * @property {flyteidl.core.INode|null} [node] ArrayNode node
+                 * @property {number|null} [parallelism] ArrayNode parallelism
+                 * @property {number|null} [minSuccesses] ArrayNode minSuccesses
+                 * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
+                 */
+    
+                /**
+                 * Constructs a new ArrayNode.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an ArrayNode.
+                 * @implements IArrayNode
+                 * @constructor
+                 * @param {flyteidl.core.IArrayNode=} [properties] Properties to set
+                 */
+                function ArrayNode(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ArrayNode node.
+                 * @member {flyteidl.core.INode|null|undefined} node
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.node = null;
+    
+                /**
+                 * ArrayNode parallelism.
+                 * @member {number} parallelism
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.parallelism = 0;
+    
+                /**
+                 * ArrayNode minSuccesses.
+                 * @member {number} minSuccesses
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.minSuccesses = 0;
+    
+                /**
+                 * ArrayNode minSuccessRatio.
+                 * @member {number} minSuccessRatio
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.minSuccessRatio = 0;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * ArrayNode successCriteria.
+                 * @member {"minSuccesses"|"minSuccessRatio"|undefined} successCriteria
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                Object.defineProperty(ArrayNode.prototype, "successCriteria", {
+                    get: $util.oneOfGetter($oneOfFields = ["minSuccesses", "minSuccessRatio"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new ArrayNode instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.ArrayNode
+                 * @static
+                 * @param {flyteidl.core.IArrayNode=} [properties] Properties to set
+                 * @returns {flyteidl.core.ArrayNode} ArrayNode instance
+                 */
+                ArrayNode.create = function create(properties) {
+                    return new ArrayNode(properties);
+                };
+    
+                /**
+                 * Encodes the specified ArrayNode message. Does not implicitly {@link flyteidl.core.ArrayNode.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @static
+                 * @param {flyteidl.core.IArrayNode} message ArrayNode message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ArrayNode.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.node != null && message.hasOwnProperty("node"))
+                        $root.flyteidl.core.Node.encode(message.node, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.parallelism != null && message.hasOwnProperty("parallelism"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.parallelism);
+                    if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
+                    if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
+                        writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ArrayNode message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.ArrayNode} ArrayNode
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ArrayNode.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ArrayNode();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.node = $root.flyteidl.core.Node.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.parallelism = reader.uint32();
+                            break;
+                        case 3:
+                            message.minSuccesses = reader.uint32();
+                            break;
+                        case 4:
+                            message.minSuccessRatio = reader.float();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ArrayNode message.
+                 * @function verify
+                 * @memberof flyteidl.core.ArrayNode
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ArrayNode.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.node != null && message.hasOwnProperty("node")) {
+                        var error = $root.flyteidl.core.Node.verify(message.node);
+                        if (error)
+                            return "node." + error;
+                    }
+                    if (message.parallelism != null && message.hasOwnProperty("parallelism"))
+                        if (!$util.isInteger(message.parallelism))
+                            return "parallelism: integer expected";
+                    if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses")) {
+                        properties.successCriteria = 1;
+                        if (!$util.isInteger(message.minSuccesses))
+                            return "minSuccesses: integer expected";
+                    }
+                    if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio")) {
+                        if (properties.successCriteria === 1)
+                            return "successCriteria: multiple values";
+                        properties.successCriteria = 1;
+                        if (typeof message.minSuccessRatio !== "number")
+                            return "minSuccessRatio: number expected";
+                    }
+                    return null;
+                };
+    
+                return ArrayNode;
+            })();
+    
             core.NodeMetadata = (function() {
     
                 /**
@@ -3524,6 +3708,7 @@
                  * @property {flyteidl.core.IWorkflowNode|null} [workflowNode] Node workflowNode
                  * @property {flyteidl.core.IBranchNode|null} [branchNode] Node branchNode
                  * @property {flyteidl.core.IGateNode|null} [gateNode] Node gateNode
+                 * @property {flyteidl.core.IArrayNode|null} [arrayNode] Node arrayNode
                  */
     
                 /**
@@ -3616,17 +3801,25 @@
                  */
                 Node.prototype.gateNode = null;
     
+                /**
+                 * Node arrayNode.
+                 * @member {flyteidl.core.IArrayNode|null|undefined} arrayNode
+                 * @memberof flyteidl.core.Node
+                 * @instance
+                 */
+                Node.prototype.arrayNode = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Node target.
-                 * @member {"taskNode"|"workflowNode"|"branchNode"|"gateNode"|undefined} target
+                 * @member {"taskNode"|"workflowNode"|"branchNode"|"gateNode"|"arrayNode"|undefined} target
                  * @memberof flyteidl.core.Node
                  * @instance
                  */
                 Object.defineProperty(Node.prototype, "target", {
-                    get: $util.oneOfGetter($oneOfFields = ["taskNode", "workflowNode", "branchNode", "gateNode"]),
+                    get: $util.oneOfGetter($oneOfFields = ["taskNode", "workflowNode", "branchNode", "gateNode", "arrayNode"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -3675,6 +3868,8 @@
                         $root.flyteidl.core.BranchNode.encode(message.branchNode, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     if (message.gateNode != null && message.hasOwnProperty("gateNode"))
                         $root.flyteidl.core.GateNode.encode(message.gateNode, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.arrayNode != null && message.hasOwnProperty("arrayNode"))
+                        $root.flyteidl.core.ArrayNode.encode(message.arrayNode, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     return writer;
                 };
     
@@ -3728,6 +3923,9 @@
                             break;
                         case 9:
                             message.gateNode = $root.flyteidl.core.GateNode.decode(reader, reader.uint32());
+                            break;
+                        case 10:
+                            message.arrayNode = $root.flyteidl.core.ArrayNode.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -3818,6 +4016,16 @@
                             var error = $root.flyteidl.core.GateNode.verify(message.gateNode);
                             if (error)
                                 return "gateNode." + error;
+                        }
+                    }
+                    if (message.arrayNode != null && message.hasOwnProperty("arrayNode")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.core.ArrayNode.verify(message.arrayNode);
+                            if (error)
+                                return "arrayNode." + error;
                         }
                     }
                     return null;

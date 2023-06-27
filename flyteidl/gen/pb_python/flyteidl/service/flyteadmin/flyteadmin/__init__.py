@@ -154,6 +154,7 @@ from flyteadmin.models.connection_set_id_list import ConnectionSetIdList
 from flyteadmin.models.container_architecture import ContainerArchitecture
 from flyteadmin.models.core_alias import CoreAlias
 from flyteadmin.models.core_approve_condition import CoreApproveCondition
+from flyteadmin.models.core_array_node import CoreArrayNode
 from flyteadmin.models.core_binary import CoreBinary
 from flyteadmin.models.core_binding import CoreBinding
 from flyteadmin.models.core_binding_data import CoreBindingData

@@ -5579,6 +5579,31 @@
       },
       "description": "ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean\nsignal with the provided signal_id."
     },
+    "coreArrayNode": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/coreNode",
+          "description": "node is the sub-node that will be executed for each element in the array."
+        },
+        "parallelism": {
+          "type": "integer",
+          "format": "int64",
+          "description": "parallelism defines the minimum number of instances to bring up concurrently at any given\npoint. Note that this is an optimistic restriction and that, due to network partitioning or\nother failures, the actual number of currently running instances might be more. This has to\nbe a positive number if assigned. Default value is size."
+        },
+        "min_successes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "min_successes is an absolute number of the minimum number of successful completions of\nsub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful\nand outputs will be computed. This has to be a non-negative number if assigned. Default\nvalue is size (if specified)."
+        },
+        "min_success_ratio": {
+          "type": "number",
+          "format": "float",
+          "description": "If the array job size is not known beforehand, the min_success_ratio can instead be used\nto determine when an ArrayNode can be marked successful."
+        }
+      },
+      "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
+    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -6306,6 +6331,10 @@
         "gate_node": {
           "$ref": "#/definitions/coreGateNode",
           "description": "Information about the condition to evaluate in this node."
+        },
+        "array_node": {
+          "$ref": "#/definitions/coreArrayNode",
+          "description": "Information about the sub-node executions for each value in the list of this nodes\ninputs values."
         }
       },
       "description": "A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch\nnode."
