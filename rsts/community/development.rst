@@ -1,7 +1,7 @@
 Development Environment Setup Guide
 ===================================================================
 
-This guide aims to provide a step-by-step approach to setting up a local development environment for `flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_, `flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_, `flytekit <https://github.com/flyteorg/flytekit>`_ and `flyteconsole <https://github.com/flyteorg/flyteconsole>`_.
+This guide provides a step-by-step approach to setting up a local development environment for `flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_, `flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_, `flytekit <https://github.com/flyteorg/flytekit>`_ and `flyteconsole <https://github.com/flyteorg/flyteconsole>`_.
 
 Requirements
 ------------
