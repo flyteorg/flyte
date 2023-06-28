@@ -134,7 +134,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 	switch target := taskTemplate.GetTarget().(type) {
 	case *core.TaskTemplate_Container:
 		// handles tasks defined by a single container
-		c, err := ToK8sContainer(ctx, tCtx)
+		c, err := BuildRawContainer(ctx, tCtx)
 		if err != nil {
 			return nil, nil, "", err
 		}

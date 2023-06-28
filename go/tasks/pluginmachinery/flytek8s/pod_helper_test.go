@@ -531,6 +531,26 @@ func TestToK8sPod(t *testing.T) {
 		assert.Equal(t, val3, *p.DNSConfig.Options[3].Value)
 		assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, p.DNSConfig.Searches)
 	})
+
+	t.Run("environmentVariables", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			DefaultEnvVars: map[string]string{
+				"foo": "bar",
+			},
+		}))
+		x := dummyExecContext(&v1.ResourceRequirements{})
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		for _, c := range p.Containers {
+			uniqueVariableNames := make(map[string]string)
+			for _, envVar := range c.Env {
+				if _, ok := uniqueVariableNames[envVar.Name]; ok {
+					t.Errorf("duplicate environment variable %s", envVar.Name)
+				}
+				uniqueVariableNames[envVar.Name] = envVar.Value
+			}
+		}
+	})
 }
 
 func TestDemystifyPending(t *testing.T) {
