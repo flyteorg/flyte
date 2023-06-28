@@ -542,7 +542,7 @@ To deploy the workflow in the sandbox, you'll need to build a Flytekit image.
 Create a Dockerfile in your Flytekit directory with the minimum required configuration to run a task, as shown below. 
 If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `officail flitekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__ 
 
-.. code:: dockerfile
+.. code:: Dockerfile
 
    FROM python:3.9-slim-buster
    USER root
@@ -550,8 +550,8 @@ If your task requires additional components, such as plugins, you may find it us
    ENV PYTHONPATH /root
    RUN apt-get update && apt-get install build-essential -y
    RUN apt-get install git -y
-   RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@demo
-   ENV FLYTE_INTERNAL_IMAGE "localhost:30000/flytekit:demo"
+   RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@demo # replace with your own repo and branch
+   ENV FLYTE_INTERNAL_IMAGE "localhost:30000/flytekit:demo" # replace with your own image name and tag
 
 The instructions below explain how to build the image, push the image to
 the Flyte Cluster, and finally submit the workflow to the Flyte Cluster.
@@ -564,7 +564,7 @@ the Flyte Cluster, and finally submit the workflow to the Flyte Cluster.
 
    # Step2: Build the image
    # In the flytekit folder
-   export FLYTE_INTERNAL_IMAGE="localhost:30000/flytekit:demo"
+   export FLYTE_INTERNAL_IMAGE="localhost:30000/flytekit:demo" # replace with your own image name and tag
    docker build --no-cache -t  "${FLYTE_INTERNAL_IMAGE}" -f ./Dockerfile .
 
    # Step3: Push the image to the Flyte Cluster
