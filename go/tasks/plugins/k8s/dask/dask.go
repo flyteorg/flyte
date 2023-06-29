@@ -237,7 +237,7 @@ func createSchedulerSpec(cluster plugins.DaskScheduler, clusterName string, defa
 
 	return &daskAPI.SchedulerSpec{
 		Spec: v1.PodSpec{
-			RestartPolicy: v1.RestartPolicyNever,
+			RestartPolicy: v1.RestartPolicyAlways,
 			Containers: []v1.Container{
 				{
 					Name:      "scheduler",
