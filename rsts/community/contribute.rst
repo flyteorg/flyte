@@ -413,15 +413,15 @@ that involve multiple components). If you don't need to change some components, 
 
 
    # Step3.1: In the flyteidl folder, before building the single binary, you should run:
-   make lint
    make generate
+   make lint
 
    # Step3.2: In the flyteadmin folder, before building the single binary, you should run:
    go mod edit -replace github.com/flyteorg/flytepropeller=/home/ubuntu/flytepropeller #replace with your own local path to flytepropeller
    go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
    go mod edit -replace github.com/flyteorg/flyteplugins=/home/ubuntu/flyteplugins # replace with your own local path to flyteplugins
-   make lint
    make generate
+   make lint
    make test_unit
 
    # Step3.3: In the flyteplugins folder, before building the single binary, you should run:
@@ -430,8 +430,8 @@ that involve multiple components). If you don't need to change some components, 
    # Step3.4: In the flytepropeller folder, before building the single binary, you should run:
    go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
    go mod edit -replace github.com/flyteorg/flyteplugins=/home/ubuntu/flyteplugins # replace with your own local path to flyteplugins
-   make lint
    make generate
+   make lint
    make test_unit
 
    # Step4: Now, you can build the single binary. In the Flyte folder, run `go mod edit -replace`. This will replace the code with your own.
