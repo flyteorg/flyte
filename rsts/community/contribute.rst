@@ -451,7 +451,7 @@ that involve multiple components). If you don't need to change some components, 
 .. code:: shell
 
    # Step1: Install flytekit
-   pip install flytekit && export PATH=$PATH:/.local/bin
+   pip install flytekit && export PATH=$PATH:/home/ubuntu/.local/bin
 
    # Step2: The flytesnacks repository provides a lot of useful examples.
    git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks/cookbook
