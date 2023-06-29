@@ -228,7 +228,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 			Protocol:      "TCP",
 		},
 	}
-	assert.Equal(t, v1.RestartPolicyNever, schedulerSpec.RestartPolicy)
+	assert.Equal(t, v1.RestartPolicyAlways, schedulerSpec.RestartPolicy)
 	assert.Equal(t, defaultTestImage, schedulerSpec.Containers[0].Image)
 	assert.Equal(t, defaultResources, schedulerSpec.Containers[0].Resources)
 	assert.Equal(t, []string{"dask-scheduler"}, schedulerSpec.Containers[0].Args)
