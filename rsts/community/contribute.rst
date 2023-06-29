@@ -404,13 +404,17 @@ that involve multiple components). If you don't need to change some components, 
 
    # Step1: Modify the source code for flyteidl, flyteadmin, flyteplugins, and flytepropeller.
 
-   # Step2: Flyteidl, flyteadmin, flyteplugins, and flytepropeller use go1.19, so make sure to switch to go1.19.
+   # Step2.1: Flyteidl, flyteadmin, flyteplugins, and flytepropeller use go1.19, so make sure to switch to go1.19.
    export PATH=$PATH:$(go env GOPATH)/bin
    go install golang.org/dl/go1.19@latest
    go1.19 download
    export GOROOT=$(go1.19 env GOROOT)
    export PATH="$GOROOT/bin:$PATH"
 
+   # Step2.2: you may need to install goimports to fix lint errors.
+   # Refer to https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+   go install golang.org/x/tools/cmd/goimports@latest
+   export PATH=$(go env GOPATH)/bin:$PATH
 
    # Step3.1: In the flyteidl folder, before building the single binary, you should run:
    make generate
@@ -426,6 +430,9 @@ that involve multiple components). If you don't need to change some components, 
 
    # Step3.3: In the flyteplugins folder, before building the single binary, you should run:
    go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
+   make generate
+   make lint
+   make test_unit
 
    # Step3.4: In the flytepropeller folder, before building the single binary, you should run:
    go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
