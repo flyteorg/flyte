@@ -39,8 +39,8 @@ func TestGCPSecretManagerInjector_Inject(t *testing.T) {
 					Image: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine",
 					Command: []string{
 						"sh",
-						"-c",
-						"gcloud secrets versions access 2 --secret=TestSecret --out-file=/etc/flyte/secrets/testsecret/2 && chmod +rX /etc/flyte/secrets/testsecret /etc/flyte/secrets/testsecret/2",
+						"-ec",
+						"gcloud secrets versions access TestSecret/versions/2 --out-file=/etc/flyte/secrets/testsecret/2 || gcloud secrets versions access 2 --secret=TestSecret --out-file=/etc/flyte/secrets/testsecret/2; chmod +rX /etc/flyte/secrets/testsecret /etc/flyte/secrets/testsecret/2",
 					},
 					Env: []corev1.EnvVar{
 						{

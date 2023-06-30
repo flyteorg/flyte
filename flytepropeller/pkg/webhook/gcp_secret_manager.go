@@ -42,24 +42,14 @@ func formatGCPSecretAccessCommand(secret *core.Secret) []string {
 	// users, so we fix the file permissions with `chmod`.
 	secretDir := strings.ToLower(filepath.Join(GCPSecretMountPath, secret.Group))
 	secretPath := strings.ToLower(filepath.Join(secretDir, secret.GroupVersion))
-	args := []string{
-		"gcloud",
-		"secrets",
-		"versions",
-		"access",
+	args := fmt.Sprintf(
+		"gcloud secrets versions access %[1]s/versions/%[2]s --out-file=%[4]s || gcloud secrets versions access %[2]s --secret=%[1]s --out-file=%[4]s; chmod +rX %[3]s %[4]s",
+		secret.Group,
 		secret.GroupVersion,
-		fmt.Sprintf("--secret=%s", secret.Group),
-		fmt.Sprintf(
-			"--out-file=%s",
-			secretPath,
-		),
-		"&&",
-		"chmod",
-		"+rX",
 		secretDir,
 		secretPath,
-	}
-	return []string{"sh", "-c", strings.Join(args, " ")}
+	)
+	return []string{"sh", "-ec", args}
 }
 
 func formatGCPInitContainerName(index int) string {
