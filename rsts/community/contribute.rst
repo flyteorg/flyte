@@ -383,7 +383,7 @@ that integrates all backend components (flyteidl, flyteadmin, flyteplugins, flyt
    # The versions of flyteidl, flyteadmin, flyteplugins, and flytepropeller used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
    go mod tidy
-   sudo make compile
+   sudo -E env "PATH=$PATH" make compile
 
    # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
    # Replace occurrences of $HOME with the actual path of your home directory.
@@ -453,7 +453,7 @@ that involve multiple components). If you don't need to change some components, 
 
    # Step5: Rebuild and rerun the single binary based on your own code.
    go mod tidy
-   sudo make compile
+   sudo -E env "PATH=$PATH" make compile
    POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
 
 **7. Test it by running a Hello World workflow.**
