@@ -385,10 +385,14 @@ that integrates all backend components (flyteidl, flyteadmin, flyteplugins, flyt
    go mod tidy
    sudo make compile
 
-   # Step3: Running the single binary. `flyte_local.yaml` is the config file. It is written to fit all your previous builds. So, you don't need to change `flyte_local.yaml`.
-   # Note: Replace `flyte_local.yaml` with file in this PR:https://github.com/flyteorg/flyte/pull/3808. Once it is merged, there is no need to change.
-   # Note: You may encounter an error due to database `flyteadmin` does not exists. Run the command again will solve the problem.
-   flyte start --config flyte_local.yaml
+   # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
+   # Replace occurrences of $HOME with the actual path of your home directory.
+   sed -i "s|\$HOME|${HOME}|g" ./flyte-single-binary-local.yaml
+
+   # Step4: Running the single binary.
+   # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 
+   # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Run the command again will solve the problem.
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
    # All logs from flyteadmin, flyteplugins, flytepropeller, etc. will appear in the terminal.
 
 **5. [Optional] Access the Flyte UI at** http://localhost:30080/console.
@@ -450,7 +454,7 @@ that involve multiple components). If you don't need to change some components, 
    # Step5: Rebuild and rerun the single binary based on your own code.
    go mod tidy
    sudo make compile
-   flyte start --config flyte_local.yaml
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
 
 **7. Test it by running a Hello World workflow.**
 
@@ -461,14 +465,14 @@ that involve multiple components). If you don't need to change some components, 
    pip install flytekit && export PATH=$PATH:/home/ubuntu/.local/bin
 
    # Step2: The flytesnacks repository provides a lot of useful examples.
-   git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks/cookbook
+   git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks
 
    # Step3: Before running the Hello World workflow, create the flytesnacks-development namespace. 
    # This is necessary because, by default (without creating a new project), task pods will run in the flytesnacks-development namespace.
    kubectl create namespace flytesnacks-development
 
    # Step4: Run a Hello World example
-   pyflyte run --remote core/flyte_basics/hello_world.py my_wf
+   pyflyte run --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
 
 **8. Tear down the k3s cluster After finishing developing.**
@@ -537,8 +541,8 @@ If not, we can start backends with a single command.
 
    # Step3: Run a hello world sample to test locally
    git clone https://github.com/flyteorg/flytesnacks
-   cd flytesnacks/cookbook
-   python3 core/flyte_basics/hello_world.py
+   cd flytesnacks
+   python3 examples/basics/basics/hello_world.py my_wf
    # Running my_wf() hello world
 
 **3. Run workflow in sandbox.**
@@ -579,11 +583,11 @@ the Flyte Cluster, and finally submit the workflow to the Flyte Cluster.
 
    # Step4: Submit a hello world workflow to the Flyte Cluster
    git clone https://github.com/flyteorg/flytesnacks
-   cd flytesnacks/cookbook
+   cd flytesnacks
    # Note create the flytesnacks-development namespace if not exists: 
    # This is necessary because, by default (without creating a new project), task pods will run in the flytesnacks-development namespace.
    # kubectl create namespace flytesnacks-development
-   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote core/flyte_basics/hello_world.py  my_wf
+   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
 How to set dev environment for flyteconsole?
