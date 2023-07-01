@@ -26,8 +26,12 @@ func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
 
 func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 	optional := true
+	secretName := strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key)
+	if len(secret.EnvName) != 0 {
+		secretName = secret.EnvName
+	}
 	return corev1.EnvVar{
-		Name: strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
+		Name: secretName,
 		ValueFrom: &corev1.EnvVarSource{
 			SecretKeyRef: &corev1.SecretKeySelector{
 				LocalObjectReference: corev1.LocalObjectReference{

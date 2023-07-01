@@ -77,6 +77,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
 	case core.Secret_ENV_VAR:
 		envVar := CreateEnvVarForSecret(secret)
+
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
 
