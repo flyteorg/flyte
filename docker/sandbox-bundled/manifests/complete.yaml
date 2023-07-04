@@ -784,7 +784,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SzlHZ0doUHFQaEswZTBEWQ==
+  haSharedSecret: WGJrSFh4aU9RNnNydndwTA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -906,6 +906,7 @@ spec:
     port: 8089
     targetPort: grpc
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -935,6 +936,7 @@ spec:
     port: 8000
     targetPort: agent-grpc
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -1078,6 +1080,7 @@ spec:
     port: 443
     targetPort: webhook
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -1177,6 +1180,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app.kubernetes.io/component: flyte-binary
       app.kubernetes.io/instance: flyte-sandbox
       app.kubernetes.io/name: flyte-sandbox
   strategy:
@@ -1188,6 +1192,7 @@ spec:
         checksum/configuration: 8118b13cf076cdede0f232d5c1babb77d378cc2aa486840ed46a21b5ab4480ea
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
+        app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/name: flyte-sandbox
     spec:
@@ -1299,7 +1304,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a9517655e17e8f68a20248fbb76c1d65f57c7d2e30d8dd58e86b4c859017f270
+        checksum/secret: 11ef7c305f97399d6a6efcc6abc5f63b400d5b6eecaabf957ceb586d530e303e
       labels:
         app: docker-registry
         release: flyte-sandbox

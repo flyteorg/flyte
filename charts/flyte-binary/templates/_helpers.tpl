@@ -31,11 +31,19 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Base labels
+*/}}
+{{- define "flyte-binary.baseLabels" -}}
+app.kubernetes.io/name: {{ include "flyte-binary.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "flyte-binary.labels" -}}
 helm.sh/chart: {{ include "flyte-binary.chart" . }}
-{{ include "flyte-binary.selectorLabels" . }}
+{{ include "flyte-binary.baseLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,8 +54,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "flyte-binary.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "flyte-binary.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "flyte-binary.baseLabels" . }}
+app.kubernetes.io/component: flyte-binary
 {{- end }}
 
 {{/*
