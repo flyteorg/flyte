@@ -7,6 +7,7 @@ import sys
 import time
 import traceback
 import requests
+import subprocess
 from typing import List, Mapping, Tuple, Dict
 from flytekit.remote import FlyteRemote
 from flytekit.models.core.execution import WorkflowExecutionPhase
@@ -43,7 +44,10 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         # ("core.flyte_basics.folders.download_and_rotate", {}),
         ("core.flyte_basics.hello_world.my_wf", {}),
         ("core.flyte_basics.lp.my_wf", {"val": 4}),
-        ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
+        (
+            "core.flyte_basics.lp.go_greet",
+            {"day_of_week": "5", "number": 3, "am": True},
+        ),
         ("core.flyte_basics.named_outputs.my_wf", {}),
         # # Getting a 403 for the wikipedia image
         # # ("core.flyte_basics.reference_task.wf", {}),
@@ -52,7 +56,7 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         # ("core.type_system.enums.enum_wf", {"c": "red"}),
         ("core.type_system.schema.df_wf", {"a": 42}),
         ("core.type_system.typed_schema.wf", {}),
-        #("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
+        # ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
     "integrations-k8s-spark": [
         ("k8s_spark.pyspark_pi.my_spark", {"triggered_date": datetime.datetime.now()}),
@@ -91,27 +95,33 @@ def execute_workflow(remote, version, workflow_name, inputs):
     wf = remote.fetch_workflow(name=workflow_name, version=version)
     return remote.execute(wf, inputs=inputs, wait=False)
 
-def executions_finished(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]) -> bool:
+
+def executions_finished(
+    executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
+) -> bool:
     for executions in executions_by_wfgroup.values():
         if not all([execution.is_done for execution in executions]):
             return False
     return True
 
-def sync_executions(remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
+
+def sync_executions(
+    remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
+):
     try:
         for executions in executions_by_wfgroup.values():
             for execution in executions:
                 print(f"About to sync execution_id={execution.id.name}")
                 remote.sync(execution)
-    except:
-        print("GOT TO THE EXCEPT")
-        print("COUNT THIS!")
+    except Exception:
+        print(traceback.format_exc())
 
 
 def report_executions(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
     for executions in executions_by_wfgroup.values():
         for execution in executions:
             print(execution)
+
 
 def schedule_workflow_groups(
     tag: str,
@@ -128,7 +138,8 @@ def schedule_workflow_groups(
     for wf_group in workflow_groups:
         workflows = FLYTESNACKS_WORKFLOW_GROUPS.get(wf_group, [])
         executions_by_wfgroup[wf_group] = [
-            execute_workflow(remote, tag, workflow[0], workflow[1]) for workflow in workflows
+            execute_workflow(remote, tag, workflow[0], workflow[1])
+            for workflow in workflows
         ]
 
     # Wait for all executions to finish
@@ -141,8 +152,41 @@ def schedule_workflow_groups(
             f"Not all executions finished yet. Sleeping for some time, will check again in {WAIT_TIME}s"
         )
         time.sleep(WAIT_TIME)
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                "flyte-sandbox",
+                "kubectl",
+                "get",
+                "pods",
+                "-A",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                "flyte-sandbox",
+                "kubectl",
+                "describe",
+                "nodes",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                "flyte-sandbox",
+                "crictl",
+                "images",
+                "ls",
+            ],
+            check=True,
+        )
         sync_executions(remote, executions_by_wfgroup)
-
 
     report_executions(executions_by_wfgroup)
 
@@ -156,9 +200,13 @@ def schedule_workflow_groups(
         if len(non_succeeded_executions) != 0:
             print(f"Failed executions for {wf_group}:")
             for execution in non_succeeded_executions:
-                print(f"    workflow={execution.spec.launch_plan.name}, execution_id={execution.id.name}")
+                print(
+                    f"    workflow={execution.spec.launch_plan.name}, execution_id={execution.id.name}"
+                )
                 if terminate_workflow_on_failure:
-                    remote.terminate(execution, "aborting execution scheduled in functional test")
+                    remote.terminate(
+                        execution, "aborting execution scheduled in functional test"
+                    )
         # A workflow group succeeds iff all of its executions succeed
         results[wf_group] = len(non_succeeded_executions) == 0
     return results
@@ -186,8 +234,10 @@ def run(
 
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
-    manifest_url = "https://raw.githubusercontent.com/flyteorg/flytesnacks/" \
-                   f"{flytesnacks_release_tag}/cookbook/flyte_tests_manifest.json"
+    manifest_url = (
+        "https://raw.githubusercontent.com/flyteorg/flytesnacks/"
+        f"{flytesnacks_release_tag}/cookbook/flyte_tests_manifest.json"
+    )
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
 
@@ -209,10 +259,7 @@ def run(
         valid_workgroups.append(workflow_group)
 
     results_by_wfgroup = schedule_workflow_groups(
-        flytesnacks_release_tag,
-        valid_workgroups,
-        remote,
-        terminate_workflow_on_failure
+        flytesnacks_release_tag, valid_workgroups, remote, terminate_workflow_on_failure
     )
 
     for workflow_group, succeeded in results_by_wfgroup.items():
