@@ -107,6 +107,37 @@ func getLegacySpecBytes() []byte {
 	return b
 }
 
+func getExpectedLegacySpec() *admin.ExecutionSpec {
+	expectedLegacySpec := getLegacySpec()
+	expectedLegacySpec.Metadata = &admin.ExecutionMetadata{
+		SystemMetadata: &admin.SystemMetadata{
+			Namespace: "project-domain",
+		},
+	}
+	return expectedLegacySpec
+}
+
+func getExpectedLegacySpecBytes() []byte {
+	expectedLegacySpec := getExpectedLegacySpec()
+	b, _ := proto.Marshal(expectedLegacySpec)
+	return b
+}
+
+func getExpectedSpec() *admin.ExecutionSpec {
+	expectedSpec := testutils.GetExecutionRequest().Spec
+	expectedSpec.Metadata = &admin.ExecutionMetadata{
+		SystemMetadata: &admin.SystemMetadata{
+			Namespace: "project-domain",
+		},
+	}
+	return expectedSpec
+}
+
+func getExpectedSpecBytes() []byte {
+	specBytes, _ := proto.Marshal(getExpectedSpec())
+	return specBytes
+}
+
 func getLegacyClosure() *admin.ExecutionClosure {
 	return &admin.ExecutionClosure{
 		Phase:          core.WorkflowExecution_RUNNING,
@@ -287,6 +318,7 @@ func TestCreateExecution(t *testing.T) {
 			assert.Equal(t, rawOutput, spec.RawOutputDataConfig.OutputLocationPrefix)
 			assert.True(t, proto.Equal(spec.ClusterAssignment, &clusterAssignment))
 			assert.Equal(t, "launch_plan", input.LaunchEntity)
+			assert.Equal(t, spec.GetMetadata().GetSystemMetadata().Namespace, "project-domain")
 			return nil
 		})
 	setDefaultLpCallbackForExecTest(repository)
@@ -1167,6 +1199,49 @@ func TestCreateExecutionWithEnvs(t *testing.T) {
 	}
 }
 
+func TestCreateExecution_CustomNamespaceMappingConfig(t *testing.T) {
+	request := testutils.GetExecutionRequest()
+	repository := getMockRepositoryForExecTest()
+	storageClient := getMockStorageForExecTest(context.Background())
+	setDefaultLpCallbackForExecTest(repository)
+	mockClock := clock.NewMock()
+	createdAt := time.Now()
+	mockClock.Set(createdAt)
+	exCreateFunc := func(ctx context.Context, input models.Execution) error {
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(input.Spec, &spec)
+		assert.NoError(t, err)
+		assert.Equal(t, spec.GetMetadata().GetSystemMetadata().Namespace, "project")
+		return nil
+	}
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.OnID().Return("testMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+
+	mockNs := runtimeMocks.NamespaceMappingConfiguration{}
+	mockNs.OnGetNamespaceTemplate().Return("{{ project }}")
+	mockExecutionsConfigProvider := runtimeMocks.NewMockConfigurationProvider(
+		testutils.GetApplicationConfigWithDefaultDomains(),
+		runtimeMocks.NewMockQueueConfigurationProvider(
+			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
+		nil,
+		runtimeMocks.NewMockTaskResourceConfiguration(resourceDefaults, resourceLimits), nil, &mockNs)
+	mockExecutionsConfigProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
+		runtimeMocks.NewMockRegistrationValidationProvider())
+
+	execManager := NewExecutionManager(repository, r, mockExecutionsConfigProvider, storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+	execManager.(*ExecutionManager)._clock = mockClock
+
+	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&executionIdentifier, response.Id))
+}
+
 func makeExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -1182,7 +1257,7 @@ func makeExecutionGetFunc(
 			BaseModel: models.BaseModel{
 				ID: uint(8),
 			},
-			Spec:         specBytes,
+			Spec:         getExpectedSpecBytes(),
 			Phase:        core.WorkflowExecution_QUEUED.String(),
 			Closure:      closureBytes,
 			LaunchPlanID: uint(1),
@@ -1769,7 +1844,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 		switch input.Name {
 		case "name":
 			return models.Execution{
-				Spec:    specBytes,
+				Spec:    getExpectedSpecBytes(),
 				Closure: existingClosureBytes,
 				BaseModel: models.BaseModel{
 					ID: referencedExecutionID,
@@ -2148,7 +2223,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 		assert.Equal(t, uint(2), execution.WorkflowID)
 		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
 		assert.Equal(t, closureBytes, execution.Closure)
-		assert.Equal(t, specBytes, execution.Spec)
+		assert.Equal(t, getExpectedSpecBytes(), execution.Spec)
 		assert.Equal(t, startTime, *execution.StartedAt)
 		assert.Equal(t, duration, execution.Duration)
 		return nil
@@ -2188,7 +2263,7 @@ func TestCreateWorkflowEvent_TerminalState(t *testing.T) {
 			BaseModel: models.BaseModel{
 				ID: uint(8),
 			},
-			Spec:  specBytes,
+			Spec:  getExpectedSpecBytes(),
 			Phase: core.WorkflowExecution_FAILED.String(),
 		}, nil
 	}
@@ -2228,7 +2303,7 @@ func TestCreateWorkflowEvent_NoRunningToQueued(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 			},
-			Spec:  specBytes,
+			Spec:  getExpectedSpecBytes(),
 			Phase: core.WorkflowExecution_RUNNING.String(),
 		}, nil
 	}
@@ -2264,7 +2339,7 @@ func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 			},
-			Spec:  specBytes,
+			Spec:  getExpectedSpecBytes(),
 			Phase: core.WorkflowExecution_ABORTING.String(),
 		}, nil
 	}
@@ -2335,7 +2410,7 @@ func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 		assert.Equal(t, uint(2), execution.WorkflowID)
 		assert.Equal(t, core.WorkflowExecution_RUNNING.String(), execution.Phase)
 		assert.Equal(t, closureBytes, execution.Closure)
-		assert.Equal(t, specBytes, execution.Spec)
+		assert.Equal(t, getExpectedSpecBytes(), execution.Spec)
 		assert.Equal(t, occurredAt, *execution.StartedAt)
 		assert.Equal(t, time.Duration(0), execution.Duration)
 		assert.Equal(t, occurredAt, *execution.ExecutionUpdatedAt)
@@ -2377,7 +2452,7 @@ func TestCreateWorkflowEvent_DuplicateRunning(t *testing.T) {
 				BaseModel: models.BaseModel{
 					ID: uint(8),
 				},
-				Spec:         specBytes,
+				Spec:         getExpectedSpecBytes(),
 				Phase:        core.WorkflowExecution_RUNNING.String(),
 				Closure:      closureBytes,
 				LaunchPlanID: uint(1),
@@ -2420,7 +2495,7 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 				BaseModel: models.BaseModel{
 					ID: uint(8),
 				},
-				Spec:         specBytes,
+				Spec:         getExpectedSpecBytes(),
 				Phase:        core.WorkflowExecution_SUCCEEDED.String(),
 				Closure:      closureBytes,
 				LaunchPlanID: uint(1),
@@ -2467,7 +2542,7 @@ func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
 				BaseModel: models.BaseModel{
 					ID: uint(8),
 				},
-				Spec:         specBytes,
+				Spec:         getExpectedSpecBytes(),
 				Phase:        core.WorkflowExecution_UNDEFINED.String(),
 				Closure:      closureBytes,
 				LaunchPlanID: uint(1),
@@ -2655,7 +2730,7 @@ func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
 				BaseModel: models.BaseModel{
 					ID: uint(8),
 				},
-				Spec:         specBytes,
+				Spec:         getExpectedSpecBytes(),
 				Phase:        core.WorkflowExecution_RUNNING.String(),
 				Closure:      closureBytes,
 				LaunchPlanID: uint(1),
@@ -2714,7 +2789,7 @@ func TestGetExecution(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 			},
-			Spec:         specBytes,
+			Spec:         getExpectedSpecBytes(),
 			Phase:        phase,
 			Closure:      closureBytes,
 			LaunchPlanID: uint(1),
@@ -2732,7 +2807,7 @@ func TestGetExecution(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&executionIdentifier, execution.Id))
-	assert.True(t, proto.Equal(spec, execution.Spec))
+	assert.True(t, proto.Equal(getExpectedSpec(), execution.Spec))
 	assert.True(t, proto.Equal(&closure, execution.Closure))
 }
 
@@ -2920,7 +2995,7 @@ func TestListExecutions(t *testing.T) {
 						Domain:  domainValue,
 						Name:    "my awesome execution",
 					},
-					Spec:    specBytes,
+					Spec:    getExpectedSpecBytes(),
 					Closure: closureBytes,
 				},
 				{
@@ -2933,7 +3008,7 @@ func TestListExecutions(t *testing.T) {
 						Name:    "my other execution",
 					},
 					Phase:   core.WorkflowExecution_SUCCEEDED.String(),
-					Spec:    specBytes,
+					Spec:    getExpectedSpecBytes(),
 					Closure: closureBytes,
 				},
 			},
@@ -2966,7 +3041,7 @@ func TestListExecutions(t *testing.T) {
 		if idx == 0 {
 			assert.Equal(t, "my awesome execution", execution.Id.Name)
 		}
-		assert.True(t, proto.Equal(spec, execution.Spec))
+		assert.True(t, proto.Equal(getExpectedSpec(), execution.Spec))
 		assert.True(t, proto.Equal(&closure, execution.Closure))
 	}
 	assert.Empty(t, executionList.Token)
@@ -3150,7 +3225,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 		LaunchPlanID: uint(1),
 		WorkflowID:   uint(2),
 		Closure:      execClosureBytes,
-		Spec:         specBytes,
+		Spec:         getExpectedSpecBytes(),
 	}
 	assert.Nil(t, myExecManager.publishNotifications(context.Background(), workflowRequest, executionModel))
 }
@@ -3259,7 +3334,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 		LaunchPlanID: uint(1),
 		WorkflowID:   uint(2),
 		Closure:      execClosureBytes,
-		Spec:         specBytes,
+		Spec:         getExpectedSpecBytes(),
 	}
 	assert.Nil(t, myExecManager.publishNotifications(context.Background(), workflowRequest, executionModel))
 
@@ -3486,7 +3561,7 @@ func TestGetExecutionData(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 			},
-			Spec:         specBytes,
+			Spec:         getExpectedSpecBytes(),
 			Phase:        phase,
 			Closure:      closureBytes,
 			LaunchPlanID: uint(1),
@@ -3661,7 +3736,7 @@ func TestGetExecution_Legacy(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 			},
-			Spec:         getLegacySpecBytes(),
+			Spec:         getExpectedLegacySpecBytes(),
 			Phase:        phase,
 			Closure:      getLegacyClosureBytes(),
 			LaunchPlanID: uint(1),
@@ -3678,7 +3753,7 @@ func TestGetExecution_Legacy(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&executionIdentifier, execution.Id))
-	assert.True(t, proto.Equal(getLegacySpec(), execution.Spec))
+	assert.True(t, proto.Equal(getExpectedLegacySpec(), execution.Spec))
 	assert.True(t, proto.Equal(getLegacyClosure(), execution.Closure))
 }
 

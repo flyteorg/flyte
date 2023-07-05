@@ -274,6 +274,38 @@ func TestService_GetData(t *testing.T) {
 		})
 		assert.Error(t, err)
 	})
+
+	t.Run("get individual literal without retry attempt", func(t *testing.T) {
+		res, err := s.GetData(context.Background(), &service.GetDataRequest{
+			FlyteUrl: "flyte://v1/proj/dev/wfexecid/n0-d0/i/input",
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(inputsLM.GetLiterals()["input"], res.GetLiteral()))
+		assert.Nil(t, res.GetPreSignedUrls())
+	})
+
+	t.Run("get individual literal with a retry attempt", func(t *testing.T) {
+		res, err := s.GetData(context.Background(), &service.GetDataRequest{
+			FlyteUrl: "flyte://v1/proj/dev/wfexecid/n0-d0/5/o/output",
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(outputsLM.GetLiterals()["output"], res.GetLiteral()))
+		assert.Nil(t, res.GetPreSignedUrls())
+	})
+
+	t.Run("error requesting missing name without retry attempt", func(t *testing.T) {
+		_, err := s.GetData(context.Background(), &service.GetDataRequest{
+			FlyteUrl: "flyte://v1/proj/dev/wfexecid/n0-d0/i/o5",
+		})
+		assert.Error(t, err)
+	})
+
+	t.Run("error requesting missing name with a retry attempt", func(t *testing.T) {
+		_, err := s.GetData(context.Background(), &service.GetDataRequest{
+			FlyteUrl: "flyte://v1/proj/dev/wfexecid/n0-d0/5/o/o1",
+		})
+		assert.Error(t, err)
+	})
 }
 
 func TestService_Error(t *testing.T) {

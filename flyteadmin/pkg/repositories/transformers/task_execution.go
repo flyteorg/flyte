@@ -5,24 +5,22 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/storage"
-
+	jsonpatch "github.com/evanphx/json-patch"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 var empty _struct.Struct
@@ -40,8 +38,13 @@ func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecution
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal occurredAt with error: %v", err)
 	}
-	taskExecutionModel.StartedAt = &occurredAt
-	closure.StartedAt = request.Event.OccurredAt
+	//Updated the startedAt timestamp only if its not set.
+	// The task start event should already be updating this through addTaskStartedState
+	// This check makes sure any out of order
+	if taskExecutionModel.StartedAt == nil {
+		taskExecutionModel.StartedAt = &occurredAt
+		closure.StartedAt = request.Event.OccurredAt
+	}
 	return nil
 }
 
@@ -441,9 +444,8 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *Execu
 	}
 	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
 		trimmedErrOutputResult := closure.GetError()
-		if len(trimmedErrOutputResult.Message) > trimmedErrMessageLen {
-			trimmedErrOutputResult.Message = trimmedErrOutputResult.Message[0:trimmedErrMessageLen]
-		}
+		trimmedErrMessage := TrimErrorMessage(trimmedErrOutputResult.GetMessage())
+		trimmedErrOutputResult.Message = trimmedErrMessage
 		closure.OutputResult = &admin.TaskExecutionClosure_Error{
 			Error: trimmedErrOutputResult,
 		}

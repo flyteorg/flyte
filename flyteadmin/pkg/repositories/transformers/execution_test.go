@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 
@@ -72,6 +73,7 @@ func TestCreateExecutionModel(t *testing.T) {
 			IamRole: "iam_role",
 		},
 	}
+	namespace := "ns"
 	execution, err := CreateExecutionModel(CreateExecutionModelInput{
 		WorkflowExecutionID: core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -89,6 +91,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		Cluster:               cluster,
 		SecurityContext:       securityCtx,
 		LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
+		Namespace:             namespace,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "project", execution.Project)
@@ -106,6 +109,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	expectedSpec.Metadata.Principal = principal
 	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 		ExecutionCluster: cluster,
+		Namespace:        namespace,
 	}
 	expectedSpec.SecurityContext = securityCtx
 	expectedSpecBytes, _ := proto.Marshal(expectedSpec)
@@ -528,7 +532,7 @@ func TestFromExecutionModel(t *testing.T) {
 		StartedAt:    &startedAt,
 		State:        &stateInt,
 	}
-	execution, err := FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
+	execution, err := FromExecutionModel(context.TODO(), executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -556,7 +560,7 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 		AbortCause: abortCause,
 		Closure:    executionClosureBytes,
 	}
-	execution, err := FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
+	execution, err := FromExecutionModel(context.TODO(), executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Equal(t, core.WorkflowExecution_ABORTED, execution.Closure.Phase)
 	assert.True(t, proto.Equal(&admin.AbortMetadata{
@@ -564,7 +568,7 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 	}, execution.Closure.GetAbortMetadata()))
 
 	executionModel.Phase = core.WorkflowExecution_RUNNING.String()
-	execution, err = FromExecutionModel(executionModel, DefaultExecutionTransformerOptions)
+	execution, err = FromExecutionModel(context.TODO(), executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Empty(t, execution.Closure.GetAbortCause())
 }
@@ -589,7 +593,7 @@ func TestFromExecutionModel_Error(t *testing.T) {
 		Phase:   core.WorkflowExecution_FAILED.String(),
 		Closure: executionClosureBytes,
 	}
-	execution, err := FromExecutionModel(executionModel, &ExecutionTransformerOptions{
+	execution, err := FromExecutionModel(context.TODO(), executionModel, &ExecutionTransformerOptions{
 		TrimErrorMessage: true,
 	})
 	expectedExecErr := execErr
@@ -597,6 +601,53 @@ func TestFromExecutionModel_Error(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, core.WorkflowExecution_FAILED, execution.Closure.Phase)
 	assert.True(t, proto.Equal(expectedExecErr, execution.Closure.GetError()))
+}
+
+func TestFromExecutionModel_ValidUTF8TrimmedErrorMsg(t *testing.T) {
+	errMsg := "[1/1] currentAttempt done. Last Error: USER::                   │\n│ ❱  760 │   │   │   │   return __callback(*args, **kwargs)                    │\n││"
+
+	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase:        core.WorkflowExecution_FAILED,
+		OutputResult: &admin.ExecutionClosure_Error{Error: &core.ExecutionError{Message: errMsg}},
+	})
+	executionModel := models.Execution{
+		ExecutionKey: models.ExecutionKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Phase:   core.WorkflowExecution_FAILED.String(),
+		Closure: executionClosureBytes,
+	}
+	execution, err := FromExecutionModel(context.TODO(), executionModel, &ExecutionTransformerOptions{
+		TrimErrorMessage: true,
+	})
+	assert.NoError(t, err)
+	errMsgAreValidUTF8 := utf8.Valid([]byte(execution.GetClosure().GetError().GetMessage()))
+	assert.True(t, errMsgAreValidUTF8)
+}
+
+func TestFromExecutionModel_OverwriteNamespace(t *testing.T) {
+	abortCause := "abort cause"
+	executionClosureBytes, _ := proto.Marshal(&admin.ExecutionClosure{
+		Phase: core.WorkflowExecution_RUNNING,
+	})
+	executionModel := models.Execution{
+		ExecutionKey: models.ExecutionKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Phase:      core.WorkflowExecution_RUNNING.String(),
+		AbortCause: abortCause,
+		Closure:    executionClosureBytes,
+	}
+	overwrittenNamespace := "ns"
+	execution, err := FromExecutionModel(context.TODO(), executionModel, &ExecutionTransformerOptions{
+		DefaultNamespace: overwrittenNamespace,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, execution.GetSpec().GetMetadata().GetSystemMetadata().Namespace, overwrittenNamespace)
 }
 
 func TestFromExecutionModels(t *testing.T) {
@@ -641,7 +692,7 @@ func TestFromExecutionModels(t *testing.T) {
 			State:        &stateInt,
 		},
 	}
-	executions, err := FromExecutionModels(executionModels, DefaultExecutionTransformerOptions)
+	executions, err := FromExecutionModels(context.TODO(), executionModels, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Len(t, executions, 1)
 	assert.True(t, proto.Equal(&admin.Execution{
@@ -848,4 +899,11 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.False(t, strings.Contains(err.Error(), "Failed to unmarshal execution closure"))
 	})
+}
+
+func TestTrimErrorMessage(t *testing.T) {
+	errMsg := "[1/1] currentAttempt done. Last Error: USER::                   │\n│ ❱  760 │   │   │   │   return __callback(*args, **kwargs)                    │\n││"
+	trimmedErrMessage := TrimErrorMessage(errMsg)
+	errMsgAreValidUTF8 := utf8.Valid([]byte(trimmedErrMessage))
+	assert.True(t, errMsgAreValidUTF8)
 }

@@ -77,10 +77,16 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	}
 
 	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
-	urlSafeMd5 := base32.StdEncoding.EncodeToString(req.ContentMd5)
 
+	var prefix string
+	if len(req.FilenameRoot) > 0 {
+		prefix = req.FilenameRoot
+	} else {
+		// url safe base32 encoding
+		prefix = base32.StdEncoding.EncodeToString(req.ContentMd5)
+	}
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-		req.Project, req.Domain, urlSafeMd5, req.Filename)
+		req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
 	}
@@ -258,6 +264,25 @@ func (s Service) validateResolveArtifactRequest(req *service.GetDataRequest) err
 	return nil
 }
 
+// GetCompleteTaskExecutionID returns the task execution identifier for the task execution with the Task ID filled in.
+// The one coming from the node execution doesn't have this as this is not data encapsulated in the flyte url.
+func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID core.TaskExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
+		NodeExecutionId: taskExecID.GetNodeExecutionId(),
+		Limit:           1,
+		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(int(taskExecID.RetryAttempt))),
+	})
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to list task executions [%v]. Error: %v", taskExecID, err)
+	}
+	if len(taskExecs.TaskExecutions) == 0 {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "no task executions were listed [%v]. Error: %v", taskExecID, err)
+	}
+	taskExec := taskExecs.TaskExecutions[0]
+	return taskExec.Id, nil
+}
+
 func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
 	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
 		NodeExecutionId: &nodeExecID,
@@ -274,66 +299,61 @@ func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID
 	return taskExec.Id, nil
 }
 
-func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
+func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
 	*service.GetDataResponse, error) {
 
-	logger.Debugf(ctx, "resolving flyte url query: %s", req.GetFlyteUrl())
-	err := s.validateResolveArtifactRequest(req)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to validate resolve artifact request. Error: %v", err)
-	}
-
-	nodeExecID, attempt, ioType, err := common.ParseFlyteURL(req.GetFlyteUrl())
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse artifact url Error: %v", err)
-	}
-
-	// Get the data location, then decide how/where to fetch it from
-	if attempt == nil {
-		resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, admin.NodeExecutionGetDataRequest{
-			Id: &nodeExecID,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		var lm *core.LiteralMap
-		if ioType == common.ArtifactTypeI {
-			lm = resp.FullInputs
-		} else if ioType == common.ArtifactTypeO {
-			lm = resp.FullOutputs
-		} else {
-			// Assume deck, and create a download link request
-			dlRequest := service.CreateDownloadLinkRequest{
-				ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
-				Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: &nodeExecID},
-			}
-			resp, err := s.CreateDownloadLink(ctx, &dlRequest)
-			if err != nil {
-				return nil, err
-			}
-			return &service.GetDataResponse{
-				Data: &service.GetDataResponse_PreSignedUrls{
-					PreSignedUrls: resp.PreSignedUrls,
-				},
-			}, nil
-		}
-
-		return &service.GetDataResponse{
-			Data: &service.GetDataResponse_LiteralMap{
-				LiteralMap: lm,
-			},
-		}, nil
-	}
-	// Rest of the logic handles task attempt lookups
-	var lm *core.LiteralMap
-	taskExecID, err := s.GetTaskExecutionID(ctx, *attempt, nodeExecID)
+	resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, admin.NodeExecutionGetDataRequest{
+		Id: &nodeExecID,
+	})
 	if err != nil {
 		return nil, err
 	}
 
+	var lm *core.LiteralMap
+	if ioType == common.ArtifactTypeI {
+		lm = resp.FullInputs
+	} else if ioType == common.ArtifactTypeO {
+		lm = resp.FullOutputs
+	} else {
+		// Assume deck, and create a download link request
+		dlRequest := service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: &nodeExecID},
+		}
+		resp, err := s.CreateDownloadLink(ctx, &dlRequest)
+		if err != nil {
+			return nil, err
+		}
+		return &service.GetDataResponse{
+			Data: &service.GetDataResponse_PreSignedUrls{
+				PreSignedUrls: resp.PreSignedUrls,
+			},
+		}, nil
+	}
+
+	if name != "" {
+		if literal, ok := lm.Literals[name]; ok {
+			return &service.GetDataResponse{
+				Data: &service.GetDataResponse_Literal{
+					Literal: literal,
+				},
+			}, nil
+		}
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "name [%v] not found in node execution [%v]", name, nodeExecID)
+	}
+	return &service.GetDataResponse{
+		Data: &service.GetDataResponse_LiteralMap{
+			LiteralMap: lm,
+		},
+	}, nil
+}
+
+func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID core.TaskExecutionIdentifier, ioType common.ArtifactType, name string) (
+	*service.GetDataResponse, error) {
+
+	var lm *core.LiteralMap
 	reqT := admin.TaskExecutionGetDataRequest{
-		Id: taskExecID,
+		Id: &taskExecID,
 	}
 	resp, err := s.taskExecutionManager.GetTaskExecutionData(ctx, reqT)
 	if err != nil {
@@ -347,11 +367,51 @@ func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
 	} else {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "deck type cannot be specified with a retry attempt, just use the node instead")
 	}
+
+	if name != "" {
+		if literal, ok := lm.Literals[name]; ok {
+			return &service.GetDataResponse{
+				Data: &service.GetDataResponse_Literal{
+					Literal: literal,
+				},
+			}, nil
+		}
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "name [%v] not found in task execution [%v]", name, taskExecID)
+	}
+
 	return &service.GetDataResponse{
 		Data: &service.GetDataResponse_LiteralMap{
 			LiteralMap: lm,
 		},
 	}, nil
+
+}
+
+func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
+	*service.GetDataResponse, error) {
+
+	logger.Debugf(ctx, "resolving flyte url query: %s", req.GetFlyteUrl())
+	err := s.validateResolveArtifactRequest(req)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to validate resolve artifact request. Error: %v", err)
+	}
+
+	execution, err := common.ParseFlyteURLToExecution(req.GetFlyteUrl())
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse artifact url Error: %v", err)
+	}
+
+	if execution.NodeExecID != nil {
+		return s.GetDataFromNodeExecution(ctx, *execution.NodeExecID, execution.IOType, execution.LiteralName)
+	} else if execution.PartialTaskExecID != nil {
+		taskExecID, err := s.GetCompleteTaskExecutionID(ctx, *execution.PartialTaskExecID)
+		if err != nil {
+			return nil, err
+		}
+		return s.GetDataFromTaskExecution(ctx, *taskExecID, execution.IOType, execution.LiteralName)
+	}
+
+	return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse get data request %v", req)
 }
 
 func NewService(cfg config.DataProxyConfig,
