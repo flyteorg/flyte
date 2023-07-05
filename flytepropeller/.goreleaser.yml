@@ -29,33 +29,23 @@ builds:
 archives:
   - id: kubectl-flyte-archive
     name_template: |-
-      kubectl-flyte_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
-      {{- with .Arm -}}
-      {{- if (eq . "6") -}}hf
-      {{- else -}}v{{- . -}}
-      {{- end -}}
-      {{- end -}}
+      kubectl-flyte_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     builds:
       - kubectl-flyte
-    replacements:
-      386: i386
-      amd64: x86_64
     format_overrides:
       - goos: windows
         format: zip
   - id: flytepropeller-archive
     name_template: |-
-      flytepropeller_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
-      {{- with .Arm -}}
-      {{- if (eq . "6") -}}hf
-      {{- else -}}v{{- . -}}
-      {{- end -}}
-      {{- end -}}
+      flytepropeller_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     builds:
       - flytepropeller
-    replacements:
-      386: i386
-      amd64: x86_64
     format_overrides:
       - goos: windows
         format: zip
