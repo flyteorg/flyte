@@ -571,14 +571,14 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
    
          secrets:
            adminOauthClientCredentials:
-             enabled: true
+             enabled: true # see the section "Disable Helm secret management" if you require to do so
              # Replace with the client_secret provided by your IdP for flytepropeller.
              clientSecret: <client_secret>
              # Replace with the client_id provided by provided by your IdP for flytepropeller.
              clientId: <client_id>
       
-      1. Save your changes
-      2. Upgrade your Helm release with the new configuration:
+      2. Save your changes
+      3. Upgrade your Helm release with the new configuration:
 
       .. prompt:: bash $
 
@@ -633,6 +633,36 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
    **Congratulations**
 
    At this point, every interaction with Flyte components -be it in the UI or CLI- should require a succesful login to your IdP, where your security policies are maintained and enforced.
+
+
+Disable Helm secret management
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Alternatively, you can instruct Helm not to create and manage the secret for `flytepropeller`. In that case, you'll have to create it following this steps:
+
+1. Disable Helm secrets management in your values file
+
+.. code-block:: yaml
+
+   secrets:
+     adminOauthClientCredentials:
+       enabled: false #set to false
+       # Replace with the client_id provided by provided by your IdP for flytepropeller.
+       clientId: <client_id> 
+
+2. Create a secret declaratively:
+
+.. code-block:: yaml
+
+   apiVersion: v1
+   kind: Secret
+   metadata:
+    name: flyte-secret-auth
+    namespace: flyte
+   type: Opaque
+   stringData:
+  # Replace with the client_secret provided by your IdP for flytepropeller.
+     client_secret: <client_secret>
 
 
 Continuous Integration - CI
