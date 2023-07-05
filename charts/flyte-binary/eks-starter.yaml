@@ -26,3 +26,14 @@ serviceAccount:
   create: true
   annotations:
   eks.amazonaws.com/role-arn: "<FLYTE_BACKEND_IAM_ARN>"
+enabled_plugins:
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+      default-for-task-types:
+        container: container
+        sidecar: sidecar
+        container_array: k8s-array

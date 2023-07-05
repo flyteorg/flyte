@@ -69,17 +69,6 @@ configuration:
       cache:
         max_size_mbs: 10
         target_gc_percent: 100
-    tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
-          - spark
-        default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
-          - spark: spark
 clusterResourceTemplates:
   inline:
     001_namespace.yaml: |
@@ -174,3 +163,16 @@ serviceAccount:
   create: true
   annotations:
     eks.amazonaws.com/role-arn: "<FLYTE_BACKEND_IAM_ARN>"
+enabled_plugins:
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - container
+        - sidecar
+        - k8s-array
+        - spark
+      default-for-task-types:
+        container: container
+        sidecar: sidecar
+        container_array: k8s-array
+        spark: spark
