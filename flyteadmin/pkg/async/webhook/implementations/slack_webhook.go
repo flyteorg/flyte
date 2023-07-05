@@ -16,17 +16,19 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
+const Slack = "slack"
+
 type SlackWebhook struct {
 	Config        runtimeInterfaces.WebHookConfig
 	systemMetrics webhookMetrics
 }
 
 func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
-	//TODO implement me
 	return s.Config
 }
 
 func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) error {
+	// TODO: we should read the webhook URL from the secret
 	webhookURL := s.Config.URL
 	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Message))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))

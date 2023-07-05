@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"fmt"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"time"
 
@@ -17,14 +18,14 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
-const Slack = "slack"
-
 var enable64decoding = false
 
 func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) webhookInterfaces.Webhook {
-	// TODO: Get others webhooks
-	if config.Name == Slack {
+	switch config.Name {
+	case implementations.Slack:
 		return implementations.NewSlackWebhook(config, scope)
+	default:
+		panic(fmt.Errorf("no matching webhook implementation for %s", config.Name))
 	}
 	return nil
 }

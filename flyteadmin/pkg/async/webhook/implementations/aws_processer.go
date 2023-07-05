@@ -115,7 +115,7 @@ func (p *Processor) run() error {
 		}
 
 		executionModel, err := util.GetExecutionModel(context.Background(), p.db, *request.Event.ExecutionId)
-		adminExecution, err := transformers.FromExecutionModel(*executionModel, transformers.DefaultExecutionTransformerOptions)
+		adminExecution, err := transformers.FromExecutionModel(context.Background(), *executionModel, transformers.DefaultExecutionTransformerOptions)
 		payload.Message = notifications.SubstituteParameters(p.webhook.GetConfig().Payload, request, adminExecution)
 		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
 		if err = p.webhook.Post(context.Background(), payload); err != nil {
