@@ -46,7 +46,6 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
-	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8
 	google.golang.org/api v0.76.0
@@ -170,6 +169,7 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
@@ -214,4 +214,4 @@ replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.2022091
 // This was published in error when attempting to create 1.5.1 Flyte release.
 retract v1.1.94
 
-replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.8-0.20230525232442-053ca98a8450
+replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.13-0.20230705131852-ba27680aa8b3
