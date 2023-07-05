@@ -248,30 +248,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 	return logReader, nil
 }
 
-func primeFlytekitPod(ctx context.Context, podService corev1.PodInterface) {
-	_, err := podService.Create(ctx, &corev1api.Pod{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "py39-cacher",
-		},
-		Spec: corev1api.PodSpec{
-			RestartPolicy: corev1api.RestartPolicyNever,
-			Containers: []corev1api.Container{
-				{
-
-					Name:    "flytekit",
-					Image:   "ghcr.io/flyteorg/flytekit:py3.9-latest",
-					Command: []string{"echo"},
-					Args:    []string{"Flyte"},
-				},
-			},
-		},
-	}, v1.CreateOptions{})
-	if err != nil {
-		fmt.Printf("Failed to create primer pod - %s", err)
-	}
-}
-
-func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config, primePod bool, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) error {
+func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) error {
 	k8sCtxMgr := k8s.NewK8sContextManager()
 	err := k8sCtxMgr.CheckConfig()
 	if err != nil {
@@ -354,16 +331,13 @@ func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdC
 		if err := WatchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
 			return err
 		}
-		if primePod {
-			primeFlytekitPod(ctx, k8sClient.CoreV1().Pods("default"))
-		}
 	}
 	return nil
 }
 
 // StartClusterForSandbox is the code for the original multi deploy version of sandbox, should be removed once we
 // document the new development experience for plugins.
-func StartClusterForSandbox(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config, primePod bool, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) error {
+func StartClusterForSandbox(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) error {
 	k8sCtxMgr := k8s.NewK8sContextManager()
 	err := k8sCtxMgr.CheckConfig()
 	if err != nil {
@@ -408,16 +382,11 @@ func StartClusterForSandbox(ctx context.Context, args []string, sandboxConfig *s
 		if err := WatchFlyteDeployment(ctx, k8sClient.CoreV1()); err != nil {
 			return err
 		}
-		if primePod {
-			primeFlytekitPod(ctx, k8sClient.CoreV1().Pods("default"))
-		}
-
 	}
 	return nil
 }
 
 func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config) error {
-	primePod := true
 	sandboxImagePrefix := "sha"
 	exposedPorts, portBindings, err := docker.GetDemoPorts()
 	if err != nil {
@@ -425,7 +394,7 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 	}
 	// K3s will automatically write the file specified by this var, which is mounted from user's local state dir.
 	sandboxConfig.Env = append(sandboxConfig.Env, k3sKubeConfigEnvVar)
-	err = StartCluster(ctx, args, sandboxConfig, primePod, demoImageName, sandboxImagePrefix, exposedPorts, portBindings, util.DemoConsolePort)
+	err = StartCluster(ctx, args, sandboxConfig, demoImageName, sandboxImagePrefix, exposedPorts, portBindings, util.DemoConsolePort)
 	if err != nil {
 		return err
 	}
@@ -434,13 +403,12 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 }
 
 func StartSandboxCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config) error {
-	primePod := false
 	demoImagePrefix := "dind"
 	exposedPorts, portBindings, err := docker.GetSandboxPorts()
 	if err != nil {
 		return err
 	}
-	err = StartClusterForSandbox(ctx, args, sandboxConfig, primePod, sandboxImageName, demoImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
+	err = StartClusterForSandbox(ctx, args, sandboxConfig, sandboxImageName, demoImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 	if err != nil {
 		return err
 	}
