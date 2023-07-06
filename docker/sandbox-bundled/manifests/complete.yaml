@@ -448,7 +448,6 @@ data:
         - container
         - sidecar
         - k8s-array
-        - agent-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -779,7 +778,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: V3g2TnplcTJOaWJKSlYySw==
+  haSharedSecret: endhMGlvUE5wQjJ1MU9aUQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1177,7 +1176,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 5c75473e4c4ec5117347f88ddec8926b43b940d7ee5c32eac674247c27bb5949
+        checksum/configuration: 27624486d221e0785d6463b067254268c05ae7302cee3966d27e10731b8005e3
         checksum/db-password-secret: 669e1cdf4633c6dd40085f78d1bb6b9672d8120ff1f62077a879a4d46db133e2
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1286,7 +1285,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: bb9d654789dd5d10134c8ee7797aaa1630a19fd77ab1b374cec0e87b9a203d4d
+        checksum/secret: 9ed19331c6cfb2ac783866eab81ef47b469eecba3d66962cd51caa83470999c7
       labels:
         app: docker-registry
         release: flyte-sandbox
