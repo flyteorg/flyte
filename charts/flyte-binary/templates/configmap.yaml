@@ -70,6 +70,9 @@ data:
         port: {{ .port }}
         dbname: {{ .dbname }}
         options: {{ .options | quote }}
+        {{- if .passwordPath }}
+        passwordPath: {{ .passwordPath }}
+        {{- end }}
     {{- end }}
   003-storage.yaml: |
     propeller:
