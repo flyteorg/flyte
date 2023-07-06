@@ -102,11 +102,11 @@ browser.
        
           - ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.  
           
-       5. *Optional* - Add logout redirect URIs:
+       4. *Optional* - Add logout redirect URIs:
        
           - ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types). 
           
-       7. Take note of the Client ID and Client Secret
+       5. Take note of the Client ID and Client Secret
    
    .. group-tab:: Keycloak
 
@@ -410,23 +410,22 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
       4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
       5. Go to `Scopes`, click `Add Scope`. 
       6. Set the name to `all` (required) and check `Required` under the **User consent** option. 
-      7. Uncheck the `Block services from requesting this scope` option.  
-      8. Click **Save**.  
-      9. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
-      10 Uncheck the `Block services from requesting this scope` option. 
-      11. Click **Save**. 
-      12. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
-      13. Add a rule to the policy with the default settings (you can fine-tune these later).
-      14. Navigate back to the **Applications** section.
-      15. Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
-      16. Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
-      17. Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
-      18. Note down the **Client ID**; there will not be a secret.
-      19. Create an integration for `flytepropeller`; it should be created with the `OIDC - OpenID Connect` sign-on method and `Web Application` type.
-      20. Check the `Client Credentials` option under **Client acting on behalf of itself**.
-      21. This app does not need a specific redirect URI; nor does it need to be assigned to any users.
-      22. Note down the **Client ID** and **Client secret**; you will need these later.
-      23. Take note of the `Issuer URI`` for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
+      7. Uncheck the `Block services from requesting this scope` option and save your changes.   
+      8. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
+      9 Uncheck the `Block services from requesting this scope` option. 
+      10. Click **Save**. 
+      11. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
+      12. Add a rule to the policy with the default settings (you can fine-tune these later).
+      13. Navigate back to the **Applications** section.
+      14. Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
+      15. Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
+      16. Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
+      17. Note down the **Client ID**; there will not be a secret.
+      18. Create an integration for `flytepropeller`; it should be created with the `OIDC - OpenID Connect` sign-on method and `Web Application` type.
+      19. Check the `Client Credentials` option under **Client acting on behalf of itself**.
+      20. This app does not need a specific redirect URI; nor does it need to be assigned to any users.
+      21. Note down the **Client ID** and **Client secret**; you will need these later.
+      22. Take note of the `Issuer URI`` for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
    
       You should have three integrations total - one for the web interface (flyteconsole), one for `flytectl`, and one for `flytepropeller`.
    
@@ -526,8 +525,8 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
                  clientId: <oidc-clientId>
       
       
-      1. Save your changes
-      2. Upgrade your Helm release with the new configuration:
+      4. Save your changes
+      5. Upgrade your Helm release with the new configuration:
 
       .. prompt:: bash $
 
