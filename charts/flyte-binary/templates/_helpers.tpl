@@ -194,3 +194,32 @@ Get the Flyte ClusterRole name.
 {{- define "flyte-binary.rbac.clusterRoleName" -}}
 {{- printf "%s-cluster-role" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
+
+{{/*
+Get the name of the Flyte Agent Deployment.
+*/}}
+{{- define "flyte-binary.agent.name" -}}
+{{- printf "%s-agent" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Flyte Agent selector labels
+*/}}
+{{- define "flyte-binary.agent.selectorLabels" -}}
+{{- include "flyte-binary.selectorLabels" . }}
+app.kubernetes.io/component: agent
+{{- end }}
+
+{{/*
+Get the name of the service account to use
+*/}}
+{{- define "flyte-binary.agent.serviceAccountName" -}}
+{{- default (include "flyte-binary.serviceAccountName" .) .Values.flyteagent.deployment.serviceAccountName }}
+{{- end }}
+
+{{/*
+Get the Flyte Agent service port.
+*/}}
+{{- define "flyte-binary.agent.servicePort" -}}
+{{- default 8000 .Values.flyteagent.service.port -}}
+{{- end -}}
