@@ -39,7 +39,7 @@ For example
     )
 
 
-See detailed usage examples in the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_lp_notifications.py>`
+See detailed usage examples in the :std:doc:`User Guide <cookbook:auto_examples/deployment/lp_notifications>`
 
 Notifications can be combined with schedules to automatically alert you when a scheduled job succeeds or fails.
 

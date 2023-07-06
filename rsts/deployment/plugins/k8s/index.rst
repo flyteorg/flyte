@@ -46,30 +46,15 @@ Install the K8S Operator
 
 .. tabs::
 
-  .. group-tab:: PyTorch and TensorFlow
-  
-     Clone the training-operator repository:
-   
-     .. code-block:: bash
-   
-        git clone https://github.com/kubeflow/training-operator.git
-   
+  .. group-tab:: PyTorch/TensorFlow/MPI
+
      Build and apply the training-operator:
    
      .. code-block:: bash
    
         export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-        kustomize build training-operator/manifests/overlays/kubeflow | kubectl apply -f -
-  
-  .. group-tab:: MPI
-   
-     Apply the MPI operator:
-   
-     .. code-block:: bash
-   
-        export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-        kubectl apply -f https://raw.githubusercontent.com/kubeflow/mpi-operator/v0.4.0/deploy/v2beta1/mpi-operator.yaml
-  
+        kustomize build "https://github.com/kubeflow/training-operator.git/manifests/overlays/standalone?ref=v1.5.0" | kubectl apply -f -
+
   .. group-tab:: Ray
   
     Install the Ray Operator:

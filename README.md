@@ -57,16 +57,16 @@ We ship new features, bug fixes and performance improvements regularly. Read our
 
 🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types. <br />
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
-📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html). <br />
-🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
-🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
-📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/folders.html) between local and cloud storage. <br />
-🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/type_system/structured_dataset.html). <br />
+📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/map_task.html). <br />
+🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
+🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
+📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/folders.html) between local and cloud storage. <br />
+🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/type_system/structured_dataset.html). <br />
 🛡️ **Recover from failures**: Recover only the failed tasks. <br />
 🔁 **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
 🚦 **Versioned workflows**: Reproduce results and roll back to a previous workflow version any time. <br />
 🔍 **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
-🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/checkpoint.html) within a task execution. <br />
+🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/checkpoint.html) within a task execution. <br />
 🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
 ⏰ **Timeout**: Define a timeout period, after which the task is marked as failure. <br />
 🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
@@ -75,14 +75,14 @@ We ship new features, bug fixes and performance improvements regularly. Read our
 🏭 **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
 💸 **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
 ☁️ **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
-📅 **Scheduling**: [Schedule](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
-📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/lp_notifications.html) through Slack, PagerDuty or email. <br />
+📅 **Scheduling**: [Schedule](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
+📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/deployment/lp_notifications.html) through Slack, PagerDuty or email. <br />
 ⌛️ **Timeline view**: Evaluate the duration of each of your Flyte tasks and identify potential bottlenecks. <br />
 💨 **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
 🐳 **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
 🔀 **Parallelism**: Flyte tasks are inherently parallel to optimize resource consumption and improve performance. <br /> 
 💾 **Allocate resources dynamically** at the task level. <br />
-⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
+⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 
 ## Quick start
 
@@ -90,7 +90,7 @@ If you want to try out Flyte, the easiest way to get started is by using the Fly
 
 However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
 
-> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/basic_workflow.html) are, be sure to check out our guides on both!
+> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/basic_workflow.html) are, be sure to check out our guides on both!
 
 ### Deploy Flyte to production
 
