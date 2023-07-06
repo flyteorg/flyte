@@ -460,6 +460,7 @@ Apply external auth server configuration
 Follow the steps in this section to configure `flyteadmin` to use an external auth server. This section assumes that you have already completed and applied the configuration for the OIDC Identity Layer.
 
 .. tabs::
+   
    .. group-tab:: flyte-binary
       
       1. Go to the values YAML file you used to install Flyte using a Helm chart
