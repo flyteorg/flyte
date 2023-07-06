@@ -1,4 +1,4 @@
-{{- if .Values.flyteagent.create }}
+{{- if .Values.flyteagent.enable }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
