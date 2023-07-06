@@ -33,10 +33,10 @@ spec:
         {{- end }}
       annotations:
         {{- if .Values.commonAnnotations }}
-        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.flyteagent.deployment.podAnnotations }}
-        {{- tpl ( .Values.flyteagent.deployment.podAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.flyteagent.deployment.podAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.flyteagent.deployment.extraPodSpec }}
