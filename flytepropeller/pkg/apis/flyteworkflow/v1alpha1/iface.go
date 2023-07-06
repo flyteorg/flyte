@@ -226,6 +226,7 @@ type ExecutableDynamicNodeStatus interface {
 	GetDynamicNodePhase() DynamicNodePhase
 	GetDynamicNodeReason() string
 	GetExecutionError() *core.ExecutionError
+	GetIsFailurePermanent() bool
 }
 
 type MutableDynamicNodeStatus interface {
@@ -235,6 +236,7 @@ type MutableDynamicNodeStatus interface {
 	SetDynamicNodePhase(phase DynamicNodePhase)
 	SetDynamicNodeReason(reason string)
 	SetExecutionError(executionError *core.ExecutionError)
+	SetIsFailurePermanent(isFailurePermanent bool)
 }
 
 // ExecutableBranchNode is an interface for Branch node. All the methods are purely read only except for the

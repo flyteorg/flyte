@@ -281,8 +281,12 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 
 		// As we do not support Failure Node, we can just return failure in this case
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoDynamicRunning(nil)),
-			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "Dynamic workflow failed", Error: state.Err},
-			nil
+			handler.DynamicNodeState{
+				Phase:              v1alpha1.DynamicNodePhaseFailing,
+				Reason:             "Dynamic workflow failed",
+				Error:              state.Err,
+				IsFailurePermanent: state.HasFailed(),
+			}, nil
 	}
 
 	if state.IsComplete() {

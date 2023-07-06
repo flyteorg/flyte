@@ -5,9 +5,8 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/storage"
-
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 // This is the legacy state structure that gets translated to node status
@@ -31,9 +30,10 @@ type BranchNodeState struct {
 type DynamicNodePhase uint8
 
 type DynamicNodeState struct {
-	Phase  v1alpha1.DynamicNodePhase
-	Reason string
-	Error  *core.ExecutionError
+	Phase              v1alpha1.DynamicNodePhase
+	Reason             string
+	Error              *core.ExecutionError
+	IsFailurePermanent bool
 }
 
 type WorkflowNodeState struct {

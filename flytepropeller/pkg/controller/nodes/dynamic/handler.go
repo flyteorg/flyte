@@ -202,11 +202,18 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.Nod
 			return trns, err
 		}
 
-		// TODO: Use Execution Error for ds.Error type to propagate the recoverable flag and determine if the error is retryable.
+		// if DynamicNodeStatus is noted with permanent failures we report a non-recoverable failure
+		phaseInfoFailureFunc := handler.PhaseInfoRetryableFailure
+		phaseInfoFailureFuncErr := handler.PhaseInfoRetryableFailureErr
+		if ds.IsFailurePermanent {
+			phaseInfoFailureFunc = handler.PhaseInfoFailure
+			phaseInfoFailureFuncErr = handler.PhaseInfoFailureErr
+		}
+
 		if ds.Error != nil {
-			trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailureErr(ds.Error, nil))
+			trns = handler.DoTransition(handler.TransitionTypeEphemeral, phaseInfoFailureFuncErr(ds.Error, nil))
 		} else {
-			trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure(core.ExecutionError_UNKNOWN, "DynamicNodeFailing", ds.Reason, nil))
+			trns = handler.DoTransition(handler.TransitionTypeEphemeral, phaseInfoFailureFunc(core.ExecutionError_UNKNOWN, "DynamicNodeFailing", ds.Reason, nil))
 		}
 	case v1alpha1.DynamicNodePhaseParentFinalizing:
 		if err := d.finalizeParentNode(ctx, nCtx); err != nil {

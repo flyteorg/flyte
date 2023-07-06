@@ -112,6 +112,38 @@ func (_m *MutableDynamicNodeStatus) GetExecutionError() *core.ExecutionError {
 	return r0
 }
 
+type MutableDynamicNodeStatus_GetIsFailurePermanent struct {
+	*mock.Call
+}
+
+func (_m MutableDynamicNodeStatus_GetIsFailurePermanent) Return(_a0 bool) *MutableDynamicNodeStatus_GetIsFailurePermanent {
+	return &MutableDynamicNodeStatus_GetIsFailurePermanent{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableDynamicNodeStatus) OnGetIsFailurePermanent() *MutableDynamicNodeStatus_GetIsFailurePermanent {
+	c_call := _m.On("GetIsFailurePermanent")
+	return &MutableDynamicNodeStatus_GetIsFailurePermanent{Call: c_call}
+}
+
+func (_m *MutableDynamicNodeStatus) OnGetIsFailurePermanentMatch(matchers ...interface{}) *MutableDynamicNodeStatus_GetIsFailurePermanent {
+	c_call := _m.On("GetIsFailurePermanent", matchers...)
+	return &MutableDynamicNodeStatus_GetIsFailurePermanent{Call: c_call}
+}
+
+// GetIsFailurePermanent provides a mock function with given fields:
+func (_m *MutableDynamicNodeStatus) GetIsFailurePermanent() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type MutableDynamicNodeStatus_IsDirty struct {
 	*mock.Call
 }
@@ -157,4 +189,9 @@ func (_m *MutableDynamicNodeStatus) SetDynamicNodeReason(reason string) {
 // SetExecutionError provides a mock function with given fields: executionError
 func (_m *MutableDynamicNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
 	_m.Called(executionError)
+}
+
+// SetIsFailurePermanent provides a mock function with given fields: isFailurePermanent
+func (_m *MutableDynamicNodeStatus) SetIsFailurePermanent(isFailurePermanent bool) {
+	_m.Called(isFailurePermanent)
 }

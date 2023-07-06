@@ -96,9 +96,10 @@ const (
 
 type DynamicNodeStatus struct {
 	MutableStruct
-	Phase  DynamicNodePhase `json:"phase,omitempty"`
-	Reason string           `json:"reason,omitempty"`
-	Error  *ExecutionError  `json:"error,omitempty"`
+	Phase              DynamicNodePhase `json:"phase,omitempty"`
+	Reason             string           `json:"reason,omitempty"`
+	Error              *ExecutionError  `json:"error,omitempty"`
+	IsFailurePermanent bool             `json:"permFailure,omitempty"`
 }
 
 func (in *DynamicNodeStatus) GetDynamicNodePhase() DynamicNodePhase {
@@ -114,6 +115,10 @@ func (in *DynamicNodeStatus) GetExecutionError() *core.ExecutionError {
 		return nil
 	}
 	return in.Error.ExecutionError
+}
+
+func (in *DynamicNodeStatus) GetIsFailurePermanent() bool {
+	return in.IsFailurePermanent
 }
 
 func (in *DynamicNodeStatus) SetDynamicNodeReason(reason string) {
@@ -135,6 +140,13 @@ func (in *DynamicNodeStatus) SetExecutionError(err *core.ExecutionError) {
 		in.Error = &ExecutionError{ExecutionError: err}
 	} else {
 		in.Error = nil
+	}
+}
+
+func (in *DynamicNodeStatus) SetIsFailurePermanent(isFailurePermanent bool) {
+	if in.IsFailurePermanent != isFailurePermanent {
+		in.SetDirty()
+		in.IsFailurePermanent = isFailurePermanent
 	}
 }
 
