@@ -403,14 +403,14 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
       2. Click on `Add Authorization Server`. 
       3. Assign an informative name and set the audience to the public URL of FlyteAdmin (e.g. https://example.foobar.com).
    
-         .. note::
+      .. note::
    
-           The audience must exactly match one of the URIs in the `authorizedUris` section above
+         The audience must exactly match one of the URIs in the `authorizedUris` section above
    
       4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
       5. Go to `Scopes`, click `Add Scope`. 
-      6. Set the name to `all` (required) and check `Required` under the **User consent** option. 
-      7. Uncheck the `Block services from requesting this scope` option and save your changes.   
+      6. Set the name to `all` (required) and check `Required` under the **User consent** option.   
+      7. Uncheck the `Block services from requesting this scope` option and save your changes.    
       8. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
       9 Uncheck the `Block services from requesting this scope` option. 
       10. Click **Save**. 
