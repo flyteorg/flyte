@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"context"
+
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -10,6 +11,8 @@ import (
 type RunFunc func() error
 
 type StopFunc func() error
+
+type WebhookPostFunc func(ctx context.Context, payload admin.WebhookPayload) error
 
 type MockSubscriber struct {
 	runFunc  RunFunc

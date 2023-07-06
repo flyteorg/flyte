@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 
 	"github.com/flyteorg/flytestdlib/logger"
 
