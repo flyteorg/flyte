@@ -63,18 +63,10 @@ spec:
           args:
           {{- tpl ( .Values.flyteagent.deployment.args | toYaml ) . | nindent 12 }}
           {{- end }}
+          {{- if .Values.flyteagent.deployment.extraEnvVars }}
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            {{- if .Values.flyteagent.deployment.extraEnvVars }}
-            {{- tpl ( .Values.flyteagent.deployment.extraEnvVars | toYaml ) . | nindent 12 }}
-            {{- end }}
+          {{- tpl ( .Values.flyteagent.deployment.extraEnvVars | toYaml ) . | nindent 12 }}
+          {{- end }}
           {{- if or .Values.flyteagent.deployment.extraEnvVarsConfigMap .Values.flyteagent.deployment.extraEnvVarsSecret }}
           envFrom:
             {{- if .Values.flyteagent.deployment.extraEnvVarsConfigMap }}
