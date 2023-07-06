@@ -99,9 +99,9 @@ browser.
        1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
        2. Create an app integration, with `OIDC - OpenID Connect` as the sign-on method and `Web Application` as the app type.
        3. Add sign-in redirect URIs: 
-          * ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types
+          * ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.  
        5. *Optional* - Add logout redirect URIs:
-          * ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types)
+          * ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types). 
        7. Take note of the Client ID and Client Secret
    
    .. group-tab:: Keycloak
@@ -373,7 +373,7 @@ browser.
    If you want to use an external OAuth2 provider for App authentication, please continue reading into the next section.
 
 Custom Authorization Server
-***************************
+---------------------------
 
 
 Flyte ships with an internal authorization server, hence setting up an external Authorization Server is optional but recommended. Having an external Authorization Server enables Flyte administrators control over which apps can be installed and what privileges can be granted to users. 
@@ -405,7 +405,7 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
       5. Go to `Scopes`, click `Add Scope`. 
       6. Set the name to `all` (required) and check `Required` under the **User consent** option. 
       7. Uncheck the `Block services from requesting this scope` option.  
-      8. Click **Save**
+      8. Click **Save**.
       9. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options
       10 Uncheck the `Block services from requesting this scope` option 
       11. Click **Save** 
