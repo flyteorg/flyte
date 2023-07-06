@@ -28,7 +28,6 @@ func GetWebhook(config runtimeInterfaces.WebHookConfig, scope promutils.Scope) w
 	default:
 		panic(fmt.Errorf("no matching webhook implementation for %s", config.Name))
 	}
-	return nil
 }
 
 func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) []interfaces.Processor {
