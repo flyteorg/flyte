@@ -61,13 +61,14 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      agent-service:
       {{- if .Values.configuration.agentService }}
+      agent-service:
       {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
       {{- else if .Values.flyteagent.create }}
-          defaultGrpcEndpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
-          supportedTaskTypes:
-          - bigquery_query_job_task
+      agent-service:
+        defaultGrpcEndpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
+        supportedTaskTypes:
+        - bigquery_query_job_task
       {{- end }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
