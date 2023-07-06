@@ -104,7 +104,6 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |
-| flyteagent.create | bool | `false` |  |
 | flyteagent.deployment.annotations | object | `{}` |  |
 | flyteagent.deployment.args | list | `[]` |  |
 | flyteagent.deployment.command | list | `[]` |  |
@@ -129,9 +128,9 @@ Chart for basic single Flyte executable deployment
 | flyteagent.deployment.podSecurityContext.runAsUser | int | `65534` |  |
 | flyteagent.deployment.readinessProbe | object | `{}` |  |
 | flyteagent.deployment.replicas | int | `1` |  |
-| flyteagent.deployment.serviceAccountName | string | `""` |  |
 | flyteagent.deployment.sidecars | list | `[]` |  |
 | flyteagent.deployment.startupProbe | object | `{}` |  |
+| flyteagent.enable | bool | `false` |  |
 | flyteagent.service.annotations | object | `{}` |  |
 | flyteagent.service.clusterIP | string | `""` |  |
 | flyteagent.service.externalTrafficPolicy | string | `"Cluster"` |  |
@@ -142,6 +141,11 @@ Chart for basic single Flyte executable deployment
 | flyteagent.service.nodePort | string | `""` |  |
 | flyteagent.service.port | string | `""` |  |
 | flyteagent.service.type | string | `"ClusterIP"` |  |
+| flyteagent.serviceAccount.annotations | object | `{}` |  |
+| flyteagent.serviceAccount.create | bool | `true` |  |
+| flyteagent.serviceAccount.imagePullSecrets | list | `[]` |  |
+| flyteagent.serviceAccount.labels | object | `{}` |  |
+| flyteagent.serviceAccount.name | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
@@ -174,6 +178,7 @@ Chart for basic single Flyte executable deployment
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
+| serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
 
