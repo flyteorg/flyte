@@ -99,9 +99,11 @@ browser.
        1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
        2. Create an app integration, with `OIDC - OpenID Connect` as the sign-on method and `Web Application` as the app type.
        3. Add sign-in redirect URIs: 
-          * ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.  
+       
+          - ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.  
        5. *Optional* - Add logout redirect URIs:
-          * ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types). 
+       
+          - ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types). 
        7. Take note of the Client ID and Client Secret
    
    .. group-tab:: Keycloak
@@ -111,6 +113,7 @@ browser.
        2. Create a realm using the `admin console <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/realms/create.html>`__
        3. Create an OIDC client with client secret and note them down. Use the following `instructions <https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/clients/client-oidc.html>`__
        4. Add Login redirect URIs:
+       
           - ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.
    
    .. group-tab:: Microsoft Azure AD
@@ -138,7 +141,7 @@ browser.
          The OpenIDConnect authentication will not work otherwise, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
 
 
-2. Apply OIDC Configuration
+1. Apply OIDC Configuration
 ===========================
 
 .. tabs::
@@ -402,7 +405,7 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
    
            The audience must exactly match one of the URIs in the `authorizedUris` section above
    
-      4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.
+      4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
       5. Go to `Scopes`, click `Add Scope`. 
       6. Set the name to `all` (required) and check `Required` under the **User consent** option. 
       7. Uncheck the `Block services from requesting this scope` option.  
