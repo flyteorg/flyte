@@ -342,11 +342,13 @@ serviceAccount:
   labels: {}
   # annotations Add annotations to ServiceAccount
   annotations: {}
+  # imagePullSecrets Secrets to use for fetching images from private registries
+  imagePullSecrets: []
 
 # flyteagent Configure Flyte Agent objects
 flyteagent:
-  # create Flag to create deployment and service for bundled Flyte Agent
-  create: false
+  # enable Flag to enable bundled Flyte Agent
+  enable: false
   # deployment Configure Flyte Agent deployment specification
   deployment:
     # replicas Number of replicas to create
@@ -408,8 +410,6 @@ flyteagent:
     sidecars: []
     # initContainers Specify additional init containers for Flyte Agent pod
     initContainers: []
-    # serviceAccountName Name of service account to use for Flyte Agent deployment
-    serviceAccountName: ""
     # extraPodSpec Specify additional configuration for Flyte Agent pod
     # This can be used for adding affinity, tolerations, hostNetwork, etc.
     extraPodSpec: {}
@@ -437,6 +437,18 @@ flyteagent:
     loadBalancerSourceRanges: []
     # extraPorts Additional ports to add to Flyte Agent service
     extraPorts: []
+  # serviceAccount Configure Flyte Agent ServiceAccount
+  serviceAccount:
+    # create Create ServiceAccount for Flyte Agent
+    create: true
+    # name Name of service account
+    name: ""
+    # labels Add labels to ServiceAccount
+    labels: {}
+    # annotations Add annotations to ServiceAccount
+    annotations: {}
+    # imagePullSecrets Secrets to use for fetching images from private registries
+    imagePullSecrets: []
 
 enabled_plugins:
   # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)

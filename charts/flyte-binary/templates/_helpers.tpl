@@ -214,7 +214,7 @@ Get the name of the Flyte Agent Deployment.
 Flyte Agent selector labels
 */}}
 {{- define "flyte-binary.agent.selectorLabels" -}}
-{{- include "flyte-binary.selectorLabels" . }}
+{{ include "flyte-binary.baseLabels" . }}
 app.kubernetes.io/component: agent
 {{- end }}
 
@@ -222,7 +222,11 @@ app.kubernetes.io/component: agent
 Get the name of the service account to use
 */}}
 {{- define "flyte-binary.agent.serviceAccountName" -}}
-{{- default (include "flyte-binary.serviceAccountName" .) .Values.flyteagent.deployment.serviceAccountName }}
+{{- if .Values.flyteagent.serviceAccount.create }}
+{{- default (include "flyte-binary.agent.name" .) .Values.flyteagent.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.flyteagent.serviceAccount.name }}
+{{- end }}
 {{- end }}
 
 {{/*

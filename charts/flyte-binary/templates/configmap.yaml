@@ -64,7 +64,7 @@ data:
       {{- if .Values.configuration.agentService }}
       agent-service:
       {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
-      {{- else if .Values.flyteagent.create }}
+      {{- else if .Values.flyteagent.enable }}
       agent-service:
         defaultGrpcEndpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
         supportedTaskTypes:
