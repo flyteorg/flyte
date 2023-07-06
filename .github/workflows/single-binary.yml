@@ -167,7 +167,6 @@ jobs:
               memory: "0"
           EOF
           flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
-          docker exec flyte-sandbox kubectl delete pods -n default --all
       - name: Register examples
         uses: unionai/flyte-register-action@v0.0.2
         with:
@@ -175,7 +174,7 @@ jobs:
           config: boilerplate/flyte/end2end/functional-test-config.yaml
           project: flytesnacks
           domain: development
-          version: "v0.3.196"
+          version: latest
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -184,7 +183,6 @@ jobs:
       - name: End2End
         env:
           PRIORITIES: "P0"
-          VERSION: "v0.3.196"
         run: |
           make end2end_execute
 
