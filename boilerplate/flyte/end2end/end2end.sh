@@ -9,4 +9,4 @@ set -eu
 CONFIG_FILE=$1; shift
 EXTRA_FLAGS=( "$@" )
 
-python ./boilerplate/flyte/end2end/run-tests.py $VERSION $PRIORITIES $CONFIG_FILE ${EXTRA_FLAGS[@]}
+python ./boilerplate/flyte/end2end/run-tests.py $FLYTESNACKS_VERSION $FLYTESNACKS_PRIORITIES $CONFIG_FILE ${EXTRA_FLAGS[@]}
