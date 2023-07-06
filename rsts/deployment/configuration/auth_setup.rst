@@ -372,8 +372,9 @@ browser.
    It should now be possible to go to Flyte UI and be prompted for authentication. Flytectl should automatically pickup the change and start prompting for authentication as well.
    If you want to use an external OAuth2 provider for App authentication, please continue reading into the next section.
 
+
 Custom Authorization Server
----------------------------
+===========================
 
 
 Flyte ships with an internal authorization server, hence setting up an external Authorization Server is optional but recommended. Having an external Authorization Server enables Flyte administrators control over which apps can be installed and what privileges can be granted to users. 
@@ -450,7 +451,7 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
 
 
 Apply external auth server configuration
-========================================
+----------------------------------------
 
 Follow the steps in this section to configure `flyteadmin` to use an external auth server. This section assumes that you have already completed and applied the configuration for the OIDC Identity Layer.
 
