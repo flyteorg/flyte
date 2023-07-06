@@ -16,7 +16,6 @@ const webhookNotifications = "webhookNotifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
-const webhook = "webhook"
 const metricPort = 10254
 
 const KB = 1024

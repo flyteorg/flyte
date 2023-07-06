@@ -109,13 +109,26 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		if common.IsExecutionTerminal(request.Event.Phase) == false {
+		if !common.IsExecutionTerminal(request.Event.Phase) {
 			p.markMessageDone(msg)
 			continue
 		}
 
 		executionModel, err := util.GetExecutionModel(context.Background(), p.db, *request.Event.ExecutionId)
+		if err != nil {
+			p.systemMetrics.MessageProcessorError.Inc()
+			logger.Errorf(context.Background(), "failed to retrieve execution model for execution [%+v] from message [%s] with err: %v", request.Event.ExecutionId, stringMsg, err)
+			p.markMessageDone(msg)
+			continue
+		}
 		adminExecution, err := transformers.FromExecutionModel(context.Background(), *executionModel, transformers.DefaultExecutionTransformerOptions)
+		if err != nil {
+			p.systemMetrics.MessageProcessorError.Inc()
+			logger.Errorf(context.Background(), "failed to transform execution model [%+v] from message [%s] with err: %v", executionModel, stringMsg, err)
+			p.markMessageDone(msg)
+			continue
+		}
+
 		payload.Message = notifications.SubstituteParameters(p.webhook.GetConfig().Payload, request, adminExecution)
 		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
 		if err = p.webhook.Post(context.Background(), payload); err != nil {
