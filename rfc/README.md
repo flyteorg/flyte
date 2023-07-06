@@ -56,7 +56,7 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
 ### Opening a Pull Request
 
 * Fork the [flyte repository](https://github.com/flyteorg/flyte).
-* Copy `rfc/RFC-0000-Template.md` to `rfc/<category>/0000-my-feature.md` (where "my-feature" is descriptive). Don't assign an RFC number yet; this is going to be the PR number and we'll rename the file accordingly if the RFC is accepted.
+* From base of the repo `cp rfc/RFC-0000-Template.md rfc/<category>/0000-my-feature.md` (where "my-feature" is descriptive). Don't assign an RFC number yet; this is going to be the PR number and we'll rename the file accordingly if the RFC is accepted.
 * Fill in the RFC. Put care into the details.
 * Submit a pull request. As a pull request the RFC will receive design feedback from the larger community, and the author should be prepared to revise it in response.
 * Now that your RFC has an open pull request, use the pull request number (e.g. `123` from `https://github.com/flyteorg/flyte/pull/123`) to update your 0000- prefix to that number.
