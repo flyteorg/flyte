@@ -101,9 +101,11 @@ browser.
        3. Add sign-in redirect URIs: 
        
           - ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types.  
+          
        5. *Optional* - Add logout redirect URIs:
        
           - ``http://localhost:30081/logout`` for sandbox, ``https://<your deployment url>/callback`` for other Flyte deployment types). 
+          
        7. Take note of the Client ID and Client Secret
    
    .. group-tab:: Keycloak
@@ -409,13 +411,13 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
       5. Go to `Scopes`, click `Add Scope`. 
       6. Set the name to `all` (required) and check `Required` under the **User consent** option. 
       7. Uncheck the `Block services from requesting this scope` option.  
-      8. Click **Save**.
-      9. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options
-      10 Uncheck the `Block services from requesting this scope` option 
-      11. Click **Save** 
-      12. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`
+      8. Click **Save**.  
+      9. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
+      10 Uncheck the `Block services from requesting this scope` option. 
+      11. Click **Save**. 
+      12. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
       13. Add a rule to the policy with the default settings (you can fine-tune these later).
-      14. Navigate back to the **Applications** section
+      14. Navigate back to the **Applications** section.
       15. Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
       16. Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
       17. Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
