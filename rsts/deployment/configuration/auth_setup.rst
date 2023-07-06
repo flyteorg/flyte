@@ -397,37 +397,37 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
 
    .. group-tab:: Okta
    
-      Okta's custom authorization servers are available through an add-on license. The free developer accounts do include access, which you can use to test before rolling out the configuration more broadly.
+       Okta's custom authorization servers are available through an add-on license. The free developer accounts do include access, which you can use to test before rolling out the configuration more broadly.
    
-      1. From the left-hand menu, go to **Security** > **API**
-      2. Click on `Add Authorization Server`. 
-      3. Assign an informative name and set the audience to the public URL of FlyteAdmin (e.g. https://example.foobar.com).
+       1. From the left-hand menu, go to **Security** > **API**
+       2. Click on `Add Authorization Server`. 
+       3. Assign an informative name and set the audience to the public URL of FlyteAdmin (e.g. https://example.foobar.com).
    
-      .. note::
+       .. note::
    
-         The audience must exactly match one of the URIs in the `authorizedUris` section above
+          The audience must exactly match one of the URIs in the `authorizedUris` section above
    
-      4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
-      5. Go to `Scopes`, click `Add Scope`. 
-      6. Set the name to `all` (required) and check `Required` under the **User consent** option.   
-      7. Uncheck the `Block services from requesting this scope` option and save your changes.    
-      8. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
-      9 Uncheck the `Block services from requesting this scope` option. 
-      10. Click **Save**. 
-      11. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
-      12. Add a rule to the policy with the default settings (you can fine-tune these later).
-      13. Navigate back to the **Applications** section.
-      14. Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
-      15. Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
-      16. Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
-      17. Note down the **Client ID**; there will not be a secret.
-      18. Create an integration for `flytepropeller`; it should be created with the `OIDC - OpenID Connect` sign-on method and `Web Application` type.
-      19. Check the `Client Credentials` option under **Client acting on behalf of itself**.
-      20. This app does not need a specific redirect URI; nor does it need to be assigned to any users.
-      21. Note down the **Client ID** and **Client secret**; you will need these later.
-      22. Take note of the `Issuer URI`` for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
+       4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
+       5. Go to `Scopes`, click `Add Scope`. 
+       6. Set the name to `all` (required) and check `Required` under the **User consent** option.   
+       7. Uncheck the `Block services from requesting this scope` option and save your changes.    
+       8. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
+       9. Uncheck the `Block services from requesting this scope` option. 
+       10.  Click **Save**. 
+       11.  Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
+       12.  Add a rule to the policy with the default settings (you can fine-tune these later).
+       13.  Navigate back to the **Applications** section.
+       14.  Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
+       15.  Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
+       16.  Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
+       17.  Note down the **Client ID**; there will not be a secret.
+       18.  Create an integration for `flytepropeller`; it should be created with the `OIDC - OpenID Connect` sign-on method and `Web Application` type.
+       19. Check the `Client Credentials` option under **Client acting on behalf of itself**.
+       20. This app does not need a specific redirect URI; nor does it need to be assigned to any users.
+       21. Note down the **Client ID** and **Client secret**; you will need these later.
+       22. Take note of the `Issuer URI`` for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
    
-      You should have three integrations total - one for the web interface (flyteconsole), one for `flytectl`, and one for `flytepropeller`.
+       You should have three integrations total - one for the web interface (flyteconsole), one for `flytectl`, and one for `flytepropeller`.
    
    .. group-tab:: Keycloak
    
@@ -442,16 +442,16 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
 
    .. group-tab:: Azure AD
    
-      1. Navigate to tab **Overview**, obtain ``<client id>`` and ``<tenant id>``
-      2. Navigate to tab **Authentication**, click ``+Add a platform``
-      3. Add **Web** for flyteconsole and flytepropeller, **Mobile and desktop applications** for flytectl.
-      4. Add URL ``https://<console-url>/callback`` as the callback for Web
-      5. Add URL ``http://localhost:53593/callback`` as the callback for flytectl
-      6. In **Advanced settings**, set ``Enable the following mobile and desktop flows`` to **Yes** to enable deviceflow
-      7. Navigate to tab **Certificates & secrets**, click ``+New client secret`` to create ``<client secret>``
-      8. Navigate to tab **Token configuration**, click ``+Add optional claim`` and create email claims for both ID and Access Token
-      9.  Navigate to tab **API permissions**, add ``email``, ``offline_access``, ``openid``, ``profile``, ``User.Read``
-      10. Navigate to tab **Expose an API**, Click ``+Add a scope`` and ``+Add a client application`` to create ``<custom scope>``
+       1. Navigate to tab **Overview**, obtain ``<client id>`` and ``<tenant id>``
+       2. Navigate to tab **Authentication**, click ``+Add a platform``
+       3. Add **Web** for flyteconsole and flytepropeller, **Mobile and desktop applications** for flytectl.
+       4. Add URL ``https://<console-url>/callback`` as the callback for Web
+       5. Add URL ``http://localhost:53593/callback`` as the callback for flytectl
+       6. In **Advanced settings**, set ``Enable the following mobile and desktop flows`` to **Yes** to enable deviceflow
+       7. Navigate to tab **Certificates & secrets**, click ``+New client secret`` to create ``<client secret>``
+       8. Navigate to tab **Token configuration**, click ``+Add optional claim`` and create email claims for both ID and Access Token
+       9.  Navigate to tab **API permissions**, add ``email``, ``offline_access``, ``openid``, ``profile``, ``User.Read``
+       10. Navigate to tab **Expose an API**, Click ``+Add a scope`` and ``+Add a client application`` to create ``<custom scope>``
 
 
 Apply external auth server configuration
