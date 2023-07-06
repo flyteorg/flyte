@@ -8,7 +8,14 @@ Flyte Native Scheduler Architecture
 
 Introduction
 ============
-Any workflow engine needs functionality to support scheduled executions. Flyte fulfills this using an in-built native scheduler, which schedules fixed rate and cron-based schedules. The workflow author specifies the schedule during the `launchplan creation <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#cron-schedules>`__ and `activates or deactivates <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#activating-a-schedule>`__ the schedule using the `admin APIs <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#launchplanupdaterequest>`__ exposed for the launch plan.
+Any workflow engine needs functionality to support scheduled executions. Flyte
+fulfills this using an in-built native scheduler, which schedules fixed rate and
+cron-based schedules. The workflow author specifies the schedule during the
+:ref:`launchplan creation <cookbook:cron-schedules>`
+and :ref:`activates or deactivates <cookbook:activating-schedules>`
+the schedule using the
+:ref:`admin APIs <flyteidl:ref_flyteidl.admin.LaunchPlanUpdateRequest>`
+exposed for the launch plan.
 
 Characteristics
 ===============
@@ -51,7 +58,7 @@ Any failure in catching up is considered a hard failure and stops the scheduler.
 GOCronWrapper
 *************
 
-This component is responsible for locking in the time for the scheduled job to be invoked and adding those to the cron scheduler. It is a wrapper around `this framework <https://github.com/robfig/cron/v3>`__ for fixed rate and cron schedules that creates in-memory representation of the scheduled job functions. The scheduler schedules a function with scheduleTime parameters. When this scheduled function is invoked, the scheduleTime parameters provide the current schedule time used by the scheduler. This scheduler supports standard cron scheduling which has 5 `fields <https://en.wikipedia.org/wiki/Cron>`__. It requires 5 entries representing ``minute``, ``hour``, ``day of month``, ``month`` and ``day of week``, in that order.
+This component is responsible for locking in the time for the scheduled job to be invoked and adding those to the cron scheduler. It is a wrapper around `this framework <https://github.com/robfig/cron>`__ for fixed rate and cron schedules that creates in-memory representation of the scheduled job functions. The scheduler schedules a function with scheduleTime parameters. When this scheduled function is invoked, the scheduleTime parameters provide the current schedule time used by the scheduler. This scheduler supports standard cron scheduling which has 5 `fields <https://en.wikipedia.org/wiki/Cron>`__. It requires 5 entries representing ``minute``, ``hour``, ``day of month``, ``month`` and ``day of week``, in that order.
 
 Job Executor
 ************
