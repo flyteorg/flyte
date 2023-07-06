@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flytectl/clierrors"
 
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -36,6 +37,7 @@ func createProjectSetup() {
 	project.DefaultProjectConfig.Name = ""
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""
+	config.GetConfig().Project = ""
 }
 func TestCreateProjectFunc(t *testing.T) {
 	s := setup()

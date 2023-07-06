@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -45,8 +46,9 @@ var DefaultProjectConfig = &ConfigProject{
 }
 
 // GetProjectSpec return project spec from a file/flags
-func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
+func (c *ConfigProject) GetProjectSpec(cf *config.Config) (*admin.Project, error) {
 	projectSpec := admin.Project{}
+
 	if len(c.File) > 0 {
 		yamlFile, err := ioutil.ReadFile(c.File)
 		if err != nil {
@@ -56,23 +58,35 @@ func (c *ConfigProject) GetProjectSpec(id string) (*admin.Project, error) {
 		if err != nil {
 			return nil, err
 		}
-		if len(id) > 0 {
-			projectSpec.Id = id
+	} else {
+		projectSpec.Id = c.ID
+		projectSpec.Name = c.Name
+		projectSpec.Description = c.Description
+		projectSpec.Labels = &admin.Labels{
+			Values: c.Labels,
 		}
-		return &projectSpec, nil
+		projectState, err := c.MapToAdminState()
+		if err != nil {
+			return nil, err
+		}
+		projectSpec.State = projectState
 	}
 
-	projectSpec.Id = id
-	projectSpec.Name = c.Name
-	projectSpec.Description = c.Description
-	projectSpec.Labels = &admin.Labels{
-		Values: c.Labels,
-	}
-	projectState, err := c.MapToAdminState()
-	if err != nil {
+	project := cf.Project
+	if len(projectSpec.Id) == 0 && len(project) == 0 {
+		err := fmt.Errorf(clierrors.ErrProjectNotPassed)
 		return nil, err
 	}
-	projectSpec.State = projectState
+
+	if len(projectSpec.Id) > 0 && len(project) > 0 {
+		err := fmt.Errorf(clierrors.ErrProjectIDBothPassed)
+		return nil, err
+	}
+
+	// Get projectId from file, if not provided, fall back to project
+	if len(projectSpec.Id) == 0 {
+		projectSpec.Id = project
+	}
 	return &projectSpec, nil
 }
 

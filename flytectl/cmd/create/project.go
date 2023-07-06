@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -45,7 +46,7 @@ Create a project by definition file.
 )
 
 func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(project.DefaultProjectConfig.ID)
+	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig())
 	if err != nil {
 		return err
 	}

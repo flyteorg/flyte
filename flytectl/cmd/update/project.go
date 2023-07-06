@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytectl/cmd/config"
-
 	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -54,7 +53,7 @@ Update projects.(project/projects can be used interchangeably in these commands)
 Update a project by definition file. Note: The name shouldn't contain any whitespace characters.
 ::
 
- flytectl update project --file project.yaml 
+ flytectl update project --file project.yaml
 
 .. code-block:: yaml
 
@@ -84,10 +83,11 @@ Usage
 )
 
 func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig().Project)
+	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig())
 	if err != nil {
 		return err
 	}
+
 	if projectSpec.Id == "" {
 		return fmt.Errorf(clierrors.ErrProjectNotPassed)
 	}
