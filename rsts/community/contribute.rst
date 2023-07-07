@@ -315,8 +315,8 @@ Content
 -  `How to setup dev environment for
    flyteconsole? <#how-to-setup-dev-environment-for-flyteconsole>`__
 
--  `How to access to Flyte UI, minio, postgress, k3s, and endpoints?
-   <#how-to-access-to-flyte-ui-minio-postgress-k3s-and-endpoints>`__
+-  `How to access Flyte UI, minio, postgres, k3s, and endpoints?
+   <#how-to-access-flyte-ui-minio-postgres-k3s-and-endpoints>`__
 
 How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib?
 ******************************************************************************************************************************
@@ -445,7 +445,7 @@ The following instructions provide guidance on how to build single binary with y
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 
-**5. Test it by running a Hello World workflow.**
+**5. Test by running a Hello World workflow.**
 
 
 .. code:: shell
@@ -590,7 +590,7 @@ Depending on your needs, refer to one of the following guides to setup up the Fl
 - If you need to change the backend code, refer to the section on `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
 
 
-**2. Start Flyteconsole.**
+**2. Start flyteconsole.**
 
 
 .. code:: shell
@@ -642,7 +642,7 @@ load resources.
 **4. Go to** http://localhost:3000/console/.
 
 
-How to access to Flyte UI, minio, postgress, k3s, and endpoints?
+How to access Flyte UI, minio, postgres, k3s, and endpoints?
 *************************************************************************
 
 
@@ -659,7 +659,7 @@ This section presumes a local Flyte Cluster is already setup. If it isn't, refer
 
 You can access it via http://localhost:30080/console.
 
-**2. Access the Minio Console.**
+**2. Access the minio console.**
 
 
 Core Flyte components, such as Admin, Propeller, and DataCatalog, as well as user runtime containers rely on an object store (in this case, Minio) to hold files. 
@@ -671,7 +671,7 @@ Access the Minio console at: http://localhost:30080/minio/login. The default cre
 - Password: ``miniostorage``
 
 
-**3. Access Postgres.**
+**3. Access the postgres.**
 
 
 FlyteAdmin and DataCatalog use Postgres to store persistent records, and you can interact with Postgres on port ``30001``. Here is an example of using `psql` to connect:
@@ -691,7 +691,7 @@ FlyteAdmin and DataCatalog use Postgres to store persistent records, and you can
 
 Access the k3s dashboard at: http://localhost:30080/kubernetes-dashboard.
 
-**5. Access the Endpoints.**
+**5. Access the endpoints.**
 
 
 Service endpoints are defined in the `flyteidl` repository under the `service` directory. You can browse them at `here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/service>`__.
