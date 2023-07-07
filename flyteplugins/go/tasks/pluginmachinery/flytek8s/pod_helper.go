@@ -521,9 +521,19 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 
 							case "ImagePullBackOff":
 								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
-									OccurredAt: &t,
-								}), nil
+								if time.Since(t) >= config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration {
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), nil
+								}
+
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), nil
+
 							default:
 								// Since we are not checking for all error states, we may end up perpetually
 								// in the queued state returned at the bottom of this function, until the Pod is reaped
