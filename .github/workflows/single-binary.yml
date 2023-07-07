@@ -205,7 +205,7 @@ jobs:
                   register \
                   --project flytesnacks \
                   --domain development \
-                  --image cr.flyte.org/flyteorg/flytekit:py3.9-latest \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/examples/$f;
           done
