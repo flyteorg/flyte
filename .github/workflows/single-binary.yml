@@ -185,6 +185,8 @@ jobs:
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
+          # TODO: Enable this once refactored version produces a release tag
+          # ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
           for f in basics/basics/basic_workflow.py \
