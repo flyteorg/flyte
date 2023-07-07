@@ -50,6 +50,9 @@ var (
 		CreateContainerErrorGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
+		ImagePullBackoffGracePeriod: config2.Duration{
+			Duration: time.Minute * 3,
+		},
 		GpuResourceName: ResourceNvidiaGPU,
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -131,6 +134,11 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	CreateContainerErrorGracePeriod config2.Duration `json:"create-container-error-grace-period" pflag:"-,Time to wait for transient CreateContainerError errors to be resolved."`
+
+	// Time to wait for transient ImagePullBackoff errors to be resolved. If the
+	// error persists past this grace period, it will be inferred to be a permanent
+	// one, and the corresponding task marked as failed
+	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
 
 	// The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
