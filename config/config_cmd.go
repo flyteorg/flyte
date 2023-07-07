@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	PathFlag        = "file"
-	StrictModeFlag  = "strict"
-	CommandValidate = "validate"
-	CommandDiscover = "discover"
-	CommandDocs     = "docs"
+	PathFlag          = "file"
+	StrictModeFlag    = "strict"
+	CommandValidate   = "validate"
+	CommandDiscover   = "discover"
+	CommandDocs       = "docs"
+	DocsSectionLength = 120
 )
 
 type AccessorProvider func(options Options) Accessor
@@ -182,10 +183,10 @@ func printToc(orderedSectionKeys sets.String) {
 func printTitle(title string, isSubsection bool) {
 	if isSubsection {
 		fmt.Println(title)
-		fmt.Println(strings.Repeat("^", 80))
+		fmt.Println(strings.Repeat("^", DocsSectionLength))
 	} else {
 		fmt.Println("Section:", title)
-		fmt.Println(strings.Repeat("=", 80))
+		fmt.Println(strings.Repeat("=", DocsSectionLength))
 	}
 	fmt.Println()
 }
@@ -198,7 +199,7 @@ func printSection(name string, dataType string, defaultValue string, description
 
 	fmt.Printf("%s ", name)
 	fmt.Printf("(%s)\n", dataType)
-	fmt.Println(strings.Repeat(c, 80))
+	fmt.Println(strings.Repeat(c, DocsSectionLength))
 	fmt.Println()
 	if description != "" {
 		fmt.Printf("%s\n\n", description)
