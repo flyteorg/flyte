@@ -17,17 +17,12 @@ builds:
 archives:
   - id: flytecopilot-archive
     name_template: |-
-      flytecopilot_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
-      {{- with .Arm -}}
-      {{- if (eq . "6") -}}hf
-      {{- else -}}v{{- . -}}
-      {{- end -}}
-      {{- end -}}
+      flytecopilot_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     builds:
       - flytecopilot
-    replacements:
-      386: i386
-      amd64: x86_64
     format_overrides:
       - goos: windows
         format: zip
