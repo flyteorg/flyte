@@ -332,6 +332,18 @@ defaultServiceConfig (string)
   ""
   
 
+httpProxyURL (`config.URL`_)
+--------------------------------------------------------------------------------
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.Duration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
