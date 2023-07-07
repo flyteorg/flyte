@@ -287,7 +287,11 @@ To understand how the below components interact with each other, refer to :ref:`
 🔮 Development Environment Setup Guide
 ======================================
 
-This guide provides a step-by-step approach to setting up a local development environment for `flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_, `flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_, `flytekit <https://github.com/flyteorg/flytekit>`_ and `flyteconsole <https://github.com/flyteorg/flyteconsole>`_.
+This guide provides a step-by-step approach to setting up a local development environment for 
+`flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_, 
+`flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_, 
+`flytekit <https://github.com/flyteorg/flytekit>`_ , `flyteconsole <https://github.com/flyteorg/flyteconsole>`_,
+`datacatalog <https://github.com/flyteorg/datacatalog>`_, and `flytestdlib <https://github.com/flyteorg/flytestdlib>`_.
 
 Requirements
 ************
@@ -302,19 +306,22 @@ image. The following tools are required:
 Content
 *******
 
--  `How to set dev environment for flyteidl, flyteadmin, flyteplugins,
-   flytepropeller? <#how-to-set-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller>`__
+-  `How to setup dev environment for flyteidl, flyteadmin, flyteplugins,
+   flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
 
--  `How to set dev environment for
-   flytekit? <#how-to-set-dev-environment-for-flytekit>`__
+-  `How to setup dev environment for
+   flytekit? <#how-to-setup-dev-environment-for-flytekit>`__
 
--  `How to set dev environment for
-   flyteconsole? <#how-to-set-dev-environment-for-flyteconsole>`__
+-  `How to setup dev environment for
+   flyteconsole? <#how-to-setup-dev-environment-for-flyteconsole>`__
 
-How to set dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller?
-**********************************************************************************
+-  `How to access to Flyte UI, minio, postgress, k3s, and endpoints?
+   <#how-to-access-to-flyte-ui-minio-postgress-k3s-and-endpoints>`__
 
-**1. install Flytectl**
+How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib?
+******************************************************************************************************************************
+
+**1. Install Flytectl**
 
 
 `Flytectl <https://github.com/flyteorg/flytectl>`__ is a portable and lightweight command-line interface to work with Flyte.
@@ -330,13 +337,11 @@ How to set dev environment for flyteidl, flyteadmin, flyteplugins, flytepropelle
    # Step2: Export Flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
-**2. Build a k3s cluster that runs Minio and Postgres pods.**
+**2. Build a k3s cluster that runs Minio and Postgres Pods.**
 
 
-| `minio <https://min.io/>`__ is an S3-compatible object store that will
-  be used later to store task output, input, etc.
-| `postgres <https://www.postgresql.org/>`__ is an open-source
-  object-relational database that will later be used by flyteadmin to
+| `Minio <https://min.io/>`__ is an S3-compatible object store that will be used later to store task output, input, etc.
+| `Postgres <https://www.postgresql.org/>`__ is an open-source object-relational database that will later be used by flyteadmin/DataCatalog to
   store all Flyte information.
 
 .. code:: shell
@@ -362,20 +367,15 @@ How to set dev environment for flyteidl, flyteadmin, flyteplugins, flytepropelle
    # flyte-sandbox-minio-645c8ddf7c-sp6cc                  1/1     Running   0          5m
    # flyte-sandbox-postgresql-0                            1/1     Running   0          5m
 
-**3. [Optional] Access the Minio console via** http://localhost:30080/minio/login.
 
-
-| The default Username is ``minio`` and the default Password is ``miniostorage``.  
-| You might need to look at ``input.pb``, ``output.pb`` or ``deck.html``, etc in Minio when you are developing.
-
-**4. Run all backends(flyteidl, flyteadmin, flyteplugins, flytepropeller, console) in a single binary.**
+**3. Run all Flyte components (flyteadmin, flytepropeller, datacatalog, flyteconsole, etc) in a single binary.**
 
 The `Flyte repository <https://github.com/flyteorg/flyte>`__ includes Go code
-that integrates all backend components (flyteidl, flyteadmin, flyteplugins, flytepropeller, console, etc) into a single binary.
+that integrates all Flyte components into a single binary.
 
 .. code:: shell
 
-   # Step1: Download flyte repo
+   # Step1: Clone flyte repo
    git clone https://github.com/flyteorg/flyte.git
    cd flyte
 
@@ -383,7 +383,7 @@ that integrates all backend components (flyteidl, flyteadmin, flyteplugins, flyt
    # The versions of flyteidl, flyteadmin, flyteplugins, and flytepropeller used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
    go mod tidy
-   sudo -E env "PATH=$PATH" make compile
+   make compile
 
    # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
    # Replace occurrences of $HOME with the actual path of your home directory.
@@ -391,72 +391,61 @@ that integrates all backend components (flyteidl, flyteadmin, flyteplugins, flyt
 
    # Step4: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 
-   # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Run the command again will solve the problem.
-   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
+   # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
+   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
    # All logs from flyteadmin, flyteplugins, flytepropeller, etc. will appear in the terminal.
 
-**5. [Optional] Access the Flyte UI at** http://localhost:30080/console.
+
+**4. Build single binary with your own code.**
 
 
-**6. Build single binary with your own code.**
+The following instructions provide guidance on how to build single binary with your customized code, using ``flyteadmin`` as an example.
 
 
-The following instructions assume that you'll change flyteidl, flyteadmin, flyteplugins, and flytepropeller simultaneously (features
-that involve multiple components). If you don't need to change some components, simply ignore the instruction for that component.
+- **Note** Although we'll use ``flyteadmin`` as an example, these steps can be applied to other Flyte components or libraries as well.
+  ``{flyteadmin}`` below can be substituted with other Flyte components/libraries: ``flyteidl``, ``flyteplugins``, ``flytepropeller``, ``datacatalog``, or ``flytestdlib``.
+
+- **Note** If modifications are needed in multiple components/libraries, the steps will need to be repeated for each component/library.
 
 .. code:: shell
 
-   # Step1: Modify the source code for flyteidl, flyteadmin, flyteplugins, and flytepropeller.
+   # Step1: Fork and clone the {flyteadmin} repository, modify the source code accordingly.
+   git clone https://github.com/flyteorg/flyteadmin.git
+   cd flyteadmin
 
-   # Step2.1: Flyteidl, flyteadmin, flyteplugins, and flytepropeller use go1.19, so make sure to switch to go1.19.
+   # Step2.1: {Flyteadmin} uses Go 1.19, so make sure to switch to Go 1.19.
    export PATH=$PATH:$(go env GOPATH)/bin
    go install golang.org/dl/go1.19@latest
    go1.19 download
    export GOROOT=$(go1.19 env GOROOT)
    export PATH="$GOROOT/bin:$PATH"
-
-   # Step2.2: you may need to install goimports to fix lint errors.
+ 
+   # Step2.2: You may need to install goimports to fix lint errors.
    # Refer to https://pkg.go.dev/golang.org/x/tools/cmd/goimports
    go install golang.org/x/tools/cmd/goimports@latest
    export PATH=$(go env GOPATH)/bin:$PATH
 
-   # Step3.1: In the flyteidl folder, before building the single binary, you should run:
-   make generate
-   make lint
-
-   # Step3.2: In the flyteadmin folder, before building the single binary, you should run:
+   # Step 3.1: Review the go.mod file in the {flyteadmin} directory to identify the Flyte components/libraries that {flyteadmin} relies on.
+   # If you have modified any of these components/libraries, use `go mod edit -replace` in the {flyteadmin} repo to to replace original components/libraries with your customized ones.
+   # For instance, if you have also modified `flytepropeller`, run the following commands:
    go mod edit -replace github.com/flyteorg/flytepropeller=/home/ubuntu/flytepropeller #replace with your own local path to flytepropeller
-   go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
-   go mod edit -replace github.com/flyteorg/flyteplugins=/home/ubuntu/flyteplugins # replace with your own local path to flyteplugins
+
+   # Step 3.2: Generate code, fix lint errors and run unit tests for {flyteadmin}.
+   # Note, flyteidl does not have unit tests, so you can skip the `make test_unit` command.
+   # Note, flytestdlib only have `make generate` command.
    make generate
    make lint
    make test_unit
-
-   # Step3.3: In the flyteplugins folder, before building the single binary, you should run:
-   go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
-   make generate
-   make lint
-   make test_unit
-
-   # Step3.4: In the flytepropeller folder, before building the single binary, you should run:
-   go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
-   go mod edit -replace github.com/flyteorg/flyteplugins=/home/ubuntu/flyteplugins # replace with your own local path to flyteplugins
-   make generate
-   make lint
-   make test_unit
-
-   # Step4: Now, you can build the single binary. In the Flyte folder, run `go mod edit -replace`. This will replace the code with your own.
-   go mod edit -replace github.com/flyteorg/flyteadmin=/home/ubuntu/flyteadmin #replace with your own local path to flyteadmin
-   go mod edit -replace github.com/flyteorg/flytepropeller=/home/ubuntu/flytepropeller #replace with your own local path to flytepropeller
-   go mod edit -replace github.com/flyteorg/flyteidl=/home/ubuntu/flyteidl #replace with your own local path to flyteidl
-   go mod edit -replace github.com/flyteorg/flyteplugins=/home/ubuntu/flyteplugins # replace with your own local path to flyteplugins
+ 
+   # Step4: Now, you can build the single binary. Go back to Flyte directory, run `go mod edit -replace` to replace the {flyteadmin} code with your own.
+   go mod edit -replace github.com/flyteorg/flyteadmin=/home/ubuntu/flyteadmin #replace with your own local path to {flyteadmin} 
 
    # Step5: Rebuild and rerun the single binary based on your own code.
    go mod tidy
-   sudo -E env "PATH=$PATH" make compile
-   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
+   make compile
+   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 
-**7. Test it by running a Hello World workflow.**
+**5. Test it by running a Hello World workflow.**
 
 
 .. code:: shell
@@ -475,7 +464,7 @@ that involve multiple components). If you don't need to change some components, 
    pyflyte run --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
 
-**8. Tear down the k3s cluster After finishing developing.**
+**6. Tear down the k3s cluster After finishing developing.**
 
 
 .. code:: shell
@@ -486,16 +475,14 @@ that involve multiple components). If you don't need to change some components, 
    # ❇️ Run the following command to unset sandbox environment variables for accessing flytectl
    #        unset FLYTECTL_CONFIG 
 
-How to set dev environment for flytekit?
-****************************************
+How to setup dev environment for flytekit?
+*******************************************
 
 **1. Set up local Flyte Cluster.**
 
 
-If you are modifying the code for flyteidl, flyteadmin, flyteplugins, or flytepropeller, you can refer to `How to set up a development
-environment for flyteidl, flyteadmin, flyteplugins, and
-flytepropeller? <#how-to-set-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller>`__
-to build the backends.
+If you are also modifying the code for flyteidl, flyteadmin, flyteplugins, flytepropeller datacatalog, or flytestdlib, 
+refer to the instructions in the  `previous section <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__ to set up a local Flyte cluster.
 
 If not, we can start backends with a single command.
 
@@ -510,7 +497,7 @@ If not, we can start backends with a single command.
    # Step2: Export Flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
-   # Step3: Create backends. This will set up a k3s cluster running Minio, Postgres pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
+   # Step3: Create backends. This will setup a k3s cluster running Minio, Postgres pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
    flytectl demo start
    # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉 
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
@@ -548,7 +535,7 @@ If not, we can start backends with a single command.
 **3. Run workflow in sandbox.**
 
 
-Before you attempt to run your workflow in the sandbox, make sure you're able to successfully run it locally. 
+Before running your workflow in the sandbox, make sure you're able to successfully run it locally. 
 To deploy the workflow in the sandbox, you'll need to build a Flytekit image. 
 Create a Dockerfile in your Flytekit directory with the minimum required configuration to run a task, as shown below. 
 If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `officail flitekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__ 
@@ -561,11 +548,13 @@ If your task requires additional components, such as plugins, you may find it us
    ENV PYTHONPATH /root
    RUN apt-get update && apt-get install build-essential -y
    RUN apt-get install git -y
+   # The following line is an example of how to install your own plugins. In this case, it demonstrates how to install the 'deck' plugin.
+   # RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@"demo#egg=flytekitplugins-deck-standard&subdirectory=plugins/flytekit-deck-standard" # replace with your own repo and branch
    RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@demo # replace with your own repo and branch
    ENV FLYTE_INTERNAL_IMAGE "localhost:30000/flytekit:demo" # replace with your own image name and tag
 
 The instructions below explain how to build the image, push the image to
-the Flyte Cluster, and finally submit the workflow to the Flyte Cluster.
+the Flyte Cluster, and finally submit the workflow.
 
 .. code:: shell
 
@@ -590,15 +579,16 @@ the Flyte Cluster, and finally submit the workflow to the Flyte Cluster.
    pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
-How to set dev environment for flyteconsole?
-********************************************
+How to setup dev environment for flyteconsole?
+**********************************************
 
 **1. Set up local Flyte Cluster.**
 
-Depending on your needs, refer to one of the following guides to set up the backend:
+Depending on your needs, refer to one of the following guides to setup up the Flyte Cluster:
 
-- If you do not need to change the backend code, refer to `How to Set Up a Dev Environment for Flytekit? <#how-to-set-dev-environment-for-flytekit>`__
-- If you need to change the backend code, refer to `How to Set Up a Development Environment for Flyteidl, Flyteadmin, Flyteplugins, and Flytepropeller? <#how-to-set-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller>`__ 
+- If you do not need to change the backend code, refer to the section on `How to Set Up a Dev Environment for Flytekit? <#how-to-setup-dev-environment-for-flytekit>`__
+- If you need to change the backend code, refer to the section on `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
+
 
 **2. Start Flyteconsole.**
 
@@ -636,7 +626,7 @@ Depending on your needs, refer to one of the following guides to set up the back
    # Step7: Start Flyteconsole
    yarn start
 
-**3. Final Step: Install the Chrome plugin:** `Moesif Origin & CORS Changer <https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc>`__.
+**3. Install the Chrome plugin:** `Moesif Origin & CORS Changer <https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc>`__.
 
 
 We need to disable
@@ -650,6 +640,78 @@ load resources.
    3. set Access-Control-Allow-Credentials: true
 
 **4. Go to** http://localhost:3000/console/.
+
+
+How to access to Flyte UI, minio, postgress, k3s, and endpoints?
+*************************************************************************
+
+
+This section presumes a local Flyte Cluster is already setup. If it isn't, refer to either: 
+
+- `How to setup dev environment for flytekit? <#how-to-setup-dev-environment-for-flytekit>`__
+- `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
+
+
+**1. Access the Flyte UI.** 
+
+
+`Flyte UI <https://docs.flyte.org/en/latest/concepts/flyte_console.html>`__ is a web-based user interface for Flyte that lets you interact with Flyte objects and build directed acyclic graphs (DAGs) for your workflows. 
+
+You can access it via http://localhost:30080/console.
+
+**2. Access the Minio Console.**
+
+
+Core Flyte components, such as Admin, Propeller, and DataCatalog, as well as user runtime containers rely on an object store (in this case, Minio) to hold files. 
+During development, you might need to examine files such as `input.pb/output.pb <https://docs.flyte.org/en/latest/concepts/data_management.html#serialization-time>`__, or `deck.html <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/deck.html#flyte-decks>`__ stored in Minio.
+
+Access the Minio console at: http://localhost:30080/minio/login. The default credentials are:  
+
+- Username: ``minio``
+- Password: ``miniostorage``
+
+
+**3. Access Postgres.**
+
+
+FlyteAdmin and DataCatalog use Postgres to store persistent records, and you can interact with Postgres on port ``30001``. Here is an example of using `psql` to connect:
+
+.. code:: shell
+    
+    # Step1: Install the PostgreSQL client.
+    sudo apt-get update
+    sudo apt-get install postgresql-client
+
+    # Step2: Connect to the PostgreSQL server. The password is "postgres".
+    psql -h localhost -p 30001 -U postgres -d flyte
+
+
+**4. Access the k3s dashboard.** 
+
+
+Access the k3s dashboard at: http://localhost:30080/kubernetes-dashboard.
+
+**5. Access the Endpoints.**
+
+
+Service endpoints are defined in the `flyteidl` repository under the `service` directory. You can browse them at `here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/service>`__.
+
+For example, the endpoint for the `ListTaskExecutions <https://github.com/flyteorg/flyteidl/blob/b219c2ab37886801039fda67d913760ac6fc4c8b/protos/flyteidl/service/admin.proto#L442>`__ API is:
+
+.. code:: shell
+
+   /api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}
+
+You can access this endpoint at:
+
+.. code:: shell
+
+   # replace with your specific task execution parameters
+   http://localhost:30080/api/v1/task_executions/flytesnacks/development/fe92c0a8cbf684ad19a8/n0?limit=10000
+
+
+
+
 
 
 🐞 File an issue
