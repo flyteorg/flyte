@@ -38,60 +38,43 @@ func (i K8sSecretInjector) Type() config.SecretManagerType {
 }
 
 func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
+
 	if len(secret.Group) == 0 || len(secret.Key) == 0 {
 		return nil, false, fmt.Errorf("k8s Secrets Webhook require both key and group to be set. "+
 			"Secret: [%v]", secret)
 	}
 
-	switch secret.MountRequirement {
-	case core.Secret_ANY:
-		fallthrough
-	case core.Secret_FILE:
-		// Inject a Volume that to the pod and all of its containers and init containers that mounts the secret into a
-		// file.
-
-		volume := CreateVolumeForSecret(secret)
-		p.Spec.Volumes = AppendVolume(p.Spec.Volumes, volume)
-
-		// Mount the secret to all containers in the given pod.
-		mount := CreateVolumeMountForSecret(volume.Name, secret)
-		p.Spec.InitContainers = AppendVolumeMounts(p.Spec.InitContainers, mount)
-		p.Spec.Containers = AppendVolumeMounts(p.Spec.Containers, mount)
-
-		// Set environment variable to let the container know where to find the mounted files.
-		defaultDirEnvVar := corev1.EnvVar{
-			Name:  SecretPathDefaultDirEnvVar,
-			Value: filepath.Join(K8sSecretPathPrefix...),
+	// Check for new MountTarget field. If MountTarget doesn't exist, fall back to old MountRequirement field.
+	if secret.MountTarget != nil {
+		switch secret.MountTarget.(type) {
+		case *core.Secret_EnvVar:
+			target, ok := secret.GetMountTarget().(*core.Secret_EnvVar)
+			if ok {
+				injectSecretAsEnvVar(p, secret, &target.EnvVar.Name)
+			}
+		case *core.Secret_File:
+			target, ok := secret.GetMountTarget().(*core.Secret_File)
+			if ok {
+				injectSecretAsFile(p, secret, &target.File.Path)
+			}
+		default:
+			err := fmt.Errorf("unrecognized mount target [%v] for secret [%v]", secret.GetMountTarget(), secret.Key)
+			logger.Error(ctx, err)
+			return p, false, err
 		}
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, defaultDirEnvVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, defaultDirEnvVar)
-
-		// Sets an empty prefix to let the containers know the file names will match the secret keys as-is.
-		prefixEnvVar := corev1.EnvVar{
-			Name:  SecretPathFilePrefixEnvVar,
-			Value: "",
+	} else {
+		switch secret.MountRequirement {
+		case core.Secret_ANY:
+			fallthrough
+		case core.Secret_FILE:
+			injectSecretAsFile(p, secret, nil)
+		case core.Secret_ENV_VAR:
+			injectSecretAsEnvVar(p, secret, nil)
+		default:
+			err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+			logger.Error(ctx, err)
+			return p, false, err
 		}
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
-	case core.Secret_ENV_VAR:
-		envVar := CreateEnvVarForSecret(secret)
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
-
-		prefixEnvVar := corev1.EnvVar{
-			Name:  SecretEnvVarPrefix,
-			Value: K8sDefaultEnvVarPrefix,
-		}
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
-	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
-		logger.Error(ctx, err)
-		return p, false, err
 	}
 
 	return p, true, nil
@@ -99,4 +82,55 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 
 func NewK8sSecretsInjector() K8sSecretInjector {
 	return K8sSecretInjector{}
+}
+
+func injectSecretAsFile(p *corev1.Pod, secret *core.Secret, mountPath *string) {
+	// Inject a Volume that to the pod and all of its containers and init containers that mounts the secret into a
+	// file.
+	volume := CreateVolumeForSecret(secret)
+	p.Spec.Volumes = AppendVolume(p.Spec.Volumes, volume)
+
+	// Mount the secret to all containers in the given pod.
+	mount := CreateVolumeMountForSecret(volume.Name, secret)
+	if mountPath != nil {
+		mount = CreateVolumeMountForSecretWithMountPath(volume.Name, secret, *mountPath)
+	}
+	p.Spec.InitContainers = AppendVolumeMounts(p.Spec.InitContainers, mount)
+	p.Spec.Containers = AppendVolumeMounts(p.Spec.Containers, mount)
+
+	// Set environment variable to let the container know where to find the mounted files.
+	defaultDirEnvVar := corev1.EnvVar{
+		Name:  SecretPathDefaultDirEnvVar,
+		Value: filepath.Join(K8sSecretPathPrefix...),
+	}
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, defaultDirEnvVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, defaultDirEnvVar)
+
+	// Sets an empty prefix to let the containers know the file names will match the secret keys as-is.
+	prefixEnvVar := corev1.EnvVar{
+		Name:  SecretPathFilePrefixEnvVar,
+		Value: "",
+	}
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
+}
+
+func injectSecretAsEnvVar(p *corev1.Pod, secret *core.Secret, envVarName *string) {
+	envVar := CreateEnvVarForSecret(secret)
+	if envVarName != nil {
+		envVar = CreateNamedEnvVarForSecret(secret, *envVarName)
+	}
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
+
+	prefixEnvVar := corev1.EnvVar{
+		Name:  SecretEnvVarPrefix,
+		Value: K8sDefaultEnvVarPrefix,
+	}
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
 }

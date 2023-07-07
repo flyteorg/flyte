@@ -26,12 +26,25 @@ func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
 
 func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 	optional := true
-	secretName := strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key)
-	if len(secret.EnvName) != 0 {
-		secretName = secret.EnvName
-	}
+	envVarName := strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key)
 	return corev1.EnvVar{
-		Name: secretName,
+		Name: envVarName,
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: secret.Group,
+				},
+				Key:      secret.Key,
+				Optional: &optional,
+			},
+		},
+	}
+}
+
+func CreateNamedEnvVarForSecret(secret *core.Secret, envVarName string) corev1.EnvVar {
+	optional := true
+	return corev1.EnvVar{
+		Name: envVarName,
 		ValueFrom: &corev1.EnvVarSource{
 			SecretKeyRef: &corev1.SecretKeySelector{
 				LocalObjectReference: corev1.LocalObjectReference{
@@ -69,6 +82,14 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 		Name:      volumeName,
 		ReadOnly:  true,
 		MountPath: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.Group)),
+	}
+}
+
+func CreateVolumeMountForSecretWithMountPath(volumeName string, secret *core.Secret, mountPath string) corev1.VolumeMount {
+	return corev1.VolumeMount{
+		Name:      volumeName,
+		ReadOnly:  true,
+		MountPath: mountPath,
 	}
 }
 
