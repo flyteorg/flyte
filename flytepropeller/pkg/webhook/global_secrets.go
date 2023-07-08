@@ -36,37 +36,40 @@ func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *co
 		return p, false, err
 	}
 
-	switch secret.MountRequirement {
-	case coreIdl.Secret_FILE:
-		return nil, false, fmt.Errorf("global secrets can only be injected as environment "+
-			"variables [%v/%v]", secret.Group, secret.Key)
-	case coreIdl.Secret_ANY:
-		fallthrough
-	case coreIdl.Secret_ENV_VAR:
-		if len(secret.Group) == 0 {
-			return nil, false, fmt.Errorf("mounting a secret to env var requires selecting the "+
-				"secret and a single key within. Key [%v]", secret.Key)
+	if secret.MountTarget != nil {
+		switch secret.MountTarget.(type) {
+		case *coreIdl.Secret_EnvVar:
+			target, ok := secret.GetMountTarget().(*coreIdl.Secret_EnvVar)
+			if ok {
+				InjectEnvVar(p, secret, &target.EnvVar.Name, v)
+			}
+		case *coreIdl.Secret_File:
+			return nil, false, fmt.Errorf("global secrets can only be injected as environment "+
+				"variables [%v/%v]", secret.Group, secret.Key)
+		default:
+			err := fmt.Errorf("unrecognized mount target [%v] for secret [%v]", secret.GetMountTarget(), secret.Key)
+			logger.Error(ctx, err)
+			return p, false, err
 		}
+	} else {
+		switch secret.MountRequirement {
+		case coreIdl.Secret_FILE:
+			return nil, false, fmt.Errorf("global secrets can only be injected as environment "+
+				"variables [%v/%v]", secret.Group, secret.Key)
+		case coreIdl.Secret_ANY:
+			fallthrough
+		case coreIdl.Secret_ENV_VAR:
+			if len(secret.Group) == 0 {
+				return nil, false, fmt.Errorf("mounting a secret to env var requires selecting the "+
+					"secret and a single key within. Key [%v]", secret.Key)
+			}
 
-		envVar := corev1.EnvVar{
-			Name:  strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
-			Value: v,
+			InjectEnvVar(p, secret, nil, v)
+		default:
+			err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+			logger.Error(ctx, err)
+			return p, false, err
 		}
-
-		prefixEnvVar := corev1.EnvVar{
-			Name:  SecretEnvVarPrefix,
-			Value: K8sDefaultEnvVarPrefix,
-		}
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
-
-		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
-		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
-	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
-		logger.Error(ctx, err)
-		return p, false, err
 	}
 
 	return p, true, nil
@@ -76,4 +79,27 @@ func NewGlobalSecrets(provider GlobalSecretProvider) GlobalSecrets {
 	return GlobalSecrets{
 		envSecretManager: provider,
 	}
+}
+
+func InjectEnvVar(p *corev1.Pod, secret *coreIdl.Secret, envVarName *string, value string) {
+	_envVarName := strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key)
+	if envVarName != nil {
+		_envVarName = *envVarName
+	}
+
+	envVar := corev1.EnvVar{
+		Name:  _envVarName,
+		Value: value,
+	}
+
+	prefixEnvVar := corev1.EnvVar{
+		Name:  SecretEnvVarPrefix,
+		Value: K8sDefaultEnvVarPrefix,
+	}
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
+
+	p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
+	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
 }

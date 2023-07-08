@@ -50,12 +50,12 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		case *core.Secret_EnvVar:
 			target, ok := secret.GetMountTarget().(*core.Secret_EnvVar)
 			if ok {
-				injectSecretAsEnvVar(p, secret, &target.EnvVar.Name)
+				InjectSecretAsEnvVar(p, secret, &target.EnvVar.Name)
 			}
 		case *core.Secret_File:
 			target, ok := secret.GetMountTarget().(*core.Secret_File)
 			if ok {
-				injectSecretAsFile(p, secret, &target.File.Path)
+				InjectSecretAsFile(p, secret, &target.File.Path)
 			}
 		default:
 			err := fmt.Errorf("unrecognized mount target [%v] for secret [%v]", secret.GetMountTarget(), secret.Key)
@@ -67,9 +67,9 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		case core.Secret_ANY:
 			fallthrough
 		case core.Secret_FILE:
-			injectSecretAsFile(p, secret, nil)
+			InjectSecretAsFile(p, secret, nil)
 		case core.Secret_ENV_VAR:
-			injectSecretAsEnvVar(p, secret, nil)
+			InjectSecretAsEnvVar(p, secret, nil)
 		default:
 			err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
 			logger.Error(ctx, err)
@@ -84,7 +84,7 @@ func NewK8sSecretsInjector() K8sSecretInjector {
 	return K8sSecretInjector{}
 }
 
-func injectSecretAsFile(p *corev1.Pod, secret *core.Secret, mountPath *string) {
+func InjectSecretAsFile(p *corev1.Pod, secret *core.Secret, mountPath *string) {
 	// Inject a Volume that to the pod and all of its containers and init containers that mounts the secret into a
 	// file.
 	volume := CreateVolumeForSecret(secret)
@@ -117,7 +117,7 @@ func injectSecretAsFile(p *corev1.Pod, secret *core.Secret, mountPath *string) {
 	p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
 }
 
-func injectSecretAsEnvVar(p *corev1.Pod, secret *core.Secret, envVarName *string) {
+func InjectSecretAsEnvVar(p *corev1.Pod, secret *core.Secret, envVarName *string) {
 	envVar := CreateEnvVarForSecret(secret)
 	if envVarName != nil {
 		envVar = CreateNamedEnvVarForSecret(secret, *envVarName)
