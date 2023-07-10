@@ -99,7 +99,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.32"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.30"
       k8s-array:
         logs:
           config:
