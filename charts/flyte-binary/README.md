@@ -41,7 +41,8 @@ If you're trying to get a secret into the flyte executable's set of configuratio
   ```
   At run time, the binary will read this in and merge it into the configuration that ultimately gets used.
 
-* Set the value separately as a secret.  The advantage of doing this is that you don't have to have a secret sitting as plaintext in your Helm values file.
+* Set the value separately as a secret.  The advantage of doing this is that you don't have to have a secret sitting as plaintext in your Helm values file. Create an external secret containing info such as DB password, S3 access/secret key, client secret hash, etc.
+
   ```
   $ cat <<EOF | kubectl apply -f -
   apiVersion: v1
@@ -70,10 +71,39 @@ If you're trying to get a secret into the flyte executable's set of configuratio
                 client_secret: <CLIENT_SECRET_HASH>
   EOF
   ```
+  Then reference the newly created secret in `.Values.configuration.inlineSecretRef` in `values.yaml` by setting:
+
+  ```
+  configuration:
+    inlineSecretRef: flyte-binary-inline-config-secret
+  ```
 
   This option basically mirrors the first option, except that you're creating the secret out of band (using TF or some other process).  This style of specifying secrets mimics the "inline" method for specifying additional configuration, hence the name.
 
-* For the secrets that always expect a path *(we should probably list these out)* you can do << insert the second block titled OIDC/Internal Client secrets in the main PR description >>.  The `flyte-binary` Helm chart is set up such that these get mounted directly under the `/etc/secrets/` folder.
+* For the secrets that always expect a path (currently just the OIDC secret and the client credentials secret that Flyte uses to talk to itself), you can store using K8s secrets as follows. First create an external secret containing the secret values:
+
+  ```
+  $ cat <<EOF | kubectl apply -f -
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: flyte-binary-client-secrets-external-secret
+    namespace: flyte
+  type: Opaque
+  stringData:
+    client_secret: <INTERNAL_CLIENT_SECRET>
+    oidc_client_secret: <OIDC_CLIENT_SECRET>
+  EOF
+  ```
+
+  Then reference the newly created secret in `.Values.configuration.auth.clientSecretsExternalSecretRef` in `values.yaml` as follows:
+  ```
+  configuration:
+    auth:
+      clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret
+  ```
+
+  The `flyte-binary` Helm chart is set up such that these get mounted directly under the `/etc/secrets/` folder.
 
 ## Values
 
