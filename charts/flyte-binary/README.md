@@ -18,6 +18,7 @@ Chart for basic single Flyte executable deployment
 | configuration.agentService | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
+| configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
 | configuration.auth.enableAuthServer | bool | `true` |  |
 | configuration.auth.enabled | bool | `false` |  |
 | configuration.auth.flyteClient.audience | string | `""` |  |
@@ -40,8 +41,10 @@ Chart for basic single Flyte executable deployment
 | configuration.database.port | int | `5432` |  |
 | configuration.database.username | string | `"postgres"` |  |
 | configuration.externalConfigMap | string | `""` |  |
+| configuration.externalSecretRef | string | `""` |  |
 | configuration.inline | object | `{}` |  |
 | configuration.inlineConfigMap | string | `""` |  |
+| configuration.inlineSecretRef | string | `""` |  |
 | configuration.labels | object | `{}` |  |
 | configuration.logging.level | int | `1` |  |
 | configuration.logging.plugins.cloudwatch.enabled | bool | `false` |  |

@@ -70,6 +70,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Flag to use external configuration.
+*/}}
+{{- define "flyte-binary.configuration.externalConfiguration" -}}
+{{- or .Values.configuration.externalConfigMap .Values.configuration.externalSecretRef -}}
+{{- end -}}
+
+{{/*
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
@@ -77,17 +84,10 @@ Get the Flyte configuration ConfigMap name.
 {{- end -}}
 
 {{/*
-Get the Flyte configuration database password secret name.
+Get the Flyte configuration Secret name.
 */}}
-{{- define "flyte-binary.configuration.database.passwordSecretName" -}}
-{{- printf "%s-db-pass" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
-
-{{/*
-Get the Flyte configuration database password secret mount path.
-*/}}
-{{- define "flyte-binary.configuration.database.passwordSecretMountPath" -}}
-{{- default "/var/run/secrets/flyte/db-pass" .Values.configuration.database.passwordPath -}}
+{{- define "flyte-binary.configuration.configSecretName" -}}
+{{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
