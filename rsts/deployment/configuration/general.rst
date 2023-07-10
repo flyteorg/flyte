@@ -290,6 +290,8 @@ The legacy technique is to set configuration options in Flyte's K8s plugin confi
 
     These two approaches can be used simultaneously, where the K8s plugin configuration will override the default PodTemplate values.
 
+.. _using-k8s-podtemplates:
+
 *******************************
 Using K8s PodTemplates
 *******************************
