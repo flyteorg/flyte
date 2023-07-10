@@ -1,8 +1,79 @@
-# flyte-binary
+# Flyte Single Deployment Helm Chart
+
+Chart for the single Flyte executable style of deployment
 
 ![Version: v0.1.10](https://img.shields.io/badge/Version-v0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
-Chart for basic single Flyte executable deployment
+## Management of Helm Values that are Secret
+Flyte as a platform over the course of its normal operation requires access to multiple resources that may be gated by the secrets. For example, the database might have a password, and if OAuth2 is enabled, there are multiple secrets that the control and data plane portion of Flyte will need access to. All these secrets that the Flyte binary relies on all ultimately come through in the form of files. There are two types of files that can contain secrets.
+
+### How Secrets are Loaded
+
+The secrets that the flyte binary relies on all ultimately come through in through files.  There are two types of files that can contain secrets.
+* Configuration Files to the Flyte Executable
+  These are a series of yaml files that get loaded via command line args to the executable.  Configuration for the same key (for maps, not lists) can be split across different files.  At run time, flyte's configuration system will merge the files to form one cohesive view of the configuration.  By default these are mounted under `/etc/flyte/config.d/` in the container. For example, if you were to set the database password via a configuration file, it would look like.
+  ```
+    database:
+      postgres:
+        username: postgres
+        password: mypassword
+  ```
+  This would get picked up by flyte's configuration logic that looks for the [db password](https://github.com/flyteorg/flyteadmin/blob/53282fe979b628447e72d0e3f8fd0e2b9235d929/pkg/runtime/interfaces/application_configuration.go#L45).
+
+* Raw Secret Files
+  These are files that contain just a straight value that gets read as a string value and should be the actual password you're looking for.  By default these are mounted under `/etc/secrets/` in the container.
+
+### Secrets with this Chart
+If you're trying to get a secret into the flyte executable's set of configuration files, there's two ways of going about this.
+
+* Set the value as plaintext in your Helm values file. This is the least secure, default option and if you're reading this you probably want the two options below. For example, the database password above is hooked up to the `chart/flyte-binary` Helm chart's value under
+  ```
+  configuration:
+  database:
+    password: "mypassword"
+  ```
+  If you do this, the Helm chart will create a K8s Secret whose value mimics the configuration structure that the flyte binary expects:
+  ```
+  012-database-secrets.yaml: |
+    database:
+      postgres:
+        password: "mypassword"
+  ```
+  At run time, the binary will read this in and merge it into the configuration that ultimately gets used.
+
+* Set the value separately as a secret.  The advantage of doing this is that you don't have to have a secret sitting as plaintext in your Helm values file.
+  ```
+  $ cat <<EOF | kubectl apply -f -
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: flyte-binary-inline-config-secret
+    namespace: flyte
+  type: Opaque
+  stringData:
+    202-database-secrets.yaml: |
+      database:
+        postgres:
+          password: <DB_PASSWORD>
+    203-storage-secrets.yaml: |
+      storage:
+        stow:
+          config:
+            access_key_id: <S3_ACCESS_KEY>
+            secret_key: <S3_SECRET_KEY>
+    204-auth-secrets.yaml: |
+      auth:
+        appAuth:
+          selfAuthServer:
+            staticClients:
+              flytepropeller:
+                client_secret: <CLIENT_SECRET_HASH>
+  EOF
+  ```
+
+  This option basically mirrors the first option, except that you're creating the secret out of band (using TF or some other process).  This style of specifying secrets mimics the "inline" method for specifying additional configuration, hence the name.
+
+* For the secrets that always expect a path *(we should probably list these out)* you can do << insert the second block titled OIDC/Internal Client secrets in the main PR description >>.  The `flyte-binary` Helm chart is set up such that these get mounted directly under the `/etc/secrets/` folder.
 
 ## Values
 

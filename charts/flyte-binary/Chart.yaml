@@ -1,6 +1,6 @@
 apiVersion: v2
 name: flyte-binary
-description: Chart for basic single Flyte executable deployment
+description: Chart for the single Flyte executable style of deployment
 
 type: application
 

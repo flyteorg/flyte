@@ -150,6 +150,11 @@ team maintains Helm charts that correspond with the latter two deployment paths.
       :language: yaml
       :caption: charts/flyte/Chart.yaml
 
+
+Secrets in Helm
+---------------
+Note that configuration values for the Flyte platform to function may involve certain secret values (especially if Authentication is enabled for instance). The ``flyte-binary`` chart comes additional functionality to set these secret values in a more secure way so that sensitive data is stored as plain-text in your Helm values files. See the guide in ``flyte-binary`` chart's Readme.
+
 **************************************
 Deployment Tips and Tricks
 **************************************
