@@ -441,7 +441,6 @@ data:
     tasks:
       task-plugins:
         default-for-task-types:
-          bigquery_query_job_task: agent-service
           container: container
           container_array: k8s-array
           sidecar: sidecar
@@ -449,7 +448,6 @@ data:
         - container
         - sidecar
         - k8s-array
-        - agent-service
     plugins:
       logs:
         kubernetes-enabled: true
@@ -466,10 +464,6 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      agent-service:
-        defaultGrpcEndpoint: flyte-sandbox-http.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-        - bigquery_query_job_task
   002-database.yaml: |
     database:
       postgres:
@@ -790,7 +784,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: T2pOZ0pudEljMmNQUzdUTA==
+  haSharedSecret: RDFqS1N3Z1RaaWw2UTRveg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -912,6 +906,7 @@ spec:
     port: 8089
     targetPort: grpc
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -933,14 +928,8 @@ spec:
     nodePort: null
     port: 8088
     targetPort: http
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
-  - name: agent-grpc
-    port: 8000
-    targetPort: agent-grpc
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -1084,6 +1073,7 @@ spec:
     port: 443
     targetPort: webhook
   selector:
+    app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyte-sandbox
   type: ClusterIP
@@ -1183,6 +1173,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app.kubernetes.io/component: flyte-binary
       app.kubernetes.io/instance: flyte-sandbox
       app.kubernetes.io/name: flyte-sandbox
   strategy:
@@ -1191,9 +1182,10 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: acb44ac515cfdfcb9fc7f5ac0d68a2d3703336f7f0f45d708961f53e220d1c45
+        checksum/configuration: 61fd030f1cf6a0903fe7696cc5a92de50c9f8ea2f636458a2036a05929c095f2
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
+        app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/name: flyte-sandbox
     spec:
@@ -1236,12 +1228,6 @@ spec:
           name: config
         - mountPath: /var/run/flyte
           name: state
-      - image: ghcr.io/flyteorg/flyteagent:1.6.2b1
-        imagePullPolicy: IfNotPresent
-        name: flyteagent
-        ports:
-        - containerPort: 8000
-          name: agent-grpc
       initContainers:
       - args:
         - |
@@ -1301,7 +1287,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: c5da0145e1985d5780bc5bfdce823bc6b149f7ddb9b88f1f051df2c009ee1319
+        checksum/secret: bd21016a74ab909d2141658a1698d749f0fc635e05c5bf730c8d72d39df26822
       labels:
         app: docker-registry
         release: flyte-sandbox

@@ -49,7 +49,8 @@ data:
       servicePort: 443
     flyte:{{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
   001-plugins.yaml: |
-    tasks:{{ .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
+    tasks:
+      {{- .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
       k8s:
@@ -60,7 +61,15 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      agent-service:{{ .Values.configuration.agentService | toYaml | nindent 8 }}
+      {{- if .Values.configuration.agentService }}
+      agent-service:
+      {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
+      {{- else if .Values.flyteagent.enable }}
+      agent-service:
+        defaultGrpcEndpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
+        supportedTaskTypes:
+        - bigquery_query_job_task
+      {{- end }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:

@@ -46,30 +46,78 @@ Install the K8S Operator
 
 .. tabs::
 
-  .. group-tab:: PyTorch and TensorFlow
-  
-     Clone the training-operator repository:
-   
-     .. code-block:: bash
-   
-        git clone https://github.com/kubeflow/training-operator.git
-   
+  .. group-tab:: PyTorch/TensorFlow/MPI
+
      Build and apply the training-operator:
    
      .. code-block:: bash
    
         export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-        kustomize build training-operator/manifests/overlays/kubeflow | kubectl apply -f -
-  
-  .. group-tab:: MPI
-   
-     Apply the MPI operator:
-   
-     .. code-block:: bash
-   
-        export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-        kubectl apply -f https://raw.githubusercontent.com/kubeflow/mpi-operator/v0.4.0/deploy/v2beta1/mpi-operator.yaml
-  
+        kustomize build "https://github.com/kubeflow/training-operator.git/manifests/overlays/standalone?ref=v1.5.0" | kubectl apply -f -
+
+
+    **Optional: Using a Gang Scheduler**
+
+    With the default Kubernetes scheduler, it can happen that some worker pods of distributed training jobs are scheduled
+    later than others due to resource constraints. This often causes the job to fail with a timeout error. To avoid
+    this you can use a gang scheduler, meaning that the worker pods are only scheduled once all of them can be scheduled at
+    the same time.
+    
+    To `enable gang scheduling for the Kubeflow training-operator <https://www.kubeflow.org/docs/components/training/job-scheduling/>`_,
+    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`_:
+
+    1. Install the `scheduler plugin as a second scheduler <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_.
+    2. Configure the Kubeflow training-operator to use the new scheduler:
+
+        Create a manifest called ``kustomization.yaml`` with the following content:
+
+        .. code-block:: yaml
+
+          apiVersion: kustomize.config.k8s.io/v1beta1
+          kind: Kustomization
+
+          resources:
+          - github.com/kubeflow/training-operator/manifests/overlays/standalone
+
+          patchesStrategicMerge:
+          - patch.yaml
+
+
+        Create a patch file called ``patch.yaml`` with the following content:
+
+        .. code-block:: yaml
+
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: training-operator
+          spec:
+            template:
+              spec:
+                containers:
+                - name: training-operator
+                  command:
+                  - /manager
+                  - --gang-scheduler-name=scheduler-plugins
+
+
+        Install the patched kustomization with:
+
+        .. code-block:: bash
+
+          kustomize build path/to/overlay/directory | kubectl apply -f -
+
+    3. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
+       to use the new gang scheduler for your tasks.
+      
+       See the :ref:`using-k8s-podtemplates` section for more information on pod templates in Flyte.
+       You can set the scheduler name in the pod template passed to the ``@task`` decorator. However, to prevent the
+       two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
+       in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
+       gang scheduler as well.
+
+
+
   .. group-tab:: Ray
   
     Install the Ray Operator:

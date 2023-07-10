@@ -184,7 +184,7 @@ spec:
             - name: webhook
               containerPort: 9443
           {{- if .Values.deployment.startupProbe }}
-          startupProbe: {{- tpl ( .Values.deployment.customStartupProbe | toYaml ) . | nindent 12 }}
+          startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
           {{- end }}
           livenessProbe:
           {{- if .Values.deployment.livenessProbe }}
@@ -222,16 +222,6 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
-        - name: flyteagent
-          {{- with .Values.flyteagent.image }}
-          image: {{ printf "%s:%s" .repository .tag | quote }}
-          imagePullPolicy: {{ .pullPolicy | quote }}
-          {{- end}}
-          {{- with .Values.flyteagent.ports }}
-          ports:
-          - name: {{ .name }}
-            containerPort: {{ .containerPort }}
-          {{- end}}
         {{- if .Values.deployment.sidecars }}
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
