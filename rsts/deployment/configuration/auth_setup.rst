@@ -152,6 +152,8 @@ Apply Configuration
 
         Note that this configuration uses the internal authorization server. See the other tab for additional information on how to configure an external server (like Okta).
 
+        Please see the discussion in the chart's README if you want to store the secret values separate from the rest of the Helm values.
+
    .. group-tab:: Helm (``flyte`` & ``flyte-core`` charts)
 
         #. Store the `client_secret` in a k8s secret as follows:
