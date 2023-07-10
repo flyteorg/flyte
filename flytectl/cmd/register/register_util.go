@@ -247,6 +247,10 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 		}
 	case *core.Node_GateNode:
 		// Do nothing.
+	case *core.Node_ArrayNode:
+		if err := hydrateNode(v.ArrayNode.Node, version, force); err != nil {
+			return fmt.Errorf("failed to hydrateNode")
+		}
 	default:
 		return fmt.Errorf("unknown type %T", v)
 	}

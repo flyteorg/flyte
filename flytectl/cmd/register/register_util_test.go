@@ -502,6 +502,33 @@ func TestHydrateNode(t *testing.T) {
 	})
 }
 
+func TestHydrateArrayNode(t *testing.T) {
+	registerFilesSetup()
+	node := &core.Node{
+		Target: &core.Node_ArrayNode{
+			ArrayNode: &core.ArrayNode{
+				Node: &core.Node{
+					Target: &core.Node_TaskNode{
+						TaskNode: &core.TaskNode{
+							Reference: &core.TaskNode_ReferenceId{
+								ReferenceId: &core.Identifier{
+									ResourceType: core.ResourceType_TASK,
+									Project:      "flytesnacks",
+									Domain:       "development",
+									Name:         "n1",
+									Version:      "v1",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	err := hydrateNode(node, rconfig.DefaultFilesConfig.Version, true)
+	assert.Nil(t, err)
+}
+
 func TestHydrateGateNode(t *testing.T) {
 	t.Run("Hydrate Sleep", func(t *testing.T) {
 		registerFilesSetup()
