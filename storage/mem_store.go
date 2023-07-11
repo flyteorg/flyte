@@ -3,6 +3,8 @@ package storage
 import (
 	"bytes"
 	"context"
+	"crypto/md5" // #nosec
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,6 +21,7 @@ type InMemoryStore struct {
 type MemoryMetadata struct {
 	exists bool
 	size   int64
+	etag   string
 }
 
 func (m MemoryMetadata) Size() int64 {
@@ -29,9 +32,21 @@ func (m MemoryMetadata) Exists() bool {
 	return m.exists
 }
 
+func (m MemoryMetadata) Etag() string {
+	return m.etag
+}
+
 func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
 	data, found := s.cache[reference]
-	return MemoryMetadata{exists: found, size: int64(len(data))}, nil
+	var hash [md5.Size]byte
+	if found {
+		hash = md5.Sum(data) // #nosec
+	}
+
+	return MemoryMetadata{
+		exists: found, size: int64(len(data)),
+		etag: hex.EncodeToString(hash[:]),
+	}, nil
 }
 
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
@@ -79,7 +94,7 @@ func (s *InMemoryStore) CreateSignedURL(ctx context.Context, reference DataRefer
 	return SignedURLResponse{}, fmt.Errorf("unsupported")
 }
 
-func NewInMemoryRawStore(_ *Config, metrics *dataStoreMetrics) (RawStore, error) {
+func NewInMemoryRawStore(_ context.Context, _ *Config, metrics *dataStoreMetrics) (RawStore, error) {
 	self := &InMemoryStore{
 		cache: map[DataReference]rawFile{},
 	}

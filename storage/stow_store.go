@@ -52,6 +52,16 @@ var fQNFn = map[string]func(string) DataReference{
 	},
 }
 
+// RegisterStowKind registers a new kind of stow store.
+func RegisterStowKind(kind string, f func(string) DataReference) error {
+	if _, ok := fQNFn[kind]; ok {
+		return fmt.Errorf("kind [%v] already registered", kind)
+	}
+
+	fQNFn[kind] = f
+	return nil
+}
+
 // Checks if the error is AWS S3 bucket not found error
 func awsBucketIsNotFound(err error) bool {
 	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
@@ -92,10 +102,11 @@ type stowMetrics struct {
 	DeleteLatency labeled.StopWatch
 }
 
-// Metadata that will be returned
+// StowMetadata that will be returned
 type StowMetadata struct {
 	exists bool
 	size   int64
+	etag   string
 }
 
 func (s StowMetadata) Size() int64 {
@@ -104,6 +115,10 @@ func (s StowMetadata) Size() int64 {
 
 func (s StowMetadata) Exists() bool {
 	return s.exists
+}
+
+func (s StowMetadata) Etag() string {
+	return s.etag
 }
 
 // Implements DataStore to talk to stow location store.
@@ -200,15 +215,19 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 	t := s.metrics.HeadLatency.Start(ctx)
 	item, err := container.Item(k)
 	if err == nil {
-		if _, err = item.Metadata(); err == nil {
-			size, err := item.Size()
-			if err == nil {
-				t.Stop()
-				return StowMetadata{
-					exists: true,
-					size:   size,
-				}, nil
-			}
+		if _, err = item.Metadata(); err != nil {
+			// Err will be caught below
+		} else if size, err := item.Size(); err != nil {
+			// Err will be caught below
+		} else if etag, err := item.ETag(); err != nil {
+			// Err will be caught below
+		} else {
+			t.Stop()
+			return StowMetadata{
+				exists: true,
+				size:   size,
+				etag:   etag,
+			}, nil
 		}
 	}
 
@@ -413,7 +432,7 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 }
 
 // Constructor for the StowRawStore
-func newStowRawStore(cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
+func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
 	if cfg.InitContainer == "" {
 		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
 	}

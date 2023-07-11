@@ -74,7 +74,7 @@ func TestDefaultProtobufStore(t *testing.T) {
 		}))
 		defer server.Close()
 
-		err = s.RefreshConfig(&Config{
+		err = s.RefreshConfig(context.TODO(), &Config{
 			Type: TypeMinio,
 			Stow: StowConfig{
 				Kind: TypeS3,
