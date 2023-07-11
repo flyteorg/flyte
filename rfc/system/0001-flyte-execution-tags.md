@@ -31,9 +31,10 @@ As a User I want to
 ### Support for tags
 
 We propose to solve the problem of discovery by supporting arbitrary metadata association with an entity. This is similar to concept of “tags” as in AWS.
-The tags are represented as plain string. In kubernetes this can be represented using “labels” and “annotations”. Labels and annotations are already supported per execution as documented in - [ExecutionCreateRequest](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executioncreaterequest) -> [ExecutionSpec](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executionspec). Moreover,  every project supports default labels [Project](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#project). Thus the final execution will have a the union of the project default labels + the user specified labels as it exists today.
+The tags are represented as plain string.
+We'll add tags to [ExecutionCreateRequest](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executioncreaterequest)  -> [ExecutionSpec](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executionspec).
 
-Currently, the resultant tags will be persisted in the database, instead of being applied to the
+The resultant tags will be persisted in the database, instead of being applied to the
 execution in Kubernetes. We'll create two new tables in the flyteadmin database.
 - ``execution_admin_tags`` is a join table, and it contains admin_tags ID and execution ID.
 - ``admin_tags`` saves all the tag names
