@@ -56,6 +56,7 @@ start:
 			--publish "30000:30000" \
 			--publish "30001:30001" \
 			--publish "30002:30002" \
+			--publish "30003:30003" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE)
 		export KUBECONFIG=$(PWD)/.kube/kubeconfig
