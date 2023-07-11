@@ -195,6 +195,30 @@ List of scopes to request
   []
   
 
+useAudienceFromAdmin (bool)
+--------------------------------------------------------------------------------
+
+Use Audience configured from admins public endpoint config.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+audience (string)
+--------------------------------------------------------------------------------
+
+Audience to use when initiating OAuth2 authorization requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 authorizationServerUrl (string)
 --------------------------------------------------------------------------------
 
@@ -280,6 +304,18 @@ defaultServiceConfig (string)
   ""
   
 
+httpProxyURL (`config.URL`_)
+--------------------------------------------------------------------------------
+
+OPTIONAL: HTTP Proxy to be used for OAuth requests.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.Duration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -306,6 +342,7 @@ URL (`url.URL`_)
   ForceQuery: false
   Fragment: ""
   Host: ""
+  OmitHost: false
   Opaque: ""
   Path: ""
   RawFragment: ""
@@ -376,6 +413,16 @@ RawPath (string)
 .. code-block:: yaml
 
   ""
+  
+
+OmitHost (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 ForceQuery (bool)
@@ -679,6 +726,40 @@ Sets logging format type.
 Section: plugins
 ================================================================================
 
+agent-service (`agent.Config`_)
+--------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  defaultGrpcEndpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
+  endpointForTaskTypes: null
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  supportedTaskTypes:
+  - task_type_1
+  - task_type_2
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
+  
+
 athena (`athena.Config`_)
 --------------------------------------------------------------------------------
 
@@ -954,6 +1035,13 @@ ray (`ray.Config`_)
   dashboardHost: 0.0.0.0
   includeDashboard: true
   nodeIPAddress: $MY_POD_IP
+  remoteClusterConfig:
+    auth:
+      caCertPath: ""
+      tokenPath: ""
+    enabled: false
+    endpoint: ""
+    name: ""
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -1075,7 +1163,7 @@ spark (`spark.Config`_)
   spark-history-server-url: ""
   
 
-athena.Config
+agent.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 webApi (`webapi.PluginConfig`_)
@@ -1116,28 +1204,37 @@ resourceConstraints (`core.ResourceConstraintsSpec`_)
     Value: 100
   
 
-defaultWorkGroup (string)
+defaultGrpcEndpoint (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Defines the default workgroup to use when running on Athena unless overwritten by the task.
+The default grpc endpoint of agent service.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  primary
+  dns:///flyte-agent.flyte.svc.cluster.local:80
   
 
-defaultCatalog (string)
+endpointForTaskTypes (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Defines the default catalog to use when running on Athena unless overwritten by the task.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  AwsDataCatalog
+  null
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_1
+  - task_type_2
   
 
 core.ResourceConstraintsSpec
@@ -1316,6 +1413,71 @@ Defines the maximum burst size.
 .. code-block:: yaml
 
   "100"
+  
+
+athena.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultWorkGroup (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the default workgroup to use when running on Athena unless overwritten by the task.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  primary
+  
+
+defaultCatalog (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the default catalog to use when running on Athena unless overwritten by the task.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  AwsDataCatalog
   
 
 aws.Config
@@ -2910,6 +3072,100 @@ nodeIPAddress (string)
 .. code-block:: yaml
 
   $MY_POD_IP
+  
+
+remoteClusterConfig (`k8s.ClusterConfig (remoteClusterConfig)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Configuration of remote K8s cluster for ray jobs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  auth:
+    caCertPath: ""
+    tokenPath: ""
+  enabled: false
+  endpoint: ""
+  name: ""
+  
+
+k8s.ClusterConfig (remoteClusterConfig)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Friendly name of the remote cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Remote K8s cluster endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+auth (`k8s.Auth (auth)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caCertPath: ""
+  tokenPath: ""
+  
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Boolean flag to enable or disable
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+k8s.Auth (auth)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tokenPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Token path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+caCertPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Certificate path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 snowflake.Config
@@ -4537,20 +4793,6 @@ Maximum number of plugin phase versions allowed for one phase.
   "100000"
   
 
-barrier (`config.BarrierConfig`_)
---------------------------------------------------------------------------------
-
-Config for Barrier implementation
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  cache-size: 10000
-  cache-ttl: 30m0s
-  enabled: true
-  
-
 backoff (`config.BackOffConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4601,45 +4843,6 @@ The cap of the backoff duration
 .. code-block:: yaml
 
   20s
-  
-
-config.BarrierConfig
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Barrier transitions using inmemory context
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "true"
-  
-
-cache-size (int)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max number of barrier to preserve in memory
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "10000"
-  
-
-cache-ttl (`config.Duration`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Max duration that a barrier would be respected if the process is not restarted. This should account for time required to store the record into persistent storage (across multiple rounds.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  30m0s
   
 
 config.TaskPluginConfig
@@ -4783,6 +4986,25 @@ AWS Secret Manager config.
   sidecarImage: docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
   
 
+gcpSecretManager (`config.GCPSecretManagerConfig`_)
+--------------------------------------------------------------------------------
+
+GCP Secret Manager config.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 500Mi
+  sidecarImage: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
 vaultSecretManager (`config.VaultSecretManagerConfig`_)
 --------------------------------------------------------------------------------
 
@@ -4792,6 +5014,7 @@ Vault Secret Manager config.
 
 .. code-block:: yaml
 
+  annotations: null
   kvVersion: "2"
   role: flyte
   
@@ -4851,6 +5074,36 @@ requests (v1.ResourceList)
   memory: 500Mi
   
 
+config.GCPSecretManagerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sidecarImage (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Specifies the sidecar docker image to use
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  
+
+resources (`v1.ResourceRequirements`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  limits:
+    cpu: 200m
+    memory: 500Mi
+  requests:
+    cpu: 200m
+    memory: 500Mi
+  
+
 config.VaultSecretManagerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4874,5 +5127,15 @@ kvVersion (int)
 .. code-block:: yaml
 
   "2"
+  
+
+annotations (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 

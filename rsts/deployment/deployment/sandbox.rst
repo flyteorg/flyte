@@ -6,7 +6,7 @@ Sandbox Deployment
 
 .. tags:: Kubernetes, Infrastructure, Basic
 
-A sandbox deployment of Flyte is bundles togeether portable versions of Flyte's
+A sandbox deployment of Flyte is bundles together portable versions of Flyte's
 dependencies such as a relational database and durable object store.
 
 For the blob store requirements, Flyte Sandbox uses `Minio <https://min.io/>`__,

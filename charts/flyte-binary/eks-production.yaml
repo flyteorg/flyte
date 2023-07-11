@@ -27,6 +27,8 @@ configuration:
     internal:
       clientSecret: <CC_PASSWD>
       clientSecretHash: <HASHED_CC_PASSWD>
+    authorizedUris:
+    - https://flyte.company.com
   inline:
     cluster_resources:
       customData:
@@ -39,6 +41,8 @@ configuration:
       - development:
         - defaultIamRole:
             value: <FLYTE_USER_IAM_ARN>
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
     plugins:
       k8s:
         inject-finalizer: true

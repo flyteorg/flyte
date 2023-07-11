@@ -1,4 +1,4 @@
-{{- if not .Values.configuration.externalConfigMap }}
+{{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,6 +21,12 @@ metadata:
 data:
   000-core.yaml: |
     admin:
+      {{- if .Values.configuration.auth.enabled }}
+      clientId: {{ .Values.configuration.auth.internal.clientId }}
+      {{- if .Values.configuration.auth.internal.audience }}
+      audience: {{ .Values.configuration.auth.internal.audience }}
+      {{- end }}
+      {{- end }}
       endpoint: localhost:8089
       insecure: true
     catalog-cache:
@@ -41,35 +47,41 @@ data:
       secretName: {{ include "flyte-binary.webhook.secretName" . }}
       serviceName: {{ include "flyte-binary.webhook.serviceName" . }}
       servicePort: 443
+    flyte:{{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 6 }}
   001-plugins.yaml: |
     tasks:
-      task-plugins:
-        enabled-plugins:
-          - container
-          - sidecar
-          - K8S-ARRAY
-        default-for-task-types:
-          - container: container
-          - container_array: K8S-ARRAY
+      {{- .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
     plugins:
       logs: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 8 }}
+      k8s:
+        co-pilot:
+          {{- with ( index .Values.configuration "co-pilot" ).image }}
+          image: {{ printf "%s:%s" .repository .tag | quote }}
+          {{- end }}
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
+      {{- if .Values.configuration.agentService }}
+      agent-service:
+      {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
+      {{- else if .Values.flyteagent.enable }}
+      agent-service:
+        defaultGrpcEndpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
+        supportedTaskTypes:
+        - bigquery_query_job_task
+      {{- end }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}
     database:
       postgres:
         username: {{ .username }}
-        {{- if .password }}
-        passwordPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" $ }}
-        {{- else }}
-        passwordPath: {{ .passwordPath }}
-        {{- end }}
-        host: {{ .host }}
+        host: {{ tpl .host $ }}
         port: {{ .port }}
         dbname: {{ .dbname }}
         options: {{ .options | quote }}
+        {{- if .passwordPath }}
+        passwordPath: {{ .passwordPath }}
+        {{- end }}
     {{- end }}
   003-storage.yaml: |
     propeller:
@@ -92,8 +104,6 @@ data:
           auth_type: iam
           {{- else if eq "accesskey" .authType }}
           auth_type: accesskey
-          access_key_id: {{ required "Access key required for S3 storage provider" .accessKey }}
-          secret_key: {{ required "Secret key required for S3 storage provider" .secretKey }}
           {{- else }}
           {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
           {{- end }}
@@ -103,20 +113,20 @@ data:
         config:
           json: ""
           project_id: {{ required "GCP project required for GCS storage provider" .providerConfig.gcs.project }}
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
         {{- else }}
         {{- printf "Invalid value for storage provider. Expected one of (s3, gcs), but got: %s" .provider | fail }}
         {{- end }}
       container: {{ required "Metadata container required" .metadataContainer }}
     {{- end }}
-  {{- if.Values.configuration.auth.enabled }}
+  {{- if .Values.configuration.auth.enabled }}
   004-auth.yaml: |
     auth:
       appAuth:
+        {{- if .Values.configuration.auth.enableAuthServer }}
         selfAuthServer:
           staticClients:
             flytepropeller:
-              client_secret: {{ required "Internal client secret hash required when authentication is enabled" .Values.configuration.auth.internal.clientSecretHash | quote }}
               grant_types:
               - refresh_token
               - client_credentials
@@ -159,21 +169,17 @@ data:
               - all
               - offline
               - access_token
+        {{- end }}
         thirdPartyConfig:
-          flyteClient:
-            clientId: flytectl
-            redirectUri: http://localhost:53593/callback
-            scopes:
-            - offline
-            - all
+          flyteClient: {{ .Values.configuration.auth.flyteClient | toYaml | nindent 12 }}
       authorizedUris:
-      {{- if .Values.ingress.host }}
-      - https://{{ tpl .Values.ingress.host . }}
+      {{- if .Values.configuration.auth.authorizedUris }}
+      {{- tpl ( .Values.configuration.auth.authorizedUris | toYaml ) . | nindent 6 }}
       {{- end }}
-      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.httpPort" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.httpPort" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.httpPort" . }}
-      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.httpPort" . }}
+      - http://{{ include "flyte-binary.fullname" . }}:{{ include "flyte-binary.service.http.port" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}:{{ include "flyte-binary.service.http.port" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc:{{ include "flyte-binary.service.http.port" . }}
+      - http://{{ include "flyte-binary.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ include "flyte-binary.service.http.port" . }}
       userAuth:
         openId:
           baseUrl: {{ required "OIDC base URL required when authentication is enabled" .Values.configuration.auth.oidc.baseUrl | quote }}
@@ -186,7 +192,7 @@ data:
         useAuth: true
   {{- end }}
   {{- if .Values.configuration.inline }}
-  010-inline-config.yaml: |
+  100-inline-config.yaml: |
     {{- tpl ( .Values.configuration.inline | toYaml ) . | nindent 4 }}
   {{- end }}
 {{- end }}

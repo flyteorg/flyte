@@ -7,7 +7,7 @@
 # flyte start --config flyte_local.yaml
 propeller:
   rawoutput-prefix: "s3://my-s3-bucket/test/"
-  kube-config: "$HOME/.flyte/k3s/k3s.yaml"
+  kube-config: "$HOME/.flyte/sandbox/kubeconfig"
   create-flyteworkflow-crd: true
 webhook:
   certDir: /tmp/k8s-webhook-server/serving-certs
@@ -24,17 +24,14 @@ tasks:
       - container: container
       - container_array: K8S-ARRAY
 server:
-  kube-config: "$HOME/.flyte/k3s/k3s.yaml"
-  httpPort: 30080
-  serviceHttpEndpoint: http://localhost:30080/
-  grpc:
-    port: 30081
+  kube-config: "$HOME/.flyte/sandbox/kubeconfig"
 flyteadmin:
   runScheduler: false
 database:
   postgres:
-    port: 30089
+    port: 30001
     username: postgres
+    password: postgres
     host: localhost
     dbname: flyteadmin
     options: "sslmode=disable"
@@ -45,7 +42,7 @@ storage:
     auth-type: accesskey
     secret-key: miniostorage
     disable-ssl: true
-    endpoint: "http://localhost:30084"
+    endpoint: "http://localhost:30002"
     region: my-region
   cache:
     max_size_mbs: 10
@@ -55,7 +52,7 @@ Logger:
   show-source: true
   level: 5
 admin:
-  endpoint: localhost:30081
+  endpoint: localhost:8089
   insecure: true
 plugins:
   # All k8s plugins default configuration
@@ -64,13 +61,13 @@ plugins:
     default-env-vars:
       - AWS_METADATA_SERVICE_TIMEOUT: 5
       - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-      - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
+      - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   # Logging configuration
   logs:
     kubernetes-enabled: true
-    kubernetes-url: "http://localhost:30082"
+    kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
 cluster_resources:
   refreshInterval: 5m
   templatePath: "/etc/flyte/clusterresource/templates"

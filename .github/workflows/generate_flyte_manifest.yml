@@ -13,7 +13,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: "1.18"
+          go-version: "1.19"
       - name: Build kustomize
         run: |
           make release_automation
@@ -46,6 +46,5 @@ jobs:
             kustomize
             helm
           team-reviewers: |
-            owners
-            maintainers
+            flyte-maintainers
           draft: false

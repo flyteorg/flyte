@@ -18,6 +18,7 @@ flyte:
 .PHONY: manifests
 manifests:
 	mkdir -p manifests
+	helm dependency update ../../charts/flyte-sandbox
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
@@ -49,14 +50,15 @@ start:
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
 			--volume $(PWD)/.kube:/.kube \
-			--volume flyte-sandbox:/var/lib/flyte \
-			--publish "6443" \
+			--volume $(HOME)/.flyte/sandbox:/var/lib/flyte/config \
+			--volume flyte-sandbox:/var/lib/flyte/storage \
+			--publish "6443":"6443" \
 			--publish "30000:30000" \
 			--publish "30001:30001" \
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE)
-
+		export KUBECONFIG=$(PWD)/.kube/kubeconfig
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:
@@ -77,9 +79,9 @@ console:
 
 .PHONY: test
 test: export FLYTECTL_CONFIG := test/config.yaml
-test: export KUBECONFIG := .kube/kubeconfig
-test: .venv kubeconfig
+test: .venv
 	. .venv/bin/activate && pyflyte run --remote test/wf.py wf --n 500 --mean 42 --sigma 2
+	. .venv/bin/activate && pyflyte run --remote test/raw_container_wf.py wf
 	kubectl create secret generic user-info \
 		--namespace flytesnacks-development \
 		--from-literal=user_secret=sosecret \

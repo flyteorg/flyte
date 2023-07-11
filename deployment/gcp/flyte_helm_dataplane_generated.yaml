@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.24
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.30
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -147,6 +147,7 @@ data:
     tasks:
       task-plugins:
         default-for-task-types:
+          bigquery_query_job_task: agent-service
           container: container
           container_array: k8s-array
           sidecar: sidecar
@@ -156,6 +157,10 @@ data:
         - k8s-array
   k8s.yaml: | 
     plugins:
+      agent-service:
+        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
+        supportedTaskTypes:
+        - bigquery_query_job_task
       k8s:
         default-cpus: 100m
         default-env-vars: []
@@ -172,7 +177,7 @@ data:
         config:
           json: ""
           project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          scopes: https://www.googleapis.com/auth/cloud-platform
       container: "<BUCKETNAME>"
       enable-multicontainer: false
       limits:
@@ -434,7 +439,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "6a8d2b542c38c5225a7cda0fca1fe8247022476eb296b44609faff929bdf1f4"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -459,12 +464,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.95"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
         - containerPort: 10254
-        resources: 
+        resources:
           limits:
             cpu: 500m
             ephemeral-storage: 2Gi
@@ -474,10 +479,10 @@ spec:
             ephemeral-storage: 2Gi
             memory: 1Gi
         volumeMounts:
-          - name: config-volume
-            mountPath: /etc/flyte/config
-          - name: auth
-            mountPath: /etc/secrets/
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: auth
+          mountPath: /etc/secrets/
         terminationMessagePolicy: "FallbackToLogsOnError"
       serviceAccountName: flytepropeller
       volumes:
@@ -513,9 +518,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.62
+        app.kubernetes.io/version: v1.1.95
       annotations:
-        configChecksum: "ea8538a261e39e90d19fe4c8f7ece1168fbb254eae2be82ac5653b293f2d490"
+        configChecksum: "6a8d2b542c38c5225a7cda0fca1fe8247022476eb296b44609faff929bdf1f4"
     spec:
       securityContext:
         fsGroup: 65534
@@ -524,7 +529,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.95"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -547,7 +552,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.62"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.95"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

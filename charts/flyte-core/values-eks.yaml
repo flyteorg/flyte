@@ -104,6 +104,12 @@ flytepropeller:
           topologyKey: kubernetes.io/hostname
 
 #
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
+
+#
 # FLYTECONSOLE
 #
 
@@ -134,6 +140,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip 
       # -- This is the certificate arn of the cert imported in AWS certificate manager.
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'

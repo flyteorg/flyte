@@ -13,15 +13,36 @@ on:
   push:
     branches:
       - master
+      - rc/*
+  workflow_dispatch:
 
 jobs:
-  trigger-single-binary-build:
+  test-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
-          fetch-depth: "0"
+          go-version: '1.19'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: docker/sandbox-bundled/bootstrap
+      - name: Check formatting
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make check-fmt
+      - name: Test
+        working-directory: docker/sandbox-bundled/bootstrap
+        run: |
+          make test
+
+  build-and-push-single-binary-image:
+    runs-on: ubuntu-latest
+    needs: [test-bootstrap]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup Golang caches
         uses: actions/cache@v3
         with:
@@ -50,21 +71,12 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
-        id: buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Setup destination directories for image tarballs
         run: |
           mkdir -p docker/sandbox-bundled/images/tar/{arm64,amd64}
       - name: Export ARM64 Image
         uses: docker/build-push-action@v3
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/arm64
@@ -76,8 +88,6 @@ jobs:
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
         uses: docker/build-push-action@v3
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/amd64
@@ -87,10 +97,21 @@ jobs:
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
+      - name: Upload single binary image
+        uses: actions/upload-artifact@v2
+        with:
+          name: single-binary-image
+          path: docker/sandbox-bundled/images/tar
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push Image
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: docker/build-push-action@v3
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: .
           platforms: linux/arm64, linux/amd64
@@ -99,25 +120,117 @@ jobs:
             FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
             FLYTE_VERSION=${{ env.FLYTE_VERSION }}
           file: Dockerfile
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      - name: Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v2
-        with:
-          name: single-binary-image
-          path: docker/sandbox-bundled/images/tar
+          push: true
 
-  trigger-sandbox-bundled-build:
+  sandbox-bundled-functional-tests:
     runs-on: ubuntu-latest
-    needs: [trigger-single-binary-build]
+    env:
+      FLYTESNACKS_PRIORITIES: 'P0'
+      FLYTESNACKS_VERSION: ''
+    timeout-minutes: 20
+    needs: [build-and-push-single-binary-image]
     steps:
+      - name: Set latest Flytesnacks release
+        if: ${{ env.FLYTESNACKS_VERSION == '' }}
+        run: |
+          FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
+          echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: "0"
+        uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
+      - name: Build sandbox image for functional tests
+        uses: docker/build-push-action@v3
+        with:
+          context: docker/sandbox-bundled
+          load: true
+          allow: "security.insecure"
+          tags: flyte-sandbox-bundled:local
+      # Without this, the GHA runner is under disk pressure and evicts all the pods.
+      # Buildx cache uses roughly 50% (7gb) of the GHA runner's disk (14gb).
+      - name: Prune Docker Buildx cache to reclaim storage
+        run: docker buildx prune --all --force
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: unionai/flytectl-setup-action@v0.0.1
+      - name: Setup sandbox
+        run: |
+          mkdir -p ~/.flyte/sandbox
+          cat << EOF > ~/.flyte/sandbox/config.yaml
+          task_resources:
+            defaults:
+              cpu: "0"
+              memory: "0"
+            limits:
+              cpu: "0"
+              memory: "0"
+          EOF
+          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flytekit
+          pip freeze
+      - name: Checkout flytesnacks
+        uses: actions/checkout@v3
+        with:
+          repository: flyteorg/flytesnacks
+          path: flytesnacks
+          # TODO: Enable this once refactored version produces a release tag
+          # ref: ${{ env.FLYTESNACKS_VERSION }}
+      - name: Register specific tests
+        run: |
+          for f in basics/basics/basic_workflow.py \
+                  basics/basics/hello_world.py \
+                  basics/basics/lp.py \
+                  basics/basics/named_outputs.py \
+                  control_flow/control_flow/chain_entities.py \
+                  control_flow/control_flow/dynamics.py \
+                  control_flow/control_flow/map_task.py \
+                  control_flow/control_flow/subworkflows.py \
+                  type_system/type_system/custom_objects.py \
+                  type_system/type_system/schema.py \
+                  type_system/type_system/typed_schema.py ;
+          do
+              pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
+                  register \
+                  --project flytesnacks \
+                  --domain development \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
+                  --version ${{ env.FLYTESNACKS_VERSION }} \
+                  flytesnacks/examples/$f;
+          done
+      - name: End2End
+        run: |
+          make end2end_execute
+
+  build-and-push-sandbox-bundled-image:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    needs: [build-and-push-single-binary-image]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: single-binary-image
+          path: docker/sandbox-bundled/images/tar
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
       - name: Set version
         id: set_version
         run: |
@@ -132,28 +245,18 @@ jobs:
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=sha,format=long,
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          driver-opts: image=moby/buildkit:master
-          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Build and push Image
+      - name: Build and push multi-arch image
         uses: docker/build-push-action@v3
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           context: docker/sandbox-bundled
           allow: "security.insecure"
           platforms: linux/arm64, linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
           build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+          push: true

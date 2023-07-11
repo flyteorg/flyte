@@ -44,6 +44,9 @@ spec:
             name: flyte-admin-secrets
           {{- end }}
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
+      {{- if .Values.cluster_resource_manager.resources }}
+      resources: {{- toYaml .Values.cluster_resource_manager.resources | nindent 10 }}
+      {{- end }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
         - configMap:
             name: clusterresource-template

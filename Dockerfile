@@ -12,7 +12,7 @@ WORKDIR /flyteorg/build
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd cmd
-COPY --from=flyteconsole /app/dist cmd/single/dist
+COPY --from=flyteconsole /app/ cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -tags console -v -o dist/flyte cmd/main.go
 

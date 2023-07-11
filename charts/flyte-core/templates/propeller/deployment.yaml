@@ -74,15 +74,21 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
-        resources: {{ toYaml .Values.flytepropeller.resources | nindent 10 }}
+        resources: {{- toYaml .Values.flytepropeller.resources | nindent 10 }}
         volumeMounts:
-          - name: config-volume
-            mountPath: /etc/flyte/config
-          - name: auth
-            mountPath: /etc/secrets/
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: auth
+          mountPath: /etc/secrets/
+        {{- with .Values.flytepropeller.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
         {{- if .Values.flytepropeller.terminationMessagePolicy }}
         terminationMessagePolicy: "{{ .Values.flytepropeller.terminationMessagePolicy }}"
         {{- end }}
+      {{- with .Values.flytepropeller.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
       serviceAccountName: {{ template "flytepropeller.name" . }}
       volumes:
       - configMap:
@@ -91,6 +97,9 @@ spec:
       - name: auth
         secret:
           secretName: flyte-secret-auth
+      {{- with .Values.flytepropeller.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
       {{- with .Values.flytepropeller.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

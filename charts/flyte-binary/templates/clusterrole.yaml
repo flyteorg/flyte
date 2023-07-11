@@ -53,6 +53,14 @@ rules:
     - patch
     - update
   - apiGroups:
+    - ""
+    resources:
+    - podtemplates
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
     - flyte.lyft.com
     resources:
     - flyteworkflows
