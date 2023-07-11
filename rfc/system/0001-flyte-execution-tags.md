@@ -8,8 +8,8 @@
 
 Flyte currently provides no visual ways of grouping executions and other
 entities with a “project” and “domain”. Usually a project is used by a team of
-engineers and/or researchers and sometimes they may be  experimenting in
-isolation or running multiple co-horts of experiments. Also there are cases in
+engineers and/or researchers, and sometimes they may be  experimenting in
+isolation or running multiple co-horts of experiments. Also, there are cases in
 which grouping executions by a group might make them easier to find and
 associate them better. This document provides a solution of how we could
 improve the experience of discovering executions within Flyte. It also provides
@@ -24,21 +24,30 @@ As a User I want to
  - External systems could group executions based on some identifiers.  
  - Users could name their executions without having to worry about the character limits, uniqueness constraints and limited characterset.
  - Simplify filtering of certain executions
- - Be able to remove tags from an execution after it has been started or after it has finished.
+ - Be able to remove tags from an execution after it has been started, or after it has finished.
 
 ## 3 Proposed Implementation
 
 ### Support for tags
 
-We propose to solve the problem of discovery by supporting arbitrary metadata association with an entity. This is similar to conceppt of “tags” as in AWS. The tags are represented as `“key”: “value”` pairs. In kuberenetes this can be represented using “labels” and “annotations”. Labels and annotations are already supported per execution as documented in - [ExecutionCreateRequest](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executioncreaterequest) -> [ExecutionSpec](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executionspec). Moreover,  every project supports default labels [Project](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#project). Thus the final execution will have a the union of the project default labels + the user specified labels as it exists today.
+We propose to solve the problem of discovery by supporting arbitrary metadata association with an entity. This is similar to concept of “tags” as in AWS.
+The tags are represented as plain string. In kubernetes this can be represented using “labels” and “annotations”. Labels and annotations are already supported per execution as documented in - [ExecutionCreateRequest](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executioncreaterequest) -> [ExecutionSpec](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executionspec). Moreover,  every project supports default labels [Project](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#project). Thus the final execution will have a the union of the project default labels + the user specified labels as it exists today.
 
-Currently the resultant labels are not persisted and are only applied to the
-execution in Kubernetes. As a first step, we recommend that these labels are
+Currently, the resultant tags will be persisted in the database, instead of being applied to the
+execution in Kubernetes. We'll create two new tables in the flyteadmin database.
+- ``execution_admin_tags`` is a join table, and it contains admin_tags ID and execution ID.
+- ``admin_tags`` saves all the tag names
+
+As a first step, we recommend that these tags are
 persisted associated with an execution and then ListExecutions API is updated
 to return all 
- - filtered executions by labels with supported `and` `or` queries
+ - filtered executions by tags with supported `and` `or` queries
  - all associated executions with every execution
- - limit total number of labels per exection to 10-15
+ - limit total number of tags per execution to 10-15
+
+For the second step, we will support attach tags to the project, task, and workflow. In addition,
+we will enable users to update the tags of an execution after it has been created. This will be done
+through a flyteadmin API (need to create a new endpoint for updating the tags).
 
 Once this is implemented the UI and CLI can be updated to support these
 queries.
@@ -48,21 +57,21 @@ queries.
 A workflow or task can be executed using
 
 ```bash
-pyflyte run --remote --labels k:v --labels k1:v1 test.py wf --input1=10
+pyflyte run --remote --tags '["hello", "world"]' test.py wf --input1=10
 ```
  (or equivalently in flytectl)
 
-flytectl and flyteremote can support filtering of executions by labels. Example
+flytectl and flyte remote can support filtering of executions by tags. Example
 in flytectl,
 ```bash
-flytectl get execution -p flytesnacks -d development --filter.labels="k:v"
+flytectl get execution -p flytesnacks -d development --filter.tags="hello,world"
 ```
 
 ### UI Interface
-All labels are treated the same way and allow search/filter and click based grouping.
-Users will get the regular executions view with all the labels available on each execution.
-The users are allowed to filter an exection simply by clicking on a label and then all
-executions are filtered by that label. 
+All tags are treated the same way and allow search/filter and click based grouping.
+Users will get the regular executions view with all the tags available on each execution.
+The users are allowed to filter an execution simply by clicking on a tag and then all
+executions are filtered by that tag. 
 
 ![Grouping / Filtering UX](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/rfc/tags/labels-filter.png)
 
@@ -75,12 +84,12 @@ experiment. Thus, we propose to add descriptions to the execution as well.
 
 Allow add description when you start an execution
 ```bash
-pyflyte run --remote --labels k:v --labels k1:v1 --description "........" test.py wf --input1=10
+pyflyte run --remote --tags '["key1", "key2"]' --description "........" test.py wf --input1=10
 ```
  
 It should be possible to add the description as a Markdown
 ```bash
-pyflyte run --remote --labels k:v --labels k1:v1 --description README.md test.py wf --input1=10
+pyflyte run --remote --tags '["key1", "key2"]' --description README.md test.py wf --input1=10
 ```
  
 It should be possible to add a description for an execution in the UI, after
@@ -94,10 +103,9 @@ NA
 It is important to understand that this may add a little more stress to the
 metadata database. Back of the envelope calculation
 
- -> 1 million executions * 20 labels each. 
- -> each label has "key" and "value". Key is 10 characters, value is 64
-characters
- -> 1.5 * 10^9 bytes (assuming one byte per character" -> 1.5GB
+ -> 1 million executions * 20 tags each. 
+ -> Each tag is a plain string, which has 64 characters.
+ -> 1.28 * 10^9 bytes (assuming one byte per character" -> 1.28GB
 
 This is not significant and will increase as executions increase
 
@@ -106,7 +114,7 @@ NA
 
 
 ## 7 Potential Impact and Dependencies
-We this this is one of the most requested features in Flyte and will solve
+This is one of the most requested features in Flyte and will solve
 a lot of problems.
 
 
@@ -114,4 +122,5 @@ a lot of problems.
 NA
 
 ## 9 Conclusion
-WIP
+With tags, users can discover their executions and other flyte entities easily.
+By storing tags in the database, it allows flyte easily search and filter executions, and also allows us to easily update/remove the tags of an execution after it has been created. 
