@@ -1,13 +1,14 @@
 package storage
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/flyteorg/flytestdlib/promutils"
 )
 
-type dataStoreCreateFn func(cfg *Config, metrics *dataStoreMetrics) (RawStore, error)
+type dataStoreCreateFn func(ctx context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error)
 
 var stores = map[string]dataStoreCreateFn{
 	TypeMemory: NewInMemoryRawStore,
@@ -73,8 +74,13 @@ func newDataStoreMetrics(scope promutils.Scope) *dataStoreMetrics {
 
 // NewDataStore creates a new Data Store with the supplied config.
 func NewDataStore(cfg *Config, scope promutils.Scope) (s *DataStore, err error) {
+	return NewDataStoreWithContext(context.Background(), cfg, scope)
+}
+
+// NewDataStoreWithContext creates a new Data Store with the supplied config and context.
+func NewDataStoreWithContext(ctx context.Context, cfg *Config, scope promutils.Scope) (s *DataStore, err error) {
 	ds := &DataStore{metrics: newDataStoreMetrics(scope)}
-	return ds, ds.RefreshConfig(cfg)
+	return ds, ds.RefreshConfig(ctx, cfg)
 }
 
 // NewCompositeDataStore composes a new DataStore.
@@ -87,7 +93,7 @@ func NewCompositeDataStore(refConstructor ReferenceConstructor, composedProtobuf
 
 // RefreshConfig re-initialises the data store client leaving metrics untouched.
 // This is NOT thread-safe!
-func (ds *DataStore) RefreshConfig(cfg *Config) error {
+func (ds *DataStore) RefreshConfig(ctx context.Context, cfg *Config) error {
 	defaultClient := http.DefaultClient
 	defer func() {
 		http.DefaultClient = defaultClient
@@ -100,7 +106,7 @@ func (ds *DataStore) RefreshConfig(cfg *Config) error {
 		return fmt.Errorf("type is of an invalid value [%v]", cfg.Type)
 	}
 
-	rawStore, err := fn(cfg, ds.metrics)
+	rawStore, err := fn(ctx, cfg, ds.metrics)
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,7 @@ func TestNewCachedStore(t *testing.T) {
 	t.Run("CachingDisabled", func(t *testing.T) {
 		cfg := &Config{}
 		assert.Nil(t, newCachedRawStore(cfg, nil, metrics.cacheMetrics))
-		store, err := NewInMemoryRawStore(cfg, metrics)
+		store, err := NewInMemoryRawStore(context.TODO(), cfg, metrics)
 		assert.NoError(t, err)
 		assert.Equal(t, store, newCachedRawStore(cfg, store, metrics.cacheMetrics))
 	})
@@ -31,7 +31,7 @@ func TestNewCachedStore(t *testing.T) {
 				TargetGCPercent:  20,
 			},
 		}
-		store, err := NewInMemoryRawStore(cfg, metrics)
+		store, err := NewInMemoryRawStore(context.TODO(), cfg, metrics)
 		assert.NoError(t, err)
 		cStore := newCachedRawStore(cfg, store, metrics.cacheMetrics)
 		assert.Equal(t, 20, debug.SetGCPercent(100))

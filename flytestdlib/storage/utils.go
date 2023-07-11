@@ -4,6 +4,9 @@ import (
 	"context"
 	"os"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	stdErrs "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
@@ -27,6 +30,10 @@ func IsNotFound(err error) bool {
 	}
 
 	if stdErrs.IsCausedByError(err, stow.ErrNotFound) {
+		return true
+	}
+
+	if status.Code(err) == codes.NotFound {
 		return true
 	}
 

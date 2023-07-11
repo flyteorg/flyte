@@ -34,6 +34,7 @@ type Options struct {
 type Metadata interface {
 	Exists() bool
 	Size() int64
+	Etag() string
 }
 
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.

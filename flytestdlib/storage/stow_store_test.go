@@ -364,7 +364,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 func TestNewLocalStore(t *testing.T) {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	t.Run("Valid config", func(t *testing.T) {
-		store, err := newStowRawStore(&Config{
+		store, err := newStowRawStore(context.TODO(), &Config{
 			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
@@ -386,7 +386,7 @@ func TestNewLocalStore(t *testing.T) {
 	})
 
 	t.Run("Invalid config", func(t *testing.T) {
-		_, err := newStowRawStore(&Config{}, metrics)
+		_, err := newStowRawStore(context.TODO(), &Config{}, metrics)
 		assert.Error(t, err)
 	})
 
@@ -398,7 +398,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, stats)
 
-		store, err := newStowRawStore(&Config{
+		store, err := newStowRawStore(context.TODO(), &Config{
 			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
@@ -426,7 +426,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, stats)
 
-		store, err := newStowRawStore(&Config{
+		store, err := newStowRawStore(context.TODO(), &Config{
 			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
@@ -447,7 +447,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, stats)
 
-		store, err := newStowRawStore(&Config{
+		store, err := newStowRawStore(context.TODO(), &Config{
 			Stow: StowConfig{
 				Kind: local.Kind,
 				Config: map[string]string{
@@ -499,7 +499,7 @@ func Test_newStowRawStore(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newStowRawStore(tt.args.cfg, metrics)
+			got, err := newStowRawStore(context.TODO(), tt.args.cfg, metrics)
 			if tt.wantErr {
 				assert.Error(t, err, "newStowRawStore() error = %v, wantErr %v", err, tt.wantErr)
 				return
