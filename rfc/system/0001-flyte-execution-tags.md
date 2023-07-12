@@ -7,7 +7,7 @@
 ## 1 Executive Summary
 
 Flyte currently provides no visual ways of grouping executions and other
-entities with a “project” and “domain”. Usually a project is used by a team of
+entities apart from with a “project” and “domain”. Usually a project is used by a team of
 engineers and/or researchers, and sometimes they may be  experimenting in
 isolation or running multiple co-horts of experiments. Also, there are cases in
 which grouping executions by a group might make them easier to find and
