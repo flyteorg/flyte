@@ -40,11 +40,10 @@ execution in Kubernetes. We'll create two new tables in the flyteadmin database.
 - ``admin_tags`` saves all the tag names
 
 As a first step, we recommend that these tags are
-persisted associated with an execution and then ListExecutions API is updated
-to return all 
- - filtered executions by tags with supported `and` `or` queries
- - all associated executions with every execution
- - limit total number of tags per execution to 10-15
+persisted associated with an execution and limit total number of tags per execution to 10-15
+The ListExecutions API is updated to return all 
+ - Filtered executions by tags with supported `and` `or` queries
+ - All associated executions with every execution
 
 For the second step, we will support attaching tags to the project, task, and workflow. In addition,
 we will enable users to update the tags of an execution after it has been created. This will be done
