@@ -71,7 +71,10 @@ func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx handler
 		return handler.UnknownTransition, err
 	}
 	execContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
-	state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.StartNode())
+	if err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.StartNode()); err != nil {
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
+	}
+	state, err := execContext.Wait()
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 	}
@@ -150,7 +153,10 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
-		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.GetOnFailureNode())
+		if err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.GetOnFailureNode()); err != nil {
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
+		}
+		state, err := execContext.Wait()
 		if err != nil {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}

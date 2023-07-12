@@ -822,6 +822,41 @@ func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructur
 
 // The space search for the next node to execute is implemented like a DFS algorithm. handleDownstream visits all the nodes downstream from
 // the currentNode. Visit a node is the RecursiveNodeHandler. A visit may be partial, complete or may result in a failure.
+func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
+	logger.Debugf(ctx, "Handling downstream Nodes")
+	// This node is success. Handle all downstream nodes
+	downstreamNodes, err := dag.FromNode(currentNode.GetID())
+	if err != nil {
+		logger.Debugf(ctx, "Error when retrieving downstream nodes, [%s]", err)
+		/*return executors.NodeStatusFailed(&core.ExecutionError{
+			Code:    errors.BadSpecificationError,
+			Message: fmt.Sprintf("failed to retrieve downstream nodes for [%s]", currentNode.GetID()),
+			Kind:    core.ExecutionError_SYSTEM,
+		}), nil*/
+		return errors2.Errorf("failed to retrieve downstream nodes for [%s]", currentNode.GetID())
+	}
+	for _, downstreamNodeName := range downstreamNodes {
+		downstreamNode, ok := nl.GetNode(downstreamNodeName)
+		if !ok {
+			/*return executors.NodeStatusFailed(&core.ExecutionError{
+				Code:    errors.BadSpecificationError,
+				Message: fmt.Sprintf("failed to retrieve downstream node [%s] for [%s]", downstreamNodeName, currentNode.GetID()),
+				Kind:    core.ExecutionError_SYSTEM,
+			}), nil*/
+			return errors2.Errorf("failed to retrieve downstream node [%s] for [%s]", downstreamNodeName, currentNode.GetID())
+		}
+
+		if err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// TODO @hamersaw - move to nodeExecutor.wait
+/*// The space search for the next node to execute is implemented like a DFS algorithm. handleDownstream visits all the nodes downstream from
+// the currentNode. Visit a node is the RecursiveNodeHandler. A visit may be partial, complete or may result in a failure.
 func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
 	logger.Debugf(ctx, "Handling downstream Nodes")
 	// This node is success. Handle all downstream nodes
@@ -896,7 +931,7 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executo
 	}
 
 	return executors.NodeStatusPending, nil
-}
+}*/
 
 func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (executors.NodeStatus, error) {
 	startNode := dag.StartNode()
@@ -968,8 +1003,7 @@ func IsMaxParallelismAchieved(ctx context.Context, currentNode v1alpha1.Executab
 // nested within other nodes. The system follows an actor model, where the parent nodes control the execution of nested nodes
 // The recursive node-handler uses a modified depth-first type of algorithm to execute non-blocked nodes.
 func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext,
-	dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (
-	executors.NodeStatus, error) {
+	dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
 
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
@@ -991,31 +1025,48 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 		// This is an optimization to avoid creating the nodeContext object in case the node has already been looked at.
 		// If the overhead was zero, we would just do the isDirtyCheck after the nodeContext is created
 		if nodeStatus.IsDirty() {
-			return executors.NodeStatusRunning, nil
+			return nil
 		}
 
 		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
-			return executors.NodeStatusRunning, nil
+			return nil
 		}
 
-		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
-		if err != nil {
-			// NodeExecution creation failure is a permanent fail / system error.
-			// Should a system failure always return an err?
-			return executors.NodeStatusFailed(&core.ExecutionError{
-				Code:    "InternalError",
-				Message: err.Error(),
-				Kind:    core.ExecutionError_SYSTEM,
-			}), nil
-		}
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
+			if err != nil {
+				// NodeExecution creation failure is a permanent fail / system error.
+				// Should a system failure always return an err?
+				nodeFuture <- executors.NodeExecutionResult{
+					NodeStatus: executors.NodeStatusFailed(&core.ExecutionError{
+						Code:    "InternalError",
+						Message: err.Error(),
+						Kind:    core.ExecutionError_SYSTEM,
+					}),
+					Err: err,
+				}
+				return
+			}
 
-		// Now depending on the node type decide
-		h, err := c.nodeHandlerFactory.GetHandler(nCtx.Node().GetKind())
-		if err != nil {
-			return executors.NodeStatusUndefined, err
-		}
+			// Now depending on the node type decide
+			h, err := c.nodeHandlerFactory.GetHandler(nCtx.Node().GetKind())
+			if err != nil {
+				nodeFuture <- executors.NodeExecutionResult{
+					NodeStatus: executors.NodeStatusUndefined,
+					Err:        err,
+				}
+				return
+			}
 
-		return c.handleNode(currentNodeCtx, dag, nCtx, h)
+			// TODO @hamersaw - remove
+			//return c.handleNode(currentNodeCtx, dag, nCtx, h)
+			nodeStatus, err := c.handleNode(currentNodeCtx, dag, nCtx, h)
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: nodeStatus,
+				Err:        err,
+			}
+		})
+		return nil
 
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
@@ -1025,23 +1076,38 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 		return c.handleDownstream(ctx, execContext, dag, nl, currentNode)
 	} else if nodePhase == v1alpha1.NodePhaseFailed {
 		logger.Debugf(currentNodeCtx, "Node has failed, traversing downstream.")
-		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
-		if err != nil {
-			return executors.NodeStatusUndefined, err
+		if err := c.handleDownstream(ctx, execContext, dag, nl, currentNode); err != nil {
+			return err
 		}
 
-		return executors.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+		// TODO @hamersaw - remove
+		//return executors.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: executors.NodeStatusFailed(nodeStatus.GetExecutionError()),
+			}
+		})
+		return nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
-		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
-		if err != nil {
-			return executors.NodeStatusUndefined, err
+		if err := c.handleDownstream(ctx, execContext, dag, nl, currentNode); err != nil {
+			return err
 		}
 
-		return executors.NodeStatusTimedOut, nil
+		// TODO @hamersaw - remove
+		//return executors.NodeStatusTimedOut, nil
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: executors.NodeStatusTimedOut,
+			}
+		})
+		return nil
 	}
 
-	return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
+	// TODO @hamersaw - remove
+	//return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
+		//"Should never reach here. Current Phase: %v", nodePhase)
+	return errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
 		"Should never reach here. Current Phase: %v", nodePhase)
 }
 
