@@ -46,7 +46,7 @@ to return all
  - all associated executions with every execution
  - limit total number of tags per execution to 10-15
 
-For the second step, we will support attach tags to the project, task, and workflow. In addition,
+For the second step, we will support attaching tags to the project, task, and workflow. In addition,
 we will enable users to update the tags of an execution after it has been created. This will be done
 through a flyteadmin API (need to create a new endpoint for updating the tags).
 
