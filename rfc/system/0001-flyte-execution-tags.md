@@ -18,7 +18,7 @@ motivation of how this feature could further improve other ecosystem projects.
 ## 2 Motivation
 
 As a User I want to
- - Group a certain number of executions into an experiment group - for ease of debugging and discovery - when launching the workflows or after they have already finished.
+ - Group a certain number of executions into an experiment group - for ease of debugging and discovery - when launching the workflows, while they are running or after they have already finished.
  - I want to mark certain executions as “blessed” or “released”. This could be done through providing a semantic version after the execution is successful 
  - I want to group all “sub launchplan” executions with the parent execution.  
  - External systems could group executions based on some identifiers.  
