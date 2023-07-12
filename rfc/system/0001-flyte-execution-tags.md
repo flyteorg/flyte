@@ -108,7 +108,7 @@ metadata database. Back of the envelope calculation
  -> Each tag is a plain string, which has 64 characters.
  -> 1.28 * 10^9 bytes (assuming one byte per character" -> 1.28GB
 
-This is not significant and will increase as executions increase
+This is not significant even though it will increase as executions increase
 
 ## 6 Alternatives
 NA
