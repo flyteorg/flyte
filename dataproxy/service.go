@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -51,12 +52,48 @@ type Service struct {
 func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUploadLocationRequest) (
 	*service.CreateUploadLocationResponse, error) {
 
+	// Basically if the full file name is user specified (non random, non-hash-derived), then we need to check if it exists.
+	// If it exists, and a hash was provided, then check if it matches. If it matches, then proceed as normal otherwise fail.
+	// If it doesn't exist, then proceed as normal.
+
 	if len(req.Project) == 0 || len(req.Domain) == 0 {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project and domain are required parameters")
 	}
 
-	if len(req.ContentMd5) == 0 {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "content_md5 is a required parameter")
+	// At least one of the hash or manually given prefix must be provided.
+	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"content_md5 or filename_root is a required parameter")
+	}
+
+	// If we fall in here, that means that the full path is deterministic and we should check for existence.
+	if len(req.Filename) > 0 && len(req.FilenameRoot) > 0 {
+		knownLocation, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
+			req.Project, req.Domain, req.FilenameRoot, req.Filename)
+		if err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
+		}
+		metadata, err := s.dataStore.Head(ctx, knownLocation)
+		if err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to check if file exists at location [%s], Error: %v", knownLocation.String(), err)
+		}
+		if metadata.Exists() {
+			// Basically if the file exists, then error unless the user also provided a hash and it matches.
+			// Keep in mind this is just a best effort attempt. There can easily be race conditions where two users
+			// request the same file at the same time and one of the writes is lost.
+			if len(req.ContentMd5) == 0 {
+				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
+			}
+			// Re-encode the hash 3-ways to support matching, hex, base32 and base64
+			hexDigest := hex.EncodeToString(req.ContentMd5)
+			base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
+			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
+			if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
+				logger.Debug(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
+				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
+			}
+			logger.Debug(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
+		}
 	}
 
 	if expiresIn := req.ExpiresIn; expiresIn != nil {
