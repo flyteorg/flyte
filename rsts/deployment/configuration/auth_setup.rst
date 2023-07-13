@@ -15,13 +15,11 @@ The following diagram summarizes the components and their interactions as part o
 
 In summary, there are two main resources required for a complete auth flow in Flyte:
 
-1. An identity layer
-====================
+**An identity layer**
 
 This is fulfilled by one of the supported IdPs after registering Flyte as a new app. It makes use of the embedded OIDC client.
 
-2. An authorization server
-==========================
+**An authorization server**
 
 There are, in turn, two options for this resource:
   
