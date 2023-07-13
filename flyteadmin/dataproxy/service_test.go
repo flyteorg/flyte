@@ -1,7 +1,10 @@
 package dataproxy
 
 import (
+	"bytes"
 	"context"
+	"crypto/md5" // #nosec
+	"net/url"
 	"testing"
 	"time"
 
@@ -82,6 +85,80 @@ func TestCreateUploadLocation(t *testing.T) {
 			ExpiresIn: durationpb.New(-time.Hour),
 		})
 		assert.Error(t, err)
+	})
+}
+
+type UploadableMemProtobufStore struct {
+	storage.ComposedProtobufStore
+}
+
+func (u *UploadableMemProtobufStore) CreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) (storage.SignedURLResponse, error) {
+	return storage.SignedURLResponse{
+		URL: url.URL{
+			Scheme: "http",
+			Host:   "localhost",
+			Path:   "/blah",
+		},
+	}, nil
+}
+
+func TestCreateUploadLocationMore(t *testing.T) {
+	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	// Overwrite the CreateSignedURL function to return a fixed value
+	uploadable := &UploadableMemProtobufStore{
+		dataStore.ComposedProtobufStore,
+	}
+
+	ds := storage.DataStore{
+		ComposedProtobufStore: uploadable,
+		ReferenceConstructor:  dataStore.ReferenceConstructor,
+	}
+
+	assert.NoError(t, err)
+	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
+	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, &ds, taskExecutionManager)
+	assert.NoError(t, err)
+
+	exists, err := createStorageLocation(context.TODO(), s.dataStore, s.cfg.Upload,
+		"flytesnacks", "development", "known_parent_folder", "myfile.txt")
+	assert.NoError(t, err)
+	err = dataStore.WriteRaw(context.TODO(), exists, 5, storage.Options{}, bytes.NewReader([]byte("hello")))
+	assert.NoError(t, err)
+
+	t.Run("no need for content md5", func(t *testing.T) {
+		_, err = s.CreateUploadLocation(context.Background(), &service.CreateUploadLocationRequest{
+			Project:      "flytesnacks",
+			Domain:       "development",
+			Filename:     "myotherfile.txt",
+			ContentMd5:   nil,
+			FilenameRoot: "known_parent_folder",
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("already exists errors", func(t *testing.T) {
+		_, err = s.CreateUploadLocation(context.Background(), &service.CreateUploadLocationRequest{
+			Project:      "flytesnacks",
+			Domain:       "development",
+			Filename:     "myfile.txt",
+			ContentMd5:   nil,
+			FilenameRoot: "known_parent_folder",
+		})
+		assert.ErrorContainsf(t, err, "already exists", "expected error to contain already exists")
+	})
+
+	t.Run("already exists but matching content md5", func(t *testing.T) {
+		m := md5.Sum([]byte("hello")) // #nosec
+		resp, err := s.CreateUploadLocation(context.Background(), &service.CreateUploadLocationRequest{
+			Project:      "flytesnacks",
+			Domain:       "development",
+			Filename:     "myfile.txt",
+			ContentMd5:   m[:],
+			FilenameRoot: "known_parent_folder",
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "/flytesnacks/development/known_parent_folder/myfile.txt", resp.GetNativeUrl())
 	})
 }
 
