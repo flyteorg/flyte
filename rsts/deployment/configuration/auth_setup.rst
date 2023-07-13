@@ -539,58 +539,59 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
        
       1. Find the `auth` section in your Helm values file, and replace the necessary data:
 
-.. note:: 
+      .. note:: 
 
-   If you were previously using the internal auth server, make sure to delete all the `selfAuthServer` section from your values file
+         If you were previously using the internal auth server, make sure to delete all the `selfAuthServer` section from your values file
 
-      .. code-block:: yaml
+         .. code-block:: yaml
           
-         configmap:
-           auth:
-             appAuth:
+             configmap:
+               auth:
+                 appAuth:
 
-                  authServerType: External
+                      authServerType: External
 
-                  # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
-                  externalAuthServer:
-                     baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm>
-                     metadataUrl: .well-known/openid-configuration
+                      # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+                      externalAuthServer:
+                         baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm>
+                         metadataUrl: .well-known/openid-configuration
 
-                  thirdPartyConfig:
-                     flyteClient:
-                           # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                           clientId: flytectl
-                           # This should not change
-                           redirectUri: http://localhost:53593/callback
-                           # 4. "all" is a required scope and must be configured in the custom authorization server.
-                           scopes:
-                           - offline
-                           - all
+                      thirdPartyConfig:
+                         flyteClient:
+                               # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                               clientId: flytectl
+                               # This should not change
+                               redirectUri: http://localhost:53593/callback
+                               # 4. "all" is a required scope and must be configured in the custom authorization server.
+                               scopes:
+                               - offline
+                               - all
 
-               userAuth:
-                  openId:
-                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
-                     scopes:
-                     - profile
-                     - openid
-                     # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-                     clientId: <client id>
-                  .. code-block:: yaml
+                   userAuth:
+                      openId:
+                         baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
+                         scopes:
+                         - profile
+                         - openid
+                         # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                         clientId: <client id>
+
+          .. code-block:: yaml
    
-         secrets:
-           adminOauthClientCredentials:
-             enabled: true # see the section "Disable Helm secret management" if you require to do so
-             # Replace with the client_secret provided by your IdP for flytepropeller.
-             clientSecret: <client_secret>
-             # Replace with the client_id provided by provided by your IdP for flytepropeller.
-             clientId: <client_id>
+             secrets:
+               adminOauthClientCredentials:
+                 enabled: true # see the section "Disable Helm secret management" if you require to do so
+                 # Replace with the client_secret provided by your IdP for flytepropeller.
+                 clientSecret: <client_secret>
+                 # Replace with the client_id provided by provided by your IdP for flytepropeller.
+                 clientId: <client_id>
       
       2. Save your changes
       3. Upgrade your Helm release with the new configuration:
 
-      .. prompt:: bash $
+          .. prompt:: bash $
 
-         helm upgrade  <release-name> flyteorg/flyte-core -n <your-namespace> --values <your-updated-values-file>.yaml
+             helm upgrade  <release-name> flyteorg/flyte-core -n <your-namespace> --values <your-updated-values-file>.yaml
 
    .. group-tab:: flyte-core with Azure AD
 
