@@ -25,12 +25,8 @@ This is fulfilled by one of the supported IdPs after registering Flyte as a new 
 
 There are, in turn, two options for this resource:
   
- * **Internal authorization server**: It comes pre-installed with Flyte and is enabled by default. It is a suitable choice for quick start and testing purposes, 
-    but it is not recommended for production environments. This is due to its inability to assign scopes to groups or specific users within the organization, lack of custom scopes, 
-    absence of rule enforcement for authorization, token expiration policies, and other essential features needed to secure critical infrastructure.
- * **External (custom) authorization server**: This is the recommended option for production and is fulfilled completely by one of the supported IdPs.
-    With an external auth server, organizations retain control over defining policies, mapping scopes to users or groups and, in general, keeping the auth configuration
-    separate of the resource it's meant to protect.
+ * **Internal authorization server**: It comes pre-installed with Flyte and is enabled by default. It is a suitable choice for quick start and testing purposes, but **not recommended for production environments**. This is due to its inability to assign scopes to groups or specific users within the organization, lack of custom scopes, absence of rule enforcement for authorization, token expiration policies, and other essential features needed to secure critical infrastructure.
+ * **External (custom) authorization server**: This is recommended for production and is fulfilled completely by one of the supported IdPs. With an external auth server, organizations retain control over policy definitions, users and groups configuration, token expiration policies and other advanced security controls. In general, keeping the authorization server separate from the resource server is considered a good practice.
 
 
 .. note::
@@ -62,9 +58,9 @@ Identity Providers Support
 
 Flyte supports OAuth2 and OpenId Connect to secure the various connections:
 
-* :ref:`OpenID Connect <deployment-auth-openid-appendix>`: used to secure user's authentication to flyteadmin through the UI.
-* :ref:`OAuth2 <deployment-auth-oauth2-appendix>`: used to secure connections from clients (i.e. pyflyte, flytectl and
-  flytepropeller) to the flyteadmin service. 
+* :ref:`OpenID Connect <deployment-auth-openid-appendix>`: used to secure user's authentication to ``flyteadmin`` through the UI.
+* :ref:`OAuth2 <deployment-auth-oauth2-appendix>`: used to secure connections from clients (i.e. ``pyflyte``, ``flytectl`` and
+  ``flytepropeller``) to the ``flyteadmin`` service. 
 
 Support for these protocols varies per IdP. Checkout the following table to understand the available support level for
 your IdP:
@@ -120,20 +116,22 @@ browser.
    
    .. group-tab:: Microsoft Azure AD
    
-       1. From the Azure homepage got to **Azure Active Directory**
-       2. From the **Ovierview** page, take note of the **Tentant ID**
+       1. From the Azure homepage go to **Azure Active Directory**
+       2. From the **Ovierview** page, take note of the **Tenant ID**
        3. Go to **App registrations**
        4. Create a **New registration**
        5. Give it a descriptive name
        6. For the **Supported account types** select the option that matches your organization's security policy
        7. In the **Redirect URI** section select:
-          * **Web** platform
-          * Add ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types
-       8. Click on **Register**
-       9. Once created, click on the registered app and go to the **Certificates and secrets** section
-       10. Go to **Client secrets** and create a **New client secret**
-       11. Enter a description and an expiration policy
-       12. Take note of the secret **Value** as it will be used in the Helm chart
+       
+          - **Web** platform
+          - Add ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types
+          
+       9. Click on **Register**
+       10. Once created, click on the registered app and go to the **Certificates and secrets** section
+       11. Go to **Client secrets** and create a **New client secret**
+       12. Enter a description and an expiration policy
+       13. Take note of the secret **Value** as it will be used in the Helm chart
        
        For further reference, check out the official `Azure AD Docs <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings>`__ on how to configure the IdP for OpenIDConnect.
    
@@ -185,11 +183,11 @@ browser.
 
       Where:
       
-      * `<release-name>` is the name of your Helm release, typically `flyte-backend`. You can find it using `helm ls -n <your-namespace>`
+      * ``<release-name>`` is the name of your Helm release, typically ``flyte-backend``. You can find it using ``helm ls -n <your-namespace>``
         
 
       6. Verify that your Flyte deployment now requires succesful login to your IdP to access the UI (https://<your domain>/console)
-      7. For flytectl/pyflyte, make sure that your local config file (`$HOME/.flyte/config.yaml`) includes the following option:
+      7. For ``flytectl`` / ``pyflyte``, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
 
       .. code-block:: yaml
 
@@ -210,15 +208,15 @@ browser.
       
       Take note of the output (only the contents inside `''`)
 
-      3. Store the `client_secret` provided by your IdP in a Kubernetes secret as follows:
+      3. Store the ``client_secret`` provided by your IdP in a Kubernetes secret as follows:
 
       .. prompt:: bash $
 
          kubectl edit secret -n <flyte-namespace> flyte-admin-secrets
 
-      Where `flyte-namespace` is the Kubernetes namespace where you have installed Flyte.
+      Where ``flyte-namespace`` is the Kubernetes namespace where you have installed Flyte.
 
-      4. Add a new key under `stringData`:
+      4. Add a new key under ``stringData``:
 
       .. code-block:: yaml
 
@@ -232,7 +230,7 @@ browser.
 
       5. Save and close your editor.
 
-      6. Go to your Helm values file and verify that the `configmap` section include the following, replacing the content where indicated:
+      6. Go to your Helm values file and verify that the ``configmap`` section include the following, replacing the content where indicated:
 
       .. code-block:: yaml
 
@@ -328,7 +326,7 @@ browser.
                     - profile
                     - openid
 
-      7. Additionally, outside the `configmap` section, add the following block and replace the necessary information:
+      7. Additionally, outside the ``configmap`` section, add the following block and replace the necessary information:
       
       .. code-block:: yaml
          
@@ -343,13 +341,13 @@ browser.
          
       8. Save and exit your editor.
 
-      9. Restart `flyteadmin` for the changes to take effect:
+      9. Restart ``flyteadmin`` for the changes to take effect:
 
       .. prompt:: bash $
 
          kubectl rollout restart deployment/flyteadmin -n flyte
 
-      10. Restart `flytepropeller` to start using authenticated requests:
+      10. Restart ``flytepropeller`` to start using authenticated requests:
 
       .. prompt:: bash $
 
@@ -361,7 +359,7 @@ browser.
 
          kubectl rollout restart deployment/flytescheduler -n flyte
 
-      12. For flytectl/pyflyte, make sure that your local config file (`$HOME/.flyte/config.yaml`) includes the following option:
+      12. For flytectl/pyflyte, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
 
       .. code-block:: yaml
 
@@ -400,34 +398,34 @@ In this section, you will find instructions on how to setup an OAuth2 Authorizat
        Okta's custom authorization servers are available through an add-on license. The free developer accounts do include access, which you can use to test before rolling out the configuration more broadly.
    
        1. From the left-hand menu, go to **Security** > **API**
-       2. Click on `Add Authorization Server`. 
+       2. Click on **Add Authorization Server**. 
        3. Assign an informative name and set the audience to the public URL of FlyteAdmin (e.g. https://example.foobar.com).
    
        .. note::
    
-          The audience must exactly match one of the URIs in the `authorizedUris` section above
+          The audience must exactly match one of the URIs in the ``authorizedUris`` section above
    
-       4. Note down the `Issuer URI`; this will be used for all the ``baseUrl`` settings in the Flyte config.  
-       5. Go to `Scopes`, click `Add Scope`. 
-       6. Set the name to `all` (required) and check `Required` under the **User consent** option.   
-       7. Uncheck the `Block services from requesting this scope` option and save your changes.    
-       8. Add another scope, named `offline`. Check both the `Required` and `Include in public metadata` options.
-       9. Uncheck the `Block services from requesting this scope` option. 
-       10.  Click **Save**. 
-       11.  Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  `All clients`.  
-       12.  Add a rule to the policy with the default settings (you can fine-tune these later).
-       13.  Navigate back to the **Applications** section.
-       14.  Create an integration for `flytectl`; it should be created with the `OIDC - OpenID Connect` sign-on method, and the `Native Application` type.
-       15.  Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
-       16.  Assign this integration to any Okta users or groups who should be able to use the `flytectl`` tool.
-       17.  Note down the **Client ID**; there will not be a secret.
-       18.  Create an integration for `flytepropeller`; it should be created with the `OIDC - OpenID Connect` sign-on method and `Web Application` type.
-       19. Check the `Client Credentials` option under **Client acting on behalf of itself**.
+       4. Note down the **Issuer URI**; this will be used for all the ``baseUrl`` settings in the Flyte config.  
+       5. Go to **Scopes** and click **Add Scope**. 
+       6. Set the name to ``all`` (required) and check ``Required`` under the **User consent** option.   
+       7. Uncheck the **Block services from requesting this scope** option and save your changes.    
+       8. Add another scope, named ``offline``. Check both the **Required** and **Include in public metadata** options.
+       9. Uncheck the **Block services from requesting this scope** option. 
+       10. Click **Save**. 
+       11. Go to  **Access Policies**, click **Add New Access Policy**. Enter a name and description and enable **Assign to** -  ``All clients``.  
+       12. Add a rule to the policy with the default settings (you can fine-tune these later).
+       13. Navigate back to the **Applications** section.
+       14. Create an integration for ``flytectl``; it should be created with the **OIDC - OpenID Connect** sign-on method, and the **Native Application** type.
+       15. Add ``http://localhost:53593/callback`` to the sign-in redirect URIs. The other options can remain as default.
+       16. Assign this integration to any Okta users or groups who should be able to use the ``flytectl`` tool.
+       17. Note down the **Client ID**; there will not be a secret.
+       18. Create an integration for ``flytepropeller``; it should be created with the **OIDC - OpenID Connect** sign-on method and **Web Application** type.
+       19. Check the ``Client Credentials`` option under **Client acting on behalf of itself**.
        20. This app does not need a specific redirect URI; nor does it need to be assigned to any users.
        21. Note down the **Client ID** and **Client secret**; you will need these later.
-       22. Take note of the `Issuer URI`` for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
+       22. Take note of the **Issuer URI** for your Authorization Server. It will be used as the baseURL parameter in the Helm chart
    
-       You should have three integrations total - one for the web interface (flyteconsole), one for `flytectl`, and one for `flytepropeller`.
+       You should have three integrations total - one for the web interface (``flyteconsole``), one for ``flytectl``, and one for ``flytepropeller``.
    
    .. group-tab:: Keycloak
    
@@ -460,11 +458,11 @@ Apply external auth server configuration
 Follow the steps in this section to configure `flyteadmin` to use an external auth server. This section assumes that you have already completed and applied the configuration for the OIDC Identity Layer.
 
 .. tabs::
-   
+
    .. group-tab:: flyte-binary
       
       1. Go to the values YAML file you used to install Flyte using a Helm chart
-      2. Find the `auth` section and follow the inline comments to insert your configuration:
+      2. Find the ``auth`` section and follow the inline comments to insert your configuration:
       
       .. code-block:: yaml
 
@@ -490,7 +488,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
            - https://<your-flyte-deployment-URL>     
         
         
-      3. Find the `inline` section of the values file and add the following content, replacing where needed:
+      3. Find the ``inline`` section of the values file and add the following content, replacing where needed:
       
       .. code-block:: yaml
 
@@ -537,11 +535,11 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
    .. group-tab:: flyte-core
 
        
-      1. Find the `auth` section in your Helm values file, and replace the necessary data:
+      1. Find the ``auth`` section in your Helm values file, and replace the necessary data:
 
-.. note:: 
+      .. note:: 
 
-   If you were previously using the internal auth server, make sure to delete all the `selfAuthServer` section from your values file
+         If you were previously using the internal auth server, make sure to delete all the ``selfAuthServer`` section from your values file
 
       .. code-block:: yaml
           
@@ -549,33 +547,40 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
            auth:
              appAuth:
 
-                  authServerType: External
+               authServerType: External
 
-                  # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
-                  externalAuthServer:
-                     baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm>
-                     metadataUrl: .well-known/openid-configuration
+               # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+               externalAuthServer:
+               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+               # For Okta, use the Issuer URI of the custom auth server:  
+                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+               
+                 metadataUrl: .well-known/openid-configuration
 
-                  thirdPartyConfig:
-                     flyteClient:
-                           # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                           clientId: flytectl
-                           # This should not change
-                           redirectUri: http://localhost:53593/callback
-                           # 4. "all" is a required scope and must be configured in the custom authorization server.
-                           scopes:
-                           - offline
-                           - all
-
-               userAuth:
-                  openId:
-                     baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
+               thirdPartyConfig:
+                  flyteClient:
+                     # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                     clientId: flytectl
+                     # This should not change
+                     redirectUri: http://localhost:53593/callback
+                     # 4. "all" is a required scope and must be configured in the custom authorization server.
                      scopes:
-                     - profile
-                     - openid
-                     # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-                     clientId: <client id>
-                  .. code-block:: yaml
+                     - offline
+                     - all
+
+             userAuth:
+               openId:
+               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+               # For Okta, use the Issuer URI of the custom auth server:  
+                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+                 scopes:
+                 - profile
+                 - openid
+                 # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                 clientId: <client id>
+                  
    
          secrets:
            adminOauthClientCredentials:
@@ -646,7 +651,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
 Disable Helm secret management
 ------------------------------
 
-Alternatively, you can instruct Helm not to create and manage the secret for `flytepropeller`. In that case, you'll have to create it following this steps:
+Alternatively, you can instruct Helm not to create and manage the secret for ``flytepropeller``. In that case, you'll have to create it following this steps:
 
 1. Disable Helm secrets management in your values file
 
@@ -671,6 +676,7 @@ Alternatively, you can instruct Helm not to create and manage the secret for `fl
    stringData:
   # Replace with the client_secret provided by your IdP for flytepropeller.
      client_secret: <client_secret>
+
 
 
 Continuous Integration - CI
