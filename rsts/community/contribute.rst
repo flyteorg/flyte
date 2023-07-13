@@ -321,32 +321,32 @@ Content
 How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib?
 ******************************************************************************************************************************
 
-**1. Install Flytectl**
+**1. Install flytectl**
 
 
 `Flytectl <https://github.com/flyteorg/flytectl>`__ is a portable and lightweight command-line interface to work with Flyte.
 
 .. code:: shell
 
-   # Step1: Install the latest version of Flytectl
+   # Step1: Install the latest version of flytectl
    curl -sL https://ctl.flyte.org/install | bash
    # flyteorg/flytectl info checking GitHub for latest tag
    # flyteorg/flytectl info found version: 0.6.39 for v0.6.39/Linux/x86_64
    # flyteorg/flytectl info installed ./bin/flytectl
 
-   # Step2: Export Flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
+   # Step2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
-**2. Build a k3s cluster that runs Minio and Postgres Pods.**
+**2. Build a k3s cluster that runs minio and postgres Pods.**
 
 
 | `Minio <https://min.io/>`__ is an S3-compatible object store that will be used later to store task output, input, etc.
-| `Postgres <https://www.postgresql.org/>`__ is an open-source object-relational database that will later be used by flyteadmin/DataCatalog to
+| `Postgres <https://www.postgresql.org/>`__ is an open-source object-relational database that will later be used by flyteadmin/dataCatalog to
   store all Flyte information.
 
 .. code:: shell
 
-   # Step1: Start k3s cluster, create pods for Postgres and Minio. Note: We cannot access Flyte UI yet! but we can access the Minio console now.
+   # Step1: Start k3s cluster, create Pods for postgres and minio. Note: We cannot access Flyte UI yet! but we can access the minio console now.
    flytectl demo start --dev
    # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉 
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
@@ -358,7 +358,7 @@ How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropel
    FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml
 
    # Step3: The kubeconfig will be automatically copied to the user's main kubeconfig (default is `/.kube/config`) with "flyte-sandbox" as the context name.
-   # Check that we can access the K3s cluster. Verify that Postgres and Minio are running.
+   # Check that we can access the K3s cluster. Verify that postgres and minio are running.
    kubectl get pod -n flyte
    # NAME                                                  READY   STATUS    RESTARTS   AGE
    # flyte-sandbox-docker-registry-85745c899d-dns8q        1/1     Running   0          5m
@@ -379,8 +379,8 @@ that integrates all Flyte components into a single binary.
    git clone https://github.com/flyteorg/flyte.git
    cd flyte
 
-   # Step2: Build a single binary that bundles all the backends (flyteidl, flyteadmin, flyteplugins, flytepropeller) and HTTP Server.
-   # The versions of flyteidl, flyteadmin, flyteplugins, and flytepropeller used to build the single binary are defined in `go.mod`.
+   # Step2: Build a single binary that bundles all the Flyte components.
+   # The version of each component/library used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
    go mod tidy
    make compile
@@ -426,7 +426,7 @@ The following instructions provide guidance on how to build single binary with y
    export PATH=$(go env GOPATH)/bin:$PATH
 
    # Step 3.1: Review the go.mod file in the {flyteadmin} directory to identify the Flyte components/libraries that {flyteadmin} relies on.
-   # If you have modified any of these components/libraries, use `go mod edit -replace` in the {flyteadmin} repo to to replace original components/libraries with your customized ones.
+   # If you have modified any of these components/libraries, use `go mod edit -replace` in the {flyteadmin} repo to replace original components/libraries with your customized ones.
    # For instance, if you have also modified `flytepropeller`, run the following commands:
    go mod edit -replace github.com/flyteorg/flytepropeller=/home/ubuntu/flytepropeller #replace with your own local path to flytepropeller
 
@@ -445,7 +445,7 @@ The following instructions provide guidance on how to build single binary with y
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 
-**5. Test by running a Hello World workflow.**
+**5. Test by running a hello world workflow.**
 
 
 .. code:: shell
@@ -456,15 +456,15 @@ The following instructions provide guidance on how to build single binary with y
    # Step2: The flytesnacks repository provides a lot of useful examples.
    git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks
 
-   # Step3: Before running the Hello World workflow, create the flytesnacks-development namespace. 
-   # This is necessary because, by default (without creating a new project), task pods will run in the flytesnacks-development namespace.
+   # Step3: Before running the hello world workflow, create the flytesnacks-development namespace.
+   # This is necessary because, by default (without creating a new project), task Pods will run in the flytesnacks-development namespace.
    kubectl create namespace flytesnacks-development
 
-   # Step4: Run a Hello World example
+   # Step4: Run a hello world example
    pyflyte run --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
 
-**6. Tear down the k3s cluster After finishing developing.**
+**6. Tear down the k3s cluster after finishing developing.**
 
 
 .. code:: shell
@@ -488,16 +488,17 @@ If not, we can start backends with a single command.
 
 .. code:: shell
 
-   # Step1: Install the latest version of Flytectl, a portable and lightweight command-line interface to work with Flyte.
+   # Step1: Install the latest version of flytectl, a portable and lightweight command-line interface to work with Flyte.
    curl -sL https://ctl.flyte.org/install | bash
    # flyteorg/flytectl info checking GitHub for latest tag
    # flyteorg/flytectl info found version: 0.6.39 for v0.6.39/Linux/x86_64
    # flyteorg/flytectl info installed ./bin/flytectl
 
-   # Step2: Export Flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
+   # Step2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
-   # Step3: Create backends. This will setup a k3s cluster running Minio, Postgres pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
+   # Step3: Starts the Flyte demo cluster. This will setup a k3s cluster running minio, postgres Pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
+   # See https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_demo_start.html for more details.
    flytectl demo start
    # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉 
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
@@ -513,8 +514,8 @@ If not, we can start backends with a single command.
    # Step1: Build a virtual environment for developing Flytekit. This will allow your local changes to take effect when the same Python interpreter runs `import flytekit`.
    git clone https://github.com/flyteorg/flytekit.git # replace with your own repo
    cd flytekit
-   virtualenv /.virtualenvs/flytekit
-   source /.virtualenvs/flytekit/bin/activate
+   virtualenv ~/.virtualenvs/flytekit
+   source ~/.virtualenvs/flytekit/bin/activate
    make setup
    pip install -e .
    pip install gsutil awscli
@@ -548,13 +549,13 @@ If your task requires additional components, such as plugins, you may find it us
    ENV PYTHONPATH /root
    RUN apt-get update && apt-get install build-essential -y
    RUN apt-get install git -y
-   # The following line is an example of how to install your own plugins. In this case, it demonstrates how to install the 'deck' plugin.
+   # The following line is an example of how to install your modified plugins. In this case, it demonstrates how to install the 'deck' plugin.
    # RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@"demo#egg=flytekitplugins-deck-standard&subdirectory=plugins/flytekit-deck-standard" # replace with your own repo and branch
    RUN pip install -U git+https://github.com/Yicheng-Lu-llll/flytekit.git@demo # replace with your own repo and branch
    ENV FLYTE_INTERNAL_IMAGE "localhost:30000/flytekit:demo" # replace with your own image name and tag
 
 The instructions below explain how to build the image, push the image to
-the Flyte Cluster, and finally submit the workflow.
+the Flyte cluster, and finally submit the workflow.
 
 .. code:: shell
 
@@ -567,14 +568,14 @@ the Flyte Cluster, and finally submit the workflow.
    export FLYTE_INTERNAL_IMAGE="localhost:30000/flytekit:demo" # replace with your own image name and tag
    docker build --no-cache -t  "${FLYTE_INTERNAL_IMAGE}" -f ./Dockerfile .
 
-   # Step3: Push the image to the Flyte Cluster
+   # Step3: Push the image to the Flyte cluster
    docker push ${FLYTE_INTERNAL_IMAGE}
 
-   # Step4: Submit a hello world workflow to the Flyte Cluster
+   # Step4: Submit a hello world workflow to the Flyte cluster
    git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks
-   # Note create the flytesnacks-development namespace if not exists: 
-   # This is necessary because, by default (without creating a new project), task pods will run in the flytesnacks-development namespace.
+   # Note, create the flytesnacks-development namespace if not exists:
+   # This is necessary because, by default (without creating a new project), task Pods will run in the flytesnacks-development namespace.
    # kubectl create namespace flytesnacks-development
    pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
@@ -582,9 +583,9 @@ the Flyte Cluster, and finally submit the workflow.
 How to setup dev environment for flyteconsole?
 **********************************************
 
-**1. Set up local Flyte Cluster.**
+**1. Set up local Flyte cluster.**
 
-Depending on your needs, refer to one of the following guides to setup up the Flyte Cluster:
+Depending on your needs, refer to one of the following guides to setup up the Flyte cluster:
 
 - If you do not need to change the backend code, refer to the section on `How to Set Up a Dev Environment for Flytekit? <#how-to-setup-dev-environment-for-flytekit>`__
 - If you need to change the backend code, refer to the section on `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
@@ -623,15 +624,13 @@ Depending on your needs, refer to one of the following guides to setup up the Fl
    yarn build:types # It is fine if seeing error `Property 'at' does not exist on type 'string[]'`
    yarn run build:prod
 
-   # Step7: Start Flyteconsole
+   # Step7: Start flyteconsole
    yarn start
 
 **3. Install the Chrome plugin:** `Moesif Origin & CORS Changer <https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc>`__.
 
 
-We need to disable
-`CORS <https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>`__ to
-load resources.
+We need to disable `CORS <https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>`__ to load resources.
 
 ::
 
@@ -646,7 +645,7 @@ How to access Flyte UI, minio, postgres, k3s, and endpoints?
 *************************************************************************
 
 
-This section presumes a local Flyte Cluster is already setup. If it isn't, refer to either: 
+This section presumes a local Flyte cluster is already setup. If it isn't, refer to either:
 
 - `How to setup dev environment for flytekit? <#how-to-setup-dev-environment-for-flytekit>`__
 - `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
@@ -662,10 +661,10 @@ You can access it via http://localhost:30080/console.
 **2. Access the minio console.**
 
 
-Core Flyte components, such as Admin, Propeller, and DataCatalog, as well as user runtime containers rely on an object store (in this case, Minio) to hold files. 
-During development, you might need to examine files such as `input.pb/output.pb <https://docs.flyte.org/en/latest/concepts/data_management.html#serialization-time>`__, or `deck.html <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/deck.html#flyte-decks>`__ stored in Minio.
+Core Flyte components, such as admin, propeller, and datacatalog, as well as user runtime containers rely on an object store (in this case, minio) to hold files.
+During development, you might need to examine files such as `input.pb/output.pb <https://docs.flyte.org/en/latest/concepts/data_management.html#serialization-time>`__, or `deck.html <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/deck.html#flyte-decks>`__ stored in minio.
 
-Access the Minio console at: http://localhost:30080/minio/login. The default credentials are:  
+Access the minio console at: http://localhost:30080/minio/login. The default credentials are:
 
 - Username: ``minio``
 - Password: ``miniostorage``
@@ -674,7 +673,7 @@ Access the Minio console at: http://localhost:30080/minio/login. The default cre
 **3. Access the postgres.**
 
 
-FlyteAdmin and DataCatalog use Postgres to store persistent records, and you can interact with Postgres on port ``30001``. Here is an example of using `psql` to connect:
+FlyteAdmin and datacatalog use postgres to store persistent records, and you can interact with postgres on port ``30001``. Here is an example of using `psql` to connect:
 
 .. code:: shell
     
