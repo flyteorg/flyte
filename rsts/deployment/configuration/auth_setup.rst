@@ -72,7 +72,7 @@ your IdP:
 +----------------------+--------+-------------+---------------------+----------+-------+----------+--------+
 
 
-1. Identity Management layer : OIDC
+Identity Management layer : OIDC
 ===================================
 
 In this section, you can find canonical examples of how to set up OIDC on some of the supported IdPs; enabling users to authenticate in the
@@ -139,7 +139,7 @@ browser.
          The OpenIDConnect authentication will not work otherwise, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
 
 
-1. Apply OIDC Configuration
+Apply OIDC Configuration
 ===========================
 
 .. tabs::
