@@ -22,42 +22,42 @@ MAX_ATTEMPTS = 200
 # starting with "core".
 FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
     "lite": [
-        ("core.flyte_basics.hello_world.my_wf", {}),
-        ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
+        ("basics.hello_world.my_wf", {}),
+        ("basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
     ],
     "core": [
-        ("core.flyte_basics.deck.wf", {}),
+        ("basics.deck.wf", {}),
         # The chain_workflows example in flytesnacks expects to be running in a sandbox.
-        # ("core.control_flow.chain_entities.chain_workflows_wf", {}),
-        ("core.control_flow.dynamics.wf", {"s1": "Pear", "s2": "Earth"}),
-        ("core.control_flow.map_task.my_map_workflow", {"a": [1, 2, 3, 4, 5]}),
+        # ("control_flow.chain_entities.chain_workflows_wf", {}),
+        ("control_flow.dynamics.wf", {"s1": "Pear", "s2": "Earth"}),
+        ("control_flow.map_task.my_map_workflow", {"a": [1, 2, 3, 4, 5]}),
         # Workflows that use nested executions cannot be launched via flyteremote.
         # This issue is being tracked in https://github.com/flyteorg/flyte/issues/1482.
-        # ("core.control_flow.run_conditions.multiplier", {"my_input": 0.5}),
-        # ("core.control_flow.run_conditions.multiplier_2", {"my_input": 10}),
-        # ("core.control_flow.run_conditions.multiplier_3", {"my_input": 5}),
-        # ("core.control_flow.run_conditions.basic_boolean_wf", {"seed": 5}),
-        # ("core.control_flow.run_conditions.bool_input_wf", {"b": True}),
-        # ("core.control_flow.run_conditions.nested_conditions", {"my_input": 0.4}),
-        # ("core.control_flow.run_conditions.consume_outputs", {"my_input": 0.4, "seed": 7}),
-        # ("core.control_flow.run_merge_sort.merge_sort", {"numbers": [5, 4, 3, 2, 1], "count": 5}),
-        ("core.control_flow.subworkflows.parent_wf", {"a": 3}),
-        ("core.control_flow.subworkflows.nested_parent_wf", {"a": 3}),
-        ("core.flyte_basics.basic_workflow.my_wf", {"a": 50, "b": "hello"}),
+        # ("control_flow.run_conditions.multiplier", {"my_input": 0.5}),
+        # ("control_flow.run_conditions.multiplier_2", {"my_input": 10}),
+        # ("control_flow.run_conditions.multiplier_3", {"my_input": 5}),
+        # ("control_flow.run_conditions.basic_boolean_wf", {"seed": 5}),
+        # ("control_flow.run_conditions.bool_input_wf", {"b": True}),
+        # ("control_flow.run_conditions.nested_conditions", {"my_input": 0.4}),
+        # ("control_flow.run_conditions.consume_outputs", {"my_input": 0.4, "seed": 7}),
+        # ("control_flow.run_merge_sort.merge_sort", {"numbers": [5, 4, 3, 2, 1], "count": 5}),
+        ("control_flow.subworkflows.parent_wf", {"a": 3}),
+        ("control_flow.subworkflows.nested_parent_wf", {"a": 3}),
+        ("basics.basic_workflow.my_wf", {"a": 50, "b": "hello"}),
         # TODO: enable new files and folders workflows
-        # ("core.flyte_basics.files.rotate_one_workflow", {"in_image": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"}),
-        # ("core.flyte_basics.folders.download_and_rotate", {}),
-        ("core.flyte_basics.hello_world.my_wf", {}),
-        ("core.flyte_basics.lp.my_wf", {"val": 4}),
-        ("core.flyte_basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
-        ("core.flyte_basics.named_outputs.my_wf", {}),
+        # ("basics.files.rotate_one_workflow", {"in_image": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Julia_set_%28C_%3D_0.285%2C_0.01%29.jpg"}),
+        # ("basics.folders.download_and_rotate", {}),
+        ("basics.hello_world.my_wf", {}),
+        ("basics.lp.my_wf", {"val": 4}),
+        ("basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
+        ("basics.named_outputs.my_wf", {}),
         # # Getting a 403 for the wikipedia image
-        # # ("core.flyte_basics.reference_task.wf", {}),
-        ("core.type_system.custom_objects.wf", {"x": 10, "y": 20}),
+        # # ("basics.reference_task.wf", {}),
+        ("type_system.custom_objects.wf", {"x": 10, "y": 20}),
         # Enums are not supported in flyteremote
-        # ("core.type_system.enums.enum_wf", {"c": "red"}),
-        ("core.type_system.schema.df_wf", {"a": 42}),
-        ("core.type_system.typed_schema.wf", {}),
+        # ("type_system.enums.enum_wf", {"c": "red"}),
+        ("type_system.schema.df_wf", {"a": 42}),
+        ("type_system.typed_schema.wf", {}),
         #("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
     "integrations-k8s-spark": [
@@ -193,7 +193,7 @@ def run(
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
     manifest_url = "https://raw.githubusercontent.com/flyteorg/flytesnacks/" \
-                   f"{flytesnacks_release_tag}/cookbook/flyte_tests_manifest.json"
+                   f"{flytesnacks_release_tag}/flyte_tests_manifest.json"
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
     workflow_groups = []
