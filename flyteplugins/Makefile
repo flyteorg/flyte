@@ -6,7 +6,3 @@ include boilerplate/flyte/golang_test_targets/Makefile
 update_boilerplate:
 	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
-
-generate: download_tooling
-	@go generate ./...
-

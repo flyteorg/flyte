@@ -225,6 +225,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_googleTokenSource.gke-task-workload-identity.remoteClusterConfig.name", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.name", testValue)
+			if vString, err := cmdFlags.GetString("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.name"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Name)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_googleTokenSource.gke-task-workload-identity.remoteClusterConfig.endpoint", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.endpoint", testValue)
+			if vString, err := cmdFlags.GetString("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Endpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_googleTokenSource.gke-task-workload-identity.remoteClusterConfig.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("googleTokenSource.gke-task-workload-identity.remoteClusterConfig.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_bigQueryEndpoint", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

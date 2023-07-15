@@ -58,7 +58,10 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "webApi.caching.resyncInterval"), defaultConfig.WebAPI.Caching.ResyncInterval.String(), "Defines the sync interval.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.caching.workers"), defaultConfig.WebAPI.Caching.Workers, "Defines the number of workers to start up to process items.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.caching.maxSystemFailures"), defaultConfig.WebAPI.Caching.MaxSystemFailures, "Defines the number of failures to fetch a task before failing the task.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.type"), defaultConfig.GoogleTokenSource.Type, "Defines type of TokenSourceFactory,  possible values are 'default'")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.type"), defaultConfig.GoogleTokenSource.Type, "Defines type of TokenSourceFactory,  possible values are 'default' and 'gke-task-workload-identity'")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.name"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Name, "Friendly name of the remote cluster")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.endpoint"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Endpoint, " Remote K8s cluster endpoint")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.enabled"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Enabled, " Boolean flag to enable or disable")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "bigQueryEndpoint"), defaultConfig.bigQueryEndpoint, "")
 	return cmdFlags
 }
