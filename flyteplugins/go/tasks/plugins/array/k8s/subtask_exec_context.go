@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -10,6 +11,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
@@ -173,6 +175,38 @@ func (s SubTaskExecutionID) GetLogSuffix() string {
 	}
 
 	return fmt.Sprintf(" #%d-%d-%d", s.taskRetryAttempt, s.executionIndex, s.subtaskRetryAttempt)
+}
+
+var logTemplateRegexes = struct {
+	ExecutionIndex     *regexp.Regexp
+	ParentName         *regexp.Regexp
+	RetryAttempt       *regexp.Regexp
+	ParentRetryAttempt *regexp.Regexp
+}{
+	tasklog.MustCreateRegex("subtaskExecutionIndex"),
+	tasklog.MustCreateRegex("subtaskParentName"),
+	tasklog.MustCreateRegex("subtaskRetryAttempt"),
+	tasklog.MustCreateRegex("subtaskParentRetryAttempt"),
+}
+
+func (s SubTaskExecutionID) TemplateVarsByScheme() *tasklog.TemplateVarsByScheme {
+	return &tasklog.TemplateVarsByScheme{
+		TaskExecution: tasklog.TemplateVars{
+			{Regex: logTemplateRegexes.ParentName, Value: s.parentName},
+			{
+				Regex: logTemplateRegexes.ExecutionIndex,
+				Value: strconv.FormatUint(uint64(s.executionIndex), 10),
+			},
+			{
+				Regex: logTemplateRegexes.RetryAttempt,
+				Value: strconv.FormatUint(s.subtaskRetryAttempt, 10),
+			},
+			{
+				Regex: logTemplateRegexes.ParentRetryAttempt,
+				Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10),
+			},
+		},
+	}
 }
 
 // NewSubtaskExecutionID constructs a SubTaskExecutionID using the provided parameters

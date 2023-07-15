@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -105,12 +106,13 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 }
 
 // GetLogs will return the logs for kubeflow job
-func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
+func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
 
 	taskLogs := make([]*core.TaskLog, 0, 10)
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 
 	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
 
@@ -132,13 +134,14 @@ func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	if taskType == PytorchTaskType && hasMaster {
 		masterTaskLog, masterErr := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				PodName:              name + "-master-0",
-				Namespace:            namespace,
-				LogName:              "master",
-				PodRFC3339StartTime:  RFC3999StartTime,
-				PodRFC3339FinishTime: RFC3999FinishTime,
-				PodUnixStartTime:     startTime,
-				PodUnixFinishTime:    finishTime,
+				PodName:                 name + "-master-0",
+				Namespace:               namespace,
+				LogName:                 "master",
+				PodRFC3339StartTime:     RFC3999StartTime,
+				PodRFC3339FinishTime:    RFC3999FinishTime,
+				PodUnixStartTime:        startTime,
+				PodUnixFinishTime:       finishTime,
+				TaskExecutionIdentifier: &taskExecID,
 			},
 		)
 		if masterErr != nil {
@@ -150,12 +153,13 @@ func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	// get all workers log
 	for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
 		workerLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:              name + fmt.Sprintf("-worker-%d", workerIndex),
-			Namespace:            namespace,
-			PodRFC3339StartTime:  RFC3999StartTime,
-			PodRFC3339FinishTime: RFC3999FinishTime,
-			PodUnixStartTime:     startTime,
-			PodUnixFinishTime:    finishTime,
+			PodName:                 name + fmt.Sprintf("-worker-%d", workerIndex),
+			Namespace:               namespace,
+			PodRFC3339StartTime:     RFC3999StartTime,
+			PodRFC3339FinishTime:    RFC3999FinishTime,
+			PodUnixStartTime:        startTime,
+			PodUnixFinishTime:       finishTime,
+			TaskExecutionIdentifier: &taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -170,8 +174,9 @@ func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	// get all parameter servers logs
 	for psReplicaIndex := int32(0); psReplicaIndex < psReplicasCount; psReplicaIndex++ {
 		psReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:   name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
-			Namespace: namespace,
+			PodName:                 name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
+			Namespace:               namespace,
+			TaskExecutionIdentifier: &taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -181,8 +186,9 @@ func GetLogs(taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
 	// get chief worker log, and the max number of chief worker is 1
 	if chiefReplicasCount != 0 {
 		chiefReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:   name + fmt.Sprintf("-chiefReplica-%d", 0),
-			Namespace: namespace,
+			PodName:                 name + fmt.Sprintf("-chiefReplica-%d", 0),
+			Namespace:               namespace,
+			TaskExecutionIdentifier: &taskExecID,
 		})
 		if err != nil {
 			return nil, err

@@ -18,7 +18,7 @@ type logPlugin struct {
 }
 
 // Internal
-func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, pod *v1.Pod, index uint32, nameSuffix string) ([]*core.TaskLog, error) {
+func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID *core.TaskExecutionIdentifier, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme) ([]*core.TaskLog, error) {
 	if logPlugin == nil {
 		return nil, nil
 	}
@@ -43,16 +43,18 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, pod
 
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
-			PodName:              pod.Name,
-			PodUID:               string(pod.GetUID()),
-			Namespace:            pod.Namespace,
-			ContainerName:        pod.Spec.Containers[index].Name,
-			ContainerID:          pod.Status.ContainerStatuses[index].ContainerID,
-			LogName:              nameSuffix,
-			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
-			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
-			PodUnixStartTime:     startTime,
-			PodUnixFinishTime:    finishTime,
+			PodName:                   pod.Name,
+			PodUID:                    string(pod.GetUID()),
+			Namespace:                 pod.Namespace,
+			ContainerName:             pod.Spec.Containers[index].Name,
+			ContainerID:               pod.Status.ContainerStatuses[index].ContainerID,
+			LogName:                   nameSuffix,
+			PodRFC3339StartTime:       time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime:      time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:          startTime,
+			PodUnixFinishTime:         finishTime,
+			TaskExecutionIdentifier:   taskExecID,
+			ExtraTemplateVarsByScheme: extraLogTemplateVarsByScheme,
 		},
 	)
 
@@ -70,6 +72,7 @@ type taskLogPluginWrapper struct {
 func (t taskLogPluginWrapper) GetTaskLogs(input tasklog.Input) (logOutput tasklog.Output, err error) {
 	logs := make([]*core.TaskLog, 0, len(t.logPlugins))
 	suffix := input.LogName
+
 	for _, plugin := range t.logPlugins {
 		input.LogName = plugin.Name + suffix
 		o, err := plugin.Plugin.GetTaskLogs(input)
@@ -92,33 +95,31 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 
 	if cfg.IsKubernetesEnabled {
 		if len(cfg.KubernetesTemplateURI) > 0 {
-			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.KubernetesTemplateURI}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{cfg.KubernetesTemplateURI}, core.TaskLog_JSON)})
 		} else {
-			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, core.TaskLog_JSON)})
 		}
 	}
 
 	if cfg.IsCloudwatchEnabled {
 		if len(cfg.CloudwatchTemplateURI) > 0 {
-			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.CloudwatchTemplateURI}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{cfg.CloudwatchTemplateURI}, core.TaskLog_JSON)})
 		} else {
-			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin(
-				[]string{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, core.TaskLog_JSON)})
 		}
 	}
 
 	if cfg.IsStackDriverEnabled {
 		if len(cfg.StackDriverTemplateURI) > 0 {
-			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.StackDriverTemplateURI}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{cfg.StackDriverTemplateURI}, core.TaskLog_JSON)})
 		} else {
-			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin(
-				[]string{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, core.TaskLog_JSON)})
+			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin(tasklog.TemplateSchemePod, []string{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, core.TaskLog_JSON)})
 		}
 	}
 
 	if len(cfg.Templates) > 0 {
 		for _, cfg := range cfg.Templates {
-			logPlugins = append(logPlugins, logPlugin{Name: cfg.DisplayName, Plugin: tasklog.NewTemplateLogPlugin(cfg.TemplateURIs, cfg.MessageFormat)})
+			logPlugins = append(logPlugins, logPlugin{Name: cfg.DisplayName, Plugin: tasklog.NewTemplateLogPlugin(cfg.Scheme, cfg.TemplateURIs, cfg.MessageFormat)})
 		}
 	}
 
@@ -126,7 +127,5 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 		return nil, nil
 	}
 
-	return taskLogPluginWrapper{
-		logPlugins: logPlugins,
-	}, nil
+	return taskLogPluginWrapper{logPlugins: logPlugins}, nil
 }

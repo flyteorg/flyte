@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/go-test/deep"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -14,10 +15,29 @@ import (
 
 const podName = "PodName"
 
+var dummyTaskExecID = &core.TaskExecutionIdentifier{
+	TaskId: &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Name:         "my-task-name",
+		Project:      "my-task-project",
+		Domain:       "my-task-domain",
+		Version:      "1",
+	},
+	NodeExecutionId: &core.NodeExecutionIdentifier{
+		NodeId: "n0",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Name:    "my-execution-name",
+			Project: "my-execution-project",
+			Domain:  "my-execution-domain",
+		},
+	},
+	RetryAttempt: 1,
+}
+
 func TestGetLogsForContainerInPod_NoPlugins(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{})
 	assert.NoError(t, err)
-	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, nil, 0, " Suffix")
+	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, nil, 0, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, l)
 }
@@ -29,7 +49,7 @@ func TestGetLogsForContainerInPod_NoLogs(t *testing.T) {
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
 	})
 	assert.NoError(t, err)
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, nil, 0, " Suffix")
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, nil, 0, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -60,7 +80,7 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 1, " Suffix")
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 1, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -85,7 +105,7 @@ func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 1, " Suffix")
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 1, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -115,7 +135,7 @@ func TestGetLogsForContainerInPod_Cloudwatch(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -145,7 +165,7 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -178,7 +198,7 @@ func TestGetLogsForContainerInPod_All(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 2)
 }
@@ -209,7 +229,7 @@ func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -283,7 +303,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*c
 		},
 	}
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, pod, 0, " my-Suffix")
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID, pod, 0, " my-Suffix", nil)
 	assert.Nil(tb, err)
 	assert.Len(tb, logs, len(expectedTaskLogs))
 	if diff := deep.Equal(logs, expectedTaskLogs); len(diff) > 0 {
@@ -301,12 +321,25 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 				},
 				MessageFormat: core.TaskLog_JSON,
 			},
+			{
+				DisplayName: "Internal",
+				TemplateURIs: []string{
+					"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs",
+				},
+				MessageFormat: core.TaskLog_JSON,
+				Scheme:        tasklog.TemplateSchemeTaskExecution,
+			},
 		},
 	}, []*core.TaskLog{
 		{
 			Uri:           "https://my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "StackDriver my-Suffix",
+		},
+		{
+			Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0/taskId/my-task-name/attempt/1/view/logs",
+			MessageFormat: core.TaskLog_JSON,
+			Name:          "Internal my-Suffix",
 		},
 	})
 }

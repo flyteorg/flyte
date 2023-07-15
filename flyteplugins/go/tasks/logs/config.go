@@ -3,6 +3,7 @@ package logs
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 //go:generate pflags LogConfig --default-var=DefaultConfig
@@ -38,6 +39,7 @@ type TemplateLogPluginConfig struct {
 	DisplayName   string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
 	TemplateURIs  []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
 	MessageFormat core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
+	Scheme        tasklog.TemplateScheme     `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 }
 
 var (

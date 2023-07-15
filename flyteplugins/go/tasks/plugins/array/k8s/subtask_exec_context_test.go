@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	podPlugin "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
 
 	"github.com/flyteorg/flytestdlib/storage"
@@ -35,4 +36,15 @@ func TestSubTaskExecutionContext(t *testing.T) {
 	assert.Equal(t, podPlugin.ContainerTaskType, subtaskTemplate.Type)
 	assert.Equal(t, storage.DataReference("/prefix/"), stCtx.OutputWriter().GetOutputPrefixPath())
 	assert.Equal(t, storage.DataReference("/raw_prefix/5/1"), stCtx.OutputWriter().GetRawOutputPrefix())
+	assert.Equal(t,
+		&tasklog.TemplateVarsByScheme{
+			TaskExecution: tasklog.TemplateVars{
+				{Regex: logTemplateRegexes.ParentName, Value: "notfound"},
+				{Regex: logTemplateRegexes.ExecutionIndex, Value: "0"},
+				{Regex: logTemplateRegexes.RetryAttempt, Value: "1"},
+				{Regex: logTemplateRegexes.ParentRetryAttempt, Value: "0"},
+			},
+		},
+		stCtx.TaskExecutionMetadata().GetTaskExecutionID().(SubTaskExecutionID).TemplateVarsByScheme(),
+	)
 }

@@ -226,7 +226,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 
 	workersCount := app.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas
 
-	taskLogs, err := common.GetLogs(common.PytorchTaskType, app.ObjectMeta, hasMaster, *workersCount, 0, 0)
+	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, hasMaster, *workersCount, 0, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
