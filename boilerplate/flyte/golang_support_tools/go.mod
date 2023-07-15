@@ -1,6 +1,6 @@
 module github.com/flyteorg/boilerplate
 
-go 1.18
+go 1.17
 
 require (
 	github.com/EngHabu/mockery v0.0.0-20220405200825-3f76291311cf
