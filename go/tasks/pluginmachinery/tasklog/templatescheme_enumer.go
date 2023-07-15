@@ -5,14 +5,11 @@ package tasklog
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 const _TemplateSchemeName = "PodTaskExecution"
 
 var _TemplateSchemeIndex = [...]uint8{0, 3, 16}
-
-const _TemplateSchemeLowerName = "podtaskexecution"
 
 func (i TemplateScheme) String() string {
 	if i < 0 || i >= TemplateScheme(len(_TemplateSchemeIndex)-1) {
@@ -21,26 +18,11 @@ func (i TemplateScheme) String() string {
 	return _TemplateSchemeName[_TemplateSchemeIndex[i]:_TemplateSchemeIndex[i+1]]
 }
 
-// An "invalid array index" compiler error signifies that the constant values have changed.
-// Re-run the stringer command to generate them again.
-func _TemplateSchemeNoOp() {
-	var x [1]struct{}
-	_ = x[TemplateSchemePod-(0)]
-	_ = x[TemplateSchemeTaskExecution-(1)]
-}
-
-var _TemplateSchemeValues = []TemplateScheme{TemplateSchemePod, TemplateSchemeTaskExecution}
+var _TemplateSchemeValues = []TemplateScheme{0, 1}
 
 var _TemplateSchemeNameToValueMap = map[string]TemplateScheme{
-	_TemplateSchemeName[0:3]:       TemplateSchemePod,
-	_TemplateSchemeLowerName[0:3]:  TemplateSchemePod,
-	_TemplateSchemeName[3:16]:      TemplateSchemeTaskExecution,
-	_TemplateSchemeLowerName[3:16]: TemplateSchemeTaskExecution,
-}
-
-var _TemplateSchemeNames = []string{
-	_TemplateSchemeName[0:3],
-	_TemplateSchemeName[3:16],
+	_TemplateSchemeName[0:3]:  0,
+	_TemplateSchemeName[3:16]: 1,
 }
 
 // TemplateSchemeString retrieves an enum value from the enum constants string name.
@@ -49,23 +31,12 @@ func TemplateSchemeString(s string) (TemplateScheme, error) {
 	if val, ok := _TemplateSchemeNameToValueMap[s]; ok {
 		return val, nil
 	}
-
-	if val, ok := _TemplateSchemeNameToValueMap[strings.ToLower(s)]; ok {
-		return val, nil
-	}
 	return 0, fmt.Errorf("%s does not belong to TemplateScheme values", s)
 }
 
 // TemplateSchemeValues returns all values of the enum
 func TemplateSchemeValues() []TemplateScheme {
 	return _TemplateSchemeValues
-}
-
-// TemplateSchemeStrings returns a slice of all String values of the enum
-func TemplateSchemeStrings() []string {
-	strs := make([]string, len(_TemplateSchemeNames))
-	copy(strs, _TemplateSchemeNames)
-	return strs
 }
 
 // IsATemplateScheme returns "true" if the value is listed in the enum definition. "false" otherwise
