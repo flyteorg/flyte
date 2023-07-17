@@ -17,14 +17,16 @@ In summary, there are two main resources required for a complete auth flow in Fl
 
 **An identity layer**
 
-This is fulfilled by one of the supported IdPs after registering Flyte as a new app. It makes use of the embedded OIDC client.
+Using an implementation of the `Open ID Connect (OIDC) specification <https://openid.net/specs/openid-connect-core-1_0.html>`__, it enables clients to verify the identity of the end user based on the authentication performed by an Authorization Server. For this flow to work, you must first register Flyte as a new client (app) to the Identity Provider (IdP).
 
 **An authorization server**
 
-There are, in turn, two options for this resource:
+As defined by IETF's `RFC #6749 <https://datatracker.ietf.org/doc/html/rfc6749>`__, the authorization server's role is to issue *access tokens to the client after successfully authenticating the resource owner and obtaining authorization*. In this context, the *resource owner* is the end user of Flyte; and the *client* is the tool or component that intends to interact with ``flyteadmin`` : ``flytepropeller``, ``flyteconsole`` or any of the CLI tools.
+
+There are two supported options to use an authorization server in Flyte:
   
- * **Internal authorization server**: It comes pre-installed with Flyte and is enabled by default. It is a suitable choice for quick start and testing purposes, but **not recommended for production environments**. This is due to its inability to assign scopes to groups or specific users within the organization, lack of custom scopes, absence of rule enforcement for authorization, token expiration policies, and other essential features needed to secure critical infrastructure.
- * **External (custom) authorization server**: This is recommended for production and is fulfilled completely by one of the supported IdPs. With an external auth server, organizations retain control over policy definitions, users and groups configuration, token expiration policies and other advanced security controls. In general, keeping the authorization server separate from the resource server is considered a good practice.
+ * **Internal authorization server**: It comes pre-installed with Flyte and it is a suitable choice for quick start and testing purposes. 
+ * **External (custom) authorization server**: This a service provided by one of the supported IdPs and is the recommended option if your organization needs to retain control over scope definitions and grants, token expiration policies and other advanced security controls. 
 
 
 .. note::
@@ -378,7 +380,7 @@ Custom Authorization Server
 ***************************
 
 
-Flyte ships with an internal authorization server, hence setting up an external Authorization Server is optional but recommended. Having an external Authorization Server enables Flyte administrators control over which apps can be installed and what privileges can be granted to users. 
+As mentioned previously, Flyte ships with an internal authorization server; hence setting up an external Authorization Server is optional and dependent on your organization's security requirements. 
 
 In this section, you will find instructions on how to setup an OAuth2 Authorization Server in the different IdPs supported by Flyte:
 
