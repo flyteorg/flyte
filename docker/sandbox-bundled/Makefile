@@ -38,6 +38,13 @@ build: flyte manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
 
+# Port map
+# 6443 - k8s API server
+# 30000 - Docker Registry
+# 30001 - DB
+# 30002 - Minio
+# 30003 - Buildkit
+# 30080 - Flyte Proxy
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
 start: FLYTE_DEV := False
