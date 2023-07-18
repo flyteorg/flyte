@@ -15993,7 +15993,7 @@ definitions:
         description: "A predefined yet extensible Task type identifier."
       metadata:
         description: "Metadata around how a task was executed."
-        $ref: "#/definitions/eventTaskExecutionMetadata"
+        $ref: "#/definitions/flyteidleventTaskExecutionMetadata"
       event_version:
         type: "integer"
         format: "int32"
@@ -59464,7 +59464,7 @@ definitions:
           \ etc."
       metadata:
         description: "Metadata around how a task was executed."
-        $ref: "#/definitions/eventTaskExecutionMetadata"
+        $ref: "#/definitions/flyteidleventTaskExecutionMetadata"
       event_version:
         type: "integer"
         format: "int32"
@@ -59484,71 +59484,6 @@ definitions:
           \ a more accurate portrayal of the evaluation time-series."
     description: "Plugin specific execution event information. For tasks like Python,\
       \ Hive, Spark, DynamicJob."
-  eventTaskExecutionMetadata:
-    type: "object"
-    properties:
-      generated_name:
-        type: "string"
-        description: "Unique, generated name for this task execution used by the backend."
-      external_resources:
-        type: "array"
-        description: "Additional data on external resources on other back-ends or\
-          \ platforms (e.g. Hive, Qubole, etc) launched by this task execution."
-        items:
-          $ref: "#/definitions/eventExternalResourceInfo"
-      resource_pool_info:
-        type: "array"
-        description: "Includes additional data on concurrent resource management used\
-          \ during execution..\nThis is a repeated field because a plugin can request\
-          \ multiple resource allocations during execution."
-        items:
-          $ref: "#/definitions/eventResourcePoolInfo"
-      plugin_identifier:
-        type: "string"
-        description: "The identifier of the plugin used to execute this task."
-      instance_class:
-        $ref: "#/definitions/TaskExecutionMetadataInstanceClass"
-    description: "Holds metadata around how a task was executed.\nAs a task transitions\
-      \ across event phases during execution some attributes, such its generated name,\
-      \ generated external resources,\nand more may grow in size but not change necessarily\
-      \ based on the phase transition that sparked the event update.\nMetadata is\
-      \ a container for these attributes across the task execution lifecycle."
-    example:
-      external_resources:
-      - index: 0
-        external_id: "external_id"
-        retry_attempt: 6
-        cache_status: {}
-        logs:
-        - message_format: {}
-          name: "name"
-          uri: "uri"
-          ttl: "ttl"
-        - message_format: {}
-          name: "name"
-          uri: "uri"
-          ttl: "ttl"
-      - index: 0
-        external_id: "external_id"
-        retry_attempt: 6
-        cache_status: {}
-        logs:
-        - message_format: {}
-          name: "name"
-          uri: "uri"
-          ttl: "ttl"
-        - message_format: {}
-          name: "name"
-          uri: "uri"
-          ttl: "ttl"
-      instance_class: {}
-      resource_pool_info:
-      - allocation_token: "allocation_token"
-        namespace: "namespace"
-      - allocation_token: "allocation_token"
-        namespace: "namespace"
-      generated_name: "generated_name"
-      plugin_identifier: "plugin_identifier"
   eventWorkflowExecutionEvent:
     type: "object"
     properties:
@@ -66479,6 +66414,71 @@ definitions:
           \ partially completed executions where the workflow has already been compiled."
     description: "For dynamic workflow nodes we send information about the dynamic\
       \ workflow definition that gets generated."
+  flyteidleventTaskExecutionMetadata:
+    type: "object"
+    properties:
+      generated_name:
+        type: "string"
+        description: "Unique, generated name for this task execution used by the backend."
+      external_resources:
+        type: "array"
+        description: "Additional data on external resources on other back-ends or\
+          \ platforms (e.g. Hive, Qubole, etc) launched by this task execution."
+        items:
+          $ref: "#/definitions/eventExternalResourceInfo"
+      resource_pool_info:
+        type: "array"
+        description: "Includes additional data on concurrent resource management used\
+          \ during execution..\nThis is a repeated field because a plugin can request\
+          \ multiple resource allocations during execution."
+        items:
+          $ref: "#/definitions/eventResourcePoolInfo"
+      plugin_identifier:
+        type: "string"
+        description: "The identifier of the plugin used to execute this task."
+      instance_class:
+        $ref: "#/definitions/TaskExecutionMetadataInstanceClass"
+    description: "Holds metadata around how a task was executed.\nAs a task transitions\
+      \ across event phases during execution some attributes, such its generated name,\
+      \ generated external resources,\nand more may grow in size but not change necessarily\
+      \ based on the phase transition that sparked the event update.\nMetadata is\
+      \ a container for these attributes across the task execution lifecycle."
+    example:
+      external_resources:
+      - index: 0
+        external_id: "external_id"
+        retry_attempt: 6
+        cache_status: {}
+        logs:
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+      - index: 0
+        external_id: "external_id"
+        retry_attempt: 6
+        cache_status: {}
+        logs:
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+        - message_format: {}
+          name: "name"
+          uri: "uri"
+          ttl: "ttl"
+      instance_class: {}
+      resource_pool_info:
+      - allocation_token: "allocation_token"
+        namespace: "namespace"
+      - allocation_token: "allocation_token"
+        namespace: "namespace"
+      generated_name: "generated_name"
+      plugin_identifier: "plugin_identifier"
   flyteidleventTaskNodeMetadata:
     type: "object"
     properties:

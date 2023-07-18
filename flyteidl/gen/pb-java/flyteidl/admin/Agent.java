@@ -143,6 +143,2088 @@ public final class Agent {
     // @@protoc_insertion_point(enum_scope:flyteidl.admin.State)
   }
 
+  public interface TaskExecutionMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.TaskExecutionMetadata)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    boolean hasTaskExecutionId();
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId();
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder();
+
+    /**
+     * <pre>
+     * k8s namespace where the task is executed in
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    java.lang.String getNamespace();
+    /**
+     * <pre>
+     * k8s namespace where the task is executed in
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getNamespaceBytes();
+
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+    int getLabelsCount();
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+    boolean containsLabels(
+        java.lang.String key);
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabels();
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabelsMap();
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    java.lang.String getLabelsOrThrow(
+        java.lang.String key);
+
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+    int getAnnotationsCount();
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+    boolean containsAnnotations(
+        java.lang.String key);
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotations();
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotationsMap();
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    java.lang.String getAnnotationsOrThrow(
+        java.lang.String key);
+
+    /**
+     * <pre>
+     * k8s service account associated with the task execution
+     * </pre>
+     *
+     * <code>string k8s_service_account = 5;</code>
+     */
+    java.lang.String getK8SServiceAccount();
+    /**
+     * <pre>
+     * k8s service account associated with the task execution
+     * </pre>
+     *
+     * <code>string k8s_service_account = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getK8SServiceAccountBytes();
+
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+    int getEnvironmentVariablesCount();
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+    boolean containsEnvironmentVariables(
+        java.lang.String key);
+    /**
+     * Use {@link #getEnvironmentVariablesMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getEnvironmentVariables();
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getEnvironmentVariablesMap();
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    java.lang.String getEnvironmentVariablesOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    java.lang.String getEnvironmentVariablesOrThrow(
+        java.lang.String key);
+  }
+  /**
+   * <pre>
+   * Represents a subset of runtime task execution metadata that are relevant to external plugins.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.TaskExecutionMetadata}
+   */
+  public  static final class TaskExecutionMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.TaskExecutionMetadata)
+      TaskExecutionMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TaskExecutionMetadata.newBuilder() to construct.
+    private TaskExecutionMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TaskExecutionMetadata() {
+      namespace_ = "";
+      k8SServiceAccount_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TaskExecutionMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder subBuilder = null;
+              if (taskExecutionId_ != null) {
+                subBuilder = taskExecutionId_.toBuilder();
+              }
+              taskExecutionId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(taskExecutionId_);
+                taskExecutionId_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              namespace_ = s;
+              break;
+            }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+                labels_ = com.google.protobuf.MapField.newMapField(
+                    LabelsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000004;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              labels__ = input.readMessage(
+                  LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              labels_.getMutableMap().put(
+                  labels__.getKey(), labels__.getValue());
+              break;
+            }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+                annotations_ = com.google.protobuf.MapField.newMapField(
+                    AnnotationsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000008;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              annotations__ = input.readMessage(
+                  AnnotationsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              annotations_.getMutableMap().put(
+                  annotations__.getKey(), annotations__.getValue());
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              k8SServiceAccount_ = s;
+              break;
+            }
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) != 0)) {
+                environmentVariables_ = com.google.protobuf.MapField.newMapField(
+                    EnvironmentVariablesDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000020;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              environmentVariables__ = input.readMessage(
+                  EnvironmentVariablesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              environmentVariables_.getMutableMap().put(
+                  environmentVariables__.getKey(), environmentVariables__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor;
+    }
+
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 3:
+          return internalGetLabels();
+        case 4:
+          return internalGetAnnotations();
+        case 6:
+          return internalGetEnvironmentVariables();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Agent.TaskExecutionMetadata.class, flyteidl.admin.Agent.TaskExecutionMetadata.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int TASK_EXECUTION_ID_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier taskExecutionId_;
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    public boolean hasTaskExecutionId() {
+      return taskExecutionId_ != null;
+    }
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId() {
+      return taskExecutionId_ == null ? flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecutionId_;
+    }
+    /**
+     * <pre>
+     * ID of the task execution
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder() {
+      return getTaskExecutionId();
+    }
+
+    public static final int NAMESPACE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object namespace_;
+    /**
+     * <pre>
+     * k8s namespace where the task is executed in
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public java.lang.String getNamespace() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        namespace_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * k8s namespace where the task is executed in
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNamespaceBytes() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        namespace_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LABELS_FIELD_NUMBER = 3;
+    private static final class LabelsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> labels_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetLabels() {
+      if (labels_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            LabelsDefaultEntryHolder.defaultEntry);
+      }
+      return labels_;
+    }
+
+    public int getLabelsCount() {
+      return internalGetLabels().getMap().size();
+    }
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    public boolean containsLabels(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetLabels().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+      return getLabelsMap();
+    }
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+      return internalGetLabels().getMap();
+    }
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    public java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Labels attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 3;</code>
+     */
+
+    public java.lang.String getLabelsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int ANNOTATIONS_FIELD_NUMBER = 4;
+    private static final class AnnotationsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> annotations_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetAnnotations() {
+      if (annotations_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            AnnotationsDefaultEntryHolder.defaultEntry);
+      }
+      return annotations_;
+    }
+
+    public int getAnnotationsCount() {
+      return internalGetAnnotations().getMap().size();
+    }
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    public boolean containsAnnotations(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetAnnotations().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+      return getAnnotationsMap();
+    }
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+      return internalGetAnnotations().getMap();
+    }
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    public java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Annotations attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 4;</code>
+     */
+
+    public java.lang.String getAnnotationsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int K8S_SERVICE_ACCOUNT_FIELD_NUMBER = 5;
+    private volatile java.lang.Object k8SServiceAccount_;
+    /**
+     * <pre>
+     * k8s service account associated with the task execution
+     * </pre>
+     *
+     * <code>string k8s_service_account = 5;</code>
+     */
+    public java.lang.String getK8SServiceAccount() {
+      java.lang.Object ref = k8SServiceAccount_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        k8SServiceAccount_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * k8s service account associated with the task execution
+     * </pre>
+     *
+     * <code>string k8s_service_account = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getK8SServiceAccountBytes() {
+      java.lang.Object ref = k8SServiceAccount_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        k8SServiceAccount_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ENVIRONMENT_VARIABLES_FIELD_NUMBER = 6;
+    private static final class EnvironmentVariablesDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> environmentVariables_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetEnvironmentVariables() {
+      if (environmentVariables_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            EnvironmentVariablesDefaultEntryHolder.defaultEntry);
+      }
+      return environmentVariables_;
+    }
+
+    public int getEnvironmentVariablesCount() {
+      return internalGetEnvironmentVariables().getMap().size();
+    }
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    public boolean containsEnvironmentVariables(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetEnvironmentVariables().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getEnvironmentVariablesMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getEnvironmentVariables() {
+      return getEnvironmentVariablesMap();
+    }
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getEnvironmentVariablesMap() {
+      return internalGetEnvironmentVariables().getMap();
+    }
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    public java.lang.String getEnvironmentVariablesOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetEnvironmentVariables().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Environment variables attached to the task execution
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+     */
+
+    public java.lang.String getEnvironmentVariablesOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetEnvironmentVariables().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (taskExecutionId_ != null) {
+        output.writeMessage(1, getTaskExecutionId());
+      }
+      if (!getNamespaceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, namespace_);
+      }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetLabels(),
+          LabelsDefaultEntryHolder.defaultEntry,
+          3);
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetAnnotations(),
+          AnnotationsDefaultEntryHolder.defaultEntry,
+          4);
+      if (!getK8SServiceAccountBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, k8SServiceAccount_);
+      }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetEnvironmentVariables(),
+          EnvironmentVariablesDefaultEntryHolder.defaultEntry,
+          6);
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (taskExecutionId_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getTaskExecutionId());
+      }
+      if (!getNamespaceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, namespace_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetLabels().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        labels__ = LabelsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, labels__);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetAnnotations().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        annotations__ = AnnotationsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(4, annotations__);
+      }
+      if (!getK8SServiceAccountBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, k8SServiceAccount_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetEnvironmentVariables().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        environmentVariables__ = EnvironmentVariablesDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(6, environmentVariables__);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Agent.TaskExecutionMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Agent.TaskExecutionMetadata other = (flyteidl.admin.Agent.TaskExecutionMetadata) obj;
+
+      if (hasTaskExecutionId() != other.hasTaskExecutionId()) return false;
+      if (hasTaskExecutionId()) {
+        if (!getTaskExecutionId()
+            .equals(other.getTaskExecutionId())) return false;
+      }
+      if (!getNamespace()
+          .equals(other.getNamespace())) return false;
+      if (!internalGetLabels().equals(
+          other.internalGetLabels())) return false;
+      if (!internalGetAnnotations().equals(
+          other.internalGetAnnotations())) return false;
+      if (!getK8SServiceAccount()
+          .equals(other.getK8SServiceAccount())) return false;
+      if (!internalGetEnvironmentVariables().equals(
+          other.internalGetEnvironmentVariables())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasTaskExecutionId()) {
+        hash = (37 * hash) + TASK_EXECUTION_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getTaskExecutionId().hashCode();
+      }
+      hash = (37 * hash) + NAMESPACE_FIELD_NUMBER;
+      hash = (53 * hash) + getNamespace().hashCode();
+      if (!internalGetLabels().getMap().isEmpty()) {
+        hash = (37 * hash) + LABELS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetLabels().hashCode();
+      }
+      if (!internalGetAnnotations().getMap().isEmpty()) {
+        hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetAnnotations().hashCode();
+      }
+      hash = (37 * hash) + K8S_SERVICE_ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getK8SServiceAccount().hashCode();
+      if (!internalGetEnvironmentVariables().getMap().isEmpty()) {
+        hash = (37 * hash) + ENVIRONMENT_VARIABLES_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetEnvironmentVariables().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Agent.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Agent.TaskExecutionMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents a subset of runtime task execution metadata that are relevant to external plugins.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.TaskExecutionMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.TaskExecutionMetadata)
+        flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor;
+      }
+
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetLabels();
+          case 4:
+            return internalGetAnnotations();
+          case 6:
+            return internalGetEnvironmentVariables();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetMutableLabels();
+          case 4:
+            return internalGetMutableAnnotations();
+          case 6:
+            return internalGetMutableEnvironmentVariables();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Agent.TaskExecutionMetadata.class, flyteidl.admin.Agent.TaskExecutionMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Agent.TaskExecutionMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (taskExecutionIdBuilder_ == null) {
+          taskExecutionId_ = null;
+        } else {
+          taskExecutionId_ = null;
+          taskExecutionIdBuilder_ = null;
+        }
+        namespace_ = "";
+
+        internalGetMutableLabels().clear();
+        internalGetMutableAnnotations().clear();
+        k8SServiceAccount_ = "";
+
+        internalGetMutableEnvironmentVariables().clear();
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Agent.internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Agent.TaskExecutionMetadata getDefaultInstanceForType() {
+        return flyteidl.admin.Agent.TaskExecutionMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Agent.TaskExecutionMetadata build() {
+        flyteidl.admin.Agent.TaskExecutionMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Agent.TaskExecutionMetadata buildPartial() {
+        flyteidl.admin.Agent.TaskExecutionMetadata result = new flyteidl.admin.Agent.TaskExecutionMetadata(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (taskExecutionIdBuilder_ == null) {
+          result.taskExecutionId_ = taskExecutionId_;
+        } else {
+          result.taskExecutionId_ = taskExecutionIdBuilder_.build();
+        }
+        result.namespace_ = namespace_;
+        result.labels_ = internalGetLabels();
+        result.labels_.makeImmutable();
+        result.annotations_ = internalGetAnnotations();
+        result.annotations_.makeImmutable();
+        result.k8SServiceAccount_ = k8SServiceAccount_;
+        result.environmentVariables_ = internalGetEnvironmentVariables();
+        result.environmentVariables_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Agent.TaskExecutionMetadata) {
+          return mergeFrom((flyteidl.admin.Agent.TaskExecutionMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Agent.TaskExecutionMetadata other) {
+        if (other == flyteidl.admin.Agent.TaskExecutionMetadata.getDefaultInstance()) return this;
+        if (other.hasTaskExecutionId()) {
+          mergeTaskExecutionId(other.getTaskExecutionId());
+        }
+        if (!other.getNamespace().isEmpty()) {
+          namespace_ = other.namespace_;
+          onChanged();
+        }
+        internalGetMutableLabels().mergeFrom(
+            other.internalGetLabels());
+        internalGetMutableAnnotations().mergeFrom(
+            other.internalGetAnnotations());
+        if (!other.getK8SServiceAccount().isEmpty()) {
+          k8SServiceAccount_ = other.k8SServiceAccount_;
+          onChanged();
+        }
+        internalGetMutableEnvironmentVariables().mergeFrom(
+            other.internalGetEnvironmentVariables());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Agent.TaskExecutionMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Agent.TaskExecutionMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier taskExecutionId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> taskExecutionIdBuilder_;
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public boolean hasTaskExecutionId() {
+        return taskExecutionIdBuilder_ != null || taskExecutionId_ != null;
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecutionId() {
+        if (taskExecutionIdBuilder_ == null) {
+          return taskExecutionId_ == null ? flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecutionId_;
+        } else {
+          return taskExecutionIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public Builder setTaskExecutionId(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
+        if (taskExecutionIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          taskExecutionId_ = value;
+          onChanged();
+        } else {
+          taskExecutionIdBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public Builder setTaskExecutionId(
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder builderForValue) {
+        if (taskExecutionIdBuilder_ == null) {
+          taskExecutionId_ = builderForValue.build();
+          onChanged();
+        } else {
+          taskExecutionIdBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public Builder mergeTaskExecutionId(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
+        if (taskExecutionIdBuilder_ == null) {
+          if (taskExecutionId_ != null) {
+            taskExecutionId_ =
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.newBuilder(taskExecutionId_).mergeFrom(value).buildPartial();
+          } else {
+            taskExecutionId_ = value;
+          }
+          onChanged();
+        } else {
+          taskExecutionIdBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public Builder clearTaskExecutionId() {
+        if (taskExecutionIdBuilder_ == null) {
+          taskExecutionId_ = null;
+          onChanged();
+        } else {
+          taskExecutionId_ = null;
+          taskExecutionIdBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder getTaskExecutionIdBuilder() {
+        
+        onChanged();
+        return getTaskExecutionIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionIdOrBuilder() {
+        if (taskExecutionIdBuilder_ != null) {
+          return taskExecutionIdBuilder_.getMessageOrBuilder();
+        } else {
+          return taskExecutionId_ == null ?
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecutionId_;
+        }
+      }
+      /**
+       * <pre>
+       * ID of the task execution
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> 
+          getTaskExecutionIdFieldBuilder() {
+        if (taskExecutionIdBuilder_ == null) {
+          taskExecutionIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder>(
+                  getTaskExecutionId(),
+                  getParentForChildren(),
+                  isClean());
+          taskExecutionId_ = null;
+        }
+        return taskExecutionIdBuilder_;
+      }
+
+      private java.lang.Object namespace_ = "";
+      /**
+       * <pre>
+       * k8s namespace where the task is executed in
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public java.lang.String getNamespace() {
+        java.lang.Object ref = namespace_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          namespace_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * k8s namespace where the task is executed in
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNamespaceBytes() {
+        java.lang.Object ref = namespace_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          namespace_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * k8s namespace where the task is executed in
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespace(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        namespace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * k8s namespace where the task is executed in
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder clearNamespace() {
+        
+        namespace_ = getDefaultInstance().getNamespace();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * k8s namespace where the task is executed in
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespaceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        namespace_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> labels_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetLabels() {
+        if (labels_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        return labels_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableLabels() {
+        onChanged();;
+        if (labels_ == null) {
+          labels_ = com.google.protobuf.MapField.newMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        if (!labels_.isMutable()) {
+          labels_ = labels_.copy();
+        }
+        return labels_;
+      }
+
+      public int getLabelsCount() {
+        return internalGetLabels().getMap().size();
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public boolean containsLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetLabels().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getLabelsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+        return getLabelsMap();
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+        return internalGetLabels().getMap();
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public java.lang.String getLabelsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public java.lang.String getLabelsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearLabels() {
+        internalGetMutableLabels().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public Builder removeLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableLabels() {
+        return internalGetMutableLabels().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+      public Builder putLabels(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Labels attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 3;</code>
+       */
+
+      public Builder putAllLabels(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableLabels().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> annotations_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetAnnotations() {
+        if (annotations_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        return annotations_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableAnnotations() {
+        onChanged();;
+        if (annotations_ == null) {
+          annotations_ = com.google.protobuf.MapField.newMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        if (!annotations_.isMutable()) {
+          annotations_ = annotations_.copy();
+        }
+        return annotations_;
+      }
+
+      public int getAnnotationsCount() {
+        return internalGetAnnotations().getMap().size();
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public boolean containsAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetAnnotations().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getAnnotationsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+        return getAnnotationsMap();
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+        return internalGetAnnotations().getMap();
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public java.lang.String getAnnotationsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public java.lang.String getAnnotationsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearAnnotations() {
+        internalGetMutableAnnotations().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public Builder removeAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableAnnotations() {
+        return internalGetMutableAnnotations().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+      public Builder putAnnotations(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Annotations attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 4;</code>
+       */
+
+      public Builder putAllAnnotations(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableAnnotations().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+
+      private java.lang.Object k8SServiceAccount_ = "";
+      /**
+       * <pre>
+       * k8s service account associated with the task execution
+       * </pre>
+       *
+       * <code>string k8s_service_account = 5;</code>
+       */
+      public java.lang.String getK8SServiceAccount() {
+        java.lang.Object ref = k8SServiceAccount_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          k8SServiceAccount_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * k8s service account associated with the task execution
+       * </pre>
+       *
+       * <code>string k8s_service_account = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getK8SServiceAccountBytes() {
+        java.lang.Object ref = k8SServiceAccount_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          k8SServiceAccount_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * k8s service account associated with the task execution
+       * </pre>
+       *
+       * <code>string k8s_service_account = 5;</code>
+       */
+      public Builder setK8SServiceAccount(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        k8SServiceAccount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * k8s service account associated with the task execution
+       * </pre>
+       *
+       * <code>string k8s_service_account = 5;</code>
+       */
+      public Builder clearK8SServiceAccount() {
+        
+        k8SServiceAccount_ = getDefaultInstance().getK8SServiceAccount();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * k8s service account associated with the task execution
+       * </pre>
+       *
+       * <code>string k8s_service_account = 5;</code>
+       */
+      public Builder setK8SServiceAccountBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        k8SServiceAccount_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> environmentVariables_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetEnvironmentVariables() {
+        if (environmentVariables_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              EnvironmentVariablesDefaultEntryHolder.defaultEntry);
+        }
+        return environmentVariables_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableEnvironmentVariables() {
+        onChanged();;
+        if (environmentVariables_ == null) {
+          environmentVariables_ = com.google.protobuf.MapField.newMapField(
+              EnvironmentVariablesDefaultEntryHolder.defaultEntry);
+        }
+        if (!environmentVariables_.isMutable()) {
+          environmentVariables_ = environmentVariables_.copy();
+        }
+        return environmentVariables_;
+      }
+
+      public int getEnvironmentVariablesCount() {
+        return internalGetEnvironmentVariables().getMap().size();
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public boolean containsEnvironmentVariables(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetEnvironmentVariables().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getEnvironmentVariablesMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getEnvironmentVariables() {
+        return getEnvironmentVariablesMap();
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getEnvironmentVariablesMap() {
+        return internalGetEnvironmentVariables().getMap();
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public java.lang.String getEnvironmentVariablesOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetEnvironmentVariables().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public java.lang.String getEnvironmentVariablesOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetEnvironmentVariables().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearEnvironmentVariables() {
+        internalGetMutableEnvironmentVariables().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public Builder removeEnvironmentVariables(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableEnvironmentVariables().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableEnvironmentVariables() {
+        return internalGetMutableEnvironmentVariables().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+      public Builder putEnvironmentVariables(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableEnvironmentVariables().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables attached to the task execution
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; environment_variables = 6;</code>
+       */
+
+      public Builder putAllEnvironmentVariables(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableEnvironmentVariables().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.TaskExecutionMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionMetadata)
+    private static final flyteidl.admin.Agent.TaskExecutionMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Agent.TaskExecutionMetadata();
+    }
+
+    public static flyteidl.admin.Agent.TaskExecutionMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TaskExecutionMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<TaskExecutionMetadata>() {
+      @java.lang.Override
+      public TaskExecutionMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TaskExecutionMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TaskExecutionMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TaskExecutionMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Agent.TaskExecutionMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface CreateTaskRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.CreateTaskRequest)
       com.google.protobuf.MessageOrBuilder {
@@ -220,6 +2302,31 @@ public final class Agent {
      */
     com.google.protobuf.ByteString
         getOutputPrefixBytes();
+
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    boolean hasTaskExecutionMetadata();
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    flyteidl.admin.Agent.TaskExecutionMetadata getTaskExecutionMetadata();
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder getTaskExecutionMetadataOrBuilder();
   }
   /**
    * <pre>
@@ -295,6 +2402,19 @@ public final class Agent {
               java.lang.String s = input.readStringRequireUtf8();
 
               outputPrefix_ = s;
+              break;
+            }
+            case 34: {
+              flyteidl.admin.Agent.TaskExecutionMetadata.Builder subBuilder = null;
+              if (taskExecutionMetadata_ != null) {
+                subBuilder = taskExecutionMetadata_.toBuilder();
+              }
+              taskExecutionMetadata_ = input.readMessage(flyteidl.admin.Agent.TaskExecutionMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(taskExecutionMetadata_);
+                taskExecutionMetadata_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -443,6 +2563,39 @@ public final class Agent {
       }
     }
 
+    public static final int TASK_EXECUTION_METADATA_FIELD_NUMBER = 4;
+    private flyteidl.admin.Agent.TaskExecutionMetadata taskExecutionMetadata_;
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    public boolean hasTaskExecutionMetadata() {
+      return taskExecutionMetadata_ != null;
+    }
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    public flyteidl.admin.Agent.TaskExecutionMetadata getTaskExecutionMetadata() {
+      return taskExecutionMetadata_ == null ? flyteidl.admin.Agent.TaskExecutionMetadata.getDefaultInstance() : taskExecutionMetadata_;
+    }
+    /**
+     * <pre>
+     * subset of runtime task execution metadata.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+     */
+    public flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder getTaskExecutionMetadataOrBuilder() {
+      return getTaskExecutionMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -466,6 +2619,9 @@ public final class Agent {
       if (!getOutputPrefixBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, outputPrefix_);
       }
+      if (taskExecutionMetadata_ != null) {
+        output.writeMessage(4, getTaskExecutionMetadata());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -485,6 +2641,10 @@ public final class Agent {
       }
       if (!getOutputPrefixBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, outputPrefix_);
+      }
+      if (taskExecutionMetadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getTaskExecutionMetadata());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -513,6 +2673,11 @@ public final class Agent {
       }
       if (!getOutputPrefix()
           .equals(other.getOutputPrefix())) return false;
+      if (hasTaskExecutionMetadata() != other.hasTaskExecutionMetadata()) return false;
+      if (hasTaskExecutionMetadata()) {
+        if (!getTaskExecutionMetadata()
+            .equals(other.getTaskExecutionMetadata())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -534,6 +2699,10 @@ public final class Agent {
       }
       hash = (37 * hash) + OUTPUT_PREFIX_FIELD_NUMBER;
       hash = (53 * hash) + getOutputPrefix().hashCode();
+      if (hasTaskExecutionMetadata()) {
+        hash = (37 * hash) + TASK_EXECUTION_METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getTaskExecutionMetadata().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -685,6 +2854,12 @@ public final class Agent {
         }
         outputPrefix_ = "";
 
+        if (taskExecutionMetadataBuilder_ == null) {
+          taskExecutionMetadata_ = null;
+        } else {
+          taskExecutionMetadata_ = null;
+          taskExecutionMetadataBuilder_ = null;
+        }
         return this;
       }
 
@@ -722,6 +2897,11 @@ public final class Agent {
           result.template_ = templateBuilder_.build();
         }
         result.outputPrefix_ = outputPrefix_;
+        if (taskExecutionMetadataBuilder_ == null) {
+          result.taskExecutionMetadata_ = taskExecutionMetadata_;
+        } else {
+          result.taskExecutionMetadata_ = taskExecutionMetadataBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -779,6 +2959,9 @@ public final class Agent {
         if (!other.getOutputPrefix().isEmpty()) {
           outputPrefix_ = other.outputPrefix_;
           onChanged();
+        }
+        if (other.hasTaskExecutionMetadata()) {
+          mergeTaskExecutionMetadata(other.getTaskExecutionMetadata());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1220,6 +3403,159 @@ public final class Agent {
         outputPrefix_ = value;
         onChanged();
         return this;
+      }
+
+      private flyteidl.admin.Agent.TaskExecutionMetadata taskExecutionMetadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Agent.TaskExecutionMetadata, flyteidl.admin.Agent.TaskExecutionMetadata.Builder, flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder> taskExecutionMetadataBuilder_;
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public boolean hasTaskExecutionMetadata() {
+        return taskExecutionMetadataBuilder_ != null || taskExecutionMetadata_ != null;
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public flyteidl.admin.Agent.TaskExecutionMetadata getTaskExecutionMetadata() {
+        if (taskExecutionMetadataBuilder_ == null) {
+          return taskExecutionMetadata_ == null ? flyteidl.admin.Agent.TaskExecutionMetadata.getDefaultInstance() : taskExecutionMetadata_;
+        } else {
+          return taskExecutionMetadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public Builder setTaskExecutionMetadata(flyteidl.admin.Agent.TaskExecutionMetadata value) {
+        if (taskExecutionMetadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          taskExecutionMetadata_ = value;
+          onChanged();
+        } else {
+          taskExecutionMetadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public Builder setTaskExecutionMetadata(
+          flyteidl.admin.Agent.TaskExecutionMetadata.Builder builderForValue) {
+        if (taskExecutionMetadataBuilder_ == null) {
+          taskExecutionMetadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          taskExecutionMetadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public Builder mergeTaskExecutionMetadata(flyteidl.admin.Agent.TaskExecutionMetadata value) {
+        if (taskExecutionMetadataBuilder_ == null) {
+          if (taskExecutionMetadata_ != null) {
+            taskExecutionMetadata_ =
+              flyteidl.admin.Agent.TaskExecutionMetadata.newBuilder(taskExecutionMetadata_).mergeFrom(value).buildPartial();
+          } else {
+            taskExecutionMetadata_ = value;
+          }
+          onChanged();
+        } else {
+          taskExecutionMetadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public Builder clearTaskExecutionMetadata() {
+        if (taskExecutionMetadataBuilder_ == null) {
+          taskExecutionMetadata_ = null;
+          onChanged();
+        } else {
+          taskExecutionMetadata_ = null;
+          taskExecutionMetadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public flyteidl.admin.Agent.TaskExecutionMetadata.Builder getTaskExecutionMetadataBuilder() {
+        
+        onChanged();
+        return getTaskExecutionMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      public flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder getTaskExecutionMetadataOrBuilder() {
+        if (taskExecutionMetadataBuilder_ != null) {
+          return taskExecutionMetadataBuilder_.getMessageOrBuilder();
+        } else {
+          return taskExecutionMetadata_ == null ?
+              flyteidl.admin.Agent.TaskExecutionMetadata.getDefaultInstance() : taskExecutionMetadata_;
+        }
+      }
+      /**
+       * <pre>
+       * subset of runtime task execution metadata.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Agent.TaskExecutionMetadata, flyteidl.admin.Agent.TaskExecutionMetadata.Builder, flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder> 
+          getTaskExecutionMetadataFieldBuilder() {
+        if (taskExecutionMetadataBuilder_ == null) {
+          taskExecutionMetadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Agent.TaskExecutionMetadata, flyteidl.admin.Agent.TaskExecutionMetadata.Builder, flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder>(
+                  getTaskExecutionMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          taskExecutionMetadata_ = null;
+        }
+        return taskExecutionMetadataBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4998,6 +7334,26 @@ public final class Agent {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_TaskExecutionMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_CreateTaskRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -5044,23 +7400,39 @@ public final class Agent {
       "\n\032flyteidl/admin/agent.proto\022\016flyteidl.a" +
       "dmin\032\034flyteidl/core/literals.proto\032\031flyt" +
       "eidl/core/tasks.proto\032\035flyteidl/core/int" +
-      "erface.proto\"\204\001\n\021CreateTaskRequest\022)\n\006in" +
-      "puts\030\001 \001(\0132\031.flyteidl.core.LiteralMap\022-\n" +
-      "\010template\030\002 \001(\0132\033.flyteidl.core.TaskTemp" +
-      "late\022\025\n\routput_prefix\030\003 \001(\t\"+\n\022CreateTas" +
-      "kResponse\022\025\n\rresource_meta\030\001 \001(\014\":\n\016GetT" +
-      "askRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresourc" +
-      "e_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010resou" +
-      "rce\030\001 \001(\0132\030.flyteidl.admin.Resource\"\\\n\010R" +
-      "esource\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin." +
-      "State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.L" +
-      "iteralMap\"=\n\021DeleteTaskRequest\022\021\n\ttask_t" +
-      "ype\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022Dele" +
-      "teTaskResponse*^\n\005State\022\025\n\021RETRYABLE_FAI" +
-      "LURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING" +
-      "\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B7Z5github" +
-      ".com/flyteorg/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "erface.proto\032\036flyteidl/core/identifier.p" +
+      "roto\"\232\004\n\025TaskExecutionMetadata\022A\n\021task_e" +
+      "xecution_id\030\001 \001(\0132&.flyteidl.core.TaskEx" +
+      "ecutionIdentifier\022\021\n\tnamespace\030\002 \001(\t\022A\n\006" +
+      "labels\030\003 \003(\01321.flyteidl.admin.TaskExecut" +
+      "ionMetadata.LabelsEntry\022K\n\013annotations\030\004" +
+      " \003(\01326.flyteidl.admin.TaskExecutionMetad" +
+      "ata.AnnotationsEntry\022\033\n\023k8s_service_acco" +
+      "unt\030\005 \001(\t\022^\n\025environment_variables\030\006 \003(\013" +
+      "2?.flyteidl.admin.TaskExecutionMetadata." +
+      "EnvironmentVariablesEntry\032-\n\013LabelsEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Anno" +
+      "tationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      ":\0028\001\032;\n\031EnvironmentVariablesEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTask" +
+      "Request\022)\n\006inputs\030\001 \001(\0132\031.flyteidl.core." +
+      "LiteralMap\022-\n\010template\030\002 \001(\0132\033.flyteidl." +
+      "core.TaskTemplate\022\025\n\routput_prefix\030\003 \001(\t" +
+      "\022F\n\027task_execution_metadata\030\004 \001(\0132%.flyt" +
+      "eidl.admin.TaskExecutionMetadata\"+\n\022Crea" +
+      "teTaskResponse\022\025\n\rresource_meta\030\001 \001(\014\":\n" +
+      "\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre" +
+      "source_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010" +
+      "resource\030\001 \001(\0132\030.flyteidl.admin.Resource" +
+      "\"\\\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a" +
+      "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c" +
+      "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt" +
+      "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n" +
+      "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL" +
+      "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE" +
+      "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B7Z5g" +
+      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
+      "yteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5076,45 +7448,70 @@ public final class Agent {
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Tasks.getDescriptor(),
           flyteidl.core.Interface.getDescriptor(),
+          flyteidl.core.IdentifierOuterClass.getDescriptor(),
         }, assigner);
-    internal_static_flyteidl_admin_CreateTaskRequest_descriptor =
+    internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_flyteidl_admin_TaskExecutionMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor,
+        new java.lang.String[] { "TaskExecutionId", "Namespace", "Labels", "Annotations", "K8SServiceAccount", "EnvironmentVariables", });
+    internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_descriptor =
+      internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_TaskExecutionMetadata_LabelsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_descriptor =
+      internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor.getNestedTypes().get(1);
+    internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_TaskExecutionMetadata_AnnotationsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_descriptor =
+      internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor.getNestedTypes().get(2);
+    internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_TaskExecutionMetadata_EnvironmentVariablesEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_admin_CreateTaskRequest_descriptor =
+      getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskRequest_descriptor,
-        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", });
+        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", });
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_CreateTaskResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskResponse_descriptor,
         new java.lang.String[] { "ResourceMeta", });
     internal_static_flyteidl_admin_GetTaskRequest_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_admin_GetTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskRequest_descriptor,
         new java.lang.String[] { "TaskType", "ResourceMeta", });
     internal_static_flyteidl_admin_GetTaskResponse_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_admin_GetTaskResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskResponse_descriptor,
         new java.lang.String[] { "Resource", });
     internal_static_flyteidl_admin_Resource_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
         new java.lang.String[] { "State", "Outputs", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_DeleteTaskRequest_descriptor,
         new java.lang.String[] { "TaskType", "ResourceMeta", });
     internal_static_flyteidl_admin_DeleteTaskResponse_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_DeleteTaskResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_DeleteTaskResponse_descriptor,
@@ -5122,6 +7519,7 @@ public final class Agent {
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Tasks.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
+    flyteidl.core.IdentifierOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

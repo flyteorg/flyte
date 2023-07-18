@@ -42,7 +42,7 @@ type EventTaskExecutionEvent struct {
 	// A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin this type will be identical, but not all task executions necessarily use pre-registered definitions and this type is useful to render the task in the UI, filter task executions, etc.
 	TaskType string `json:"task_type,omitempty"`
 	// Metadata around how a task was executed.
-	Metadata *EventTaskExecutionMetadata `json:"metadata,omitempty"`
+	Metadata *FlyteidleventTaskExecutionMetadata `json:"metadata,omitempty"`
 	// The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.
 	EventVersion int32 `json:"event_version,omitempty"`
 	// This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes, but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.

@@ -1,6 +1,8 @@
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.core import interface_pb2 as _interface_pb2
+from flyteidl.core import identifier_pb2 as _identifier_pb2
+from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -21,15 +23,54 @@ PENDING: State
 RUNNING: State
 SUCCEEDED: State
 
+class TaskExecutionMetadata(_message.Message):
+    __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables"]
+    class LabelsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class AnnotationsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class EnvironmentVariablesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    TASK_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
+    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
+    K8S_SERVICE_ACCOUNT_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
+    task_execution_id: _identifier_pb2.TaskExecutionIdentifier
+    namespace: str
+    labels: _containers.ScalarMap[str, str]
+    annotations: _containers.ScalarMap[str, str]
+    k8s_service_account: str
+    environment_variables: _containers.ScalarMap[str, str]
+    def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class CreateTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix"]
+    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
     inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ...) -> None: ...
+    task_execution_metadata: TaskExecutionMetadata
+    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]

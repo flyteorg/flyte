@@ -7585,6 +7585,88 @@ export namespace flyteidl {
             SUCCEEDED = 4
         }
 
+        /** Properties of a TaskExecutionMetadata. */
+        interface ITaskExecutionMetadata {
+
+            /** TaskExecutionMetadata taskExecutionId */
+            taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionMetadata namespace */
+            namespace?: (string|null);
+
+            /** TaskExecutionMetadata labels */
+            labels?: ({ [k: string]: string }|null);
+
+            /** TaskExecutionMetadata annotations */
+            annotations?: ({ [k: string]: string }|null);
+
+            /** TaskExecutionMetadata k8sServiceAccount */
+            k8sServiceAccount?: (string|null);
+
+            /** TaskExecutionMetadata environmentVariables */
+            environmentVariables?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a TaskExecutionMetadata. */
+        class TaskExecutionMetadata implements ITaskExecutionMetadata {
+
+            /**
+             * Constructs a new TaskExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskExecutionMetadata);
+
+            /** TaskExecutionMetadata taskExecutionId. */
+            public taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionMetadata namespace. */
+            public namespace: string;
+
+            /** TaskExecutionMetadata labels. */
+            public labels: { [k: string]: string };
+
+            /** TaskExecutionMetadata annotations. */
+            public annotations: { [k: string]: string };
+
+            /** TaskExecutionMetadata k8sServiceAccount. */
+            public k8sServiceAccount: string;
+
+            /** TaskExecutionMetadata environmentVariables. */
+            public environmentVariables: { [k: string]: string };
+
+            /**
+             * Creates a new TaskExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskExecutionMetadata): flyteidl.admin.TaskExecutionMetadata;
+
+            /**
+             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.admin.TaskExecutionMetadata.verify|verify} messages.
+             * @param message TaskExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskExecutionMetadata;
+
+            /**
+             * Verifies a TaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a CreateTaskRequest. */
         interface ICreateTaskRequest {
 
@@ -7596,6 +7678,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest outputPrefix */
             outputPrefix?: (string|null);
+
+            /** CreateTaskRequest taskExecutionMetadata */
+            taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -7615,6 +7700,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest outputPrefix. */
             public outputPrefix: string;
+
+            /** CreateTaskRequest taskExecutionMetadata. */
+            public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.

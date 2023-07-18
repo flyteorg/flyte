@@ -22,7 +22,7 @@ from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
-from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: F401,E501
+from flyteadmin.models.flyteidlevent_task_execution_metadata import FlyteidleventTaskExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -56,7 +56,7 @@ class EventTaskExecutionEvent(object):
         'phase_version': 'int',
         'reason': 'str',
         'task_type': 'str',
-        'metadata': 'EventTaskExecutionMetadata',
+        'metadata': 'FlyteidleventTaskExecutionMetadata',
         'event_version': 'int',
         'reported_at': 'datetime'
     }
@@ -509,7 +509,7 @@ class EventTaskExecutionEvent(object):
         Metadata around how a task was executed.  # noqa: E501
 
         :return: The metadata of this EventTaskExecutionEvent.  # noqa: E501
-        :rtype: EventTaskExecutionMetadata
+        :rtype: FlyteidleventTaskExecutionMetadata
         """
         return self._metadata
 
@@ -520,7 +520,7 @@ class EventTaskExecutionEvent(object):
         Metadata around how a task was executed.  # noqa: E501
 
         :param metadata: The metadata of this EventTaskExecutionEvent.  # noqa: E501
-        :type: EventTaskExecutionMetadata
+        :type: FlyteidleventTaskExecutionMetadata
         """
 
         self._metadata = metadata
