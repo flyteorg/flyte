@@ -550,6 +550,64 @@ func TestHashLiteralMap_LiteralsWithHashSet(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "literal map containing hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"hello": {
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Primitive{
+											Primitive: &core.Primitive{
+												Value: &core.Primitive_StringValue{
+													StringValue: "world",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Hash: "0xffff",
+			},
+			expectedLiteral: &core.Literal{
+				Value: nil,
+				Hash:  "0xffff",
+			},
+		},
+		{
+			name: "literal collection containing hash",
+			literal: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Primitive{
+											Primitive: &core.Primitive{
+												Value: &core.Primitive_Integer{
+													Integer: 42,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Hash: "0xabcdef",
+			},
+			expectedLiteral: &core.Literal{
+				Value: nil,
+				Hash:  "0xabcdef",
+			},
+		},
 	}
 
 	for _, tt := range tests {
