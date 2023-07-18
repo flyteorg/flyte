@@ -13,10 +13,17 @@ var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
 // Hashify a literal, in other words, produce a new literal where the corresponding value is removed in case
 // the literal hash is set.
 func hashify(literal *core.Literal) *core.Literal {
+	// If the hash is set, return an empty literal with the same hash,
+	// regardless of type (scalar/collection/map).
+	if literal.GetHash() != "" {
+		return &core.Literal{
+			Hash: literal.GetHash(),
+		}
+	}
+
 	// Two recursive cases:
 	//   1. A collection of literals or
 	//   2. A map of literals
-
 	if literal.GetCollection() != nil {
 		literals := literal.GetCollection().Literals
 		literalsHash := make([]*core.Literal, 0)
@@ -45,12 +52,6 @@ func hashify(literal *core.Literal) *core.Literal {
 		}
 	}
 
-	// And a base case that consists of a scalar, where the hash might be set
-	if literal.GetHash() != "" {
-		return &core.Literal{
-			Hash: literal.GetHash(),
-		}
-	}
 	return literal
 }
 
