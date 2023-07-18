@@ -5134,7 +5134,7 @@
           "description": "A predefined yet extensible Task type identifier."
         },
         "metadata": {
-          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidleventTaskExecutionMetadata",
           "description": "Metadata around how a task was executed."
         },
         "event_version": {
@@ -7480,7 +7480,7 @@
           "description": "A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin\nthis type will be identical, but not all task executions necessarily use pre-registered definitions and this\ntype is useful to render the task in the UI, filter task executions, etc."
         },
         "metadata": {
-          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidleventTaskExecutionMetadata",
           "description": "Metadata around how a task was executed."
         },
         "event_version": {
@@ -7495,37 +7495,6 @@
         }
       },
       "description": "Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob."
-    },
-    "eventTaskExecutionMetadata": {
-      "type": "object",
-      "properties": {
-        "generated_name": {
-          "type": "string",
-          "description": "Unique, generated name for this task execution used by the backend."
-        },
-        "external_resources": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/eventExternalResourceInfo"
-          },
-          "description": "Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution."
-        },
-        "resource_pool_info": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/eventResourcePoolInfo"
-          },
-          "description": "Includes additional data on concurrent resource management used during execution..\nThis is a repeated field because a plugin can request multiple resource allocations during execution."
-        },
-        "plugin_identifier": {
-          "type": "string",
-          "description": "The identifier of the plugin used to execute this task."
-        },
-        "instance_class": {
-          "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
-        }
-      },
-      "description": "Holds metadata around how a task was executed.\nAs a task transitions across event phases during execution some attributes, such its generated name, generated external resources,\nand more may grow in size but not change necessarily based on the phase transition that sparked the event update.\nMetadata is a container for these attributes across the task execution lifecycle."
     },
     "eventWorkflowExecutionEvent": {
       "type": "object",
@@ -7686,6 +7655,37 @@
         }
       },
       "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."
+    },
+    "flyteidleventTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "generated_name": {
+          "type": "string",
+          "description": "Unique, generated name for this task execution used by the backend."
+        },
+        "external_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventExternalResourceInfo"
+          },
+          "description": "Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution."
+        },
+        "resource_pool_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventResourcePoolInfo"
+          },
+          "description": "Includes additional data on concurrent resource management used during execution..\nThis is a repeated field because a plugin can request multiple resource allocations during execution."
+        },
+        "plugin_identifier": {
+          "type": "string",
+          "description": "The identifier of the plugin used to execute this task."
+        },
+        "instance_class": {
+          "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
+        }
+      },
+      "description": "Holds metadata around how a task was executed.\nAs a task transitions across event phases during execution some attributes, such its generated name, generated external resources,\nand more may grow in size but not change necessarily based on the phase transition that sparked the event update.\nMetadata is a container for these attributes across the task execution lifecycle."
     },
     "flyteidleventTaskNodeMetadata": {
       "type": "object",

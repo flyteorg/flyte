@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: E501
+from flyteadmin.models.flyteidlevent_task_execution_metadata import FlyteidleventTaskExecutionMetadata  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestEventTaskExecutionMetadata(unittest.TestCase):
-    """EventTaskExecutionMetadata unit test stubs"""
+class TestFlyteidleventTaskExecutionMetadata(unittest.TestCase):
+    """FlyteidleventTaskExecutionMetadata unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestEventTaskExecutionMetadata(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testEventTaskExecutionMetadata(self):
-        """Test EventTaskExecutionMetadata"""
+    def testFlyteidleventTaskExecutionMetadata(self):
+        """Test FlyteidleventTaskExecutionMetadata"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.event_task_execution_metadata.EventTaskExecutionMetadata()  # noqa: E501
+        # model = flyteadmin.models.flyteidlevent_task_execution_metadata.FlyteidleventTaskExecutionMetadata()  # noqa: E501
         pass
 
 

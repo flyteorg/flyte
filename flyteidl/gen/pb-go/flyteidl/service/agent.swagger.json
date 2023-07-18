@@ -575,6 +575,18 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
+    "coreNodeExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "execution_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+        }
+      },
+      "description": "Encapsulation of fields that identify a Flyte node execution entity."
+    },
     "coreOAuth2Client": {
       "type": "object",
       "properties": {
@@ -891,6 +903,22 @@
         }
       }
     },
+    "coreTaskExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        },
+        "node_execution_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier"
+        },
+        "retry_attempt": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
     "coreTaskMetadata": {
       "type": "object",
       "properties": {
@@ -1086,6 +1114,24 @@
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
     },
+    "coreWorkflowExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User or system provided value for the resource."
+        }
+      },
+      "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+    },
     "flyteidladminState": {
       "type": "string",
       "enum": [
@@ -1097,6 +1143,45 @@
       ],
       "default": "RETRYABLE_FAILURE",
       "description": "The state of the execution is used to control its visibility in the UI/CLI."
+    },
+    "flyteidladminTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "task_execution_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier",
+          "title": "ID of the task execution"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "k8s namespace where the task is executed in"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels attached to the task execution"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Annotations attached to the task execution"
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "title": "k8s service account associated with the task execution"
+        },
+        "environment_variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Environment variables attached to the task execution"
+        }
+      },
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
     },
     "protobufListValue": {
       "type": "object",
