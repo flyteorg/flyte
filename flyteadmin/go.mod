@@ -13,7 +13,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/evanphx/json-patch v4.12.0+incompatible
-	github.com/flyteorg/flyteidl v1.5.7
+	github.com/flyteorg/flyteidl v1.5.8-0.20230714175257-ad36544662c7
 	github.com/flyteorg/flyteplugins v1.0.56
 	github.com/flyteorg/flytepropeller v1.1.87
 	github.com/flyteorg/flytestdlib v1.0.15
@@ -85,11 +85,12 @@ require (
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
@@ -158,6 +159,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
+	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
@@ -209,6 +211,7 @@ require (
 )
 
 replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
+
 replace github.com/flyteorg/flyteidl => ../flyteidl
 
 // Retracted versions

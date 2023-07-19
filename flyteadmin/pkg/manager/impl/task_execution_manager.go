@@ -3,7 +3,6 @@ package impl
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
 	"strconv"
 
 	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -32,7 +31,6 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 )
@@ -131,57 +129,69 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 	return *existingTaskExecution, nil
 }
 
-func (m *TaskExecutionManager) tempHandleArtifactEventEmitting(ctx context.Context, request admin.TaskExecutionEventRequest, taskExecutionID core.TaskExecutionIdentifier) {
-	// Print out what the catalog service will eventually do. Can all this be retrieved just from the raw event? No.
-	// Missing is: tags/aliases/given name
-	var outputs *core.LiteralMap
-	var err error
-	if request.Event.GetOutputData() != nil {
-		fmt.Printf("Got output data")
-		outputs = request.Event.GetOutputData()
-	} else if len(request.Event.GetOutputUri()) > 0 {
-		fmt.Printf("Got output URI")
-		// GetInputs actually fetches the data, even though this is an output
-		outputs, _, err = util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-			m.storageClient, request.Event.GetOutputUri())
-		if err != nil {
-			fmt.Printf("Error fetching output literal map %v", request.Event)
-		}
-	} else {
-		fmt.Printf("No output data found for %v\n", request.Event)
-	}
-	if outputs != nil {
-		urls := common.FlyteURLsFromTaskExecutionID(taskExecutionID, false)
-		outputURLs := common.AppendLinksForLiteralMap(urls.GetOutputs(), *outputs)
-		for k, v := range outputs.Literals {
-			as := artifact.ArtifactSpec{
-				Value: v,
-				// Type, tags and aliases will need to be filled in later
-				Source: &artifact.ArtifactSpec_TaskExecution{
-					TaskExecution: &taskExecutionID,
-				},
-			}
-			ak := core.ArtifactKey{
-				Project: request.Event.ParentNodeExecutionId.ExecutionId.Project,
-				Domain:  request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-				// This will need to be filled in later, will need to pull from task template, or set to
-				// something pretty unique, like the task ID.
-				Name: "",
-			}
-
-			a := artifact.CreateArtifactRequest{
-				ArtifactKey: &ak,
-				Version:     request.Event.ParentNodeExecutionId.ExecutionId.Name,
-				Uri:         outputURLs[k],
-				Spec:        &as,
-			}
-			e := event.ArtifactCreateEvent{
-				CreateRequest: &a,
-			}
-			print(fmt.Sprintf("Output %s, becomes artifact request: %v\n", k, e))
-		}
-	}
-}
+//func (m *TaskExecutionManager) handleArtifactEventEmitting(ctx context.Context, request admin.TaskExecutionEventRequest, taskExecutionID core.TaskExecutionIdentifier) {
+//
+//	taskModel, err := m.db.TaskRepo().Get(ctx, repoInterfaces.Identifier{
+//		Project: request.Event.TaskId.Project,
+//		Domain:  request.Event.TaskId.Domain,
+//		Name:    request.Event.TaskId.Name,
+//		Version: request.Event.TaskId.Version,
+//	})
+//	if err != nil {
+//		// TODO: metric this
+//		logger.Debugf(ctx, "Failed to get task with task id [%+v] with err %v", request.Event.TaskId, err)
+//		return
+//	}
+//	task, err := transformers.FromTaskModel(taskModel)
+//	task.Closure.CompiledTask.Template.Interface
+//
+//	var outputs *core.LiteralMap
+//	if request.Event.GetOutputData() != nil {
+//		fmt.Printf("remove this - Got output data")
+//		outputs = request.Event.GetOutputData()
+//	} else if len(request.Event.GetOutputUri()) > 0 {
+//		fmt.Printf("remove this - Got output URI")
+//		// GetInputs actually fetches the data, even though this is an output
+//		outputs, _, err = util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+//			m.storageClient, request.Event.GetOutputUri())
+//		if err != nil {
+//			fmt.Printf("Error fetching output literal map %v", request.Event)
+//		}
+//	} else {
+//		fmt.Printf("No output data found for %v\n", request.Event)
+//	}
+//	if outputs != nil {
+//		urls := common.FlyteURLsFromTaskExecutionID(taskExecutionID, false)
+//		outputURLs := common.AppendLinksForLiteralMap(urls.GetOutputs(), *outputs)
+//		for k, v := range outputs.Literals {
+//			as := artifact.ArtifactSpec{
+//				Value: v,
+//				// Type, tags and aliases will need to be filled in later
+//				Source: &artifact.ArtifactSpec_TaskExecution{
+//					TaskExecution: &taskExecutionID,
+//				},
+//			}
+//			ak := core.ArtifactKey{
+//				Project: request.Event.ParentNodeExecutionId.ExecutionId.Project,
+//				Domain:  request.Event.ParentNodeExecutionId.ExecutionId.Domain,
+//				// This will need to be filled in later, will need to pull from task template, or set to
+//				// something pretty unique, like the task ID.
+//				Name: "",
+//			}
+//
+//			a := artifact.CreateArtifactRequest{
+//				ArtifactKey: &ak,
+//				Version:     request.Event.ParentNodeExecutionId.ExecutionId.Name,
+//				Uri:         outputURLs[k],
+//				Spec:        &as,
+//			}
+//			e := event.ArtifactCreateEvent{
+//				CreateRequest: &a,
+//			}
+//			print(fmt.Sprintf("Output %s, becomes artifact request: %v\n", k, e))
+//		}
+//	}
+//}
 
 func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	*admin.TaskExecutionEventResponse, error) {
@@ -256,7 +266,10 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		if request.Event.GetOutputData() != nil {
 			m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
 		}
-		m.tempHandleArtifactEventEmitting(ctx, request, taskExecutionID)
+		//go func() {
+		//	logger.Debugf(ctx, "Emitting task execution artifacts for [%+v] [%+v]", taskExecutionID, request)
+		//	m.handleArtifactEventEmitting(ctx, request, taskExecutionID)
+		//}()
 	}
 
 	if err = m.notificationClient.Publish(ctx, proto.MessageName(&request), &request); err != nil {

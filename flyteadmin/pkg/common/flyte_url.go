@@ -139,6 +139,13 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 	return res
 }
 
+// FlyteURLKeyFromNodeExecutionIDAndOutput is a modified version of the function above.
+func FlyteURLKeyFromNodeExecutionIDAndOutput(nodeExecutionID core.NodeExecutionIdentifier, artifactType ArtifactType, outputName string) string {
+	res := fmt.Sprintf("%s/%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, artifactType, outputName)
+
+	return res
+}
+
 func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
 	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Project,
 		taskExecutionID.NodeExecutionId.ExecutionId.Domain, taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))

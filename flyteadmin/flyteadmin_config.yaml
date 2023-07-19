@@ -112,6 +112,10 @@ externalEvents:
   eventsPublisher:
     topicName: "bar"
     eventTypes: all
+cloudEvents:
+  type: redis
+  redis:
+    addr: "localhost:6379"
 Logger:
   show-source: true
   level: 5
