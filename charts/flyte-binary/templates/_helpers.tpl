@@ -31,11 +31,19 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Base labels
+*/}}
+{{- define "flyte-binary.baseLabels" -}}
+app.kubernetes.io/name: {{ include "flyte-binary.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "flyte-binary.labels" -}}
 helm.sh/chart: {{ include "flyte-binary.chart" . }}
-{{ include "flyte-binary.selectorLabels" . }}
+{{ include "flyte-binary.baseLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,8 +54,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "flyte-binary.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "flyte-binary.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "flyte-binary.baseLabels" . }}
+app.kubernetes.io/component: flyte-binary
 {{- end }}
 
 {{/*
@@ -62,6 +70,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Flag to use external configuration.
+*/}}
+{{- define "flyte-binary.configuration.externalConfiguration" -}}
+{{- or .Values.configuration.externalConfigMap .Values.configuration.externalSecretRef -}}
+{{- end -}}
+
+{{/*
 Get the Flyte configuration ConfigMap name.
 */}}
 {{- define "flyte-binary.configuration.configMapName" -}}
@@ -69,17 +84,10 @@ Get the Flyte configuration ConfigMap name.
 {{- end -}}
 
 {{/*
-Get the Flyte configuration database password secret name.
+Get the Flyte configuration Secret name.
 */}}
-{{- define "flyte-binary.configuration.database.passwordSecretName" -}}
-{{- printf "%s-db-pass" (include "flyte-binary.fullname" .) -}}
-{{- end -}}
-
-{{/*
-Get the Flyte configuration database password secret mount path.
-*/}}
-{{- define "flyte-binary.configuration.database.passwordSecretMountPath" -}}
-{{- default "/var/run/secrets/flyte/db-pass" .Values.configuration.database.passwordPath -}}
+{{- define "flyte-binary.configuration.configSecretName" -}}
+{{- printf "%s-config-secret" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
@@ -193,4 +201,37 @@ Get the Flyte ClusterRole name.
 */}}
 {{- define "flyte-binary.rbac.clusterRoleName" -}}
 {{- printf "%s-cluster-role" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Get the name of the Flyte Agent Deployment.
+*/}}
+{{- define "flyte-binary.agent.name" -}}
+{{- printf "%s-agent" (include "flyte-binary.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Flyte Agent selector labels
+*/}}
+{{- define "flyte-binary.agent.selectorLabels" -}}
+{{ include "flyte-binary.baseLabels" . }}
+app.kubernetes.io/component: agent
+{{- end }}
+
+{{/*
+Get the name of the service account to use
+*/}}
+{{- define "flyte-binary.agent.serviceAccountName" -}}
+{{- if .Values.flyteagent.serviceAccount.create }}
+{{- default (include "flyte-binary.agent.name" .) .Values.flyteagent.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.flyteagent.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Get the Flyte Agent service port.
+*/}}
+{{- define "flyte-binary.agent.servicePort" -}}
+{{- default 8000 .Values.flyteagent.service.port -}}
 {{- end -}}

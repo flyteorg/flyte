@@ -4,7 +4,7 @@
 ARG FLYTE_VERSION="latest"
 FROM ghcr.io/flyteorg/flyteconsole-release:${FLYTE_VERSION} AS flyteconsole
 
-FROM --platform=${BUILDPLATFORM} golang:1.18.0-alpine3.15 AS go_builder
+FROM --platform=${BUILDPLATFORM} golang:1.19.0-alpine3.16 AS go_builder
 
 ARG TARGETARCH
 ENV GOARCH=${TARGETARCH}

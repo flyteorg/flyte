@@ -124,9 +124,17 @@ jobs:
 
   sandbox-bundled-functional-tests:
     runs-on: ubuntu-latest
+    env:
+      FLYTESNACKS_PRIORITIES: 'P0'
+      FLYTESNACKS_VERSION: ''
     timeout-minutes: 20
     needs: [build-and-push-single-binary-image]
     steps:
+      - name: Set latest Flytesnacks release
+        if: ${{ env.FLYTESNACKS_VERSION == '' }}
+        run: |
+          FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
+          echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
         uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -162,6 +170,9 @@ jobs:
             defaults:
               cpu: "0"
               memory: "0"
+            limits:
+              cpu: "0"
+              memory: "0"
           EOF
           flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
       - name: Install Python dependencies
@@ -169,17 +180,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install flytekit
           pip freeze
-      - name: Register examples
-        uses: unionai/flyte-register-action@v0.0.2
+      - name: Checkout flytesnacks
+        uses: actions/checkout@v3
         with:
-          flytesnacks: true
-          config: boilerplate/flyte/end2end/functional-test-config.yaml
-          project: flytesnacks
-          domain: development
-          version: "latest"
+          repository: flyteorg/flytesnacks
+          path: flytesnacks
+          # TODO: Enable this once refactored version produces a release tag
+          # ref: ${{ env.FLYTESNACKS_VERSION }}
+      - name: Register specific tests
+        run: |
+          for f in basics/basics/basic_workflow.py \
+                  basics/basics/hello_world.py \
+                  basics/basics/lp.py \
+                  basics/basics/named_outputs.py \
+                  control_flow/control_flow/chain_entities.py \
+                  control_flow/control_flow/dynamics.py \
+                  control_flow/control_flow/map_task.py \
+                  control_flow/control_flow/subworkflows.py \
+                  type_system/type_system/custom_objects.py \
+                  type_system/type_system/schema.py \
+                  type_system/type_system/typed_schema.py ;
+          do
+              pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
+                  register \
+                  --project flytesnacks \
+                  --domain development \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
+                  --version ${{ env.FLYTESNACKS_VERSION }} \
+                  flytesnacks/examples/$f;
+          done
       - name: End2End
-        env:
-          PRIORITIES: "P0"
         run: |
           make end2end_execute
 
