@@ -100,6 +100,57 @@ func TestEvaluateComparison(t *testing.T) {
 		assert.NoError(t, err)
 		assert.False(t, v)
 	})
+	t.Run("CompareNoneAndLiteral", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> literal
+		exp := &core.ComparisonExpression{
+			LeftValue: &core.Operand{},
+			Operator:  core.ComparisonExpression_EQ,
+			RightValue: &core.Operand{
+				Val: &core.Operand_Primitive{
+					Primitive: coreutils.MustMakePrimitive(1),
+				},
+			},
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.False(t, v)
+	})
+	t.Run("CompareLiteralAndNone", func(t *testing.T) {
+		// Compare lVal -> literal and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue: &core.Operand{
+				Val: &core.Operand_Primitive{
+					Primitive: coreutils.MustMakePrimitive(1),
+				},
+			},
+			Operator:   core.ComparisonExpression_NEQ,
+			RightValue: &core.Operand{},
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.True(t, v)
+	})
+	t.Run("CompareNoneAndNone", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue:  &core.Operand{},
+			Operator:   core.ComparisonExpression_EQ,
+			RightValue: &core.Operand{},
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.True(t, v)
+	})
+	t.Run("CompareNoneAndNoneWithError", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue:  &core.Operand{},
+			Operator:   core.ComparisonExpression_GTE,
+			RightValue: &core.Operand{},
+		}
+		_, err := EvaluateComparison(exp, nil)
+		assert.Error(t, err)
+	})
 	t.Run("CompareLiteralAndPrimitive", func(t *testing.T) {
 
 		// Compare lVal -> literal and rVal -> primitive

@@ -24,10 +24,14 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 	var rPrim *core.Primitive
 
 	if expr.GetLeftValue().GetPrimitive() == nil {
-		if nodeInputs == nil {
-			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+		if len(expr.GetLeftValue().GetVar()) == 0 {
+			lValue = &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_NoneType{NoneType: &core.Void{}}}}}
+		} else {
+			if nodeInputs == nil {
+				return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			}
+			lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
 		}
-		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
@@ -36,10 +40,14 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 	}
 
 	if expr.GetRightValue().GetPrimitive() == nil {
-		if nodeInputs == nil {
-			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+		if len(expr.GetRightValue().GetVar()) == 0 {
+			rValue = &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_NoneType{NoneType: &core.Void{}}}}}
+		} else {
+			if nodeInputs == nil {
+				return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			}
+			rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
 		}
-		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
 		if rValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}

@@ -72,6 +72,16 @@ var perTypeComparators = map[string]comparators{
 }
 
 func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.ComparisonExpression_Operator) (bool, error) {
+	if lValue == nil || rValue == nil {
+		switch op {
+		case core.ComparisonExpression_EQ:
+			return lValue == rValue, nil
+		case core.ComparisonExpression_NEQ:
+			return lValue != rValue, nil
+		default:
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Comparison between nil and non-nil values with operator [%v] is not supported. lVal[%v]:rVal[%v]", op, lValue, rValue)
+		}
+	}
 	lValueType := reflect.TypeOf(lValue.Value)
 	rValueType := reflect.TypeOf(rValue.Value)
 	if lValueType != rValueType {
@@ -116,24 +126,32 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 
 func Evaluate1(lValue *core.Primitive, rValue *core.Literal, op core.ComparisonExpression_Operator) (bool, error) {
 	if rValue.GetScalar() == nil || rValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive.")
+		if rValue.GetScalar().GetNoneType() == nil {
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive")
+		}
 	}
 	return Evaluate(lValue, rValue.GetScalar().GetPrimitive(), op)
 }
 
 func Evaluate2(lValue *core.Literal, rValue *core.Primitive, op core.ComparisonExpression_Operator) (bool, error) {
 	if lValue.GetScalar() == nil || lValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
+		if lValue.GetScalar().GetNoneType() == nil {
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
+		}
 	}
 	return Evaluate(lValue.GetScalar().GetPrimitive(), rValue, op)
 }
 
 func EvaluateLiterals(lValue *core.Literal, rValue *core.Literal, op core.ComparisonExpression_Operator) (bool, error) {
 	if lValue.GetScalar() == nil || lValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
+		if lValue.GetScalar().GetNoneType() == nil {
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
+		}
 	}
 	if rValue.GetScalar() == nil || rValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive")
+		if rValue.GetScalar().GetNoneType() == nil {
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive")
+		}
 	}
 	return Evaluate(lValue.GetScalar().GetPrimitive(), rValue.GetScalar().GetPrimitive(), op)
 }
