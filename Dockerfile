@@ -1,5 +1,5 @@
 ARG FLYTECONSOLE_VERSION=latest
-FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
+FROM ghcr.io/flyteorg/flyteconsole:breadcrumbststv1 AS flyteconsole
 
 
 FROM --platform=${BUILDPLATFORM} golang:1.19.1-bullseye AS flytebuilder
