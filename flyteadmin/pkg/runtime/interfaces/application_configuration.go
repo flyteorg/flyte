@@ -555,9 +555,9 @@ type NotificationsConfig struct {
 type WebHookConfig struct {
 	// Type of webhook service to use. Currently only "slack" is supported.
 	Name                         string                       `json:"name"`
-	URL                          string                       `json:"url"`
+	URL                          string                       `json:"url" pflag:",Secret that contains the webhook URL"`
 	Payload                      string                       `json:"payload"`
-	SecretName                   string                       `json:"secret"`
+	Token                        string                       `json:"token" pflag:",Secret that contains the bearer token"`
 	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
 }
 
