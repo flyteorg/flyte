@@ -23,6 +23,10 @@ func (m MockMetadata) Size() int64 {
 	return noopFileSize
 }
 
+func (m MockMetadata) Etag() string {
+	return "etag"
+}
+
 func getMockStorage() storage.DataStore {
 	mockStorage := commonMocks.GetMockStorageClient()
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb =

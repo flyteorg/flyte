@@ -25,6 +25,20 @@ func TestAlterTableColumnType(t *testing.T) {
 	assert.True(t, query.Triggered)
 }
 
+func TestAlterIDSequenceType(t *testing.T) {
+	gormDb := GetDbForTest(t)
+	db, err := gormDb.DB()
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	query := GlobalMock.NewMock()
+	query.WithQuery(
+		`ALTER SEQUENCE IF EXISTS execution_events_id_seq AS bigint NO MAXVALUE`)
+	assert.NoError(t, err)
+	tables = []string{"execution_events"}
+	_ = alterIDSequenceType(db)
+	assert.True(t, query.Triggered)
+}
+
 func GetDbForTest(t *testing.T) *gorm.DB {
 	mocket.Catcher.Register()
 	db, err := gorm.Open(postgres.New(postgres.Config{DriverName: mocket.DriverName}))
