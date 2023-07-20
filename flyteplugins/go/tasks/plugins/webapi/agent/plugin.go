@@ -72,7 +72,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
 
-	res, err := client.CreateTask(ctx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix})
+	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	res, err := client.CreateTask(ctx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -181,6 +182,18 @@ func getClientFunc(ctx context.Context, endpoint string, connectionCache map[str
 		}()
 	}()
 	return service.NewAsyncAgentServiceClient(conn), nil
+}
+
+func buildTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecutionMetadata) admin.TaskExecutionMetadata {
+	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
+	return admin.TaskExecutionMetadata{
+		TaskExecutionId:      &taskExecutionID,
+		Namespace:            taskExecutionMetadata.GetNamespace(),
+		Labels:               taskExecutionMetadata.GetLabels(),
+		Annotations:          taskExecutionMetadata.GetAnnotations(),
+		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
+		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
+	}
 }
 
 func newAgentPlugin() webapi.PluginEntry {
