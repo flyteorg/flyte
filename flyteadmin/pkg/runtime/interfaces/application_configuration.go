@@ -563,6 +563,9 @@ type WebHookConfig struct {
 
 // WebhookNotificationsConfig defines the configuration for the webhook service.
 type WebhookNotificationsConfig struct {
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type      string    `json:"type"`
 	AWSConfig AWSConfig `json:"aws"`
 	GCPConfig GCPConfig `json:"gcp"`
 	// Defines the list of webhooks to be configured.

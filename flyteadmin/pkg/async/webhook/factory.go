@@ -3,6 +3,8 @@ package webhook
 import (
 	"context"
 	"fmt"
+	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"time"
 
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
@@ -10,6 +12,7 @@ import (
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/flyteorg/flyteadmin/pkg/async"
+	notificationsImplementations "github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/webhook/implementations"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -35,9 +38,12 @@ func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
 	var processors []interfaces.Processor
+	var err error
 
 	for _, cfg := range config.WebhooksConfig {
-		if len(config.AWSConfig.Region) != 0 {
+		var processor interfaces.Processor
+		switch config.Type {
+		case common.AWS:
 			sqsConfig := gizmoAWS.SQSConfig{
 				QueueName:           cfg.NotificationsProcessorConfig.QueueName,
 				QueueOwnerAccountID: cfg.NotificationsProcessorConfig.AccountID,
@@ -47,7 +53,6 @@ func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces
 				ConsumeBase64: &enable64decoding,
 			}
 			sqsConfig.Region = config.AWSConfig.Region
-			var err error
 			err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 				sub, err = gizmoAWS.NewSubscriber(sqsConfig)
 				if err != nil {
@@ -58,12 +63,29 @@ func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces
 			if err != nil {
 				panic(err)
 			}
+			processor = implementations.NewWebhookProcessor(common.AWS, sub, GetWebhook(cfg, scope), db, scope)
+		case common.GCP:
+			projectID := config.GCPConfig.ProjectID
+			subscription := cfg.NotificationsProcessorConfig.QueueName
+			err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
+				sub, err = gizmoGCP.NewSubscriber(context.TODO(), projectID, subscription)
+				if err != nil {
+					logger.Warnf(context.TODO(), "Failed to initialize new gizmo gcp subscriber with config [ProjectID: %s, Subscription: %s] and err: %v", projectID, subscription, err)
+				}
+				return err
+			})
+			if err != nil {
+				panic(err)
+			}
+			processor = implementations.NewWebhookProcessor(common.GCP, sub, GetWebhook(cfg, scope), db, scope)
+		case common.Local:
+			fallthrough
+		default:
+			logger.Infof(context.Background(),
+				"Using default noop notifications processor implementation for config type [%s]", config.Type)
+			processor = notificationsImplementations.NewNoopProcess()
 		}
-
-		webhook := GetWebhook(cfg, scope)
-		if webhook != nil {
-			processors = append(processors, implementations.NewWebhookProcessor(sub, webhook, db, scope))
-		}
+		processors = append(processors, processor)
 	}
 	return processors
 }

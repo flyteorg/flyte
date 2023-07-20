@@ -63,7 +63,9 @@ var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.Remote
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
 })
-var webhookNotificationsConfig = config.MustRegisterSection(webhookNotifications, &interfaces.WebhookNotificationsConfig{})
+var webhookNotificationsConfig = config.MustRegisterSection(webhookNotifications, &interfaces.WebhookNotificationsConfig{
+	Type: common.Local,
+})
 var domainsConfig = config.MustRegisterSection(domains, &interfaces.DomainsConfig{
 	{
 		ID:   "development",

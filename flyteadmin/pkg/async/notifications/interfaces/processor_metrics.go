@@ -1,11 +1,11 @@
-package implementations
+package interfaces
 
 import (
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type processorSystemMetrics struct {
+type ProcessorSystemMetrics struct {
 	Scope                 promutils.Scope
 	MessageTotal          prometheus.Counter
 	MessageDoneError      prometheus.Counter
@@ -17,8 +17,8 @@ type processorSystemMetrics struct {
 	StopError             prometheus.Counter
 }
 
-func newProcessorSystemMetrics(scope promutils.Scope) processorSystemMetrics {
-	return processorSystemMetrics{
+func NewProcessorSystemMetrics(scope promutils.Scope) ProcessorSystemMetrics {
+	return ProcessorSystemMetrics{
 		Scope:                 scope,
 		MessageTotal:          scope.MustNewCounter("message_total", "overall count of messages processed"),
 		MessageDecodingError:  scope.MustNewCounter("message_decoding_error", "count of messages with decoding errors"),

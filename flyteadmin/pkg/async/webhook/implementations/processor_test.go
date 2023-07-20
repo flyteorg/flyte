@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"testing"
 	"time"
 
@@ -118,13 +119,13 @@ func TestProcessor_StartProcessing(t *testing.T) {
 			}, nil
 		},
 	)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
 func TestProcessor_StartProcessingNoMessages(t *testing.T) {
 	initializeProcessor()
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
@@ -135,7 +136,7 @@ func TestProcessor_StartProcessingNoNotificationMessage(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
@@ -147,7 +148,7 @@ func TestProcessor_StartProcessingMessageWrongDataType(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
@@ -159,7 +160,7 @@ func TestProcessor_StartProcessingBase64DecodeError(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
@@ -172,7 +173,7 @@ func TestProcessor_StartProcessingProtoMarshallError(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
@@ -180,7 +181,7 @@ func TestProcessor_StartProcessingError(t *testing.T) {
 	initializeProcessor()
 	var ret = errors.New("err() returned an error")
 	testSubscriber.GivenErrError = ret
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Equal(t, ret, testProcessor.(*Processor).run())
 }
 
@@ -192,13 +193,13 @@ func TestProcessor_StartProcessingWebhookError(t *testing.T) {
 	}
 	mockWebhook.SetWebhookPostFunc(sendWebhookErrorFunc)
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
 func TestProcessor_StopProcessing(t *testing.T) {
 	initializeProcessor()
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Nil(t, testProcessor.StopProcessing())
 }
 
@@ -206,6 +207,6 @@ func TestProcessor_StopProcessingError(t *testing.T) {
 	initializeProcessor()
 	var stopError = errors.New("stop() returns an error")
 	testSubscriber.GivenStopError = stopError
-	testProcessor := NewWebhookProcessor(mockSub, &mockWebhook, repo, promutils.NewTestScope())
+	testProcessor := NewWebhookProcessor(common.AWS, mockSub, &mockWebhook, repo, promutils.NewTestScope())
 	assert.Equal(t, stopError, testProcessor.StopProcessing())
 }
