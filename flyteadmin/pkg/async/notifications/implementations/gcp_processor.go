@@ -3,11 +3,13 @@ package implementations
 import (
 	"context"
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
+	"time"
 )
 
 // TODO: Add a counter that encompasses the publisher stats grouped by project and domain.
@@ -23,6 +25,15 @@ func NewGcpProcessor(sub pubsub.Subscriber, emailer interfaces.Emailer, scope pr
 			Sub:           sub,
 			SystemMetrics: interfaces.NewProcessorSystemMetrics(scope.NewSubScope("processor")),
 		},
+	}
+}
+
+func (p *GcpProcessor) StartProcessing() {
+	for {
+		logger.Warningf(context.Background(), "Starting GCP notifications processor")
+		err := p.run()
+		logger.Errorf(context.Background(), "error with running GCP processor err: [%v] ", err)
+		time.Sleep(async.RetryDelay)
 	}
 }
 

@@ -4,12 +4,9 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
-	"github.com/flyteorg/flyteadmin/pkg/async"
 	"github.com/flyteorg/flytestdlib/logger"
-	"time"
 )
 
 // Exposes the common methods required for a subscriber.
@@ -31,22 +28,6 @@ type Processor interface {
 type BaseProcessor struct {
 	Sub           pubsub.Subscriber
 	SystemMetrics ProcessorSystemMetrics
-}
-
-// StartProcessing Currently only email is the supported notification because slack and pagerduty both use
-// email client to trigger those notifications.
-// When Pagerduty and other notifications are supported, a publisher per type should be created.
-func (p *BaseProcessor) StartProcessing() {
-	for {
-		logger.Warningf(context.Background(), "Starting notifications processor")
-		err := p.run()
-		logger.Errorf(context.Background(), "error with running processor err: [%v] ", err)
-		time.Sleep(async.RetryDelay)
-	}
-}
-
-func (p *BaseProcessor) run() error {
-	return errors.New("run() is not implemented")
 }
 
 // FromPubSubMessage Parse the message from GCP PubSub and return the message subject and the message body.

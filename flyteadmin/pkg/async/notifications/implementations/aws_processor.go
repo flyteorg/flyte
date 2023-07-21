@@ -3,11 +3,13 @@ package implementations
 import (
 	"context"
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
+	"time"
 )
 
 // TODO: Add a counter that encompasses the publisher stats grouped by project and domain.
@@ -16,10 +18,21 @@ type Processor struct {
 	interfaces.BaseProcessor
 }
 
+// StartProcessing Currently only email is the supported notification because slack and pagerduty both use
+// email client to trigger those notifications.
+// When Pagerduty and other notifications are supported, a publisher per type should be created.
+func (p *Processor) StartProcessing() {
+	for {
+		logger.Warningf(context.Background(), "Starting notifications processor")
+		err := p.run()
+		logger.Errorf(context.Background(), "error with running processor err: [%v] ", err)
+		time.Sleep(async.RetryDelay)
+	}
+}
+
 func (p *Processor) run() error {
 	var emailMessage admin.EmailMessage
 	var err error
-	p.BaseProcessor.StartProcessing()
 	for msg := range p.Sub.Start() {
 		p.SystemMetrics.MessageTotal.Inc()
 		stringMsg := string(msg.Message())
