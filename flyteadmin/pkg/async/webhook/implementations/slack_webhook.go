@@ -30,7 +30,7 @@ func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
 
 func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) error {
 	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
-	webhookURL, err := sm.Get(ctx, s.Config.URL)
+	webhookURL, err := sm.Get(ctx, s.Config.URLSecretName)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get url from secret manager with error: %v", err)
 		return err
@@ -42,8 +42,8 @@ func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) e
 		return err
 	}
 	request.Header.Add("Content-Type", "application/json")
-	if len(s.Config.Token) != 0 {
-		token, err := sm.Get(ctx, s.Config.Token)
+	if len(s.Config.TokenSecretName) != 0 {
+		token, err := sm.Get(ctx, s.Config.TokenSecretName)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to get bearer token from secret manager with error: %v", err)
 			return err
