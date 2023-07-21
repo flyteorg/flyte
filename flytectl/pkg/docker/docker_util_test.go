@@ -404,7 +404,7 @@ func TestGetOrCreateVolume(t *testing.T) {
 
 func TestDemoPorts(t *testing.T) {
 	_, ports, _ := GetDemoPorts()
-	assert.Equal(t, 5, len(ports))
+	assert.Equal(t, 6, len(ports))
 }
 
 func TestCopyFile(t *testing.T) {
