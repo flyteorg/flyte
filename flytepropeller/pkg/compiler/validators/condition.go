@@ -15,6 +15,10 @@ func validateOperand(node c.NodeBuilder, paramName string, operand *flyte.Operan
 	} else if operand.GetPrimitive() != nil {
 		// no validation
 		literalType = literalTypeForPrimitive(operand.GetPrimitive())
+	} else if operand.GetScalar().GetPrimitive() != nil {
+		literalType = literalTypeForPrimitive(operand.GetPrimitive())
+	} else if operand.GetScalar().GetNoneType() != nil {
+		literalType = &flyte.LiteralType{Type: &flyte.LiteralType_Simple{Simple: flyte.SimpleType_NONE}}
 	} else if len(operand.GetVar()) > 0 {
 		if node.GetInterface() != nil {
 			if param, paramOk := validateInputVar(node, operand.GetVar(), requireParamType, errs.NewScope()); paramOk {
@@ -41,7 +45,10 @@ func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *fl
 				expr.GetComparison().GetRightValue(), requireParamType, errs.NewScope())
 			op2Type, op2Valid := validateOperand(node, "LeftValue",
 				expr.GetComparison().GetLeftValue(), requireParamType, errs.NewScope())
-			if op1Valid && op2Valid && op1Type != nil && op2Type != nil {
+			// Valid expression
+			// 1. Both operands are primitive types and have the same types.
+			// 2. One of the operands is the None type.
+			if op1Valid && op2Valid && op1Type != nil && op2Type != nil && op1Type.GetSimple() != flyte.SimpleType_NONE && op2Type.GetSimple() != flyte.SimpleType_NONE {
 				if op1Type.String() != op2Type.String() {
 					errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), "RightValue",
 						op1Type.String(), op2Type.String()))
