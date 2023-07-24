@@ -96,6 +96,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 			publisher, err = redisPublisher.NewPublisher(cloudEventsConfig.RedisConfig)
 			return err
 		})
+		logger.Infof(ctx, "Using Redis cloud events publisher [%v]", publisher)
 
 		// Persistent errors should hard fail
 		if err != nil {

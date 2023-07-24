@@ -113,6 +113,7 @@ externalEvents:
     topicName: "bar"
     eventTypes: all
 cloudEvents:
+  enable: true
   type: redis
   redis:
     addr: "localhost:6379"

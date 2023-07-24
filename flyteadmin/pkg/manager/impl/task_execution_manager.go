@@ -278,7 +278,8 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 	}
 
 	go func() {
-		if err := m.cloudEventsPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		ceCtx := context.TODO()
+		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
 	}()

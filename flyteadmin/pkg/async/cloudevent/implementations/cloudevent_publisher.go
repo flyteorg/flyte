@@ -134,13 +134,22 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		return nil, fmt.Errorf("nil execution id in event [%+v]", rawEvent)
 	}
 
+	// For now, don't append any additional information unless succeeded
+	if rawEvent.Phase != core.WorkflowExecution_SUCCEEDED {
+		return &event.CloudEventWorkflowExecution{
+			RawEvent:        rawEvent,
+			OutputData:      nil,
+			OutputInterface: nil,
+		}, nil
+	}
+
 	// TODO: Make this one call to the DB instead of two.
 	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: rawEvent.ExecutionId.Project,
 		Domain:  rawEvent.ExecutionId.Domain,
 		Name:    rawEvent.ExecutionId.Name,
 	})
-	ex, err := transformers.FromExecutionModel(ctx, executionModel, nil)
+	ex, err := transformers.FromExecutionModel(ctx, executionModel, transformers.DefaultExecutionTransformerOptions)
 	if ex.Closure.WorkflowId == nil {
 		logger.Warningf(ctx, "workflow id is nil for execution [%+v]", ex)
 		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
@@ -199,6 +208,15 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 		return nil, fmt.Errorf("nothing to publish, TaskExecution event is nil")
 	}
 
+	// For now, don't append any additional information unless succeeded
+	if rawEvent.Phase != core.TaskExecution_SUCCEEDED {
+		return &event.CloudEventTaskExecution{
+			RawEvent:        rawEvent,
+			OutputData:      nil,
+			OutputInterface: nil,
+		}, nil
+	}
+
 	taskModel, err := c.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: rawEvent.TaskId.Project,
 		Domain:  rawEvent.TaskId.Domain,
@@ -247,9 +265,12 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 	var phase string
 	var eventTime time.Time
 	var finalMsg proto.Message
+	// this is a modified notification type. will be used for both event type and publishing topic.
+	var topic string
 
 	switch msgType := msg.(type) {
 	case *admin.WorkflowExecutionEventRequest:
+		topic = "cloudevents.WorkflowExecution"
 		e := msgType.Event
 		executionID = e.ExecutionId.String()
 		phase = e.Phase.String()
@@ -262,12 +283,14 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		}
 
 	case *admin.TaskExecutionEventRequest:
+		topic = "cloudevents.TaskExecution"
 		e := msgType.Event
 		executionID = e.TaskId.String()
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
 	case *admin.NodeExecutionEventRequest:
+		topic = "cloudevents.NodeExecution"
 		e := msgType.Event
 		executionID = msgType.Event.Id.String()
 		phase = e.Phase.String()
@@ -290,7 +313,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 
 	cloudEvt := cloudevents.NewEvent()
 	// CloudEvent specification: https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes
-	cloudEvt.SetType(fmt.Sprintf("%v.%v", cloudEventTypePrefix, notificationType))
+	cloudEvt.SetType(fmt.Sprintf("%v.%v", cloudEventTypePrefix, topic))
 	cloudEvt.SetSource(cloudEventSource)
 	cloudEvt.SetID(fmt.Sprintf("%v.%v", executionID, phase))
 	cloudEvt.SetTime(eventTime)
@@ -302,7 +325,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		return err
 	}
 
-	if err := c.sender.Send(ctx, notificationType, cloudEvt); err != nil {
+	if err := c.sender.Send(ctx, topic, cloudEvt); err != nil {
 		c.systemMetrics.PublishError.Inc()
 		logger.Errorf(ctx, "Failed to send message [%v] with error: %v", msg, err)
 		return err
