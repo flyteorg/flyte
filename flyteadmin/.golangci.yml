@@ -1,0 +1,27 @@
+run:
+  skip-files:
+    # because we're skipping TLS verification - for now
+    - cmd/entrypoints/serve.go
+    - pkg/async/messages/sqs.go
+
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gas
+    - goconst
+    - goimports
+    - golint
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
