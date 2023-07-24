@@ -1,0 +1,31 @@
+template:
+  Target: null
+  id:
+    name: my-objectstore-sensor
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        path:
+          description: path
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        path:
+          description: path
+          type:
+            Type:
+              Simple: 3
+  metadata:
+    InterruptibleValue: null
+    retries:
+      retries: 10
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+    timeout:
+      seconds: 1200
+  type: object-store-sensor

@@ -1,0 +1,78 @@
+workflow:
+  id:
+    name: core.control_flow.map_task.my_map_workflow
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        a:
+          description: a
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 3
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.map_task.mapper_a_mappable_task_0
+            resource_type: 1
+        overrides:
+          resources:
+            limits:
+            - name: 3
+              value: 500Mi
+            requests:
+            - name: 3
+              value: 300Mi
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    metadata:
+      InterruptibleValue: null
+      name: mapper_a_mappable_task_0
+      retries:
+        retries: 1
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.map_task.coalesce
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: coalesce
+      retries: {}
+    upstream_node_ids:
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: o0
+    var: o0

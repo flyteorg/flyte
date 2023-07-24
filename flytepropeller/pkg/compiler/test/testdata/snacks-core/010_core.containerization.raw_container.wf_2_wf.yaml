@@ -1,0 +1,215 @@
+workflow:
+  id:
+    name: core.containerization.raw_container.wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        a:
+          description: a
+          type:
+            Type:
+              Simple: 2
+        b:
+          description: b
+          type:
+            Type:
+              Simple: 2
+    outputs: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: ellipse-area-metadata-shell
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: ellipse-area-metadata-shell
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: ellipse-area-metadata-python
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: ellipse-area-metadata-python
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: ellipse-area-metadata-r
+            resource_type: 1
+        overrides: {}
+    id: n2
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: ellipse-area-metadata-r
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: ellipse-area-metadata-haskell
+            resource_type: 1
+        overrides: {}
+    id: n3
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: ellipse-area-metadata-haskell
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: ellipse-area-metadata-julia
+            resource_type: 1
+        overrides: {}
+    id: n4
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    - binding:
+        Value:
+          Promise:
+            var: b
+      var: b
+    metadata:
+      InterruptibleValue: null
+      name: ellipse-area-metadata-julia
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.containerization.raw_container.report_all_calculated_areas
+            resource_type: 1
+        overrides: {}
+    id: n5
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n3
+            var: area
+      var: area_haskell
+    - binding:
+        Value:
+          Promise:
+            node_id: n4
+            var: area
+      var: area_julia
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: area
+      var: area_python
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: area
+      var: area_r
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: area
+      var: area_shell
+    - binding:
+        Value:
+          Promise:
+            node_id: n3
+            var: metadata
+      var: metadata_haskell
+    - binding:
+        Value:
+          Promise:
+            node_id: n4
+            var: metadata
+      var: metadata_julia
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: metadata
+      var: metadata_python
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: metadata
+      var: metadata_r
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: metadata
+      var: metadata_shell
+    metadata:
+      InterruptibleValue: null
+      name: report_all_calculated_areas
+      retries: {}
+    upstream_node_ids:
+    - n0
+    - n1
+    - n2
+    - n4
+    - n3

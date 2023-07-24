@@ -1,0 +1,57 @@
+template:
+  Target:
+    Container:
+      command:
+      - julia
+      - calculate-ellipse-area.jl
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      data_config:
+        enabled: true
+        input_path: /var/inputs
+        output_path: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-julia:v1
+      resources: {}
+  id:
+    name: ellipse-area-metadata-julia
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        a:
+          description: a
+          type:
+            Type:
+              Simple: 2
+        b:
+          description: b
+          type:
+            Type:
+              Simple: 2
+    outputs:
+      variables:
+        area:
+          description: area
+          type:
+            Type:
+              Simple: 2
+        metadata:
+          description: metadata
+          type:
+            Type:
+              Simple: 3
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: raw-container
