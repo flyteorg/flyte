@@ -9,6 +9,14 @@ ENV GOARCH "${TARGETARCH}"
 ENV GOOS linux
 
 WORKDIR /flyteorg/build
+
+COPY datacatalog datacatalog
+COPY flyteadmin flyteadmin
+COPY flytepropeller flytepropeller
+COPY flytestdlib flytestdlib
+COPY flyteplugins flyteplugins
+COPY flytecopilot flytecopilot
+
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd cmd
