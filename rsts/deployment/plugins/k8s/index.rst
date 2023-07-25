@@ -64,7 +64,7 @@ Install the K8S Operator
     the same time.
     
     To `enable gang scheduling for the Kubeflow training-operator <https://www.kubeflow.org/docs/components/training/job-scheduling/>`_,
-    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`_ or `Apache YuniKorn <https://yunikorn.apache.org/>`_.
+    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`_ or `Apache YuniKorn scheduler <https://yunikorn.apache.org/>`_.
 
     1. Install the `scheduler plugin <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_ or
        `Apache YuniKorn <https://yunikorn.apache.org/docs/next/#install>`_ as a second scheduler
