@@ -33,7 +33,7 @@ Fetch Flytectl version.
 type versionOutput struct {
 	// Specifies the Name of app
 	App string `json:"App,omitempty"`
-	// Specifies the GIT sha of the build
+	// Specifies the git revision SHA1 of the build
 	Build string `json:"Build,omitempty"`
 	// Version for the build, should follow a semver
 	Version string `json:"Version,omitempty"`
