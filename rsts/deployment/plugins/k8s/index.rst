@@ -110,7 +110,7 @@ Install the K8S Operator
 
     3. (Only for Apache YuniKorn) Configure ``template.metadata.annotations.yunikorn.apache.org/task-group-name`` ,
        ``template.metadata.annotations.yunikorn.apache.org/task-groups`` and
-       ``template.metadata.annotations.yunikorn.apache.org/schedulingPolicyParameters`` in your Job or Deployment templates.
+       ``template.metadata.annotations.yunikorn.apache.org/schedulingPolicyParameters`` in Flyte pod templates.
        See `Apache YuniKorn Gang-Scheduling <https://yunikorn.apache.org/docs/next/user_guide/gang_scheduling>`_ for more configuration detail.
 
     4. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
