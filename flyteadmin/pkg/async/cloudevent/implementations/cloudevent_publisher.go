@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"reflect"
 	"time"
 
@@ -267,6 +268,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 	var finalMsg proto.Message
 	// this is a modified notification type. will be used for both event type and publishing topic.
 	var topic string
+	var eventSource = cloudEventSource
 
 	switch msgType := msg.(type) {
 	case *admin.WorkflowExecutionEventRequest:
@@ -276,6 +278,11 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 
+		dummyNodeExecutionID := core.NodeExecutionIdentifier{
+			NodeId:      "end-node",
+			ExecutionId: e.ExecutionId,
+		}
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(dummyNodeExecutionID, common.ArtifactTypeI)
 		finalMsg, err = c.TransformWorkflowExecutionEvent(ctx, e)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to transform workflow execution event with error: %v", err)
@@ -288,6 +295,12 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		executionID = e.TaskId.String()
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
+
+		if e.ParentNodeExecutionId == nil {
+			return fmt.Errorf("parent node execution id is nil for task execution [%+v]", e)
+		}
+		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
+			int(e.RetryAttempt), common.ArtifactTypeO)
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
 	case *admin.NodeExecutionEventRequest:
 		topic = "cloudevents.NodeExecution"
@@ -314,7 +327,10 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 	cloudEvt := cloudevents.NewEvent()
 	// CloudEvent specification: https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes
 	cloudEvt.SetType(fmt.Sprintf("%v.%v", cloudEventTypePrefix, topic))
-	cloudEvt.SetSource(cloudEventSource)
+	// According to the spec, the combination of source and id should be unique.
+	// Artifact service's uniqueness is project/domain/suffix. project/domain are available from the execution id.
+	// so set the suffix as the source. Can ignore ID since Artifact will only listen to succeeded events.
+	cloudEvt.SetSource(eventSource)
 	cloudEvt.SetID(fmt.Sprintf("%v.%v", executionID, phase))
 	cloudEvt.SetTime(eventTime)
 	cloudEvt.SetExtension(jsonSchemaURLKey, jsonSchemaURL)

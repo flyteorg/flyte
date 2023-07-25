@@ -139,9 +139,16 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 	return res
 }
 
-// FlyteURLKeyFromNodeExecutionIDAndOutput is a modified version of the function above.
-func FlyteURLKeyFromNodeExecutionIDAndOutput(nodeExecutionID core.NodeExecutionIdentifier, artifactType ArtifactType, outputName string) string {
-	res := fmt.Sprintf("%s/%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, artifactType, outputName)
+// FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
+func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, artifactType ArtifactType) string {
+	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, artifactType)
+
+	return res
+}
+
+// FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
+func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int, artifactType ArtifactType) string {
+	res := fmt.Sprintf("%s/%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry), artifactType)
 
 	return res
 }
@@ -156,15 +163,6 @@ func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, 
 	}
 	if deck {
 		res.Deck = fmt.Sprintf("%s/%s", base, ArtifactTypeD)
-	}
-	return res
-}
-
-// AppendLinksForLiteralMap returns a map of URLs for each output in the supplied literal map.
-func AppendLinksForLiteralMap(baseOutputURL string, literalMap core.LiteralMap) map[string]string {
-	res := make(map[string]string, len(literalMap.Literals))
-	for k, _ := range literalMap.Literals {
-		res[k] = fmt.Sprintf("%s/%s", baseOutputURL, k)
 	}
 	return res
 }

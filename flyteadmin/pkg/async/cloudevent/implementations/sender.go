@@ -2,11 +2,11 @@ package implementations
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/Shopify/sarama"
-	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -24,7 +24,7 @@ type PubSubSender struct {
 }
 
 func (s *PubSubSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
-	eventByte, err := pbcloudevents.Protobuf.Marshal(&event)
+	eventByte, err := json.Marshal(&event)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal cloudevent with error: %v", err)
 		return err
