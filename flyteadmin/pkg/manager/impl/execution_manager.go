@@ -1219,128 +1219,6 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 	watch.Observe(*executionModel.ExecutionCreatedAt, terminalEventTime)
 }
 
-//// getAliases creates a list of aliases for a given output in a workflow execution. It should be called once per
-//// output for a given workflow execution.
-//func (m *ExecutionManager) getAliases(workflowID core.Identifier, execID core.WorkflowExecutionIdentifier, typedInterface core.TypedInterface, outputName string) ([]*artifact.Alias, error) {
-//
-//	if v, ok := typedInterface.Outputs.Variables[outputName]; ok {
-//		defaultAlias := &artifact.Alias{
-//			Name:  fmt.Sprintf("%s/%s", workflowID.Name, outputName),
-//			Value: execID.Name,
-//		}
-//
-//		if v.Artifact != nil && len(v.Artifact.Spec.Aliases) > 0 {
-//			aliases := make([]*artifact.Alias, 0, len(v.Artifact.Spec.Aliases)+1)
-//			aliases = append(aliases, defaultAlias)
-//			for _, a := range v.Artifact.Spec.Aliases {
-//				aliases = append(aliases, &artifact.Alias{
-//					Name:  a.Name,
-//					Value: a.Value,
-//				})
-//			}
-//			return aliases, nil
-//		}
-//
-//		// If nothing specified by the user, just return the default alias.
-//		return []*artifact.Alias{defaultAlias}, nil
-//	}
-//	return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "output [%s] not found in workflow interface [%v] for workflow [%v]", outputName, typedInterface, workflowID)
-//}
-//
-//func (m *ExecutionManager) handleArtifactEventEmitting(ctx context.Context, request admin.WorkflowExecutionEventRequest) {
-//	// Basic error checking
-//	if request.Event.ExecutionId == nil {
-//		logger.Warningf(ctx, "nil execution id in event request [%+v]", request)
-//		return
-//	}
-//
-//	// TODO: Make this one call to the DB instead of two.
-//	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
-//		Project: request.Event.ExecutionId.Project,
-//		Domain:  request.Event.ExecutionId.Domain,
-//		Name:    request.Event.ExecutionId.Name,
-//	})
-//	ex, err := transformers.FromExecutionModel(ctx, executionModel, nil)
-//	if ex.Closure.WorkflowId == nil {
-//		logger.Warningf(ctx, "workflow id is nil for execution [%+v]", ex)
-//		return
-//	}
-//	workflowModel, err := m.db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
-//		Project: ex.Closure.WorkflowId.Project,
-//		Domain:  ex.Closure.WorkflowId.Domain,
-//		Name:    ex.Closure.WorkflowId.Name,
-//		Version: ex.Closure.WorkflowId.Version,
-//	})
-//	var workflowInterface core.TypedInterface
-//	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
-//		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
-//		if err != nil {
-//			logger.Errorf(ctx,
-//				"Artifact eventing - failed to unmarshal TypedInterface for workflow [%+v] with err: %v",
-//				workflowModel.ID, err)
-//			return
-//		}
-//	}
-//
-//	var outputs *core.LiteralMap
-//	if request.Event.GetOutputData() != nil {
-//		fmt.Printf("remove this - Got output data")
-//		outputs = request.Event.GetOutputData()
-//	} else if len(request.Event.GetOutputUri()) > 0 {
-//		fmt.Printf("remove this - Got output URI")
-//		// GetInputs actually fetches the data, even though this is an output
-//		outputs, _, err = util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-//			m.storageClient, request.Event.GetOutputUri())
-//		if err != nil {
-//			// TODO: metric this
-//			logger.Warningf(ctx, "Error fetching output literal map %v", request.Event)
-//		}
-//	} else {
-//		logger.Debugf(ctx, "Neither output data nor uri found for %v", request.Event)
-//		return
-//	}
-//	if outputs == nil {
-//		logger.Debugf(ctx, "Output data was nil for %v", request.Event)
-//		return
-//	}
-//
-//	nodeExecutionID := core.NodeExecutionIdentifier{
-//		NodeId:      "end-node",
-//		ExecutionId: request.Event.ExecutionId,
-//	}
-//
-//	for k, v := range outputs.Literals {
-//		// Use input type because workflow outputs are inputs to the end node.
-//		artifactKeySuffix := common.FlyteURLKeyFromNodeExecutionIDAndOutput(nodeExecutionID, common.ArtifactTypeI, k)
-//
-//		aliases, err := m.getAliases(*ex.Closure.WorkflowId, *request.Event.ExecutionId, workflowInterface, k)
-//		if err != nil {
-//			logger.Errorf(ctx, "Failed getting alias for [%s] in workflow [%v], err: %v", k, ex.Closure.WorkflowId, err)
-//		}
-//		as := artifact.ArtifactSpec{
-//			Value: v,
-//			Source: &artifact.ArtifactSpec_Execution{
-//				Execution: request.Event.ExecutionId,
-//			},
-//			Aliases: aliases,
-//		}
-//		ak := core.ArtifactKey{
-//			Project: request.Event.ExecutionId.Project,
-//			Domain:  request.Event.ExecutionId.Domain,
-//			Suffix:  artifactKeySuffix,
-//		}
-//
-//		a := artifact.CreateArtifactRequest{
-//			ArtifactKey: &ak,
-//			Spec:        &as,
-//		}
-//		e := event.ArtifactCreateEvent{
-//			CreateRequest: &a,
-//		}
-//		print(fmt.Sprintf("Output %s, becomes artifact request: %v\n", k, e))
-//	}
-//}
-
 func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
 	*admin.WorkflowExecutionEventResponse, error) {
 	err := validation.ValidateCreateWorkflowEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes)
@@ -1426,10 +1304,6 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		if request.Event.GetOutputData() != nil {
 			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
 		}
-		//go func() {
-		//	logger.Debugf(ctx, "Emitting workflow success artifact event flow for [%+v]", request)
-		//	m.handleArtifactEventEmitting(ctx, request)
-		//}()
 
 		err = m.publishNotifications(ctx, request, *executionModel)
 		if err != nil {
