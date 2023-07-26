@@ -232,7 +232,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	scope := testScope.NewSubScope("12")
 	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope.NewSubScope("event_sink"))
 	assert.NoError(t, err)
 
 	te := createTaskExecutorErrorInCheck(t)
@@ -311,7 +311,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	scope := testScope.NewSubScope("13")
 	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope.NewSubScope("event_sink"))
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
@@ -376,7 +376,7 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	ctx := context.Background()
 	store := createInmemoryDataStore(b, scope.NewSubScope(strconv.Itoa(b.N)))
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope.NewSubScope("event_sink"))
 	assert.NoError(b, err)
 
 	te := createHappyPathTaskExecutor(b, false)
@@ -449,7 +449,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	scope := promutils.NewTestScope()
 	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope)
 	assert.NoError(t, err)
 
 	te := createFailingTaskExecutor(t)
@@ -538,7 +538,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	scope := promutils.NewTestScope()
 	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope)
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
@@ -626,7 +626,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	scope := promutils.NewTestScope()
 	store := createInmemoryDataStore(t, scope)
 	recorder := StdOutEventRecorder()
-	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope)
+	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope)
 	assert.NoError(t, err)
 
 	te := createHappyPathTaskExecutor(t, true)
