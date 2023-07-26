@@ -95,6 +95,8 @@ var (
 		NodeConfig: NodeConfig{
 			MaxNodeRetriesOnSystemFailures: 3,
 			InterruptibleFailureThreshold:  1,
+			DefaultMaxAttempts:             1,
+			IgnoreRetryCause:               false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -204,6 +206,8 @@ type NodeConfig struct {
 	DefaultDeadlines               DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
 	MaxNodeRetriesOnSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
 	InterruptibleFailureThreshold  int64            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible'"`
+	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
+	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
 }
 
 // DefaultDeadlines contains default values for timeouts

@@ -196,21 +196,21 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog         catalog.Client
-	asyncCatalog    catalog.AsyncClient
-	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap  map[MetricKey]*taskMetrics
-	defaultPlugin   pluginCore.Plugin
-	metrics         *metrics
-	pluginRegistry  PluginRegistryIface
-	kubeClient      pluginCore.KubeClient
-	secretManager   pluginCore.SecretManager
-	resourceManager resourcemanager.BaseResourceManager
-	cfg             *config.Config
-	pluginScope     promutils.Scope
-	eventConfig     *controllerConfig.EventConfig
-	clusterID       string
+	catalog            catalog.Client
+	asyncCatalog       catalog.AsyncClient
+	defaultPlugins     map[pluginCore.TaskType]pluginCore.Plugin
+	pluginsForType     map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap     map[MetricKey]*taskMetrics
+	defaultPlugin      pluginCore.Plugin
+	metrics            *metrics
+	pluginRegistry     PluginRegistryIface
+	kubeClient         pluginCore.KubeClient
+	secretManager      pluginCore.SecretManager
+	resourceManager    resourcemanager.BaseResourceManager
+	cfg                *config.Config
+	pluginScope        promutils.Scope
+	eventConfig        *controllerConfig.EventConfig
+	clusterID          string
 }
 
 func (t *Handler) FinalizeRequired() bool {

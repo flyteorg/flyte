@@ -715,6 +715,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_node-config.default-max-attempts", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.default-max-attempts", testValue)
+			if vInt32, err := cmdFlags.GetInt32("node-config.default-max-attempts"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.NodeConfig.DefaultMaxAttempts)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-config.ignore-retry-cause", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.ignore-retry-cause", testValue)
+			if vBool, err := cmdFlags.GetBool("node-config.ignore-retry-cause"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.NodeConfig.IgnoreRetryCause)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_max-streak-length", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

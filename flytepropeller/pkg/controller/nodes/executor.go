@@ -438,18 +438,29 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 }
 
 func (c *nodeExecutor) isEligibleForRetry(nCtx *nodeExecContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
-	if err.Kind == core.ExecutionError_SYSTEM {
-		currentAttempt = nodeStatus.GetSystemFailures()
-		maxAttempts = c.maxNodeRetriesForSystemFailures
-		isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
+	if config.GetConfig().NodeConfig.IgnoreRetryCause {
+		currentAttempt = nodeStatus.GetAttempts() + 1 + nodeStatus.GetSystemFailures()
+		maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 0 {
+			maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		}
+		isEligible = currentAttempt < maxAttempts
 		return
-	}
+	} else {
+		if err.Kind == core.ExecutionError_SYSTEM {
+			currentAttempt = nodeStatus.GetSystemFailures()
+			maxAttempts = c.maxNodeRetriesForSystemFailures
+			isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
+			return
+		}
 
-	currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
-	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
-		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
+		maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 0 {
+			maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		}
+		isEligible = currentAttempt < maxAttempts
 	}
-	isEligible = currentAttempt < maxAttempts
 	return
 }
 
