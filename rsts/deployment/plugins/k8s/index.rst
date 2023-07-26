@@ -64,9 +64,10 @@ Install the K8S Operator
     the same time.
     
     To `enable gang scheduling for the Kubeflow training-operator <https://www.kubeflow.org/docs/components/training/job-scheduling/>`_,
-    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`_:
+    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`_ or `Apache YuniKorn scheduler <https://yunikorn.apache.org/>`_.
 
-    1. Install the `scheduler plugin as a second scheduler <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_.
+    1. Install the `scheduler plugin <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_ or
+       `Apache YuniKorn <https://yunikorn.apache.org/docs/next/#install>`_ as a second scheduler
     2. Configure the Kubeflow training-operator to use the new scheduler:
 
         Create a manifest called ``kustomization.yaml`` with the following content:
@@ -98,7 +99,7 @@ Install the K8S Operator
                 - name: training-operator
                   command:
                   - /manager
-                  - --gang-scheduler-name=scheduler-plugins
+                  - --gang-scheduler-name=<scheduler-plugins/yunikorn>
 
 
         Install the patched kustomization with:
@@ -107,7 +108,12 @@ Install the K8S Operator
 
           kustomize build path/to/overlay/directory | kubectl apply -f -
 
-    3. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
+    3. (Only for Apache YuniKorn) Configure ``template.metadata.annotations.yunikorn.apache.org/task-group-name`` ,
+       ``template.metadata.annotations.yunikorn.apache.org/task-groups`` and
+       ``template.metadata.annotations.yunikorn.apache.org/schedulingPolicyParameters`` in Flyte pod templates.
+       See `Apache YuniKorn Gang-Scheduling <https://yunikorn.apache.org/docs/next/user_guide/gang_scheduling>`_ for more configuration detail.
+
+    4. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
        to use the new gang scheduler for your tasks.
       
        See the :ref:`using-k8s-podtemplates` section for more information on pod templates in Flyte.
