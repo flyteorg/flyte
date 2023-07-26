@@ -668,6 +668,9 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 		}
 		if pluginTrns.IsPreviouslyObserved() {
+			if !pluginTrns.pInfo.Phase().IsTerminal() {
+				logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+			}
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
 			return pluginTrns.FinalTransition(ctx)
 		}
@@ -755,8 +758,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	}
 
 	if !pluginTrns.pInfo.Phase().IsTerminal() {
-		eCtx := nCtx.ExecutionContext()
-		logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
+		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
 	}
 	return pluginTrns.FinalTransition(ctx)
 }
