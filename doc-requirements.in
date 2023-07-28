@@ -1,6 +1,14 @@
 codespell
 git+https://github.com/flyteorg/furo@main
+flytekit
+flytekitplugins-deck-standard
+flytekitplugins-kfpytorch
+flytekitplugins-sqlalchemy
+ipython!=8.7.0
 jupytext
+myst-nb
+plotly
+psycopg2-binary
 sphinx
 sphinx-prompt
 sphinx-code-include

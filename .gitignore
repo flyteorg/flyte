@@ -35,3 +35,4 @@ vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
 docs/_tags/
+docs/_repos/
