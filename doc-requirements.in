@@ -1,5 +1,6 @@
 codespell
 git+https://github.com/flyteorg/furo@main
+jupytext
 sphinx
 sphinx-prompt
 sphinx-code-include
