@@ -6,39 +6,39 @@ import (
 	"runtime/debug"
 	"time"
 
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	pluginMachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
+	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/golang/protobuf/ptypes"
+
 	regErrors "github.com/pkg/errors"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 )
 
 const pluginContextKey = contextutils.Key("plugin")
@@ -227,7 +227,7 @@ func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	return nil
 }
 
-func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
+func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error {
 	tSCtx := t.newSetupContext(sCtx)
 
 	// Create a new base resource negotiator
@@ -532,7 +532,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	return pluginTrns, nil
 }
 
-func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -553,6 +553,14 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	ts := nCtx.NodeStateReader().GetTaskNodeState()
 
 	pluginTrns := &pluginRequestedTransition{}
+	defer func() {
+		// increment parallelism if the final pluginTrns is not in a terminal state
+		if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+			eCtx := nCtx.ExecutionContext()
+			logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
+		}
+	}()
+
 	// We will start with the assumption that catalog is disabled
 	pluginTrns.PopulateCacheInfo(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil)))
 
@@ -763,7 +771,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	return pluginTrns.FinalTransition(ctx)
 }
 
-func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
 	currentPhase := taskNodeState.PluginPhase
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
@@ -829,7 +837,7 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 	return nil
 }
 
-func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	logger.Debugf(ctx, "Finalize invoked.")
 	ttype := nCtx.TaskReader().GetTaskType()
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())

@@ -28,15 +28,18 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	executorMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/dynamic/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 type dynamicNodeStateHolder struct {
 	s handler.DynamicNodeState
+}
+
+func (t *dynamicNodeStateHolder) ClearNodeStatus() {
 }
 
 func (t *dynamicNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
@@ -57,6 +60,10 @@ func (t *dynamicNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState)
 }
 
 func (t dynamicNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
+	panic("not implemented")
+}
+
+func (t dynamicNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
 	panic("not implemented")
 }
 
@@ -186,7 +193,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			}
 			h := &mocks.TaskNodeHandler{}
 			mockLPLauncher := &lpMocks.Reader{}
-			n := &executorMocks.Node{}
+			n := &nodeMocks.Node{}
 			if tt.args.isErr {
 				h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
 			} else {
@@ -300,7 +307,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
 		mockLPLauncher := &lpMocks.Reader{}
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
@@ -320,7 +327,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
 		mockLPLauncher := &lpMocks.Reader{}
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
@@ -546,7 +553,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 	}
 
 	type args struct {
-		s                executors.NodeStatus
+		s                interfaces.NodeStatus
 		isErr            bool
 		dj               *core.DynamicJobSpec
 		validErr         *io.ExecutionError
@@ -565,15 +572,15 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		want want
 	}{
 		{"error", args{isErr: true, dj: createDynamicJobSpec()}, want{isErr: true}},
-		{"success", args{s: executors.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true, validCacheStatus: &validCachePopulatedStatus}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting, info: execInfoWithTaskNodeMeta}},
-		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
-		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
-		{"failed", args{s: executors.NodeStatusFailed(&core.ExecutionError{}), dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"running", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"running-valid-err", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"queued", args{s: executors.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"success", args{s: interfaces.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true, validCacheStatus: &validCachePopulatedStatus}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting, info: execInfoWithTaskNodeMeta}},
+		{"complete-no-outputs", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"complete-valid-error-retryable", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
+		{"complete-valid-error", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
+		{"failed", args{s: interfaces.NodeStatusFailed(&core.ExecutionError{}), dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"running", args{s: interfaces.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"running-valid-err", args{s: interfaces.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"queued", args{s: interfaces.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -601,9 +608,9 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 				}
 				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(validCacheStatus, nil, nil)
 			}
-			n := &executorMocks.Node{}
+			n := &nodeMocks.Node{}
 			if tt.args.isErr {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executors.NodeStatusUndefined, fmt.Errorf("error"))
+				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
 			} else {
 				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
 			}
@@ -747,7 +754,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 	}
 
 	type args struct {
-		s               executors.NodeStatus
+		s               interfaces.NodeStatus
 		isErr           bool
 		dj              *core.DynamicJobSpec
 		validErr        *io.ExecutionError
@@ -764,15 +771,15 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		want want
 	}{
 		{"error", args{isErr: true, dj: createDynamicJobSpec()}, want{isErr: true}},
-		{"success", args{s: executors.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"failed", args{s: executors.NodeStatusFailed(&core.ExecutionError{}), dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"running", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"running-valid-err", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"queued", args{s: executors.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"success", args{s: interfaces.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete-no-outputs", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"complete-valid-error-retryable", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"complete-valid-error", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"failed", args{s: interfaces.NodeStatusFailed(&core.ExecutionError{}), dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"running", args{s: interfaces.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"running-valid-err", args{s: interfaces.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"queued", args{s: interfaces.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -792,9 +799,9 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			} else {
 				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
 			}
-			n := &executorMocks.Node{}
+			n := &nodeMocks.Node{}
 			if tt.args.isErr {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executors.NodeStatusUndefined, fmt.Errorf("error"))
+				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
 			} else {
 				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
 			}
@@ -876,7 +883,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
@@ -1007,7 +1014,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
@@ -1028,7 +1035,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(fmt.Errorf("err"))
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))
@@ -1049,7 +1056,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
-		n := &executorMocks.Node{}
+		n := &nodeMocks.Node{}
 		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))

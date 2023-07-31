@@ -6,22 +6,89 @@ import (
 	"strconv"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/storage"
-	"k8s.io/apimachinery/pkg/types"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/flyteorg/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	nodeerrors "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
+
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/pkg/errors"
+
+	"k8s.io/apimachinery/pkg/types"
 )
 
 const NodeIDLabel = "node-id"
 const TaskNameLabel = "task-name"
 const NodeInterruptibleLabel = "interruptible"
+
+type eventRecorder struct {
+	taskEventRecorder events.TaskEventRecorder
+	nodeEventRecorder events.NodeEventRecorder
+}
+
+func (e eventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+	if err := e.taskEventRecorder.RecordTaskEvent(ctx, ev, eventConfig); err != nil {
+		if eventsErr.IsAlreadyExists(err) {
+			logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.Phase)
+			return nil
+		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
+			if IsTerminalTaskPhase(ev.Phase) {
+				// Event is terminal and the stored value in flyteadmin is already terminal. This implies aborted case. So ignoring
+				logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.Phase)
+				return nil
+			}
+			logger.Warningf(ctx, "Failed to record taskEvent in state: %s, error: %s", ev.Phase, err)
+			return errors.Wrapf(err, "failed to record task event, as it already exists in terminal state. Event state: %s", ev.Phase)
+		}
+		return err
+	}
+	return nil
+}
+
+func (e eventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+	if nodeEvent == nil {
+		return fmt.Errorf("event recording attempt of Nil Node execution event")
+	}
+
+	if nodeEvent.Id == nil {
+		return fmt.Errorf("event recording attempt of with nil node Event ID")
+	}
+
+	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.Phase.String())
+	err := e.nodeEventRecorder.RecordNodeEvent(ctx, nodeEvent, eventConfig)
+	if err != nil {
+		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
+			return nil
+		}
+
+		if eventsErr.IsAlreadyExists(err) {
+			logger.Infof(ctx, "Node event phase: %s, nodeId %s already exist",
+				nodeEvent.Phase.String(), nodeEvent.GetId().NodeId)
+			return nil
+		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
+			if IsTerminalNodePhase(nodeEvent.Phase) {
+				// Event was trying to record a different terminal phase for an already terminal event. ignoring.
+				logger.Infof(ctx, "Node event phase: %s, nodeId %s already in terminal phase. err: %s",
+					nodeEvent.Phase.String(), nodeEvent.GetId().NodeId, err.Error())
+				return nil
+			}
+			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
+			return nodeerrors.Wrapf(nodeerrors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mis-match mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
+		}
+	}
+	return err
+}
 
 type nodeExecMetadata struct {
 	v1alpha1.Meta
@@ -57,9 +124,9 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 
 type nodeExecContext struct {
 	store               *storage.DataStore
-	tr                  handler.TaskReader
-	md                  handler.NodeExecutionMetadata
-	er                  events.TaskEventRecorder
+	tr                  interfaces.TaskReader
+	md                  interfaces.NodeExecutionMetadata
+	eventRecorder       interfaces.EventRecorder
 	inputs              io.InputReader
 	node                v1alpha1.ExecutableNode
 	nodeStatus          v1alpha1.ExecutableNodeStatus
@@ -92,15 +159,15 @@ func (e nodeExecContext) EnqueueOwnerFunc() func() error {
 	return e.enqueueOwner
 }
 
-func (e nodeExecContext) TaskReader() handler.TaskReader {
+func (e nodeExecContext) TaskReader() interfaces.TaskReader {
 	return e.tr
 }
 
-func (e nodeExecContext) NodeStateReader() handler.NodeStateReader {
+func (e nodeExecContext) NodeStateReader() interfaces.NodeStateReader {
 	return e.nsm
 }
 
-func (e nodeExecContext) NodeStateWriter() handler.NodeStateWriter {
+func (e nodeExecContext) NodeStateWriter() interfaces.NodeStateWriter {
 	return e.nsm
 }
 
@@ -112,8 +179,8 @@ func (e nodeExecContext) InputReader() io.InputReader {
 	return e.inputs
 }
 
-func (e nodeExecContext) EventsRecorder() events.TaskEventRecorder {
-	return e.er
+func (e nodeExecContext) EventsRecorder() interfaces.EventRecorder {
+	return e.eventRecorder
 }
 
 func (e nodeExecContext) NodeID() v1alpha1.NodeID {
@@ -132,7 +199,7 @@ func (e nodeExecContext) NodeStatus() v1alpha1.ExecutableNodeStatus {
 	return e.nodeStatus
 }
 
-func (e nodeExecContext) NodeExecutionMetadata() handler.NodeExecutionMetadata {
+func (e nodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadata {
 	return e.md
 }
 
@@ -142,7 +209,7 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold uint32,
-	maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager,
+	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
 	md := nodeExecMetadata{
@@ -168,12 +235,15 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	md.nodeLabels = nodeLabels
 
 	return &nodeExecContext{
-		md:                  md,
-		store:               store,
-		node:                node,
-		nodeStatus:          nodeStatus,
-		inputs:              inputs,
-		er:                  er,
+		md:         md,
+		store:      store,
+		node:       node,
+		nodeStatus: nodeStatus,
+		inputs:     inputs,
+		eventRecorder: &eventRecorder{
+			taskEventRecorder: taskEventRecorder,
+			nodeEventRecorder: nodeEventRecorder,
+		},
 		maxDatasetSizeBytes: maxDatasetSize,
 		tr:                  tr,
 		nsm:                 nsm,
@@ -185,14 +255,14 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	}
 }
 
-func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNodeID v1alpha1.NodeID,
-	executionContext executors.ExecutionContext, nl executors.NodeLookup) (*nodeExecContext, error) {
+func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
+	nl executors.NodeLookup, currentNodeID v1alpha1.NodeID) (interfaces.NodeExecutionContext, error) {
 	n, ok := nl.GetNode(currentNodeID)
 	if !ok {
 		return nil, fmt.Errorf("failed to find node with ID [%s] in execution [%s]", currentNodeID, executionContext.GetID())
 	}
 
-	var tr handler.TaskReader
+	var tr interfaces.TaskReader
 	if n.GetKind() == v1alpha1.NodeKindTask {
 		if n.GetTaskID() == nil {
 			return nil, fmt.Errorf("bad state, no task-id defined for node [%s]", n.GetID())
@@ -243,7 +313,8 @@ func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNod
 		interruptible,
 		c.interruptibleFailureThreshold,
 		c.maxDatasetSizeBytes,
-		&taskEventRecorder{TaskEventRecorder: c.taskRecorder},
+		c.taskRecorder,
+		c.nodeRecorder,
 		tr,
 		newNodeStateManager(ctx, s),
 		workflowEnqueuer,

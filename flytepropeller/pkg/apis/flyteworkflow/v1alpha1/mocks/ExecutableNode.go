@@ -51,6 +51,40 @@ func (_m *ExecutableNode) GetActiveDeadline() *time.Duration {
 	return r0
 }
 
+type ExecutableNode_GetArrayNode struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetArrayNode) Return(_a0 v1alpha1.ExecutableArrayNode) *ExecutableNode_GetArrayNode {
+	return &ExecutableNode_GetArrayNode{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetArrayNode() *ExecutableNode_GetArrayNode {
+	c_call := _m.On("GetArrayNode")
+	return &ExecutableNode_GetArrayNode{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetArrayNodeMatch(matchers ...interface{}) *ExecutableNode_GetArrayNode {
+	c_call := _m.On("GetArrayNode", matchers...)
+	return &ExecutableNode_GetArrayNode{Call: c_call}
+}
+
+// GetArrayNode provides a mock function with given fields:
+func (_m *ExecutableNode) GetArrayNode() v1alpha1.ExecutableArrayNode {
+	ret := _m.Called()
+
+	var r0 v1alpha1.ExecutableArrayNode
+	if rf, ok := ret.Get(0).(func() v1alpha1.ExecutableArrayNode); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.ExecutableArrayNode)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetBranchNode struct {
 	*mock.Call
 }

@@ -10,9 +10,6 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-	mocks2 "github.com/flyteorg/flytepropeller/events/mocks"
-
-	"github.com/flyteorg/flytepropeller/events"
 
 	pluginK8sMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 
@@ -49,7 +46,8 @@ import (
 	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/fakeplugins"
@@ -352,17 +350,24 @@ func Test_task_ResolvePlugin(t *testing.T) {
 	}
 }
 
-type fakeBufferedTaskEventRecorder struct {
+type fakeBufferedEventRecorder struct {
 	evs []*event.TaskExecutionEvent
 }
 
-func (f *fakeBufferedTaskEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *controllerConfig.EventConfig) error {
+func (f *fakeBufferedEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *controllerConfig.EventConfig) error {
 	f.evs = append(f.evs, ev)
+	return nil
+}
+
+func (f *fakeBufferedEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeExecutionEvent, eventConfig *controllerConfig.EventConfig) error {
 	return nil
 }
 
 type taskNodeStateHolder struct {
 	s handler.TaskNodeState
+}
+
+func (t *taskNodeStateHolder) ClearNodeStatus() {
 }
 
 func (t *taskNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
@@ -386,6 +391,10 @@ func (t taskNodeStateHolder) PutGateNodeState(s handler.GateNodeState) error {
 	panic("not implemented")
 }
 
+func (t taskNodeStateHolder) PutArrayNodeState(s handler.ArrayNodeState) error {
+	panic("not implemented")
+}
+
 func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) resourcemanager.BaseResourceManager {
 	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(ctx, rmConfig.TypeNoop, scope)
 	rm, _ := rmBuilder.BuildResourceManager(ctx)
@@ -399,7 +408,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 			"foo": coreutils.MustMakeLiteral("bar"),
 		},
 	}
-	createNodeContext := func(pluginPhase pluginCore.Phase, pluginVer uint32, pluginResp fakeplugins.NextPhaseState, recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, allowIncrementParallelism bool) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(pluginPhase pluginCore.Phase, pluginVer uint32, pluginResp fakeplugins.NextPhaseState, recorder interfaces.EventRecorder, ttype string, s *taskNodeStateHolder, allowIncrementParallelism bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -690,7 +699,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
-			ev := &fakeBufferedTaskEventRecorder{}
+			ev := &fakeBufferedEventRecorder{}
 			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
@@ -758,7 +767,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 
 func Test_task_Handle_Catalog(t *testing.T) {
 
-	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(recorder interfaces.EventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -950,7 +959,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
-			ev := &fakeBufferedTaskEventRecorder{}
+			ev := &fakeBufferedEventRecorder{}
 			nCtx := createNodeContext(ev, "test", state, tt.args.catalogSkip)
 			c := &pluginCatalogMocks.Client{}
 			if tt.args.catalogFetch {
@@ -1018,7 +1027,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 
 func Test_task_Handle_Reservation(t *testing.T) {
 
-	createNodeContext := func(recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(recorder interfaces.EventRecorder, ttype string, s *taskNodeStateHolder, overwriteCache bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1206,7 +1215,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
-			ev := &fakeBufferedTaskEventRecorder{}
+			ev := &fakeBufferedEventRecorder{}
 			nCtx := createNodeContext(ev, "test", state, tt.args.catalogSkip)
 			c := &pluginCatalogMocks.Client{}
 			nr := &nodeMocks.NodeStateReader{}
@@ -1269,7 +1278,7 @@ func Test_task_Handle_Reservation(t *testing.T) {
 }
 
 func Test_task_Abort(t *testing.T) {
-	createNodeCtx := func(ev events.TaskEventRecorder) *nodeMocks.NodeExecutionContext {
+	createNodeCtx := func(ev interfaces.EventRecorder) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1355,7 +1364,7 @@ func Test_task_Abort(t *testing.T) {
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 
-	incompatibleClusterEventsRecorder := mocks2.TaskEventRecorder{}
+	incompatibleClusterEventsRecorder := nodeMocks.EventRecorder{}
 	incompatibleClusterEventsRecorder.OnRecordTaskEventMatch(mock.Anything, mock.Anything, mock.Anything).Return(
 		&eventsErr.EventError{
 			Code: eventsErr.EventIncompatibleCusterError,
@@ -1365,7 +1374,7 @@ func Test_task_Abort(t *testing.T) {
 		defaultPluginCallback func() pluginCore.Plugin
 	}
 	type args struct {
-		ev events.TaskEventRecorder
+		ev interfaces.EventRecorder
 	}
 	tests := []struct {
 		name        string
@@ -1391,7 +1400,7 @@ func Test_task_Abort(t *testing.T) {
 			p.OnGetProperties().Return(pluginCore.PluginProperties{})
 			p.On("Abort", mock.Anything, mock.Anything).Return(nil)
 			return p
-		}}, args{ev: &fakeBufferedTaskEventRecorder{}}, false, true},
+		}}, args{ev: &fakeBufferedEventRecorder{}}, false, true},
 		{"abort-swallows-incompatible-cluster-err", fields{defaultPluginCallback: func() pluginCore.Plugin {
 			p := &pluginCoreMocks.Plugin{}
 			p.On("GetID").Return("id")
@@ -1416,10 +1425,10 @@ func Test_task_Abort(t *testing.T) {
 				c = 1
 				if !tt.wantErr {
 					switch tt.args.ev.(type) {
-					case *fakeBufferedTaskEventRecorder:
-						assert.Len(t, tt.args.ev.(*fakeBufferedTaskEventRecorder).evs, 1)
-					case *mocks2.TaskEventRecorder:
-						assert.Len(t, tt.args.ev.(*mocks2.TaskEventRecorder).Calls, 1)
+					case *fakeBufferedEventRecorder:
+						assert.Len(t, tt.args.ev.(*fakeBufferedEventRecorder).evs, 1)
+					case *nodeMocks.EventRecorder:
+						assert.Len(t, tt.args.ev.(*nodeMocks.EventRecorder).Calls, 1)
 					}
 				}
 			}
@@ -1431,7 +1440,7 @@ func Test_task_Abort(t *testing.T) {
 }
 
 func Test_task_Abort_v1(t *testing.T) {
-	createNodeCtx := func(ev events.TaskEventRecorder) *nodeMocks.NodeExecutionContext {
+	createNodeCtx := func(ev interfaces.EventRecorder) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1517,7 +1526,7 @@ func Test_task_Abort_v1(t *testing.T) {
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 
-	incompatibleClusterEventsRecorder := mocks2.TaskEventRecorder{}
+	incompatibleClusterEventsRecorder := nodeMocks.EventRecorder{}
 	incompatibleClusterEventsRecorder.OnRecordTaskEventMatch(mock.Anything, mock.Anything, mock.Anything).Return(
 		&eventsErr.EventError{
 			Code: eventsErr.EventIncompatibleCusterError,
@@ -1527,7 +1536,7 @@ func Test_task_Abort_v1(t *testing.T) {
 		defaultPluginCallback func() pluginCore.Plugin
 	}
 	type args struct {
-		ev events.TaskEventRecorder
+		ev interfaces.EventRecorder
 	}
 	tests := []struct {
 		name        string
@@ -1553,7 +1562,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			p.OnGetProperties().Return(pluginCore.PluginProperties{})
 			p.On("Abort", mock.Anything, mock.Anything).Return(nil)
 			return p
-		}}, args{ev: &fakeBufferedTaskEventRecorder{}}, false, true},
+		}}, args{ev: &fakeBufferedEventRecorder{}}, false, true},
 		{"abort-swallows-incompatible-cluster-err", fields{defaultPluginCallback: func() pluginCore.Plugin {
 			p := &pluginCoreMocks.Plugin{}
 			p.On("GetID").Return("id")
@@ -1578,10 +1587,10 @@ func Test_task_Abort_v1(t *testing.T) {
 				c = 1
 				if !tt.wantErr {
 					switch tt.args.ev.(type) {
-					case *fakeBufferedTaskEventRecorder:
-						assert.Len(t, tt.args.ev.(*fakeBufferedTaskEventRecorder).evs, 1)
-					case *mocks2.TaskEventRecorder:
-						assert.Len(t, tt.args.ev.(*mocks2.TaskEventRecorder).Calls, 1)
+					case *fakeBufferedEventRecorder:
+						assert.Len(t, tt.args.ev.(*fakeBufferedEventRecorder).evs, 1)
+					case *nodeMocks.EventRecorder:
+						assert.Len(t, tt.args.ev.(*nodeMocks.EventRecorder).Calls, 1)
 					}
 				}
 			}

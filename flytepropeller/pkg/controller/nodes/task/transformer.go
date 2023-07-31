@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 
 	"github.com/golang/protobuf/ptypes"
 	timestamppb "github.com/golang/protobuf/ptypes/timestamp"
@@ -75,7 +76,7 @@ type ToTaskExecutionEventInputs struct {
 	EventConfig           *config.EventConfig
 	OutputWriter          io.OutputFilePaths
 	Info                  pluginCore.PhaseInfo
-	NodeExecutionMetadata handler.NodeExecutionMetadata
+	NodeExecutionMetadata interfaces.NodeExecutionMetadata
 	ExecContext           executors.ExecutionContext
 	TaskType              string
 	PluginID              string
@@ -185,7 +186,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 	return tev, nil
 }
 
-func GetTaskExecutionIdentifier(nCtx handler.NodeExecutionContext) *core.TaskExecutionIdentifier {
+func GetTaskExecutionIdentifier(nCtx interfaces.NodeExecutionContext) *core.TaskExecutionIdentifier {
 	return &core.TaskExecutionIdentifier{
 		TaskId:          nCtx.TaskReader().GetTaskID(),
 		RetryAttempt:    nCtx.CurrentAttempt(),

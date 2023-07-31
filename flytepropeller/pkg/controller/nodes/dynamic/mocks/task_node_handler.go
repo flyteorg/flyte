@@ -9,6 +9,8 @@ import (
 
 	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 
+	interfaces "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
 	io "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
 	ioutils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -31,7 +33,7 @@ func (_m TaskNodeHandler_Abort) Return(_a0 error) *TaskNodeHandler_Abort {
 	return &TaskNodeHandler_Abort{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskNodeHandler) OnAbort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) *TaskNodeHandler_Abort {
+func (_m *TaskNodeHandler) OnAbort(ctx context.Context, executionContext interfaces.NodeExecutionContext, reason string) *TaskNodeHandler_Abort {
 	c_call := _m.On("Abort", ctx, executionContext, reason)
 	return &TaskNodeHandler_Abort{Call: c_call}
 }
@@ -42,11 +44,11 @@ func (_m *TaskNodeHandler) OnAbortMatch(matchers ...interface{}) *TaskNodeHandle
 }
 
 // Abort provides a mock function with given fields: ctx, executionContext, reason
-func (_m *TaskNodeHandler) Abort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) error {
+func (_m *TaskNodeHandler) Abort(ctx context.Context, executionContext interfaces.NodeExecutionContext, reason string) error {
 	ret := _m.Called(ctx, executionContext, reason)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, handler.NodeExecutionContext, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext, string) error); ok {
 		r0 = rf(ctx, executionContext, reason)
 	} else {
 		r0 = ret.Error(0)
@@ -63,7 +65,7 @@ func (_m TaskNodeHandler_Finalize) Return(_a0 error) *TaskNodeHandler_Finalize {
 	return &TaskNodeHandler_Finalize{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskNodeHandler) OnFinalize(ctx context.Context, executionContext handler.NodeExecutionContext) *TaskNodeHandler_Finalize {
+func (_m *TaskNodeHandler) OnFinalize(ctx context.Context, executionContext interfaces.NodeExecutionContext) *TaskNodeHandler_Finalize {
 	c_call := _m.On("Finalize", ctx, executionContext)
 	return &TaskNodeHandler_Finalize{Call: c_call}
 }
@@ -74,11 +76,11 @@ func (_m *TaskNodeHandler) OnFinalizeMatch(matchers ...interface{}) *TaskNodeHan
 }
 
 // Finalize provides a mock function with given fields: ctx, executionContext
-func (_m *TaskNodeHandler) Finalize(ctx context.Context, executionContext handler.NodeExecutionContext) error {
+func (_m *TaskNodeHandler) Finalize(ctx context.Context, executionContext interfaces.NodeExecutionContext) error {
 	ret := _m.Called(ctx, executionContext)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, handler.NodeExecutionContext) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext) error); ok {
 		r0 = rf(ctx, executionContext)
 	} else {
 		r0 = ret.Error(0)
@@ -127,7 +129,7 @@ func (_m TaskNodeHandler_Handle) Return(_a0 handler.Transition, _a1 error) *Task
 	return &TaskNodeHandler_Handle{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *TaskNodeHandler) OnHandle(ctx context.Context, executionContext handler.NodeExecutionContext) *TaskNodeHandler_Handle {
+func (_m *TaskNodeHandler) OnHandle(ctx context.Context, executionContext interfaces.NodeExecutionContext) *TaskNodeHandler_Handle {
 	c_call := _m.On("Handle", ctx, executionContext)
 	return &TaskNodeHandler_Handle{Call: c_call}
 }
@@ -138,18 +140,18 @@ func (_m *TaskNodeHandler) OnHandleMatch(matchers ...interface{}) *TaskNodeHandl
 }
 
 // Handle provides a mock function with given fields: ctx, executionContext
-func (_m *TaskNodeHandler) Handle(ctx context.Context, executionContext handler.NodeExecutionContext) (handler.Transition, error) {
+func (_m *TaskNodeHandler) Handle(ctx context.Context, executionContext interfaces.NodeExecutionContext) (handler.Transition, error) {
 	ret := _m.Called(ctx, executionContext)
 
 	var r0 handler.Transition
-	if rf, ok := ret.Get(0).(func(context.Context, handler.NodeExecutionContext) handler.Transition); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext) handler.Transition); ok {
 		r0 = rf(ctx, executionContext)
 	} else {
 		r0 = ret.Get(0).(handler.Transition)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, handler.NodeExecutionContext) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, interfaces.NodeExecutionContext) error); ok {
 		r1 = rf(ctx, executionContext)
 	} else {
 		r1 = ret.Error(1)
@@ -166,7 +168,7 @@ func (_m TaskNodeHandler_Setup) Return(_a0 error) *TaskNodeHandler_Setup {
 	return &TaskNodeHandler_Setup{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskNodeHandler) OnSetup(ctx context.Context, setupContext handler.SetupContext) *TaskNodeHandler_Setup {
+func (_m *TaskNodeHandler) OnSetup(ctx context.Context, setupContext interfaces.SetupContext) *TaskNodeHandler_Setup {
 	c_call := _m.On("Setup", ctx, setupContext)
 	return &TaskNodeHandler_Setup{Call: c_call}
 }
@@ -177,11 +179,11 @@ func (_m *TaskNodeHandler) OnSetupMatch(matchers ...interface{}) *TaskNodeHandle
 }
 
 // Setup provides a mock function with given fields: ctx, setupContext
-func (_m *TaskNodeHandler) Setup(ctx context.Context, setupContext handler.SetupContext) error {
+func (_m *TaskNodeHandler) Setup(ctx context.Context, setupContext interfaces.SetupContext) error {
 	ret := _m.Called(ctx, setupContext)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, handler.SetupContext) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.SetupContext) error); ok {
 		r0 = rf(ctx, setupContext)
 	} else {
 		r0 = ret.Error(0)

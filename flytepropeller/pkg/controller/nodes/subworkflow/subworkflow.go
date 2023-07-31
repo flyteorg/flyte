@@ -4,28 +4,28 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 // Subworkflow handler handles inline subWorkflows
 type subworkflowHandler struct {
-	nodeExecutor executors.Node
+	nodeExecutor interfaces.Node
 	eventConfig  *config.EventConfig
 }
 
 // Helper method that extracts the SubWorkflow from the ExecutionContext
-func GetSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (v1alpha1.ExecutableSubWorkflow, error) {
+func GetSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (v1alpha1.ExecutableSubWorkflow, error) {
 	node := nCtx.Node()
 	subID := *node.GetWorkflowNode().GetSubWorkflowRef()
 	subWorkflow := nCtx.ExecutionContext().FindSubWorkflow(subID)
@@ -36,7 +36,7 @@ func GetSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (v1a
 }
 
 // Performs an additional step of passing in and setting the inputs, before handling the execution of a SubWorkflow.
-func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext, subWorkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
+func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subWorkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
 	nodeInputs, err := nCtx.InputReader().Get(ctx)
@@ -63,7 +63,7 @@ func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx
 }
 
 // Calls the recursive node executor to handle the SubWorkflow and translates the results after the success
-func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
+func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	// The current node would end up becoming the parent for the sub workflow nodes.
 	// This is done to track the lineage. For level zero, the CreateParentInfo will return nil
 	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
@@ -135,7 +135,7 @@ func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx handler
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
-func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx handler.NodeExecutionContext) (executors.ExecutionContext, error) {
+func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExecutionContext) (executors.ExecutionContext, error) {
 	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
 	if err != nil {
 		return nil, err
@@ -143,7 +143,7 @@ func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx handler.NodeE
 	return executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), nil
 }
 
-func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
+func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
 	if subworkflow.GetOnFailureNode() != nil {
 		execContext, err := s.getExecutionContextForDownstream(nCtx)
@@ -155,7 +155,7 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}
 
-		if state.NodePhase == executors.NodePhaseRunning {
+		if state.NodePhase == interfaces.NodePhaseRunning {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 		}
 
@@ -185,7 +185,7 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 		originalError, nil)), nil
 }
 
-func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	subWorkflow, err := GetSubWorkflow(ctx, nCtx)
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.SubWorkflowExecutionFailed, err.Error(), nil)), nil
@@ -213,7 +213,7 @@ func (s *subworkflowHandler) HandleFailingSubWorkflow(ctx context.Context, nCtx 
 	return s.HandleFailureNodeOfSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
-func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	subWorkflow, err := GetSubWorkflow(ctx, nCtx)
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.SubWorkflowExecutionFailed, err.Error(), nil)), nil
@@ -226,7 +226,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 	return s.startAndHandleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
-func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	subWorkflow, err := GetSubWorkflow(ctx, nCtx)
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.SubWorkflowExecutionFailed, err.Error(), nil)), nil
@@ -237,7 +237,7 @@ func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx ha
 	return s.handleSubWorkflow(ctx, nCtx, subWorkflow, nodeLookup)
 }
 
-func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	subWorkflow, err := GetSubWorkflow(ctx, nCtx)
 	if err != nil {
 		return err
@@ -251,7 +251,7 @@ func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeE
 	return s.nodeExecutor.AbortHandler(ctx, execContext, subWorkflow, nodeLookup, subWorkflow.StartNode(), reason)
 }
 
-func newSubworkflowHandler(nodeExecutor executors.Node, eventConfig *config.EventConfig) subworkflowHandler {
+func newSubworkflowHandler(nodeExecutor interfaces.Node, eventConfig *config.EventConfig) subworkflowHandler {
 	return subworkflowHandler{
 		nodeExecutor: nodeExecutor,
 		eventConfig:  eventConfig,

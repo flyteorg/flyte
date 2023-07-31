@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type launchPlanHandler struct {
@@ -28,7 +28,7 @@ type launchPlanHandler struct {
 	eventConfig    *config.EventConfig
 }
 
-func getParentNodeExecutionID(nCtx handler.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {
+func getParentNodeExecutionID(nCtx interfaces.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {
 	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
 	}
@@ -45,7 +45,7 @@ func getParentNodeExecutionID(nCtx handler.NodeExecutionContext) (*core.NodeExec
 	return nodeExecID, nil
 }
 
-func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	nodeInputs, err := nCtx.InputReader().Get(ctx)
 	if err != nil {
 		errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
@@ -125,7 +125,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	})), nil
 }
 
-func GetChildWorkflowExecutionIDForExecution(parentNodeExecID *core.NodeExecutionIdentifier, nCtx handler.NodeExecutionContext) (*core.WorkflowExecutionIdentifier, error) {
+func GetChildWorkflowExecutionIDForExecution(parentNodeExecID *core.NodeExecutionIdentifier, nCtx interfaces.NodeExecutionContext) (*core.WorkflowExecutionIdentifier, error) {
 	// Handle launch plan
 	if nCtx.ExecutionContext().GetDefinitionVersion() == v1alpha1.WorkflowDefinitionVersion0 {
 		return GetChildWorkflowExecutionID(
@@ -140,7 +140,7 @@ func GetChildWorkflowExecutionIDForExecution(parentNodeExecID *core.NodeExecutio
 	)
 }
 
-func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
 	if err != nil {
 		return handler.UnknownTransition, err
@@ -218,7 +218,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
-func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
 	if err != nil {
 		return err

@@ -19,7 +19,7 @@ const (
 const currentCodec = GobCodecVersion
 
 // TODO Configurable?
-const maxPluginStateSizeBytes = 256
+const MaxPluginStateSizeBytes = 256
 
 type stateCodec interface {
 	Encode(interface{}, io.Writer) error
@@ -38,7 +38,7 @@ type pluginStateManager struct {
 func (p *pluginStateManager) Put(stateVersion uint8, v interface{}) error {
 	p.newStateVersion = stateVersion
 	if v != nil {
-		buf := make([]byte, 0, maxPluginStateSizeBytes)
+		buf := make([]byte, 0, MaxPluginStateSizeBytes)
 		p.newState = bytes.NewBuffer(buf)
 		return p.codec.Encode(v, p.newState)
 	}

@@ -13,7 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-const maxErrorMessageLength = 104857600 //100KB
+const MaxErrorMessageLength = 104857600 //100KB
 const truncationIndicator = "... <Message Truncated> ..."
 
 type recordingMetrics struct {
@@ -60,7 +60,7 @@ func (r *eventRecorder) sinkEvent(ctx context.Context, event proto.Message) erro
 
 func (r *eventRecorder) RecordNodeEvent(ctx context.Context, e *event.NodeExecutionEvent) error {
 	if err, ok := e.GetOutputResult().(*event.NodeExecutionEvent_Error); ok {
-		truncateErrorMessage(err.Error, maxErrorMessageLength)
+		truncateErrorMessage(err.Error, MaxErrorMessageLength)
 	}
 
 	return r.sinkEvent(ctx, e)
@@ -68,7 +68,7 @@ func (r *eventRecorder) RecordNodeEvent(ctx context.Context, e *event.NodeExecut
 
 func (r *eventRecorder) RecordTaskEvent(ctx context.Context, e *event.TaskExecutionEvent) error {
 	if err, ok := e.GetOutputResult().(*event.TaskExecutionEvent_Error); ok {
-		truncateErrorMessage(err.Error, maxErrorMessageLength)
+		truncateErrorMessage(err.Error, MaxErrorMessageLength)
 	}
 
 	return r.sinkEvent(ctx, e)
@@ -76,7 +76,7 @@ func (r *eventRecorder) RecordTaskEvent(ctx context.Context, e *event.TaskExecut
 
 func (r *eventRecorder) RecordWorkflowEvent(ctx context.Context, e *event.WorkflowExecutionEvent) error {
 	if err, ok := e.GetOutputResult().(*event.WorkflowExecutionEvent_Error); ok {
-		truncateErrorMessage(err.Error, maxErrorMessageLength)
+		truncateErrorMessage(err.Error, MaxErrorMessageLength)
 	}
 
 	return r.sinkEvent(ctx, e)

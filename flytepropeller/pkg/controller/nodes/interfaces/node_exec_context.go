@@ -1,20 +1,21 @@
-package handler
+package interfaces
 
 import (
 	"context"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/flyteorg/flytepropeller/events"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+
+	"github.com/flyteorg/flytestdlib/storage"
+
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type TaskReader interface {
@@ -23,10 +24,9 @@ type TaskReader interface {
 	GetTaskID() *core.Identifier
 }
 
-type SetupContext interface {
-	EnqueueOwner() func(string)
-	OwnerKind() string
-	MetricsScope() promutils.Scope
+type EventRecorder interface {
+	events.TaskEventRecorder
+	events.NodeEventRecorder
 }
 
 type NodeExecutionMetadata interface {
@@ -54,7 +54,8 @@ type NodeExecutionContext interface {
 
 	DataStore() *storage.DataStore
 	InputReader() io.InputReader
-	EventsRecorder() events.TaskEventRecorder
+	//EventsRecorder() events.TaskEventRecorder
+	EventsRecorder() EventRecorder
 	NodeID() v1alpha1.NodeID
 	Node() v1alpha1.ExecutableNode
 	CurrentAttempt() uint32

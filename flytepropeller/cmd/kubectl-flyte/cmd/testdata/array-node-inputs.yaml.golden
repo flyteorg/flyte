@@ -1,0 +1,13 @@
+literals:
+  "x":
+    collection:
+      literals:
+      - scalar:
+          primitive:
+            integer: "1"
+      - scalar:
+          primitive:
+            integer: "2"
+      - scalar:
+          primitive:
+            integer: "3"

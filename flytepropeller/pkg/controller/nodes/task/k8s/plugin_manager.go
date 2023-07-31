@@ -185,7 +185,6 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 }
 
 func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
-
 	tmpl, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return pluginsCore.Transition{}, err
@@ -253,7 +252,6 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 }
 
 func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s.PluginState) (pluginsCore.Transition, error) {
-
 	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)

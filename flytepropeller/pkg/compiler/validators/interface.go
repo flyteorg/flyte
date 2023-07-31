@@ -153,6 +153,14 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 		} else {
 			errs.Collect(errors.NewNoConditionFound(node.GetId()))
 		}
+	case *core.Node_ArrayNode:
+		arrayNode := node.GetArrayNode()
+		underlyingNodeBuilder := w.GetOrCreateNodeBuilder(arrayNode.Node)
+		if underlyingIface, ok := ValidateUnderlyingInterface(w, underlyingNodeBuilder, errs.NewScope()); ok {
+			// ArrayNode interface should be inferred from the underlying node interface. flytekit
+			// will correct wrap variables in collections as needed, leaving partials as is.
+			iface = underlyingIface
+		}
 	default:
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Target"))
 	}
