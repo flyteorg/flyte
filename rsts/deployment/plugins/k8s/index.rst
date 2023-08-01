@@ -282,10 +282,12 @@ Install the Kubernetes operator
     simultaneously, reducing the likelihood of job failures caused by timeout errors.
     
     To `enable gang scheduling for the Kubeflow training-operator <https://www.kubeflow.org/docs/components/training/job-scheduling/>`__,
-    follow these steps:
+    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`__
+    or the `Apache YuniKorn scheduler <https://yunikorn.apache.org/>`__.
 
-    1. Install the `scheduler plugin as a second scheduler <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`__.
-    2. Configure the Kubeflow training-operator to utilize the new scheduler:
+    1. Install the `scheduler plugin <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_ or
+       `Apache YuniKorn <https://yunikorn.apache.org/docs/next/#install>`_ as a second scheduler.
+    2. Configure the Kubeflow training-operator to use the new scheduler:
 
         Create a manifest called ``kustomization.yaml`` with the following content:
 
@@ -315,7 +317,7 @@ Install the Kubernetes operator
                 - name: training-operator
                   command:
                   - /manager
-                  - --gang-scheduler-name=scheduler-plugins
+                  - --gang-scheduler-name=<scheduler-plugins/yunikorn>
 
         Install the patched kustomization with the following command:
 
@@ -323,8 +325,26 @@ Install the Kubernetes operator
 
           kustomize build path/to/overlay/directory | kubectl apply -f -
 
-    3. To utilize the new gang scheduler for your tasks, 
-       use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``.
+       (Only for Apache YuniKorn) To configure gang scheduling with Apache YuniKorn,
+       make sure to set the following annotations in Flyte pod templates:
+
+       - ``template.metadata.annotations.yunikorn.apache.org/task-group-name``
+       - ``template.metadata.annotations.yunikorn.apache.org/task-groups``
+       - ``template.metadata.annotations.yunikorn.apache.org/schedulingPolicyParameters``
+
+       For more configuration details,
+       refer to the `Apache YuniKorn Gang-Scheduling documentation 
+       <https://yunikorn.apache.org/docs/next/user_guide/gang_scheduling>`__.
+
+    3. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
+       to use the new gang scheduler for your tasks.
+      
+       See the :ref:`using-k8s-podtemplates` section for more information on pod templates in Flyte.
+       You can set the scheduler name in the pod template passed to the ``@task`` decorator. However, to prevent the
+       two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
+       in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
+       gang scheduler as well.
+
 
        For more information on pod templates in Flyte, refer to the :ref:`using-k8s-podtemplates` section.
        You can set the scheduler name in the pod template passed to the ``@task`` decorator.

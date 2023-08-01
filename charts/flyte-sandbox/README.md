@@ -25,8 +25,6 @@ A Helm chart for the Flyte local sandbox
 | docker-registry.service.nodePort | int | `30000` |  |
 | docker-registry.service.type | string | `"NodePort"` |  |
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
-| flyte-binary.configuration.agentService.defaultGrpcEndpoint | string | `"flyte-sandbox-http.flyte.svc.cluster.local:8000"` |  |
-| flyte-binary.configuration.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
 | flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
@@ -94,9 +92,12 @@ A Helm chart for the Flyte local sandbox
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
+| sandbox.buildkit.enabled | bool | `true` |  |
+| sandbox.buildkit.image.pullPolicy | string | `"Never"` |  |
+| sandbox.buildkit.image.repository | string | `"moby/buildkit"` |  |
+| sandbox.buildkit.image.tag | string | `"sandbox"` |  |
 | sandbox.dev | bool | `false` |  |
 | sandbox.proxy.enabled | bool | `true` |  |
 | sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
 | sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
 | sandbox.proxy.image.tag | string | `"sandbox"` |  |
-
