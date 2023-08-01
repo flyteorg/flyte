@@ -3,6 +3,7 @@ package artifacts
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc"
@@ -24,7 +25,7 @@ func NewArtifactConnection(_ context.Context, cfg *Config, opts ...grpc.DialOpti
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-	return grpc.Dial(cfg.Host, opts...)
+	return grpc.Dial(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), opts...)
 }
 
 func InitializeArtifactClient(ctx context.Context, cfg *Config, opts ...grpc.DialOption) artifact.ArtifactRegistryClient {

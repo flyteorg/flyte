@@ -712,8 +712,11 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 // ResolveLiteralMapArtifacts will go through the input literal map and resolve any artifact references to their
 // literal values.
 func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, inputs *core.LiteralMap) (*core.LiteralMap, []*core.ArtifactID, error) {
-	// only top level replace for now.
 	var artifactIDs []*core.ArtifactID
+	if inputs == nil {
+		return nil, artifactIDs, nil
+	}
+	// only top level replace for now.
 	outputs := map[string]*core.Literal{}
 	for k, v := range inputs.Literals {
 		if v.GetArtifactId() != nil {
@@ -746,6 +749,9 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap) (*core.ParameterMap, []*core.ArtifactID, error) {
 	// only top level replace for now.
 	var artifactIDs []*core.ArtifactID
+	if inputs == nil {
+		return nil, artifactIDs, nil
+	}
 	outputs := map[string]*core.Parameter{}
 	x := *m.artifactClient
 
