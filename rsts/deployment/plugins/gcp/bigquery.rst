@@ -1,6 +1,6 @@
 .. _deployment-plugin-setup-gcp-bigquery:
 
-Google Bigquery Plugin
+Google BigQuery Plugin
 ======================
 
 This guide provides an overview of setting up BigQuery in your Flyte deployment.
