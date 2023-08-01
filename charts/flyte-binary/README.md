@@ -155,10 +155,15 @@ Chart for basic single Flyte executable deployment
 | ingress.grpcAnnotations | object | `{}` |  |
 | ingress.grpcExtraPaths.append | list | `[]` |  |
 | ingress.grpcExtraPaths.prepend | list | `[]` |  |
+| ingress.grpcIngressClassName | string | `""` |  |
+| ingress.grpcTls | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
 | ingress.httpExtraPaths.append | list | `[]` |  |
 | ingress.httpExtraPaths.prepend | list | `[]` |  |
+| ingress.httpIngressClassName | string | `""` |  |
+| ingress.httpTls | list | `[]` |  |
+| ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
