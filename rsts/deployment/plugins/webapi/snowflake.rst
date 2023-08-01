@@ -112,14 +112,10 @@ Specify plugin configuration
 Obtain and add the Snowflake JWT token
 --------------------------------------
 
-Create a Snowflake account, and follow the documentation to generate a JWT token.
+Create a Snowflake account, and follow the `Snowflake docs 
+<https://docs.snowflake.com/en/developer-guide/sql-api/authenticating#using-key-pair-authentication>`__
+to generate a JWT token.
 Then, add the Snowflake JWT token to FlytePropeller.
- 
-.. note::
-
-  Refer to the `Snowflake docs 
-  <https://docs.snowflake.com/en/developer-guide/sql-api/authenticating#using-key-pair-authentication>`__
-  to learn how to obtain the Snowflake JWT token.
 
 .. tabs::
 
