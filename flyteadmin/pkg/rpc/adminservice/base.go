@@ -14,10 +14,11 @@ import (
 
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/implementations"
 
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
-
+	artifactClient "github.com/flyteorg/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule"
 	"github.com/flyteorg/flyteadmin/pkg/data"
@@ -142,9 +143,14 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		executionEventWriter.Run()
 	}()
 
+	var artifactsClient *artifact.ArtifactRegistryClient
+	if configuration.ApplicationConfiguration().GetArtifactsConfig() != nil {
+		c := artifactClient.InitializeArtifactClient(ctx, configuration.ApplicationConfiguration().GetArtifactsConfig())
+		artifactsClient = &c
+	}
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactsClient)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)

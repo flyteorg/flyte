@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	artifactsClient "github.com/flyteorg/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/config"
@@ -592,4 +593,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
+	GetArtifactsConfig() *artifactsClient.Config
 }

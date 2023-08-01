@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	artifactsClient "github.com/flyteorg/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
@@ -15,6 +16,7 @@ const notifications = "notifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
+const artifact = "artifacts"
 const metricPort = 10254
 
 const KB = 1024
@@ -84,6 +86,8 @@ var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.Clou
 	Type: common.Local,
 })
 
+var artifactsConfig = config.MustRegisterSection(artifact, &artifactsClient.Config{})
+
 // Implementation of an interfaces.ApplicationConfiguration
 type ApplicationConfigurationProvider struct{}
 
@@ -117,6 +121,10 @@ func (p *ApplicationConfigurationProvider) GetExternalEventsConfig() *interfaces
 
 func (p *ApplicationConfigurationProvider) GetCloudEventsConfig() *interfaces.CloudEventsConfig {
 	return cloudEventsConfig.GetConfig().(*interfaces.CloudEventsConfig)
+}
+
+func (p *ApplicationConfigurationProvider) GetArtifactsConfig() *artifactsClient.Config {
+	return artifactsConfig.GetConfig().(*artifactsClient.Config)
 }
 
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {

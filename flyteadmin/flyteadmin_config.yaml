@@ -60,6 +60,10 @@ flyteadmin:
     - "metadata"
     - "admin"
   useOffloadedWorkflowClosure: false
+artifacts:
+  host: localhost
+  port: 50051
+  insecure: true
 database:
   postgres:
     port: 30001
