@@ -13,5 +13,3 @@ sphinxcontrib-video
 sphinxcontrib-youtube
 sphinx-tabs
 sphinx-tags
-grpcio<1.49.0
-grpcio-status<1.49.0
