@@ -11,7 +11,7 @@ the integrity of the overall system.
 
 The following diagram summarizes the components and their interactions as part of Flyte's auth implementation:
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/auth/flyte-auth-arch.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/auth/flyte-auth-arch-v2.png
 
 In summary, there are two main resources required for a complete auth flow in Flyte:
 
@@ -43,7 +43,7 @@ Authentication Setup
 Prerequisites
 =============
 
-The following is required for non-sandbox (non `flytectl demo`) deployments:
+The following is required for non-sandbox (non ``flytectl demo``) deployments:
 
 * A public domain name (e.g. example.foobar.com)
 * Routing of traffic from that domain name to the Kubernetes Flyte Ingress IP address
@@ -85,7 +85,7 @@ browser.
    .. group-tab:: Google
    
 
-          - Create an OAuth2 Client Credential following the `official documentation  <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ and take note of the `client_id` and `client_secret`
+          - Create an OAuth2 Client Credential following the `official documentation  <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ and take note of the ``client_id`` and ``client_secret``
           - In the **Authorized redirect URIs** field, add ``http://localhost:30081/callback`` for **sandbox** deployments, or ``https://<your-deployment-URL>/callback`` for other methods of deployment. 
           
    
@@ -148,7 +148,7 @@ Apply OIDC Configuration
 
    .. group-tab:: flyte-binary
 
-      1. Generate a random password to be used internally by flytepropeller
+      1. Generate a random password to be used internally by ``flytepropeller``
       2. Use the following command to generate a bcrypt hash for that password:
    
       .. prompt:: bash $
@@ -162,6 +162,9 @@ Apply OIDC Configuration
          auth:
           enabled: true
           oidc:
+            # baseUrl: https://accounts.google.com # Uncomment for Google
+            # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+            # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
             # For Okta use the Issuer URI from Okta's default auth server
             baseUrl: https://dev-<org-id>.okta.com/oauth2/default
             # Replace with the client ID and secret created for Flyte in your IdP
@@ -170,7 +173,7 @@ Apply OIDC Configuration
           internal:
             clientSecret: '<your-random-password>'
             # Use the output of step #2 (only the content inside of '')
-            clientSecretHash: JDJiJDA2JHJyNXZ5VmZrYVEvYkptYTU3Z1B6aE9UTGRhWDhvTnNCY2k3UFdncDI3SmdMdFNxd0ttUWhL
+            clientSecretHash: <your-hashed-password>
           authorizedUris:
           - https://<your-flyte-deployment-URL>
 
@@ -186,7 +189,7 @@ Apply OIDC Configuration
       * ``<release-name>`` is the name of your Helm release, typically ``flyte-backend``. You can find it using ``helm ls -n <your-namespace>``
         
 
-      6. Verify that your Flyte deployment now requires succesful login to your IdP to access the UI (https://<your domain>/console)
+      6. Verify that your Flyte deployment now requires succesful login to your IdP to access the UI (``https://<your domain>/console``)
       7. For ``flytectl`` / ``pyflyte``, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
 
       .. code-block:: yaml
@@ -315,7 +318,8 @@ Apply OIDC Configuration
                  - http://flyteadmin.flyte.svc.cluster.local:80
                userAuth:
                  openId:
-               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+                # baseUrl: https://accounts.google.com # Uncomment for Google
+                # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
                 # baseUrl: https://accounts.google.com # Uncomment for Google
                 # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
                   # For Okta, use the Issuer URI of the default auth server
@@ -651,7 +655,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
 Disable Helm secret management
 ------------------------------
 
-Alternatively, you can instruct Helm not to create and manage the secret for ``flytepropeller``. In that case, you'll have to create it following this steps:
+Alternatively, you can instruct Helm not to create and manage the secret for ``flytepropeller``. In that case, you'll have to create it following these steps:
 
 1. Disable Helm secrets management in your values file
 
