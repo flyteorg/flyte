@@ -49,12 +49,12 @@ func TestPlugin(t *testing.T) {
 		assert.NotNil(t, p.PluginLoader)
 	})
 
-	t.Run("test getFinalEndpoint", func(t *testing.T) {
-		endpoint, _ := getFinalEndpoint("spark", &cfg)
-		assert.Equal(t, cfg.Agents["spark_agent"].Endpoint, endpoint.Endpoint)
-		endpoint, _ = getFinalEndpoint("foo", &cfg)
-		assert.Equal(t, cfg.DefaultAgent.Endpoint, endpoint.Endpoint)
-		_, err := getFinalEndpoint("bar", &cfg)
+	t.Run("test getFinalAgent", func(t *testing.T) {
+		agent, _ := getFinalAgent("spark", &cfg)
+		assert.Equal(t, cfg.Agents["spark_agent"].Endpoint, agent.Endpoint)
+		agent, _ = getFinalAgent("foo", &cfg)
+		assert.Equal(t, cfg.DefaultAgent.Endpoint, agent.Endpoint)
+		_, err := getFinalAgent("bar", &cfg)
 		assert.NotNil(t, err)
 	})
 
@@ -72,14 +72,14 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test getClientFunc cache hit", func(t *testing.T) {
 		connectionCache := make(map[*Agent]*grpc.ClientConn)
-		endpoint := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
+		agent := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
 
-		client, err := getClientFunc(context.Background(), endpoint, connectionCache)
+		client, err := getClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
-		assert.NotNil(t, client, connectionCache[endpoint])
+		assert.NotNil(t, client, connectionCache[agent])
 
-		cachedClient, err := getClientFunc(context.Background(), endpoint, connectionCache)
+		cachedClient, err := getClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, cachedClient)
 		assert.Equal(t, client, cachedClient)

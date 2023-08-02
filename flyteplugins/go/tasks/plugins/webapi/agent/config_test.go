@@ -28,13 +28,13 @@ func TestGetAndSetConfig(t *testing.T) {
 	}
 	cfg.DefaultAgent.DefaultTimeout = config.Duration{Duration: 10 * time.Second}
 	cfg.Agents = map[string]*Agent{
-		"endpoint_1": {
+		"agent_1": {
 			Insecure:             cfg.DefaultAgent.Insecure,
 			DefaultServiceConfig: cfg.DefaultAgent.DefaultServiceConfig,
 			Timeouts:             cfg.DefaultAgent.Timeouts,
 		},
 	}
-	cfg.AgentForTaskTypes = map[string]string{"task_type_1": "endpoint_1"}
+	cfg.AgentForTaskTypes = map[string]string{"task_type_1": "agent_1"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 	assert.Equal(t, &cfg, GetConfig())
