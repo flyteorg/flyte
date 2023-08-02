@@ -499,7 +499,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: TmJ6QldYSHBnaFBJaEQ3NQ==
+  haSharedSecret: cGU1MFpxVHFEU01SR2dVQw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -858,6 +858,64 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-sandbox-0.1.0
+  name: flyte-sandbox-buildkit
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: buildkit
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyte-sandbox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: buildkit
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/name: flyte-sandbox
+    spec:
+      containers:
+      - args:
+        - --addr
+        - unix:///run/buildkit/buildkitd.sock
+        - --addr
+        - tcp://0.0.0.0:30003
+        image: moby/buildkit:sandbox
+        imagePullPolicy: Never
+        livenessProbe:
+          exec:
+            command:
+            - buildctl
+            - debug
+            - workers
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        name: buildkit
+        ports:
+        - containerPort: 30003
+          name: tcp
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - buildctl
+            - debug
+            - workers
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        securityContext:
+          privileged: true
+      hostNetwork: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: docker-registry
     chart: docker-registry-2.2.2
     heritage: Helm
@@ -875,7 +933,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0ea5a0f5db0680e8f00da24466ac135454104a626fbc465af8b2a069830ecdb0
+        checksum/secret: dc53bb66c2eb99ad100a1aae2c1a5cc6016f129f2025b25e40991e6d1153e158
       labels:
         app: docker-registry
         release: flyte-sandbox

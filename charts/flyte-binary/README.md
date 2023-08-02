@@ -15,10 +15,10 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
-| configuration.agentService.defaultGrpcEndpoint | string | `"flyte-binary-http.flyte.svc.cluster.local:8000"` |  |
-| configuration.agentService.supportedTaskTypes[0] | string | `"bigquery_query_job_task"` |  |
+| configuration.agentService | object | `{}` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
+| configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
 | configuration.auth.enableAuthServer | bool | `true` |  |
 | configuration.auth.enabled | bool | `false` |  |
 | configuration.auth.flyteClient.audience | string | `""` |  |
@@ -41,8 +41,10 @@ Chart for basic single Flyte executable deployment
 | configuration.database.port | int | `5432` |  |
 | configuration.database.username | string | `"postgres"` |  |
 | configuration.externalConfigMap | string | `""` |  |
+| configuration.externalSecretRef | string | `""` |  |
 | configuration.inline | object | `{}` |  |
 | configuration.inlineConfigMap | string | `""` |  |
+| configuration.inlineSecretRef | string | `""` |  |
 | configuration.labels | object | `{}` |  |
 | configuration.logging.level | int | `1` |  |
 | configuration.logging.plugins.cloudwatch.enabled | bool | `false` |  |
@@ -95,9 +97,9 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
-| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
-| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
-| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
+| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
+| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
+| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
 | flyte-core-components.admin.disableScheduler | bool | `false` |  |
 | flyte-core-components.admin.disabled | bool | `false` |  |
@@ -105,21 +107,63 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |
-| flyteagent.image.pullPolicy | string | `"IfNotPresent"` |  |
-| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` |  |
-| flyteagent.image.tag | string | `"1.6.2b1"` |  |
-| flyteagent.ports.containerPort | int | `8000` |  |
-| flyteagent.ports.name | string | `"agent-grpc"` |  |
+| flyteagent.deployment.annotations | object | `{}` |  |
+| flyteagent.deployment.args | list | `[]` |  |
+| flyteagent.deployment.command | list | `[]` |  |
+| flyteagent.deployment.extraEnvVars | list | `[]` |  |
+| flyteagent.deployment.extraEnvVarsConfigMap | string | `""` |  |
+| flyteagent.deployment.extraEnvVarsSecret | string | `""` |  |
+| flyteagent.deployment.extraPodSpec | object | `{}` |  |
+| flyteagent.deployment.extraVolumeMounts | list | `[]` |  |
+| flyteagent.deployment.extraVolumes | list | `[]` |  |
+| flyteagent.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
+| flyteagent.deployment.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` |  |
+| flyteagent.deployment.image.tag | string | `"1.6.2b1"` |  |
+| flyteagent.deployment.initContainers | list | `[]` |  |
+| flyteagent.deployment.labels | object | `{}` |  |
+| flyteagent.deployment.lifecycleHooks | object | `{}` |  |
+| flyteagent.deployment.livenessProbe | object | `{}` |  |
+| flyteagent.deployment.podAnnotations | object | `{}` |  |
+| flyteagent.deployment.podLabels | object | `{}` |  |
+| flyteagent.deployment.podSecurityContext.enabled | bool | `false` |  |
+| flyteagent.deployment.podSecurityContext.fsGroup | int | `65534` |  |
+| flyteagent.deployment.podSecurityContext.runAsGroup | int | `65534` |  |
+| flyteagent.deployment.podSecurityContext.runAsUser | int | `65534` |  |
+| flyteagent.deployment.readinessProbe | object | `{}` |  |
+| flyteagent.deployment.replicas | int | `1` |  |
+| flyteagent.deployment.sidecars | list | `[]` |  |
+| flyteagent.deployment.startupProbe | object | `{}` |  |
+| flyteagent.enable | bool | `false` |  |
+| flyteagent.service.annotations | object | `{}` |  |
+| flyteagent.service.clusterIP | string | `""` |  |
+| flyteagent.service.externalTrafficPolicy | string | `"Cluster"` |  |
+| flyteagent.service.extraPorts | list | `[]` |  |
+| flyteagent.service.labels | object | `{}` |  |
+| flyteagent.service.loadBalancerIP | string | `""` |  |
+| flyteagent.service.loadBalancerSourceRanges | list | `[]` |  |
+| flyteagent.service.nodePort | string | `""` |  |
+| flyteagent.service.port | string | `""` |  |
+| flyteagent.service.type | string | `"ClusterIP"` |  |
+| flyteagent.serviceAccount.annotations | object | `{}` |  |
+| flyteagent.serviceAccount.create | bool | `true` |  |
+| flyteagent.serviceAccount.imagePullSecrets | list | `[]` |  |
+| flyteagent.serviceAccount.labels | object | `{}` |  |
+| flyteagent.serviceAccount.name | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.grpcAnnotations | object | `{}` |  |
 | ingress.grpcExtraPaths.append | list | `[]` |  |
 | ingress.grpcExtraPaths.prepend | list | `[]` |  |
+| ingress.grpcIngressClassName | string | `""` |  |
+| ingress.grpcTls | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
 | ingress.httpExtraPaths.append | list | `[]` |  |
 | ingress.httpExtraPaths.prepend | list | `[]` |  |
+| ingress.httpIngressClassName | string | `""` |  |
+| ingress.httpTls | list | `[]` |  |
+| ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
@@ -142,6 +186,6 @@ Chart for basic single Flyte executable deployment
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
+| serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-
