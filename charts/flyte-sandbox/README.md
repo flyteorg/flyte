@@ -97,4 +97,3 @@ A Helm chart for the Flyte local sandbox
 | sandbox.proxy.image.pullPolicy | string | `"Never"` |  |
 | sandbox.proxy.image.repository | string | `"envoyproxy/envoy"` |  |
 | sandbox.proxy.image.tag | string | `"sandbox"` |  |
-
