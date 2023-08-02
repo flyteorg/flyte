@@ -1094,7 +1094,7 @@ spec:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.8.5"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.8.7"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
