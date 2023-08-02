@@ -8993,7 +8993,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: cr.flyte.org/flyteorg/flyteconsole:v1.8.5
+        image: cr.flyte.org/flyteorg/flyteconsole:v1.8.7
         name: flyteconsole
         ports:
         - containerPort: 8080
