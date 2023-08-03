@@ -67,7 +67,7 @@ Specify plugin configuration
 
       .. group-tab:: Helm chart
 
-        Edit the relevant YAML file (``eks-starter`` / ``eks-production``) to specify the plugin.
+        Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -180,14 +180,11 @@ Then, add the Snowflake JWT token to FlytePropeller.
       :emphasize-lines: 3
 
       apiVersion: v1
-        data:
-          FLYTE_SNOWFLAKE_CLIENT_TOKEN: <JWT_TOKEN>
-        kind: Secret
-        metadata:
-          annotations:
-            meta.helm.sh/release-name: flyte
-            meta.helm.sh/release-namespace: flyte
-        ...
+      data:
+        FLYTE_SNOWFLAKE_CLIENT_TOKEN: <JWT_TOKEN>
+        client_secret: Zm9vYmFy
+      kind: Secret
+      ...
 
     Replace ``<JWT_TOKEN>`` with your JWT token.
 
@@ -210,13 +207,20 @@ Upgrade the deployment
 
         .. code-block:: bash
 
-           helm upgrade flyte-backend flyteorg/flyte-binary -n flyte --values <your-yaml-file>
+          helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+        Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+        ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+        and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
 
   .. group-tab:: Flyte core
 
     .. code-block::
 
-      helm upgrade -f values-override.yaml flyte flyte/flyte-core -n flyte
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
 Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
 

@@ -44,7 +44,7 @@ To set up your Databricks account, follow these steps:
 1. Create a `Databricks account <https://www.databricks.com/>`__.
 2. Ensure that you have a Databricks workspace up and running.
 3. Generate a `personal access token 
-   <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-access-token-authentication>`__ to be used in the Flyte configuration.
+   <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-ACCESS_TOKEN-authentication>`__ to be used in the Flyte configuration.
    You can find the personal access token in the user settings within the workspace.
 
 .. note::
@@ -150,44 +150,44 @@ Specify plugin configuration
           plugins:
             databricks:
               entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS-ACCOUNT>.cloud.databricks.com
+              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
             k8s:
               default-env-vars:
-                - FLYTE_AWS_ACCESS_KEY_ID: <AWS-ACCESS-KEY-ID>
-                - FLYTE_AWS_SECRET_ACCESS_KEY: <AWS-SECRET-ACCESS-KEY>
-                - AWS_DEFAULT_REGION: <AWS-REGION>
+                - FLYTE_AWS_ACCESS_KEY_ID: <AWS_ACCESS_KEY_ID>
+                - FLYTE_AWS_SECRET_ACCESS_KEY: <AWS_SECRET_ACCESS_KEY>
+                - AWS_DEFAULT_REGION: <AWS_REGION>
           remoteData:
-            region: <AWS-REGION>
+            region: <AWS_REGION>
             scheme: aws
             signedUrls:
               durationMinutes: 3
           propeller:
-            rawoutput-prefix: s3://<S3-BUCKET-NAME>/
+            rawoutput-prefix: s3://<S3_BUCKET_NAME>/
           storage:
-            container: "<S3-BUCKET-NAME>"
+            container: "<S3_BUCKET_NAME>"
             type: s3
             stow:
               kind: s3
               config:
-                region: <AWS-REGION>
+                region: <AWS_REGION>
                 disable_ssl: true
                 v2_signing: false
                 auth_type: accesskey
-                access_key_id: <AWS-ACCESS-KEY-ID>
-                secret_key: <AWS-SECRET-ACCESS-KEY>
+                access_key_id: <AWS_ACCESS_KEY_ID>
+                secret_key: <AWS_SECRET_ACCESS_KEY>
             signedURL:
               stowConfigOverride:
                 endpoint: ""
 
-        Substitute ``<DATABRICKS-ACCOUNT>`` with the name of your Databricks account, 
-        ``<AWS-REGION>`` with the region where you created your AWS bucket,
-        ``<AWS-ACCESS-KEY-ID>`` with your AWS access key ID,
-        ``<AWS-SECRET-ACCESS-KEY>`` with your AWS secret access key,
-        and ``<S3-BUCKET-NAME>`` with the name of your S3 bucket.
+        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account, 
+        ``<AWS_REGION>`` with the region where you created your AWS bucket,
+        ``<AWS_ACCESS_KEY_ID>`` with your AWS access key ID,
+        ``<AWS_SECRET_ACCESS_KEY>`` with your AWS secret access key,
+        and ``<S3_BUCKET_NAME>`` with the name of your S3 bucket.
 
       .. group-tab:: Helm chart
 
-        Edit the relevant YAML file (``eks-starter`` / ``eks-production``) to specify the plugin.
+        Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -211,9 +211,9 @@ Specify plugin configuration
             plugins:
               databricks:
                 entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-                databricksInstance: <DATABRICKS-ACCOUNT>.cloud.databricks.com
+                databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
         
-        Substitute ``<DATABRICKS-ACCOUNT>`` with the name of your Databricks account.
+        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
   .. group-tab:: Flyte core
 
@@ -242,9 +242,9 @@ Specify plugin configuration
           plugins:
             databricks:
               entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS-ACCOUNT>.cloud.databricks.com
+              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
     
-    Substitute ``<DATABRICKS-ACCOUNT>`` with the name of your Databricks account.
+    Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
 Add the Databricks access token
 -------------------------------
@@ -282,7 +282,7 @@ Add the Databricks access token to FlytePropeller:
               apiVersion: v1
               fieldPath: metadata.namespace
           - name: FLYTE_SECRET_FLYTE_DATABRICKS_API_TOKEN
-            value: <ACCESS-TOKEN>
+            value: <ACCESS_TOKEN>
           image: flyte-binary:sandbox
           ...
 
@@ -297,10 +297,10 @@ Add the Databricks access token to FlytePropeller:
         .. code-block:: yaml
 
           stringData:
-            FLYTE_DATABRICKS_API_TOKEN: <ACCESS-TOKEN>
+            FLYTE_DATABRICKS_API_TOKEN: <ACCESS_TOKEN>
           ...
     
-    Replace ``<ACCESS-TOKEN>`` with your access token.
+    Replace ``<ACCESS_TOKEN>`` with your access token.
 
   .. group-tab:: Flyte core
 
@@ -314,16 +314,13 @@ Add the Databricks access token to FlytePropeller:
       :emphasize-lines: 3
 
       apiVersion: v1
-        data:
-          FLYTE_DATABRICKS_API_TOKEN: <ACCESS-TOKEN>
-        kind: Secret
-        metadata:
-          annotations:
-            meta.helm.sh/release-name: flyte
-            meta.helm.sh/release-namespace: flyte
-        ...
+      data:
+        FLYTE_DATABRICKS_API_TOKEN: <ACCESS_TOKEN>
+        client_secret: Zm9vYmFy
+      kind: Secret
+      ...
 
-    Replace ``<ACCESS-TOKEN>`` with your access token.
+    Replace ``<ACCESS_TOKEN>`` with your access token.
 
 Upgrade the deployment
 ----------------------
@@ -344,13 +341,20 @@ Upgrade the deployment
 
         .. code-block:: bash
 
-           helm upgrade flyte-backend flyteorg/flyte-binary -n flyte --values <your-yaml-file>
+          helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+        Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+        ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+        and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
 
   .. group-tab:: Flyte core
 
     .. code-block::
 
-      helm upgrade -f values-override.yaml flyte flyte/flyte-core -n flyte
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
 Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
 

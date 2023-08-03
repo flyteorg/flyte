@@ -26,7 +26,7 @@ Specify the plugin configuration
 
   .. tab:: Flyte binary
 
-    Edit the relevant YAML file (``eks-starter`` / ``eks-production``) to specify the plugin.
+    Edit the relevant YAML file to specify the plugin.
 
     .. code-block:: yaml
       :emphasize-lines: 7,8
@@ -79,12 +79,17 @@ Upgrade the Flyte Helm release
 
     .. code-block:: bash
 
-      helm upgrade flyte-backend flyteorg/flyte-binary -n flyte --values <YOUR-YAML-FILE>
+      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
 
-    Replace ``<YOUR-YAML-FILE>`` with the name of your YAML file.
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+    and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
 
   .. group-tab:: Flyte core
 
     .. code-block:: bash
 
-      helm upgrade -f values-override.yaml flyte flyte/flyte-core -n flyte
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).

@@ -402,8 +402,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart,
-        edit the relevant YAML file (``eks-starter`` / ``eks-production``).
+        To specify the plugin when using the Helm chart, edit the relevant YAML file.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -447,8 +446,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart,
-        edit the relevant YAML file (``eks-starter`` / ``eks-production``).
+        To specify the plugin when using the Helm chart, edit the relevant YAML file.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -492,8 +490,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart,
-        edit the relevant YAML file (``eks-starter`` / ``eks-production``).
+        To specify the plugin when using the Helm chart, edit the relevant YAML file.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -537,8 +534,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart,
-        edit the relevant YAML file (``eks-starter`` / ``eks-production``).
+        To specify the plugin when using the Helm chart, edit the relevant YAML file.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -582,8 +578,7 @@ Specify plugin configuration
 
         .. group-tab:: Flyte binary
 
-          To specify the plugin when using the Helm chart,
-          edit the relevant YAML file (``eks-starter`` / ``eks-production``).
+          To specify the plugin when using the Helm chart, edit the relevant YAML file.
 
         .. group-tab:: Flyte core
 
@@ -729,7 +724,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        Edit the relevant YAML file (``eks-starter`` / ``eks-production``) to specify the plugin.
+        Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -774,7 +769,7 @@ Upgrade the deployment
 
   .. group-tab:: Flyte binary
 
-    If you are using the Helm chart, run the following command:
+    If you are installing Flyte via the Helm chart, run the following command:
 
     .. note::
 
@@ -782,15 +777,20 @@ Upgrade the deployment
 
     .. code-block:: bash
 
-      helm upgrade flyte-backend flyteorg/flyte-binary -n flyte --values <YOUR-YAML-FILE>
-    
-    Replace ``<YOUR-YAML-FILE>`` with the name of your YAML file.
+      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+    and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
 
   .. group-tab:: Flyte core
 
     .. code-block:: bash
     
-      helm upgrade -f values-override.yaml flyte flyte/flyte-core -n flyte
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
 Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
 
