@@ -104,6 +104,8 @@ An open question is how we deal with the `interruptibleFailureThreshold`. Curren
 
 We could define the number of retries that ARE NOT interruptible. For example a value of `nonInterruptibleRetries` that is set to 1 means that the last retry is not interruptible regardless of how many retries there are. We also have to discuss whether this value would be configured on the platform side (only for the new retry behavior) or whether we would add this value to to task-level metadata and expose it to users. Adding this flag while ensuring backwards compatibility will require further discussion.
 
+Note: while unifying the retry budgets, the new retry behaviour still distinguishes between retriable and non-retriable exceptions and should do so consistently across plugins.
+
 ## 9 Conclusion
 
 With the proposed new retry behavior
