@@ -91,13 +91,6 @@ We discussed ways to give plugins access to the status of not only the custom re
 This approach would allow plugins to demistify failures of tasks by looking at the underlying pods which, in contrast to the custom resource, do contain hints of preemptions. This way, we could unify the retry behavior upon preemptions of the different plugins. However, wouldn't make the retry behavior easier to understand and users still wouldn't have control over the number of preemptions which is why we opted to not continue these discussions either.
 
 
-### 6.3 Inform the user which retry budget an attempt counted against
-
-We considered showing the user in the Flyte console whether an attempt counted against the user retry budget or the system retry budget.
-
-This only improves the transparency and does not remove the different behavior between plugins. Doing so is not necessary when every failure is counted against the same retry budget.
-
-![budgets](https://github.com/flyteorg/flyte/assets/26092524/3e425528-ce3f-42af-8cc3-f0ca0cdab660)
 
 
 
