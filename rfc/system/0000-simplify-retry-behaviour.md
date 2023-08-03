@@ -14,7 +14,7 @@ Flyte implements a retry mechanism to make workflows robust against failure. Thi
 
 Especially when it comes to interruptions/node terminations, the details of the retry behavior (which budget a retry counts against and how many retry possibilities are remaining) are intransparent and difficult to understand. The behavior is unfortunately also not consistent between plugins or even within the Pod plugin.
 
-The goal of this RFC is to make the behaviour easy to understand and consistent between plugins.
+The goal of this RFC is to make the behavior easy to understand and consistent between plugins.
 
 ## 2 Motivation
 
@@ -35,7 +35,7 @@ When using for instance the kubeflow operators plugin (e.g. Pytorch Task) all pr
 Preempted attempts are shown as follows in the console:
 <img src="https://github.com/flyteorg/flyte/assets/26092524/4e5beb9d-d247-4ff8-bf9a-2e6b4fa7f73d" width="400" >
 
-The incoherent behaviour is intransparent and counterintuitive for platform users. As one can see in the previous screenshots the user can't distinguish which retry budget an attempt counted against. We as platform engineers have been approached multiple times with questions such as: *"Why did my task retry only x times when I specified y times."*
+The incoherent behavior is intransparent and counterintuitive for platform users. As one can see in the previous screenshots the user can't distinguish which retry budget an attempt counted against. We as platform engineers have been approached multiple times with questions such as: *"Why did my task retry only x times when I specified y times."*
 
 Several users were also surprised to learn that the `retries` parameter in the `@task` decorator has no effect on how many times a task can get preempted - at least in the case of python tasks (not in the case of e.g. pytorch tasks). For longer trainings, a larger number of preemptions can be acceptable to a user. Some of our users remarked they would like to have control over the maximum number of preemptions.
 
@@ -46,7 +46,7 @@ Several users were also surprised to learn that the `retries` parameter in the `
 
 ## 3 Proposed Implementation
 
-We propose to introduce a new simplified retry behaviour (which will have to be activated in the platform configuration and which will **not** be the default behaviour in order to not make a breaking change).
+We propose to introduce a new simplified retry behavior (which will have to be activated in the platform configuration and which will **not** be the default behavior in order to not make a breaking change).
 
 This simplified retry behavior does not distinguish between user and system failures but considers a single maximum number of retries (defined by the user in the task decorator) regardless of the cause.
 
@@ -55,11 +55,11 @@ This will require a surprisingly small amount of changes to Flyte:
 We propose to:
 
 * Add a configuration flag in FlytePropeller for counting system and user retries the same.
-* Apply the new behaviour in the [`isEligibleForRetry`](https://github.com/flyteorg/flytepropeller/blob/294f47a18c9b11892f2d1a3573019e85257c3b19/pkg/controller/nodes/executor.go#L440) function where, in contrast to the current logic, if the flag is set, we check if the number of attempts + the number of system failures is larger than the max number of retries set in the task decorator. For the last retries (details see section 8), non-spot instances are used.
+* Apply the new behavior in the [`isEligibleForRetry`](https://github.com/flyteorg/flytepropeller/blob/294f47a18c9b11892f2d1a3573019e85257c3b19/pkg/controller/nodes/executor.go#L440) function where, in contrast to the current logic, if the flag is set, we check if the number of attempts + the number of system failures is larger than the max number of retries set in the task decorator. For the last retries (details see section 8), non-spot instances are used.
 * Add configuration for default number of retries in FlytePropeller. Currently the default maximum number of attempts is hardcoded. This should be exposed in the configuration.
 
 
-In addition to a much easier to understand behaviour, all plugins will automatically count preemptions the same way and users will have control over the maximum number of preemptions acceptable for their workflow.
+In addition to a much easier to understand behavior, all plugins will automatically count preemptions the same way and users will have control over the maximum number of preemptions acceptable for their workflow.
 
 ## 4 Metrics & Dashboards
 
@@ -67,14 +67,14 @@ _NA_
 
 ## 5 Drawbacks
 
-Currently the behaviour is intransparent and confusing for platform users. We as platform engineers have to look deep into the code to understand which budget a certain failure counts against. Users cannot increase the number of accepted preemptions when their training runs longer. Different plugins handle preemptions in different ways.
+Currently the behavior is intransparent and confusing for platform users. We as platform engineers have to look deep into the code to understand which budget a certain failure counts against. Users cannot increase the number of accepted preemptions when their training runs longer. Different plugins handle preemptions in different ways.
 We should not leave these quirks untackled.
 
 ## 6 Alternatives
 
 ### 6.1 Count preemptions towards user retry budget
 
-If we didn't want to try to make the retry behaviour easier to understand but only wanted to 1) remove the incoherence between plugins when it comes to preemption handling and 2) give users the ability the control the number of accepted preemptions, we could simply always count preemptions towards the user retry budget.
+If we didn't want to try to make the retry behavior easier to understand but only wanted to 1) remove the incoherence between plugins when it comes to preemption handling and 2) give users the ability the control the number of accepted preemptions, we could simply always count preemptions towards the user retry budget.
 
 In this case, [here](https://github.com/flyteorg/flyteplugins/blob/dfdf6f95aef7bebff160d6660f5c62f5832c39e4/go/tasks/pluginmachinery/flytek8s/pod_helper.go#L628), we would return a `PhaseInfoRetryableFailure` instead of a `PhaseInfoSystemRetryableFailure`.
 
@@ -82,13 +82,13 @@ In this case, [here](https://github.com/flyteorg/flyteplugins/blob/dfdf6f95aef7b
 * This would also mean that the Pod plugin and e.g. the kubeflow plugin would deal with preemptions the same way.
 * If preemptions counted against the user retry budget, we would have to switch to non-preemptible instances for the last retry of the user retry budget [instead of the system retry budget](https://github.com/flyteorg/flytepropeller/blob/a3c6e91f19c19601a957b29891437112868845de/pkg/controller/nodes/node_exec_context.go#L213).
 
-The downside of this approach is that the general retry behaviour remains as complex and difficult to understand as it is now.
+The downside of this approach is that the general retry behavior remains as complex and difficult to understand as it is now.
 
 ### 6.2 Demistify failure of Pods belonging to plugins/CRDs
 
 We discussed ways to give plugins access to the status of not only the custom resource they create (e.g. `PyTorchJob`) but also to the statuses of the pods created from the custom resource by the respective third-party operator (e.g. the kubeflow training operator). (This might require changes to the plugin interface, see details [here](https://github.com/flyteorg/flyte/discussions/3793).)
 
-This approach would allow plugins to demistify failures of tasks by looking at the underlying pods which, in contrast to the custom resource, do contain hints of preemptions. This way, we could unify the retry behaviour upon preemptions of the different plugins. However, wouldn't make the retry behaviour easier to understand and users still wouldn't have control over the number of preemptions which is why we opted to not continue these discussions either.
+This approach would allow plugins to demistify failures of tasks by looking at the underlying pods which, in contrast to the custom resource, do contain hints of preemptions. This way, we could unify the retry behavior upon preemptions of the different plugins. However, wouldn't make the retry behavior easier to understand and users still wouldn't have control over the number of preemptions which is why we opted to not continue these discussions either.
 
 
 ### 6.3 Inform the user which retry budget an attempt counted against
@@ -103,17 +103,17 @@ This only improves the transparency and does not remove the different behavior b
 
 ## 7 Potential Impact and Dependencies
 
-By having to activate the new retry behaviour in the platform configuration, we will not break existing workflows.
+By having to activate the new retry behavior in the platform configuration, we will not break existing workflows.
 
 ## 8 Unresolved questions
 
 An open question is how we deal with the `interruptibleFailureThreshold`. Currently, this value is a positive integer that is the number of retries that are interruptible. For example, 4 (system failure) retries are allowed where 3 of them are interruptible. Defining it this way does not make as much sense when we allow for task-level configuration of the retries.
 
-We could define the number of retries that ARE NOT interruptible. For example a value of `nonInterruptibleRetries` that is set to 1 means that the last retry is not interruptible regardless of how many retries there are. We also have to discuss whether this value would be configured on the platform side (only for the new retry behaviour) or whether we would add this value to to task-level metadata and expose it to users. Adding this flag while ensuring backwards compatibility will require further discussion.
+We could define the number of retries that ARE NOT interruptible. For example a value of `nonInterruptibleRetries` that is set to 1 means that the last retry is not interruptible regardless of how many retries there are. We also have to discuss whether this value would be configured on the platform side (only for the new retry behavior) or whether we would add this value to to task-level metadata and expose it to users. Adding this flag while ensuring backwards compatibility will require further discussion.
 
 ## 9 Conclusion
 
-With the proposed new retry behaviour
+With the proposed new retry behavior
 
 * Flyte could handle interruptible tasks the same, no matter which plugin is responsible.
 * users would be able to control how often a task can get preempted.
