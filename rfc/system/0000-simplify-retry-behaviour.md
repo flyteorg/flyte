@@ -1,4 +1,4 @@
-# [RFC Template] Simplify retry behaviour and unify it between plugins
+# [RFC Template] Simplify retry behavior and unify it between plugins
 
 **Authors:**
 
@@ -12,7 +12,7 @@ Flyte implements a retry mechanism to make workflows robust against failure. Thi
 
 > We distinguish between Flytekit/system-level exceptions and user exceptions. For instance, if Flytekit encounters an issue while uploading outputs, it is considered a system exception. On the other hand, if a user raises a ValueError due to an unexpected input in the task code, it is classified as a user exception. [(Source)](https://docs.flyte.org/projects/flytekit/en/latest/design/authoring.html#exception-handling)
 
-Especially when it comes to interruptions/node terminations, the details of the retry behaviour (which budget a retry counts against and how many retry possibilities are remaining) are intransparent and difficult to understand. The behavior is unfortunately also not consistent between plugins or even within the Pod plugin.
+Especially when it comes to interruptions/node terminations, the details of the retry behavior (which budget a retry counts against and how many retry possibilities are remaining) are intransparent and difficult to understand. The behavior is unfortunately also not consistent between plugins or even within the Pod plugin.
 
 The goal of this RFC is to make the behaviour easy to understand and consistent between plugins.
 
