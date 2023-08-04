@@ -4022,6 +4022,13 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."

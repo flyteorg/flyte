@@ -39,4 +39,6 @@ type AdminExecutionSpec struct {
 	OverwriteCache bool `json:"overwrite_cache,omitempty"`
 	// Environment variables to be set for the execution.
 	Envs *AdminEnvs `json:"envs,omitempty"`
+	// Tags to be set for the execution.
+	Tags []string `json:"tags,omitempty"`
 }
