@@ -3544,6 +3544,9 @@ definitions:
         labels:
           values:
             key: "values"
+        tags:
+        - "tags"
+        - "tags"
         launch_plan:
           domain: "domain"
           resource_type: {}
@@ -3926,6 +3929,9 @@ definitions:
           labels:
             values:
               key: "values"
+          tags:
+          - "tags"
+          - "tags"
           launch_plan:
             domain: "domain"
             resource_type: {}
@@ -4124,6 +4130,9 @@ definitions:
           labels:
             values:
               key: "values"
+          tags:
+          - "tags"
+          - "tags"
           launch_plan:
             domain: "domain"
             resource_type: {}
@@ -4392,6 +4401,11 @@ definitions:
       envs:
         description: "Environment variables to be set for the execution."
         $ref: "#/definitions/adminEnvs"
+      tags:
+        type: "array"
+        description: "Tags to be set for the execution."
+        items:
+          type: "string"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes."
@@ -4431,6 +4445,9 @@ definitions:
       labels:
         values:
           key: "values"
+      tags:
+      - "tags"
+      - "tags"
       launch_plan:
         domain: "domain"
         resource_type: {}

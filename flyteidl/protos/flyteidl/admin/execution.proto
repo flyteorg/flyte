@@ -316,6 +316,8 @@ message ExecutionSpec {
 
     // Environment variables to be set for the execution.
     Envs envs = 23;
+    // Tags to be set for the execution.
+    repeated string tags = 24;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.
