@@ -288,17 +288,31 @@ Add the Databricks access token to FlytePropeller:
 
       .. group-tab:: Helm chart
 
-        Add the access token as a secret to ``flyte-binary-config-secret``.
+        Create an external secret as follows:
 
-        .. code-block::
+        .. code-block:: bash
 
-          kubectl edit secret -n flyte flyte-binary-config-secret
-
-        .. code-block:: yaml
-
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: flyte-binary-client-secrets-external-secret
+            namespace: flyte
+          type: Opaque
           stringData:
             FLYTE_DATABRICKS_API_TOKEN: <ACCESS_TOKEN>
-          ...
+          EOF
+        
+        Reference the newly created secret in 
+        ``.Values.configuration.auth.clientSecretsExternalSecretRef``
+        in your YAML file as follows:
+
+        .. code-block:: yaml
+          :emphasize-lines: 3
+
+          configuration:
+            auth:
+              clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret 
     
     Replace ``<ACCESS_TOKEN>`` with your access token.
 
