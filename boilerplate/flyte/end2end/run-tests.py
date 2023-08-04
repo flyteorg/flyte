@@ -21,8 +21,14 @@ MAX_ATTEMPTS = 200
 # inputs. This is so we can progressively cover all priorities in the original flytesnacks manifest,
 # starting with "core".
 FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
+    "lite": [
+        ("basics.hello_world.my_wf", {}),
+        ("basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
+    ],
     "core": [
-        ("control_flow.chain_entities.chain_workflows_wf", {}),
+        ("basics.deck.wf", {}),
+        # The chain_workflows example in flytesnacks expects to be running in a sandbox.
+        # ("control_flow.chain_entities.chain_workflows_wf", {}),
         ("control_flow.dynamics.wf", {"s1": "Pear", "s2": "Earth"}),
         ("control_flow.map_task.my_map_workflow", {"a": [1, 2, 3, 4, 5]}),
         # Workflows that use nested executions cannot be launched via flyteremote.
@@ -43,10 +49,7 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         # ("basics.folders.download_and_rotate", {}),
         ("basics.hello_world.my_wf", {}),
         ("basics.lp.my_wf", {"val": 4}),
-        (
-            "basics.lp.go_greet",
-            {"day_of_week": "5", "number": 3, "am": True},
-        ),
+        ("basics.lp.go_greet", {"day_of_week": "5", "number": 3, "am": True}),
         ("basics.named_outputs.my_wf", {}),
         # # Getting a 403 for the wikipedia image
         # # ("basics.reference_task.wf", {}),
@@ -55,36 +58,36 @@ FLYTESNACKS_WORKFLOW_GROUPS: Mapping[str, List[Tuple[str, dict]]] = {
         # ("type_system.enums.enum_wf", {"c": "red"}),
         ("type_system.schema.df_wf", {"a": 42}),
         ("type_system.typed_schema.wf", {}),
-        # ("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
+        #("my.imperative.workflow.example", {"in1": "hello", "in2": "foo"}),
     ],
     "integrations-k8s-spark": [
-        ("k8s_spark.pyspark_pi.my_spark", {"triggered_date": datetime.datetime.now()}),
+        ("k8s_spark_plugin.pyspark_pi.my_spark", {"triggered_date": datetime.datetime.now()}),
     ],
     "integrations-kfpytorch": [
-        ("kfpytorch.pytorch_mnist.pytorch_training_wf", {}),
+        ("kfpytorch_plugin.pytorch_mnist.pytorch_training_wf", {}),
     ],
     "integrations-kftensorflow": [
-        ("kftensorflow.tf_mnist.mnist_tensorflow_workflow", {}),
+        ("kftensorflow_plugin.tf_mnist.mnist_tensorflow_workflow", {}),
     ],
     # "integrations-pod": [
     #     ("pod.pod.pod_workflow", {}),
     # ],
     "integrations-pandera_examples": [
-        ("pandera_examples.basic_schema_example.process_data", {}),
+        ("pandera_plugin.basic_schema_example.process_data", {}),
         # TODO: investigate type mismatch float -> numpy.float64
-        # ("pandera_examples.validating_and_testing_ml_pipelines.pipeline", {"data_random_state": 42, "model_random_state": 99}),
+        # ("pandera_plugin.validating_and_testing_ml_pipelines.pipeline", {"data_random_state": 42, "model_random_state": 99}),
     ],
     "integrations-modin_examples": [
-        ("modin_examples.knn_classifier.pipeline", {}),
+        ("modin_plugin.knn_classifier.pipeline", {}),
     ],
     "integrations-papermilltasks": [
-        ("papermilltasks.simple.nb_to_python_wf", {"f": 3.1415926535}),
+        ("papermill_plugin.simple.nb_to_python_wf", {"f": 3.1415926535}),
     ],
     "integrations-greatexpectations": [
-        ("greatexpectations.task_example.simple_wf", {}),
-        ("greatexpectations.task_example.file_wf", {}),
-        ("greatexpectations.task_example.schema_wf", {}),
-        ("greatexpectations.task_example.runtime_wf", {}),
+        ("greatexpectations_plugin.task_example.simple_wf", {}),
+        ("greatexpectations_plugin.task_example.file_wf", {}),
+        ("greatexpectations_plugin.task_example.schema_wf", {}),
+        ("greatexpectations_plugin.task_example.runtime_wf", {}),
     ],
 }
 
@@ -106,8 +109,7 @@ def sync_executions(remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[F
             for execution in executions:
                 print(f"About to sync execution_id={execution.id.name}")
                 remote.sync(execution)
-    except Exception:
-        print(traceback.format_exc())
+    except:
         print("GOT TO THE EXCEPT")
         print("COUNT THIS!")
 
@@ -190,16 +192,15 @@ def run(
 
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
-    manifest_url = (
-        "https://raw.githubusercontent.com/flyteorg/flytesnacks/"
-        f"{flytesnacks_release_tag}/flyte_tests_manifest.json"
-    )
+    manifest_url = "https://raw.githubusercontent.com/flyteorg/flytesnacks/" \
+                   f"{flytesnacks_release_tag}/flyte_tests_manifest.json"
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
+    workflow_groups = []
+    workflow_groups = ["lite"] if "lite" in priorities else [
+            group["name"] for group in parsed_manifest if group["priority"] in priorities
+        ]
 
-    workflow_groups = [
-        group["name"] for group in parsed_manifest if group["priority"] in priorities
-    ]
     results = []
     valid_workgroups = []
     for workflow_group in workflow_groups:
