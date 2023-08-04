@@ -109,9 +109,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 		if launchplan.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)
 		} else if launchplan.IsUserError(err) {
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RuntimeExecutionError, err.Error(), &handler.ExecutionInfo{
-				WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
-			})), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RuntimeExecutionError, err.Error(), nil)), nil
 		} else {
 			return handler.UnknownTransition, err
 		}

@@ -192,11 +192,11 @@ func (a *adminLaunchPlanExecutor) Kill(ctx context.Context, executionID *core.Wo
 	}
 	_, err := a.adminClient.TerminateExecution(ctx, req)
 	if err != nil {
-		if status.Code(err) == codes.NotFound {
+		err := evtErr.WrapError(err)
+		if evtErr.IsNotFound(err) {
 			return nil
 		}
 
-		err = evtErr.WrapError(err)
 		if evtErr.IsEventAlreadyInTerminalStateError(err) {
 			return nil
 		}
