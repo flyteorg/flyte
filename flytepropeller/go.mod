@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/flyteorg/flyteidl v1.5.10
 	github.com/flyteorg/flyteplugins v1.1.8
-	github.com/flyteorg/flytestdlib v1.0.20
+	github.com/flyteorg/flytestdlib v1.0.22
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-test/deep v1.0.7
@@ -74,7 +74,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
-	github.com/flyteorg/stow v0.3.6 // indirect
+	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
