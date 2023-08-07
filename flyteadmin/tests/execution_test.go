@@ -185,6 +185,14 @@ func populateWorkflowExecutionsForTestingOnly() {
 	db.Exec(`INSERT INTO workflows ("id", "project", "domain", "name", "version", "remote_closure_identifier") ` +
 		`VALUES (4, 'project2', 'domain2', 'name2', 'version1', 's3://foo')`)
 
+	// Insert dummy tags
+	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (1, 'hello')`)
+	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (2, 'flyte')`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 1)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name3', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name4', 1)`)
+
 	for _, statement := range insertExecutionStatements {
 		db.Exec(statement)
 	}
@@ -207,6 +215,26 @@ func TestListWorkflowExecutions(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, len(resp.Executions), 4)
+}
+
+func TestListWorkflowExecutionsWithTags(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	resp, err := client.ListExecutions(ctx, &admin.ResourceListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project1",
+			Domain:  "domain1",
+		},
+		Limit:   5,
+		Filters: "value_in(admin_tag.name, hello)",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, len(resp.Executions), 2)
 }
 
 func TestListWorkflowExecutions_Filters(t *testing.T) {

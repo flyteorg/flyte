@@ -913,6 +913,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 			workflowExecutionID, err)
 		return nil, nil, err
 	}
+
 	return ctx, executionModel, nil
 }
 
@@ -1478,6 +1479,7 @@ func (m *ExecutionManager) ListExecutions(
 		execution.Spec.Inputs = nil
 		execution.Closure.ComputedInputs = nil
 	}
+
 	// END TO BE DELETED
 	var token string
 	if len(executionList) == int(request.Limit) {

@@ -222,6 +222,7 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 			},
 			RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: "default_raw_output"},
 			Envs:                &admin.Envs{},
+			Tags:                []string{"tag1", "tag2"},
 		},
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{

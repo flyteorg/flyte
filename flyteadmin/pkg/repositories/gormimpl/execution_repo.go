@@ -32,7 +32,7 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) erro
 	return nil
 }
 
-func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+func (r *ExecutionRepo) Get(_ context.Context, input interfaces.Identifier) (models.Execution, error) {
 	var execution models.Execution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.Execution{
@@ -66,7 +66,7 @@ func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) 
 	return nil
 }
 
-func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (
+func (r *ExecutionRepo) List(_ context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error) {
 	var err error
 	// First validate input.
@@ -87,6 +87,13 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	if ok := input.JoinTableEntities[common.Task]; ok {
 		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.task_id = %s.id",
 			taskTableName, executionTableName, taskTableName))
+	}
+
+	if ok := input.JoinTableEntities[common.AdminTag]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
+			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
+			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
 	}
 
 	// Apply filters

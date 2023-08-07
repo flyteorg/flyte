@@ -18,6 +18,8 @@ const (
 	NamedEntityMetadata = "nem"
 	Project             = "p"
 	Signal              = "s"
+	AdminTag            = "at"
+	ExecutionAdminTag   = "eat"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters

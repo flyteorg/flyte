@@ -3,6 +3,10 @@ package models
 import (
 	"time"
 
+	"gorm.io/gorm/clause"
+
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flytestdlib/storage"
 )
 
@@ -60,4 +64,19 @@ type Execution struct {
 	State *int32 `gorm:"index;default:0"`
 	// The resource type of the entity used to launch the execution, one of 'launch_plan' or 'task'
 	LaunchEntity string
+	// Tags associated with the execution
+	Tags []AdminTag `gorm:"many2many:execution_admin_tags;"`
+}
+
+type AdminTag struct {
+	gorm.Model
+	Name string `gorm:"index:,unique;size:255"`
+}
+
+func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
+	tx.Statement.AddClause(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "name"}},            // key column
+		DoUpdates: clause.AssignmentColumns([]string{"name"}), // column needed to be updated
+	})
+	return nil
 }
