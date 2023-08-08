@@ -39,7 +39,7 @@ Open Source Community Meeting
 -----------------------------
 
 When: every other Tuesday, 9:00 AM Pacific Time.
-You'll typically find here other commmunity members sharing their experiences with Flyte or any other technology from the AI ecosystem.
+You're welcome to join and learn from other commmunity members sharing their experiences with Flyte or any other technology from the AI ecosystem.
 Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
 .. image:: https://img.shields.io/badge/Join-Zoom-blue?style=for-the-badge
