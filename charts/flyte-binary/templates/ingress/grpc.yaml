@@ -125,5 +125,7 @@ spec:
     {{- end }}
     {{- if .Values.ingress.grpcTls }}
     tls: {{- tpl ( .Values.ingress.grpcTls | toYaml ) . | nindent 6 }}
+    {{- else if .Values.ingress.tls }}
+    tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 6 }}
     {{- end }}
 {{- end }}
