@@ -327,9 +327,11 @@ ingress:
   httpIngressClassName: ""
   # grpcIngressClassName Ingress class to use with all grpc ingress resource. Overrides `ingressClassName`
   grpcIngressClassName: ""
-  # httpTls Add TLS configuration to http ingress resource
+  # tls Add TLS configuration to all ingress resources
+  tls: []
+  # httpTls Add TLS configuration to http ingress resource. Overrides `tls`
   httpTls: []
-  # grpcTls Add TLS configuration to grpc ingress resource
+  # grpcTls Add TLS configuration to grpc ingress resource. Overrides `tls`
   grpcTls: []
   # httpExtraPaths Add extra paths to http ingress rule
   httpExtraPaths:
