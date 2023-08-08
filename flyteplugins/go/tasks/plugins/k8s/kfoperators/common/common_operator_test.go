@@ -314,11 +314,13 @@ func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 
 func TestOverrideContainerNilResources(t *testing.T) {
 	podSpec := dummyPodSpec()
+	podSpecCopy := podSpec.DeepCopy()
+
 	err := OverrideContainerSpec(&podSpec, "primary container", "", nil, []string{})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(podSpec.Containers))
-	assert.Nil(t, podSpec.Containers[0].Resources.Limits)
-	assert.Nil(t, podSpec.Containers[0].Resources.Requests)
+	assert.Equal(t, podSpec.Containers[0].Resources.Limits, podSpecCopy.Containers[0].Resources.Limits)
+	assert.Equal(t, podSpec.Containers[0].Resources.Requests, podSpecCopy.Containers[0].Resources.Requests)
 }
 
 func dummyTaskContext() pluginsCore.TaskExecutionContext {

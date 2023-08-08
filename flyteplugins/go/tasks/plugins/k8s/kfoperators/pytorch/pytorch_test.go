@@ -720,7 +720,7 @@ func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestParasElasticConfig(t *testing.T) {
+func TestParseElasticConfig(t *testing.T) {
 	elasticConfig := plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}
 	elasticPolicy := ParseElasticConfig(&elasticConfig)
 	assert.Equal(t, int32(1), *elasticPolicy.MinReplicas)
