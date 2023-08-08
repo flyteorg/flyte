@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.32
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.33
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -431,7 +431,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5aeb1eaeab35d20dc21450af4b772c377f0d5418905bf6eaf170a6e5ebaade1"
+        configChecksum: "b32a5adbc942215ae2a73cfe0f4d2b195658c8396734ef80f419f74104819d2"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -457,7 +457,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.106"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.116"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -511,9 +511,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.1.106
+        app.kubernetes.io/version: v1.1.116
       annotations:
-        configChecksum: "5aeb1eaeab35d20dc21450af4b772c377f0d5418905bf6eaf170a6e5ebaade1"
+        configChecksum: "b32a5adbc942215ae2a73cfe0f4d2b195658c8396734ef80f419f74104819d2"
     spec:
       securityContext:
         fsGroup: 65534
@@ -522,7 +522,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.106"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.116"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -545,7 +545,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.106"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.1.116"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
