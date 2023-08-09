@@ -18,7 +18,7 @@ import (
 	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -68,6 +68,19 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 
+	if taskTemplate.GetContainer() != nil {
+		templateParameters := template.Parameters{
+			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+			Inputs:           taskCtx.InputReader(),
+			OutputPath:       taskCtx.OutputWriter(),
+			Task:             taskCtx.TaskReader(),
+		}
+		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
+		if err != nil {
+			return nil, nil, err
+		}
+		taskTemplate.GetContainer().Args = modifiedArgs
+	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
@@ -150,7 +163,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 
 	switch resource.State {
 	case admin.State_RUNNING:
-		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
+		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:
@@ -164,7 +177,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", resource.State)
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
 }
 
 func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
@@ -225,7 +238,7 @@ func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent
 	return service.NewAsyncAgentServiceClient(conn), nil
 }
 
-func buildTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecutionMetadata) admin.TaskExecutionMetadata {
+func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 	return admin.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
