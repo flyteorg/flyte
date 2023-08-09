@@ -51,7 +51,6 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.deployment.waitForDB.image.repository | string | `"bitnami/postgresql"` |  |
 | flyte-binary.deployment.waitForDB.image.tag | string | `"sandbox"` |  |
 | flyte-binary.enabled | bool | `true` |  |
-| flyte-binary.flyteagent.enable | bool | `true` |  |
 | flyte-binary.nameOverride | string | `"flyte-sandbox"` |  |
 | flyte-binary.rbac.extraRules[0].apiGroups[0] | string | `"*"` |  |
 | flyte-binary.rbac.extraRules[0].resources[0] | string | `"*"` |  |

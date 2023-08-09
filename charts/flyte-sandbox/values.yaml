@@ -10,8 +10,6 @@ docker-registry:
     nodePort: 30000
 
 flyte-binary:
-  flyteagent:
-    enable: true
   nameOverride: flyte-sandbox
   enabled: true
   configuration:
