@@ -17,6 +17,7 @@ helm dep update ${DIR}/../charts/flyte/
 helm dep update ${DIR}/../charts/flyte-deps/
 helm dep update ${DIR}/../charts/flyte-core/
 helm dep update ${DIR}/../charts/flyte-binary/
+helm dep update ${DIR}/../charts/flyte-sandbox/
 
 helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
