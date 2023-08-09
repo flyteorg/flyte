@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        chart: ["flyte-binary", "flyte-core"]
+        chart: ["flyte-binary", "flyte-core", "flyte-agent"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
