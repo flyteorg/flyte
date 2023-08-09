@@ -726,6 +726,7 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 
 			x := *m.artifactClient
 			req := &artifact.GetArtifactRequest{
+				// TODO: Do all the templating work for querying.
 				Query: &core.ArtifactQuery{
 					Identifier: &core.ArtifactQuery_ArtifactId{ArtifactId: v.GetArtifactId()},
 				},
@@ -775,7 +776,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if m.artifactClient == nil {
 				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
 			}
-
+			// TODO: Do all the templating work for querying.
 			req := &artifact.GetArtifactRequest{
 				Query:   v.GetArtifactQuery(),
 				Details: false,

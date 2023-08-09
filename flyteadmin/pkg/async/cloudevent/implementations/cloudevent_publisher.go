@@ -171,6 +171,21 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		}
 	}
 
+	// Get inputs to the workflow execution
+	var inputs *core.LiteralMap
+	inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+		c.storageClient, executionModel.InputsURI.String())
+	if err != nil {
+		logger.Warningf(ctx, "Error fetching input literal map %s", executionModel.InputsURI.String())
+	}
+	// The spec is used to retrieve metadata fields
+	spec := &admin.ExecutionSpec{}
+	err = proto.Unmarshal(executionModel.Spec, spec)
+	if err != nil {
+		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
+	}
+
+	// Get outputs from the workflow execution
 	var outputs *core.LiteralMap
 	if rawEvent.GetOutputData() != nil {
 		fmt.Printf("remove this - Got output data")
@@ -192,9 +207,14 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 	}
 
 	return &event.CloudEventWorkflowExecution{
-		RawEvent:        rawEvent,
-		OutputData:      outputs,
-		OutputInterface: &workflowInterface,
+		RawEvent:            rawEvent,
+		OutputData:          outputs,
+		OutputInterface:     &workflowInterface,
+		InputData:           inputs,
+		ScheduledAt:         spec.GetMetadata().GetScheduledAt(),
+		ArtifactIds:         spec.GetMetadata().GetArtifactIds(),
+		ParentNodeExecution: spec.GetMetadata().GetParentNodeExecution(),
+		ReferenceExecution:  spec.GetMetadata().GetReferenceExecution(),
 	}, nil
 }
 
@@ -205,6 +225,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 }
 
 func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Context, rawEvent *event.TaskExecutionEvent) (*event.CloudEventTaskExecution, error) {
+
 	if rawEvent == nil {
 		return nil, fmt.Errorf("nothing to publish, TaskExecution event is nil")
 	}
@@ -216,6 +237,23 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 			OutputData:      nil,
 			OutputInterface: nil,
 		}, nil
+	}
+
+	// This gets the parent workflow execution metadata
+	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Project: rawEvent.ParentNodeExecutionId.ExecutionId.Project,
+		Domain:  rawEvent.ParentNodeExecutionId.ExecutionId.Domain,
+		Name:    rawEvent.ParentNodeExecutionId.ExecutionId.Name,
+	})
+	if err != nil {
+		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", rawEvent.ParentNodeExecutionId)
+		return nil, err
+	}
+
+	spec := &admin.ExecutionSpec{}
+	err = proto.Unmarshal(executionModel.Spec, spec)
+	if err != nil {
+		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
 	}
 
 	taskModel, err := c.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
@@ -230,6 +268,19 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 		return nil, err
 	}
 	task, err := transformers.FromTaskModel(taskModel)
+
+	var inputs *core.LiteralMap
+	if rawEvent.GetInputData() != nil {
+		inputs = rawEvent.GetInputData()
+	} else if len(rawEvent.GetInputUri()) > 0 {
+		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+			c.storageClient, rawEvent.GetInputUri())
+		if err != nil {
+			fmt.Printf("Error fetching input literal map %v", rawEvent)
+		}
+	} else {
+		logger.Infof(ctx, "Task execution for node exec [%+v] has no input data", rawEvent.ParentNodeExecutionId)
+	}
 
 	var outputs *core.LiteralMap
 	if rawEvent.GetOutputData() != nil {
@@ -251,9 +302,14 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 	}
 
 	return &event.CloudEventTaskExecution{
-		RawEvent:        rawEvent,
-		OutputData:      outputs,
-		OutputInterface: task.Closure.CompiledTask.Template.Interface,
+		RawEvent:            rawEvent,
+		OutputData:          outputs,
+		OutputInterface:     task.Closure.CompiledTask.Template.Interface,
+		InputData:           inputs,
+		ScheduledAt:         spec.GetMetadata().GetScheduledAt(),
+		ArtifactIds:         spec.GetMetadata().GetArtifactIds(),
+		ParentNodeExecution: spec.GetMetadata().GetParentNodeExecution(),
+		ReferenceExecution:  spec.GetMetadata().GetReferenceExecution(),
 	}, nil
 }
 
