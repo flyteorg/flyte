@@ -5,8 +5,9 @@ package common
 type CloudProvider = string
 
 const (
-	AWS   CloudProvider = "aws"
-	GCP   CloudProvider = "gcp"
-	Local CloudProvider = "local"
-	None  CloudProvider = "none"
+	AWS     CloudProvider = "aws"
+	GCP     CloudProvider = "gcp"
+	Sandbox CloudProvider = "sandbox"
+	Local   CloudProvider = "local"
+	None    CloudProvider = "none"
 )
