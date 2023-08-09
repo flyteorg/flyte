@@ -31,16 +31,12 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 # Optional blocks for secret mount
 
 {{- define "agentSecret.volume" -}}
-{{- with .Values.agentSecret.name -}}
-- name: {{ . }}
+- name: {{ include "flyte.name" . }}
   secret:
-    secretName: {{ . }}
-{{- end }}
+    secretName: {{ include "flyte.name" . }}
 {{- end }}
 
 {{- define "agentSecret.volumeMount" -}}
-{{- with .Values.agentSecret.name -}}
 - mountPath: /etc/agent-secret
-  name: {{ . }}
-{{- end }}
+  name: {{ include "flyte.name" . }}
 {{- end }}

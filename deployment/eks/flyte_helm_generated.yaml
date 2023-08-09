@@ -946,7 +946,8 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
-        
+        - mountPath: /etc/agent-secret
+          name: flyteagent
         ports:
         - containerPort: 8000
           name: agent-grpc
@@ -961,6 +962,9 @@ spec:
             memory: 200Mi
       serviceAccountName: flyteagent
       volumes:
+      - name: flyteagent
+        secret:
+          secretName: flyteagent
 ---
 # Source: flyte-core/templates/admin/deployment.yaml
 apiVersion: apps/v1
