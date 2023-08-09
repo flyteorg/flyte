@@ -27,6 +27,7 @@ spec:
         image: "{{ .Values.flyteagent.image.repository }}:{{ .Values.flyteagent.image.tag }}"
         imagePullPolicy: "{{ .Values.flyteagent.image.pullPolicy }}"
         name: flyteagent
+        volumeMounts: {{- include "agentSecret.volumeMount" . | nindent 8 }}
         ports:
         - containerPort: {{ .Values.flyteagent.ports.containerPort }}
           name: {{ .Values.flyteagent.ports.name }}
@@ -38,6 +39,7 @@ spec:
       {{- tpl (toYaml .) $ | nindent 6}}
       {{- end }}
       serviceAccountName: {{ template "flyteagent.name" . }}
+      volumes: {{- include "agentSecret.volume" . | nindent 6 }}
       {{- with .Values.flyteagent.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
       {{- end }}

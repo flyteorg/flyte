@@ -18,4 +18,4 @@ spec:
     protocol: TCP
     targetPort: {{ .Values.flyteagent.ports.name }}
   selector: {{ include "flyteagent.selectorLabels" . | nindent 4 }}
-{{- end }}
+    {{- end }}

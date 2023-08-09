@@ -4,6 +4,12 @@
 
 A Helm chart for Flyte core
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../flyte-agent | flyteagent(flyteagent) | v0.1.10 |
+
 ### Flyte INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
 - Fetch chart dependencies ``

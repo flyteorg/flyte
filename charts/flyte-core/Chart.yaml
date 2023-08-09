@@ -3,3 +3,8 @@ name: flyte-core
 description: A Helm chart for Flyte core
 type: application
 version: v0.1.10 # VERSION
+dependencies:
+  - name: flyteagent
+    alias: flyteagent
+    version: v0.1.10 # VERSION
+    repository: file://../flyte-agent # REPOSITORY

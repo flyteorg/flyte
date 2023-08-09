@@ -4,6 +4,12 @@
 
 Chart for basic single Flyte executable deployment
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../flyte-agent | flyteagent(flyteagent) | v0.1.10 |
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -184,4 +190,3 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-
