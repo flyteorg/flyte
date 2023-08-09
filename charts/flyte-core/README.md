@@ -173,29 +173,29 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
-| flyteagent.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
-| flyteagent.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
-| flyteagent.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
-| flyteagent.affinity | object | `{}` | affinity for flyteagent deployment |
-| flyteagent.configPath | string | `"/etc/flyteagent/config/*.yaml"` | Default regex string for searching configuration files |
-| flyteagent.enabled | bool | `true` |  |
-| flyteagent.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
-| flyteagent.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
-| flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
-| flyteagent.nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
-| flyteagent.podAnnotations | object | `{}` | Annotations for flyteagent pods |
-| flyteagent.ports.containerPort | int | `8000` |  |
-| flyteagent.ports.name | string | `"agent-grpc"` |  |
-| flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
-| flyteagent.replicaCount | int | `1` | Replicas count for flyteagent deployment |
-| flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteagent deployment |
-| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
-| flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
-| flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |
-| flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |
-| flyteagent.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flyteagent.tolerations | list | `[]` | tolerations for flyteagent deployment |
+| flyteagent.flyteagent.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| flyteagent.flyteagent.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| flyteagent.flyteagent.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| flyteagent.flyteagent.affinity | object | `{}` | affinity for flyteagent deployment |
+| flyteagent.flyteagent.configPath | string | `"/etc/flyteagent/config/*.yaml"` | Default regex string for searching configuration files |
+| flyteagent.flyteagent.enabled | bool | `true` |  |
+| flyteagent.flyteagent.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
+| flyteagent.flyteagent.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flyteagent.flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
+| flyteagent.flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
+| flyteagent.flyteagent.nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
+| flyteagent.flyteagent.podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| flyteagent.flyteagent.ports.containerPort | int | `8000` |  |
+| flyteagent.flyteagent.ports.name | string | `"agent-grpc"` |  |
+| flyteagent.flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| flyteagent.flyteagent.replicaCount | int | `1` | Replicas count for flyteagent deployment |
+| flyteagent.flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteagent deployment |
+| flyteagent.flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
+| flyteagent.flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
+| flyteagent.flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |
+| flyteagent.flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |
+| flyteagent.flyteagent.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flyteagent.flyteagent.tolerations | list | `[]` | tolerations for flyteagent deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
