@@ -164,7 +164,6 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 					Domain:  req.Domain,
 				},
 			},
-			Uri:  "flyte://random/returned/url",
 			Spec: req.GetArtifactSpec(),
 		},
 	}, nil

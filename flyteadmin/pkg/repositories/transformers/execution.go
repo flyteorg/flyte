@@ -322,12 +322,12 @@ func GetExecutionIdentifier(executionModel *models.Execution) core.WorkflowExecu
 func FromExecutionModel(ctx context.Context, executionModel models.Execution, opts *ExecutionTransformerOptions) (*admin.Execution, error) {
 	var spec admin.ExecutionSpec
 	var err error
-	if executionModel.Spec == nil {
-		fmt.Println("!!@ executionModel.Spec is nil")
-	}
-	if opts == nil {
-		fmt.Println("!!@ opts is nil")
-	}
+	//if executionModel.Spec == nil {
+	//	fmt.Println("!!@ executionModel.Spec is nil")
+	//}
+	//if opts == nil {
+	//	fmt.Println("!!@ opts is nil")
+	//}
 	if err = proto.Unmarshal(executionModel.Spec, &spec); err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
 	}

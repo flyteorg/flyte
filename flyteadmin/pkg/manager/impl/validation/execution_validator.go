@@ -76,8 +76,6 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 	return nil
 }
 
-// CheckAndFetchInputsForExecution will merge inputs and also resolve any artifacts that are required.
-// A map will be returned for all artifacts used.
 func CheckAndFetchInputsForExecution(
 	userInputs *core.LiteralMap, fixedInputs *core.LiteralMap, expectedInputs *core.ParameterMap) (*core.LiteralMap, error) {
 
@@ -102,14 +100,7 @@ func CheckAndFetchInputsForExecution(
 			if expectedInput.GetRequired() {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s missing", shared.ExpectedInputs, name)
 			}
-			// Look up from Artifact service if necessary
-			if expectedInput.GetArtifactQuery() != nil {
-				// should be executionInputMap[name] = artifactService.query(expectedInput.GetArtifactQuery())
-				executionInputMap[name] = expectedInput.GetDefault()
-			} else {
-				// At this point, the Literal returned by GetDefault might still be an ArtifactID
-				executionInputMap[name] = expectedInput.GetDefault()
-			}
+			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
 			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {

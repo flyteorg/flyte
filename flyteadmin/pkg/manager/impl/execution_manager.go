@@ -711,8 +711,8 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 
 // ResolveLiteralMapArtifacts will go through the input literal map and resolve any artifact references to their
 // literal values.
-func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, inputs *core.LiteralMap) (*core.LiteralMap, []*core.ArtifactID, error) {
-	var artifactIDs []*core.ArtifactID
+func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, inputs *core.LiteralMap) (*core.LiteralMap, map[string]*core.ArtifactID, error) {
+	var artifactIDs = make(map[string]*core.ArtifactID)
 	if inputs == nil {
 		return nil, artifactIDs, nil
 	}
@@ -726,14 +726,17 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 
 			x := *m.artifactClient
 			req := &artifact.GetArtifactRequest{
-				Identifier: &artifact.GetArtifactRequest_ArtifactId{ArtifactId: v.GetArtifactId()},
-				Details:    false,
+				Query: &core.ArtifactQuery{
+					Identifier: &core.ArtifactQuery_ArtifactId{ArtifactId: v.GetArtifactId()},
+				},
+				Details: false,
 			}
 			resp, err := x.GetArtifact(ctx, req)
 			if err != nil {
+				logger.Errorf(ctx, "Failed to find artifact by ID [%+v]", v.GetArtifactId())
 				return nil, nil, err
 			}
-			artifactIDs = append(artifactIDs, resp.Artifact.GetArtifactId())
+			artifactIDs[k] = resp.Artifact.GetArtifactId()
 			logger.Debugf(ctx, "Resolved artifact for [%s] to [%+v]", k, resp.GetArtifact().ArtifactId)
 			outputs[k] = resp.Artifact.Spec.Value
 		} else {
@@ -746,9 +749,9 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 }
 
 // ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
-func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap) (*core.ParameterMap, []*core.ArtifactID, error) {
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, fulfilled map[string]*core.ArtifactID) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
 	// only top level replace for now.
-	var artifactIDs []*core.ArtifactID
+	var artifactIDs = make(map[string]*core.ArtifactID)
 	if inputs == nil {
 		return nil, artifactIDs, nil
 	}
@@ -756,21 +759,33 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 	x := *m.artifactClient
 
 	for k, v := range inputs.Parameters {
+		if fulfilled != nil {
+			if _, ok := fulfilled[k]; ok {
+				// Pretend it's required since it's already been found.
+				// CheckAndFetchInputsForExecution should be fine.
+				// todo: clean this up later
+				outputs[k] = &core.Parameter{
+					Var:      v.Var,
+					Behavior: &core.Parameter_Required{Required: true},
+				}
+				continue
+			}
+		}
 		if v.GetArtifactQuery() != nil {
 			if m.artifactClient == nil {
 				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
 			}
 
 			req := &artifact.GetArtifactRequest{
-				Identifier: &artifact.GetArtifactRequest_Query{Query: v.GetArtifactQuery()},
-				Details:    false,
+				Query:   v.GetArtifactQuery(),
+				Details: false,
 			}
 
 			resp, err := x.GetArtifact(ctx, req)
 			if err != nil {
 				return nil, nil, err
 			}
-			artifactIDs = append(artifactIDs, resp.Artifact.GetArtifactId())
+			artifactIDs[k] = resp.Artifact.GetArtifactId()
 			logger.Debugf(ctx, "Resolved query for [%s] to [%+v]", k, resp.Artifact.ArtifactId)
 			outputs[k] = &core.Parameter{
 				Var:      v.Var,
@@ -815,28 +830,38 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Resolve artifacts.
 	// two sources of artifacts: launch plan and create execute request.
 	//   - within the create request, artifacts will be pinned in the Literals.
-	//   - within the launch plan, the artifact will be in the Parameter map, and can come in the Literal,
-	//     or as an ArtifactQuery.
+	//   - within the launch plan, the artifact will be in the Parameter map, and can come in form of a Literal
+	//     in the default, or as an ArtifactQuery.
 	// All three components that comprise the inputs may contain artifacts.
-	var foundArtifacts []*core.ArtifactID
+	// The results of the first two need to be passed to the ParameterMap resolution - this is because for inputs
+	// that are already satisfied in the request, we don't want to perform the search (maybe the search doesn't even
+	// return anything yet).
+	var foundArtifacts = make(map[string]*core.ArtifactID)
 	resolvedRequestInputs, as, err := m.ResolveLiteralMapArtifacts(ctx, request.Inputs)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up request.Inputs for artifacts: %v", err)
 		return nil, nil, nil, err
 	}
-	foundArtifacts = append(foundArtifacts, as...)
+	for k, v := range as {
+		foundArtifacts[k] = v
+	}
 	resolvedFixedInputs, as, err := m.ResolveLiteralMapArtifacts(ctx, launchPlan.Spec.FixedInputs)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up launch plan fixed inputs for artifacts: %v", err)
 		return nil, nil, nil, err
 	}
-	foundArtifacts = append(foundArtifacts, as...)
-	resolvedExpectedInputs, as, err := m.ResolveParameterMapArtifacts(ctx, launchPlan.Closure.ExpectedInputs)
+	for k, v := range as {
+		foundArtifacts[k] = v
+	}
+	resolvedExpectedInputs, as, err := m.ResolveParameterMapArtifacts(ctx, launchPlan.Closure.ExpectedInputs, foundArtifacts)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
 		return nil, nil, nil, err
 	}
-	foundArtifacts = append(foundArtifacts, as...)
+	for k, v := range as {
+		foundArtifacts[k] = v
+	}
+
 	if len(foundArtifacts) > 0 {
 		logger.Debugf(ctx, "Resolved request.Inputs from [%+v] to [%+v]", request.Inputs, resolvedRequestInputs)
 		logger.Debugf(ctx, "Resolved launch plan fixed inputs from [%+v] to [%+v]", launchPlan.Spec.FixedInputs, resolvedFixedInputs)
@@ -889,7 +914,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
-	requestSpec.Metadata.ArtifactIds = foundArtifacts
+	// Construct a list of the values for saving.
+	artifactIDs := make([]*core.ArtifactID, 0, len(foundArtifacts))
+	for _, value := range foundArtifacts {
+		artifactIDs = append(artifactIDs, value)
+	}
+	requestSpec.Metadata.ArtifactIds = artifactIDs
 
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -1031,7 +1061,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 			workflowExecutionID, err)
 		return nil, nil, nil, err
 	}
-	return ctx, executionModel, foundArtifacts, nil
+	return ctx, executionModel, artifactIDs, nil
 }
 
 // Inserts an execution model into the database store and emits platform metrics.
