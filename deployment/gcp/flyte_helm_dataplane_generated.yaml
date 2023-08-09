@@ -47,6 +47,16 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 ---
+# Source: flyte-core/charts/flyteagent/templates/agent/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyteagent
+  namespace: flyte
+type: Opaque
+data:
+  username: User
+---
 # Source: flyte-core/templates/common/secret-auth.yaml
 apiVersion: v1
 kind: Secret

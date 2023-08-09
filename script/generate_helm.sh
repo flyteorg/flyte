@@ -16,6 +16,7 @@ HELM_CAPABILITIES="-a rbac.authorization.k8s.io/v1 -a networking.k8s.io/v1/Ingre
 helm dep update ${DIR}/../charts/flyte/
 helm dep update ${DIR}/../charts/flyte-deps/
 helm dep update ${DIR}/../charts/flyte-core/
+helm dep update ${DIR}/../charts/flyte-binary/
 
 helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 

@@ -121,6 +121,16 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   name: flyte-kubernetes-dashboard
 ---
+# Source: flyte/charts/flyte/charts/flyteagent/templates/agent/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyteagent
+  namespace: flyte
+type: Opaque
+data:
+  username: User
+---
 # Source: flyte/charts/flyte/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret

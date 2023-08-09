@@ -25,6 +25,16 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   annotations:
 ---
+# Source: flyte-binary/charts/flyteagent/templates/agent/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyteagent
+  namespace: flyte
+type: Opaque
+data:
+  username: User
+---
 # Source: flyte-binary/templates/config-secret.yaml
 apiVersion: v1
 kind: Secret

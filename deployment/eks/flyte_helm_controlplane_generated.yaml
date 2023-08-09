@@ -51,6 +51,16 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte-core/charts/flyteagent/templates/agent/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyteagent
+  namespace: flyte
+type: Opaque
+data:
+  username: User
+---
 # Source: flyte-core/templates/admin/secret.yaml
 apiVersion: v1
 kind: Secret
