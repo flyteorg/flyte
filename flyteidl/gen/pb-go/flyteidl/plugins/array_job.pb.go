@@ -23,7 +23,7 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 // Describes a job that can process independent pieces of data concurrently. Multiple copies of the runnable component
 // will be executed concurrently.
 type ArrayJob struct {
-	// Defines the minimum number of instances to bring up concurrently at any given point. Note that this is an
+	// Defines the maximum number of instances to bring up concurrently at any given point. Note that this is an
 	// optimistic restriction and that, due to network partitioning or other failures, the actual number of currently
 	// running instances might be more. This has to be a positive number if assigned. Default value is size.
 	Parallelism int64 `protobuf:"varint,1,opt,name=parallelism,proto3" json:"parallelism,omitempty"`
