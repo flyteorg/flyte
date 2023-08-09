@@ -2,5 +2,4 @@ flytepropeller:
   enabled: false
 
 flyteagent:
-  flyteagent:
-    enabled: false
+  enabled: false

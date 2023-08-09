@@ -112,8 +112,7 @@ flytepropeller:
 # FLYTE_AGENT
 #
 flyteagent:
-  flyteagent:
-    enabled: false
+  enabled: false
 
 #
 # FLYTECONSOLE

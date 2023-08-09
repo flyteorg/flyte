@@ -11,8 +11,7 @@ docker-registry:
 
 flyte-binary:
   flyteagent:
-    flyteagent:
-      enable: true
+    enable: true
   nameOverride: flyte-sandbox
   enabled: true
   configuration:
