@@ -343,10 +343,10 @@ github.com/fatih/structs v1.0.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
-github.com/flyteorg/datacatalog v1.0.46 h1:55zJCroLskg08MrSxZpo0S+uZhQagXJYQN0Rkv4KI8A=
-github.com/flyteorg/datacatalog v1.0.46/go.mod h1:VhtWkjCBJ9LZpt6uqTyKMYq1IAkW7dUeAdbWN9DI6h0=
-github.com/flyteorg/flyteadmin v1.1.105 h1:F5wq9qWlfoVIcV6JyrIkE+s/aRblZKST8vM1CKt5KuI=
-github.com/flyteorg/flyteadmin v1.1.105/go.mod h1:ilKMGjsVL7z+V3lYVM0owutjOGV83vn4rsScMJTWVNk=
+github.com/flyteorg/datacatalog v1.0.48 h1:KPUV4uUZ0adLL9uvQ+pmGymdzDrwqeYJzpOk+DR+2e4=
+github.com/flyteorg/datacatalog v1.0.48/go.mod h1:VhtWkjCBJ9LZpt6uqTyKMYq1IAkW7dUeAdbWN9DI6h0=
+github.com/flyteorg/flyteadmin v1.1.110 h1:NNZtL50qhGGpp8J1P7Bl7QLPTMLT/qdpiWQtmut4fgM=
+github.com/flyteorg/flyteadmin v1.1.110/go.mod h1:xlEV456kroJDnPRSRV50iO0VKttiLJDHHH+TJJuh7Dc=
 github.com/flyteorg/flyteidl v1.5.13 h1:IQ2Cw+u36ew3BPyRDAcHdzc/GyNEOXOxhKy9jbS4hbo=
 github.com/flyteorg/flyteidl v1.5.13/go.mod h1:EtE/muM2lHHgBabjYcxqe9TWeJSL0kXwbI0RgVwI4Og=
 github.com/flyteorg/flyteplugins v1.1.16 h1:DIQxPERFMvTGnLTkkeG9R8STF3YMvxK1nPtFf+a6o5Q=

@@ -190,8 +190,10 @@ def run(
 
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
-    manifest_url = "https://raw.githubusercontent.com/flyteorg/flytesnacks/" \
-                   f"{flytesnacks_release_tag}/cookbook/flyte_tests_manifest.json"
+    manifest_url = (
+        "https://raw.githubusercontent.com/flyteorg/flytesnacks/"
+        f"{flytesnacks_release_tag}/flyte_tests_manifest.json"
+    )
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
 
