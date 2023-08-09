@@ -224,7 +224,7 @@ flyte:
       # -- Docker image for flyteagent deployment
       repository: ghcr.io/flyteorg/flyteagent
       # -- Docker image tag
-      tag: 1.6.2b1
+      tag: 1.8.1
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for flyteagent deployment

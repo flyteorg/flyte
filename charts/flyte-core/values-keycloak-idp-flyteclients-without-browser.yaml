@@ -244,7 +244,8 @@ flytepropeller:
 # FLYTE_AGENT
 #
 flyteagent:
-  enabled: false
+  flyteagent:
+    enabled: false
 
 #
 # FLYTECONSOLE SETTINGS

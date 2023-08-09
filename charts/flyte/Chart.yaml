@@ -8,10 +8,6 @@ dependencies:
     alias: flyte
     version: v0.1.10 # VERSION
     repository: file://../flyte-core # REPOSITORY
-  - name: flyteagent
-    alias: flyteagent
-    version: v0.1.10 # VERSION
-    repository: file://../flyte-agent # REPOSITORY
   - name: contour
     version: 7.10.1
     repository: https://charts.bitnami.com/bitnami

@@ -20,4 +20,5 @@ flyteconsole:
   enabled: false
 
 flyteagent:
-  enabled: false
+  flyteagent:
+    enabled: false
