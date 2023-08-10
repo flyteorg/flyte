@@ -14,12 +14,11 @@ commonAnnotations: {}
 agentSecret:
   # -- Specify name of K8s Secret. Leave it empty if you don't need this Secret
   name: ""
-  # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
+  # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data).
   secretData:
     data:
       username: User
 
-enabled: true
 # -- Replicas count for flyteagent deployment
 replicaCount: 1
 image:

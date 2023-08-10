@@ -13,11 +13,10 @@ A Helm chart for Flyte agent
 | additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | affinity | object | `{}` | affinity for flyteagent deployment |
 | agentSecret.name | string | `""` | Specify name of K8s Secret. Leave it empty if you don't need this Secret |
-| agentSecret.secretData | object | `{"data":{"username":"User"}}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets |
+| agentSecret.secretData | object | `{"data":{"username":"User"}}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configPath | string | `"/etc/flyteagent/config/*.yaml"` | Default regex string for searching configuration files |
-| enabled | bool | `true` |  |
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |

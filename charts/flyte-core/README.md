@@ -100,7 +100,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
 | configmap.enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"bigquery_query_job_task":"agent-service","container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
-| configmap.k8s | object | `{"plugins":{"agent-service":{"defaultGrpcEndpoint":"flyteagent.flyte.svc.cluster.local:8000","supportedTaskTypes":["bigquery_query_job_task"]},"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
+| configmap.k8s | object | `{"plugins":{"agent-service":{"defaultAgent":{"endpoint":"flyteagent.flyte.svc.cluster.local:8000","insecure":true},"supportedTaskTypes":["bigquery_query_job_task"]},"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
@@ -173,29 +173,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
-| flyteagent.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
-| flyteagent.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
-| flyteagent.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
-| flyteagent.affinity | object | `{}` | affinity for flyteagent deployment |
-| flyteagent.configPath | string | `"/etc/flyteagent/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteagent.enabled | bool | `true` |  |
-| flyteagent.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
-| flyteagent.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| flyteagent.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
-| flyteagent.image.tag | string | `"1.6.2b1"` | Docker image tag |
-| flyteagent.nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
-| flyteagent.podAnnotations | object | `{}` | Annotations for flyteagent pods |
-| flyteagent.ports.containerPort | int | `8000` |  |
-| flyteagent.ports.name | string | `"agent-grpc"` |  |
-| flyteagent.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
-| flyteagent.replicaCount | int | `1` | Replicas count for flyteagent deployment |
-| flyteagent.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for flyteagent deployment |
-| flyteagent.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
-| flyteagent.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
-| flyteagent.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |
-| flyteagent.serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |
-| flyteagent.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flyteagent.tolerations | list | `[]` | tolerations for flyteagent deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |

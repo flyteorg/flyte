@@ -667,7 +667,9 @@ data:
   k8s.yaml: | 
     plugins:
       agent-service:
-        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
+        defaultAgent:
+          endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+          insecure: true
         supportedTaskTypes:
         - bigquery_query_job_task
       k8s:
@@ -6747,7 +6749,7 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: "ghcr.io/flyteorg/flyteagent:1.8.1"
+        image: "ghcr.io/flyteorg/flyteagent:1.8.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -6759,12 +6761,12 @@ spec:
         resources:
           limits:
             cpu: 500m
-            ephemeral-storage: 100Mi
-            memory: 500Mi
+            ephemeral-storage: 200Mi
+            memory: 200Mi
           requests:
-            cpu: 10m
-            ephemeral-storage: 50Mi
-            memory: 50Mi
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 200Mi
       serviceAccountName: flyteagent
       volumes:
       - name: flyteagent
@@ -7225,7 +7227,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b7f9a0fa68b94c02a3815d28c3d6c4b15661a67166f2988bd99a248ba6ada25"
+        configChecksum: "8a3a62b3a31dd7ddebdf117278a07de412e4a9acbdbed91b521e72ebf14cb75"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7299,7 +7301,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.106
       annotations:
-        configChecksum: "b7f9a0fa68b94c02a3815d28c3d6c4b15661a67166f2988bd99a248ba6ada25"
+        configChecksum: "8a3a62b3a31dd7ddebdf117278a07de412e4a9acbdbed91b521e72ebf14cb75"
     spec:
       securityContext:
         fsGroup: 65534
