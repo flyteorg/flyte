@@ -5440,6 +5440,30 @@ func TestGetClusterAssignment(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
 	})
+	t.Run("value from config", func(t *testing.T) {
+		customCP := "my_cp"
+		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
+		clusterPoolAsstProvider.OnGetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
+			workflowIdentifier.GetDomain(): runtimeInterfaces.ClusterPoolAssignment{
+				Pool: customCP,
+			},
+		})
+		mockConfig := getMockExecutionsConfigProvider()
+		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
+
+		executionManager := ExecutionManager{
+			resourceManager: &managerMocks.MockResourceManager{},
+			config:          mockConfig,
+		}
+
+		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, customCP, ca.GetClusterPoolName())
+	})
 }
 
 func TestResolvePermissions(t *testing.T) {

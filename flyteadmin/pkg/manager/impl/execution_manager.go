@@ -444,8 +444,11 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	if resource != nil && resource.Attributes.GetClusterAssignment() != nil {
 		return resource.Attributes.GetClusterAssignment(), nil
 	}
-	// Defaults to empty assignment with no selectors
-	return &admin.ClusterAssignment{}, nil
+	clusterPoolAssignment := m.config.ClusterPoolAssignmentConfiguration().GetClusterPoolAssignments()[request.GetDomain()]
+
+	return &admin.ClusterAssignment{
+		ClusterPoolName: clusterPoolAssignment.Pool,
+	}, nil
 }
 
 func (m *ExecutionManager) launchSingleTaskExecution(

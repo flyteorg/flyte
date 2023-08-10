@@ -11,4 +11,5 @@ type Configuration interface {
 	ClusterResourceConfiguration() ClusterResourceConfiguration
 	NamespaceMappingConfiguration() NamespaceMappingConfiguration
 	QualityOfServiceConfiguration() QualityOfServiceConfiguration
+	ClusterPoolAssignmentConfiguration() ClusterPoolAssignmentConfiguration
 }
