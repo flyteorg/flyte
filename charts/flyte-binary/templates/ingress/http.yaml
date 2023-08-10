@@ -27,6 +27,11 @@ spec:
   {{- else if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
   {{- end }}
+  {{- if .Values.ingress.httpTls }}
+  tls: {{- tpl ( .Values.ingress.httpTls | toYaml ) . | nindent 2 }}
+  {{- else if .Values.ingress.tls }}
+  tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 2 }}
+  {{- end }}
   rules:
   - http:
       paths:
@@ -171,10 +176,5 @@ spec:
       {{- end }}
     {{- if .Values.ingress.host }}
     host: {{ tpl .Values.ingress.host . | quote }}
-    {{- end }}
-    {{- if .Values.ingress.httpTls }}
-    tls: {{- tpl ( .Values.ingress.httpTls | toYaml ) . | nindent 6 }}
-    {{- else if .Values.ingress.tls }}
-    tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 6 }}
     {{- end }}
 {{- end }}

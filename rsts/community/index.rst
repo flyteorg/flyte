@@ -35,11 +35,12 @@ Please join us on:
 ..    :classes: btn-outline-secondary
 
 
-Open Source Community Sync
---------------------------
+Open Source Community Meeting 
+-----------------------------
 
-We host an Open Source Community Sync every other Tuesday, 9:00 AM PDT/PST.
-Check it out, subscribe to the `calendar <https://www.addevent.com/calendar/kE355955>`_, or just pop in!
+When: every other Tuesday, 9:00 AM Pacific Time.
+You're welcome to join and learn from other commmunity members sharing their experiences with Flyte or any other technology from the AI ecosystem.
+Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
 .. image:: https://img.shields.io/badge/Join-Zoom-blue?style=for-the-badge
     :target: https://www.addevent.com/event/EA7823958
