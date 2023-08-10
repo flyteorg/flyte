@@ -3,7 +3,9 @@ package impl
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
@@ -726,7 +728,6 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 
 			x := *m.artifactClient
 			req := &artifact.GetArtifactRequest{
-				// TODO: Do all the templating work for querying.
 				Query: &core.ArtifactQuery{
 					Identifier: &core.ArtifactQuery_ArtifactId{ArtifactId: v.GetArtifactId()},
 				},
@@ -746,18 +747,134 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 	}
 	lm := &core.LiteralMap{Literals: outputs}
 	return lm, artifactIDs, nil
+}
 
+var re = regexp.MustCompile(`.*({{\s*\.inputs\.([a-zA-Z0-9_]+)\s*}}).*`)
+
+// templateInputString uses regex to take a string that looks like "{{ .inputs.var1 }}" and replace it with the
+// string value of var1
+func (m *ExecutionManager) templateInputString(ctx context.Context, input string, inputs map[string]*core.Literal) (string, error) {
+	// todo: fill this in
+	if input == "{{ .execution.kickoff_time }}" {
+		return "2023-08-58", nil
+	}
+	matches := re.FindStringSubmatch(input)
+	if len(matches) == 3 {
+		val, ok := inputs[matches[2]]
+		if !ok {
+			return input, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input var [%s] not found", matches[2])
+		}
+		if val.GetScalar() == nil || val.GetScalar().GetPrimitive() == nil {
+			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", val)
+		}
+		x := strings.Replace(input, matches[1], val.GetScalar().GetPrimitive().GetStringValue(), -1)
+		return x, nil
+	} else {
+		logger.Debugf(ctx, "No matches found for input string [%s]", input)
+		return input, nil
+	}
+}
+
+func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.ArtifactQuery, inputs map[string]*core.Literal) (core.ArtifactQuery, error) {
+	if query.GetUri() != "" {
+		// If a query string, then just pass it through, nothing to fill in.
+		return query, nil
+	} else if query.GetArtifactTag() != nil {
+		t := query.GetArtifactTag()
+		ak := t.GetArtifactKey()
+		if ak == nil {
+			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "tag doesn't have key")
+		}
+		var project, domain string
+		if ak.GetProject() == "" {
+			project = contextutils.Value(ctx, contextutils.ProjectKey)
+		} else {
+			project = ak.GetProject()
+		}
+		if ak.GetDomain() == "" {
+			domain = contextutils.Value(ctx, contextutils.DomainKey)
+		} else {
+			domain = ak.GetDomain()
+		}
+
+		newValue, err := m.templateInputString(ctx, t.GetValue(), inputs)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to template input string [%s] [%v]", t.GetValue(), err)
+			return query, err
+		}
+
+		return core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactTag{
+				ArtifactTag: &core.ArtifactTag{
+					ArtifactKey: &core.ArtifactKey{
+						Project: project,
+						Domain:  domain,
+						Name:    ak.GetName(),
+					},
+					Value: newValue,
+				},
+			},
+		}, nil
+	} else if query.GetArtifactId() != nil {
+		artifactID := query.GetArtifactId()
+		ak := artifactID.GetArtifactKey()
+		if ak == nil {
+			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "id doesn't have key")
+		}
+		var project, domain string
+		if ak.GetProject() == "" {
+			project = contextutils.Value(ctx, contextutils.ProjectKey)
+		} else {
+			project = ak.GetProject()
+		}
+		if ak.GetDomain() == "" {
+			domain = contextutils.Value(ctx, contextutils.DomainKey)
+		} else {
+			domain = ak.GetDomain()
+		}
+
+		var partitions map[string]string
+
+		if artifactID.GetPartitions() != nil {
+			partitions = make(map[string]string, len(artifactID.GetPartitions().Value))
+			for k, v := range artifactID.GetPartitions().Value {
+				newValue, err := m.templateInputString(ctx, v, inputs)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to template input string [%s] [%v]", v, err)
+					return query, err
+				}
+				partitions[k] = newValue
+			}
+		}
+		return core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey: &core.ArtifactKey{
+						Project: project,
+						Domain:  domain,
+						Name:    ak.GetName(),
+					},
+					Dimensions: &core.ArtifactID_Partitions{
+						Partitions: &core.Partitions{
+							Value: partitions,
+						},
+					},
+				},
+			},
+		}, nil
+	}
+	return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "query doesn't have uri, tag, or id")
 }
 
 // ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
-func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, fulfilled map[string]*core.ArtifactID) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, fulfilled map[string]*core.ArtifactID, inputsForQueryTemplating map[string]*core.Literal) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
 	// only top level replace for now.
 	var artifactIDs = make(map[string]*core.ArtifactID)
 	if inputs == nil {
 		return nil, artifactIDs, nil
 	}
 	outputs := map[string]*core.Parameter{}
-	x := *m.artifactClient
+	client := *m.artifactClient
 
 	for k, v := range inputs.Parameters {
 		if fulfilled != nil {
@@ -776,13 +893,17 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if m.artifactClient == nil {
 				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
 			}
-			// TODO: Do all the templating work for querying.
+			filledInQuery, err := m.fillInTemplateArgs(ctx, *v.GetArtifactQuery(), inputsForQueryTemplating)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to fill in template args for [%s] [%v]", k, err)
+				return nil, nil, err
+			}
 			req := &artifact.GetArtifactRequest{
-				Query:   v.GetArtifactQuery(),
+				Query:   &filledInQuery,
 				Details: false,
 			}
 
-			resp, err := x.GetArtifact(ctx, req)
+			resp, err := client.GetArtifact(ctx, req)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -803,6 +924,8 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, []*core.ArtifactID, error) {
+
+	ctxPD := contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
@@ -838,7 +961,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// that are already satisfied in the request, we don't want to perform the search (maybe the search doesn't even
 	// return anything yet).
 	var foundArtifacts = make(map[string]*core.ArtifactID)
-	resolvedRequestInputs, as, err := m.ResolveLiteralMapArtifacts(ctx, request.Inputs)
+	resolvedRequestInputs, as, err := m.ResolveLiteralMapArtifacts(ctxPD, request.Inputs)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up request.Inputs for artifacts: %v", err)
 		return nil, nil, nil, err
@@ -846,7 +969,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	for k, v := range as {
 		foundArtifacts[k] = v
 	}
-	resolvedFixedInputs, as, err := m.ResolveLiteralMapArtifacts(ctx, launchPlan.Spec.FixedInputs)
+	resolvedFixedInputs, as, err := m.ResolveLiteralMapArtifacts(ctxPD, launchPlan.Spec.FixedInputs)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up launch plan fixed inputs for artifacts: %v", err)
 		return nil, nil, nil, err
@@ -854,7 +977,20 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	for k, v := range as {
 		foundArtifacts[k] = v
 	}
-	resolvedExpectedInputs, as, err := m.ResolveParameterMapArtifacts(ctx, launchPlan.Closure.ExpectedInputs, foundArtifacts)
+	// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
+	var inputsForQueryTemplating = make(map[string]*core.Literal)
+	if resolvedRequestInputs != nil {
+		for k, v := range resolvedRequestInputs.Literals {
+			inputsForQueryTemplating[k] = v
+		}
+	}
+	if resolvedFixedInputs != nil {
+		for k, v := range resolvedFixedInputs.Literals {
+			inputsForQueryTemplating[k] = v
+		}
+	}
+
+	resolvedExpectedInputs, as, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, foundArtifacts, inputsForQueryTemplating)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
 		return nil, nil, nil, err
@@ -1101,6 +1237,7 @@ func (m *ExecutionManager) handleArtifactEvents(artifactIDs []*core.ArtifactID, 
 func (m *ExecutionManager) CreateExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
+
 	// Prior to  flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
 	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
