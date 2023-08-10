@@ -64,10 +64,10 @@ data:
       {{- if .Values.configuration.agentService }}
       agent-service:
       {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
-      {{- else if .Values.flyteagent.enable }}
+      {{- else if .Values.flyteagent.enabled }}
       agent-service:
         defaultAgent:
-          endpoint: {{ include "flyte-binary.agent.name" . }}:{{ include "flyte-binary.agent.servicePort" . }}
+          endpoint: {{ include "flyteagent.name" . }}:{{ include "flyteagent.servicePort" . }}
           insecure: true
         supportedTaskTypes:
         - bigquery_query_job_task

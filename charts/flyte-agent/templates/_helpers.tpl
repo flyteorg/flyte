@@ -40,3 +40,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 - mountPath: /etc/agent-secret
   name: {{ include "flyte.name" . }}
 {{- end }}
+
+{{- define "flyteagent.servicePort" -}}
+{{ include .Values.ports.containerPort}}
+{{- end }}
