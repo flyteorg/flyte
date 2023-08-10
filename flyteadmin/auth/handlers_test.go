@@ -10,18 +10,19 @@ import (
 	"strings"
 	"testing"
 
-	"google.golang.org/protobuf/types/known/structpb"
-
-	"github.com/flyteorg/flyteadmin/auth/config"
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
-
 	"github.com/coreos/go-oidc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
+	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	stdConfig "github.com/flyteorg/flytestdlib/config"
 )
 
 const (
@@ -81,7 +82,8 @@ func TestGetCallbackHandlerWithErrorOnToken(t *testing.T) {
 	defer localServer.Close()
 	http.DefaultClient = localServer.Client()
 	mockAuthCtx := setupMockedAuthContextAtEndpoint(localServer.URL)
-	callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx)
+	r := plugins.NewRegistry()
+	callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 	request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
 	addCsrfCookie(request)
 	addStateString(request)
@@ -102,7 +104,8 @@ func TestGetCallbackHandlerWithUnAuthorized(t *testing.T) {
 	defer localServer.Close()
 	http.DefaultClient = localServer.Client()
 	mockAuthCtx := setupMockedAuthContextAtEndpoint(localServer.URL)
-	callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx)
+	r := plugins.NewRegistry()
+	callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 	request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
 	writer := httptest.NewRecorder()
 	callbackHandlerFunc(writer, request)
@@ -153,7 +156,8 @@ func TestGetCallbackHandler(t *testing.T) {
 
 	t.Run("forbidden request when accessing user info", func(t *testing.T) {
 		mockAuthCtx := setupMockedAuthContextAtEndpoint(localServer.URL)
-		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx)
+		r := plugins.NewRegistry()
+		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
 		addCsrfCookie(request)
 		addStateString(request)
@@ -172,9 +176,15 @@ func TestGetCallbackHandler(t *testing.T) {
 		assert.Equal(t, "403 Forbidden", writer.Result().Status)
 	})
 
-	t.Run("successful callback and redirect", func(t *testing.T) {
+	t.Run("successful callback with redirect and successful preredirect hook call", func(t *testing.T) {
 		mockAuthCtx := setupMockedAuthContextAtEndpoint(localServer.URL)
-		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx)
+		r := plugins.NewRegistry()
+		var redirectFunc PreRedirectHookFunc = func(redirectContext context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, responseWriter http.ResponseWriter) *PreRedirectHookError {
+			return nil
+		}
+
+		r.RegisterDefault(plugins.PluginIDPreRedirectHook, redirectFunc)
+		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
 		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
 		addCsrfCookie(request)
 		addStateString(request)
@@ -192,6 +202,37 @@ func TestGetCallbackHandler(t *testing.T) {
 		mockAuthCtx.OnOidcProviderMatch().Return(oidcProvider)
 		callbackHandlerFunc(writer, request)
 		assert.Equal(t, "307 Temporary Redirect", writer.Result().Status)
+	})
+
+	t.Run("successful callback with pre-redirecthook failure", func(t *testing.T) {
+		mockAuthCtx := setupMockedAuthContextAtEndpoint(localServer.URL)
+		r := plugins.NewRegistry()
+		var redirectFunc PreRedirectHookFunc = func(redirectContext context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, responseWriter http.ResponseWriter) *PreRedirectHookError {
+			return &PreRedirectHookError{
+				Code:    http.StatusPreconditionFailed,
+				Message: "precondition error",
+			}
+		}
+
+		r.RegisterDefault(plugins.PluginIDPreRedirectHook, redirectFunc)
+		callbackHandlerFunc := GetCallbackHandler(ctx, mockAuthCtx, r)
+		request := httptest.NewRequest("GET", localServer.URL+"/callback", nil)
+		addCsrfCookie(request)
+		addStateString(request)
+		writer := httptest.NewRecorder()
+		openIDConfigJSON = fmt.Sprintf(`{
+				"userinfo_endpoint": "%v/userinfo",
+				"issuer": "%v",
+				"authorization_endpoint": "%v/auth",
+				"token_endpoint": "%v/token",
+				"jwks_uri": "%v/keys",
+				"id_token_signing_alg_values_supported": ["RS256"]
+			}`, issuer, issuer, issuer, issuer, issuer)
+		oidcProvider, err := oidc.NewProvider(ctx, issuer)
+		assert.Nil(t, err)
+		mockAuthCtx.OnOidcProviderMatch().Return(oidcProvider)
+		callbackHandlerFunc(writer, request)
+		assert.Equal(t, "412 Precondition Failed", writer.Result().Status)
 	})
 }
 

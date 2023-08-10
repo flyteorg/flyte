@@ -1,6 +1,8 @@
 package plugins
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,6 +21,24 @@ func TestNewAtomicRegistry(t *testing.T) {
 	ar.Store(r)
 	r = ar.Load()
 	assert.Equal(t, 5, r.Get(PluginIDDataProxy))
+}
+
+type PreRedirectHookFunc func(ctx context.Context) error
+
+func TestRedirectHook(t *testing.T) {
+	ar := NewAtomicRegistry(nil)
+	r := NewRegistry()
+
+	var redirectHookfn PreRedirectHookFunc = func(ctx context.Context) error {
+		return fmt.Errorf("redirect hook error")
+	}
+	err := r.Register(PluginIDPreRedirectHook, redirectHookfn)
+	assert.NoError(t, err)
+	ar.Store(r)
+	r = ar.Load()
+	fn := Get[PreRedirectHookFunc](r, PluginIDPreRedirectHook)
+	err = fn(context.Background())
+	assert.Equal(t, fmt.Errorf("redirect hook error"), err)
 }
 
 func TestRegistry_RegisterDefault(t *testing.T) {
