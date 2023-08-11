@@ -77,8 +77,15 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	headReplicas := int32(1)
 	headNodeRayStartParams := make(map[string]string)
-	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
-		headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
+	headGroupResources := &v1.ResourceRequirements{}
+	if rayJob.RayCluster.HeadGroupSpec != nil{
+		if rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
+			headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
+		}
+		headGroupResources, err = flytek8s.ToK8sResourceRequirements(rayJob.RayCluster.HeadGroupSpec.Resources)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", headGroupResources, err.Error())
+		}
 	}
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
 		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(GetConfig().IncludeDashboard)
@@ -92,14 +99,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	if rayJob.RayCluster.Namespace != "" {
 		objectMeta.Namespace = rayJob.RayCluster.Namespace
-	}
-
-	headGroupResources := &v1.ResourceRequirements{}
-	if rayJob.RayCluster.HeadGroupSpec != nil {
-		headGroupResources, err = flytek8s.ToK8sResourceRequirements(rayJob.RayCluster.HeadGroupSpec.Resources)
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", headGroupResources, err.Error())
-		}
 	}
 
 	enableIngress := true
