@@ -101,13 +101,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", headGroupResources, err.Error())
 		}
 	}
-	workerGroupResources := &v1.ResourceRequirements{}
-	if rayJob.RayCluster.WorkerGroupSpec != nil {
-		workerGroupResources, err = flytek8s.ToK8sResourceRequirements(rayJob.RayCluster.WorkerGroupSpec[0].Resources)
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", workerGroupResources, err.Error())
-		}
-	}
 
 	enableIngress := true
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
@@ -122,6 +115,11 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+		workerGroupResources, err := flytek8s.ToK8sResourceRequirements(spec.Resources)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", workerGroupResources, err.Error())
+		}
+
 		workerPodTemplate := buildWorkerPodTemplate(&container, podSpec, objectMeta, taskCtx, workerGroupResources)
 
 		minReplicas := spec.Replicas
