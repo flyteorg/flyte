@@ -522,7 +522,6 @@ data:
         - k8s-array
   k8s.yaml: | 
     plugins:
-      agent-service: {}
       k8s:
         default-cpus: 100m
         default-env-vars: []
@@ -1349,7 +1348,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "1bbdc9b2504a6b85907de21a271d104c15214d6f985e5273c963e5df3dca814"
+        configChecksum: "4ba4974b5cb243e068ebba9501891f71b52aada9c279a0ba7b6e2943abcc7f6"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1431,7 +1430,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.106
       annotations:
-        configChecksum: "1bbdc9b2504a6b85907de21a271d104c15214d6f985e5273c963e5df3dca814"
+        configChecksum: "4ba4974b5cb243e068ebba9501891f71b52aada9c279a0ba7b6e2943abcc7f6"
     spec:
       securityContext:
         fsGroup: 65534

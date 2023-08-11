@@ -736,11 +736,11 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      agent-service: {}
       # Uncomment and modify to include configuration for Flyte Agent
-      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000 
-      # supportedTaskTypes:
-      #   - bigquery_query_job_task
+      # agent-service:
+      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
+      #   supportedTaskTypes:
+      #     - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"
