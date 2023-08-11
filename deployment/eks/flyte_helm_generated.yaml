@@ -513,7 +513,6 @@ data:
     tasks:
       task-plugins:
         default-for-task-types:
-          bigquery_query_job_task: agent-service
           container: container
           container_array: k8s-array
           sidecar: sidecar
@@ -523,10 +522,7 @@ data:
         - k8s-array
   k8s.yaml: | 
     plugins:
-      agent-service:
-        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-        - bigquery_query_job_task
+      agent-service: {}
       k8s:
         default-cpus: 100m
         default-env-vars: []
@@ -1353,7 +1349,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "5aeb1eaeab35d20dc21450af4b772c377f0d5418905bf6eaf170a6e5ebaade1"
+        configChecksum: "1bbdc9b2504a6b85907de21a271d104c15214d6f985e5273c963e5df3dca814"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1435,7 +1431,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.1.106
       annotations:
-        configChecksum: "5aeb1eaeab35d20dc21450af4b772c377f0d5418905bf6eaf170a6e5ebaade1"
+        configChecksum: "1bbdc9b2504a6b85907de21a271d104c15214d6f985e5273c963e5df3dca814"
     spec:
       securityContext:
         fsGroup: 65534
