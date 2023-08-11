@@ -203,7 +203,7 @@ datacatalog:
 #
 
 flyteagent:
-  enabled: true
+  enabled: false
   # -- Replicas count for flyteagent deployment
   replicaCount: 1
   image:
@@ -718,12 +718,14 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          # -- Uncomment to enable agent service
+          # - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
-          bigquery_query_job_task: agent-service
+          # -- Uncomment to enable task type that uses Flyte Agent
+          # bigquery_query_job_task: agent-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:
@@ -734,11 +736,11 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      agent-service:
-        defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
-        supportedTaskTypes:
-          - bigquery_query_job_task
-
+      agent-service: {}
+      # Uncomment and modify to include configuration for Flyte Agent
+      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000 
+      # supportedTaskTypes:
+      #   - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"
