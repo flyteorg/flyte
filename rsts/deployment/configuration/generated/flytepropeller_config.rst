@@ -733,8 +733,14 @@ agent-service (`agent.Config`_)
 
 .. code-block:: yaml
 
-  defaultGrpcEndpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
-  endpointForTaskTypes: null
+  agentForTaskTypes: null
+  agents: null
+  defaultAgent:
+    defaultServiceConfig: ""
+    defaultTimeout: 10s
+    endpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
+    insecure: true
+    timeouts: null
   resourceConstraints:
     NamespaceScopeResourceConstraint:
       Value: 50
@@ -1213,19 +1219,35 @@ resourceConstraints (`core.ResourceConstraintsSpec`_)
     Value: 100
   
 
-defaultGrpcEndpoint (string)
+defaultAgent (`agent.Agent`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The default grpc endpoint of agent service.
+The default agent.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  dns:///flyte-agent.flyte.svc.cluster.local:80
+  defaultServiceConfig: ""
+  defaultTimeout: 10s
+  endpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
+  insecure: true
+  timeouts: null
   
 
-endpointForTaskTypes (map[string]string)
+agents (map[string]*agent.Agent)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The agents.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+agentForTaskTypes (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -1244,6 +1266,59 @@ supportedTaskTypes ([]string)
 
   - task_type_1
   - task_type_2
+  
+
+agent.Agent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dns:///flyte-agent.flyte.svc.cluster.local:80
+  
+
+insecure (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+defaultServiceConfig (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+timeouts (map[string]config.Duration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+defaultTimeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
   
 
 core.ResourceConstraintsSpec
