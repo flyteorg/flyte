@@ -102,9 +102,7 @@ type PluginManager struct {
 }
 
 func (e *PluginManager) AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
-	if len(o.GetNamespace()) == 0 {
-		o.SetNamespace(taskCtx.GetNamespace())
-	}
+	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), utils.CopyMap(taskCtx.GetAnnotations())))
 	o.SetLabels(utils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), utils.CopyMap(taskCtx.GetLabels())))
 	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())

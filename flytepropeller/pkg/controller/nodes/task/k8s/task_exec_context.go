@@ -31,6 +31,7 @@ type TaskExecutionMetadata struct {
 
 	annotations map[string]string
 	labels      map[string]string
+	namespace   string
 }
 
 func (t TaskExecutionMetadata) GetLabels() map[string]string {
@@ -39,6 +40,10 @@ func (t TaskExecutionMetadata) GetLabels() map[string]string {
 
 func (t TaskExecutionMetadata) GetAnnotations() map[string]string {
 	return t.annotations
+}
+
+func (t TaskExecutionMetadata) GetNamespace() string {
+	return t.namespace
 }
 
 // newTaskExecutionMetadata creates a TaskExecutionMetadata with secrets serialized as annotations and a label added
@@ -57,10 +62,15 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 			secrets.PodLabel: secrets.PodLabelValue,
 		}
 	}
+	namespace := tCtx.GetNamespace()
+	if len(taskTmpl.Metadata.Namespace) > 0 {
+		namespace = taskTmpl.Metadata.Namespace
+	}
 
 	return TaskExecutionMetadata{
 		TaskExecutionMetadata: tCtx,
 		annotations:           utils.UnionMaps(tCtx.GetAnnotations(), secretsMap),
 		labels:                utils.UnionMaps(tCtx.GetLabels(), injectSecretsLabel),
+		namespace:             namespace,
 	}, nil
 }
