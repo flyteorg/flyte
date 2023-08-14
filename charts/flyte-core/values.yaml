@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.1.110 # FLYTEADMIN_TAG
+    tag: v1.1.118 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -97,7 +97,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.1.110 # FLYTESCHEDULER_TAG
+    tag: v1.1.118 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -151,7 +151,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.0.48 # DATACATALOG_TAG
+    tag: v1.0.51 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -203,7 +203,7 @@ datacatalog:
 #
 
 flyteagent:
-  enabled: true
+  enabled: false
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -219,7 +219,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.1.106 # FLYTEPROPELLER_TAG
+    tag: v1.1.116 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -277,7 +277,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.8.5 # FLYTECONSOLE_TAG
+    tag: v1.9.2 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -602,7 +602,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.32 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v0.0.33 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -663,12 +663,14 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          # -- Uncomment to enable agent service
+          # - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
-          bigquery_query_job_task: agent-service
+          # -- Uncomment to enable task type that uses Flyte Agent
+          # bigquery_query_job_task: agent-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:
@@ -679,13 +681,11 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      agent-service:
-        defaultAgent:
-          endpoint: flyteagent.flyte.svc.cluster.local:8000
-          insecure: true
-        supportedTaskTypes:
-          - bigquery_query_job_task
-
+      # Uncomment and modify to include configuration for Flyte Agent
+      # agent-service:
+      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
+      #   supportedTaskTypes:
+      #     - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"
