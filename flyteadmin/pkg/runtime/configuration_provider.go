@@ -15,6 +15,7 @@ type ConfigurationProvider struct {
 	clusterResourceConfiguration        interfaces.ClusterResourceConfiguration
 	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
 	qualityOfServiceConfiguration       interfaces.QualityOfServiceConfiguration
+	clusterPoolAssignmentConfiguration  interfaces.ClusterPoolAssignmentConfiguration
 }
 
 func (p *ConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -53,6 +54,10 @@ func (p *ConfigurationProvider) QualityOfServiceConfiguration() interfaces.Quali
 	return p.qualityOfServiceConfiguration
 }
 
+func (p *ConfigurationProvider) ClusterPoolAssignmentConfiguration() interfaces.ClusterPoolAssignmentConfiguration {
+	return p.clusterPoolAssignmentConfiguration
+}
+
 func NewConfigurationProvider() interfaces.Configuration {
 	return &ConfigurationProvider{
 		applicationConfiguration:            NewApplicationConfigurationProvider(),
@@ -64,5 +69,6 @@ func NewConfigurationProvider() interfaces.Configuration {
 		clusterResourceConfiguration:        NewClusterResourceConfigurationProvider(),
 		namespaceMappingConfiguration:       NewNamespaceMappingConfigurationProvider(),
 		qualityOfServiceConfiguration:       NewQualityOfServiceConfigProvider(),
+		clusterPoolAssignmentConfiguration:  NewClusterPoolAssignmentConfigurationProvider(),
 	}
 }

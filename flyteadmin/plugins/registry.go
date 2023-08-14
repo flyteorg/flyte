@@ -12,6 +12,7 @@ const (
 	PluginIDWorkflowExecutor       PluginID = "WorkflowExecutor"
 	PluginIDDataProxy              PluginID = "DataProxy"
 	PluginIDUnaryServiceMiddleware PluginID = "UnaryServiceMiddleware"
+	PluginIDPreRedirectHook        PluginID = "PreRedirectHook"
 )
 
 type AtomicRegistry struct {

@@ -8,11 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -21,6 +16,13 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/runtime/protoiface"
+
+	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (
@@ -29,6 +31,23 @@ const (
 	FromHTTPVal          = "true"
 )
 
+type PreRedirectHookError struct {
+	Message string
+	Code    int
+}
+
+func (e *PreRedirectHookError) Error() string {
+	return e.Message
+}
+
+// PreRedirectHookFunc Interface used for running custom code before the redirect happens during a successful auth flow.
+// This might be useful in cases where the auth flow allows the user to login since the IDP has been configured
+// for eg: to allow all users from a particular domain to login
+// but you want to restrict access to only a particular set of user ids. eg : users@domain.com are allowed to login but user user1@domain.com, user2@domain.com
+// should only be allowed
+// PreRedirectHookError is the error interface which allows the user to set correct http status code and Message to be set in case the function returns an error
+// without which the current usage in GetCallbackHandler will set this to InternalServerError
+type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
 type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
 
@@ -39,11 +58,11 @@ type AuthenticatedClientMeta struct {
 	Subject       string
 }
 
-func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer, authCtx interfaces.AuthenticationContext) {
+func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer, authCtx interfaces.AuthenticationContext, pluginRegistry *plugins.Registry) {
 	// Add HTTP handlers for OAuth2 endpoints
 	handler.HandleFunc("/login", RefreshTokensIfExists(ctx, authCtx,
 		GetLoginHandler(ctx, authCtx)))
-	handler.HandleFunc("/callback", GetCallbackHandler(ctx, authCtx))
+	handler.HandleFunc("/callback", GetCallbackHandler(ctx, authCtx, pluginRegistry))
 
 	// The metadata endpoint is an RFC-defined constant, but we need a leading / for the handler to pattern match correctly.
 	handler.HandleFunc(fmt.Sprintf("/%s", OIdCMetadataEndpoint), GetOIdCMetadataEndpointRedirectHandler(ctx, authCtx))
@@ -129,14 +148,13 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 				logger.Errorf(ctx, "Was not able to create a redirect cookie")
 			}
 		}
-
 		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
 	}
 }
 
 // GetCallbackHandler returns a handler that is called by the OIdC provider with the authorization code to complete
 // the user authentication flow.
-func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
+func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationContext, pluginRegistry *plugins.Registry) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		logger.Debugf(ctx, "Running callback handler... for RequestURI %v", request.RequestURI)
 		authorizationCode := request.FormValue(AuthorizationResponseCodeType)
@@ -178,6 +196,20 @@ func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationCo
 			return
 		}
 
+		preRedirectHook := plugins.Get[PreRedirectHookFunc](pluginRegistry, plugins.PluginIDPreRedirectHook)
+		if preRedirectHook != nil {
+			logger.Infof(ctx, "preRedirect hook is set")
+			if err := preRedirectHook(ctx, authCtx, request, writer); err != nil {
+				logger.Errorf(ctx, "failed the preRedirect hook due %v with status code  %v", err.Message, err.Code)
+				if http.StatusText(err.Code) != "" {
+					writer.WriteHeader(err.Code)
+				} else {
+					writer.WriteHeader(http.StatusInternalServerError)
+				}
+				return
+			}
+			logger.Info(ctx, "Successfully called the preRedirect hook")
+		}
 		redirectURL := getAuthFlowEndRedirect(ctx, authCtx, request)
 		http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 	}

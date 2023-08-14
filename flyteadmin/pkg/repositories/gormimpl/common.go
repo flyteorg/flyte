@@ -28,6 +28,8 @@ const taskExecutionTableName = "task_executions"
 const taskTableName = "tasks"
 const workflowTableName = "workflows"
 const descriptionEntityTableName = "description_entities"
+const AdminTagsTableName = "admin_tags"
+const executionAdminTagsTableName = "execution_admin_tags"
 
 const limit = "limit"
 const filters = "filters"
@@ -45,6 +47,8 @@ var entityToTableName = map[common.Entity]string{
 	common.NamedEntity:         "entities",
 	common.NamedEntityMetadata: "named_entity_metadata",
 	common.Signal:              "signals",
+	common.AdminTag:            "admin_tags",
+	common.ExecutionAdminTag:   "execution_admin_tags",
 }
 
 var innerJoinExecToNodeExec = fmt.Sprintf(

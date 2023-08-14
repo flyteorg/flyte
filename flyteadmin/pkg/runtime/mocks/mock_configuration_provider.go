@@ -16,6 +16,7 @@ type MockConfigurationProvider struct {
 	clusterResourceConfiguration        interfaces.ClusterResourceConfiguration
 	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
 	qualityOfServiceConfiguration       interfaces.QualityOfServiceConfiguration
+	clusterPoolAssignmentConfiguration  interfaces.ClusterPoolAssignmentConfiguration
 }
 
 func (p *MockConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -70,6 +71,14 @@ func (p *MockConfigurationProvider) AddQualityOfServiceConfiguration(config inte
 	p.qualityOfServiceConfiguration = config
 }
 
+func (p *MockConfigurationProvider) ClusterPoolAssignmentConfiguration() interfaces.ClusterPoolAssignmentConfiguration {
+	return p.clusterPoolAssignmentConfiguration
+}
+
+func (p *MockConfigurationProvider) AddClusterPoolAssignmentConfiguration(cfg interfaces.ClusterPoolAssignmentConfiguration) {
+	p.clusterPoolAssignmentConfiguration = cfg
+}
+
 func NewMockConfigurationProvider(
 	applicationConfiguration interfaces.ApplicationConfiguration,
 	queueConfiguration interfaces.QueueConfiguration,
@@ -82,13 +91,17 @@ func NewMockConfigurationProvider(
 	mockQualityOfServiceConfiguration.OnGetDefaultTiers().Return(make(map[string]core.QualityOfService_Tier))
 	mockQualityOfServiceConfiguration.OnGetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]core.QualityOfServiceSpec))
 
+	mockClusterPoolAssignmentConfiguration := &ifaceMocks.ClusterPoolAssignmentConfiguration{}
+	mockClusterPoolAssignmentConfiguration.OnGetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))
+
 	return &MockConfigurationProvider{
-		applicationConfiguration:      applicationConfiguration,
-		queueConfiguration:            queueConfiguration,
-		clusterConfiguration:          clusterConfiguration,
-		taskResourceConfiguration:     taskResourceConfiguration,
-		whitelistConfiguration:        whitelistConfiguration,
-		namespaceMappingConfiguration: namespaceMappingConfiguration,
-		qualityOfServiceConfiguration: mockQualityOfServiceConfiguration,
+		applicationConfiguration:           applicationConfiguration,
+		queueConfiguration:                 queueConfiguration,
+		clusterConfiguration:               clusterConfiguration,
+		taskResourceConfiguration:          taskResourceConfiguration,
+		whitelistConfiguration:             whitelistConfiguration,
+		namespaceMappingConfiguration:      namespaceMappingConfiguration,
+		qualityOfServiceConfiguration:      mockQualityOfServiceConfiguration,
+		clusterPoolAssignmentConfiguration: mockClusterPoolAssignmentConfiguration,
 	}
 }

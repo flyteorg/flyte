@@ -444,8 +444,11 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	if resource != nil && resource.Attributes.GetClusterAssignment() != nil {
 		return resource.Attributes.GetClusterAssignment(), nil
 	}
-	// Defaults to empty assignment with no selectors
-	return &admin.ClusterAssignment{}, nil
+	clusterPoolAssignment := m.config.ClusterPoolAssignmentConfiguration().GetClusterPoolAssignments()[request.GetDomain()]
+
+	return &admin.ClusterAssignment{
+		ClusterPoolName: clusterPoolAssignment.Pool,
+	}, nil
 }
 
 func (m *ExecutionManager) launchSingleTaskExecution(
@@ -913,6 +916,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 			workflowExecutionID, err)
 		return nil, nil, err
 	}
+
 	return ctx, executionModel, nil
 }
 
@@ -1480,6 +1484,7 @@ func (m *ExecutionManager) ListExecutions(
 		execution.Spec.Inputs = nil
 		execution.Closure.ComputedInputs = nil
 	}
+
 	// END TO BE DELETED
 	var token string
 	if len(executionList) == int(request.Limit) {

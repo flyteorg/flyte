@@ -9,31 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/grpc/metadata"
-	"k8s.io/apimachinery/pkg/util/rand"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	runtime2 "github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
-
-	"github.com/flyteorg/flyteadmin/dataproxy"
-	"github.com/flyteorg/flyteadmin/plugins"
-
-	"github.com/flyteorg/flyteadmin/auth"
-	"github.com/flyteorg/flyteadmin/auth/authzserver"
-	authConfig "github.com/flyteorg/flyteadmin/auth/config"
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flyteadmin/pkg/rpc"
-	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice"
-	runtimeIfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
-	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -44,7 +19,29 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"k8s.io/apimachinery/pkg/util/rand"
+
+	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyteadmin/auth/authzserver"
+	authConfig "github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyteadmin/dataproxy"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyteadmin/pkg/rpc"
+	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice"
+	runtime2 "github.com/flyteorg/flyteadmin/pkg/runtime"
+	runtimeIfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 var defaultCorsHeaders = []string{"Content-Type"}
@@ -163,7 +160,7 @@ func healthCheckFunc(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, _ *authConfig.Config, authCtx interfaces.AuthenticationContext,
+func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig, _ *authConfig.Config, authCtx interfaces.AuthenticationContext,
 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
 	grpcAddress string, grpcConnectionOpts ...grpc.DialOption) (*http.ServeMux, error) {
 
@@ -191,7 +188,7 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, _ *authConfig.
 
 	if cfg.Security.UseAuth {
 		// Add HTTP handlers for OIDC endpoints
-		auth.RegisterHandlers(ctx, mux, authCtx)
+		auth.RegisterHandlers(ctx, mux, authCtx, pluginRegistry)
 
 		// Add HTTP handlers for OAuth2 endpoints
 		authzserver.RegisterHandlers(mux, authCtx)
@@ -278,7 +275,8 @@ func generateRequestID() string {
 
 func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
 	authCfg *authConfig.Config, storageConfig *storage.Config,
-	additionalHandlers map[string]func(http.ResponseWriter, *http.Request), scope promutils.Scope) error {
+	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
+	scope promutils.Scope) error {
 	logger.Infof(ctx, "Serving Flyte Admin Insecure")
 
 	// This will parse configuration and create the necessary objects for dealing with auth
@@ -343,7 +341,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		grpcOptions = append(grpcOptions,
 			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes)))
 	}
-	httpServer, err := newHTTPServer(ctx, cfg, authCfg, authCtx, additionalHandlers, cfg.GetGrpcHostAddress(), grpcOptions...)
+	httpServer, err := newHTTPServer(ctx, pluginRegistry, cfg, authCfg, authCtx, additionalHandlers, cfg.GetGrpcHostAddress(), grpcOptions...)
 	if err != nil {
 		return err
 	}
@@ -390,7 +388,8 @@ func grpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Ha
 
 func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig, authCfg *authConfig.Config,
 	storageCfg *storage.Config,
-	additionalHandlers map[string]func(http.ResponseWriter, *http.Request), scope promutils.Scope) error {
+	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
+	scope promutils.Scope) error {
 	certPool, cert, err := GetSslCredentials(ctx, cfg.Security.Ssl.CertificateFile, cfg.Security.Ssl.KeyFile)
 	if err != nil {
 		return err
@@ -445,7 +444,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		serverOpts = append(serverOpts,
 			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes)))
 	}
-	httpServer, err := newHTTPServer(ctx, cfg, authCfg, authCtx, additionalHandlers, cfg.GetHostAddress(), serverOpts...)
+	httpServer, err := newHTTPServer(ctx, pluginRegistry, cfg, authCfg, authCtx, additionalHandlers, cfg.GetHostAddress(), serverOpts...)
 	if err != nil {
 		return err
 	}

@@ -62,6 +62,8 @@ var filterFieldEntityPrefix = map[string]common.Entity{
 	"named_entity_metadata": common.NamedEntityMetadata,
 	"project":               common.Project,
 	"signal":                common.Signal,
+	"admin_tag":             common.AdminTag,
+	"execution_admin_tag":   common.ExecutionAdminTag,
 }
 
 func parseField(field string, primaryEntity common.Entity) (common.Entity, string) {
