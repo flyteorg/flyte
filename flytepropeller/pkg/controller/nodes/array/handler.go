@@ -295,6 +295,18 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			retryAttempt := subNodeStatus.GetAttempts()
 
+			// fastcache will not emit task events for cache hits. we need to manually detect a
+			// transition to `SUCCEEDED` and add an `ExternalResourceInfo` for it.
+			if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(arrayEventRecorder.TaskEvents()) == 0 {
+				externalResources = append(externalResources, &event.ExternalResourceInfo{
+					ExternalId:   buildSubNodeID(nCtx, i, retryAttempt),
+					Index:        uint32(i),
+					RetryAttempt: retryAttempt,
+					Phase:        idlcore.TaskExecution_SUCCEEDED,
+					CacheStatus:  cacheStatus,
+				})
+			}
+
 			for _, taskExecutionEvent := range arrayEventRecorder.TaskEvents() {
 				for _, log := range taskExecutionEvent.Logs {
 					log.Name = fmt.Sprintf("%s-%d", log.Name, i)
@@ -543,19 +555,17 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 
 	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
 
-	// if node has not yet started we automatically set to NodePhaseQueued to skip input resolution
-	if nodePhase == v1alpha1.NodePhaseNotYetStarted {
-		// TODO - to supprt fastcache we'll need to override the bindings to BindingScalars for the input resolution on the nCtx
-		// that way resolution is just reading a literal ... but does this still write a file then?!?
-		nodePhase = v1alpha1.NodePhaseQueued
-	}
-
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()
 
 	subNodeID := fmt.Sprintf("%s-n%d", nCtx.NodeID(), subNodeIndex)
 	subNodeSpec.ID = subNodeID
 	subNodeSpec.Name = subNodeID
+	// mock the input bindings for the subNode to nil to bypass input resolution in the
+	// `nodeExecutor.preExecute` function. this is required because this function is the entrypoint
+	// for initial cache lookups. an alternative solution would be to mock the datastore to bypass
+	// writing the inputFile.
+	subNodeSpec.InputBindings = nil
 
 	// TODO - if we want to support more plugin types we need to figure out the best way to store plugin state
 	// currently just mocking based on node phase -> which works for all k8s plugins

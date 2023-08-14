@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
@@ -31,10 +30,10 @@ import (
 const dynamicNodeID = "dynamic-node"
 
 type TaskNodeHandler interface {
-	interfaces.NodeHandler
-	ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+	interfaces.CacheableNodeHandler
+	ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 		r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
-		tr ioutils.SimpleTaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error)
+		tr ioutils.SimpleTaskReader) (*io.ExecutionError, error)
 }
 
 type metrics struct {
@@ -145,12 +144,9 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 		// These outputPaths only reads the output metadata. So the sandbox is completely optional here and hence it is nil.
 		// The sandbox creation as it uses hashing can be expensive and we skip that expense.
 		outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-		execID := task.GetTaskExecutionIdentifier(nCtx)
 		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
-		status, ee, err := d.TaskNodeHandler.ValidateOutputAndCacheAdd(ctx, nCtx.NodeID(), nCtx.InputReader(),
-			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader(), catalog.Metadata{
-				TaskExecutionIdentifier: execID,
-			})
+		ee, err := d.TaskNodeHandler.ValidateOutput(ctx, nCtx.NodeID(), nCtx.InputReader(),
+			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader())
 
 		if err != nil {
 			return handler.UnknownTransition, prevState, err
@@ -163,10 +159,9 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 
 			return trns.WithInfo(handler.PhaseInfoFailureErr(ee.ExecutionError, trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: ee.ExecutionError.String()}, nil
 		}
-		taskNodeInfoMetadata := &event.TaskNodeMetadata{CacheStatus: status.GetCacheStatus(), CatalogKey: status.GetMetadata()}
+
 		trns = trns.WithInfo(trns.Info().WithInfo(&handler.ExecutionInfo{
-			OutputInfo:   trns.Info().GetInfo().OutputInfo,
-			TaskNodeInfo: &handler.TaskNodeInfo{TaskNodeMetadata: taskNodeInfoMetadata},
+			OutputInfo: trns.Info().GetInfo().OutputInfo,
 		}))
 	}
 

@@ -54,7 +54,6 @@ type NodeExecutionContext interface {
 
 	DataStore() *storage.DataStore
 	InputReader() io.InputReader
-	//EventsRecorder() events.TaskEventRecorder
 	EventsRecorder() EventRecorder
 	NodeID() v1alpha1.NodeID
 	Node() v1alpha1.ExecutableNode

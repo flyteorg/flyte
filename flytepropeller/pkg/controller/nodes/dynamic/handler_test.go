@@ -7,7 +7,6 @@ import (
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
@@ -25,7 +24,6 @@ import (
 
 	lpMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	executorMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
@@ -520,45 +518,18 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		return nCtx
 	}
 
-	validCachePopulatedStatus := catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, &core.CatalogMetadata{
-		DatasetId: &core.Identifier{
-			ResourceType: core.ResourceType_TASK,
-			Project:      "project",
-			Domain:       "domain",
-			Name:         "name",
-			Version:      "version",
-		},
-		ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"},
-	})
 	execInfoOutputOnly := &handler.ExecutionInfo{
 		OutputInfo: &handler.OutputInfo{
 			OutputURI: "output-dir/outputs.pb",
 		},
 	}
-	execInfoWithTaskNodeMeta := &handler.ExecutionInfo{
-		OutputInfo: &handler.OutputInfo{
-			OutputURI: "output-dir/outputs.pb",
-		},
-		TaskNodeInfo: &handler.TaskNodeInfo{
-			TaskNodeMetadata: &event.TaskNodeMetadata{
-				CacheStatus: validCachePopulatedStatus.GetCacheStatus(),
-				CatalogKey: &core.CatalogMetadata{
-					DatasetId:       validCachePopulatedStatus.GetMetadata().DatasetId,
-					ArtifactTag:     validCachePopulatedStatus.GetMetadata().ArtifactTag,
-					SourceExecution: validCachePopulatedStatus.GetMetadata().SourceExecution,
-				},
-				ReservationStatus: core.CatalogReservation_RESERVATION_DISABLED,
-			},
-		},
-	}
 
 	type args struct {
-		s                interfaces.NodeStatus
-		isErr            bool
-		dj               *core.DynamicJobSpec
-		validErr         *io.ExecutionError
-		validCacheStatus *catalog.Status
-		generateOutputs  bool
+		s               interfaces.NodeStatus
+		isErr           bool
+		dj              *core.DynamicJobSpec
+		validErr        *io.ExecutionError
+		generateOutputs bool
 	}
 	type want struct {
 		p     handler.EPhase
@@ -573,7 +544,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 	}{
 		{"error", args{isErr: true, dj: createDynamicJobSpec()}, want{isErr: true}},
 		{"success", args{s: interfaces.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseDynamicRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true, validCacheStatus: &validCachePopulatedStatus}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting, info: execInfoWithTaskNodeMeta}},
+		{"complete", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting, info: execInfoOutputOnly}},
 		{"complete-no-outputs", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
 		{"complete-valid-error-retryable", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
 		{"complete-valid-error", args{s: interfaces.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing, info: execInfoOutputOnly}},
@@ -596,17 +567,9 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
+				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
 			} else {
-				var validCacheStatus catalog.Status
-				if tt.args.validCacheStatus == nil {
-					validCacheStatus = catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{
-						ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"},
-					})
-				} else {
-					validCacheStatus = *tt.args.validCacheStatus
-				}
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(validCacheStatus, nil, nil)
+				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
 			}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {
@@ -795,9 +758,9 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
+				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
 			} else {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
+				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
 			}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {

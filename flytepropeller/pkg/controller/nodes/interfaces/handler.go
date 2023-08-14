@@ -3,6 +3,7 @@ package interfaces
 import (
 	"context"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -34,6 +35,18 @@ type NodeHandler interface {
 	// This method is always called before completing the node, if FinalizeRequired returns true.
 	// It is guaranteed that Handle -> (happens before) -> Finalize. Abort -> finalize may be repeated multiple times
 	Finalize(ctx context.Context, executionContext NodeExecutionContext) error
+}
+
+// CacheableNodeHandler is a node that supports caching
+type CacheableNodeHandler interface {
+	NodeHandler
+
+	// GetCatalogKey returns the unique key for the node represented by the NodeExecutionContext
+	GetCatalogKey(ctx context.Context, executionContext NodeExecutionContext) (catalog.Key, error)
+
+	// IsCacheable returns two booleans representing if the node represented by the
+	// NodeExecutionContext is cacheable and cache serializable respectively.
+	IsCacheable(ctx context.Context, executionContext NodeExecutionContext) (bool, bool, error)
 }
 
 type SetupContext interface {

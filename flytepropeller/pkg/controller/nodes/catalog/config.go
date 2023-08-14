@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flytestdlib/config"
 	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
 )
 
 //go:generate pflags Config --default-var defaultConfig

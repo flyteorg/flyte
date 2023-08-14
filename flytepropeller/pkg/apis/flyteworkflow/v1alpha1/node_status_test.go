@@ -263,7 +263,8 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 	t.Run("identical-phase", func(t *testing.T) {
 		p := NodePhaseQueued
 		ns := NodeStatus{
-			Phase: p,
+			Phase:   p,
+			Message: queued,
 		}
 		msg := queued
 		ns.UpdatePhase(p, n, msg, nil)

@@ -57,6 +57,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const cacheSerializedReason = "waiting on serialized cache"
+
 type nodeMetrics struct {
 	Scope                         promutils.Scope
 	FailureDuration               labeled.StopWatch
@@ -83,6 +85,17 @@ type nodeMetrics struct {
 	QueuingLatency         labeled.StopWatch
 	NodeExecutionTime      labeled.StopWatch
 	NodeInputGatherLatency labeled.StopWatch
+
+	catalogPutFailureCount         labeled.Counter
+	catalogGetFailureCount         labeled.Counter
+	catalogPutSuccessCount         labeled.Counter
+	catalogMissCount               labeled.Counter
+	catalogHitCount                labeled.Counter
+	catalogSkipCount               labeled.Counter
+	reservationGetSuccessCount     labeled.Counter
+	reservationGetFailureCount     labeled.Counter
+	reservationReleaseSuccessCount labeled.Counter
+	reservationReleaseFailureCount labeled.Counter
 }
 
 // recursiveNodeExector implements the executors.Node interfaces and is the starting point for
@@ -464,6 +477,7 @@ func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder inte
 
 // nodeExecutor implements the NodeExecutor interface and is responsible for executing a single node.
 type nodeExecutor struct {
+	catalog                         catalog.Client
 	clusterID                       string
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
@@ -497,40 +511,6 @@ func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executor
 		c.metrics.TransitionLatency.Observe(ctx, nodeStatus.GetLastUpdatedAt().Time, time.Now())
 	}
 }
-
-/*func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *event.NodeExecutionEvent) error {
-	if nodeEvent == nil {
-		return fmt.Errorf("event recording attempt of Nil Node execution event")
-	}
-
-	if nodeEvent.Id == nil {
-		return fmt.Errorf("event recording attempt of with nil node Event ID")
-	}
-
-	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.Phase.String())
-	err := c.nodeRecorder.RecordNodeEvent(ctx, nodeEvent, c.eventConfig)
-	if err != nil {
-		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
-			return nil
-		}
-
-		if eventsErr.IsAlreadyExists(err) {
-			logger.Infof(ctx, "Node event phase: %s, nodeId %s already exist",
-				nodeEvent.Phase.String(), nodeEvent.GetId().NodeId)
-			return nil
-		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
-			if IsTerminalNodePhase(nodeEvent.Phase) {
-				// Event was trying to record a different terminal phase for an already terminal event. ignoring.
-				logger.Infof(ctx, "Node event phase: %s, nodeId %s already in terminal phase. err: %s",
-					nodeEvent.Phase.String(), nodeEvent.GetId().NodeId, err.Error())
-				return nil
-			}
-			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
-			return errors.Wrapf(errors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mis-match mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
-		}
-	}
-	return err
-}*/
 
 func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.LiteralMap, error) {
@@ -939,7 +919,9 @@ func (c *nodeExecutor) Finalize(ctx context.Context, h interfaces.NodeHandler, n
 	return h.Finalize(ctx, nCtx)
 }
 
-func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, _ interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+	nodeStatus := nCtx.NodeStatus()
+
 	logger.Debugf(ctx, "Node not yet started, running pre-execute")
 	defer logger.Debugf(ctx, "Node pre-execute completed")
 	occurredAt := time.Now()
@@ -957,12 +939,54 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		return interfaces.NodeStatusPending, nil
 	}
 
+	var cacheStatus *catalog.Status
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); ok {
+		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
+		if err != nil {
+			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
+			return interfaces.NodeStatusUndefined, err
+		} else if cacheable && nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
+			logger.Info(ctx, "execution config forced cache skip, not checking catalog")
+			status := catalog.NewStatus(core.CatalogCacheStatus_CACHE_SKIPPED, nil)
+			cacheStatus = &status
+			c.metrics.catalogSkipCount.Inc(ctx)
+		} else if cacheable {
+			entry, err := c.CheckCatalogCache(ctx, nCtx, cacheHandler)
+			if err != nil {
+				logger.Errorf(ctx, "failed to check the catalog cache with err '%s'", err.Error())
+				return interfaces.NodeStatusUndefined, err
+			}
+
+			status := entry.GetStatus()
+			cacheStatus = &status
+			if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
+				// if cache hit we immediately transition the node to successful
+				outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
+				p = handler.PhaseInfoSuccess(&handler.ExecutionInfo{
+					OutputInfo: &handler.OutputInfo{
+						OutputURI: outputFile,
+					},
+					TaskNodeInfo: &handler.TaskNodeInfo{
+						TaskNodeMetadata: &event.TaskNodeMetadata{
+							CacheStatus: entry.GetStatus().GetCacheStatus(),
+							CatalogKey:  entry.GetStatus().GetMetadata(),
+						},
+					},
+				})
+			}
+		}
+	}
+
 	np, err := ToNodePhase(p.GetPhase())
 	if err != nil {
 		return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "failed to move from queued")
 	}
 
-	nodeStatus := nCtx.NodeStatus()
+	if np == v1alpha1.NodePhaseSucceeding && (!h.FinalizeRequired() || (cacheStatus != nil && cacheStatus.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT)) {
+		logger.Infof(ctx, "Finalize not required, moving node to Succeeded")
+		np = v1alpha1.NodePhaseSucceeded
+	}
+
 	if np != nodeStatus.GetPhase() {
 		// assert np == Queued!
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
@@ -999,24 +1023,135 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
 	nodeStatus := nCtx.NodeStatus()
 	currentPhase := nodeStatus.GetPhase()
+	p := handler.PhaseInfoUndefined
 
 	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning:
 	logger.Debugf(ctx, "node executing, current phase [%s]", currentPhase)
 	defer logger.Debugf(ctx, "node execution completed")
 
+	var cacheStatus *catalog.Status
+	var catalogReservationStatus *core.CatalogReservation_Status
+	cacheHandler, cacheHandlerOk := h.(interfaces.CacheableNodeHandler)
+	if cacheHandlerOk {
+		// if node is cacheable we attempt to check the cache if in queued phase or get / extend a
+		// catalog reservation
+		_, cacheSerializable, err := cacheHandler.IsCacheable(ctx, nCtx)
+		if err != nil {
+			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
+			return interfaces.NodeStatusUndefined, err
+		}
+
+		if cacheSerializable && nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
+			status := catalog.NewStatus(core.CatalogCacheStatus_CACHE_SKIPPED, nil)
+			cacheStatus = &status
+		} else if cacheSerializable && currentPhase == v1alpha1.NodePhaseQueued && nodeStatus.GetMessage() == cacheSerializedReason {
+			// since we already check the cache before transitioning to Phase Queued we only need to check it again if
+			// the cache is serialized and that causes the node to stay in the Queued phase. the easiest way to detect
+			// this is verifying the NodeStatus Reason is what we set it during cache serialization.
+
+			entry, err := c.CheckCatalogCache(ctx, nCtx, cacheHandler)
+			if err != nil {
+				logger.Errorf(ctx, "failed to check the catalog cache with err '%s'", err.Error())
+				return interfaces.NodeStatusUndefined, err
+			}
+
+			status := entry.GetStatus()
+			cacheStatus = &status
+			if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
+				// if cache hit we immediately transition the node to successful
+				outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
+				p = handler.PhaseInfoSuccess(&handler.ExecutionInfo{
+					OutputInfo: &handler.OutputInfo{
+						OutputURI: outputFile,
+					},
+					TaskNodeInfo: &handler.TaskNodeInfo{
+						TaskNodeMetadata: &event.TaskNodeMetadata{
+							CacheStatus: entry.GetStatus().GetCacheStatus(),
+							CatalogKey:  entry.GetStatus().GetMetadata(),
+						},
+					},
+				})
+			}
+		}
+
+		if cacheSerializable && !nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache &&
+			(cacheStatus == nil || (cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT)) {
+
+			entry, err := c.GetOrExtendCatalogReservation(ctx, nCtx, cacheHandler, config.GetConfig().WorkflowReEval.Duration)
+			if err != nil {
+				logger.Errorf(ctx, "failed to check for catalog reservation with err '%s'", err.Error())
+				return interfaces.NodeStatusUndefined, err
+			}
+
+			status := entry.GetStatus()
+			catalogReservationStatus = &status
+			if status == core.CatalogReservation_RESERVATION_ACQUIRED && currentPhase == v1alpha1.NodePhaseQueued {
+				logger.Infof(ctx, "acquired cache reservation")
+			} else if status == core.CatalogReservation_RESERVATION_EXISTS {
+				// if reservation is held by another owner we stay in the queued phase
+				p = handler.PhaseInfoQueued(cacheSerializedReason, nil)
+			}
+		}
+	}
+
 	// Since we reset node status inside execute for retryable failure, we use lastAttemptStartTime to carry that information
 	// across execute which is used to emit metrics
 	lastAttemptStartTime := nodeStatus.GetLastAttemptStartedAt()
 
-	p, err := c.execute(ctx, h, nCtx, nodeStatus)
-	if err != nil {
-		logger.Errorf(ctx, "failed Execute for node. Error: %s", err.Error())
-		return interfaces.NodeStatusUndefined, err
+	// we execute the node if:
+	//  (1) caching is disabled (ie. cacheStatus == nil)
+	//  (2) there was no cache hit and the cache is not blocked by a cache reservation
+	//  (3) the node is already running, this covers the scenario where the node held the cache
+	//      reservation, but it expired and was captured by a different node
+	if currentPhase != v1alpha1.NodePhaseQueued ||
+		((cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) &&
+			(catalogReservationStatus == nil || *catalogReservationStatus != core.CatalogReservation_RESERVATION_EXISTS)) {
+
+		var err error
+		p, err = c.execute(ctx, h, nCtx, nodeStatus)
+		if err != nil {
+			logger.Errorf(ctx, "failed Execute for node. Error: %s", err.Error())
+			return interfaces.NodeStatusUndefined, err
+		}
 	}
 
 	if p.GetPhase() == handler.EPhaseUndefined {
 		return interfaces.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "received undefined phase.")
 	}
+
+	if p.GetPhase() == handler.EPhaseSuccess && cacheHandlerOk {
+		// if node is cacheable we attempt to write outputs to the cache and release catalog reservation
+		cacheable, cacheSerializable, err := cacheHandler.IsCacheable(ctx, nCtx)
+		if err != nil {
+			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
+			return interfaces.NodeStatusUndefined, err
+		}
+
+		if cacheable && (cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) {
+			status, err := c.WriteCatalogCache(ctx, nCtx, cacheHandler)
+			if err != nil {
+				// ignore failure to write to catalog
+				logger.Warnf(ctx, "failed to write to the catalog cache with err '%s'", err.Error())
+			}
+
+			cacheStatus = &status
+		}
+
+		if cacheSerializable && (cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) {
+			entry, err := c.ReleaseCatalogReservation(ctx, nCtx, cacheHandler)
+			if err != nil {
+				// ignore failure to release the catalog reservation
+				logger.Warnf(ctx, "failed to write to the catalog cache with err '%s'", err.Error())
+			} else {
+				status := entry.GetStatus()
+				catalogReservationStatus = &status
+			}
+		}
+	}
+
+	// update phase info with catalog cache and reservation information while maintaining all
+	// other metadata
+	p = updatePhaseCacheInfo(p, cacheStatus, catalogReservationStatus)
 
 	np, err := ToNodePhase(p.GetPhase())
 	if err != nil {
@@ -1068,11 +1203,12 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		finalStatus = interfaces.NodeStatusTimedOut
 	}
 
-	if np == v1alpha1.NodePhaseSucceeding && !h.FinalizeRequired() {
+	if np == v1alpha1.NodePhaseSucceeding && (!h.FinalizeRequired() || (cacheStatus != nil && cacheStatus.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT)) {
 		logger.Infof(ctx, "Finalize not required, moving node to Succeeded")
 		np = v1alpha1.NodePhaseSucceeded
 		finalStatus = interfaces.NodeStatusSuccess
 	}
+
 	if np == v1alpha1.NodePhaseRecovered {
 		logger.Infof(ctx, "Finalize not required, moving node to Recovered")
 		finalStatus = interfaces.NodeStatusRecovered
@@ -1253,29 +1389,40 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 
 	nodeScope := scope.NewSubScope("node")
 	metrics := &nodeMetrics{
-		Scope:                         nodeScope,
-		FailureDuration:               labeled.NewStopWatch("failure_duration", "Indicates the total execution time of a failed workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		SuccessDuration:               labeled.NewStopWatch("success_duration", "Indicates the total execution time of a successful workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		RecoveryDuration:              labeled.NewStopWatch("recovery_duration", "Indicates the total execution time of a recovered workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		UserErrorDuration:             labeled.NewStopWatch("user_error_duration", "Indicates the total execution time before user error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		SystemErrorDuration:           labeled.NewStopWatch("system_error_duration", "Indicates the total execution time before system error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		UnknownErrorDuration:          labeled.NewStopWatch("unknown_error_duration", "Indicates the total execution time before unknown error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		PermanentUserErrorDuration:    labeled.NewStopWatch("perma_user_error_duration", "Indicates the total execution time before non recoverable user error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		PermanentSystemErrorDuration:  labeled.NewStopWatch("perma_system_error_duration", "Indicates the total execution time before non recoverable system error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		PermanentUnknownErrorDuration: labeled.NewStopWatch("perma_unknown_error_duration", "Indicates the total execution time before non recoverable unknown error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		InputsWriteFailure:            labeled.NewCounter("inputs_write_fail", "Indicates failure in writing node inputs to metastore", nodeScope),
-		TimedOutFailure:               labeled.NewCounter("timeout_fail", "Indicates failure due to timeout", nodeScope),
-		InterruptedThresholdHit:       labeled.NewCounter("interrupted_threshold", "Indicates the node interruptible disabled because it hit max failure count", nodeScope),
-		InterruptibleNodesRunning:     labeled.NewCounter("interruptible_nodes_running", "number of interruptible nodes running", nodeScope),
-		InterruptibleNodesTerminated:  labeled.NewCounter("interruptible_nodes_terminated", "number of interruptible nodes finished running", nodeScope),
-		ResolutionFailure:             labeled.NewCounter("input_resolve_fail", "Indicates failure in resolving node inputs", nodeScope),
-		TransitionLatency:             labeled.NewStopWatch("transition_latency", "Measures the latency between the last parent node stoppedAt time and current node's queued time.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		QueuingLatency:                labeled.NewStopWatch("queueing_latency", "Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
-		NodeExecutionTime:             labeled.NewStopWatch("node_exec_latency", "Measures the time taken to execute one node, a node can be complex so it may encompass sub-node latency.", time.Microsecond, nodeScope, labeled.EmitUnlabeledMetric),
-		NodeInputGatherLatency:        labeled.NewStopWatch("node_input_latency", "Measures the latency to aggregate inputs and check readiness of a node", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		Scope:                          nodeScope,
+		FailureDuration:                labeled.NewStopWatch("failure_duration", "Indicates the total execution time of a failed workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		SuccessDuration:                labeled.NewStopWatch("success_duration", "Indicates the total execution time of a successful workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		RecoveryDuration:               labeled.NewStopWatch("recovery_duration", "Indicates the total execution time of a recovered workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		UserErrorDuration:              labeled.NewStopWatch("user_error_duration", "Indicates the total execution time before user error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		SystemErrorDuration:            labeled.NewStopWatch("system_error_duration", "Indicates the total execution time before system error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		UnknownErrorDuration:           labeled.NewStopWatch("unknown_error_duration", "Indicates the total execution time before unknown error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		PermanentUserErrorDuration:     labeled.NewStopWatch("perma_user_error_duration", "Indicates the total execution time before non recoverable user error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		PermanentSystemErrorDuration:   labeled.NewStopWatch("perma_system_error_duration", "Indicates the total execution time before non recoverable system error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		PermanentUnknownErrorDuration:  labeled.NewStopWatch("perma_unknown_error_duration", "Indicates the total execution time before non recoverable unknown error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		InputsWriteFailure:             labeled.NewCounter("inputs_write_fail", "Indicates failure in writing node inputs to metastore", nodeScope),
+		TimedOutFailure:                labeled.NewCounter("timeout_fail", "Indicates failure due to timeout", nodeScope),
+		InterruptedThresholdHit:        labeled.NewCounter("interrupted_threshold", "Indicates the node interruptible disabled because it hit max failure count", nodeScope),
+		InterruptibleNodesRunning:      labeled.NewCounter("interruptible_nodes_running", "number of interruptible nodes running", nodeScope),
+		InterruptibleNodesTerminated:   labeled.NewCounter("interruptible_nodes_terminated", "number of interruptible nodes finished running", nodeScope),
+		ResolutionFailure:              labeled.NewCounter("input_resolve_fail", "Indicates failure in resolving node inputs", nodeScope),
+		TransitionLatency:              labeled.NewStopWatch("transition_latency", "Measures the latency between the last parent node stoppedAt time and current node's queued time.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		QueuingLatency:                 labeled.NewStopWatch("queueing_latency", "Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		NodeExecutionTime:              labeled.NewStopWatch("node_exec_latency", "Measures the time taken to execute one node, a node can be complex so it may encompass sub-node latency.", time.Microsecond, nodeScope, labeled.EmitUnlabeledMetric),
+		NodeInputGatherLatency:         labeled.NewStopWatch("node_input_latency", "Measures the latency to aggregate inputs and check readiness of a node", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+		catalogHitCount:                labeled.NewCounter("discovery_hit_count", "Task cached in Discovery", scope),
+		catalogMissCount:               labeled.NewCounter("discovery_miss_count", "Task not cached in Discovery", scope),
+		catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", scope),
+		catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
+		catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
+		catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
+		reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", scope),
+		reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", scope),
+		reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", scope),
+		reservationReleaseSuccessCount: labeled.NewCounter("reservation_release_success_count", "Reservation Release success count", scope),
 	}
 
 	nodeExecutor := &nodeExecutor{
+		catalog:                         catalogClient,
 		clusterID:                       clusterID,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
@@ -1302,7 +1449,5 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		store:              store,
 		metrics:            metrics,
 	}
-	/*nodeHandlerFactory, err := NewHandlerFactory(ctx, exec, workflowLauncher, launchPlanReader, kubeClient, catalogClient, recoveryClient, eventConfig, clusterID, signalClient, nodeScope)
-	exec.nodeHandlerFactory = nodeHandlerFactory*/
 	return exec, err
 }

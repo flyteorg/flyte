@@ -14,6 +14,14 @@ type arrayNodeLookup struct {
 	subNodeStatus *v1alpha1.NodeStatus
 }
 
+func (a *arrayNodeLookup) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+	if id == a.subNodeID {
+		return nil, nil
+	}
+
+	return a.NodeLookup.ToNode(id)
+}
+
 func (a *arrayNodeLookup) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
 	if nodeID == a.subNodeID {
 		return a.subNodeSpec, true
