@@ -4862,6 +4862,7 @@
                  * @interface IOperand
                  * @property {flyteidl.core.IPrimitive|null} [primitive] Operand primitive
                  * @property {string|null} ["var"] Operand var
+                 * @property {flyteidl.core.IScalar|null} [scalar] Operand scalar
                  */
     
                 /**
@@ -4895,17 +4896,25 @@
                  */
                 Operand.prototype["var"] = "";
     
+                /**
+                 * Operand scalar.
+                 * @member {flyteidl.core.IScalar|null|undefined} scalar
+                 * @memberof flyteidl.core.Operand
+                 * @instance
+                 */
+                Operand.prototype.scalar = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Operand val.
-                 * @member {"primitive"|"var"|undefined} val
+                 * @member {"primitive"|"var"|"scalar"|undefined} val
                  * @memberof flyteidl.core.Operand
                  * @instance
                  */
                 Object.defineProperty(Operand.prototype, "val", {
-                    get: $util.oneOfGetter($oneOfFields = ["primitive", "var"]),
+                    get: $util.oneOfGetter($oneOfFields = ["primitive", "var", "scalar"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -4937,6 +4946,8 @@
                         $root.flyteidl.core.Primitive.encode(message.primitive, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message["var"] != null && message.hasOwnProperty("var"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message["var"]);
+                    if (message.scalar != null && message.hasOwnProperty("scalar"))
+                        $root.flyteidl.core.Scalar.encode(message.scalar, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -4963,6 +4974,9 @@
                             break;
                         case 2:
                             message["var"] = reader.string();
+                            break;
+                        case 3:
+                            message.scalar = $root.flyteidl.core.Scalar.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -4998,6 +5012,16 @@
                         properties.val = 1;
                         if (!$util.isString(message["var"]))
                             return "var: string expected";
+                    }
+                    if (message.scalar != null && message.hasOwnProperty("scalar")) {
+                        if (properties.val === 1)
+                            return "val: multiple values";
+                        properties.val = 1;
+                        {
+                            var error = $root.flyteidl.core.Scalar.verify(message.scalar);
+                            if (error)
+                                return "scalar." + error;
+                        }
                     }
                     return null;
                 };
