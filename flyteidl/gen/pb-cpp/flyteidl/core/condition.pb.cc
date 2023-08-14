@@ -18,8 +18,9 @@
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 namespace flyteidl {
 namespace core {
 class ComparisonExpressionDefaultTypeInternal {
@@ -31,6 +32,7 @@ class OperandDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<Operand> _instance;
   const ::flyteidl::core::Primitive* primitive_;
   ::google::protobuf::internal::ArenaStringPtr var_;
+  const ::flyteidl::core::Scalar* scalar_;
 } _Operand_default_instance_;
 class BooleanExpressionDefaultTypeInternal {
  public:
@@ -70,9 +72,10 @@ static void InitDefaultsOperand_flyteidl_2fcore_2fcondition_2eproto() {
   ::flyteidl::core::Operand::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsOperand_flyteidl_2fcore_2fcondition_2eproto}, {
-      &scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsOperand_flyteidl_2fcore_2fcondition_2eproto}, {
+      &scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto.base,
+      &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,}};
 
 static void InitDefaultsBooleanExpression_flyteidl_2fcore_2fcondition_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -121,6 +124,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fcondition_2eproto
   ~0u,  // no _weak_field_map_
   offsetof(::flyteidl::core::OperandDefaultTypeInternal, primitive_),
   offsetof(::flyteidl::core::OperandDefaultTypeInternal, var_),
+  offsetof(::flyteidl::core::OperandDefaultTypeInternal, scalar_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Operand, val_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::BooleanExpression, _internal_metadata_),
@@ -142,8 +146,8 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fcondition_2eproto
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::ComparisonExpression)},
   { 8, -1, sizeof(::flyteidl::core::Operand)},
-  { 16, -1, sizeof(::flyteidl::core::BooleanExpression)},
-  { 24, -1, sizeof(::flyteidl::core::ConjunctionExpression)},
+  { 17, -1, sizeof(::flyteidl::core::BooleanExpression)},
+  { 25, -1, sizeof(::flyteidl::core::ConjunctionExpression)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -167,26 +171,27 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto[] =
   "rator\022*\n\nleft_value\030\002 \001(\0132\026.flyteidl.cor"
   "e.Operand\022+\n\013right_value\030\003 \001(\0132\026.flyteid"
   "l.core.Operand\"=\n\010Operator\022\006\n\002EQ\020\000\022\007\n\003NE"
-  "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"N\n"
-  "\007Operand\022-\n\tprimitive\030\001 \001(\0132\030.flyteidl.c"
-  "ore.PrimitiveH\000\022\r\n\003var\030\002 \001(\tH\000B\005\n\003val\"\223\001"
-  "\n\021BooleanExpression\022;\n\013conjunction\030\001 \001(\013"
-  "2$.flyteidl.core.ConjunctionExpressionH\000"
-  "\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.core.Com"
-  "parisonExpressionH\000B\006\n\004expr\"\372\001\n\025Conjunct"
-  "ionExpression\022F\n\010operator\030\001 \001(\01624.flytei"
-  "dl.core.ConjunctionExpression.LogicalOpe"
-  "rator\0229\n\017left_expression\030\002 \001(\0132 .flyteid"
-  "l.core.BooleanExpression\022:\n\020right_expres"
-  "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres"
-  "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001"
-  "B6Z4github.com/flyteorg/flyteidl/gen/pb-"
-  "go/flyteidl/coreb\006proto3"
+  "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"{\n"
+  "\007Operand\0221\n\tprimitive\030\001 \001(\0132\030.flyteidl.c"
+  "ore.PrimitiveB\002\030\001H\000\022\r\n\003var\030\002 \001(\tH\000\022\'\n\006sc"
+  "alar\030\003 \001(\0132\025.flyteidl.core.ScalarH\000B\005\n\003v"
+  "al\"\223\001\n\021BooleanExpression\022;\n\013conjunction\030"
+  "\001 \001(\0132$.flyteidl.core.ConjunctionExpress"
+  "ionH\000\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.cor"
+  "e.ComparisonExpressionH\000B\006\n\004expr\"\372\001\n\025Con"
+  "junctionExpression\022F\n\010operator\030\001 \001(\01624.f"
+  "lyteidl.core.ConjunctionExpression.Logic"
+  "alOperator\0229\n\017left_expression\030\002 \001(\0132 .fl"
+  "yteidl.core.BooleanExpression\022:\n\020right_e"
+  "xpression\030\003 \001(\0132 .flyteidl.core.BooleanE"
+  "xpression\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n"
+  "\002OR\020\001B6Z4github.com/flyteorg/flyteidl/ge"
+  "n/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcondition_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcondition_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto,
-  "flyteidl/core/condition.proto", &assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto, 864,
+  "flyteidl/core/condition.proto", &assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto, 909,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcondition_2eproto() {
@@ -661,15 +666,22 @@ void Operand::InitAsDefaultInstance() {
       ::flyteidl::core::Primitive::internal_default_instance());
   ::flyteidl::core::_Operand_default_instance_.var_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::flyteidl::core::_Operand_default_instance_.scalar_ = const_cast< ::flyteidl::core::Scalar*>(
+      ::flyteidl::core::Scalar::internal_default_instance());
 }
 class Operand::HasBitSetters {
  public:
   static const ::flyteidl::core::Primitive& primitive(const Operand* msg);
+  static const ::flyteidl::core::Scalar& scalar(const Operand* msg);
 };
 
 const ::flyteidl::core::Primitive&
 Operand::HasBitSetters::primitive(const Operand* msg) {
   return *msg->val_.primitive_;
+}
+const ::flyteidl::core::Scalar&
+Operand::HasBitSetters::scalar(const Operand* msg) {
+  return *msg->val_.scalar_;
 }
 void Operand::set_allocated_primitive(::flyteidl::core::Primitive* primitive) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
@@ -691,9 +703,30 @@ void Operand::clear_primitive() {
     clear_has_val();
   }
 }
+void Operand::set_allocated_scalar(::flyteidl::core::Scalar* scalar) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_val();
+  if (scalar) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      scalar = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, scalar, submessage_arena);
+    }
+    set_has_scalar();
+    val_.scalar_ = scalar;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Operand.scalar)
+}
+void Operand::clear_scalar() {
+  if (has_scalar()) {
+    delete val_.scalar_;
+    clear_has_val();
+  }
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Operand::kPrimitiveFieldNumber;
 const int Operand::kVarFieldNumber;
+const int Operand::kScalarFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Operand::Operand()
@@ -713,6 +746,10 @@ Operand::Operand(const Operand& from)
     }
     case kVar: {
       set_var(from.var());
+      break;
+    }
+    case kScalar: {
+      mutable_scalar()->::flyteidl::core::Scalar::MergeFrom(from.scalar());
       break;
     }
     case VAL_NOT_SET: {
@@ -759,6 +796,10 @@ void Operand::clear_val() {
       val_.var_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
       break;
     }
+    case kScalar: {
+      delete val_.scalar_;
+      break;
+    }
     case VAL_NOT_SET: {
       break;
     }
@@ -790,7 +831,7 @@ const char* Operand::_InternalParse(const char* begin, const char* end, void* ob
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.core.Primitive primitive = 1;
+      // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -817,6 +858,19 @@ const char* Operand::_InternalParse(const char* begin, const char* end, void* ob
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // .flyteidl.core.Scalar scalar = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::Scalar::_InternalParse;
+        object = msg->mutable_scalar();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -853,7 +907,7 @@ bool Operand::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.Primitive primitive = 1;
+      // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -873,6 +927,17 @@ bool Operand::MergePartialFromCodedStream(
             this->var().data(), static_cast<int>(this->var().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
             "flyteidl.core.Operand.var"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.Scalar scalar = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_scalar()));
         } else {
           goto handle_unusual;
         }
@@ -906,7 +971,7 @@ void Operand::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.Primitive primitive = 1;
+  // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
   if (has_primitive()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, HasBitSetters::primitive(this), output);
@@ -922,6 +987,12 @@ void Operand::SerializeWithCachedSizes(
       2, this->var(), output);
   }
 
+  // .flyteidl.core.Scalar scalar = 3;
+  if (has_scalar()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, HasBitSetters::scalar(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -935,7 +1006,7 @@ void Operand::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.Primitive primitive = 1;
+  // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
   if (has_primitive()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
@@ -951,6 +1022,13 @@ void Operand::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         2, this->var(), target);
+  }
+
+  // .flyteidl.core.Scalar scalar = 3;
+  if (has_scalar()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        3, HasBitSetters::scalar(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -975,7 +1053,7 @@ size_t Operand::ByteSizeLong() const {
   (void) cached_has_bits;
 
   switch (val_case()) {
-    // .flyteidl.core.Primitive primitive = 1;
+    // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
     case kPrimitive: {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -987,6 +1065,13 @@ size_t Operand::ByteSizeLong() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->var());
+      break;
+    }
+    // .flyteidl.core.Scalar scalar = 3;
+    case kScalar: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *val_.scalar_);
       break;
     }
     case VAL_NOT_SET: {
@@ -1027,6 +1112,10 @@ void Operand::MergeFrom(const Operand& from) {
     }
     case kVar: {
       set_var(from.var());
+      break;
+    }
+    case kScalar: {
+      mutable_scalar()->::flyteidl::core::Scalar::MergeFrom(from.scalar());
       break;
     }
     case VAL_NOT_SET: {

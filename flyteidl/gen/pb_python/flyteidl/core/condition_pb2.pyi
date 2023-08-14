@@ -31,12 +31,14 @@ class ComparisonExpression(_message.Message):
     def __init__(self, operator: _Optional[_Union[ComparisonExpression.Operator, str]] = ..., left_value: _Optional[_Union[Operand, _Mapping]] = ..., right_value: _Optional[_Union[Operand, _Mapping]] = ...) -> None: ...
 
 class Operand(_message.Message):
-    __slots__ = ["primitive", "var"]
+    __slots__ = ["primitive", "var", "scalar"]
     PRIMITIVE_FIELD_NUMBER: _ClassVar[int]
     VAR_FIELD_NUMBER: _ClassVar[int]
+    SCALAR_FIELD_NUMBER: _ClassVar[int]
     primitive: _literals_pb2.Primitive
     var: str
-    def __init__(self, primitive: _Optional[_Union[_literals_pb2.Primitive, _Mapping]] = ..., var: _Optional[str] = ...) -> None: ...
+    scalar: _literals_pb2.Scalar
+    def __init__(self, primitive: _Optional[_Union[_literals_pb2.Primitive, _Mapping]] = ..., var: _Optional[str] = ..., scalar: _Optional[_Union[_literals_pb2.Scalar, _Mapping]] = ...) -> None: ...
 
 class BooleanExpression(_message.Message):
     __slots__ = ["conjunction", "comparison"]

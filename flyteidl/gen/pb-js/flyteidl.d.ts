@@ -2018,6 +2018,9 @@ export namespace flyteidl {
 
             /** Operand var */
             "var"?: (string|null);
+
+            /** Operand scalar */
+            scalar?: (flyteidl.core.IScalar|null);
         }
 
         /** Represents an Operand. */
@@ -2035,8 +2038,11 @@ export namespace flyteidl {
             /** Operand var. */
             public var: string;
 
+            /** Operand scalar. */
+            public scalar?: (flyteidl.core.IScalar|null);
+
             /** Operand val. */
-            public val?: ("primitive"|"var");
+            public val?: ("primitive"|"var"|"scalar");
 
             /**
              * Creates a new Operand instance using the specified properties.

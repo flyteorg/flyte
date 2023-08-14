@@ -30,9 +30,11 @@ message ComparisonExpression {
 message Operand {
     oneof val {
         // Can be a constant
-        core.Primitive primitive = 1;
+        core.Primitive primitive = 1 [deprecated = true];
         // Or one of this node's input variables
         string var = 2;
+        // Replace the primitive field
+        core.Scalar scalar = 3;
     }
 }
 

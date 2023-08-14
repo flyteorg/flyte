@@ -1859,7 +1859,7 @@ pub mod comparison_expression {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Operand {
-    #[prost(oneof="operand::Val", tags="1, 2")]
+    #[prost(oneof="operand::Val", tags="1, 2, 3")]
     pub val: ::core::option::Option<operand::Val>,
 }
 /// Nested message and enum types in `Operand`.
@@ -1873,6 +1873,9 @@ pub mod operand {
         /// Or one of this node's input variables
         #[prost(string, tag="2")]
         Var(::prost::alloc::string::String),
+        /// Replace the primitive field
+        #[prost(message, tag="3")]
+        Scalar(super::Scalar),
     }
 }
 /// Defines a boolean expression tree. It can be a simple or a conjunction expression.

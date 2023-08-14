@@ -6455,6 +6455,10 @@
         "var": {
           "type": "string",
           "title": "Or one of this node's input variables"
+        },
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "title": "Replace the primitive field"
         }
       },
       "description": "Defines an operand to a comparison expression."
