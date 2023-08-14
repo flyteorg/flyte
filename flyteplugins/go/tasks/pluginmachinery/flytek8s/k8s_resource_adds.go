@@ -31,6 +31,15 @@ func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
 			},
 		)
 	}
+
+	if nodeId := contextutils.Value(ownerCtx, contextutils.NodeIDKey); nodeId != "" {
+		envVars = append(envVars,
+			v1.EnvVar{
+				Name:  "FLYTE_INTERNAL_NODE_ID",
+				Value: nodeId,
+			},
+		)
+	}
 	return envVars
 }
 
