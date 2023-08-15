@@ -389,7 +389,19 @@ that integrates all Flyte components into a single binary.
    # Replace occurrences of $HOME with the actual path of your home directory.
    sed -i "s|\$HOME|${HOME}|g" ./flyte-single-binary-local.yaml
 
-   # Step4: Running the single binary.
+   # Step 4: Prepare a namespace template for the cluster resource controller.
+   # The configuration file "flyte-single-binary-local.yaml" has an entry named cluster_resources.templatePath.
+   # This entry needs to direct to a directory containing the templates for the cluster resource controller to use.
+   # We will now create a simple template that allows the automatic creation of required namespaces for projects.
+   # For example, with Flyte's default project "flytesnacks", the controller will auto-create the following namespaces:
+   # flytesnacks-staging, flytesnacks-development, and flytesnacks-production.
+   mkdir $HOME/.flyte/cluster-resource-templates/
+   echo "apiVersion: v1
+   kind: Namespace
+   metadata:
+     name: '{{ namespace }}'" > $HOME/.flyte/cluster-resource-templates/namespace.yaml
+
+   # Step5: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
@@ -456,11 +468,7 @@ The following instructions provide guidance on how to build single binary with y
    # Step2: The flytesnacks repository provides a lot of useful examples.
    git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks
 
-   # Step3: Before running the hello world workflow, create the flytesnacks-development namespace.
-   # This is necessary because, by default (without creating a new project), task Pods will run in the flytesnacks-development namespace.
-   kubectl create namespace flytesnacks-development
-
-   # Step4: Run a hello world example
+   # Step3: Run a hello world example
    pyflyte run --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
 
@@ -574,9 +582,6 @@ the Flyte cluster, and finally submit the workflow.
    # Step4: Submit a hello world workflow to the Flyte cluster
    git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks
-   # Note, create the flytesnacks-development namespace if not exists:
-   # This is necessary because, by default (without creating a new project), task Pods will run in the flytesnacks-development namespace.
-   # kubectl create namespace flytesnacks-development
    pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py my_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
