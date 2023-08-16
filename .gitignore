@@ -10,10 +10,6 @@ _repos/
 _rsts/
 rsts_tmp/
 .doctrees/
-docs/_sources/
-docs/flytekit/flytekit.interfaces.html
-docs/searchindex.js
-docs/
 !flyteidl/protos/docs
 release/
 __pycache__/
@@ -34,5 +30,9 @@ dist
 vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
+docs/
 docs/_tags/
 docs/_repos/
+docs/_sources/
+docs/flytekit/flytekit.interfaces.html
+docs/searchindex.js
