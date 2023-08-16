@@ -2,7 +2,6 @@ package spark
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -34,7 +33,7 @@ import (
 const sparkMainClass = "MainClass"
 const sparkApplicationFile = "local:///spark_app.py"
 const testImage = "image://"
-const sparkUIAddress = "spark-ui.flyte"
+const sparkUIAddress = "https://spark-ui.flyte"
 
 var (
 	dummySparkConf = map[string]string{
@@ -92,7 +91,7 @@ func TestGetEventInfo(t *testing.T) {
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
-	assert.Equal(t, fmt.Sprintf("https://%s", sparkUIAddress), info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
+	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
 	generatedLinks := make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
 		generatedLinks = append(generatedLinks, l.Uri)
