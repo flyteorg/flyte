@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
@@ -46,12 +47,12 @@ func newMetrics(scope promutils.Scope) metrics {
 }
 
 // Abort stops the gate node defined in the NodeExecutionContext
-func (g *gateNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (g *gateNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	return nil
 }
 
 // Finalize completes the gate node defined in the NodeExecutionContext
-func (g *gateNodeHandler) Finalize(ctx context.Context, _ handler.NodeExecutionContext) error {
+func (g *gateNodeHandler) Finalize(ctx context.Context, _ interfaces.NodeExecutionContext) error {
 	return nil
 }
 
@@ -63,7 +64,7 @@ func (g *gateNodeHandler) FinalizeRequired() bool {
 
 // Handle is responsible for transitioning and reporting node state to complete the node defined
 // by the NodeExecutionContext
-func (g *gateNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (g *gateNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	gateNode := nCtx.Node().GetGateNode()
 	gateNodeState := nCtx.NodeStateReader().GetGateNodeState()
 
@@ -197,7 +198,7 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecution
 
 	// update gate node status
 	if err := nCtx.NodeStateWriter().PutGateNodeState(gateNodeState); err != nil {
-		logger.Errorf(ctx, "failed to store TaskNode state with err [%s]", err.Error())
+		logger.Errorf(ctx, "failed to store GateNode state with err [%s]", err.Error())
 		return handler.UnknownTransition, err
 	}
 
@@ -205,12 +206,12 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecution
 }
 
 // Setup handles any initialization requirements for this handler
-func (g *gateNodeHandler) Setup(_ context.Context, _ handler.SetupContext) error {
+func (g *gateNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) error {
 	return nil
 }
 
 // New initializes a new gateNodeHandler
-func New(eventConfig *config.EventConfig, signalClient service.SignalServiceClient, scope promutils.Scope) handler.Node {
+func New(eventConfig *config.EventConfig, signalClient service.SignalServiceClient, scope promutils.Scope) interfaces.NodeHandler {
 	gateScope := scope.NewSubScope("gate")
 	return &gateNodeHandler{
 		signalClient: signalClient,

@@ -17,7 +17,7 @@ import (
 	executormocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"

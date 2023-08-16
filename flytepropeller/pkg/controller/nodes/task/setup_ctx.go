@@ -2,14 +2,16 @@ package task
 
 import (
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
+	"github.com/flyteorg/flytestdlib/promutils"
+
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type setupContext struct {
-	handler.SetupContext
+	interfaces.SetupContext
 	kubeClient    pluginCore.KubeClient
 	secretManager pluginCore.SecretManager
 }
@@ -29,7 +31,7 @@ func (s setupContext) EnqueueOwner() pluginCore.EnqueueOwner {
 	}
 }
 
-func (t *Handler) newSetupContext(sCtx handler.SetupContext) *setupContext {
+func (t *Handler) newSetupContext(sCtx interfaces.SetupContext) *setupContext {
 
 	return &setupContext{
 		SetupContext:  sCtx,

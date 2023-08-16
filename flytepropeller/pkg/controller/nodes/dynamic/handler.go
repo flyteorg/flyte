@@ -4,28 +4,25 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	stdErrors "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 //go:generate mockery -all -case=underscore
@@ -33,10 +30,10 @@ import (
 const dynamicNodeID = "dynamic-node"
 
 type TaskNodeHandler interface {
-	handler.Node
-	ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+	interfaces.CacheableNodeHandler
+	ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 		r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
-		tr ioutils.SimpleTaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error)
+		tr ioutils.SimpleTaskReader) (*io.ExecutionError, error)
 }
 
 type metrics struct {
@@ -60,12 +57,12 @@ func newMetrics(scope promutils.Scope) metrics {
 type dynamicNodeTaskNodeHandler struct {
 	TaskNodeHandler
 	metrics      metrics
-	nodeExecutor executors.Node
+	nodeExecutor interfaces.Node
 	lpReader     launchplan.Reader
 	eventConfig  *config.EventConfig
 }
 
-func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx handler.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
+func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx interfaces.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
 	// It seems parent node is still running, lets call handle for parent node
 	trns, err := d.TaskNodeHandler.Handle(ctx, nCtx)
 	if err != nil {
@@ -95,7 +92,7 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 	return trns, prevState, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (
+func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (
 	handler.Transition, handler.DynamicNodeState, error) {
 	// The first time this is called we go ahead and evaluate the dynamic node to build the workflow. We then cache
 	// this workflow definition and send it to be persisted by flyteadmin so that users can observe the structure.
@@ -125,7 +122,7 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 	})), nextState, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
+func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx interfaces.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
 	dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
@@ -147,12 +144,9 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 		// These outputPaths only reads the output metadata. So the sandbox is completely optional here and hence it is nil.
 		// The sandbox creation as it uses hashing can be expensive and we skip that expense.
 		outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-		execID := task.GetTaskExecutionIdentifier(nCtx)
 		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
-		status, ee, err := d.TaskNodeHandler.ValidateOutputAndCacheAdd(ctx, nCtx.NodeID(), nCtx.InputReader(),
-			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader(), catalog.Metadata{
-				TaskExecutionIdentifier: execID,
-			})
+		ee, err := d.TaskNodeHandler.ValidateOutput(ctx, nCtx.NodeID(), nCtx.InputReader(),
+			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader())
 
 		if err != nil {
 			return handler.UnknownTransition, prevState, err
@@ -165,10 +159,9 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 
 			return trns.WithInfo(handler.PhaseInfoFailureErr(ee.ExecutionError, trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: ee.ExecutionError.String()}, nil
 		}
-		taskNodeInfoMetadata := &event.TaskNodeMetadata{CacheStatus: status.GetCacheStatus(), CatalogKey: status.GetMetadata()}
+
 		trns = trns.WithInfo(trns.Info().WithInfo(&handler.ExecutionInfo{
-			OutputInfo:   trns.Info().GetInfo().OutputInfo,
-			TaskNodeInfo: &handler.TaskNodeInfo{TaskNodeMetadata: taskNodeInfoMetadata},
+			OutputInfo: trns.Info().GetInfo().OutputInfo,
 		}))
 	}
 
@@ -182,7 +175,7 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 // DynamicNodePhaseParentFinalized: The parent has node completed successfully and the generated dynamic sub workflow has been serialized and sent as an event.
 // DynamicNodePhaseExecuting: The parent node has completed and finalized successfully, the sub-nodes are being handled
 // DynamicNodePhaseFailing: one or more of sub-nodes have failed and the failure is being handled
-func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
 	var err error
 	var trns handler.Transition
@@ -242,7 +235,7 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.Nod
 	return trns, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
 	switch ds.Phase {
 	case v1alpha1.DynamicNodePhaseFailing:
@@ -269,7 +262,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 	}
 }
 
-func (d dynamicNodeTaskNodeHandler) finalizeParentNode(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+func (d dynamicNodeTaskNodeHandler) finalizeParentNode(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	logger.Infof(ctx, "Finalizing Parent node RetryAttempt [%d]", nCtx.CurrentAttempt())
 	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
 		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
@@ -279,7 +272,7 @@ func (d dynamicNodeTaskNodeHandler) finalizeParentNode(ctx context.Context, nCtx
 }
 
 // This is a weird method. We should always finalize before we set the dynamic parent node phase as complete?
-func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	errs := make([]error, 0, 2)
 
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
@@ -312,7 +305,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	return nil
 }
 
-func New(underlying TaskNodeHandler, nodeExecutor executors.Node, launchPlanReader launchplan.Reader, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
+func New(underlying TaskNodeHandler, nodeExecutor interfaces.Node, launchPlanReader launchplan.Reader, eventConfig *config.EventConfig, scope promutils.Scope) interfaces.NodeHandler {
 
 	return &dynamicNodeTaskNodeHandler{
 		TaskNodeHandler: underlying,

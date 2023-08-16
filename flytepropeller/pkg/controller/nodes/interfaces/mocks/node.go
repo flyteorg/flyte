@@ -8,6 +8,8 @@ import (
 	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
 
+	interfaces "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
 	mock "github.com/stretchr/testify/mock"
 
 	v1alpha1 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -82,6 +84,40 @@ func (_m *Node) FinalizeHandler(ctx context.Context, execContext executors.Execu
 	return r0
 }
 
+type Node_GetNodeExecutionContextBuilder struct {
+	*mock.Call
+}
+
+func (_m Node_GetNodeExecutionContextBuilder) Return(_a0 interfaces.NodeExecutionContextBuilder) *Node_GetNodeExecutionContextBuilder {
+	return &Node_GetNodeExecutionContextBuilder{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Node) OnGetNodeExecutionContextBuilder() *Node_GetNodeExecutionContextBuilder {
+	c_call := _m.On("GetNodeExecutionContextBuilder")
+	return &Node_GetNodeExecutionContextBuilder{Call: c_call}
+}
+
+func (_m *Node) OnGetNodeExecutionContextBuilderMatch(matchers ...interface{}) *Node_GetNodeExecutionContextBuilder {
+	c_call := _m.On("GetNodeExecutionContextBuilder", matchers...)
+	return &Node_GetNodeExecutionContextBuilder{Call: c_call}
+}
+
+// GetNodeExecutionContextBuilder provides a mock function with given fields:
+func (_m *Node) GetNodeExecutionContextBuilder() interfaces.NodeExecutionContextBuilder {
+	ret := _m.Called()
+
+	var r0 interfaces.NodeExecutionContextBuilder
+	if rf, ok := ret.Get(0).(func() interfaces.NodeExecutionContextBuilder); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interfaces.NodeExecutionContextBuilder)
+		}
+	}
+
+	return r0
+}
+
 type Node_Initialize struct {
 	*mock.Call
 }
@@ -118,7 +154,7 @@ type Node_RecursiveNodeHandler struct {
 	*mock.Call
 }
 
-func (_m Node_RecursiveNodeHandler) Return(_a0 executors.NodeStatus, _a1 error) *Node_RecursiveNodeHandler {
+func (_m Node_RecursiveNodeHandler) Return(_a0 interfaces.NodeStatus, _a1 error) *Node_RecursiveNodeHandler {
 	return &Node_RecursiveNodeHandler{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -133,14 +169,14 @@ func (_m *Node) OnRecursiveNodeHandlerMatch(matchers ...interface{}) *Node_Recur
 }
 
 // RecursiveNodeHandler provides a mock function with given fields: ctx, execContext, dag, nl, currentNode
-func (_m *Node) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
+func (_m *Node) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (interfaces.NodeStatus, error) {
 	ret := _m.Called(ctx, execContext, dag, nl, currentNode)
 
-	var r0 executors.NodeStatus
-	if rf, ok := ret.Get(0).(func(context.Context, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, v1alpha1.ExecutableNode) executors.NodeStatus); ok {
+	var r0 interfaces.NodeStatus
+	if rf, ok := ret.Get(0).(func(context.Context, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, v1alpha1.ExecutableNode) interfaces.NodeStatus); ok {
 		r0 = rf(ctx, execContext, dag, nl, currentNode)
 	} else {
-		r0 = ret.Get(0).(executors.NodeStatus)
+		r0 = ret.Get(0).(interfaces.NodeStatus)
 	}
 
 	var r1 error
@@ -157,7 +193,7 @@ type Node_SetInputsForStartNode struct {
 	*mock.Call
 }
 
-func (_m Node_SetInputsForStartNode) Return(_a0 executors.NodeStatus, _a1 error) *Node_SetInputsForStartNode {
+func (_m Node_SetInputsForStartNode) Return(_a0 interfaces.NodeStatus, _a1 error) *Node_SetInputsForStartNode {
 	return &Node_SetInputsForStartNode{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -172,14 +208,14 @@ func (_m *Node) OnSetInputsForStartNodeMatch(matchers ...interface{}) *Node_SetI
 }
 
 // SetInputsForStartNode provides a mock function with given fields: ctx, execContext, dag, nl, inputs
-func (_m *Node) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (executors.NodeStatus, error) {
+func (_m *Node) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (interfaces.NodeStatus, error) {
 	ret := _m.Called(ctx, execContext, dag, nl, inputs)
 
-	var r0 executors.NodeStatus
-	if rf, ok := ret.Get(0).(func(context.Context, executors.ExecutionContext, executors.DAGStructureWithStartNode, executors.NodeLookup, *core.LiteralMap) executors.NodeStatus); ok {
+	var r0 interfaces.NodeStatus
+	if rf, ok := ret.Get(0).(func(context.Context, executors.ExecutionContext, executors.DAGStructureWithStartNode, executors.NodeLookup, *core.LiteralMap) interfaces.NodeStatus); ok {
 		r0 = rf(ctx, execContext, dag, nl, inputs)
 	} else {
-		r0 = ret.Get(0).(executors.NodeStatus)
+		r0 = ret.Get(0).(interfaces.NodeStatus)
 	}
 
 	var r1 error
@@ -190,4 +226,38 @@ func (_m *Node) SetInputsForStartNode(ctx context.Context, execContext executors
 	}
 
 	return r0, r1
+}
+
+type Node_WithNodeExecutionContextBuilder struct {
+	*mock.Call
+}
+
+func (_m Node_WithNodeExecutionContextBuilder) Return(_a0 interfaces.Node) *Node_WithNodeExecutionContextBuilder {
+	return &Node_WithNodeExecutionContextBuilder{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Node) OnWithNodeExecutionContextBuilder(_a0 interfaces.NodeExecutionContextBuilder) *Node_WithNodeExecutionContextBuilder {
+	c_call := _m.On("WithNodeExecutionContextBuilder", _a0)
+	return &Node_WithNodeExecutionContextBuilder{Call: c_call}
+}
+
+func (_m *Node) OnWithNodeExecutionContextBuilderMatch(matchers ...interface{}) *Node_WithNodeExecutionContextBuilder {
+	c_call := _m.On("WithNodeExecutionContextBuilder", matchers...)
+	return &Node_WithNodeExecutionContextBuilder{Call: c_call}
+}
+
+// WithNodeExecutionContextBuilder provides a mock function with given fields: _a0
+func (_m *Node) WithNodeExecutionContextBuilder(_a0 interfaces.NodeExecutionContextBuilder) interfaces.Node {
+	ret := _m.Called(_a0)
+
+	var r0 interfaces.Node
+	if rf, ok := ret.Get(0).(func(interfaces.NodeExecutionContextBuilder) interfaces.Node); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interfaces.Node)
+		}
+	}
+
+	return r0
 }

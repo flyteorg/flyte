@@ -52,6 +52,9 @@ type TaskNodeInfo struct {
 type GateNodeInfo struct {
 }
 
+type ArrayNodeInfo struct {
+}
+
 type OutputInfo struct {
 	OutputURI storage.DataReference
 	DeckURI   *storage.DataReference
@@ -65,6 +68,7 @@ type ExecutionInfo struct {
 	OutputInfo       *OutputInfo
 	TaskNodeInfo     *TaskNodeInfo
 	GateNodeInfo     *GateNodeInfo
+	ArrayNodeInfo    *ArrayNodeInfo
 }
 
 type PhaseInfo struct {

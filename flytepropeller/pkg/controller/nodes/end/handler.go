@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 )
 
 type endHandler struct {
@@ -18,11 +19,11 @@ func (e endHandler) FinalizeRequired() bool {
 	return false
 }
 
-func (e endHandler) Setup(ctx context.Context, setupContext handler.SetupContext) error {
+func (e endHandler) Setup(ctx context.Context, setupContext interfaces.SetupContext) error {
 	return nil
 }
 
-func (e endHandler) Handle(ctx context.Context, executionContext handler.NodeExecutionContext) (handler.Transition, error) {
+func (e endHandler) Handle(ctx context.Context, executionContext interfaces.NodeExecutionContext) (handler.Transition, error) {
 	inputs, err := executionContext.InputReader().Get(ctx)
 	if err != nil {
 		return handler.UnknownTransition, err
@@ -41,14 +42,14 @@ func (e endHandler) Handle(ctx context.Context, executionContext handler.NodeExe
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil
 }
 
-func (e endHandler) Abort(_ context.Context, _ handler.NodeExecutionContext, _ string) error {
+func (e endHandler) Abort(_ context.Context, _ interfaces.NodeExecutionContext, _ string) error {
 	return nil
 }
 
-func (e endHandler) Finalize(_ context.Context, _ handler.NodeExecutionContext) error {
+func (e endHandler) Finalize(_ context.Context, _ interfaces.NodeExecutionContext) error {
 	return nil
 }
 
-func New() handler.Node {
+func New() interfaces.NodeHandler {
 	return &endHandler{}
 }

@@ -101,6 +101,7 @@ type NodeSpec struct {
 	TaskRef       *TaskID                       `json:"task,omitempty"`
 	WorkflowNode  *WorkflowNodeSpec             `json:"workflow,omitempty"`
 	GateNode      *GateNodeSpec                 `json:"gate,omitempty"`
+	ArrayNode     *ArrayNodeSpec                `json:"array,omitempty"`
 	InputBindings []*Binding                    `json:"inputBindings,omitempty"`
 	Config        *typesv1.ConfigMap            `json:"config,omitempty"`
 	RetryStrategy *RetryStrategy                `json:"retry,omitempty"`
@@ -204,6 +205,13 @@ func (in *NodeSpec) GetGateNode() ExecutableGateNode {
 		return nil
 	}
 	return in.GateNode
+}
+
+func (in *NodeSpec) GetArrayNode() ExecutableArrayNode {
+	if in.ArrayNode == nil {
+		return nil
+	}
+	return in.ArrayNode
 }
 
 func (in *NodeSpec) GetTaskID() *TaskID {

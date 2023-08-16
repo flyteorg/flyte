@@ -5,23 +5,23 @@ import (
 	"fmt"
 	"strconv"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
-	node_common "github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	node_common "github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
+
+	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 type dynamicWorkflowContext struct {
@@ -36,7 +36,7 @@ type dynamicWorkflowContext struct {
 const dynamicWfNameTemplate = "dynamic_%s"
 
 func setEphemeralNodeExecutionStatusAttributes(ctx context.Context, djSpec *core.DynamicJobSpec,
-	nCtx handler.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) error {
+	nCtx interfaces.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) error {
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		return nil
 	}
@@ -77,7 +77,7 @@ func setEphemeralNodeExecutionStatusAttributes(ctx context.Context, djSpec *core
 }
 
 func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, djSpec *core.DynamicJobSpec,
-	nCtx handler.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) (*core.WorkflowTemplate, error) {
+	nCtx interfaces.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) (*core.WorkflowTemplate, error) {
 
 	iface, err := underlyingInterface(ctx, nCtx.TaskReader())
 	if err != nil {
@@ -127,7 +127,7 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 	}, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (dynamicWorkflowContext, error) {
+func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (dynamicWorkflowContext, error) {
 
 	t := d.metrics.buildDynamicWorkflow.Start(ctx)
 	defer t.Stop()
@@ -221,7 +221,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	}, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext,
+func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	djSpec *core.DynamicJobSpec, dynamicNodeStatus v1alpha1.ExecutableNodeStatus) (*core.CompiledWorkflowClosure, *v1alpha1.FlyteWorkflow, error) {
 	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, dynamicNodeStatus)
 	if err != nil {
@@ -265,7 +265,7 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nC
 }
 
 func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, execContext executors.ExecutionContext, dynamicWorkflow v1alpha1.ExecutableWorkflow, nl executors.NodeLookup,
-	nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
+	nCtx interfaces.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
 
 	state, err := d.nodeExecutor.RecursiveNodeHandler(ctx, execContext, dynamicWorkflow, nl, dynamicWorkflow.StartNode())
 	if err != nil {

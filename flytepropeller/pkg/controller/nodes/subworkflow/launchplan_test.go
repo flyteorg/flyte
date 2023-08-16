@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	mocks4 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	mocks3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	mocks3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 

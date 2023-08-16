@@ -24,7 +24,7 @@ import (
 
 	pluginMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	handlerMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	nodemocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 const containerTaskType = "container"
@@ -60,7 +60,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	const outputPath = "out"
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
-	nodeExecutionMetadata := handlerMocks.NodeExecutionMetadata{}
+	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
 	nodeExecutionMetadata.OnIsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
@@ -158,7 +158,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
 	assert.Equal(t, testClusterID, tev.ProducerId)
 
-	defaultNodeExecutionMetadata := handlerMocks.NodeExecutionMetadata{}
+	defaultNodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
 	defaultNodeExecutionMetadata.OnIsInterruptible().Return(false)
 	tev, err = ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 		TaskExecContext: tCtx,
@@ -251,7 +251,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	const outputPath = "out"
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
-	nodeExecutionMetadata := handlerMocks.NodeExecutionMetadata{}
+	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
 	nodeExecutionMetadata.OnIsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}

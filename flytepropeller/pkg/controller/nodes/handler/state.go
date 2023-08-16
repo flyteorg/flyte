@@ -4,8 +4,12 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+
+	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/flyteorg/flytestdlib/storage"
 )
 
@@ -46,18 +50,12 @@ type GateNodeState struct {
 	StartedAt time.Time
 }
 
-type NodeStateWriter interface {
-	PutTaskNodeState(s TaskNodeState) error
-	PutBranchNode(s BranchNodeState) error
-	PutDynamicNodeState(s DynamicNodeState) error
-	PutWorkflowNodeState(s WorkflowNodeState) error
-	PutGateNodeState(s GateNodeState) error
-}
-
-type NodeStateReader interface {
-	GetTaskNodeState() TaskNodeState
-	GetBranchNode() BranchNodeState
-	GetDynamicNodeState() DynamicNodeState
-	GetWorkflowNodeState() WorkflowNodeState
-	GetGateNodeState() GateNodeState
+type ArrayNodeState struct {
+	Phase                 v1alpha1.ArrayNodePhase
+	TaskPhaseVersion      uint32
+	Error                 *core.ExecutionError
+	SubNodePhases         bitarray.CompactArray
+	SubNodeTaskPhases     bitarray.CompactArray
+	SubNodeRetryAttempts  bitarray.CompactArray
+	SubNodeSystemFailures bitarray.CompactArray
 }

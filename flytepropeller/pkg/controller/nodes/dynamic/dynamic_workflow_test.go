@@ -25,7 +25,7 @@ import (
 	mocks4 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	mocks6 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/dynamic/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	mocks5 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 )
 
@@ -183,7 +183,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -255,7 +255,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -324,7 +324,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -407,7 +407,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -461,7 +461,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		mockLPLauncher := &mocks5.Reader{}
 
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -550,7 +550,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}, nil)
 
 		h := &mocks6.TaskNodeHandler{}
-		n := &mocks4.Node{}
+		n := &mocks.Node{}
 		d := dynamicNodeTaskNodeHandler{
 			TaskNodeHandler: h,
 			nodeExecutor:    n,
@@ -591,4 +591,8 @@ func (e existsMetadata) Exists() bool {
 
 func (e existsMetadata) Size() int64 {
 	return int64(1)
+}
+
+func (e existsMetadata) Etag() string {
+	return ""
 }

@@ -6,19 +6,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/golang/protobuf/ptypes"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
+	"github.com/flyteorg/flytestdlib/logger"
+
+	"github.com/golang/protobuf/ptypes"
+
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // This is used by flyteadmin to indicate that the events will now contain populated IsParent and IsDynamic bits.
@@ -226,54 +228,72 @@ func ToK8sTime(t time.Time) v1.Time {
 	return v1.Time{Time: t}
 }
 
-func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n *nodeStateManager, s v1alpha1.ExecutableNodeStatus) {
-	// We update the phase only if it is not already updated
-	if np != s.GetPhase() {
+func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus) {
+	// We update the phase and / or reason only if they are not already updated
+	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
 		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), p.GetErr())
 	}
 	// Update TaskStatus
-	if n.t != nil {
+	if n.HasTaskNodeState() {
+		nt := n.GetTaskNodeState()
 		t := s.GetOrCreateTaskStatus()
-		t.SetPhaseVersion(n.t.PluginPhaseVersion)
-		t.SetPhase(int(n.t.PluginPhase))
-		t.SetLastPhaseUpdatedAt(n.t.LastPhaseUpdatedAt)
-		t.SetPluginState(n.t.PluginState)
-		t.SetPluginStateVersion(n.t.PluginStateVersion)
-		t.SetPreviousNodeExecutionCheckpointPath(n.t.PreviousNodeExecutionCheckpointURI)
-		t.SetCleanupOnFailure(n.t.CleanupOnFailure)
+		t.SetPhaseVersion(nt.PluginPhaseVersion)
+		t.SetPhase(int(nt.PluginPhase))
+		t.SetLastPhaseUpdatedAt(nt.LastPhaseUpdatedAt)
+		t.SetPluginState(nt.PluginState)
+		t.SetPluginStateVersion(nt.PluginStateVersion)
+		t.SetPreviousNodeExecutionCheckpointPath(nt.PreviousNodeExecutionCheckpointURI)
+		t.SetCleanupOnFailure(nt.CleanupOnFailure)
 	}
 
 	// Update dynamic node status
-	if n.d != nil {
+	if n.HasDynamicNodeState() {
+		nd := n.GetDynamicNodeState()
 		t := s.GetOrCreateDynamicNodeStatus()
-		t.SetDynamicNodePhase(n.d.Phase)
-		t.SetDynamicNodeReason(n.d.Reason)
-		t.SetExecutionError(n.d.Error)
-		t.SetIsFailurePermanent(n.d.IsFailurePermanent)
+		t.SetDynamicNodePhase(nd.Phase)
+		t.SetDynamicNodeReason(nd.Reason)
+		t.SetExecutionError(nd.Error)
+		t.SetIsFailurePermanent(nd.IsFailurePermanent)
 	}
 
 	// Update branch node status
-	if n.b != nil {
+	if n.HasBranchNodeState() {
+		nb := n.GetBranchNodeState()
 		t := s.GetOrCreateBranchStatus()
-		if n.b.Phase == v1alpha1.BranchNodeError {
+		if nb.Phase == v1alpha1.BranchNodeError {
 			t.SetBranchNodeError()
-		} else if n.b.FinalizedNodeID != nil {
-			t.SetBranchNodeSuccess(*n.b.FinalizedNodeID)
+		} else if nb.FinalizedNodeID != nil {
+			t.SetBranchNodeSuccess(*nb.FinalizedNodeID)
 		} else {
 			logger.Warnf(context.TODO(), "branch node status neither success nor error set")
 		}
 	}
 
 	// Update workflow node status
-	if n.w != nil {
+	if n.HasWorkflowNodeState() {
+		nw := n.GetWorkflowNodeState()
 		t := s.GetOrCreateWorkflowStatus()
-		t.SetWorkflowNodePhase(n.w.Phase)
-		t.SetExecutionError(n.w.Error)
+		t.SetWorkflowNodePhase(nw.Phase)
+		t.SetExecutionError(nw.Error)
 	}
 
 	// Update gate node status
-	if n.g != nil {
+	if n.HasGateNodeState() {
+		ng := n.GetGateNodeState()
 		t := s.GetOrCreateGateNodeStatus()
-		t.SetGateNodePhase(n.g.Phase)
+		t.SetGateNodePhase(ng.Phase)
+	}
+
+	// Update array node status
+	if n.HasArrayNodeState() {
+		na := n.GetArrayNodeState()
+		t := s.GetOrCreateArrayNodeStatus()
+		t.SetArrayNodePhase(na.Phase)
+		t.SetExecutionError(na.Error)
+		t.SetSubNodePhases(na.SubNodePhases)
+		t.SetSubNodeTaskPhases(na.SubNodeTaskPhases)
+		t.SetSubNodeRetryAttempts(na.SubNodeRetryAttempts)
+		t.SetSubNodeSystemFailures(na.SubNodeSystemFailures)
+		t.SetTaskPhaseVersion(na.TaskPhaseVersion)
 	}
 }

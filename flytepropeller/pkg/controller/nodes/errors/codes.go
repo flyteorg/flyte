@@ -25,4 +25,5 @@ const (
 	StorageError                       ErrorCode = "StorageError"
 	EventRecordingFailed               ErrorCode = "EventRecordingFailed"
 	CatalogCallFailed                  ErrorCode = "CatalogCallFailed"
+	InvalidArrayLength                 ErrorCode = "InvalidArrayLength"
 )

@@ -5,16 +5,18 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+
 	stdErrors "github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 )
 
 type metrics struct {
@@ -22,7 +24,7 @@ type metrics struct {
 }
 
 type branchHandler struct {
-	nodeExecutor executors.Node
+	nodeExecutor interfaces.Node
 	m            metrics
 	eventConfig  *config.EventConfig
 }
@@ -31,13 +33,13 @@ func (b *branchHandler) FinalizeRequired() bool {
 	return false
 }
 
-func (b *branchHandler) Setup(ctx context.Context, _ handler.SetupContext) error {
+func (b *branchHandler) Setup(ctx context.Context, _ interfaces.SetupContext) error {
 	logger.Debugf(ctx, "BranchNode::Setup: nothing to do")
 	return nil
 }
 
-func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha1.ExecutableBranchNode, nCtx handler.NodeExecutionContext, nl executors.NodeLookup) (handler.Transition, error) {
-	if nCtx.NodeStateReader().GetBranchNode().FinalizedNodeID == nil {
+func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha1.ExecutableBranchNode, nCtx interfaces.NodeExecutionContext, nl executors.NodeLookup) (handler.Transition, error) {
+	if nCtx.NodeStateReader().GetBranchNodeState().FinalizedNodeID == nil {
 		nodeInputs, err := nCtx.InputReader().Get(ctx)
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
@@ -79,7 +81,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 	}
 
 	// If the branchNodestatus was already evaluated i.e, Node is in Running status
-	branchStatus := nCtx.NodeStateReader().GetBranchNode()
+	branchStatus := nCtx.NodeStateReader().GetBranchNodeState()
 	userError := branchNode.GetElseFail()
 	finalNodeID := branchStatus.FinalizedNodeID
 	if finalNodeID == nil {
@@ -103,7 +105,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 	return b.recurseDownstream(ctx, nCtx, nodeStatus, branchTakenNode)
 }
 
-func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (b *branchHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	logger.Debug(ctx, "Starting Branch Node")
 	branchNode := nCtx.Node().GetBranchNode()
 	if branchNode == nil {
@@ -115,7 +117,7 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 	return b.HandleBranchNode(ctx, branchNode, nCtx, nl)
 }
 
-func (b *branchHandler) getExecutionContextForDownstream(nCtx handler.NodeExecutionContext) (executors.ExecutionContext, error) {
+func (b *branchHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExecutionContext) (executors.ExecutionContext, error) {
 	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
 	if err != nil {
 		return nil, err
@@ -123,7 +125,7 @@ func (b *branchHandler) getExecutionContextForDownstream(nCtx handler.NodeExecut
 	return executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), nil
 }
 
-func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, branchTakenNode v1alpha1.ExecutableNode) (handler.Transition, error) {
+func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, branchTakenNode v1alpha1.ExecutableNode) (handler.Transition, error) {
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
 	// The parent of the BranchTaken Node is the actual Branch Node and all the data is just forwarded from the Branch to the executed node.
@@ -167,7 +169,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 	return handler.DoTransition(handler.TransitionTypeEphemeral, phase), nil
 }
 
-func (b *branchHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (b *branchHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 
 	branch := nCtx.Node().GetBranchNode()
 	if branch == nil {
@@ -175,7 +177,7 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionCon
 	}
 
 	// If the branch was already evaluated i.e, Node is in Running status
-	branchNodeState := nCtx.NodeStateReader().GetBranchNode()
+	branchNodeState := nCtx.NodeStateReader().GetBranchNodeState()
 	if branchNodeState.Phase == v1alpha1.BranchNodeNotYetEvaluated {
 		logger.Errorf(ctx, "No node finalized through previous branch evaluation.")
 		return nil
@@ -212,14 +214,14 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionCon
 	return b.nodeExecutor.AbortHandler(ctx, execContext, dag, nCtx.ContextualNodeLookup(), branchTakenNode, reason)
 }
 
-func (b *branchHandler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+func (b *branchHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	branch := nCtx.Node().GetBranchNode()
 	if branch == nil {
 		return errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "Invoked branch handler, for a non branch node.")
 	}
 
 	// If the branch was already evaluated i.e, Node is in Running status
-	branchNodeState := nCtx.NodeStateReader().GetBranchNode()
+	branchNodeState := nCtx.NodeStateReader().GetBranchNodeState()
 	if branchNodeState.Phase == v1alpha1.BranchNodeNotYetEvaluated {
 		logger.Errorf(ctx, "No node finalized through previous branch evaluation.")
 		return nil
@@ -256,7 +258,7 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx handler.NodeExecution
 	return b.nodeExecutor.FinalizeHandler(ctx, execContext, dag, nCtx.ContextualNodeLookup(), branchTakenNode)
 }
 
-func New(executor executors.Node, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
+func New(executor interfaces.Node, eventConfig *config.EventConfig, scope promutils.Scope) interfaces.NodeHandler {
 	return &branchHandler{
 		nodeExecutor: executor,
 		m:            metrics{scope: scope},

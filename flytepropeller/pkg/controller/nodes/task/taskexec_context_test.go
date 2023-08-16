@@ -31,7 +31,7 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 )
