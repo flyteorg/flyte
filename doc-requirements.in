@@ -4,6 +4,7 @@ flytekit
 flytekitplugins-deck-standard
 flytekitplugins-kfpytorch
 flytekitplugins-sqlalchemy
+gitpython
 ipython!=8.7.0
 jupytext
 myst-nb
