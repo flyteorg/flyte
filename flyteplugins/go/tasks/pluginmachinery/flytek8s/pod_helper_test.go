@@ -112,6 +112,226 @@ func TestPodSetup(t *testing.T) {
 	t.Run("ToK8sPodInterruptible", toK8sPodInterruptible)
 }
 
+func TestAddRequiredNodeSelectorRequirements(t *testing.T) {
+	t.Run("with empty node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddRequiredNodeSelectorRequirements(&affinity, nst)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "new",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"new"},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+	})
+
+	t.Run("with existing node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+					NodeSelectorTerms: []v1.NodeSelectorTerm{
+						v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "required",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"required"},
+								},
+							},
+						},
+					},
+				},
+				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
+					v1.PreferredSchedulingTerm{
+						Weight: 1,
+						Preference: v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "preferred",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"preferred"},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddRequiredNodeSelectorRequirements(&affinity, nst)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "required",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"required"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "new",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"new"},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 1,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "preferred",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"preferred"},
+							},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+}
+
+func TestAddPreferredNodeSelectorRequirements(t *testing.T) {
+	t.Run("with empty node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 10,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "new",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"new"},
+							},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+
+	t.Run("with existing node affinity", func(t *testing.T) {
+		affinity := v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+					NodeSelectorTerms: []v1.NodeSelectorTerm{
+						v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "required",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"required"},
+								},
+							},
+						},
+					},
+				},
+				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{
+					v1.PreferredSchedulingTerm{
+						Weight: 1,
+						Preference: v1.NodeSelectorTerm{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								v1.NodeSelectorRequirement{
+									Key:      "preferred",
+									Operator: v1.NodeSelectorOpIn,
+									Values:   []string{"preferred"},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		nst := v1.NodeSelectorRequirement{
+			Key:      "new",
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{"new"},
+		}
+		AddPreferredNodeSelectorRequirements(&affinity, 10, nst)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "required",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"required"},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 1,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "preferred",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"preferred"},
+							},
+						},
+					},
+				},
+				v1.PreferredSchedulingTerm{
+					Weight: 10,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      "new",
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"new"},
+							},
+						},
+					},
+				},
+			},
+			affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+}
+
 func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 	t.Run("WithInterruptibleNodeSelectorRequirement", func(t *testing.T) {
 		podSpec := v1.PodSpec{}
@@ -194,6 +414,59 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 		)
 	})
+}
+
+func TestApplyNodeSelectors(t *testing.T) {
+	podSpec := &v1.PodSpec{
+		Affinity: &v1.Affinity{},
+	}
+	ApplyNodeSelectors(
+		podSpec,
+		&core.Selector{
+			Selection: &core.Selector_GpuDevice{
+				GpuDevice: "nvidia-tesla-a100",
+			},
+		},
+		&core.Selector{
+			Selection: &core.Selector_GpuPartitionSize{
+				GpuPartitionSize: "1g.5gb",
+			},
+			OnlyPreferred: true,
+		},
+	)
+	assert.EqualValues(
+		t,
+		[]v1.NodeSelectorTerm{
+			v1.NodeSelectorTerm{
+				MatchExpressions: []v1.NodeSelectorRequirement{
+					v1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"nvidia-tesla-a100"},
+					},
+				},
+			},
+		},
+		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
+	assert.EqualValues(
+		t,
+		[]v1.PreferredSchedulingTerm{
+			v1.PreferredSchedulingTerm{
+				Weight: 10,
+				Preference: v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+		},
+		podSpec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+	)
 }
 
 func updatePod(t *testing.T) {

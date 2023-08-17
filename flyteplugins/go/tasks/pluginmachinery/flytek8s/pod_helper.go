@@ -32,6 +32,51 @@ const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
 
+// AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object. If there are no existing required
+// node selectors, the new v1.NodeSelectorRequirement will be added as-is.
+// However, if there are existing required node selectors, we iterate over all existing
+// node selector terms and append the node selector requirement. Note that multiple node
+// selector terms are OR'd, and match expressions within a single node selector term
+// are AND'd during scheduling.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	if base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
+	}
+	if len(base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
+		nodeSelectorTerms := base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+		for i := range nodeSelectorTerms {
+			nst := &nodeSelectorTerms[i]
+			nst.MatchExpressions = append(nst.MatchExpressions, new...)
+		}
+	} else {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+	}
+}
+
+// AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object's list of preferred scheduling terms.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity-weight
+// for how weights are used during scheduling.
+func AddPreferredNodeSelectorRequirements(base *v1.Affinity, weight int32, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(
+		base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		v1.PreferredSchedulingTerm{
+			Weight: weight,
+			Preference: v1.NodeSelectorTerm{
+				MatchExpressions: new,
+			},
+		},
+	)
+}
+
 // ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
 func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
 	// Determine node selector terms to add to node affinity
@@ -48,22 +93,7 @@ func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.
 		nodeSelectorRequirement = *config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement
 	}
 
-	if affinity.NodeAffinity == nil {
-		affinity.NodeAffinity = &v1.NodeAffinity{}
-	}
-	if affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
-	}
-	if len(affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
-		nodeSelectorTerms := affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-		for i := range nodeSelectorTerms {
-			nst := &nodeSelectorTerms[i]
-			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
-		}
-	} else {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
-	}
-
+	AddRequiredNodeSelectorRequirements(affinity, nodeSelectorRequirement)
 }
 
 // ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
@@ -73,6 +103,36 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	}
 
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+}
+
+func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	for _, selector := range selectors {
+		var ns v1.NodeSelectorRequirement
+		switch selector.GetSelection().(type) {
+		case *core.Selector_GpuDevice:
+			ns = v1.NodeSelectorRequirement{
+				Key: config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+				Operator: v1.NodeSelectorOpIn,
+				Values: []string{selector.GetGpuDevice()},
+			}
+		case *core.Selector_GpuPartitionSize:
+			ns = v1.NodeSelectorRequirement{
+				Key: config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpIn,
+				Values: []string{selector.GetGpuPartitionSize()},
+			}
+		}
+		if selector.GetOnlyPreferred() {
+			// TODO (jeev): Should we make the weight configurable?
+			AddPreferredNodeSelectorRequirements(podSpec.Affinity, 10, ns)
+		} else {
+			AddRequiredNodeSelectorRequirements(podSpec.Affinity, ns)
+		}
+	}
 }
 
 // UpdatePod updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
@@ -91,6 +151,7 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 		podSpec.SchedulerName = config.GetK8sPluginConfig().SchedulerName
 	}
 	podSpec.NodeSelector = utils.UnionMaps(config.GetK8sPluginConfig().DefaultNodeSelector, podSpec.NodeSelector)
+
 	if taskExecutionMetadata.IsInterruptible() {
 		podSpec.NodeSelector = utils.UnionMaps(podSpec.NodeSelector, config.GetK8sPluginConfig().InterruptibleNodeSelector)
 	}
@@ -248,6 +309,10 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if taskTemplate.GetMetadata() != nil {
+		ApplyNodeSelectors(podSpec, taskTemplate.GetMetadata().Selectors...)
 	}
 
 	return podSpec, objectMeta, nil

@@ -53,6 +53,8 @@ var (
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
+		GpuDeviceNodeLabel: "k8s.amazonaws.com/accelerator",
+		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName: ResourceNvidiaGPU,
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -139,6 +141,12 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
+
+	// The node label that specifies the attached GPU device.
+	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`
+
+	// The node label that specifies the attached GPU partition size.
+	GpuPartitionSizeNodeLabel string `json:"gpu-partition-size-node-label" pflag:"-,The node label that specifies the attached GPU partition size."`
 
 	// The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
