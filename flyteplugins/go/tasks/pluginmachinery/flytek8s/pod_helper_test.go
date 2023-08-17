@@ -417,56 +417,96 @@ func TestApplyInterruptibleNodeAffinity(t *testing.T) {
 }
 
 func TestApplyNodeSelectors(t *testing.T) {
-	podSpec := &v1.PodSpec{
-		Affinity: &v1.Affinity{},
-	}
-	ApplyNodeSelectors(
-		podSpec,
-		&core.Selector{
-			Selection: &core.Selector_GpuDevice{
-				GpuDevice: "nvidia-tesla-a100",
-			},
-		},
-		&core.Selector{
-			Selection: &core.Selector_GpuPartitionSize{
-				GpuPartitionSize: "1g.5gb",
-			},
-			OnlyPreferred: true,
-		},
-	)
-	assert.EqualValues(
-		t,
-		[]v1.NodeSelectorTerm{
-			v1.NodeSelectorTerm{
-				MatchExpressions: []v1.NodeSelectorRequirement{
-					v1.NodeSelectorRequirement{
-						Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{"nvidia-tesla-a100"},
-					},
+	t.Run("with gpu device and partition size", func(t *testing.T) {
+		podSpec := &v1.PodSpec{
+			Affinity: &v1.Affinity{},
+		}
+		ApplyNodeSelectors(
+			podSpec,
+			&core.Selector{
+				Selection: &core.Selector_GpuDevice{
+					GpuDevice: "nvidia-tesla-a100",
 				},
 			},
-		},
-		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-	)
-	assert.EqualValues(
-		t,
-		[]v1.PreferredSchedulingTerm{
-			v1.PreferredSchedulingTerm{
-				Weight: 10,
-				Preference: v1.NodeSelectorTerm{
+			&core.Selector{
+				Selection: &core.Selector_GpuPartitionSize{
+					GpuPartitionSize: "1g.5gb",
+				},
+				OnlyPreferred: true,
+			},
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
 					MatchExpressions: []v1.NodeSelectorRequirement{
 						v1.NodeSelectorRequirement{
-							Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
 							Operator: v1.NodeSelectorOpIn,
-							Values:   []string{"1g.5gb"},
+							Values:   []string{"nvidia-tesla-a100"},
 						},
 					},
 				},
 			},
-		},
-		podSpec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
-	)
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.PreferredSchedulingTerm{
+				v1.PreferredSchedulingTerm{
+					Weight: 10,
+					Preference: v1.NodeSelectorTerm{
+						MatchExpressions: []v1.NodeSelectorRequirement{
+							v1.NodeSelectorRequirement{
+								Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+								Operator: v1.NodeSelectorOpIn,
+								Values:   []string{"1g.5gb"},
+							},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		)
+	})
+
+	t.Run("with gpu device but without partition size", func(t *testing.T) {
+		podSpec := &v1.PodSpec{
+			Affinity: &v1.Affinity{},
+		}
+		ApplyNodeSelectors(
+			podSpec,
+			&core.Selector{
+				Selection: &core.Selector_GpuDevice{
+					GpuDevice: "nvidia-tesla-a100",
+				},
+			},
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: v1.NodeSelectorOpDoesNotExist,
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			0,
+			len(podSpec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution),
+		)
+	})
 }
 
 func updatePod(t *testing.T) {

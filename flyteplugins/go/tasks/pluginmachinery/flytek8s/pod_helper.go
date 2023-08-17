@@ -110,6 +110,7 @@ func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 		podSpec.Affinity = &v1.Affinity{}
 	}
 
+	gpuPartitionSizeSpecified := false
 	for _, selector := range selectors {
 		var ns v1.NodeSelectorRequirement
 		switch selector.GetSelection().(type) {
@@ -120,6 +121,7 @@ func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 				Values:   []string{selector.GetGpuDevice()},
 			}
 		case *core.Selector_GpuPartitionSize:
+			gpuPartitionSizeSpecified = true
 			ns = v1.NodeSelectorRequirement{
 				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
 				Operator: v1.NodeSelectorOpIn,
@@ -132,6 +134,18 @@ func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 		} else {
 			AddRequiredNodeSelectorRequirements(podSpec.Affinity, ns)
 		}
+	}
+
+	// If a gpu partition size selector was not specified, we assume that the user
+	// wants full, unpartitioned GPUs.
+	if !gpuPartitionSizeSpecified {
+		AddRequiredNodeSelectorRequirements(
+			podSpec.Affinity,
+			v1.NodeSelectorRequirement{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpDoesNotExist,
+			},
+		)
 	}
 }
 
