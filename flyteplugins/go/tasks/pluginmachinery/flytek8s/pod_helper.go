@@ -115,15 +115,15 @@ func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 		switch selector.GetSelection().(type) {
 		case *core.Selector_GpuDevice:
 			ns = v1.NodeSelectorRequirement{
-				Key: config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+				Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
 				Operator: v1.NodeSelectorOpIn,
-				Values: []string{selector.GetGpuDevice()},
+				Values:   []string{selector.GetGpuDevice()},
 			}
 		case *core.Selector_GpuPartitionSize:
 			ns = v1.NodeSelectorRequirement{
-				Key: config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
 				Operator: v1.NodeSelectorOpIn,
-				Values: []string{selector.GetGpuPartitionSize()},
+				Values:   []string{selector.GetGpuPartitionSize()},
 			}
 		}
 		if selector.GetOnlyPreferred() {

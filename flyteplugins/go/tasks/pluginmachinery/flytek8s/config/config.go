@@ -53,9 +53,9 @@ var (
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
-		GpuDeviceNodeLabel: "k8s.amazonaws.com/accelerator",
+		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
-		GpuResourceName: ResourceNvidiaGPU,
+		GpuResourceName:           ResourceNvidiaGPU,
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
