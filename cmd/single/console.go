@@ -1,6 +1,7 @@
 package single
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -14,7 +15,9 @@ const indexHTML = "/index.html"
 // Every path has a '/console' as the prefix. After dropping this prefix, the following 3 rules are checked
 // Rule 1: If path is now "" or "/" then return index.html
 // Rule 2: If path contains no "assets" sub-string and has an additional substring "/", then return "index.html".
-//         This is to allow vanity urls in React
+//
+//	This is to allow vanity urls in React
+//
 // Rule 3: Finally return every file path as is
 // For every file add a "dist" as the prefix, as every file is assumed to be packaged in "dist" folder fv
 func GetConsoleFile(name string) string {
@@ -22,11 +25,15 @@ func GetConsoleFile(name string) string {
 	name = strings.TrimPrefix(name, "/"+assetsDir)
 	if name == "" || name == "/" {
 		name = indexHTML
+		fmt.Println("Returning--- index.html 1")
 	} else if !strings.Contains(name, assetsDir) {
 		if strings.Contains(name[1:], "/") {
+			fmt.Printf("Returning--- index.html 2 %v", name)
 			name = indexHTML
 		}
+		fmt.Printf("Returning--- 2 %v", name)
 	}
+	fmt.Printf("Returning--- 3 %v %v", packageDir, name)
 	return packageDir + name
 }
 
