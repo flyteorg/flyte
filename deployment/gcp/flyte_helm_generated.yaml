@@ -608,11 +608,11 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
-- apiGroups:
+- apiGroups: 
   - ""
   - flyte.lyft.com
   - rbac.authorization.k8s.io
-  resources:
+  resources: 
   - configmaps
   - flyteworkflows
   - namespaces
@@ -624,7 +624,8 @@ rules:
   - services
   - serviceaccounts
   - spark-role
-  verbs:
+  - limitranges
+  verbs: 
   - '*'
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
