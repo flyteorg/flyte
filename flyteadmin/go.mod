@@ -214,4 +214,4 @@ replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.2022091
 // This was published in error when attempting to create 1.5.1 Flyte release.
 retract v1.1.94
 
-replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.17-0.20230821184213-8fa0999bf29f
+replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.17-0.20230821222808-485ae223c7f1
