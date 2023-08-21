@@ -5501,11 +5501,11 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
-- apiGroups:
+- apiGroups: 
   - ""
   - flyte.lyft.com
   - rbac.authorization.k8s.io
-  resources:
+  resources: 
   - configmaps
   - flyteworkflows
   - namespaces
@@ -5518,7 +5518,7 @@ rules:
   - serviceaccounts
   - spark-role
   - limitranges
-  verbs:
+  verbs: 
   - '*'
 ---
 # Source: flyte/charts/flyte/templates/propeller/rbac.yaml

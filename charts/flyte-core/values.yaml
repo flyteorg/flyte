@@ -66,6 +66,30 @@ flyteadmin:
     imagePullSecrets: []
     # -- Should a ClusterRole be created for Flyteadmin
     createClusterRole: true
+    # -- Configuration for ClusterRole created for Flyteadmin
+    clusterRole:
+      # -- Specifies the API groups that this ClusterRole can access
+      apiGroups:
+        - ""
+        - "flyte.lyft.com"
+        - "rbac.authorization.k8s.io"
+      # -- Specifies the resources that this ClusterRole can access
+      resources:
+        - configmaps
+        - flyteworkflows
+        - namespaces
+        - pods
+        - resourcequotas
+        - roles
+        - rolebindings
+        - secrets
+        - services
+        - serviceaccounts
+        - spark-role
+        - limitranges
+      # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
+      verbs:
+        - '*'
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- nodeSelector for Flyteadmin deployment
@@ -575,6 +599,7 @@ configmap:
       eventVersion: 2
       testing:
         host: http://flyteadmin
+      
     # -- Authentication configuration
     auth:
       authorizedUris:
