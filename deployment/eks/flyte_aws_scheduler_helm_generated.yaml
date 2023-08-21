@@ -572,6 +572,7 @@ rules:
   - services
   - serviceaccounts
   - spark-role
+  - limitranges
   verbs:
   - '*'
 ---
