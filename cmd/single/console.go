@@ -1,33 +1,29 @@
 package single
 
 import (
+	"path/filepath"
 	"net/http"
 	"strings"
 )
 
-const consoleRoot = "/console"
-const assetsDir = "assets"
-const packageDir = "dist"
-const indexHTML = "/index.html"
+const (
+	consoleRoot = "/console"
+	consoleStatic = consoleRoot + "/assets/"
+	packageDir = "dist"
+	indexHTML = "index.html"
+)
 
 // GetConsoleFile returns the console file that should be used for the given path.
-// Every path has a '/console' as the prefix. After dropping this prefix, the following 3 rules are checked
-// Rule 1: If path is now "" or "/" then return index.html
-// Rule 2: If path contains no "assets" sub-string and has an additional substring "/", then return "index.html".
-//         This is to allow vanity urls in React
-// Rule 3: Finally return every file path as is
 // For every file add a "dist" as the prefix, as every file is assumed to be packaged in "dist" folder fv
 func GetConsoleFile(name string) string {
-	name = strings.TrimPrefix(name, consoleRoot)
-	name = strings.TrimPrefix(name, "/"+assetsDir)
-	if name == "" || name == "/" {
-		name = indexHTML
-	} else if !strings.Contains(name, assetsDir) {
-		if strings.Contains(name[1:], "/") {
-			name = indexHTML
-		}
+	// Serve requests for static assets at `/console/assets/<filename>`
+	// as-is from `dist`
+	if strings.HasPrefix(name, consoleStatic) {
+		return filepath.Join(packageDir, strings.TrimPrefix(name, consoleStatic))
 	}
-	return packageDir + name
+
+	// Send all other requests to `index.html` to be handled by react router
+	return filepath.Join(packageDir, indexHTML)
 }
 
 type consoleFS struct {
