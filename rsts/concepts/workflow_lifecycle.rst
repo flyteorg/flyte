@@ -10,7 +10,7 @@ Let's understand how Flyte's plugin machinery works and how information flows fr
 
 Under the hood, Flyte relies on a primitive called “Plugins”. Every task that you run on Flyte is powered by a plugin. Some of these plugins are native and guaranteed by Flyte system. These native plugins, for example, run your Flyte tasks inside a k8s pod. There are three native plugins, namely, ``Container``, ``K8sPod``, and ``Sql``.
 
-Moreover, there are plugins that are actual extensions; they create additional infrastructure and communicate with SaaS on your behalf. Examples include :ref:`Spark <intermediate_using_spark_tasks>`, :ref:`AWS Athena <AWS Athena>`, etc.
+Moreover, there are plugins that are actual extensions; they create additional infrastructure and communicate with SaaS on your behalf. Examples include :ref:`Spark <spark_task>`, :ref:`AWS Athena <AWS Athena>`, etc.
 
 A plugin requires code to live in multiple locations.
 
