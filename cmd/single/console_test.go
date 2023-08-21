@@ -9,10 +9,10 @@ func TestGetConsoleFile(t *testing.T) {
 	}{
 		{"/console", "dist/index.html"},
 		{"/console/", "dist/index.html"},
-		{"/console/main.js", "dist/main.js"},
-		{"/console/assets/xyz.png", "dist/assets/xyz.png"},
-		{"/console/assets/dir/xyz.png", "dist/assets/dir/xyz.png"},
-		{"console/projects/flytesnacks/workflows?domain=development", "dist/index.html"},
+		{"/console/assets/xyz.png", "dist/xyz.png"},
+		{"/console/assets/dir/xyz.png", "dist/dir/xyz.png"},
+		{"/console/projects/flytesnacks/workflows?domain=development", "dist/index.html"},
+		{"/console/select-project", "dist/index.html"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
