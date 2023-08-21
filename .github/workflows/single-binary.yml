@@ -189,7 +189,9 @@ jobs:
           # ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
-          for f in basics/basics/basic_workflow.py \
+          for f in \
+                  basics/basics/basic_workflow.py \
+                  basics/basics/deck.py \
                   basics/basics/hello_world.py \
                   basics/basics/lp.py \
                   basics/basics/named_outputs.py \
