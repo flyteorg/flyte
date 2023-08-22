@@ -1,18 +1,5 @@
 admin:
+  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: dns:///localhost:30080
-  insecure: true
   authType: Pkce
-logger:
-  show-source: true
-  level: 0
-storage:
-  connection:
-    access-key: minio
-    auth-type: accesskey
-    disable-ssl: true
-    endpoint: http://localhost:30002
-    region: us-east-1
-    secret-key: miniostorage
-  type: minio
-  container: "my-s3-bucket"
-  enable-multicontainer: true
+  insecure: true
