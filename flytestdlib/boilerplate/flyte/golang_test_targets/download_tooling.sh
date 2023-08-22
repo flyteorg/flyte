@@ -16,8 +16,9 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
-  "github.com/vektra/mockery/cmd/mockery"
-  "github.com/flyteorg/flytestdlib/cli/pflags"
+  "github.com/EngHabu/mockery/cmd/mockery"
+  "github.com/flyteorg/flytestdlib/cli/pflags@latest"
+  "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"
   "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
 )
@@ -26,8 +27,6 @@ tmp_dir=$(mktemp -d -t gotooling-XXX)
 echo "Using temp directory ${tmp_dir}"
 cp -R boilerplate/flyte/golang_support_tools/* $tmp_dir
 pushd "$tmp_dir"
-
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.49.0
 
 for tool in "${tools[@]}"
 do
