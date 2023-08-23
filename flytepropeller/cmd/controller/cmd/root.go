@@ -4,6 +4,7 @@ package cmd
 import (
 	"context"
 	"flag"
+	"net/http"
 	"os"
 	"runtime"
 
@@ -21,6 +22,8 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/version"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -32,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const (
@@ -140,9 +144,17 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		return err
 	}
 
+	handlers := map[string]http.Handler{
+		"/k8smetrics": promhttp.HandlerFor(metrics.Registry,
+			promhttp.HandlerOpts{
+				ErrorHandling: promhttp.HTTPErrorOnError,
+			},
+		),
+	}
+
 	g, childCtx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, cfg.ProfilerPort.Port, nil)
+		err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, cfg.ProfilerPort.Port, handlers)
 		if err != nil {
 			logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
 		}
