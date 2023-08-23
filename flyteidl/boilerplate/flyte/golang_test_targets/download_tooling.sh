@@ -18,7 +18,7 @@ set -e
 tools=(
   "github.com/EngHabu/mockery/cmd/mockery"
   "github.com/flyteorg/flytestdlib/cli/pflags@latest"
-  "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+  "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"
   "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
 )
