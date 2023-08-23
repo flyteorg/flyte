@@ -21,7 +21,6 @@ import (
 	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
 )
@@ -106,15 +105,6 @@ func NewDataCatalogService() *DataCatalogService {
 	repos := repositories.GetRepository(ctx, repositories.POSTGRES, *dbConfigValues, catalogScope)
 	logger.Infof(ctx, "Created DB connection.")
 
-	// Serve profiling endpoint.
-	go func() {
-		err := profutils.StartProfilingServerWithDefaultHandlers(
-			context.Background(), dataCatalogConfig.ProfilerPort, nil)
-		if err != nil {
-			logger.Panicf(context.Background(), "Failed to Start profiling and Metrics server. Error, %v", err)
-		}
-	}()
-
 	return &DataCatalogService{
 		DatasetManager:  impl.NewDatasetManager(repos, dataStorageClient, catalogScope.NewSubScope("dataset")),
 		ArtifactManager: impl.NewArtifactManager(repos, dataStorageClient, storagePrefix, catalogScope.NewSubScope("artifact")),
@@ -173,14 +163,6 @@ func ServeHTTPHealthCheck(ctx context.Context, cfg *config.Config) error {
 
 // Create and start the gRPC server and http healthcheck endpoint
 func Serve(ctx context.Context, cfg *config.Config) error {
-	// serve a http healthcheck endpoint
-	go func() {
-		err := ServeHTTPHealthCheck(ctx, cfg)
-		if err != nil {
-			logger.Errorf(ctx, "Unable to serve http", cfg.GetGrpcHostAddress(), err)
-		}
-	}()
-
 	grpcServer := newGRPCDummyServer(ctx, cfg)
 
 	grpcListener, err := net.Listen("tcp", cfg.GetGrpcHostAddress())
