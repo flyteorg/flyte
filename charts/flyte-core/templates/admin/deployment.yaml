@@ -72,6 +72,8 @@ spec:
             name: clusters-config-volume
           - mountPath: /etc/secrets/
             name: admin-secrets
+          - mountPath: /var/run/credentials
+            name: cluster-secrets
         {{- end }}
         - name: generate-secrets
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
