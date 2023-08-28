@@ -28,18 +28,18 @@ To turn on ingress, update your ``values.yaml`` file to include the following bl
    .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
       :caption: charts/flyte-binary/eks-production.yaml
       :language: yaml
-      :lines: 123-131
+      :lines: 127-135
 
 .. note::
    
-   This currently assumes that you have nginx ingress. We'll be updating these
-   in the near future to use the ALB ingress controller instead.
+   This section assumes that you're using the NGINX Ingress controller. Instructions and annotations for the ALB controller
+   are covered in the `Flyte The Hard Way <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/06-intro-to-ingress.md#setting-up-amazons-load-balancer-alb-ingress-controller>`__ tutorial.
 
 ***************
 Authentication
 ***************
 
-Authentication comes with Flyte in the form of OAuth 2. Please see the
+Authentication comes with Flyte in the form of OAuth 2.0. Please see the
 `authentication guide <deployment-configuration-auth-setup>`__ for instructions.
 
 .. note::
@@ -60,10 +60,3 @@ compatibility being maintained, for the most part.
 
 If you're using the :ref:`multi-cluster <deployment-deployment-multicluster>`
 deployment model for Flyte, components should be upgraded together.
-
-.. note::
-
-   Expect to see minor version releases roughly 4-6 times a year - we aim to
-   release monthly, or whenever there is a large enough set of features to
-   warrant a release. Expect to see patch releases at more regular intervals,
-   especially for flytekit, the Python SDK.

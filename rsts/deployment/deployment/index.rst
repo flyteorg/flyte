@@ -49,29 +49,6 @@ deployment comes with a containerized `Minio <https://min.io/>`__, which offers 
    - **GCP**: `GCS <https://cloud.google.com/storage/>`__
    - **Azure**: `Azure Blob Storage <https://azure.microsoft.com/en-us/products/storage/blobs>`__
 
-
-Cluster Configuration
-=====================
-
-Flyte configures K8s clusters to work with it. For example, as your Flyte userbase evolves, adding new projects is as
-simple as registering them through the command line:
-
-.. prompt:: bash $
-
-   flytectl create project \
-       --id my-flyte-project \
-       --name "My Flyte Project" \
-       --description "My first project onboarding onto Flyte"
-
-Once you invoke this command, this project should immediately show up in the Flyte console after refreshing.
-
-Flyte runs at a configurable cadence that ensures that all Kubernetes resources necessary for the new project are
-created and new workflows can successfully be registered and executed within it.
-
-.. note::
-
-   For more information, see :std:ref:`flytectl <flytectl:flytectl_create_project>`.
-
 ************************
 Flyte Deployment Paths
 ************************
@@ -108,7 +85,7 @@ There are three different paths for deploying a Flyte cluster:
    This option is appropriate if all your compute can `fit on one EKS cluster <https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html>`__ .
    As of this writing, a single Flyte cluster can handle more than 13,000 nodes.
   
-   Whatever path you choose, note that ``FlytePropeller`` itself can be sharded as well, though typically it's not required.
+   Regardless of using single or multiple Kubernetes clusters for Flyte, note that ``FlytePropeller`` -tha main data plane component- can be sharded as well, if scale demands require it.
 
 Helm
 ====
@@ -156,10 +133,13 @@ Deployment Tips and Tricks
 
 Due to the many choices and constraints that you may face in your organization, the specific steps for deploying Flyte
 can vary significantly. For example, which cloud platform to use is typically a big fork in the road for many, and there
-are many choices to make in terms of ingresses, auth providers, and versions of different dependent libraries that
+are many choices to make in terms of Ingress controllers, auth providers, and versions of different dependent libraries that
 may interact with other parts of your stack.
 
-In addition to searching and posting on the `Flyte Slack community <https://flyte-org.slack.com/archives/C01P3B761A6>`__,
+Considering the above, we recommend checking out the `"Flyte The Hard Way" <https://github.com/davidmirror-ops/flyte-the-hard-way/tree/main#flyte-the-hard-way>`__ set of community-maintained tutorials that can guide you through the process of preparing the infrastructure and
+deploying Flyte.
+
+In addition to searching and posting on the `#flyte-deployment Slack channel <https://flyte-org.slack.com/archives/C01P3B761A6>`__,
 we have a `Github Discussion <https://github.com/flyteorg/flyte/discussions/categories/deployment-tips-tricks>`__
 section dedicated to deploying Flyte. Feel free to submit any hints you've found helpful as a discussion, ask questions,
 or simply document what worked or what didn't work for you.

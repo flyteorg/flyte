@@ -8,8 +8,8 @@ Multiple K8s Cluster Deployment
 
 .. note::
 
-    The multicluster deployment described in this doc assumes you have deployed
-    the ``flyte`` Helm chart, which runs the individual Flyte services separately.
+    The multicluster deployment described in this section, assumes you have deployed
+    the ``flyte-core`` Helm chart, which runs the individual Flyte services separately.
     This is needed because in a multicluster setup, the execution engine is
     deployed to multiple K8s clusters. This will not work with the ``flyte-binary``
     Helm chart, since that chart deploys all Flyte service as one single binary.
@@ -24,23 +24,22 @@ Scaling Beyond Kubernetes
    execution. The data plane fulfills these workflows by launching pods in
    Kubernetes.
 
-At very large companies, total compute needs could exceed the limits of a single
+At large organizations, total compute needs could exceed the limits of a single
 Kubernetes cluster.
 
 To address this, you can deploy the data plane to multiple Kubernetes clusters.
 The control plane (FlyteAdmin) can be configured to load-balance workflows across
 these individual data planes, protecting you from failure in a single Kubernetes
-cluster increasing scalability.
+cluster, thus increasing scalability.
 
-To achieve this, first, you have to create additional Kubernetes clusters.
-For now, let's assume you have three Kubernetes clusters and that you can access
+To achieve this, first you have to create additional Kubernetes clusters.
+
+This gude assumes that you have three Kubernetes clusters and that you can access
 them all with ``kubectl``.
 
 Let's call these clusters ``cluster1``, ``cluster2``, and ``cluster3``.
 
-Next, deploy *only* the data planes to these clusters. To do this, remove the
-data plane components from the ``flyte`` overlay, and create a new overlay
-containing *only* the data plane resources.
+Next, deploy *only* the data planes to these clusters. To do this, use the `values-dataplane.yaml <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/values-dataplane.yaml>`__ provided with the Helm chart.
 
 Data Plane Deployment
 *********************
@@ -61,16 +60,16 @@ Install Flyte data plane Helm chart
 
     .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml \
+        helm upgrade -n flyte -f values.yaml \
             -f values-eks.yaml \
             -f values-dataplane.yaml \
-            --create-namespace flyte --install
+            --create-namespace flyte flyteorg/flyte-core --install
 
 .. tabbed:: GCP
 
     .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml \
+        helm upgrade flyte -n flyte flyteorg/flyte-core -f values.yaml \
             -f values-gcp.yaml \
             -f values-dataplane.yaml \
             --create-namespace flyte --install
@@ -83,24 +82,24 @@ Some Flyte deployments may choose to run the control plane separate from the dat
 plane. FlyteAdmin is designed to create Kubernetes resources in one or more
 Flyte data plane clusters. For the admin to access remote clusters, it needs
 credentials to each cluster.
+Flyte makes use of Kubernetess Service Accounts to enable every data plane cluster to perform
+authenticated requests to the K8s API Server.
+The default behaviour is that ``FlyteAdmin`` creates a `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
+in each data plane cluster. 
+In order to verify requests, the API Server expects a `signed bearer token <https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens>`__
+attached to the Service Account. 
 
-In Kubernetes, scoped service credentials are created by configuring a "Role"
-resource in a Kubernetes cluster. When you attach the role to a "ServiceAccount",
-Kubernetes generates a bearer token that permits access. Hence, create a
-FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
-in each data plane cluster to generate these tokens.
 
-.. warning::
+.. note::
+   As of Kubernetes 1.24 an above, the bearer token has to be generated manually for a Service Account, using the following command:
+
+   .. prompt:: bash $
+   
+     kubectl create token <service-account-name> -n <namespace>
   
-   **Never delete a ServiceAccount 🛑**
+To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster and upload them to ``FlyteAmin``.
 
-   When you first create the FlyteAdmin ``ServiceAccount`` in a new cluster, a
-   bearer token is generated and will continue to allow access unless the
-   "ServiceAccount" is deleted.
-
-To feed the credentials to FlyteAdmin, you must retrieve them from your new data plane cluster and upload them to admin (for example, within Lyft, `Confidant <https://github.com/lyft/confidant>`__ is used).
-
-The credentials have two parts ("ca cert" and "bearer token"). Find the generated secret via:
+The credentials have two parts (``ca cert`` and ``bearer token``). Find the generated secret via:
 
 .. prompt:: bash $
 
@@ -133,12 +132,12 @@ file named ``secrets.yaml`` that looks like:
      namespace: flyte
    type: Opaque
    data:
-     cluster_1_token: {{ cluster 1 token here }}
-     cluster_1_cacert: {{ cluster 1 cacert here }}
-     cluster_2_token: {{ cluster 2 token here }}
-     cluster_2_cacert: {{ cluster 2 cacert here }}
-     cluster_3_token: {{ cluster 3 token here }}
-     cluster_3_cacert: {{ cluster 3 cacert here }}
+     cluster_1_token: "cluster-1-token-here"
+     cluster_1_cacert: "cluster-1-cacert-here"
+     cluster_2_token: "cluster-2-token-here"
+     cluster_2_cacert: "cluster-2-cacert-here"
+     cluster_3_token: "cluster-3-token-here"
+     cluster_3_cacert: "cluster-3-cacert-here"
 
 Create cluster credentials secret in the control plane cluster.
 
