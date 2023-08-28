@@ -37,7 +37,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{- define "agentSecret.volumeMount" -}}
-- mountPath: /etc/agent-secret
+- mountPath: /etc/secrets
   name: {{ include "flyte.name" . }}
 {{- end }}
 
