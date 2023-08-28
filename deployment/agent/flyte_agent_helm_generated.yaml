@@ -79,7 +79,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
-        - mountPath: /etc/agent-secret
+        - mountPath: /etc/secrets
           name: flyteagent
         ports:
         - containerPort: 8000

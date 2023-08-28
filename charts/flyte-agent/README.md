@@ -12,7 +12,6 @@ A Helm chart for Flyte agent
 | additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | affinity | object | `{}` | affinity for flyteagent deployment |
-| agentSecret.name | string | `""` | Specify name of K8s Secret. Leave it empty if you don't need this Secret |
 | agentSecret.secretData | object | `{"data":{"username":"User"}}` | Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
