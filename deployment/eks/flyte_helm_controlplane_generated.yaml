@@ -618,8 +618,6 @@ spec:
             name: clusters-config-volume
           - mountPath: /etc/secrets/
             name: admin-secrets
-          - mountPath: /var/run/credentials
-            name: cluster-secrets
         - name: generate-secrets
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.1.118"
           imagePullPolicy: "IfNotPresent"
