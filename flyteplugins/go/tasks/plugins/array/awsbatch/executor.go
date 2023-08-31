@@ -111,7 +111,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	if p == arrayCore.PhaseStart && nextPhase != arrayCore.PhaseStart {
 		// if transitioning from PhaseStart to another phase then cache lookups have completed
 		externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, pluginState.State,
-			func(tCtx core.TaskExecutionContext, childIndex int) string {
+			func(tCtx core.TaskExecutionContext, executionIndex, originalIndex int) string {
 				// subTaskIDs for the the aws_batch are generated based on the job ID, therefore
 				// to initialize we default to an empty string which will be updated later.
 				return ""

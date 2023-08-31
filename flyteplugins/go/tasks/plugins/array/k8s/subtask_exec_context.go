@@ -73,7 +73,7 @@ func (s SubTaskExecutionContext) PluginStateReader() pluginsCore.PluginStateRead
 func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
 	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
 
-	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, retryAttempt, systemFailures)
+	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, originalIndex, retryAttempt, systemFailures)
 	if err != nil {
 		return SubTaskExecutionContext{}, err
 	}
@@ -146,6 +146,7 @@ func (s SubTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
 type SubTaskExecutionID struct {
 	pluginsCore.TaskExecutionID
 	executionIndex      int
+	originalIndex       int
 	parentName          string
 	subtaskRetryAttempt uint64
 	taskRetryAttempt    uint32
@@ -170,11 +171,15 @@ func (s SubTaskExecutionID) GetLogSuffix() string {
 	// Append the retry attempt and executionIndex so that log names coincide with pod names per
 	// https://github.com/flyteorg/flyteplugins/pull/186#discussion_r666569825. To maintain
 	// backwards compatibility we append the subtaskRetryAttempt if it is not 0.
+
+	// To ensure UI indicies match, we append the originalIndex rather than the executionIndex.
+	// This does mean that Pod names and log links may differ when the original and execution
+	// indicies differ (ex. cache hits).
 	if s.subtaskRetryAttempt == 0 {
-		return fmt.Sprintf(" #%d-%d", s.taskRetryAttempt, s.executionIndex)
+		return fmt.Sprintf(" #%d-%d", s.taskRetryAttempt, s.originalIndex)
 	}
 
-	return fmt.Sprintf(" #%d-%d-%d", s.taskRetryAttempt, s.executionIndex, s.subtaskRetryAttempt)
+	return fmt.Sprintf(" #%d-%d-%d", s.taskRetryAttempt, s.originalIndex, s.subtaskRetryAttempt)
 }
 
 var logTemplateRegexes = struct {
@@ -210,10 +215,11 @@ func (s SubTaskExecutionID) TemplateVarsByScheme() *tasklog.TemplateVarsByScheme
 }
 
 // NewSubtaskExecutionID constructs a SubTaskExecutionID using the provided parameters
-func NewSubTaskExecutionID(taskExecutionID pluginsCore.TaskExecutionID, executionIndex int, retryAttempt uint64) SubTaskExecutionID {
+func NewSubTaskExecutionID(taskExecutionID pluginsCore.TaskExecutionID, executionIndex, originalIndex int, retryAttempt uint64) SubTaskExecutionID {
 	return SubTaskExecutionID{
 		taskExecutionID,
 		executionIndex,
+		originalIndex,
 		taskExecutionID.GetGeneratedName(),
 		retryAttempt,
 		taskExecutionID.GetID().RetryAttempt,
@@ -251,7 +257,7 @@ func (s SubTaskExecutionMetadata) IsInterruptible() bool {
 
 // NewSubtaskExecutionMetadata constructs a SubTaskExecutionMetadata using the provided parameters
 func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskTemplate *core.TaskTemplate,
-	executionIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionMetadata, error) {
+	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionMetadata, error) {
 
 	var err error
 	secretsMap := make(map[string]string)
@@ -267,7 +273,7 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 		}
 	}
 
-	subTaskExecutionID := NewSubTaskExecutionID(taskExecutionMetadata.GetTaskExecutionID(), executionIndex, retryAttempt)
+	subTaskExecutionID := NewSubTaskExecutionID(taskExecutionMetadata.GetTaskExecutionID(), executionIndex, originalIndex, retryAttempt)
 	interruptible := taskExecutionMetadata.IsInterruptible() && uint32(systemFailures) < taskExecutionMetadata.GetInterruptibleFailureThreshold()
 	return SubTaskExecutionMetadata{
 		taskExecutionMetadata,
