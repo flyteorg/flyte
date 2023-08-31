@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 )
 
 var taskPhase = core.TaskExecution_ABORTED.String()

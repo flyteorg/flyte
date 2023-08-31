@@ -3,14 +3,14 @@ package gormimpl
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/promutils"
+	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"gorm.io/gorm"
 )
 
 // DescriptionEntityRepo Implementation of DescriptionEntityRepoInterface.

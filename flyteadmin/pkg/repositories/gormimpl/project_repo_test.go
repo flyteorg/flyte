@@ -5,19 +5,20 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
-var alphabeticalSortParam, _ = common.NewSortParameter(admin.Sort{
+var alphabeticalSortParam, _ = common.NewSortParameter(&admin.Sort{
 	Direction: admin.Sort_ASCENDING,
 	Key:       "identifier",
-})
+}, models.ProjectColumns)
 
 func TestCreateProject(t *testing.T) {
 	projectRepo := NewProjectRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
@@ -94,7 +95,8 @@ func testListProjects(input interfaces.ListResourceInput, sql string, t *testing
 
 func TestListProjects(t *testing.T) {
 	filter, err := common.NewSingleValueFilter(common.Project, common.Equal, "name", "foo")
-	assert.Nil(t, err)
+
+	assert.NoError(t, err)
 	testListProjects(interfaces.ListResourceInput{
 		Offset:        0,
 		Limit:         1,

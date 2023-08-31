@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -23,13 +24,22 @@ func (s *sortParamImpl) GetGormOrderExpr() string {
 	return s.gormOrderExpression
 }
 
-func NewSortParameter(sort admin.Sort) (SortParameter, error) {
+func NewSortParameter(sort *admin.Sort, allowed sets.String) (SortParameter, error) {
+	if sort == nil {
+		return nil, nil
+	}
+
+	key := sort.Key
+	if !allowed.Has(key) {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid sort key '%s'", key)
+	}
+
 	var gormOrderExpression string
 	switch sort.Direction {
 	case admin.Sort_DESCENDING:
-		gormOrderExpression = fmt.Sprintf(gormDescending, sort.Key)
+		gormOrderExpression = fmt.Sprintf(gormDescending, key)
 	case admin.Sort_ASCENDING:
-		gormOrderExpression = fmt.Sprintf(gormAscending, sort.Key)
+		gormOrderExpression = fmt.Sprintf(gormAscending, key)
 	default:
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid sort order specified: %v", sort)
 	}

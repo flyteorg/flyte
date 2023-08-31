@@ -19,3 +19,5 @@ type Workflow struct {
 	// ShortDescription for the workflow.
 	ShortDescription string
 }
+
+var WorkflowColumns = modelColumns(Workflow{})

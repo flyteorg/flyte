@@ -3,64 +3,54 @@ package impl
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
-
-	"github.com/flyteorg/flyteadmin/plugins"
-
-	"google.golang.org/grpc/status"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	commonTestUtils "github.com/flyteorg/flyteadmin/pkg/common/testutils"
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/executions"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
-	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/gogo/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
-
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/resource"
-
-	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/auth"
-
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
-
-	"github.com/flyteorg/flytestdlib/storage"
-
-	"time"
-
-	"fmt"
-
+	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
 	notificationMocks "github.com/flyteorg/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyteadmin/pkg/common/testutils"
 	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/executions"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	runtimeIFaceMocks "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces/mocks"
 	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
 	workflowengineMocks "github.com/flyteorg/flyteadmin/pkg/workflowengine/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyteadmin/plugins"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -2979,7 +2969,7 @@ func TestListExecutions(t *testing.T) {
 		assert.True(t, domainFilter, "Missing domain equality filter")
 		assert.False(t, nameFilter, "Included name equality filter")
 		assert.Equal(t, limit, input.Limit)
-		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
+		assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 2, input.Offset)
 		assert.EqualValues(t, map[common.Entity]bool{
 			common.Execution: true,
@@ -3027,7 +3017,7 @@ func TestListExecutions(t *testing.T) {
 		Limit: limit,
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 		Token: "2",
 	})
@@ -3965,7 +3955,7 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 		assert.True(t, domainFilter, "Missing domain equality filter")
 		assert.False(t, nameFilter, "Included name equality filter")
 		assert.Equal(t, limit, input.Limit)
-		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
+		assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 2, input.Offset)
 		return interfaces.ExecutionCollectionOutput{
 			Executions: []models.Execution{
@@ -4010,7 +4000,7 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 		Limit: limit,
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 		Token: "2",
 	})

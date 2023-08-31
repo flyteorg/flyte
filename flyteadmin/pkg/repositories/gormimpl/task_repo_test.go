@@ -9,11 +9,12 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/stretchr/testify/assert"
 )
 
 const pythonTestTaskType = "python-task"
@@ -197,10 +198,10 @@ func TestListTasks_Order(t *testing.T) {
 	mockQuery.WithQuery(`project desc`)
 	mockQuery.WithReply(tasks)
 
-	sortParameter, _ := common.NewSortParameter(admin.Sort{
+	sortParameter, _ := common.NewSortParameter(&admin.Sort{
 		Direction: admin.Sort_DESCENDING,
 		Key:       "project",
-	})
+	}, models.TaskColumns)
 	_, err := taskRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
 		InlineFilters: []common.InlineFilter{

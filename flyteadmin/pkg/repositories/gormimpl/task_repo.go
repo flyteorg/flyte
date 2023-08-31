@@ -5,13 +5,12 @@ import (
 	"errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flytestdlib/promutils"
+	"gorm.io/gorm"
 
 	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"gorm.io/gorm"
 )
 
 // Implementation of TaskRepoInterface.

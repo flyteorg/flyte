@@ -80,3 +80,8 @@ func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
 	})
 	return nil
 }
+
+var (
+	ExecutionColumns = modelColumns(Execution{})
+	AdminTagColumns  = modelColumns(AdminTag{})
+)

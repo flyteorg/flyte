@@ -4,7 +4,13 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -12,16 +18,8 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"google.golang.org/grpc/codes"
 )
 
 type signalMetrics struct {
@@ -83,12 +81,10 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.SignalColumns)
+	if err != nil {
+		return nil, err
 	}
 
 	offset, err := validation.ValidateToken(request.Token)

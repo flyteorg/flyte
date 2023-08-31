@@ -2,43 +2,34 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
-	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
-
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
-
-	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flytestdlib/storage"
-
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/contextutils"
-
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/golang/protobuf/proto"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
 
+	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
+	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
+	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
-
-	"fmt"
-
 	dataInterfaces "github.com/flyteorg/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc/codes"
 )
 
 type nodeExecutionMetrics struct {
@@ -378,13 +369,12 @@ func (m *NodeExecutionManager) listNodeExecutions(
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if sortBy != nil {
-		sortParameter, err = common.NewSortParameter(*sortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(sortBy, models.NodeExecutionColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(requestToken)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,

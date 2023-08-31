@@ -6,17 +6,15 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/contextutils"
-
-	"github.com/prometheus/client_golang/prometheus"
-
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -25,11 +23,10 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	workflowengine "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
 )
 
 type taskMetrics struct {
@@ -169,13 +166,12 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(request.Token)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
@@ -226,13 +222,12 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(request.Token)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,

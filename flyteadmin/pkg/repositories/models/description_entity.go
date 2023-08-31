@@ -28,3 +28,5 @@ type DescriptionEntity struct {
 
 	SourceCode
 }
+
+var DescriptionEntityColumns = modelColumns(DescriptionEntity{})

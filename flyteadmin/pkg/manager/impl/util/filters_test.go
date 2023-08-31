@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestParseRepeatedValues(t *testing.T) {
@@ -64,28 +65,57 @@ func TestPrepareValues_RepeatedValues(t *testing.T) {
 	assert.Equal(t, []interface{}{"value a", "value b"}, values)
 }
 
-func TestParseFilters(t *testing.T) {
-	filterExpression := "eq(foo, 123)+ne(version, TheWorst)+value_in(bar, 4;5;6)"
-	taskFilters, err := ParseFilters(filterExpression, common.Task)
-	assert.NoError(t, err)
+func Test_ParseFilters_Success(t *testing.T) {
+	filterExpression := "eq(project, flytesnacks)+ne(domain, development)+value_in(type, 4;5;6)"
 
-	assert.Len(t, taskFilters, 3)
+	taskFilters, err := ParseFilters(filterExpression, common.Task)
+
+	assert.NoError(t, err)
+	require.Len(t, taskFilters, 3)
+
 	actualFilterExpression, _ := taskFilters[0].GetGormQueryExpr()
-	assert.Equal(t, "foo = ?", actualFilterExpression.Query)
-	assert.Equal(t, "123", actualFilterExpression.Args)
+	assert.Equal(t, "project = ?", actualFilterExpression.Query)
+	assert.Equal(t, "flytesnacks", actualFilterExpression.Args)
 
 	actualFilterExpression, _ = taskFilters[1].GetGormQueryExpr()
-	assert.Equal(t, "version <> ?", actualFilterExpression.Query)
-	assert.Equal(t, "TheWorst", actualFilterExpression.Args)
+	assert.Equal(t, "domain <> ?", actualFilterExpression.Query)
+	assert.Equal(t, "development", actualFilterExpression.Args)
 
 	actualFilterExpression, _ = taskFilters[2].GetGormQueryExpr()
-	assert.Equal(t, "bar in (?)", actualFilterExpression.Query)
+	assert.Equal(t, "type in (?)", actualFilterExpression.Query)
 	assert.Equal(t, []interface{}{"4", "5", "6"}, actualFilterExpression.Args)
+}
 
-	filterExpression = "invalid_function(foo,bar)"
-	_, err = ParseFilters(filterExpression, common.Task)
-	assert.Error(t, err)
+func Test_ParseFilters_InvalidFunction(t *testing.T) {
+	filterExpression := "invalid_function(type,bar)"
+
+	_, err := ParseFilters(filterExpression, common.Task)
+
 	assert.EqualError(t, err, "unrecognized filter function: invalid_function")
+}
+
+func Test_ParseFilters_UnsupportedEntity(t *testing.T) {
+	filterExpression := "eq(foo, 123)"
+
+	_, err := ParseFilters(filterExpression, "wrong")
+
+	assert.EqualError(t, err, "unsupported entity 'wrong'")
+}
+
+func Test_ParseFilters_InvalidJoinEntity(t *testing.T) {
+	filterExpression := "eq(project.name, 123)"
+
+	_, err := ParseFilters(filterExpression, common.Workflow)
+
+	assert.EqualError(t, err, "'p' entity is not allowed in filters")
+}
+
+func Test_ParseFilters_InvalidFilter(t *testing.T) {
+	filterExpression := "eq(foo, 123)"
+
+	_, err := ParseFilters(filterExpression, common.Task)
+
+	assert.EqualError(t, err, "'t.foo' is invalid filter")
 }
 
 func TestGetEqualityFilter(t *testing.T) {
@@ -97,18 +127,20 @@ func TestGetEqualityFilter(t *testing.T) {
 	assert.Equal(t, "value", actualFilterExpression.Args)
 }
 
-func TestAddRequestFilters(t *testing.T) {
+func Test_AddRequestFilters(t *testing.T) {
 	filters, err := AddRequestFilters(
-		"ne(version, TheWorst)+eq(workflow.name, workflow)", common.Execution, make([]common.InlineFilter, 0))
-	assert.Nil(t, err)
-	assert.Len(t, filters, 2)
+		"ne(cluster, TheWorst)+eq(workflow.name, workflow)", common.Execution, make([]common.InlineFilter, 0))
+
+	assert.NoError(t, err)
+	require.Len(t, filters, 2)
+
 	expression, err := filters[0].GetGormQueryExpr()
-	assert.Nil(t, err)
-	assert.Equal(t, "version <> ?", expression.Query)
+	assert.NoError(t, err)
+	assert.Equal(t, "cluster <> ?", expression.Query)
 	assert.Equal(t, "TheWorst", expression.Args)
 
 	expression, err = filters[1].GetGormQueryExpr()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, testutils.NameQueryPattern, expression.Query)
 	assert.Equal(t, "workflow", expression.Args)
 }

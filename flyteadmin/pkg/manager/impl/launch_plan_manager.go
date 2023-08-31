@@ -5,15 +5,16 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/contextutils"
-
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
 
 	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
@@ -23,10 +24,6 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc/codes"
 )
 
 type launchPlanMetrics struct {
@@ -408,13 +405,11 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.R
 		return nil, err
 	}
 
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(request.Token)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
@@ -463,13 +458,11 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request a
 		return nil, err
 	}
 
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(request.Token)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
@@ -514,13 +507,12 @@ func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	if err != nil {
+		return nil, err
 	}
+
 	offset, err := validation.ValidateToken(request.Token)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid pagination token %s", request.Token)

@@ -4,16 +4,18 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
 )
 
 type ProjectManager struct {
@@ -21,10 +23,10 @@ type ProjectManager struct {
 	config runtimeInterfaces.Configuration
 }
 
-var alphabeticalSortParam, _ = common.NewSortParameter(admin.Sort{
+var alphabeticalSortParam, _ = common.NewSortParameter(&admin.Sort{
 	Direction: admin.Sort_ASCENDING,
 	Key:       "identifier",
-})
+}, models.ProjectColumns)
 
 func (m *ProjectManager) CreateProject(ctx context.Context, request admin.ProjectRegisterRequest) (
 	*admin.ProjectRegisterResponse, error) {
@@ -61,13 +63,11 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 		return nil, err
 	}
 
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
-	} else {
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.ProjectColumns)
+	if err != nil {
+		return nil, err
+	}
+	if sortParameter == nil {
 		sortParameter = alphabeticalSortParam
 	}
 

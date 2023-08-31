@@ -51,3 +51,5 @@ type NodeExecution struct {
 	// Metadata that is only relevant to the flyteadmin service that is used to parse the model and track additional attributes.
 	InternalData []byte
 }
+
+var NodeExecutionColumns = modelColumns(NodeExecution{})

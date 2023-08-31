@@ -15,16 +15,10 @@ import (
 
 	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
-	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -33,6 +27,14 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	dataMocks "github.com/flyteorg/flyteadmin/pkg/data/mocks"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 var occurredAt = time.Now().UTC()
@@ -807,7 +809,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 				"parent_task_execution_id": nil,
 			}, filter)
 
-			assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
+			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 			return interfaces.NodeExecutionCollectionOutput{
 				NodeExecutions: []models.NodeExecution{
 					{
@@ -858,10 +860,10 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		Token: "2",
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Len(t, nodeExecutions.NodeExecutions, 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
@@ -925,7 +927,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			assert.Equal(t, parentID, queryExpr.Args)
 			assert.Equal(t, "parent_id = ?", queryExpr.Query)
 
-			assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
+			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 			return interfaces.NodeExecutionCollectionOutput{
 				NodeExecutions: []models.NodeExecution{
 					{
@@ -958,7 +960,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		Token: "2",
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 		UniqueParentId: "parent_1",
 	})
@@ -1075,6 +1077,7 @@ func TestListNodeExecutions_NothingToReturn(t *testing.T) {
 			return interfaces.ExecutionCollectionOutput{}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+
 	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -1085,10 +1088,11 @@ func TestListNodeExecutions_NothingToReturn(t *testing.T) {
 		Token: "2",
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 	})
-	assert.Nil(t, err)
+
+	assert.NoError(t, err)
 	assert.False(t, listExecutionsCalled)
 }
 
@@ -1139,7 +1143,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			assert.Equal(t, uint(8), queryExpr.Args)
 			assert.Equal(t, "parent_task_execution_id = ?", queryExpr.Query)
 
-			assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
+			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 			return interfaces.NodeExecutionCollectionOutput{
 				NodeExecutions: []models.NodeExecution{
 					{
@@ -1184,7 +1188,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		Token: "2",
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
-			Key:       "domain",
+			Key:       "execution_domain",
 		},
 	})
 	assert.Nil(t, err)

@@ -5,21 +5,20 @@ import (
 	"testing"
 	"time"
 
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	mocket "github.com/Selvatico/go-mocket"
 	"github.com/flyteorg/flyteadmin/pkg/common"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/stretchr/testify/assert"
 )
 
 var nodePhase = core.NodeExecution_RUNNING.String()
@@ -248,20 +247,23 @@ func TestListNodeExecutions_Order(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that include ordering by project
 	mockQuery := GlobalMock.NewMock()
-	mockQuery.WithQuery(`project desc`)
+	mockQuery.WithQuery(`execution_project desc`)
 	mockQuery.WithReply(nodeExecutions)
 
-	sortParameter, _ := common.NewSortParameter(admin.Sort{
+	sortParameter, err := common.NewSortParameter(&admin.Sort{
 		Direction: admin.Sort_DESCENDING,
-		Key:       "project",
-	})
-	_, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
+		Key:       "execution_project",
+	}, models.NodeExecutionColumns)
+	require.NoError(t, err)
+
+	_, err = nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
 		InlineFilters: []common.InlineFilter{
 			getEqualityFilter(common.NodeExecution, "phase", nodePhase),
 		},
 		Limit: 20,
 	})
+
 	assert.NoError(t, err)
 	assert.True(t, mockQuery.Triggered)
 }

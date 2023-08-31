@@ -13,3 +13,5 @@ type Signal struct {
 	Type  []byte `gorm:"not null"`
 	Value []byte
 }
+
+var SignalColumns = modelColumns(Signal{})

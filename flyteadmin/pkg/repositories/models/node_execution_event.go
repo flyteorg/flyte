@@ -11,3 +11,5 @@ type NodeExecutionEvent struct {
 	OccurredAt time.Time
 	Phase      string `gorm:"primary_key"`
 }
+
+var NodeExecutionEventColumns = modelColumns(NodeExecutionEvent{})

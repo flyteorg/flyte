@@ -6,34 +6,32 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flyteadmin/plugins"
-
+	"github.com/benbjohnson/clock"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-
-	"github.com/flyteorg/flyteadmin/auth"
-
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
-
-	dataInterfaces "github.com/flyteorg/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
-
+	"github.com/flyteorg/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	dataInterfaces "github.com/flyteorg/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/executions"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
@@ -42,13 +40,7 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc/codes"
-
-	"github.com/benbjohnson/clock"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
-	"github.com/golang/protobuf/proto"
+	"github.com/flyteorg/flyteadmin/plugins"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -1434,12 +1426,10 @@ func (m *ExecutionManager) ListExecutions(
 	if err != nil {
 		return nil, err
 	}
-	var sortParameter common.SortParameter
-	if request.SortBy != nil {
-		sortParameter, err = common.NewSortParameter(*request.SortBy)
-		if err != nil {
-			return nil, err
-		}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.ExecutionColumns)
+	if err != nil {
+		return nil, err
 	}
 
 	offset, err := validation.ValidateToken(request.Token)

@@ -37,3 +37,5 @@ type TaskExecution struct {
 	// The child node executions (if any) launched by this task execution.
 	ChildNodeExecution []NodeExecution `gorm:"foreignkey:ParentTaskExecutionID;references:ID"`
 }
+
+var TaskExecutionColumns = modelColumns(TaskExecution{})

@@ -32,3 +32,5 @@ type LaunchPlan struct {
 	Digest       []byte
 	ScheduleType LaunchPlanScheduleType
 }
+
+var LaunchPlanColumns = modelColumns(LaunchPlan{})

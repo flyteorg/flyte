@@ -3,6 +3,7 @@ package util
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -10,14 +11,13 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
-
-	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
-
-	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 const (
@@ -120,6 +120,36 @@ func prepareValues(field string, values []string) (interface{}, error) {
 	return preparedValues, nil
 }
 
+var allowedJoinEntities = map[common.Entity]sets.String{
+	common.Execution:           sets.NewString(common.Execution, common.LaunchPlan, common.Workflow, common.Task, common.AdminTag),
+	common.LaunchPlan:          sets.NewString(common.LaunchPlan, common.Workflow),
+	common.NodeExecution:       sets.NewString(common.NodeExecution, common.Execution),
+	common.NodeExecutionEvent:  sets.NewString(common.NodeExecutionEvent),
+	common.Task:                sets.NewString(common.Task),
+	common.TaskExecution:       sets.NewString(common.TaskExecution, common.Task, common.Execution, common.NodeExecution),
+	common.Workflow:            sets.NewString(common.Workflow),
+	common.NamedEntity:         sets.NewString(common.NamedEntity),
+	common.NamedEntityMetadata: sets.NewString(common.NamedEntityMetadata),
+	common.Project:             sets.NewString(common.Project),
+	common.Signal:              sets.NewString(common.Signal),
+	common.AdminTag:            sets.NewString(common.AdminTag),
+}
+
+var entityColumns = map[common.Entity]sets.String{
+	common.Execution:           models.ExecutionColumns,
+	common.LaunchPlan:          models.LaunchPlanColumns,
+	common.NodeExecution:       models.NodeExecutionColumns,
+	common.NodeExecutionEvent:  models.NodeExecutionEventColumns,
+	common.Task:                models.TaskColumns,
+	common.TaskExecution:       models.TaskExecutionColumns,
+	common.Workflow:            models.WorkflowColumns,
+	common.NamedEntity:         models.NamedEntityColumns,
+	common.NamedEntityMetadata: models.NamedEntityMetadataColumns,
+	common.Project:             models.ProjectColumns,
+	common.Signal:              models.SignalColumns,
+	common.AdminTag:            models.AdminTagColumns,
+}
+
 func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.InlineFilter, error) {
 	// Multiple filters can be appended as URI-escaped strings joined by filterExpressionSeperator
 	filterExpressions := strings.Split(filterParams, filterExpressionSeperator)
@@ -132,6 +162,19 @@ func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.In
 			return nil, shared.GetInvalidArgumentError(shared.Filters)
 		}
 		referencedEntity, field := parseField(matches[fieldMatchIndex], primaryEntity)
+
+		joinEntities, ok := allowedJoinEntities[primaryEntity]
+		if !ok {
+			return nil, fmt.Errorf("unsupported entity '%s'", primaryEntity)
+		}
+
+		if !joinEntities.Has(referencedEntity) {
+			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "'%s' entity is not allowed in filters", referencedEntity)
+		}
+
+		if !entityColumns[referencedEntity].Has(field) {
+			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "'%s.%s' is invalid filter", referencedEntity, field)
+		}
 
 		// Parse and transform values
 		parsedValues := parseRepeatedValues(matches[valueMatchIndex])

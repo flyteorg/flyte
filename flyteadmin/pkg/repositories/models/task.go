@@ -23,3 +23,5 @@ type Task struct {
 	// ShortDescription for the task.
 	ShortDescription string
 }
+
+var TaskColumns = modelColumns(Task{})

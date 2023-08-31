@@ -40,3 +40,8 @@ type NamedEntity struct {
 	NamedEntityKey
 	NamedEntityMetadataFields
 }
+
+var (
+	NamedEntityColumns         = modelColumns(NamedEntity{})
+	NamedEntityMetadataColumns = modelColumns(NamedEntityMetadata{})
+)

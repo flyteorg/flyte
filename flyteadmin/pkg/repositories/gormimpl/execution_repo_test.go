@@ -6,18 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/stretchr/testify/assert"
 )
 
 var createdAt = time.Date(2018, time.February, 17, 00, 00, 00, 00, time.UTC).UTC()
@@ -250,14 +249,16 @@ func TestListExecutions_Order(t *testing.T) {
 	executions := make([]map[string]interface{}, 0)
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that include ordering by name
-	mockQuery := GlobalMock.NewMock().WithQuery(`name asc`)
+	mockQuery := GlobalMock.NewMock().WithQuery(`execution_name asc`)
 	mockQuery.WithReply(executions)
 
-	sortParameter, _ := common.NewSortParameter(admin.Sort{
+	sortParameter, err := common.NewSortParameter(&admin.Sort{
 		Direction: admin.Sort_ASCENDING,
-		Key:       "name",
-	})
-	_, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
+		Key:       "execution_name",
+	}, models.ExecutionColumns)
+	require.NoError(t, err)
+
+	_, err = executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
 		InlineFilters: []common.InlineFilter{
 			getEqualityFilter(common.Task, "project", project),
@@ -266,6 +267,7 @@ func TestListExecutions_Order(t *testing.T) {
 		},
 		Limit: 20,
 	})
+
 	assert.NoError(t, err)
 	assert.True(t, mockQuery.Triggered)
 }
@@ -276,16 +278,19 @@ func TestListExecutions_WithTags(t *testing.T) {
 	executions := make([]map[string]interface{}, 0)
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that include ordering by name
-	mockQuery := GlobalMock.NewMock().WithQuery(`name asc`)
+	mockQuery := GlobalMock.NewMock().WithQuery(`execution_name asc`)
 	mockQuery.WithReply(executions)
 
-	sortParameter, _ := common.NewSortParameter(admin.Sort{
+	sortParameter, err := common.NewSortParameter(&admin.Sort{
 		Direction: admin.Sort_ASCENDING,
-		Key:       "name",
-	})
+		Key:       "execution_name",
+	}, models.ExecutionColumns)
+	require.NoError(t, err)
+
 	vals := []string{"tag1", "tag2"}
 	tagFilter, err := common.NewRepeatedValueFilter(common.ExecutionAdminTag, common.ValueIn, "admin_tag_name", vals)
 	assert.NoError(t, err)
+
 	_, err = executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
 		InlineFilters: []common.InlineFilter{

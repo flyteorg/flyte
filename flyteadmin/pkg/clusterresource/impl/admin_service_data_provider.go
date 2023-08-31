@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
+	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 // Implementation of an interfaces.FlyteAdminDataProvider which fetches data using a flyteadmin service client
@@ -31,6 +34,13 @@ func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, 
 }
 
 var activeProjectsFilter = fmt.Sprintf("ne(state,%d)", admin.Project_ARCHIVED)
+
+var descCreatedAtSortParam = admin.Sort{
+	Direction: admin.Sort_DESCENDING,
+	Key:       "created_at",
+}
+
+var descCreatedAtSortDBParam, _ = common.NewSortParameter(&descCreatedAtSortParam, models.ProjectColumns)
 
 func (p serviceAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, error) {
 	projects := make([]*admin.Project, 0)

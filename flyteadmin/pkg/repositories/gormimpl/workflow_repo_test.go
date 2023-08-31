@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
 var typedInterface = []byte{1, 2, 3}
@@ -182,10 +183,10 @@ func TestListWorkflows_Order(t *testing.T) {
 	mockQuery.WithQuery(`project desc`)
 	mockQuery.WithReply(workflows)
 
-	sortParameter, _ := common.NewSortParameter(admin.Sort{
+	sortParameter, _ := common.NewSortParameter(&admin.Sort{
 		Direction: admin.Sort_DESCENDING,
 		Key:       "project",
-	})
+	}, models.WorkflowColumns)
 	_, err := workflowRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
 		InlineFilters: []common.InlineFilter{
