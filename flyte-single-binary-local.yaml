@@ -11,7 +11,7 @@ catalog-cache:
 
 cluster_resources:
   standaloneDeployment: false
-  templatePath: $HOME/.flyte/cluster-resource-templates
+  templatePath: /Users/ytong/.flyte/sandbox/cluster-resource-templates
 
 logger:
   show-source: true
@@ -19,14 +19,14 @@ logger:
 
 propeller:
   create-flyteworkflow-crd: true
-  kube-config: $HOME/.flyte/sandbox/kubeconfig
+  kube-config: /Users/ytong/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
 
 server:
-  kube-config: $HOME/.flyte/sandbox/kubeconfig
+  kube-config: /Users/ytong/.flyte/sandbox/kubeconfig
 
 webhook:
-  certDir: $HOME/.flyte/webhook-certs
+  certDir: /Users/ytong/.flyte/webhook-certs
   localCert: true
   secretName: flyte-sandbox-webhook-secret
   serviceName: flyte-sandbox-local
@@ -50,9 +50,9 @@ plugins:
     stackdriver-enabled: false
   k8s:
     default-env-vars:
-    - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
-    - FLYTE_AWS_ACCESS_KEY_ID: minio
-    - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+      - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   k8s-array:
     logs:
       config:
@@ -69,7 +69,25 @@ database:
     port: 30001
     dbname: flyte
     options: "sslmode=disable"
-
+  # Point to cloned repo instead.
+  #
+#  postgres:
+#    username: postgres
+#    password: xxx
+#    host: 127.0.0.1
+#    port: 54328
+#    dbname: app
+#    options: "sslmode=disable"
+cloudEvents:
+  enable: true
+  transformToCloudEvents: true
+  type: redis
+  redis:
+    addr: "localhost:6379"
+artifacts:
+  host: localhost
+  port: 50051
+  insecure: true
 storage:
   type: stow
   stow:
