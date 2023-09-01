@@ -507,8 +507,8 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 				},
 			},
 			&core.Selector{
-				Selection: &core.Selector_GpuPartitionSize{
-					GpuPartitionSize: "",
+				Selection: &core.Selector_GpuUnpartitioned{
+					GpuUnpartitioned: true,
 				},
 			},
 		)

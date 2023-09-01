@@ -137,38 +137,39 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 				Operator: v1.TolerationOpEqual,
 				Effect:   v1.TaintEffectNoSchedule,
 			}
-		case *core.Selector_GpuPartitionSize:
-			if selector.GetGpuPartitionSize() != "" {
+		case *core.Selector_GpuUnpartitioned:
+			if !selector.GetGpuUnpartitioned() {
+				break
+			}
+			if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
+				partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+			} else {
 				partitionSizeNsr = &v1.NodeSelectorRequirement{
 					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Operator: v1.NodeSelectorOpIn,
-					Values:   []string{selector.GetGpuPartitionSize()},
+					Operator: v1.NodeSelectorOpDoesNotExist,
 				}
+			}
+			if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
+				partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+			} else {
 				partitionSizeTol = &v1.Toleration{
 					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Value:    selector.GetGpuPartitionSize(),
+					Value:    GpuPartitionSizeNotSet,
 					Operator: v1.TolerationOpEqual,
 					Effect:   v1.TaintEffectNoSchedule,
 				}
-			} else {
-				if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
-					partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
-				} else {
-					partitionSizeNsr = &v1.NodeSelectorRequirement{
-						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-						Operator: v1.NodeSelectorOpDoesNotExist,
-					}
-				}
-				if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
-					partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
-				} else {
-					partitionSizeTol = &v1.Toleration{
-						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-						Value:    GpuPartitionSizeNotSet,
-						Operator: v1.TolerationOpEqual,
-						Effect:   v1.TaintEffectNoSchedule,
-					}
-				}
+			}
+		case *core.Selector_GpuPartitionSize:
+			partitionSizeNsr = &v1.NodeSelectorRequirement{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpIn,
+				Values:   []string{selector.GetGpuPartitionSize()},
+			}
+			partitionSizeTol = &v1.Toleration{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Value:    selector.GetGpuPartitionSize(),
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
 			}
 		}
 	}
