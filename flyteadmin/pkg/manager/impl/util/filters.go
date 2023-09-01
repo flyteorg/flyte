@@ -128,7 +128,7 @@ var allowedJoinEntities = map[common.Entity]sets.String{
 	common.Task:                sets.NewString(common.Task),
 	common.TaskExecution:       sets.NewString(common.TaskExecution, common.Task, common.Execution, common.NodeExecution),
 	common.Workflow:            sets.NewString(common.Workflow),
-	common.NamedEntity:         sets.NewString(common.NamedEntity),
+	common.NamedEntity:         sets.NewString(common.NamedEntity, common.NamedEntityMetadata),
 	common.NamedEntityMetadata: sets.NewString(common.NamedEntityMetadata),
 	common.Project:             sets.NewString(common.Project),
 	common.Signal:              sets.NewString(common.Signal),

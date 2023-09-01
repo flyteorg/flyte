@@ -2,11 +2,12 @@ package common
 
 import (
 	"fmt"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
 )
 
 const gormDescending = "%s desc"

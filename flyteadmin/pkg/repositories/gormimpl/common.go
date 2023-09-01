@@ -2,12 +2,9 @@ package gormimpl
 
 import (
 	"fmt"
-	"sync"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
-	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
@@ -117,12 +114,4 @@ func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFil
 		tx = tx.Where(mapFilter.GetFilter())
 	}
 	return tx, nil
-}
-
-func modelColumns(v any) sets.String {
-	s, err := schema.Parse(v, &sync.Map{}, schema.NamingStrategy{})
-	if err != nil {
-		panic(err)
-	}
-	return sets.NewString(s.DBNames...)
 }
