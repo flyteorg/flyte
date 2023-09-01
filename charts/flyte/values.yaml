@@ -213,66 +213,6 @@ flyte:
     affinity: {}
 
   #
-  # FLYTE_AGENT SETTINGS
-  #
-
-  flyteagent:
-    enabled: true
-    # -- Replicas count for flyteagent deployment
-    replicaCount: 1
-    image:
-      # -- Docker image for flyteagent deployment
-      repository: ghcr.io/flyteorg/flyteagent
-      # -- Docker image tag
-      tag: 1.6.2b1
-      # -- Docker image pull policy
-      pullPolicy: IfNotPresent
-    # -- Default resources requests and limits for flyteagent deployment
-    resources:
-      limits:
-        cpu: 500m
-        ephemeral-storage: 100Mi
-        memory: 500Mi
-      requests:
-        cpu: 10m
-        ephemeral-storage: 50Mi
-        memory: 50Mi
-    # -- Default regex string for searching configuration files
-    configPath: /etc/flyteagent/config/*.yaml
-    # -- Service settings for flyteagent
-    service:
-      annotations:
-        projectcontour.io/upstream-protocol.h2c: grpc
-      type: ClusterIP
-    # -- Configuration for service accounts for flyteagent
-    serviceAccount:
-      # -- Should a service account be created for flyteagent
-      create: true
-      # -- Annotations for ServiceAccount attached to flyteagent pods
-      annotations: { }
-      # -- ImagePullSecrets to automatically assign to the service account
-      imagePullSecrets: [ ]
-    # -- Annotations for flyteagent pods
-    podAnnotations: { }
-    # -- nodeSelector for flyteagent deployment
-    nodeSelector: { }
-    # -- tolerations for flyteagent deployment
-    tolerations: [ ]
-    # -- affinity for flyteagent deployment
-    affinity: { }
-    # -- Appends additional volumes to the deployment spec. May include template values.
-    additionalVolumes: [ ]
-    # -- Appends additional volume mounts to the main container's spec. May include template values.
-    additionalVolumeMounts: [ ]
-    # -- Appends additional containers to the deployment spec. May include template values.
-    additionalContainers: [ ]
-    # -- Appends extra command line arguments to the main command
-    extraArgs: { }
-    # -- Sets priorityClassName for datacatalog pod(s).
-    priorityClassName: ""
-
-
-  #
   # FLYTECONSOLE SETTINGS
   #
 
@@ -608,7 +548,9 @@ flyte:
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
         agent-service:
-          defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
+          defaultAgent:
+            endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+            insecure: true
           supportedTaskTypes:
             - bigquery_query_job_task
 
@@ -920,3 +862,6 @@ sparkoperator:
 daskoperator:
   # --- enable or disable the dask operator deployment installation
   enabled: false
+
+flyteagent:
+  enabled: true

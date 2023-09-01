@@ -13,8 +13,11 @@ DEPLOYMENT_CORE=${1:-eks gcp}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 HELM_CAPABILITIES="-a rbac.authorization.k8s.io/v1 -a networking.k8s.io/v1/Ingress -a apiextensions.k8s.io/v1/CustomResourceDefinition"
 
-helm dep update ${DIR}/../charts/flyte/
 helm dep update ${DIR}/../charts/flyte-deps/
+helm dep update ${DIR}/../charts/flyte-core/
+helm dep update ${DIR}/../charts/flyte-binary/
+helm dep update ${DIR}/../charts/flyte-sandbox/
+helm dep update ${DIR}/../charts/flyte/
 
 helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
@@ -32,6 +35,9 @@ helm template flyte -n flyte ${DIR}/../charts/flyte-deps/ ${HELM_CAPABILITIES} -
 
 # Generate manifest single binary chart
 helm template flyte -n flyte ${DIR}/../charts/flyte-binary/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/sandbox-binary/flyte_sandbox_binary_helm_generated.yaml
+
+# Generate manifest flyte agent
+helm template flyte -n flyte ${DIR}/../charts/flyte-agent/ ${HELM_CAPABILITIES} --debug > ${DIR}/../deployment/agent/flyte_agent_helm_generated.yaml
 
 
 echo "Generating helm docs"
