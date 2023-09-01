@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
-
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyteadmin/auth/config"
 )
 
 type CookieManager struct {
@@ -175,29 +175,31 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 	return nil
 }
 
-func getLogoutAccessCookie() *http.Cookie {
+func (c *CookieManager) getLogoutAccessCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     accessTokenCookieName,
 		Value:    "",
+		Domain:   c.domain,
 		MaxAge:   0,
 		HttpOnly: true,
 		Expires:  time.Now().Add(-1 * time.Hour),
 	}
 }
 
-func getLogoutRefreshCookie() *http.Cookie {
+func (c *CookieManager) getLogoutRefreshCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     refreshTokenCookieName,
 		Value:    "",
+		Domain:   c.domain,
 		MaxAge:   0,
 		HttpOnly: true,
 		Expires:  time.Now().Add(-1 * time.Hour),
 	}
 }
 
-func (c CookieManager) DeleteCookies(ctx context.Context, writer http.ResponseWriter) {
-	http.SetCookie(writer, getLogoutAccessCookie())
-	http.SetCookie(writer, getLogoutRefreshCookie())
+func (c CookieManager) DeleteCookies(_ context.Context, writer http.ResponseWriter) {
+	http.SetCookie(writer, c.getLogoutAccessCookie())
+	http.SetCookie(writer, c.getLogoutRefreshCookie())
 }
 
 func (c CookieManager) getHTTPSameSitePolicy() http.SameSite {

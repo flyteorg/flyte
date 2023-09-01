@@ -1,17 +1,20 @@
 package auth
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyteadmin/auth/config"
 )
 
 func TestCookieManager_SetTokenCookies(t *testing.T) {
@@ -25,124 +28,128 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 	}
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
 	assert.NoError(t, err)
-
 	token := &oauth2.Token{
 		AccessToken:  "access",
 		RefreshToken: "refresh",
 	}
-
 	token = token.WithExtra(map[string]interface{}{
 		"id_token": "id token",
 	})
 
-	w := httptest.NewRecorder()
-	_, err = http.NewRequest("GET", "/api/v1/projects", nil)
-	assert.NoError(t, err)
-	err = manager.SetTokenCookies(ctx, w, token)
-	assert.NoError(t, err)
-	fmt.Println(w.Header().Get("Set-Cookie"))
-	c := w.Result().Cookies()
-	assert.Equal(t, "flyte_at", c[0].Name)
-	assert.Equal(t, "flyte_idt", c[1].Name)
-	assert.Equal(t, "flyte_rt", c[2].Name)
-}
+	t.Run("invalid_hash_key", func(t *testing.T) {
+		_, err := NewCookieManager(ctx, "wrong", blockKeyEncoded, cookieSetting)
 
-func TestCookieManager_RetrieveTokenValues(t *testing.T) {
-	ctx := context.Background()
-	// These were generated for unit testing only.
-	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
-	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-
-	cookieSetting := config.CookieSettings{
-		SameSitePolicy: config.SameSiteDefaultMode,
-		Domain:         "default",
-	}
-
-	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
-	assert.NoError(t, err)
-
-	token := &oauth2.Token{
-		AccessToken:  "access",
-		RefreshToken: "refresh",
-	}
-
-	token = token.WithExtra(map[string]interface{}{
-		"id_token": "id token",
+		assert.EqualError(t, err, "[BINARY_DECODING_FAILED] Error decoding hash key bytes, caused by: illegal base64 data at input byte 4")
 	})
 
-	w := httptest.NewRecorder()
-	_, err = http.NewRequest("GET", "/api/v1/projects", nil)
-	assert.NoError(t, err)
-	err = manager.SetTokenCookies(ctx, w, token)
-	assert.NoError(t, err)
+	t.Run("invalid_block_key", func(t *testing.T) {
+		_, err := NewCookieManager(ctx, hashKeyEncoded, "wrong", cookieSetting)
 
-	cookies := w.Result().Cookies()
-	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
-	assert.NoError(t, err)
-	for _, c := range cookies {
-		req.AddCookie(c)
-	}
+		assert.EqualError(t, err, "[BINARY_DECODING_FAILED] Error decoding block key bytes, caused by: illegal base64 data at input byte 4")
+	})
 
-	idToken, access, refresh, err := manager.RetrieveTokenValues(ctx, req)
-	assert.NoError(t, err)
-	assert.Equal(t, "id token", idToken)
-	assert.Equal(t, "access", access)
-	assert.Equal(t, "refresh", refresh)
-}
+	t.Run("set_token_cookies", func(t *testing.T) {
+		w := httptest.NewRecorder()
 
-func TestGetLogoutAccessCookie(t *testing.T) {
-	cookie := getLogoutAccessCookie()
-	assert.True(t, time.Now().After(cookie.Expires))
-}
+		err = manager.SetTokenCookies(ctx, w, token)
 
-func TestGetLogoutRefreshCookie(t *testing.T) {
-	cookie := getLogoutRefreshCookie()
-	assert.True(t, time.Now().After(cookie.Expires))
-}
+		assert.NoError(t, err)
+		fmt.Println(w.Header().Get("Set-Cookie"))
+		c := w.Result().Cookies()
+		assert.Equal(t, "flyte_at", c[0].Name)
+		assert.Equal(t, "flyte_idt", c[1].Name)
+		assert.Equal(t, "flyte_rt", c[2].Name)
+	})
 
-func TestCookieManager_DeleteCookies(t *testing.T) {
-	ctx := context.Background()
+	t.Run("set_token_cookies_wrong_key", func(t *testing.T) {
+		wrongKey := base64.RawStdEncoding.EncodeToString(bytes.Repeat([]byte("X"), 75))
+		wrongManager, err := NewCookieManager(ctx, wrongKey, wrongKey, cookieSetting)
+		require.NoError(t, err)
+		w := httptest.NewRecorder()
 
-	// These were generated for unit testing only.
-	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
-	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-	cookieSetting := config.CookieSettings{
-		SameSitePolicy: config.SameSiteDefaultMode,
-		Domain:         "default",
-	}
+		err = wrongManager.SetTokenCookies(ctx, w, token)
 
-	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
-	assert.NoError(t, err)
+		assert.EqualError(t, err, "[SECURE_COOKIE_ERROR] Error creating secure cookie, caused by: securecookie: error - caused by: crypto/aes: invalid key size 75")
+	})
 
-	w := httptest.NewRecorder()
-	manager.DeleteCookies(ctx, w)
-	cookies := w.Result().Cookies()
-	assert.Equal(t, 2, len(cookies))
-	assert.True(t, time.Now().After(cookies[0].Expires))
-	assert.True(t, time.Now().After(cookies[1].Expires))
-}
+	t.Run("retrieve_token_values", func(t *testing.T) {
+		w := httptest.NewRecorder()
 
-func TestGetHTTPSameSitePolicy(t *testing.T) {
-	ctx := context.Background()
+		err = manager.SetTokenCookies(ctx, w, token)
+		assert.NoError(t, err)
 
-	// These were generated for unit testing only.
-	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
-	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
-	cookieSetting := config.CookieSettings{
-		SameSitePolicy: config.SameSiteDefaultMode,
-		Domain:         "default",
-	}
+		cookies := w.Result().Cookies()
+		req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+		assert.NoError(t, err)
+		for _, c := range cookies {
+			req.AddCookie(c)
+		}
 
-	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
-	assert.NoError(t, err)
-	assert.Equal(t, http.SameSiteDefaultMode, manager.getHTTPSameSitePolicy())
+		idToken, access, refresh, err := manager.RetrieveTokenValues(ctx, req)
 
-	manager.sameSitePolicy = config.SameSiteLaxMode
-	assert.Equal(t, http.SameSiteLaxMode, manager.getHTTPSameSitePolicy())
+		assert.NoError(t, err)
+		assert.Equal(t, "id token", idToken)
+		assert.Equal(t, "access", access)
+		assert.Equal(t, "refresh", refresh)
+	})
 
-	manager.sameSitePolicy = config.SameSiteStrictMode
-	assert.Equal(t, http.SameSiteStrictMode, manager.getHTTPSameSitePolicy())
+	t.Run("retrieve_token_values_wrong_key", func(t *testing.T) {
+		wrongKey := base64.RawStdEncoding.EncodeToString(bytes.Repeat([]byte("X"), 75))
+		wrongManager, err := NewCookieManager(ctx, wrongKey, wrongKey, cookieSetting)
+		require.NoError(t, err)
 
-	manager.sameSitePolicy = config.SameSiteNoneMode
-	assert.Equal(t, http.SameSiteNoneMode, manager.getHTTPSameSitePolicy())
+		w := httptest.NewRecorder()
+
+		err = manager.SetTokenCookies(ctx, w, token)
+		assert.NoError(t, err)
+
+		cookies := w.Result().Cookies()
+		req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+		assert.NoError(t, err)
+		for _, c := range cookies {
+			req.AddCookie(c)
+		}
+
+		_, _, _, err = wrongManager.RetrieveTokenValues(ctx, req)
+
+		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Error reading existing secure cookie [flyte_idt]. Error: [SECURE_COOKIE_ERROR] Error reading secure cookie flyte_idt, caused by: securecookie: error - caused by: crypto/aes: invalid key size 75")
+	})
+
+	t.Run("logout_access_cookie", func(t *testing.T) {
+		cookie := manager.getLogoutAccessCookie()
+
+		assert.True(t, time.Now().After(cookie.Expires))
+		assert.Equal(t, cookieSetting.Domain, cookie.Domain)
+	})
+
+	t.Run("logout_refresh_cookie", func(t *testing.T) {
+		cookie := manager.getLogoutRefreshCookie()
+
+		assert.True(t, time.Now().After(cookie.Expires))
+		assert.Equal(t, cookieSetting.Domain, cookie.Domain)
+	})
+
+	t.Run("delete_cookies", func(t *testing.T) {
+		w := httptest.NewRecorder()
+
+		manager.DeleteCookies(ctx, w)
+
+		cookies := w.Result().Cookies()
+		require.Equal(t, 2, len(cookies))
+		assert.True(t, time.Now().After(cookies[0].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[0].Domain)
+		assert.True(t, time.Now().After(cookies[1].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
+	})
+
+	t.Run("get_http_same_site_policy", func(t *testing.T) {
+		manager.sameSitePolicy = config.SameSiteLaxMode
+		assert.Equal(t, http.SameSiteLaxMode, manager.getHTTPSameSitePolicy())
+
+		manager.sameSitePolicy = config.SameSiteStrictMode
+		assert.Equal(t, http.SameSiteStrictMode, manager.getHTTPSameSitePolicy())
+
+		manager.sameSitePolicy = config.SameSiteNoneMode
+		assert.Equal(t, http.SameSiteNoneMode, manager.getHTTPSameSitePolicy())
+	})
 }

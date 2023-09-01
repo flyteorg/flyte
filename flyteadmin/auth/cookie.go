@@ -9,10 +9,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/gorilla/securecookie"
+
+	"github.com/flyteorg/flyteadmin/auth/interfaces"
 )
 
 const (
@@ -52,25 +53,18 @@ func HashCsrfState(csrf string) string {
 }
 
 func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte, domain string, sameSiteMode http.SameSite) (http.Cookie, error) {
-	var s = securecookie.New(hashKey, blockKey)
+	s := securecookie.New(hashKey, blockKey)
 	encoded, err := s.Encode(cookieName, value)
-	if err == nil {
-		if len(domain) > 0 {
-			return http.Cookie{
-				Name:     cookieName,
-				Value:    encoded,
-				Domain:   domain,
-				SameSite: sameSiteMode,
-			}, nil
-		}
-		return http.Cookie{
-			Name:     cookieName,
-			Value:    encoded,
-			SameSite: sameSiteMode,
-		}, nil
+	if err != nil {
+		return http.Cookie{}, errors.Wrapf(ErrSecureCookie, err, "Error creating secure cookie")
 	}
 
-	return http.Cookie{}, errors.Wrapf(ErrSecureCookie, err, "Error creating secure cookie")
+	return http.Cookie{
+		Name:     cookieName,
+		Value:    encoded,
+		Domain:   domain,
+		SameSite: sameSiteMode,
+	}, nil
 }
 
 func retrieveSecureCookie(ctx context.Context, request *http.Request, cookieName string, hashKey, blockKey []byte) (string, error) {
