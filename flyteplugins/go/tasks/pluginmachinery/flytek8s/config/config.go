@@ -148,6 +148,12 @@ type K8sPluginConfig struct {
 	// The node label that specifies the attached GPU partition size.
 	GpuPartitionSizeNodeLabel string `json:"gpu-partition-size-node-label" pflag:"-,The node label that specifies the attached GPU partition size."`
 
+	// Override for node selector requirement added to pods intended for unpartitioned GPU nodes.
+	GpuUnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"gpu-unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned GPU nodes."`
+
+	// Override for toleration added to pods intended for unpartitioned GPU nodes.
+	GpuUnpartitionedToleration *v1.Toleration `json:"gpu-unpartitioned-toleration" pflag:"-,Override for toleration added to pods intended for unpartitioned GPU nodes."`
+
 	// The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
 

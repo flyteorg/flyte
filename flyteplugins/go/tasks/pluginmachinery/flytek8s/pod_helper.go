@@ -32,6 +32,8 @@ const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
 
+const GpuPartitionSizeNotSet = "NotSet"
+
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
 // objects to an existing v1.Affinity object. If there are no existing required
 // node selectors, the new v1.NodeSelectorRequirement will be added as-is.
@@ -105,47 +107,88 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
-func ApplyNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
-	if podSpec.Affinity == nil {
-		podSpec.Affinity = &v1.Affinity{}
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
+	// Short circuit if pod spec does not contain any containers that use GPUs
+	requiresGPUs := false
+	for _, cnt := range podSpec.Containers {
+		if _, ok := cnt.Resources.Limits[config.GetK8sPluginConfig().GpuResourceName]; ok {
+			requiresGPUs = true
+			break
+		}
+	}
+	if !requiresGPUs {
+		return
 	}
 
-	gpuPartitionSizeSpecified := false
+	// Determine the node selector requirements and tolerations
+	var deviceNsr, partitionSizeNsr *v1.NodeSelectorRequirement
+	var deviceTol, partitionSizeTol *v1.Toleration
 	for _, selector := range selectors {
-		var ns v1.NodeSelectorRequirement
 		switch selector.GetSelection().(type) {
 		case *core.Selector_GpuDevice:
-			ns = v1.NodeSelectorRequirement{
+			deviceNsr = &v1.NodeSelectorRequirement{
 				Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
 				Operator: v1.NodeSelectorOpIn,
 				Values:   []string{selector.GetGpuDevice()},
 			}
-		case *core.Selector_GpuPartitionSize:
-			gpuPartitionSizeSpecified = true
-			ns = v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-				Operator: v1.NodeSelectorOpIn,
-				Values:   []string{selector.GetGpuPartitionSize()},
+			deviceTol = &v1.Toleration{
+				Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+				Value:    selector.GetGpuDevice(),
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
 			}
-		}
-		if selector.GetOnlyPreferred() {
-			// TODO (jeev): Should we make the weight configurable?
-			AddPreferredNodeSelectorRequirements(podSpec.Affinity, 10, ns)
-		} else {
-			AddRequiredNodeSelectorRequirements(podSpec.Affinity, ns)
+		case *core.Selector_GpuPartitionSize:
+			if selector.GetGpuPartitionSize() != "" {
+				partitionSizeNsr = &v1.NodeSelectorRequirement{
+					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Operator: v1.NodeSelectorOpIn,
+					Values:   []string{selector.GetGpuPartitionSize()},
+				}
+				partitionSizeTol = &v1.Toleration{
+					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Value:    selector.GetGpuPartitionSize(),
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				}
+			} else {
+				if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
+					partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+				} else {
+					partitionSizeNsr = &v1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+						Operator: v1.NodeSelectorOpDoesNotExist,
+					}
+				}
+				if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
+					partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+				} else {
+					partitionSizeTol = &v1.Toleration{
+						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+						Value:    GpuPartitionSizeNotSet,
+						Operator: v1.TolerationOpEqual,
+						Effect:   v1.TaintEffectNoSchedule,
+					}
+				}
+			}
 		}
 	}
 
-	// If a gpu partition size selector was not specified, we assume that the user
-	// wants full, unpartitioned GPUs.
-	if !gpuPartitionSizeSpecified {
-		AddRequiredNodeSelectorRequirements(
-			podSpec.Affinity,
-			v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-				Operator: v1.NodeSelectorOpDoesNotExist,
-			},
-		)
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	// Add node selector requirements to pod spec
+	for _, nsr := range []*v1.NodeSelectorRequirement{deviceNsr, partitionSizeNsr} {
+		if nsr != nil {
+			AddRequiredNodeSelectorRequirements(podSpec.Affinity, *nsr)
+		}
+	}
+
+	// Add tolerations to pod spec
+	for _, tol := range []*v1.Toleration{deviceTol, partitionSizeTol} {
+		if tol != nil {
+			podSpec.Tolerations = append(podSpec.Tolerations, *tol)
+		}
 	}
 }
 
@@ -326,7 +369,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	if taskTemplate.GetMetadata() != nil {
-		ApplyNodeSelectors(podSpec, taskTemplate.GetMetadata().Selectors...)
+		ApplyGPUNodeSelectors(podSpec, taskTemplate.GetMetadata().Selectors...)
 	}
 
 	return podSpec, objectMeta, nil
