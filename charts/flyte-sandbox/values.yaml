@@ -138,6 +138,21 @@ postgresql:
       tag: sandbox
       pullPolicy: Never
 
+redis:
+  enabled: true
+  image:
+    tag: sandbox
+    pullPolicy: Never
+  auth:
+    enabled: false
+  master:
+    service:
+      type: NodePort
+      nodePorts:
+        redis: 30004
+  replica:
+    replicaCount: 0
+
 sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
