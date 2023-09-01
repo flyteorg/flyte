@@ -31,23 +31,6 @@ type ReplicaEntry struct {
 	RestartPolicy commonOp.RestartPolicy
 }
 
-// ExtractMPICurrentCondition will return the first job condition for MPI
-func ExtractMPICurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
-	if jobConditions != nil {
-		sort.Slice(jobConditions, func(i, j int) bool {
-			return jobConditions[i].LastTransitionTime.Time.After(jobConditions[j].LastTransitionTime.Time)
-		})
-
-		for _, jc := range jobConditions {
-			if jc.Status == v1.ConditionTrue {
-				return jc, nil
-			}
-		}
-	}
-
-	return commonOp.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
-}
-
 // ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
 func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
 	if jobConditions != nil {
@@ -60,14 +43,17 @@ func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.Jo
 				return jc, nil
 			}
 		}
+		return commonOp.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
 	}
-
-	return commonOp.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
+	return commonOp.JobCondition{}, nil
 }
 
 // GetPhaseInfo will return the phase of kubeflow job
 func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	if len(currentCondition.Type) == 0 {
+		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+	}
 	switch currentCondition.Type {
 	case commonOp.JobCreated:
 		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil

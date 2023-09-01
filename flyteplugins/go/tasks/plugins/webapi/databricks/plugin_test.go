@@ -67,7 +67,7 @@ func TestBuildRequest(t *testing.T) {
 	runID := "019e70eb"
 	databricksEndpoint := ""
 	databricksURL := "https://" + testInstance + "/api/2.0/jobs/runs"
-	t.Run("build http request for submitting a snowflake query", func(t *testing.T) {
+	t.Run("build http request for submitting a databricks job", func(t *testing.T) {
 		req, err := buildRequest(post, nil, databricksEndpoint, testInstance, token, runID, false)
 		header := http.Header{}
 		header.Add("Authorization", "Bearer "+token)

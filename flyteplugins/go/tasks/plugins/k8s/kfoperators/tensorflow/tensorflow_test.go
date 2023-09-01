@@ -283,7 +283,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 		Status: commonOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
-			StartTime:         nil,
+			StartTime:         &v1.Time{Time: time.Now()},
 			CompletionTime:    nil,
 			LastReconcileTime: nil,
 		},

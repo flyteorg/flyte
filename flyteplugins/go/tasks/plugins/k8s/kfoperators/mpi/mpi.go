@@ -209,7 +209,10 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
-	currentCondition, err := common.ExtractMPICurrentCondition(app.Status.Conditions)
+	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the mpi custom resource since creation time %v", app.CreationTimestamp)
+	}
+	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -223,7 +226,6 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 	}
 
 	return common.GetMPIPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
-
 }
 
 func init() {
