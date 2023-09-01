@@ -293,8 +293,9 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 
 	return &kubeflowv1.PyTorchJob{
 		ObjectMeta: v1.ObjectMeta{
-			Name:      jobName,
-			Namespace: jobNamespace,
+			CreationTimestamp: v1.Time{Time: time.Now()},
+			Name:              jobName,
+			Namespace:         jobNamespace,
 		},
 		Spec: resource.(*kubeflowv1.PyTorchJob).Spec,
 		Status: commonOp.JobStatus{

@@ -231,6 +231,9 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
+	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the pytorch custom resource since creation time %v", app.CreationTimestamp)
+	}
 	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err

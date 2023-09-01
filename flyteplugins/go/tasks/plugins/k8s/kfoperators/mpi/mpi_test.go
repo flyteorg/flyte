@@ -281,7 +281,7 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 		Status: mpiOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
-			StartTime:         nil,
+			StartTime:         &v1.Time{Time: time.Now()},
 			CompletionTime:    nil,
 			LastReconcileTime: nil,
 		},
