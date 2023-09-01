@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
-	github.com/flyteorg/flyteidl v1.5.17-0.20230816172111-a434a70bf284
+	github.com/flyteorg/flyteidl v1.5.18-0.20230901184530-2772407af8ca
 	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
