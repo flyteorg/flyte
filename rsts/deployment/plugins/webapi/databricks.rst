@@ -385,9 +385,16 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 Databricks Agent Service configuration
 --------------------------------------
 
-You can use spark by the Databricks Agent Service.
+You can use Spark via the Databricks Agent Service.
 
-To do so, you need to start the agent service by pyflyte and configure the Databricks Agent Service.
+To do so, follow these steps:
+
+1. Start the agent service using PyFlyte.
+2. Configure the Databricks Agent Service.
+3. Create a secret with the group "databricks" and the key "token."
+    
+   For more details, you can refer to
+   `here <https://docs.flyte.org/projects/cookbook/en/stable/auto_examples/containerization/use_secrets.html>`__.
 
 .. code-block::
 
