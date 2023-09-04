@@ -381,3 +381,47 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
   Make sure you enable `custom containers 
   <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
   on your Databricks cluster before you trigger the workflow.
+
+Databricks Agent Service configuration
+--------------------------------------
+
+You can use spark by the Databricks Agent Service.
+
+To do so, you need to start the agent service by pyflyte and configure the Databricks Agent Service.
+
+.. code-block::
+
+  pyflyte serve
+
+.. code-block:: yaml
+
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - agent-service
+      default-for-task-types:
+        - spark: agent-service
+  plugins:
+    agent-service:
+      supportedTaskTypes:
+        - spark
+        - default_task
+        - custom_task
+      # By default, all the request will be sent to the default agent.
+      defaultAgent:
+        endpoint: "dns:///localhost:8000"
+        insecure: true
+        timeouts:
+          GetTask: 100s
+        defaultTimeout: 100s
+      agents:
+        custom_agent:
+          endpoint: "dns:///localhost:8000"
+          insecure: false
+          defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+          timeouts:
+            GetTask: 100s
+          defaultTimeout: 100s
+      agentForTaskTypes:
+        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
+        - custom_task: custom_agent
