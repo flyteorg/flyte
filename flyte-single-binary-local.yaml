@@ -83,7 +83,7 @@ cloudEvents:
   transformToCloudEvents: true
   type: redis
   redis:
-    addr: "localhost:6379"
+    addr: "localhost:30004"
 artifacts:
   host: localhost
   port: 50051
