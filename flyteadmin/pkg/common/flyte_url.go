@@ -142,16 +142,16 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 // FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
 // This constructs a fully unique prefix, and when post-pended with the output name, forms a fully unique name for
 // the artifact service (including the project/domain of course, which the artifact service will add).
-func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, artifactType ArtifactType) string {
-	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, artifactType)
+func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier) string {
+	res := fmt.Sprintf("%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
 
 	return res
 }
 
 // FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
 // See the uniqueness comment above.
-func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int, artifactType ArtifactType) string {
-	res := fmt.Sprintf("%s/%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry), artifactType)
+func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int) string {
+	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry))
 
 	return res
 }

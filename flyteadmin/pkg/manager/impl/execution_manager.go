@@ -721,26 +721,14 @@ func (m *ExecutionManager) ResolveLiteralMapArtifacts(ctx context.Context, input
 	// only top level replace for now.
 	outputs := map[string]*core.Literal{}
 	for k, v := range inputs.Literals {
-		if v.GetArtifactId() != nil {
-			if m.artifactClient == nil {
-				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized")
+		if v.GetMetadata() != nil {
+			for k, v := range v.GetMetadata() {
+				if k == "_ua" {
+					// TODO: Update the signature of this function and return these keys in the
+					// yet to be created new execution kickoff event.
+					logger.Warningf(ctx, "Using artifact with metadata %s, to be recorded later", v)
+				}
 			}
-
-			x := *m.artifactClient
-			req := &artifact.GetArtifactRequest{
-				Query: &core.ArtifactQuery{
-					Identifier: &core.ArtifactQuery_ArtifactId{ArtifactId: v.GetArtifactId()},
-				},
-				Details: false,
-			}
-			resp, err := x.GetArtifact(ctx, req)
-			if err != nil {
-				logger.Errorf(ctx, "Failed to find artifact by ID [%+v]", v.GetArtifactId())
-				return nil, nil, err
-			}
-			artifactIDs[k] = resp.Artifact.GetArtifactId()
-			logger.Debugf(ctx, "Resolved artifact for [%s] to [%+v]", k, resp.GetArtifact().ArtifactId)
-			outputs[k] = resp.Artifact.Spec.Value
 		} else {
 			outputs[k] = v
 		}

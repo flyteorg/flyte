@@ -338,7 +338,9 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 			NodeId:      "end-node",
 			ExecutionId: e.ExecutionId,
 		}
-		eventSource = common.FlyteURLKeyFromNodeExecutionID(dummyNodeExecutionID, common.ArtifactTypeI)
+		// This forms part of the key in the Artifact store,
+		// but it should probably be entirely derived by that service instead.
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(dummyNodeExecutionID)
 		finalMsg, err = c.TransformWorkflowExecutionEvent(ctx, e)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to transform workflow execution event with error: %v", err)
@@ -356,7 +358,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 			return fmt.Errorf("parent node execution id is nil for task execution [%+v]", e)
 		}
 		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
-			int(e.RetryAttempt), common.ArtifactTypeO)
+			int(e.RetryAttempt))
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
 	case *admin.NodeExecutionEventRequest:
 		topic = "cloudevents.NodeExecution"
