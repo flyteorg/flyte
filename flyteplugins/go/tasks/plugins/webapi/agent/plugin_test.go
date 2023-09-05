@@ -31,6 +31,7 @@ func TestPlugin(t *testing.T) {
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
 	}
+
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
 		assert.NoError(t, err)
@@ -102,12 +103,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test PENDING Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_PENDING,
 			Outputs: nil,
@@ -119,12 +115,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_RUNNING,
 			Outputs: nil,
@@ -136,12 +127,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_PERMANENT_FAILURE,
 			Outputs: nil,
@@ -153,12 +139,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test RETRYABLE_FAILURE Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_RETRYABLE_FAILURE,
 			Outputs: nil,
@@ -170,12 +151,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test SUCCEEDED Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_SUCCEEDED,
 			Outputs: nil,
@@ -187,12 +163,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test UNDEFINED Status", func(t *testing.T) {
-		plugin := Plugin{
-			metricScope: fakeSetupContext.MetricsScope(),
-			cfg:         GetConfig(),
-		}
 		taskContext := new(webapiPlugin.StatusContext)
-
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   5,
 			Outputs: nil,
