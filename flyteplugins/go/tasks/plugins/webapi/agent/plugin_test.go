@@ -113,7 +113,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
@@ -131,7 +130,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
@@ -149,7 +147,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
@@ -167,7 +164,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
@@ -185,7 +181,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phase.Phase())
@@ -203,7 +198,6 @@ func TestPlugin(t *testing.T) {
 			Outputs: nil,
 		})
 
-		plugin.Status(context.Background(), taskContext)
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
