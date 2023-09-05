@@ -148,7 +148,7 @@ func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier
 	return res
 }
 
-// FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
+// FlyteURLKeyFromNodeExecutionIDRetry is a modified version of the function above.
 // See the uniqueness comment above.
 func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int) string {
 	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry))
