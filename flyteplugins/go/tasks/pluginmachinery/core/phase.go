@@ -25,8 +25,6 @@ const (
 	PhaseQueued
 	// The system has started the pre-execution process, like container download, cluster startup etc
 	PhaseInitializing
-	// Indicates that the task is awaiting resource allocation
-	PhasePending
 	// Indicates that the task has started executing
 	PhaseRunning
 	// Indicates that the task has completed successfully
@@ -238,10 +236,6 @@ func phaseInfoFailed(p Phase, err *core.ExecutionError, info *TaskInfo, cleanupO
 
 func PhaseInfoFailed(p Phase, err *core.ExecutionError, info *TaskInfo) PhaseInfo {
 	return phaseInfo(p, DefaultPhaseVersion, err, info, false)
-}
-
-func PhaseInfoPending(version uint32, info *TaskInfo) PhaseInfo {
-	return phaseInfo(PhasePending, version, nil, info, false)
 }
 
 func PhaseInfoRunning(version uint32, info *TaskInfo) PhaseInfo {
