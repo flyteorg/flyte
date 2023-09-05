@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/config"
-
 	"google.golang.org/grpc"
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	webapiPlugin "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -98,5 +99,113 @@ func TestPlugin(t *testing.T) {
 
 		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.NotEqual(t, context.TODO(), ctx)
+	})
+
+	t.Run("test PENDING Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   admin.State_PENDING,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
+	})
+
+	t.Run("test RUNNING Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   admin.State_RUNNING,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	})
+
+	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   admin.State_PERMANENT_FAILURE,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+
+	t.Run("test RETRYABLE_FAILURE Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   admin.State_RETRYABLE_FAILURE,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+	})
+
+	t.Run("test SUCCEEDED Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   admin.State_SUCCEEDED,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseSuccess, phase.Phase())
+	})
+
+	t.Run("test UNDEFINED Status", func(t *testing.T) {
+		plugin := Plugin{
+			metricScope: fakeSetupContext.MetricsScope(),
+			cfg:         GetConfig(),
+		}
+		taskContext := new(webapiPlugin.StatusContext)
+
+		taskContext.On("Resource").Return(&ResourceWrapper{
+			State:   5,
+			Outputs: nil,
+		})
+
+		plugin.Status(context.Background(), taskContext)
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.Error(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
 }
