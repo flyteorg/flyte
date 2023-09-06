@@ -1,0 +1,323 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - n1
+      n1:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+    upstream:
+      end-node:
+        ids:
+        - n1
+      n0:
+        ids:
+        - start-node
+      n0-n0:
+        ids:
+        - start-node
+      n0-n1:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - n0
+  template:
+    id:
+      name: core.control_flow.conditions.multiplier_3
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          my_input:
+            description: my_input
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: o0
+        var: o0
+    - Target:
+        BranchNode:
+          if_else:
+            Default:
+              Error:
+                failed_node_id: fractions
+                message: The input must be between 0 and 10
+            case:
+              condition:
+                Expr:
+                  Conjunction:
+                    left_expression:
+                      Expr:
+                        Comparison:
+                          left_value:
+                            Val:
+                              Var: .my_input
+                          operator: 2
+                          right_value:
+                            Val:
+                              Primitive:
+                                Value:
+                                  FloatValue: 0.1
+                    right_expression:
+                      Expr:
+                        Comparison:
+                          left_value:
+                            Val:
+                              Var: .my_input
+                          operator: 4
+                          right_value:
+                            Val:
+                              Primitive:
+                                Value:
+                                  FloatValue: 1
+              then_node:
+                Target:
+                  TaskNode:
+                    Reference:
+                      ReferenceId:
+                        name: core.control_flow.conditions.double
+                        resource_type: 1
+                    overrides: {}
+                id: n0-n0
+                inputs:
+                - binding:
+                    Value:
+                      Promise:
+                        node_id: start-node
+                        var: my_input
+                  var: "n"
+                metadata:
+                  InterruptibleValue: null
+                  name: double
+                  retries: {}
+            other:
+            - condition:
+                Expr:
+                  Conjunction:
+                    left_expression:
+                      Expr:
+                        Comparison:
+                          left_value:
+                            Val:
+                              Var: .my_input
+                          operator: 2
+                          right_value:
+                            Val:
+                              Primitive:
+                                Value:
+                                  FloatValue: 1
+                    right_expression:
+                      Expr:
+                        Comparison:
+                          left_value:
+                            Val:
+                              Var: .my_input
+                          operator: 4
+                          right_value:
+                            Val:
+                              Primitive:
+                                Value:
+                                  FloatValue: 10
+              then_node:
+                Target:
+                  TaskNode:
+                    Reference:
+                      ReferenceId:
+                        name: core.control_flow.conditions.square
+                        resource_type: 1
+                    overrides: {}
+                id: n0-n1
+                inputs:
+                - binding:
+                    Value:
+                      Promise:
+                        node_id: start-node
+                        var: my_input
+                  var: "n"
+                metadata:
+                  InterruptibleValue: null
+                  name: square
+                  retries: {}
+      id: n0
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: my_input
+        var: .my_input
+      metadata:
+        InterruptibleValue: null
+        name: fractions
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.control_flow.conditions.double
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: "n"
+      metadata:
+        InterruptibleValue: null
+        name: double
+        retries: {}
+      upstream_node_ids:
+      - n0
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n1
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.control_flow.conditions
+        - task-name
+        - double
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.control_flow.conditions.double
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          "n":
+            description: |-
+              name of the parameter for the task is derived from the name of the input variable
+              and the type is mapped to ``Types.Integer``
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.control_flow.conditions
+        - task-name
+        - square
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.control_flow.conditions.square
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          "n":
+            description: |-
+              name of the parameter for the task is derived from the name of the input variable, and
+              the type is automatically mapped to Types.Integer
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Simple: 2
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task

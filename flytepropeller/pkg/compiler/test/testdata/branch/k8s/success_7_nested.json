@@ -1,0 +1,466 @@
+{
+  "kind": "flyteworkflow",
+  "apiVersion": "flyte.lyft.com/v1alpha1",
+  "metadata": {
+    "name": "name",
+    "namespace": "namespace",
+    "creationTimestamp": null,
+    "labels": {
+      "domain": "domain",
+      "execution-id": "name",
+      "project": "hello",
+      "shard-key": "6",
+      "workflow-name": "core-control-flow-run-conditions-so-nested"
+    }
+  },
+  "spec": {
+    "id": "test_proj:test_domain:core.control_flow.run_conditions.so_nested",
+    "nodes": {
+      "branchnode-2": {
+        "id": "branchnode-2",
+        "name": "fractions",
+        "resources": {},
+        "kind": "branch",
+        "branch": {
+          "if": {
+            "condition": {
+              "conjunction": {
+                "leftExpression": {
+                  "comparison": {
+                    "operator": "GT",
+                    "leftValue": {
+                      "var": ".my_input"
+                    },
+                    "rightValue": {
+                      "primitive": {
+                        "floatValue": 0.1
+                      }
+                    }
+                  }
+                },
+                "rightExpression": {
+                  "comparison": {
+                    "operator": "LT",
+                    "leftValue": {
+                      "var": ".my_input"
+                    },
+                    "rightValue": {
+                      "primitive": {
+                        "floatValue": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": "branchnode-2-branchbranchnode-1"
+          },
+          "elseIf": [
+            {
+              "condition": {
+                "conjunction": {
+                  "leftExpression": {
+                    "comparison": {
+                      "operator": "GT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 1
+                        }
+                      }
+                    }
+                  },
+                  "rightExpression": {
+                    "comparison": {
+                      "operator": "LT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "then": "branchnode-2-branchn1"
+            }
+          ],
+          "elseFail": {
+            "failedNodeId": "fractions",
+            "message": "The input must be between 0 and 10"
+          }
+        },
+        "inputBindings": [
+          {
+            "var": ".my_input",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "branchnode-2-branchbranchnode-1": {
+        "id": "branchnode-2-branchbranchnode-1",
+        "name": "inner_fractions",
+        "resources": {},
+        "kind": "branch",
+        "branch": {
+          "if": {
+            "condition": {
+              "comparison": {
+                "operator": "LT",
+                "leftValue": {
+                  "var": ".my_input"
+                },
+                "rightValue": {
+                  "primitive": {
+                    "floatValue": 0.5
+                  }
+                }
+              }
+            },
+            "then": "branchnode-2-branchbranchnode-1-branchbranchn0"
+          },
+          "elseFail": {
+            "failedNodeId": "inner_fractions",
+            "message": "Only \u003c0.5 allowed"
+          }
+        },
+        "inputBindings": [
+          {
+            "var": ".my_input",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "branchnode-2-branchbranchnode-1-branchbranchn0": {
+        "id": "branchnode-2-branchbranchnode-1-branchbranchn0",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
+        "resources": {},
+        "kind": "task",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.double\" version:\"abc\" ",
+        "inputBindings": [
+          {
+            "var": "n",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "branchnode-2-branchn1": {
+        "id": "branchnode-2-branchn1",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
+        "resources": {},
+        "kind": "task",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.square\" version:\"abc\" ",
+        "inputBindings": [
+          {
+            "var": "n",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "end-node": {
+        "id": "end-node",
+        "resources": {},
+        "kind": "end",
+        "inputBindings": [
+          {
+            "var": "o0",
+            "binding": {
+              "promise": {
+                "nodeId": "branchnode-2",
+                "var": "o0"
+              }
+            }
+          }
+        ]
+      },
+      "start-node": {
+        "id": "start-node",
+        "resources": {},
+        "kind": "start"
+      }
+    },
+    "connections": {
+      "branchnode-2": [
+        "end-node"
+      ],
+      "start-node": [
+        "branchnode-2"
+      ]
+    },
+    "edges": {
+      "downstream": {
+        "branchnode-2": [
+          "end-node"
+        ],
+        "start-node": [
+          "branchnode-2"
+        ]
+      },
+      "upstream": {
+        "branchnode-2": [
+          "start-node"
+        ],
+        "branchnode-2-branchbranchnode-1": [
+          "start-node"
+        ],
+        "branchnode-2-branchbranchnode-1-branchbranchn0": [
+          "start-node"
+        ],
+        "branchnode-2-branchn1": [
+          "start-node"
+        ],
+        "end-node": [
+          "branchnode-2"
+        ]
+      }
+    },
+    "outputs": {
+      "variables": {
+        "o0": {
+          "type": {
+            "simple": "FLOAT"
+          },
+          "description": "o0"
+        }
+      }
+    },
+    "outputBindings": [
+      {
+        "var": "o0",
+        "binding": {
+          "promise": {
+            "nodeId": "branchnode-2",
+            "var": "o0"
+          }
+        }
+      }
+    ]
+  },
+  "inputs": {
+    "literals": {
+      "my_input": {
+        "scalar": {
+          "primitive": {
+            "floatValue": 0
+          }
+        }
+      }
+    }
+  },
+  "executionId": {},
+  "tasks": {
+    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.double\" version:\"abc\" ": {
+      "id": {
+        "resourceType": "TASK",
+        "project": "test_proj",
+        "domain": "test_domain",
+        "name": "core.control_flow.run_conditions.double",
+        "version": "abc"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "image:name",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "core.control_flow.run_conditions",
+          "--task-name",
+          "double",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "config": [
+          {
+            "key": "testKey1",
+            "value": "testValue1"
+          },
+          {
+            "key": "testKey2",
+            "value": "testValue2"
+          },
+          {
+            "key": "testKey3",
+            "value": "testValue3"
+          }
+        ]
+      }
+    },
+    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.square\" version:\"abc\" ": {
+      "id": {
+        "resourceType": "TASK",
+        "project": "test_proj",
+        "domain": "test_domain",
+        "name": "core.control_flow.run_conditions.square",
+        "version": "abc"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "image:name",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "core.control_flow.run_conditions",
+          "--task-name",
+          "square",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "config": [
+          {
+            "key": "testKey1",
+            "value": "testValue1"
+          },
+          {
+            "key": "testKey2",
+            "value": "testValue2"
+          },
+          {
+            "key": "testKey3",
+            "value": "testValue3"
+          }
+        ]
+      }
+    }
+  },
+  "node-defaults": {},
+  "securityContext": {},
+  "status": {
+    "phase": 0
+  },
+  "rawOutputDataConfig": {},
+  "executionConfig": {
+    "TaskPluginImpls": null,
+    "MaxParallelism": 0,
+    "RecoveryExecution": {},
+    "TaskResources": {
+      "Requests": {
+        "CPU": "0",
+        "Memory": "0",
+        "EphemeralStorage": "0",
+        "Storage": "0",
+        "GPU": "0"
+      },
+      "Limits": {
+        "CPU": "0",
+        "Memory": "0",
+        "EphemeralStorage": "0",
+        "Storage": "0",
+        "GPU": "0"
+      }
+    },
+    "Interruptible": null
+  }
+}

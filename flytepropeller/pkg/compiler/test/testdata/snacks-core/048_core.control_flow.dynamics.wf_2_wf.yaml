@@ -1,0 +1,57 @@
+workflow:
+  id:
+    name: core.control_flow.dynamics.wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        s1:
+          description: s1
+          type:
+            Type:
+              Simple: 3
+        s2:
+          description: s2
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Simple: 1
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.dynamics.count_characters
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: s1
+      var: s1
+    - binding:
+        Value:
+          Promise:
+            var: s2
+      var: s2
+    metadata:
+      InterruptibleValue: null
+      name: count_characters
+      retries: {}
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n0
+          var: o0
+    var: o0

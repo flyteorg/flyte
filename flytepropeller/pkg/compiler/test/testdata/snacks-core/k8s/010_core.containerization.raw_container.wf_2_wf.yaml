@@ -1,0 +1,581 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionConfig:
+  EnvironmentVariables: null
+  Interruptible: null
+  MaxParallelism: 0
+  OverwriteCache: false
+  RecoveryExecution: {}
+  TaskPluginImpls: null
+  TaskResources:
+    Limits:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+    Requests:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+executionId: {}
+inputs:
+  literals:
+    a:
+      scalar:
+        primitive:
+          floatValue: 0
+    b:
+      scalar:
+        primitive:
+          floatValue: 0
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    domain: domain
+    execution-id: name
+    project: hello
+    shard-key: "6"
+    workflow-name: core-containerization-raw-container-wf
+  name: name
+  namespace: namespace
+node-defaults: {}
+rawOutputDataConfig: {}
+securityContext: {}
+spec:
+  connections:
+    n0:
+    - n5
+    n1:
+    - n5
+    n2:
+    - n5
+    n3:
+    - n5
+    n4:
+    - n5
+    n5:
+    - end-node
+    start-node:
+    - n0
+    - n1
+    - n2
+    - n3
+    - n4
+  edges:
+    downstream:
+      n0:
+      - n5
+      n1:
+      - n5
+      n2:
+      - n5
+      n3:
+      - n5
+      n4:
+      - n5
+      n5:
+      - end-node
+      start-node:
+      - n0
+      - n1
+      - n2
+      - n3
+      - n4
+    upstream:
+      end-node:
+      - n5
+      n0:
+      - start-node
+      n1:
+      - start-node
+      n2:
+      - start-node
+      n3:
+      - start-node
+      n4:
+      - start-node
+      n5:
+      - n0
+      - n1
+      - n2
+      - n3
+      - n4
+  id: ::core.containerization.raw_container.wf
+  nodes:
+    end-node:
+      id: end-node
+      kind: end
+      resources: {}
+    n0:
+      id: n0
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      - binding:
+          promise:
+            nodeId: start-node
+            var: b
+        var: b
+      kind: task
+      name: ellipse-area-metadata-shell
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"ellipse-area-metadata-shell" '
+    n1:
+      id: n1
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      - binding:
+          promise:
+            nodeId: start-node
+            var: b
+        var: b
+      kind: task
+      name: ellipse-area-metadata-python
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"ellipse-area-metadata-python" '
+    n2:
+      id: n2
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      - binding:
+          promise:
+            nodeId: start-node
+            var: b
+        var: b
+      kind: task
+      name: ellipse-area-metadata-r
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"ellipse-area-metadata-r" '
+    n3:
+      id: n3
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      - binding:
+          promise:
+            nodeId: start-node
+            var: b
+        var: b
+      kind: task
+      name: ellipse-area-metadata-haskell
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"ellipse-area-metadata-haskell" '
+    n4:
+      id: n4
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      - binding:
+          promise:
+            nodeId: start-node
+            var: b
+        var: b
+      kind: task
+      name: ellipse-area-metadata-julia
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"ellipse-area-metadata-julia" '
+    n5:
+      id: n5
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n3
+            var: area
+        var: area_haskell
+      - binding:
+          promise:
+            nodeId: n4
+            var: area
+        var: area_julia
+      - binding:
+          promise:
+            nodeId: n1
+            var: area
+        var: area_python
+      - binding:
+          promise:
+            nodeId: n2
+            var: area
+        var: area_r
+      - binding:
+          promise:
+            nodeId: n0
+            var: area
+        var: area_shell
+      - binding:
+          promise:
+            nodeId: n3
+            var: metadata
+        var: metadata_haskell
+      - binding:
+          promise:
+            nodeId: n4
+            var: metadata
+        var: metadata_julia
+      - binding:
+          promise:
+            nodeId: n1
+            var: metadata
+        var: metadata_python
+      - binding:
+          promise:
+            nodeId: n2
+            var: metadata
+        var: metadata_r
+      - binding:
+          promise:
+            nodeId: n0
+            var: metadata
+        var: metadata_shell
+      kind: task
+      name: report_all_calculated_areas
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.containerization.raw_container.report_all_calculated_areas" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputs: {}
+status:
+  phase: 0
+tasks:
+  'resource_type:TASK name:"core.containerization.raw_container.report_all_calculated_areas" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.containerization.raw_container
+      - task-name
+      - report_all_calculated_areas
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.containerization.raw_container.report_all_calculated_areas
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          area_haskell:
+            type:
+              simple: FLOAT
+          area_julia:
+            type:
+              simple: FLOAT
+          area_python:
+            type:
+              simple: FLOAT
+          area_r:
+            type:
+              simple: FLOAT
+          area_shell:
+            type:
+              simple: FLOAT
+          metadata_haskell:
+            type:
+              simple: STRING
+          metadata_julia:
+            type:
+              simple: STRING
+          metadata_python:
+            type:
+              simple: STRING
+          metadata_r:
+            type:
+              simple: STRING
+          metadata_shell:
+            type:
+              simple: STRING
+      outputs: {}
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task
+  'resource_type:TASK name:"ellipse-area-metadata-haskell" ':
+    container:
+      command:
+      - ./calculate-ellipse-area
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      dataConfig:
+        enabled: true
+        inputPath: /var/inputs
+        outputPath: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-haskell:v1
+      resources: {}
+    id:
+      name: ellipse-area-metadata-haskell
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              simple: FLOAT
+          b:
+            type:
+              simple: FLOAT
+      outputs:
+        variables:
+          area:
+            type:
+              simple: FLOAT
+          metadata:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: raw-container
+  'resource_type:TASK name:"ellipse-area-metadata-julia" ':
+    container:
+      command:
+      - julia
+      - calculate-ellipse-area.jl
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      dataConfig:
+        enabled: true
+        inputPath: /var/inputs
+        outputPath: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-julia:v1
+      resources: {}
+    id:
+      name: ellipse-area-metadata-julia
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              simple: FLOAT
+          b:
+            type:
+              simple: FLOAT
+      outputs:
+        variables:
+          area:
+            type:
+              simple: FLOAT
+          metadata:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: raw-container
+  'resource_type:TASK name:"ellipse-area-metadata-python" ':
+    container:
+      command:
+      - python
+      - calculate-ellipse-area.py
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      dataConfig:
+        enabled: true
+        inputPath: /var/inputs
+        outputPath: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-python:v1
+      resources: {}
+    id:
+      name: ellipse-area-metadata-python
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              simple: FLOAT
+          b:
+            type:
+              simple: FLOAT
+      outputs:
+        variables:
+          area:
+            type:
+              simple: FLOAT
+          metadata:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: raw-container
+  'resource_type:TASK name:"ellipse-area-metadata-r" ':
+    container:
+      command:
+      - Rscript
+      - --vanilla
+      - calculate-ellipse-area.R
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      dataConfig:
+        enabled: true
+        inputPath: /var/inputs
+        outputPath: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-r:v1
+      resources: {}
+    id:
+      name: ellipse-area-metadata-r
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              simple: FLOAT
+          b:
+            type:
+              simple: FLOAT
+      outputs:
+        variables:
+          area:
+            type:
+              simple: FLOAT
+          metadata:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: raw-container
+  'resource_type:TASK name:"ellipse-area-metadata-shell" ':
+    container:
+      command:
+      - ./calculate-ellipse-area.sh
+      - /var/inputs
+      - /var/outputs
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      dataConfig:
+        enabled: true
+        inputPath: /var/inputs
+        outputPath: /var/outputs
+      image: ghcr.io/flyteorg/rawcontainers-shell:v1
+      resources: {}
+    id:
+      name: ellipse-area-metadata-shell
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              simple: FLOAT
+          b:
+            type:
+              simple: FLOAT
+      outputs:
+        variables:
+          area:
+            type:
+              simple: FLOAT
+          metadata:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: raw-container

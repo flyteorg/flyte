@@ -1,0 +1,336 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - n1
+      n1:
+        ids:
+        - n2
+      n2:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+    upstream:
+      end-node:
+        ids:
+        - n2
+      n0:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - n0
+      n2:
+        ids:
+        - n1
+  template:
+    id:
+      name: core.type_system.structured_dataset.schema_compatibility_wf
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                StructuredDatasetType:
+                  columns:
+                  - literal_type:
+                      Type:
+                        Simple: 1
+                    name: Age
+                  format: parquet
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n2
+              var: o0
+        var: o0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.structured_dataset.get_schema_df
+              resource_type: 1
+          overrides: {}
+      id: n0
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      metadata:
+        InterruptibleValue: null
+        name: get_schema_df
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.structured_dataset.get_subset_df
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: df
+      metadata:
+        InterruptibleValue: null
+        name: get_subset_df
+        retries: {}
+      upstream_node_ids:
+      - n0
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.type_system.structured_dataset.to_numpy
+              resource_type: 1
+          overrides: {}
+      id: n2
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: o0
+        var: ds
+      metadata:
+        InterruptibleValue: null
+        name: to_numpy
+        retries: {}
+      upstream_node_ids:
+      - n1
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n2
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.structured_dataset
+        - task-name
+        - get_schema_df
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.structured_dataset.get_schema_df
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                Schema:
+                  columns:
+                  - name: Name
+                    type: 2
+                  - name: Age
+                  - name: Height
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.structured_dataset
+        - task-name
+        - get_subset_df
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.structured_dataset.get_subset_df
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          df:
+            description: df
+            type:
+              Type:
+                StructuredDatasetType:
+                  columns:
+                  - literal_type:
+                      Type:
+                        Simple: 1
+                    name: Age
+                  format: parquet
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                StructuredDatasetType:
+                  columns:
+                  - literal_type:
+                      Type:
+                        Simple: 1
+                    name: Age
+                  format: parquet
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.type_system.structured_dataset
+        - task-name
+        - to_numpy
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.type_system.structured_dataset.to_numpy
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          ds:
+            description: ds
+            type:
+              Type:
+                StructuredDatasetType:
+                  columns:
+                  - literal_type:
+                      Type:
+                        Simple: 1
+                    name: Age
+                  format: parquet
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                StructuredDatasetType:
+                  columns:
+                  - literal_type:
+                      Type:
+                        Simple: 1
+                    name: Age
+                  format: parquet
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
