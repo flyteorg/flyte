@@ -39,7 +39,7 @@ For example
     )
 
 
-See detailed usage examples in the :std:doc:`User Guide <cookbook:auto_examples/deployment/lp_notifications>`
+See detailed usage examples in the :std:doc:`User Guide <cookbook:auto_examples/productionizing/lp_notifications>`
 
 Notifications can be combined with schedules to automatically alert you when a scheduled job succeeds or fails.
 
