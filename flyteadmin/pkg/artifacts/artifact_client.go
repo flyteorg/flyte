@@ -29,6 +29,10 @@ func NewArtifactConnection(_ context.Context, cfg *Config, opts ...grpc.DialOpti
 }
 
 func InitializeArtifactClient(ctx context.Context, cfg *Config, opts ...grpc.DialOption) artifact.ArtifactRegistryClient {
+	if cfg == nil {
+		logger.Warningf(ctx, "Artifact config is not set, skipping creation of client...")
+		return nil
+	}
 	conn, err := NewArtifactConnection(ctx, cfg, opts...)
 	if err != nil {
 		logger.Panicf(ctx, "failed to initialize Artifact connection. Err: %s", err.Error())

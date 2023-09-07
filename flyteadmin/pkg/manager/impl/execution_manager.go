@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"regexp"
 	"strconv"
@@ -103,7 +104,7 @@ type ExecutionManager struct {
 	cloudEventPublisher       notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 	pluginRegistry            *plugins.Registry
-	artifactClient            *artifact.ArtifactRegistryClient
+	artifactRegistry          artifacts.ArtifactRegistry
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -523,7 +524,6 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
-	//requestSpec.Metadata.ArtifactIds = resolvedArtifactMap
 
 	// Get the node execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -887,7 +887,6 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 		return nil, artifactIDs, nil
 	}
 	outputs := map[string]*core.Parameter{}
-	client := *m.artifactClient
 
 	for k, v := range inputs.Parameters {
 		if inputsForQueryTemplating != nil {
@@ -902,7 +901,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 		}
 		if v.GetArtifactQuery() != nil {
 			// This case handles when an Artifact query is specified as a default value.
-			if m.artifactClient == nil {
+			if m.artifactRegistry.GetClient() == nil {
 				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
 			}
 			filledInQuery, err := m.fillInTemplateArgs(ctx, *v.GetArtifactQuery(), inputsForQueryTemplating, metadata)
@@ -915,7 +914,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 				Details: false,
 			}
 
-			resp, err := client.GetArtifact(ctx, req)
+			resp, err := m.artifactRegistry.GetClient().GetArtifact(ctx, req)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -935,7 +934,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 				},
 				Details: false,
 			}
-			resp, err := client.GetArtifact(ctx, req)
+			resp, err := m.artifactRegistry.GetClient().GetArtifact(ctx, req)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -1962,7 +1961,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactClient *artifact.ArtifactRegistryClient) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
 
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
@@ -1996,7 +1995,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		cloudEventPublisher:       cloudEventPublisher,
 		dbEventWriter:             eventWriter,
 		pluginRegistry:            pluginRegistry,
-		artifactClient:            artifactClient,
+		artifactRegistry:          artifactRegistry,
 	}
 }
 

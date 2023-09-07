@@ -3,6 +3,7 @@ package impl
 import (
 	"bytes"
 	"context"
+	"github.com/flyteorg/flyteadmin/pkg/artifacts"
 	"strconv"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -37,10 +38,11 @@ type launchPlanMetrics struct {
 }
 
 type LaunchPlanManager struct {
-	db        repoInterfaces.Repository
-	config    runtimeInterfaces.Configuration
-	scheduler scheduleInterfaces.EventScheduler
-	metrics   launchPlanMetrics
+	db               repoInterfaces.Repository
+	config           runtimeInterfaces.Configuration
+	scheduler        scheduleInterfaces.EventScheduler
+	metrics          launchPlanMetrics
+	artifactRegistry artifacts.ArtifactRegistry
 }
 
 func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -114,6 +116,15 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	}
 	m.metrics.SpecSizeBytes.Observe(float64(len(launchPlanModel.Spec)))
 	m.metrics.ClosureSizeBytes.Observe(float64(len(launchPlanModel.Closure)))
+	go func() {
+		ceCtx := context.TODO()
+		if launchPlan.Spec.DefaultInputs == nil {
+			logger.Debugf(ceCtx, "Insufficient fields to submit launchplan interface %v", launchPlan.Id)
+			return
+		}
+		m.artifactRegistry.RegisterArtifactConsumer(ceCtx, launchPlan.Id, *launchPlan.Spec.DefaultInputs)
+	}()
+
 	return &admin.LaunchPlanCreateResponse{}, nil
 }
 
@@ -552,7 +563,8 @@ func NewLaunchPlanManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	scheduler scheduleInterfaces.EventScheduler,
-	scope promutils.Scope) interfaces.LaunchPlanInterface {
+	scope promutils.Scope,
+	artifactRegistry artifacts.ArtifactRegistry) interfaces.LaunchPlanInterface {
 
 	metrics := launchPlanMetrics{
 		Scope: scope,
@@ -562,9 +574,10 @@ func NewLaunchPlanManager(
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
 	}
 	return &LaunchPlanManager{
-		db:        db,
-		config:    config,
-		scheduler: scheduler,
-		metrics:   metrics,
+		db:               db,
+		config:           config,
+		scheduler:        scheduler,
+		metrics:          metrics,
+		artifactRegistry: artifactRegistry,
 	}
 }
