@@ -1,0 +1,237 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionConfig:
+  EnvironmentVariables: null
+  Interruptible: null
+  MaxParallelism: 0
+  OverwriteCache: false
+  RecoveryExecution: {}
+  TaskPluginImpls: null
+  TaskResources:
+    Limits:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+    Requests:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+executionId: {}
+inputs:
+  literals:
+    a:
+      collection:
+        literals:
+        - scalar:
+            primitive:
+              integer: "0"
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    domain: domain
+    execution-id: name
+    project: hello
+    shard-key: "6"
+    workflow-name: core-control-flow-map-task-my-map-workflow
+  name: name
+  namespace: namespace
+node-defaults: {}
+rawOutputDataConfig: {}
+securityContext: {}
+spec:
+  connections:
+    n0:
+    - n1
+    n1:
+    - end-node
+    start-node:
+    - n0
+  edges:
+    downstream:
+      n0:
+      - n1
+      n1:
+      - end-node
+      start-node:
+      - n0
+    upstream:
+      end-node:
+      - n1
+      n0:
+      - start-node
+      n1:
+      - n0
+  id: ::core.control_flow.map_task.my_map_workflow
+  nodes:
+    end-node:
+      id: end-node
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n1
+            var: o0
+        var: o0
+      kind: end
+      resources: {}
+    n0:
+      id: n0
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: a
+        var: a
+      kind: task
+      name: mapper_a_mappable_task_0
+      resources:
+        limits:
+          memory: 500Mi
+        requests:
+          memory: 300Mi
+      retry:
+        minAttempts: 2
+      task: 'resource_type:TASK name:"core.control_flow.map_task.mapper_a_mappable_task_0" '
+    n1:
+      id: n1
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n0
+            var: o0
+        var: b
+      kind: task
+      name: coalesce
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.control_flow.map_task.coalesce" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputBindings:
+  - binding:
+      promise:
+        nodeId: n1
+        var: o0
+    var: o0
+  outputs:
+    variables:
+      o0:
+        type:
+          simple: STRING
+status:
+  phase: 0
+tasks:
+  'resource_type:TASK name:"core.control_flow.map_task.coalesce" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.control_flow.map_task
+      - task-name
+      - coalesce
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.control_flow.map_task.coalesce
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          b:
+            type:
+              collectionType:
+                simple: STRING
+      outputs:
+        variables:
+          o0:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task
+  'resource_type:TASK name:"core.control_flow.map_task.mapper_a_mappable_task_0" ':
+    container:
+      args:
+      - pyflyte-map-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.control_flow.map_task
+      - task-name
+      - a_mappable_task
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    custom:
+      minSuccessRatio: 1
+    id:
+      name: core.control_flow.map_task.mapper_a_mappable_task_0
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          a:
+            type:
+              collectionType:
+                simple: INTEGER
+      outputs:
+        variables:
+          o0:
+            type:
+              collectionType:
+                simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    taskTypeVersion: 1
+    type: container_array

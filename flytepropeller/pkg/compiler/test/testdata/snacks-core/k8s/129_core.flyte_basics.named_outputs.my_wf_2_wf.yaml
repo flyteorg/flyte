@@ -1,0 +1,169 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionConfig:
+  EnvironmentVariables: null
+  Interruptible: null
+  MaxParallelism: 0
+  OverwriteCache: false
+  RecoveryExecution: {}
+  TaskPluginImpls: null
+  TaskResources:
+    Limits:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+    Requests:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+executionId: {}
+inputs: {}
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    domain: domain
+    execution-id: name
+    project: hello
+    shard-key: "6"
+    workflow-name: core-flyte-basics-named-outputs-my-wf
+  name: name
+  namespace: namespace
+node-defaults: {}
+rawOutputDataConfig: {}
+securityContext: {}
+spec:
+  connections:
+    n0:
+    - end-node
+    n1:
+    - end-node
+    start-node:
+    - n0
+    - n1
+  edges:
+    downstream:
+      n0:
+      - end-node
+      n1:
+      - end-node
+      start-node:
+      - n0
+      - n1
+    upstream:
+      end-node:
+      - n0
+      - n1
+      n0:
+      - start-node
+      n1:
+      - start-node
+  id: ::core.flyte_basics.named_outputs.my_wf
+  nodes:
+    end-node:
+      id: end-node
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n0
+            var: greet
+        var: greet1
+      - binding:
+          promise:
+            nodeId: n1
+            var: greet
+        var: greet2
+      kind: end
+      resources: {}
+    n0:
+      id: n0
+      kind: task
+      name: say_hello
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.named_outputs.say_hello" '
+    n1:
+      id: n1
+      kind: task
+      name: say_hello
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.named_outputs.say_hello" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputBindings:
+  - binding:
+      promise:
+        nodeId: n0
+        var: greet
+    var: greet1
+  - binding:
+      promise:
+        nodeId: n1
+        var: greet
+    var: greet2
+  outputs:
+    variables:
+      greet1:
+        type:
+          simple: STRING
+      greet2:
+        type:
+          simple: STRING
+status:
+  phase: 0
+tasks:
+  'resource_type:TASK name:"core.flyte_basics.named_outputs.say_hello" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.named_outputs
+      - task-name
+      - say_hello
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.flyte_basics.named_outputs.say_hello
+      resourceType: TASK
+    interface:
+      inputs: {}
+      outputs:
+        variables:
+          greet:
+            type:
+              simple: STRING
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task

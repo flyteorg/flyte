@@ -1,0 +1,378 @@
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  generateName: dummy-workflow-1-0-
+  labels:
+    execution-id: "exec-id"
+    workflow-id: dummy-workflow-1-0
+  namespace: myflytenamespace
+  name: "test-wf"
+inputs:
+  literals:
+    triggered_date:
+      scalar:
+        primitive:
+          datetime: 2018-08-08T22:16:36.860016587Z
+spec:
+  connections:
+    add-one-and-print-0:
+      - sum-non-none-0
+    add-one-and-print-1:
+      - add-one-and-print-2
+      - add-one-and-print-2
+      - sum-and-print-0
+      - sum-and-print-0
+    add-one-and-print-2:
+      - sum-and-print-0
+      - sum-and-print-0
+    add-one-and-print-3:
+      - sum-non-none-0
+      - sum-non-none-0
+    start-node:
+      - print-every-time-0
+      - add-one-and-print-0
+      - add-one-and-print-3
+    sum-and-print-0:
+      - print-every-time-0
+      - print-every-time-0
+      - print-every-time-0
+      - print-every-time-0
+    sum-non-none-0:
+      - add-one-and-print-1
+      - add-one-and-print-1
+      - sum-and-print-0
+  id: dummy-workflow-1-0
+  nodes:
+    add-one-and-print-0:
+      activeDeadlineSeconds: 0
+      id: add-one-and-print-0
+      inputBindings:
+        - binding:
+            scalar:
+              primitive:
+                integer: "3"
+          var: value_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: add-one-and-print
+    add-one-and-print-1:
+      activeDeadlineSeconds: 0
+      id: add-one-and-print-1
+      inputBindings:
+        - binding:
+            promise:
+              nodeId: sum-non-none-0
+              var: out
+          var: value_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: add-one-and-print
+    add-one-and-print-2:
+      activeDeadlineSeconds: 0
+      id: add-one-and-print-2
+      inputBindings:
+        - binding:
+            promise:
+              nodeId: add-one-and-print-1
+              var: out
+          var: value_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: add-one-and-print
+    add-one-and-print-3:
+      activeDeadlineSeconds: 0
+      id: add-one-and-print-3
+      inputBindings:
+        - binding:
+            scalar:
+              primitive:
+                integer: "101"
+          var: value_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: add-one-and-print
+    end-node:
+      id: end-node
+      kind: end
+      resources: {}
+      status:
+        phase: 0
+    print-every-time-0:
+      activeDeadlineSeconds: 0
+      id: print-every-time-0
+      inputBindings:
+        - binding:
+            promise:
+              nodeId: start-node
+              var: triggered_date
+          var: date_triggered
+        - binding:
+            promise:
+              nodeId: sum-and-print-0
+              var: out_blob
+          var: in_blob
+        - binding:
+            promise:
+              nodeId: sum-and-print-0
+              var: multi_blob
+          var: multi_blob
+        - binding:
+            promise:
+              nodeId: sum-and-print-0
+              var: out
+          var: value_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: print-every-time
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+      status:
+        phase: 0
+    sum-and-print-0:
+      activeDeadlineSeconds: 0
+      id: sum-and-print-0
+      inputBindings:
+        - binding:
+            collection:
+              bindings:
+                - promise:
+                    nodeId: sum-non-none-0
+                    var: out
+                - promise:
+                    nodeId: add-one-and-print-1
+                    var: out
+                - promise:
+                    nodeId: add-one-and-print-2
+                    var: out
+                - scalar:
+                    primitive:
+                      integer: "100"
+          var: values_to_add
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: sum-and-print
+    sum-non-none-0:
+      activeDeadlineSeconds: 0
+      id: sum-non-none-0
+      inputBindings:
+        - binding:
+            collection:
+              bindings:
+                - promise:
+                    nodeId: add-one-and-print-0
+                    var: out
+                - promise:
+                    nodeId: add-one-and-print-3
+                    var: out
+          var: values_to_print
+      kind: task
+      resources:
+        requests:
+          cpu: "2"
+          memory: 2Gi
+      status:
+        phase: 0
+      task: sum-non-none
+status:
+  phase: 0
+tasks:
+  add-one-and-print:
+    container:
+      args:
+        - --task-module=flytekit.examples.tasks
+        - --task-name=add_one_and_print
+        - --inputs={{$input}}
+        - --output-prefix={{$output}}
+      command:
+        - flyte-python-entrypoint
+      image: myflytecontainer:abc123
+      resources:
+        requests:
+          - name: 1
+            value: "2.000"
+          - name: 3
+            value: 2048Mi
+          - name: 2
+            value: "0.000"
+    id:
+      name: add-one-and-print
+    interface:
+      inputs:
+        variables:
+          value_to_print:
+            type:
+              simple: INTEGER
+      outputs:
+        variables:
+          out:
+            type:
+              simple: INTEGER
+    metadata:
+      runtime:
+        type: 1
+        version: 1.19.0b10
+      timeout: 0s
+    type: "7"
+  print-every-time:
+    container:
+      args:
+        - --task-module=flytekit.examples.tasks
+        - --task-name=print_every_time
+        - --inputs={{$input}}
+        - --output-prefix={{$output}}
+      command:
+        - flyte-python-entrypoint
+      image: myflytecontainer:abc123
+      resources:
+        requests:
+          - name: 1
+            value: "2.000"
+          - name: 3
+            value: 2048Mi
+          - name: 2
+            value: "0.000"
+    id:
+      name: print-every-time
+    interface:
+      inputs:
+        variables:
+          date_triggered:
+            type:
+              simple: DATETIME
+          in_blob:
+            type:
+              blob:
+                dimensionality: SINGLE
+          multi_blob:
+            type:
+              blob:
+                dimensionality: 1
+          value_to_print:
+            type:
+              simple: INTEGER
+      outputs:
+        variables: {}
+    metadata:
+      runtime:
+        type: 1
+        version: 1.19.0b10
+      timeout: 0s
+    type: "7"
+  sum-and-print:
+    container:
+      args:
+        - --task-module=flytekit.examples.tasks
+        - --task-name=sum_and_print
+        - --inputs={{$input}}
+        - --output-prefix={{$output}}
+      command:
+        - flyte-python-entrypoint
+      image: myflytecontainer:abc123
+      resources:
+        requests:
+          - name: 1
+            value: "2.000"
+          - name: 3
+            value: 2048Mi
+          - name: 2
+            value: "0.000"
+    id:
+      name: sum-and-print
+    interface:
+      inputs:
+        variables:
+          values_to_add:
+            type:
+              collectionType:
+                simple: INTEGER
+      outputs:
+        variables:
+          multi_blob:
+            type:
+              blob:
+                dimensionality: 1
+          out:
+            type:
+              blob:
+                dimensionality: 0
+          out_blob:
+            type:
+              blob:
+                dimensionality: 0
+    metadata:
+      runtime:
+        type: 1
+        version: 1.19.0b10
+      timeout: 0s
+    type: "7"
+  sum-non-none:
+    container:
+      args:
+        - --task-module=flytekit.examples.tasks
+        - --task-name=sum_non_none
+        - --inputs={{$input}}
+        - --output-prefix={{$output}}
+      command:
+        - flyte-python-entrypoint
+      image: myflytecontainer:abc123
+      resources:
+        requests:
+          - name: 1
+            value: "2.000"
+          - name: 3
+            value: 2048Mi
+          - name: 2
+            value: "0.000"
+    id:
+      name: sum-non-none
+    interface:
+      inputs:
+        variables:
+          values_to_print:
+            type:
+              collectionType:
+                simple: INTEGER
+      outputs:
+        variables:
+          out:
+            type:
+              simple: INTEGER
+    metadata:
+      runtime:
+        type: 1
+        version: 1.19.0b10
+      timeout: 0s
+    type: "7"
+

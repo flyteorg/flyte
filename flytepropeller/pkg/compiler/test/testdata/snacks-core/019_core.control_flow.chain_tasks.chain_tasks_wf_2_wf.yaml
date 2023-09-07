@@ -1,0 +1,50 @@
+workflow:
+  id:
+    name: core.control_flow.chain_tasks.chain_tasks_wf
+    resource_type: 2
+  interface:
+    inputs: {}
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.chain_tasks.write
+            resource_type: 1
+        overrides: {}
+    id: n0
+    metadata:
+      InterruptibleValue: null
+      name: write
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.control_flow.chain_tasks.read
+            resource_type: 1
+        overrides: {}
+    id: n1
+    metadata:
+      InterruptibleValue: null
+      name: read
+      retries: {}
+    upstream_node_ids:
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: o0
+    var: o0

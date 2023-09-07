@@ -1,0 +1,104 @@
+# Sample plugins config
+plugins:
+  # All k8s plugins default configuration
+  sagemaker:
+    roleArn: test-role
+    region: us-east-1
+    roleAnnotationKey: "iam.amazonaws.com/role"
+    prebuiltAlgorithms:
+      - name: xgboost
+        regionalConfigs:
+          - region: "us-east-1"
+            versionConfigs:
+              - version: 0.72
+                image: "811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
+              - version: 0.90
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
+
+  k8s:
+    inject-finalizer: true
+    default-annotations:
+      - annotationKey1: annotationValue1
+      - annotationKey2: annotationValue2
+    default-labels:
+      - label1: labelValue1
+      - label2: labelValue2
+    resource-tolerations:
+      nvidia.com/gpu:
+        key: flyte/gpu
+        value: dedicated
+        operator: Equal
+        effect: NoSchedule
+      storage:
+        - key: storage
+          value: special
+          operator: Equal
+          effect: PreferNoSchedule
+    interruptible-node-selector:
+      - x/interruptible: "true"
+    interruptible-tolerations:
+      - key: x/flyte
+        value: interruptible
+        operator: Equal
+        effect: NoSchedule
+    default-env-vars:
+      - AWS_METADATA_SERVICE_TIMEOUT: 5
+      - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
+      - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    default-pod-security-context:
+      runAsUser: 1000
+      runAsGroup: 3000
+      fsGroup: 2000
+    default-security-context:
+      allowPrivilegeEscalation: false
+    enable-host-networking-pod: true
+    default-pod-dns-config:
+      options:
+        - name: "ndots"
+          value: "1"
+        - name: "single-request-reopen"
+        - name: "timeout"
+          value: "1"
+        - name: "attempts"
+          value: "3"
+      nameservers:
+        - "8.8.8.8"
+        - "8.8.4.4"
+      searches:
+        - "ns1.svc.cluster-domain.example"
+        - "my.dns.search.suffix"
+
+  # Spark Plugin configuration
+  spark:
+    spark-config-default:
+      - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+      - spark.kubernetes.allocation.batch.size: "50"
+      - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+      - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+      - spark.blacklist.enabled: "true"
+      - spark.blacklist.timeout: "5m"
+    features:
+      - name: "feature1"
+        spark-config:
+          - spark.hadoop.feature1: "true"
+          - spark.sql.feature1: "true"
+      - name: "feature2"
+        spark-config:
+          - spark.hadoop.feature2: "true"
+          - spark.sql.feature2: "true"
+    logs:
+      mixed:
+        kubernetes-enabled: true
+        kubernetes-url: "http://localhost:30082"
+  # Logging configuration
+  logs:
+    kubernetes-enabled: true
+    kubernetes-url: "http://localhost:30082"

@@ -1,0 +1,664 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - n5
+      n1:
+        ids:
+        - n5
+      n2:
+        ids:
+        - n5
+      n3:
+        ids:
+        - n5
+      n4:
+        ids:
+        - n5
+      n5:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+        - n1
+        - n2
+        - n3
+        - n4
+    upstream:
+      end-node:
+        ids:
+        - n5
+      n0:
+        ids:
+        - start-node
+      n1:
+        ids:
+        - start-node
+      n2:
+        ids:
+        - start-node
+      n3:
+        ids:
+        - start-node
+      n4:
+        ids:
+        - start-node
+      n5:
+        ids:
+        - n0
+        - n1
+        - n2
+        - n3
+        - n4
+  template:
+    id:
+      name: core.containerization.raw_container.wf
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs: {}
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: ellipse-area-metadata-shell
+              resource_type: 1
+          overrides: {}
+      id: n0
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: b
+        var: b
+      metadata:
+        InterruptibleValue: null
+        name: ellipse-area-metadata-shell
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: ellipse-area-metadata-python
+              resource_type: 1
+          overrides: {}
+      id: n1
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: b
+        var: b
+      metadata:
+        InterruptibleValue: null
+        name: ellipse-area-metadata-python
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: ellipse-area-metadata-r
+              resource_type: 1
+          overrides: {}
+      id: n2
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: b
+        var: b
+      metadata:
+        InterruptibleValue: null
+        name: ellipse-area-metadata-r
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: ellipse-area-metadata-haskell
+              resource_type: 1
+          overrides: {}
+      id: n3
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: b
+        var: b
+      metadata:
+        InterruptibleValue: null
+        name: ellipse-area-metadata-haskell
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: ellipse-area-metadata-julia
+              resource_type: 1
+          overrides: {}
+      id: n4
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: a
+        var: a
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: b
+        var: b
+      metadata:
+        InterruptibleValue: null
+        name: ellipse-area-metadata-julia
+        retries: {}
+    - Target:
+        TaskNode:
+          Reference:
+            ReferenceId:
+              name: core.containerization.raw_container.report_all_calculated_areas
+              resource_type: 1
+          overrides: {}
+      id: n5
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n3
+              var: area
+        var: area_haskell
+      - binding:
+          Value:
+            Promise:
+              node_id: n4
+              var: area
+        var: area_julia
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: area
+        var: area_python
+      - binding:
+          Value:
+            Promise:
+              node_id: n2
+              var: area
+        var: area_r
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: area
+        var: area_shell
+      - binding:
+          Value:
+            Promise:
+              node_id: n3
+              var: metadata
+        var: metadata_haskell
+      - binding:
+          Value:
+            Promise:
+              node_id: n4
+              var: metadata
+        var: metadata_julia
+      - binding:
+          Value:
+            Promise:
+              node_id: n1
+              var: metadata
+        var: metadata_python
+      - binding:
+          Value:
+            Promise:
+              node_id: n2
+              var: metadata
+        var: metadata_r
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: metadata
+        var: metadata_shell
+      metadata:
+        InterruptibleValue: null
+        name: report_all_calculated_areas
+        retries: {}
+      upstream_node_ids:
+      - n0
+      - n1
+      - n2
+      - n3
+      - n4
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.containerization.raw_container
+        - task-name
+        - report_all_calculated_areas
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.containerization.raw_container.report_all_calculated_areas
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          area_haskell:
+            description: area_haskell
+            type:
+              Type:
+                Simple: 2
+          area_julia:
+            description: area_julia
+            type:
+              Type:
+                Simple: 2
+          area_python:
+            description: area_python
+            type:
+              Type:
+                Simple: 2
+          area_r:
+            description: area_r
+            type:
+              Type:
+                Simple: 2
+          area_shell:
+            description: area_shell
+            type:
+              Type:
+                Simple: 2
+          metadata_haskell:
+            description: metadata_haskell
+            type:
+              Type:
+                Simple: 3
+          metadata_julia:
+            description: metadata_julia
+            type:
+              Type:
+                Simple: 3
+          metadata_python:
+            description: metadata_python
+            type:
+              Type:
+                Simple: 3
+          metadata_r:
+            description: metadata_r
+            type:
+              Type:
+                Simple: 3
+          metadata_shell:
+            description: metadata_shell
+            type:
+              Type:
+                Simple: 3
+      outputs: {}
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        command:
+        - ./calculate-ellipse-area
+        - /var/inputs
+        - /var/outputs
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        data_config:
+          enabled: true
+          input_path: /var/inputs
+          output_path: /var/outputs
+        image: ghcr.io/flyteorg/rawcontainers-haskell:v1
+        resources: {}
+    id:
+      name: ellipse-area-metadata-haskell
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          area:
+            description: area
+            type:
+              Type:
+                Simple: 2
+          metadata:
+            description: metadata
+            type:
+              Type:
+                Simple: 3
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: raw-container
+- template:
+    Target:
+      Container:
+        command:
+        - julia
+        - calculate-ellipse-area.jl
+        - /var/inputs
+        - /var/outputs
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        data_config:
+          enabled: true
+          input_path: /var/inputs
+          output_path: /var/outputs
+        image: ghcr.io/flyteorg/rawcontainers-julia:v1
+        resources: {}
+    id:
+      name: ellipse-area-metadata-julia
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          area:
+            description: area
+            type:
+              Type:
+                Simple: 2
+          metadata:
+            description: metadata
+            type:
+              Type:
+                Simple: 3
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: raw-container
+- template:
+    Target:
+      Container:
+        command:
+        - python
+        - calculate-ellipse-area.py
+        - /var/inputs
+        - /var/outputs
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        data_config:
+          enabled: true
+          input_path: /var/inputs
+          output_path: /var/outputs
+        image: ghcr.io/flyteorg/rawcontainers-python:v1
+        resources: {}
+    id:
+      name: ellipse-area-metadata-python
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          area:
+            description: area
+            type:
+              Type:
+                Simple: 2
+          metadata:
+            description: metadata
+            type:
+              Type:
+                Simple: 3
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: raw-container
+- template:
+    Target:
+      Container:
+        command:
+        - Rscript
+        - --vanilla
+        - calculate-ellipse-area.R
+        - /var/inputs
+        - /var/outputs
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        data_config:
+          enabled: true
+          input_path: /var/inputs
+          output_path: /var/outputs
+        image: ghcr.io/flyteorg/rawcontainers-r:v1
+        resources: {}
+    id:
+      name: ellipse-area-metadata-r
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          area:
+            description: area
+            type:
+              Type:
+                Simple: 2
+          metadata:
+            description: metadata
+            type:
+              Type:
+                Simple: 3
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: raw-container
+- template:
+    Target:
+      Container:
+        command:
+        - ./calculate-ellipse-area.sh
+        - /var/inputs
+        - /var/outputs
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        data_config:
+          enabled: true
+          input_path: /var/inputs
+          output_path: /var/outputs
+        image: ghcr.io/flyteorg/rawcontainers-shell:v1
+        resources: {}
+    id:
+      name: ellipse-area-metadata-shell
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          a:
+            description: a
+            type:
+              Type:
+                Simple: 2
+          b:
+            description: b
+            type:
+              Type:
+                Simple: 2
+      outputs:
+        variables:
+          area:
+            description: area
+            type:
+              Type:
+                Simple: 2
+          metadata:
+            description: metadata
+            type:
+              Type:
+                Simple: 3
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: raw-container

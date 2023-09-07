@@ -1,0 +1,225 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionConfig:
+  EnvironmentVariables: null
+  Interruptible: null
+  MaxParallelism: 0
+  OverwriteCache: false
+  RecoveryExecution: {}
+  TaskPluginImpls: null
+  TaskResources:
+    Limits:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+    Requests:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+executionId: {}
+inputs:
+  literals:
+    x:
+      scalar:
+        primitive:
+          integer: "0"
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    domain: domain
+    execution-id: name
+    project: hello
+    shard-key: "6"
+    workflow-name: core-flyte-basics-decorating-tasks-wf
+  name: name
+  namespace: namespace
+node-defaults: {}
+rawOutputDataConfig: {}
+securityContext: {}
+spec:
+  connections:
+    n0:
+    - n1
+    n1:
+    - end-node
+    start-node:
+    - n0
+  edges:
+    downstream:
+      n0:
+      - n1
+      n1:
+      - end-node
+      start-node:
+      - n0
+    upstream:
+      end-node:
+      - n1
+      n0:
+      - start-node
+      n1:
+      - n0
+  id: ::core.flyte_basics.decorating_tasks.wf
+  nodes:
+    end-node:
+      id: end-node
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n1
+            var: o0
+        var: o0
+      kind: end
+      resources: {}
+    n0:
+      id: n0
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: x
+        var: x
+      kind: task
+      name: t1
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t1" '
+    n1:
+      id: n1
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n0
+            var: o0
+        var: x
+      kind: task
+      name: t2
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t2" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputBindings:
+  - binding:
+      promise:
+        nodeId: n1
+        var: o0
+    var: o0
+  outputs:
+    variables:
+      o0:
+        type:
+          simple: INTEGER
+status:
+  phase: 0
+tasks:
+  'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t1" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.decorating_tasks
+      - task-name
+      - t1
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.flyte_basics.decorating_tasks.t1
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          x:
+            type:
+              simple: INTEGER
+      outputs:
+        variables:
+          o0:
+            type:
+              simple: INTEGER
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task
+  'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t2" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.decorating_tasks
+      - task-name
+      - t2
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.flyte_basics.decorating_tasks.t2
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          x:
+            type:
+              simple: INTEGER
+      outputs:
+        variables:
+          o0:
+            type:
+              simple: INTEGER
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task
