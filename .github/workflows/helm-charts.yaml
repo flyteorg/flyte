@@ -28,6 +28,7 @@ jobs:
       - name: Publish Helm chart to GHCR
         working-directory: charts
         run: |
+          helm dep update ${{ matrix.chart }}
           helm package \
             --app-version=${{ github.sha }} \
             --version=0.0-${{ github.sha }} \
