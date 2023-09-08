@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mock "github.com/stretchr/testify/mock"
 )
 

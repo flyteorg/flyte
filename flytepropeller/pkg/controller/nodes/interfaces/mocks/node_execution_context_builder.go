@@ -5,8 +5,8 @@ package mocks
 import (
 	context "context"
 
-	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	interfaces "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 )

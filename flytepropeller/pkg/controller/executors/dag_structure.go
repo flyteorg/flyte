@@ -3,7 +3,7 @@ package executors
 import (
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 // An interface that captures the Directed Acyclic Graph structure in which the nodes are connected.

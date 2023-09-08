@@ -3,7 +3,7 @@ package common
 
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 )
 
 const (

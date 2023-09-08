@@ -3,9 +3,9 @@ package task
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

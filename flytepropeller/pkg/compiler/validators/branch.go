@@ -2,8 +2,8 @@ package validators
 
 import (
 	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 

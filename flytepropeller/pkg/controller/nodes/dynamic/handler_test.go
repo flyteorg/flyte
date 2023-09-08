@@ -5,32 +5,32 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	lpMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
+	lpMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	executorMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/dynamic/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/dynamic/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 type dynamicNodeStateHolder struct {

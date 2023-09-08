@@ -6,7 +6,7 @@ import (
 	cache "sigs.k8s.io/controller-runtime/pkg/cache"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 
-	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 
 	mock "github.com/stretchr/testify/mock"
 

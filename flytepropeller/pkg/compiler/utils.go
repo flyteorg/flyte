@@ -2,7 +2,7 @@ package compiler
 
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	handler "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 
 	mock "github.com/stretchr/testify/mock"
 )

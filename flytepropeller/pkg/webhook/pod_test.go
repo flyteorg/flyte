@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
