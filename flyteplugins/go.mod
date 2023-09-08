@@ -1,4 +1,4 @@
-module github.com/flyteorg/flyteplugins
+module github.com/flyteorg/flyte/flyteplugins
 
 go 1.19
 
@@ -12,8 +12,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyteidl v1.5.13
-	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
 	github.com/hashicorp/golang-lru v0.5.4
@@ -70,6 +70,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/flyteorg/flytestdlib v1.0.15 // indirect
 	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -137,9 +138,9 @@ require (
 
 replace (
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
-	github.com/flyteorg/datacatalog => ../datacatalog
-	github.com/flyteorg/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 )

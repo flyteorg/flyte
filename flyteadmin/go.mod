@@ -1,4 +1,4 @@
-module github.com/flyteorg/flyteadmin
+module github.com/flyteorg/flyte/flyteadmin
 
 go 1.19
 
@@ -13,10 +13,10 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/evanphx/json-patch v4.12.0+incompatible
+	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyteidl v1.5.14
 	github.com/flyteorg/flyteplugins v1.1.16
-	github.com/flyteorg/flytepropeller v1.1.98
-	github.com/flyteorg/flytestdlib v1.0.22
 	github.com/flyteorg/stow v0.3.7
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
@@ -94,6 +94,8 @@ require (
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
+	github.com/flyteorg/flytestdlib v1.0.22 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
@@ -211,10 +213,10 @@ require (
 retract v1.1.94
 
 replace (
-	github.com/flyteorg/datacatalog => ../datacatalog
-	github.com/flyteorg/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 )

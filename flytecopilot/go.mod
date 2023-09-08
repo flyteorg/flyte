@@ -1,9 +1,10 @@
-module github.com/flyteorg/flytecopilot
+module github.com/flyteorg/flyte/flytecopilot
 
 go 1.19
 
 require (
 	github.com/aws/aws-sdk-go v1.44.2
+	github.com/flyteorg/flytecopilot v0.0.33
 	github.com/flyteorg/flyteidl v1.3.6
 	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/fsnotify/fsnotify v1.5.1
@@ -105,9 +106,9 @@ require (
 )
 
 replace (
-	github.com/flyteorg/datacatalog => ../datacatalog
-	github.com/flyteorg/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 )

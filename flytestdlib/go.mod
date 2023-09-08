@@ -1,4 +1,4 @@
-module github.com/flyteorg/flytestdlib
+module github.com/flyteorg/flyte/flytestdlib
 
 go 1.19
 
@@ -106,9 +106,9 @@ require (
 )
 
 replace (
-	github.com/flyteorg/datacatalog => ../datacatalog
-	github.com/flyteorg/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyteplugins => ../flyteplugins
-	github.com/flyteorg/flytepropeller => ../flytepropeller
-	github.com/flyteorg/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 )
