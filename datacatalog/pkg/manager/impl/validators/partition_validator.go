@@ -3,7 +3,7 @@ package validators
 import (
 	"fmt"
 
-	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"google.golang.org/grpc/codes"
 )

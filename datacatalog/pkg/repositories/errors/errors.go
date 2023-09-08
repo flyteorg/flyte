@@ -2,8 +2,8 @@
 package errors
 
 import (
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 )

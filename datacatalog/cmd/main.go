@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/flyteorg/datacatalog/cmd/entrypoints"
+	"github.com/flyteorg/flyte/datacatalog/cmd/entrypoints"
 	"github.com/golang/glog"
 )
 
