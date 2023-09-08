@@ -997,8 +997,10 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
 	// This is to support artifact queries that depend on other inputs using the {{ .inputs.var }} construct.
 	var inputsForQueryTemplating = make(map[string]*core.Literal)
-	for k, v := range request.Inputs.Literals {
-		inputsForQueryTemplating[k] = v
+	if request.Inputs != nil {
+		for k, v := range request.Inputs.Literals {
+			inputsForQueryTemplating[k] = v
+		}
 	}
 	for k, v := range launchPlan.Spec.FixedInputs.Literals {
 		inputsForQueryTemplating[k] = v
