@@ -3,10 +3,10 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.51
-	github.com/flyteorg/flyteadmin v1.1.118
-	github.com/flyteorg/flytepropeller v1.1.116
-	github.com/flyteorg/flytestdlib v1.0.22
+	github.com/flyteorg/flyte/datacatalog v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.1.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -70,8 +70,10 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyteidl v1.5.14 // indirect
 	github.com/flyteorg/flyteplugins v1.1.16 // indirect
+	github.com/flyteorg/flytestdlib v1.0.22 // indirect
 	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -216,4 +218,11 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
+replace (
+	github.com/flyteorg/flyte/datacatalog => ./datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ./flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ./flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ./flytestdlib
+	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
+)
