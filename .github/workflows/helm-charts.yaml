@@ -1,6 +1,7 @@
 name: Package & Push Flyte Helm Charts
 
 on:
+  pull_request:
   push:
     branches:
       - master
@@ -28,8 +29,9 @@ jobs:
       - name: Publish Helm chart to GHCR
         working-directory: charts
         run: |
+          helm dep update ${{ matrix.chart }}
           helm package \
             --app-version=${{ github.sha }} \
             --version=0.0-${{ github.sha }} \
             ${{ matrix.chart }}
-          helm push ${{ matrix.chart }}-*.tgz oci://ghcr.io/flyteorg/helm-charts
+#          helm push ${{ matrix.chart }}-*.tgz oci://ghcr.io/flyteorg/helm-charts
