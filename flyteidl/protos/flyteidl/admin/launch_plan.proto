@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/security.proto";
+import "flyteidl/admin/schedule.proto";
+import "flyteidl/admin/common.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
+// to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
+// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
+message LaunchPlanCreateRequest {
+    // Uniquely identifies a launch plan entity.
+    core.Identifier id = 1;
+
+    // User-provided launch plan details, including reference workflow, inputs and other metadata.
+    LaunchPlanSpec spec = 2;
+}
+
+message LaunchPlanCreateResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// By default any launch plan regardless of state can be used to launch a workflow execution.
+// However, at most one version of a launch plan
+// (e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be
+// active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier
+// group will be observed and trigger executions at a defined cadence.
+enum LaunchPlanState {
+    INACTIVE = 0;
+    ACTIVE = 1;
+}
+
+// A LaunchPlan provides the capability to templatize workflow executions.
+// Launch plans simplify associating one or more schedules, inputs and notifications with your workflows.
+// Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
+// definition doesn't necessarily have a default value for said input.
+message LaunchPlan {
+    // Uniquely identifies a launch plan entity.
+    core.Identifier id = 1;
+
+    // User-provided launch plan details, including reference workflow, inputs and other metadata.
+    LaunchPlanSpec spec = 2;
+
+    // Values computed by the flyte platform after launch plan registration.
+    LaunchPlanClosure closure = 3;
+}
+
+// Response object for list launch plan requests.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+message LaunchPlanList {
+    repeated LaunchPlan launch_plans = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token = 2;
+}
+
+// Defines permissions associated with executions created by this launch plan spec.
+// Use either of these roles when they have permissions required by your workflow execution.
+// Deprecated.
+message Auth {
+    option deprecated = true;
+
+    // Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+    string assumable_iam_role = 1;
+
+    // Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+    string kubernetes_service_account = 2;
+}
+
+// User-provided launch plan definition and configuration values.
+message LaunchPlanSpec {
+    // Reference to the Workflow template that the launch plan references
+    core.Identifier workflow_id = 1;
+
+    // Metadata for the Launch Plan
+    LaunchPlanMetadata entity_metadata = 2;
+
+    // Input values to be passed for the execution.
+    // These can be overriden when an execution is created with this launch plan.
+    core.ParameterMap default_inputs = 3;
+
+    // Fixed, non-overridable inputs for the Launch Plan.
+    // These can not be overriden when an execution is created with this launch plan.
+    core.LiteralMap fixed_inputs = 4;
+
+    // String to indicate the role to use to execute the workflow underneath
+    string role = 5 [deprecated = true];
+
+    // Custom labels to be applied to the execution resource.
+    Labels labels = 6;
+
+    // Custom annotations to be applied to the execution resource.
+    Annotations annotations = 7;
+
+    // Indicates the permission associated with workflow executions triggered with this launch plan.
+    Auth auth = 8 [deprecated = true];
+
+    AuthRole auth_role = 9 [deprecated = true];
+
+    // Indicates security context for permissions triggered with this launch plan
+    core.SecurityContext security_context = 10;
+
+    // Indicates the runtime priority of the execution.
+    core.QualityOfService quality_of_service = 16;
+
+    // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+    RawOutputDataConfig raw_output_data_config = 17;
+
+    // Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+    // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+    // and parallelism/concurrency of MapTasks is independent from this.
+    int32 max_parallelism = 18;
+
+    // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    // Omitting this field uses the workflow's value as a default.
+    // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    // around the bool field.
+    google.protobuf.BoolValue interruptible = 19;
+
+    // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+    // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+    // data once execution finishes successfully.
+    bool overwrite_cache = 20;
+
+    // Environment variables to be set for the execution.
+    Envs envs = 21;
+}
+
+// Values computed by the flyte platform after launch plan registration.
+// These include expected_inputs required to be present in a CreateExecutionRequest
+// to launch the reference workflow as well timestamp values associated with the launch plan.
+message LaunchPlanClosure {
+    // Indicate the Launch plan state. 
+    LaunchPlanState state = 1;
+
+    // Indicates the set of inputs expected when creating an execution with the Launch plan
+    core.ParameterMap expected_inputs = 2;
+
+    // Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
+    core.VariableMap expected_outputs = 3;
+
+    // Time at which the launch plan was created.
+    google.protobuf.Timestamp created_at = 4;
+
+    // Time at which the launch plan was last updated.
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+// Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
+// the reference workflow.
+message LaunchPlanMetadata {
+    // Schedule to execute the Launch Plan
+    Schedule schedule = 1;
+
+    // List of notifications based on Execution status transitions
+    repeated Notification notifications = 2;
+}
+
+// Request to set the referenced launch plan state to the configured value.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+message LaunchPlanUpdateRequest {
+    // Identifier of launch plan for which to change state.
+    // +required.
+    core.Identifier id = 1;
+
+    // Desired state to apply to the launch plan.
+    // +required.
+    LaunchPlanState state = 2;
+}
+
+// Purposefully empty, may be populated in the future.
+message LaunchPlanUpdateResponse {
+}
+
+// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+message ActiveLaunchPlanRequest {
+    // +required.
+    NamedEntityIdentifier id = 1;
+}
+
+// Represents a request structure to list active launch plans within a project/domain.
+// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+message ActiveLaunchPlanListRequest {
+    // Name of the project that contains the identifiers.
+    // +required.
+    string project = 1;
+
+    // Name of the domain the identifiers belongs to within the project.
+    // +required.
+    string domain = 2;
+
+    // Indicates the number of resources to be returned.
+    // +required.
+    uint32 limit = 3;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by = 5;
+}

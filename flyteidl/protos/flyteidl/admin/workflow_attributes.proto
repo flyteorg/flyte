@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+
+// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message WorkflowAttributes {
+    // Unique project id for which this set of attributes will be applied.
+    string project                 = 1;
+
+    // Unique domain id for which this set of attributes will be applied.
+    string domain                  = 2;
+
+    // Workflow name for which this set of attributes will be applied.
+    string workflow                = 3;
+
+    MatchingAttributes matching_attributes = 4;
+}
+
+// Sets custom attributes for a project, domain and workflow combination.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message WorkflowAttributesUpdateRequest {
+    WorkflowAttributes attributes = 1;
+}
+
+// Purposefully empty, may be populated in the future.
+message WorkflowAttributesUpdateResponse {
+}
+
+// Request to get an individual workflow attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message WorkflowAttributesGetRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    // +required
+    string domain                  = 2;
+
+    // Workflow name which this set of attributes references.
+    // +required
+    string workflow                = 3;
+
+    // Which type of matchable attributes to return.
+    // +required
+    MatchableResource resource_type = 4;
+}
+
+// Response to get an individual workflow attribute override.
+message WorkflowAttributesGetResponse {
+    WorkflowAttributes attributes = 1;
+}
+
+// Request to delete a set matchable workflow attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message WorkflowAttributesDeleteRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    // +required
+    string domain                  = 2;
+
+    // Workflow name which this set of attributes references.
+    // +required
+    string workflow                = 3;
+
+    // Which type of matchable attributes to delete.
+    // +required
+    MatchableResource resource_type = 4;
+}
+
+// Purposefully empty, may be populated in the future.
+message WorkflowAttributesDeleteResponse {
+}

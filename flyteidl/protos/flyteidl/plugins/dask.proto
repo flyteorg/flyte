@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "flyteidl/core/tasks.proto";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+
+// Custom Proto for Dask Plugin.
+message DaskJob {
+    // Spec for the scheduler pod.
+    DaskScheduler scheduler = 1; 
+
+    // Spec of the default worker group.
+    DaskWorkerGroup workers = 2;
+}
+
+// Specification for the scheduler pod.
+message DaskScheduler {
+    // Optional image to use. If unset, will use the default image.
+    string image = 1;
+
+    // Resources assigned to the scheduler pod.
+    core.Resources resources = 2;
+}
+
+message DaskWorkerGroup {
+    // Number of workers in the group.
+    uint32 number_of_workers = 1;
+
+    // Optional image to use for the pods of the worker group. If unset, will use the default image.
+    string image = 2;
+    
+    // Resources assigned to the all pods of the worker group.
+    // As per https://kubernetes.dask.org/en/latest/kubecluster.html?highlight=limit#best-practices 
+    // it is advised to only set limits. If requests are not explicitly set, the plugin will make
+    // sure to set requests==limits.
+    // The plugin sets ` --memory-limit` as well as `--nthreads` for the workers according to the limit.
+    core.Resources resources = 3;
+}
