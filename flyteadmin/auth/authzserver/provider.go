@@ -19,7 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
 	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"

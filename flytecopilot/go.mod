@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/aws/aws-sdk-go v1.44.2
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flytecopilot v0.0.33
 	github.com/flyteorg/flyteidl v1.3.6
-	github.com/flyteorg/flytestdlib v1.0.15
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.5.3
@@ -43,6 +43,7 @@ require (
 	github.com/coocood/freecache v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/flyteorg/flytestdlib v1.0.15 // indirect
 	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
@@ -111,4 +112,5 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyteidl => ../flyteidl
 )

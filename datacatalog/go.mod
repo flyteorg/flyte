@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyteidl v1.3.6
+	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/glog v1.1.0
 	github.com/golang/protobuf v1.5.3
@@ -112,4 +112,5 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyteidl => ../flyteidl
 )
