@@ -12,6 +12,7 @@ WORKDIR /flyteorg/build
 
 COPY datacatalog datacatalog
 COPY flyteadmin flyteadmin
+COPY flyteidl flyteidl
 COPY flyteplugins flyteplugins
 COPY flytepropeller flytepropeller
 COPY flytestdlib flytestdlib
