@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/common.proto";
+import "flyteidl/admin/cluster_assignment.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/security.proto";
+import "google/protobuf/wrappers.proto";
+
+// Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
+// based on matching tags.
+enum MatchableResource {
+  // Applies to customizable task resource requests and limits.
+  TASK_RESOURCE = 0;
+
+  // Applies to configuring templated kubernetes cluster resources.
+  CLUSTER_RESOURCE = 1;
+
+  // Configures task and dynamic task execution queue assignment.
+  EXECUTION_QUEUE = 2;
+
+  // Configures the K8s cluster label to be used for execution to be run
+  EXECUTION_CLUSTER_LABEL = 3;
+
+  // Configures default quality of service when undefined in an execution spec.
+  QUALITY_OF_SERVICE_SPECIFICATION = 4;
+
+  // Selects configurable plugin implementation behavior for a given task type.
+  PLUGIN_OVERRIDE = 5;
+
+  // Adds defaults for customizable workflow-execution specifications and overrides.
+  WORKFLOW_EXECUTION_CONFIG = 6;
+
+  // Controls how to select an available cluster on which this execution should run.
+  CLUSTER_ASSIGNMENT = 7;
+}
+
+// Defines a set of overridable task resource attributes set during task registration.
+message TaskResourceSpec {
+  string cpu = 1;
+
+  string gpu = 2;
+
+  string memory = 3;
+
+  string storage = 4;  
+
+  string ephemeral_storage = 5;
+}
+
+// Defines task resource defaults and limits that will be applied at task registration.
+message TaskResourceAttributes {
+  TaskResourceSpec defaults = 1;
+
+  TaskResourceSpec limits = 2;
+}
+
+message ClusterResourceAttributes {
+  // Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
+  // Map keys are the *case-sensitive* names of variables in templatized resource files.
+  // Map values should be the custom values which get substituted during resource creation.
+  map<string, string> attributes = 1;
+}
+
+message ExecutionQueueAttributes {
+  // Tags used for assigning execution queues for tasks defined within this project.
+  repeated string tags           = 1; 
+}
+
+message ExecutionClusterLabel {
+  // Label value to determine where the execution will be run
+  string value	= 1;
+}
+
+// This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
+// In addition to an override implementation a selection of fallbacks can be provided or other modes
+// for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
+message PluginOverride {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+
+  // A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+  repeated string plugin_id = 2;
+
+  enum MissingPluginBehavior {
+    // By default, if this plugin is not enabled for a Flyte deployment then execution will fail.
+    FAIL = 0;
+
+    // Uses the system-configured default implementation.
+    USE_DEFAULT = 1;
+  }
+  
+  // Defines the behavior when no plugin from the plugin_id list is not found.
+  MissingPluginBehavior missing_plugin_behavior = 4;
+}
+
+
+message PluginOverrides {
+  repeated PluginOverride overrides = 1;
+}
+
+// Adds defaults for customizable workflow-execution specifications and overrides.
+message WorkflowExecutionConfig {
+  // Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
+  int32 max_parallelism = 1;
+
+  // Indicates security context permissions for executions triggered with this matchable attribute. 
+  core.SecurityContext security_context = 2;
+
+  // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+  RawOutputDataConfig raw_output_data_config = 3;
+
+  // Custom labels to be applied to a triggered execution resource.
+  Labels labels = 4;
+
+  // Custom annotations to be applied to a triggered execution resource.
+  Annotations annotations = 5;
+
+  // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+  // Omitting this field uses the workflow's value as a default.
+  // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+  // around the bool field.
+  google.protobuf.BoolValue interruptible = 6;
+
+  // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+  // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+  // data once execution finishes successfully.
+  bool overwrite_cache = 7;
+
+  // Environment variables to be set for the execution.
+  Envs envs = 8;
+}
+
+// Generic container for encapsulating all types of the above attributes messages.
+message MatchingAttributes {
+  oneof target {
+    TaskResourceAttributes task_resource_attributes = 1; 
+
+    ClusterResourceAttributes cluster_resource_attributes = 2; 
+
+    ExecutionQueueAttributes execution_queue_attributes = 3;
+
+    ExecutionClusterLabel execution_cluster_label = 4;
+
+    core.QualityOfService quality_of_service = 5;
+
+    PluginOverrides plugin_overrides = 6;
+
+    WorkflowExecutionConfig workflow_execution_config = 7;
+
+    ClusterAssignment cluster_assignment = 8;
+  }
+}
+
+// Represents a custom set of attributes applied for either a domain; a domain and project; or
+// domain, project and workflow name.
+// These are used to override system level defaults for kubernetes cluster resource management,
+// default execution values, and more all across different levels of specificity.
+message MatchableAttributesConfiguration {
+    MatchingAttributes attributes = 1;
+
+    string domain = 2;
+
+    string project = 3;
+
+    string workflow = 4;
+
+    string launch_plan = 5;
+}
+
+// Request all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
+message ListMatchableAttributesRequest {
+    // +required
+    MatchableResource resource_type = 1;
+}
+
+// Response for a request for all matching resource attributes for a resource type.
+// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
+message ListMatchableAttributesResponse {
+    repeated MatchableAttributesConfiguration configurations = 1;
+}

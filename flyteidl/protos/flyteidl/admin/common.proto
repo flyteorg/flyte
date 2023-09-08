@@ -1,0 +1,319 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+import "google/protobuf/timestamp.proto";
+
+// Encapsulation of fields that identifies a Flyte resource.
+// A Flyte resource can be a task, workflow or launch plan.
+// A resource can internally have multiple versions and is uniquely identified
+// by project, domain, and name.
+message NamedEntityIdentifier {
+    // Name of the project the resource belongs to.
+    string project = 1;
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain = 2;
+    // User provided value for the resource.
+    // The combination of project + domain + name uniquely identifies the resource.
+    // +optional - in certain contexts - like 'List API', 'Launch plans'
+    string name = 3;
+}
+
+// The status of the named entity is used to control its visibility in the UI.
+enum NamedEntityState {
+    // By default, all named entities are considered active and under development.
+    NAMED_ENTITY_ACTIVE = 0;
+
+    // Archived named entities are no longer visible in the UI.
+    NAMED_ENTITY_ARCHIVED = 1;
+
+    // System generated entities that aren't explicitly created or managed by a user.
+    SYSTEM_GENERATED = 2;
+}
+
+// Additional metadata around a named entity.
+message NamedEntityMetadata {
+    // Common description across all versions of the entity
+    // +optional
+    string description = 1;
+
+    // Shared state across all version of the entity
+    // At this point in time, only workflow entities can have their state archived.
+    NamedEntityState state = 2;
+}
+
+// Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
+// workflow or launch plan. A NamedEntity is exclusively identified by its resource type
+// and identifier.
+message NamedEntity {
+    // Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+    flyteidl.core.ResourceType resource_type = 1;
+    NamedEntityIdentifier id = 2;
+
+    // Additional metadata around a named entity.
+    NamedEntityMetadata metadata = 3;
+}
+
+// Specifies sort ordering in a list request.
+message Sort {
+    enum Direction {
+
+        // By default, fields are sorted in descending order.
+        DESCENDING = 0;
+        ASCENDING = 1;
+    }
+    // Indicates an attribute to sort the response values.
+    // +required
+    string key = 1;
+
+    // Indicates the direction to apply sort key for response values.
+    // +optional
+    Direction direction = 2;
+}
+
+// Represents a request structure to list NamedEntityIdentifiers.
+message NamedEntityIdentifierListRequest {
+    // Name of the project that contains the identifiers.
+    // +required
+    string project = 1;
+
+    // Name of the domain the identifiers belongs to within the project.
+    // +required
+    string domain = 2;
+
+    // Indicates the number of resources to be returned.
+    // +required
+    uint32 limit = 3;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token = 4;
+
+    // Specifies how listed entities should be sorted in the response.
+    // +optional
+    Sort sort_by = 5;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters = 6;
+}
+
+// Represents a request structure to list NamedEntity objects
+message NamedEntityListRequest {
+    // Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+    // +required
+    flyteidl.core.ResourceType resource_type = 1;
+    // Name of the project that contains the identifiers.
+    // +required
+    string project = 2;
+    // Name of the domain the identifiers belongs to within the project.
+    string domain = 3;
+    // Indicates the number of resources to be returned.
+    uint32 limit = 4;
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token = 5;
+
+    // Specifies how listed entities should be sorted in the response.
+    // +optional
+    Sort sort_by = 6;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters = 7;
+
+}
+
+// Represents a list of NamedEntityIdentifiers.
+message NamedEntityIdentifierList {
+    // A list of identifiers.
+    repeated NamedEntityIdentifier entities = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token = 2;
+}
+
+// Represents a list of NamedEntityIdentifiers.
+message NamedEntityList {
+    // A list of NamedEntity objects
+    repeated NamedEntity entities = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token = 2;
+}
+
+// A request to retrieve the metadata associated with a NamedEntityIdentifier
+message NamedEntityGetRequest {
+    // Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+    // +required
+    flyteidl.core.ResourceType resource_type = 1;
+
+    // The identifier for the named entity for which to fetch metadata.
+    // +required
+    NamedEntityIdentifier id = 2;
+}
+
+// Request to set the referenced named entity state to the configured value.
+message NamedEntityUpdateRequest {
+    // Resource type of the metadata to update
+    // +required
+    flyteidl.core.ResourceType resource_type = 1;
+
+    // Identifier of the metadata to update
+    // +required
+    NamedEntityIdentifier id = 2;
+
+    // Metadata object to set as the new value
+    // +required
+    NamedEntityMetadata metadata = 3;
+}
+
+// Purposefully empty, may be populated in the future.
+message NamedEntityUpdateResponse {
+}
+
+// Shared request structure to fetch a single resource.
+// Resources include: Task, Workflow, LaunchPlan
+message ObjectGetRequest {
+    // Indicates a unique version of resource.
+    // +required
+    core.Identifier id = 1;
+}
+
+// Shared request structure to retrieve a list of resources.
+// Resources include: Task, Workflow, LaunchPlan
+message ResourceListRequest {
+    // id represents the unique identifier of the resource.
+    // +required
+    NamedEntityIdentifier id = 1;
+
+    // Indicates the number of resources to be returned.
+    // +required
+    uint32 limit = 2;
+
+    // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token = 3;
+
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by = 5;
+}
+
+// Defines an email notification specification.
+message EmailNotification {
+    // The list of email addresses recipients for this notification.
+    // +required
+    repeated string recipients_email = 1;
+}
+
+// Defines a pager duty notification specification.
+message PagerDutyNotification {
+    // Currently, PagerDuty notifications leverage email to trigger a notification.
+    // +required
+    repeated string recipients_email = 1;
+}
+
+// Defines a slack notification specification.
+message SlackNotification {
+    // Currently, Slack notifications leverage email to trigger a notification.
+    // +required
+    repeated string recipients_email = 1;
+}
+
+// Represents a structure for notifications based on execution status.
+// The notification content is configured within flyte admin but can be templatized.
+// Future iterations could expose configuring notifications with custom content.
+message Notification {
+    // A list of phases to which users can associate the notifications to.
+    // +required
+    repeated core.WorkflowExecution.Phase phases = 1;
+
+    // The type of notification to trigger.
+    // +required
+    oneof type {
+        EmailNotification email = 2;
+        PagerDutyNotification pager_duty = 3;
+        SlackNotification slack = 4;
+    }
+
+}
+
+// Represents a string url and associated metadata used throughout the platform.
+message UrlBlob {
+    option deprecated = true;
+
+    // Actual url value.
+    string url = 1;
+
+    // Represents the size of the file accessible at the above url.
+    int64 bytes = 2;
+}
+
+// Label values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge labels defined at registration and execution time.
+message Labels {
+    // Map of custom labels to be applied to the execution resource.
+    map<string, string> values = 1;
+}
+
+// Annotation values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge annotations defined at registration and execution time.
+message Annotations {
+    // Map of custom annotations to be applied to the execution resource.
+    map<string, string> values = 1;
+}
+
+// Environment variable values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge environment variables defined at registration and execution time.
+message Envs {
+    // Map of custom environment variables to be applied to the execution resource.
+    repeated flyteidl.core.KeyValuePair values = 1;
+}
+
+// Defines permissions associated with executions created by this launch plan spec.
+// Use either of these roles when they have permissions required by your workflow execution.
+// Deprecated.
+message AuthRole {
+    option deprecated = true;
+
+    // Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+    string assumable_iam_role = 1;
+
+    // Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+    string kubernetes_service_account = 2;
+}
+
+
+// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+// See https://github.com/flyteorg/flyte/issues/211 for more background information.
+message RawOutputDataConfig {
+    // Prefix for where offloaded data from user workflows will be written
+    // e.g. s3://bucket/key or s3://bucket/
+    string output_location_prefix = 1;
+}
+
+// These URLs are returned as part of node and task execution data requests.
+message FlyteURLs {
+    string inputs      = 1;
+    string outputs     = 2;
+    string deck        = 3;
+}

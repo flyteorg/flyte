@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+
+// Defines a set of custom matching attributes at the project level.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectAttributes {
+    // Unique project id for which this set of attributes will be applied.
+    string project = 1;
+
+    MatchingAttributes matching_attributes = 2;
+}
+
+// Sets custom attributes for a project
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectAttributesUpdateRequest {
+    // +required
+    ProjectAttributes attributes = 1;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectAttributesUpdateResponse {
+}
+
+// Request to get an individual project level attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectAttributesGetRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project = 1;
+
+    // Which type of matchable attributes to return.
+    // +required
+    MatchableResource resource_type = 2;
+}
+
+// Response to get an individual project level attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectAttributesGetResponse {
+  ProjectAttributes attributes = 1;
+}
+
+// Request to delete a set matchable project level attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectAttributesDeleteRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project = 1;
+
+    // Which type of matchable attributes to delete.
+    // +required
+    MatchableResource resource_type = 2;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectAttributesDeleteResponse {
+}

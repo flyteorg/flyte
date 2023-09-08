@@ -1,0 +1,639 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+import "flyteidl/admin/project.proto";
+import "flyteidl/admin/project_domain_attributes.proto";
+import "flyteidl/admin/project_attributes.proto";
+import "flyteidl/admin/task.proto";
+import "flyteidl/admin/workflow.proto";
+import "flyteidl/admin/workflow_attributes.proto";
+import "flyteidl/admin/launch_plan.proto";
+import "flyteidl/admin/event.proto";
+import "flyteidl/admin/execution.proto";
+import "flyteidl/admin/matchable_resource.proto";
+import "flyteidl/admin/node_execution.proto";
+import "flyteidl/admin/task_execution.proto";
+import "flyteidl/admin/version.proto";
+import "flyteidl/admin/common.proto";
+import "flyteidl/admin/description_entity.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+
+// The following defines an RPC service that is also served over HTTP via grpc-gateway.
+// Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
+service AdminService {
+  // Create and upload a :ref:`ref_flyteidl.admin.Task` definition
+  rpc CreateTask (flyteidl.admin.TaskCreateRequest) returns (flyteidl.admin.TaskCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create and register a task definition."
+    //   responses: {
+    //     key: "400"
+    //     value: {
+    //       description: "Returned for bad request that may have failed validation."
+    //     }
+    //   }
+    //   responses: {
+    //     key: "409"
+    //     value: {
+    //       description: "Returned for a request that references an identical entity that has already been registered."
+    //     }
+    //   }
+    // };
+  }
+
+  // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
+  rpc GetTask (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Task) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing task definition."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+  rpc ListTaskIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/task_ids/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing task definition identifiers matching input filters."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+  rpc ListTasks (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.TaskList) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/tasks/{id.project}/{id.domain}"
+      }
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing task definitions matching input filters."
+    // };
+  }
+
+  // Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
+  rpc CreateWorkflow (flyteidl.admin.WorkflowCreateRequest) returns (flyteidl.admin.WorkflowCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/workflows"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create and register a workflow definition."
+    //   responses: {
+    //     key: "400"
+    //     value: {
+    //       description: "Returned for bad request that may have failed validation."
+    //     }
+    //   }
+    //   responses: {
+    //     key: "409"
+    //     value: {
+    //       description: "Returned for a request that references an identical entity that has already been registered."
+    //     }
+    //   }
+    // };
+  }
+
+  // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
+  rpc GetWorkflow (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Workflow) {
+    option (google.api.http) = {
+      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing workflow definition."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
+  rpc ListWorkflowIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/workflow_ids/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch an existing workflow definition identifiers matching input filters."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+  rpc ListWorkflows (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.WorkflowList) {
+    option (google.api.http) = {
+      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/workflows/{id.project}/{id.domain}"
+      }
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing workflow definitions matching input filters."
+    // };
+  }
+
+  // Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
+  rpc CreateLaunchPlan (flyteidl.admin.LaunchPlanCreateRequest) returns (flyteidl.admin.LaunchPlanCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/launch_plans"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create and register a launch plan definition."
+    //   responses: {
+    //     key: "400"
+    //     value: {
+    //       description: "Returned for bad request that may have failed validation."
+    //     }
+    //   }
+    //   responses: {
+    //     key: "409"
+    //     value: {
+    //       description: "Returned for a request that references an identical entity that has already been registered."
+    //     }
+    //   }
+    // };
+  }
+
+  // Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
+  rpc GetLaunchPlan (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.LaunchPlan) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing launch plan definition."
+    // };
+  }
+
+  // Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
+  rpc GetActiveLaunchPlan (flyteidl.admin.ActiveLaunchPlanRequest) returns (flyteidl.admin.LaunchPlan) {
+    option (google.api.http) = {
+      get: "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve the active launch plan version specified by input request filters."
+    // };
+  }
+
+  // List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
+  rpc ListActiveLaunchPlans (flyteidl.admin.ActiveLaunchPlanListRequest) returns (flyteidl.admin.LaunchPlanList) {
+    option (google.api.http) = {
+      get: "/api/v1/active_launch_plans/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch the active launch plan versions specified by input request filters."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
+  rpc ListLaunchPlanIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plan_ids/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing launch plan definition identifiers matching input filters."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+  rpc ListLaunchPlans (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.LaunchPlanList) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/launch_plans/{id.project}/{id.domain}"
+      }
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing launch plan definitions matching input filters."
+    // };
+  }
+
+  // Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
+  rpc UpdateLaunchPlan (flyteidl.admin.LaunchPlanUpdateRequest) returns (flyteidl.admin.LaunchPlanUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update the status of an existing launch plan definition. "
+    //   "At most one launch plan version for a given {project, domain, name} can be active at a time. "
+    //   "If this call sets a launch plan to active and existing version is already active, the result of this call will be that the "
+    //   "formerly active launch plan will be made inactive and specified launch plan in this request will be made active. "
+    //   "In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. "
+    //   "If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled."
+    // };
+  }
+
+  // Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
+  rpc CreateExecution (flyteidl.admin.ExecutionCreateRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create a workflow execution."
+    // };
+  }
+
+  // Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
+  rpc RelaunchExecution (flyteidl.admin.ExecutionRelaunchRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions/relaunch"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Relaunch a workflow execution."
+    // };
+  }
+
+  // Recreates a previously-run workflow execution that will only start executing from the last known failure point.
+  // In Recover mode, users cannot change any input parameters or update the version of the execution.
+  // This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,
+  // downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.
+  // See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
+  rpc RecoverExecution (flyteidl.admin.ExecutionRecoverRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions/recover"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Recreates a previously-run workflow execution that will only start executing from the last known failure point. "
+    //   "In Recover mode, users cannot change any input parameters or update the version of the execution. "
+    //   "This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, "
+    //   "downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again."
+
+    // };
+  }
+
+  // Fetches a :ref:`ref_flyteidl.admin.Execution`.
+  rpc GetExecution (flyteidl.admin.WorkflowExecutionGetRequest) returns (flyteidl.admin.Execution) {
+    option (google.api.http) = {
+      get: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing workflow execution."
+    // };
+  }
+
+  // Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.
+  rpc UpdateExecution (flyteidl.admin.ExecutionUpdateRequest) returns (flyteidl.admin.ExecutionUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update execution belonging to project domain."
+    // };
+  }
+
+  // Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.
+  rpc GetExecutionData (flyteidl.admin.WorkflowExecutionGetDataRequest) returns (flyteidl.admin.WorkflowExecutionGetDataResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve input and output data from an existing workflow execution."
+    // };
+  };
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.Execution`.
+  rpc ListExecutions (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.ExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/executions/{id.project}/{id.domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing workflow executions matching input filters."
+    // };
+  }
+
+  // Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.
+  rpc TerminateExecution (flyteidl.admin.ExecutionTerminateRequest) returns (flyteidl.admin.ExecutionTerminateResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Terminate the active workflow execution specified in the request."
+    // };
+  }
+
+  // Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
+  rpc GetNodeExecution (flyteidl.admin.NodeExecutionGetRequest) returns (flyteidl.admin.NodeExecution) {
+    option (google.api.http) = {
+      get: "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing node execution."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
+  rpc ListNodeExecutions (flyteidl.admin.NodeExecutionListRequest) returns (flyteidl.admin.NodeExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing node executions matching input filters."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc ListNodeExecutionsForTask (flyteidl.admin.NodeExecutionForTaskListRequest) returns (flyteidl.admin.NodeExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch child node executions launched by the specified task execution."
+    // };
+  }
+
+  // Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
+  rpc GetNodeExecutionData (flyteidl.admin.NodeExecutionGetDataRequest) returns (flyteidl.admin.NodeExecutionGetDataResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve input and output data from an existing node execution."
+    // };
+  };
+
+  // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
+  rpc RegisterProject (flyteidl.admin.ProjectRegisterRequest) returns (flyteidl.admin.ProjectRegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/projects"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Register a project."
+    // };
+  }
+
+  // Updates an existing :ref:`ref_flyteidl.admin.Project` 
+  // flyteidl.admin.Project should be passed but the domains property should be empty;
+  // it will be ignored in the handler as domains cannot be updated via this API.
+  rpc UpdateProject (flyteidl.admin.Project) returns (flyteidl.admin.ProjectUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/projects/{id}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update a project."
+    // };
+  }
+
+  // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+  rpc ListProjects (flyteidl.admin.ProjectListRequest) returns (flyteidl.admin.Projects) {
+    option (google.api.http) = {
+      get:  "/api/v1/projects"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch registered projects."
+    // };
+  }
+
+  // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
+  rpc CreateWorkflowEvent (flyteidl.admin.WorkflowExecutionEventRequest) returns (flyteidl.admin.WorkflowExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/workflows"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create a workflow execution event recording a phase transition."
+    // };
+  }
+
+  // Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
+  rpc CreateNodeEvent (flyteidl.admin.NodeExecutionEventRequest) returns (flyteidl.admin.NodeExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/nodes"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create a node execution event recording a phase transition."
+    // };
+  }
+
+  // Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.
+  rpc CreateTaskEvent (flyteidl.admin.TaskExecutionEventRequest) returns (flyteidl.admin.TaskExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/tasks"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Create a task execution event recording a phase transition."
+    // };
+  }
+
+  // Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc GetTaskExecution (flyteidl.admin.TaskExecutionGetRequest) returns (flyteidl.admin.TaskExecution) {
+    option (google.api.http) = {
+        get: "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing task execution."
+    // };
+  }
+
+  // Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc ListTaskExecutions (flyteidl.admin.TaskExecutionListRequest) returns (flyteidl.admin.TaskExecutionList) {
+    option (google.api.http) = {
+        get: "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing task executions matching input filters."
+    // };
+
+  }
+
+  // Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc GetTaskExecutionData (flyteidl.admin.TaskExecutionGetDataRequest) returns (flyteidl.admin.TaskExecutionGetDataResponse) {
+    option (google.api.http) = {
+        get: "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve input and output data from an existing task execution."
+    // };
+  }
+
+  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update the customized resource attributes associated with a project-domain combination"
+    // };
+  }
+
+  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc GetProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesGetRequest) returns (flyteidl.admin.ProjectDomainAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/project_domain_attributes/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve the customized resource attributes associated with a project-domain combination"
+    // };
+  }
+
+  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc DeleteProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesDeleteRequest) returns (flyteidl.admin.ProjectDomainAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_domain_attributes/{project}/{domain}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Delete the customized resource attributes associated with a project-domain combination"
+    // };
+  }
+
+  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level
+  rpc UpdateProjectAttributes (flyteidl.admin.ProjectAttributesUpdateRequest) returns (flyteidl.admin.ProjectAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/project_attributes/{attributes.project}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update the customized resource attributes associated with a project"
+    // };
+  }
+
+  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/project_attributes/{project}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve the customized resource attributes associated with a project"
+    // };
+  }
+
+  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.
+  rpc DeleteProjectAttributes (flyteidl.admin.ProjectAttributesDeleteRequest) returns (flyteidl.admin.ProjectAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_attributes/{project}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Delete the customized resource attributes associated with a project"
+    // };
+  }
+  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+  rpc UpdateWorkflowAttributes (flyteidl.admin.WorkflowAttributesUpdateRequest) returns (flyteidl.admin.WorkflowAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update the customized resource attributes associated with a project, domain and workflow combination"
+    // };
+  }
+
+  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+  rpc GetWorkflowAttributes (flyteidl.admin.WorkflowAttributesGetRequest) returns (flyteidl.admin.WorkflowAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve the customized resource attributes associated with a project, domain and workflow combination"
+    // };
+  }
+
+  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
+  rpc DeleteWorkflowAttributes (flyteidl.admin.WorkflowAttributesDeleteRequest) returns (flyteidl.admin.WorkflowAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Delete the customized resource attributes associated with a project, domain and workflow combination"
+    // };
+  }
+
+  // Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.
+  rpc ListMatchableAttributes (flyteidl.admin.ListMatchableAttributesRequest) returns (flyteidl.admin.ListMatchableAttributesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matchable_attributes"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a list of MatchableAttributesConfiguration objects."
+    // };
+  }
+
+  // Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.
+  rpc ListNamedEntities (flyteidl.admin.NamedEntityListRequest) returns (flyteidl.admin.NamedEntityList) {
+    option (google.api.http) = {
+      get: "/api/v1/named_entities/{resource_type}/{project}/{domain}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain."
+    // };
+  }
+
+  // Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.
+  rpc GetNamedEntity (flyteidl.admin.NamedEntityGetRequest) returns (flyteidl.admin.NamedEntity) {
+    option (google.api.http) = {
+      get: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a NamedEntity object."
+    // };
+  }
+
+  // Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.
+  rpc UpdateNamedEntity (flyteidl.admin.NamedEntityUpdateRequest) returns (flyteidl.admin.NamedEntityUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Update the fields associated with a NamedEntity"
+    // };
+  }
+
+  rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.GetVersionResponse) {
+      option (google.api.http) = {
+        get: "/api/v1/version"
+      };
+      // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      //   description: "Retrieve the Version (including the Build  information) for FlyteAdmin service"
+      // };
+  }
+
+  // Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.
+  rpc GetDescriptionEntity (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.DescriptionEntity) {
+    option (google.api.http) = {
+      get: "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve an existing description entity description."
+    // };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.
+  rpc ListDescriptionEntities (flyteidl.admin.DescriptionEntityListRequest) returns (flyteidl.admin.DescriptionEntityList) {
+    option (google.api.http) = {
+      get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}"
+      }
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch existing description entity definitions matching input filters."
+    // };
+  }
+
+  // Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
+  rpc GetExecutionMetrics (flyteidl.admin.WorkflowExecutionGetMetricsRequest) returns (flyteidl.admin.WorkflowExecutionGetMetricsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve metrics from an existing workflow execution."
+    // };
+  };
+}

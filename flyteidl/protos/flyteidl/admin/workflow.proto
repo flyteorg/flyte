@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/compiler.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/workflow.proto";
+import "flyteidl/admin/description_entity.proto";
+import "google/protobuf/timestamp.proto";
+
+// Represents a request structure to create a revision of a workflow.
+// See :ref:`ref_flyteidl.admin.Workflow` for more details
+message WorkflowCreateRequest {
+    // id represents the unique identifier of the workflow.
+    // +required
+    core.Identifier id     = 1;
+    
+    // Represents the specification for workflow.
+    // +required
+    WorkflowSpec spec      = 2;
+}
+
+message WorkflowCreateResponse {
+    // Purposefully empty, may be populated in the future. 
+}
+
+// Represents the workflow structure stored in the Admin
+// A workflow is created by ordering tasks and associating outputs to inputs
+// in order to produce a directed-acyclic execution graph.
+message Workflow {
+    // id represents the unique identifier of the workflow.
+    core.Identifier id       = 1;
+    
+    // closure encapsulates all the fields that maps to a compiled version of the workflow.
+    WorkflowClosure closure  = 2;
+
+    // One-liner overview of the entity.
+    string short_description = 3;
+}
+
+// Represents a list of workflows returned from the admin.
+// See :ref:`ref_flyteidl.admin.Workflow` for more details
+message WorkflowList {
+    // A list of workflows returned based on the request.
+    repeated Workflow workflows = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                = 2;
+}
+
+// Represents a structure that encapsulates the specification of the workflow.
+message WorkflowSpec {
+    // Template of the task that encapsulates all the metadata of the workflow.
+    core.WorkflowTemplate template = 1;
+
+    // Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+    // propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+    // to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+    repeated core.WorkflowTemplate sub_workflows = 2;
+
+    // Represents the specification for description entity.
+    DescriptionEntity description        = 3;
+}
+
+// A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
+message WorkflowClosure {
+    // Represents the compiled representation of the workflow from the specification provided.
+    core.CompiledWorkflowClosure compiled_workflow = 1;
+
+    // Time at which the workflow was created.
+    google.protobuf.Timestamp created_at           = 2;
+}
+
+// The workflow id is already used and the structure is different
+message WorkflowErrorExistsDifferentStructure {
+    core.Identifier id = 1;
+}
+
+// The workflow id is already used with an identical sctructure
+message WorkflowErrorExistsIdenticalStructure {
+    core.Identifier id = 1;
+}
+
+// When a CreateWorkflowRequest failes due to matching id
+message CreateWorkflowFailureReason {
+    oneof reason {
+        WorkflowErrorExistsDifferentStructure exists_different_structure = 1;
+        WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;
+    }
+}

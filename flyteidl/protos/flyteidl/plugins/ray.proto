@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// RayJobSpec defines the desired state of RayJob
+message RayJob {
+  // RayClusterSpec is the cluster template to run the job
+  RayCluster ray_cluster = 1;
+  // runtime_env is base64 encoded.
+  // Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
+  string runtime_env = 2;
+}
+
+// Define Ray cluster defines the desired state of RayCluster
+message RayCluster {
+  // HeadGroupSpecs are the spec for the head pod
+  HeadGroupSpec head_group_spec = 1;
+  // WorkerGroupSpecs are the specs for the worker pods
+  repeated WorkerGroupSpec worker_group_spec = 2;
+}
+
+// HeadGroupSpec are the spec for the head pod
+message HeadGroupSpec {
+  // Optional. RayStartParams are the params of the start command: address, object-store-memory.
+  // Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start
+  map<string, string> ray_start_params = 1;
+}
+
+// WorkerGroupSpec are the specs for the worker pods
+message WorkerGroupSpec {
+  // Required. RayCluster can have multiple worker groups, and it distinguishes them by name
+  string group_name = 1;
+  // Required. Desired replicas of the worker group. Defaults to 1.
+  int32 replicas = 2;
+  // Optional. Min replicas of the worker group. MinReplicas defaults to 1.
+  int32 min_replicas = 3;
+  // Optional. Max replicas of the worker group. MaxReplicas defaults to maxInt32
+  int32 max_replicas = 4;
+  // Optional. RayStartParams are the params of the start command: address, object-store-memory.
+  // Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start
+  map<string, string> ray_start_params = 5;
+}
