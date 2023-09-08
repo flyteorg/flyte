@@ -1,0 +1,412 @@
+syntax = "proto3";
+
+package datacatalog;
+
+import "flyteidl/core/literals.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog";
+
+/*
+ * Data Catalog service definition
+ * Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
+ * Artifacts are associated with a Dataset, and can be tagged for retrieval.
+ */
+service DataCatalog {
+    // Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+    // Each dataset can have one or more artifacts
+    rpc CreateDataset (CreateDatasetRequest) returns (CreateDatasetResponse);
+
+    // Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
+    rpc GetDataset (GetDatasetRequest) returns (GetDatasetResponse);
+
+    // Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+    // files or data values
+    rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
+
+    // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
+    rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
+
+    // Associate a tag with an artifact. Tags are unique within a Dataset.
+    rpc AddTag (AddTagRequest) returns (AddTagResponse);
+
+    // Return a paginated list of artifacts
+    rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse);
+
+    // Return a paginated list of datasets
+    rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
+
+    // Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
+    rpc UpdateArtifact (UpdateArtifactRequest) returns (UpdateArtifactResponse);
+
+    // Attempts to get or extend a reservation for the corresponding artifact. If one already exists
+    // (ie. another entity owns the reservation) then that reservation is retrieved.
+    // Once you acquire a reservation, you need to  periodically extend the reservation with an
+    // identical call. If the reservation is not extended before the defined expiration, it may be
+    // acquired by another task.
+    // Note: We may have multiple concurrent tasks with the same signature and the same input that
+    // try to populate the same artifact at the same time. Thus with reservation, only one task can
+    // run at a time, until the reservation expires.
+    // Note: If task A does not extend the reservation in time and the reservation expires, another
+    // task B may take over the reservation, resulting in two tasks A and B running in parallel. So
+    // a third task C may get the Artifact from A or B, whichever writes last.
+    rpc GetOrExtendReservation (GetOrExtendReservationRequest) returns (GetOrExtendReservationResponse);
+
+    // Release the reservation when the task holding the spot fails so that the other tasks
+    // can grab the spot.
+    rpc ReleaseReservation (ReleaseReservationRequest) returns (ReleaseReservationResponse);
+}
+
+/*
+ * Request message for creating a Dataset.
+ */
+message CreateDatasetRequest {
+    Dataset dataset = 1;
+}
+
+/*
+ * Response message for creating a Dataset
+ */
+message CreateDatasetResponse {
+
+}
+
+/*
+ * Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
+ * which is a combination of several fields.
+ */
+message GetDatasetRequest {
+    DatasetID dataset = 1;
+}
+
+/*
+ * Response message for retrieving a Dataset. The response will include the metadata for the
+ * Dataset.
+ */
+message GetDatasetResponse {
+    Dataset dataset = 1;
+}
+
+/*
+ * Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
+ * can be one of artifact_id or tag. The result returned will include the artifact data and metadata
+ * associated with the artifact.
+ */
+message GetArtifactRequest {
+    DatasetID dataset = 1;
+
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+}
+
+/*
+ * Response message for retrieving an Artifact. The result returned will include the artifact data
+ * and metadata associated with the artifact.
+ */
+message GetArtifactResponse {
+    Artifact artifact = 1;
+}
+
+/*
+ * Request message for creating an Artifact and its associated artifact Data.
+ */
+message CreateArtifactRequest {
+    Artifact artifact = 1;
+}
+
+/*
+ * Response message for creating an Artifact.
+ */
+message CreateArtifactResponse {
+
+}
+
+/*
+ * Request message for tagging an Artifact.
+ */
+message AddTagRequest {
+    Tag tag = 1;
+}
+
+/*
+ * Response message for tagging an Artifact.
+ */
+message AddTagResponse {
+
+}
+
+// List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
+message ListArtifactsRequest {
+    // Use a datasetID for which you want to retrieve the artifacts
+    DatasetID dataset = 1;
+
+    // Apply the filter expression to this query
+    FilterExpression filter = 2;
+    // Pagination options to get a page of artifacts
+    PaginationOptions pagination = 3;
+}
+
+// Response to list artifacts
+message ListArtifactsResponse {
+    // The list of artifacts
+    repeated Artifact artifacts = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
+// List the datasets for the given query
+message ListDatasetsRequest {
+    // Apply the filter expression to this query
+    FilterExpression filter = 1;
+    // Pagination options to get a page of datasets
+    PaginationOptions pagination = 2;
+}
+
+// List the datasets response with token for next pagination
+message ListDatasetsResponse {
+    // The list of datasets
+    repeated Dataset datasets = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
+/*
+ * Request message for updating an Artifact and overwriting its associated ArtifactData.
+ */
+message UpdateArtifactRequest {
+    // ID of dataset the artifact is associated with
+    DatasetID dataset = 1;
+
+    // Either ID of artifact or name of tag to retrieve existing artifact from
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+
+    // List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing
+    // ArtifactData entries will be removed from the underlying blob storage and database.
+    repeated ArtifactData data = 4;
+}
+
+/*
+ * Response message for updating an Artifact.
+ */
+message UpdateArtifactResponse {
+    // The unique ID of the artifact updated
+    string artifact_id = 1;
+}
+
+/*
+ * ReservationID message that is composed of several string fields.
+ */
+message ReservationID {
+    // The unique ID for the reserved dataset
+    DatasetID dataset_id = 1;
+
+    // The specific artifact tag for the reservation
+    string tag_name = 2;
+}
+
+// Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+message GetOrExtendReservationRequest {
+    // The unique ID for the reservation
+    ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
+    string owner_id = 2;
+
+    // Requested reservation extension heartbeat interval
+    google.protobuf.Duration heartbeat_interval = 3;
+}
+
+// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
+message Reservation {
+    // The unique ID for the reservation
+    ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
+    string owner_id = 2;
+
+    // Recommended heartbeat interval to extend reservation
+    google.protobuf.Duration heartbeat_interval = 3;
+
+    // Expiration timestamp of this reservation
+    google.protobuf.Timestamp expires_at = 4;
+
+    // Free-form metadata associated with the artifact
+    Metadata metadata = 6;
+}
+
+// Response including either a newly minted reservation or the existing reservation
+message GetOrExtendReservationResponse {
+    // The reservation to be acquired or extended
+    Reservation reservation = 1;
+}
+
+// Request to release reservation
+message ReleaseReservationRequest {
+    // The unique ID for the reservation
+    ReservationID reservation_id = 1;
+
+    // The unique ID of the owner for the reservation
+    string owner_id = 2;
+}
+
+// Response to release reservation
+message ReleaseReservationResponse {
+
+}
+
+/*
+ * Dataset message. It is uniquely identified by DatasetID.
+ */
+message Dataset {
+    DatasetID id = 1;
+    Metadata metadata = 2;
+    repeated string partitionKeys = 3;
+}
+
+/*
+ * An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
+ */
+message Partition {
+    string key = 1;
+    string value = 2;
+}
+
+/*
+ * DatasetID message that is composed of several string fields.
+ */
+message DatasetID {
+    string project = 1;  // The name of the project
+    string name = 2;     // The name of the dataset
+    string domain = 3;   // The domain (eg. environment)
+    string version = 4;  // Version of the data schema
+    string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
+}
+
+/*
+ * Artifact message. It is composed of several string fields.
+ */
+message Artifact {
+    string id = 1; // The unique ID of the artifact
+    DatasetID dataset = 2; // The Dataset that the artifact belongs to
+    repeated ArtifactData data = 3; // A list of data that is associated with the artifact
+    Metadata metadata = 4; // Free-form metadata associated with the artifact
+    repeated Partition partitions = 5;
+    repeated Tag tags = 6;
+    google.protobuf.Timestamp created_at = 7; // creation timestamp of artifact, autogenerated by service
+}
+
+/*
+ * ArtifactData that belongs to an artifact
+ */
+message ArtifactData {
+    string name = 1;
+    flyteidl.core.Literal value = 2;
+}
+
+/*
+ * Tag message that is unique to a Dataset. It is associated to a single artifact and
+ * can be retrieved by name later.
+ */
+message Tag {
+    string name = 1;        // Name of tag
+    string artifact_id = 2; // The tagged artifact
+    DatasetID dataset = 3;  // The Dataset that this tag belongs to
+}
+
+/*
+ * Metadata representation for artifacts and datasets
+ */
+message Metadata {
+    map<string, string> key_map = 1; // key map is a dictionary of key/val strings that represent metadata
+}
+
+// Filter expression that is composed of a combination of single filters
+message FilterExpression {
+    repeated SinglePropertyFilter filters = 1;
+}
+
+// A single property to filter on.
+message SinglePropertyFilter {
+    oneof property_filter {
+        TagPropertyFilter tag_filter = 1;
+        PartitionPropertyFilter partition_filter = 2;
+        ArtifactPropertyFilter artifact_filter = 3;
+        DatasetPropertyFilter dataset_filter = 4;
+    }
+
+    // as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+    enum ComparisonOperator {
+        EQUALS = 0;
+    }
+
+    ComparisonOperator operator = 10; // field 10 in case we add more entities to query
+    // Next field number: 11
+}
+
+// Artifact properties we can filter by
+message ArtifactPropertyFilter {
+    // oneof because we can add more properties in the future
+    oneof property {
+        string artifact_id = 1;
+    }
+}
+
+// Tag properties we can filter by
+message TagPropertyFilter {
+    oneof property {
+        string tag_name = 1;
+    }
+}
+
+// Partition properties we can filter by
+message PartitionPropertyFilter {
+    oneof property {
+        KeyValuePair key_val = 1;
+    }
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
+
+// Dataset properties we can filter by
+message DatasetPropertyFilter {
+    oneof property {
+        string project = 1;
+        string name = 2;
+        string domain = 3;
+        string version = 4;
+    }
+}
+
+// Pagination options for making list requests
+message PaginationOptions {
+
+    // the max number of results to return
+    uint32 limit = 1;
+
+    // the token to pass to fetch the next page
+    string token = 2;
+
+    // the property that we want to sort the results by
+    SortKey sortKey = 3;
+
+    // the sort order of the results
+    SortOrder sortOrder = 4;
+
+    enum SortOrder {
+        DESCENDING = 0;
+        ASCENDING = 1;
+    }
+
+    enum SortKey {
+        CREATION_TIME = 0;
+    }
+}

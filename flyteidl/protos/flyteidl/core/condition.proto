@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/literals.proto";
+
+// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
+// Each expression results in a boolean result.
+message ComparisonExpression {
+    // Binary Operator for each expression
+    enum Operator {
+        EQ = 0;
+        NEQ = 1;
+        // Greater Than
+        GT = 2;
+        GTE = 3;
+        // Less Than
+        LT = 4;
+        LTE = 5;
+    }
+
+    Operator operator = 1;
+    Operand left_value = 2;
+    Operand right_value = 3;
+}
+
+// Defines an operand to a comparison expression.
+message Operand {
+    oneof val {
+        // Can be a constant
+        core.Primitive primitive = 1 [deprecated = true];
+        // Or one of this node's input variables
+        string var = 2;
+        // Replace the primitive field
+        core.Scalar scalar = 3;
+    }
+}
+
+// Defines a boolean expression tree. It can be a simple or a conjunction expression.
+// Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
+message BooleanExpression {
+    oneof expr {
+        ConjunctionExpression conjunction = 1;
+        ComparisonExpression comparison = 2;
+    }
+}
+
+// Defines a conjunction expression of two boolean expressions.
+message ConjunctionExpression {
+    // Nested conditions. They can be conjoined using AND / OR
+    // Order of evaluation is not important as the operators are Commutative
+    enum LogicalOperator {
+        // Conjunction
+        AND = 0;
+        OR = 1;
+    }
+
+    LogicalOperator operator = 1;
+    BooleanExpression left_expression = 2;
+    BooleanExpression right_expression = 3;
+}

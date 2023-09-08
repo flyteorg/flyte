@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+// Represents a frequency at which to run a schedule.
+enum FixedRateUnit {
+    MINUTE = 0;
+    HOUR = 1;
+    DAY = 2;
+}
+
+// Option for schedules run at a certain frequency e.g. every 2 minutes.
+message FixedRate {
+    uint32 value = 1;
+    FixedRateUnit unit = 2;
+}
+
+// Options for schedules to run according to a cron expression.
+message CronSchedule {
+    // Standard/default cron implementation as described by https://en.wikipedia.org/wiki/Cron#CRON_expression;
+    // Also supports nonstandard predefined scheduling definitions
+    // as described by https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions
+    // except @reboot
+    string schedule = 1;
+    // ISO 8601 duration as described by https://en.wikipedia.org/wiki/ISO_8601#Durations
+    string offset = 2;
+}
+
+// Defines complete set of information required to trigger an execution on a schedule.
+message Schedule {
+
+    oneof ScheduleExpression {
+        // Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+        // e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+        string cron_expression = 1 [deprecated=true];
+        FixedRate rate = 2;
+        CronSchedule cron_schedule = 4;
+    }
+
+    // Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
+    string kickoff_time_input_arg = 3;
+}
