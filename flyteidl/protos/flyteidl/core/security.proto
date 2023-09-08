@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+// Secret encapsulates information about the secret a task needs to proceed. An environment variable
+// FLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if
+// secrets are passed through environment variables.
+// FLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets
+// are passed through file mounts.
+message Secret {
+    enum MountType {
+        // Default case, indicates the client can tolerate either mounting options.
+        ANY = 0;
+
+        // ENV_VAR indicates the secret needs to be mounted as an environment variable.
+        ENV_VAR = 1;
+
+        // FILE indicates the secret needs to be mounted as a file.
+        FILE = 2;
+    }
+
+    // The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+    // the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+    // For AWS Secret Manager, this should be the name of the secret.
+    // +required
+    string group = 1;
+
+    // The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+    // that do not support it.
+    // +optional
+    string group_version = 2;
+
+    // The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
+    // of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+    // match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+    // +optional
+    string key = 3;
+
+    // mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail
+    // if the underlying key management system cannot satisfy that requirement. If not provided, the default location
+    // will depend on the key management system.
+    // +optional
+    MountType mount_requirement = 4;
+}
+
+// OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
+message OAuth2Client {
+    // client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
+    // secret requested matches the client_id indicated here.
+    // +required
+    string client_id = 1;
+
+    // client_secret is a reference to the secret used to authenticate the OAuth2 client.
+    // +required
+    Secret client_secret = 2;
+}
+
+// Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the
+// right identity for the execution environment.
+message Identity {
+    // iam_role references the fully qualified name of Identity & Access Management role to impersonate.
+    string iam_role = 1;
+
+    // k8s_service_account references a kubernetes service account to impersonate.
+    string k8s_service_account = 2;
+
+    // oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when
+    // making external calls.
+    OAuth2Client oauth2_client = 3;
+
+    // execution_identity references the subject who makes the execution
+    string execution_identity = 4;
+}
+
+// OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.
+// FLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if
+// tokens are passed through environment variables.
+// FLYTE_TOKENS_PATH_PREFIX will be passed to indicate the prefix of the path where secrets will be mounted if tokens
+// are passed through file mounts.
+message OAuth2TokenRequest {
+    // Type of the token requested.
+    enum Type {
+        // CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials.
+        CLIENT_CREDENTIALS = 0;
+    }
+
+    // name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
+    // environment variables and as a filename for mounting tokens as files.
+    // +required
+    string name = 1;
+
+    // type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+    // +required
+    Type type = 2;
+
+    // client references the client_id/secret to use to request the OAuth2 token.
+    // +required
+    OAuth2Client client = 3;
+
+    // idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related
+    // information.
+    // +optional
+    string idp_discovery_endpoint = 4;
+
+    // token_endpoint references the token issuance endpoint. If idp_discovery_endpoint is not provided, this parameter is
+    // mandatory.
+    // +optional
+    string token_endpoint = 5;
+}
+
+// SecurityContext holds security attributes that apply to tasks.
+message SecurityContext {
+    // run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the
+    // backend plugin to choose the appropriate identity for the execution engine the task will run on.
+    Identity run_as = 1;
+
+    // secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the
+    // pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS
+    // Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access
+    // to the secret) and to pass it to the remote execution engine.
+    repeated Secret secrets = 2;
+
+    // tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the
+    // pod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS
+    // Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access
+    // to the secret) and to pass it to the remote execution engine.
+    repeated OAuth2TokenRequest tokens = 3;
+}

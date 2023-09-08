@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package flyteidl.plugins.sagemaker;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+import "flyteidl/plugins/sagemaker/parameter_ranges.proto";
+import "flyteidl/plugins/sagemaker/training_job.proto";
+
+// A pass-through for SageMaker's hyperparameter tuning job
+message HyperparameterTuningJob {
+    // The underlying training job that the hyperparameter tuning job will launch during the process
+    TrainingJob training_job = 1;
+
+    // The maximum number of training jobs that an hpo job can launch. For resource limit purpose.
+    // https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_ResourceLimits.html
+    int64 max_number_of_training_jobs = 2;
+
+    // The maximum number of concurrent training job that an hpo job can launch
+    // https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_ResourceLimits.html
+    int64 max_parallel_training_jobs = 3;
+}
+
+// HyperparameterTuningObjectiveType determines the direction of the tuning of the Hyperparameter Tuning Job
+// with respect to the specified metric.
+message HyperparameterTuningObjectiveType {
+    enum Value {
+        MINIMIZE = 0;
+        MAXIMIZE = 1;
+    }
+}
+
+// The target metric and the objective of the hyperparameter tuning.
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-metrics.html
+message HyperparameterTuningObjective {
+
+    // HyperparameterTuningObjectiveType determines the direction of the tuning of the Hyperparameter Tuning Job
+    // with respect to the specified metric.
+    HyperparameterTuningObjectiveType.Value objective_type = 1;
+
+    // The target metric name, which is the user-defined name of the metric specified in the
+    // training job's algorithm specification
+    string metric_name = 2;
+}
+
+
+// Setting the strategy used when searching in the hyperparameter space
+// Refer this doc for more details:
+// https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-automatic-model-tuning-now-supports-random-search-and-hyperparameter-scaling/
+message HyperparameterTuningStrategy {
+    enum Value {
+        BAYESIAN = 0;
+        RANDOM = 1;
+    }
+}
+
+// When the training jobs launched by the hyperparameter tuning job are not improving significantly,
+// a hyperparameter tuning job can be stopping early.
+// Note that there's only a subset of built-in algorithms that supports early stopping.
+// see: https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-early-stopping.html
+message TrainingJobEarlyStoppingType {
+    enum Value {
+        OFF = 0;
+        AUTO = 1;
+    }
+}
+
+// The specification of the hyperparameter tuning process
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-ex-tuning-job.html#automatic-model-tuning-ex-low-tuning-config
+message HyperparameterTuningJobConfig {
+    // ParameterRanges is a map that maps hyperparameter name to the corresponding hyperparameter range
+    ParameterRanges hyperparameter_ranges = 1;
+
+    // Setting the strategy used when searching in the hyperparameter space
+    HyperparameterTuningStrategy.Value tuning_strategy = 2;
+
+    // The target metric and the objective of the hyperparameter tuning.
+    HyperparameterTuningObjective tuning_objective = 3;
+
+    // When the training jobs launched by the hyperparameter tuning job are not improving significantly,
+    // a hyperparameter tuning job can be stopping early.
+    TrainingJobEarlyStoppingType.Value training_job_early_stopping_type = 4;
+}

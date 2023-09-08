@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+
+// Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectDomainAttributes {
+    // Unique project id for which this set of attributes will be applied.
+    string project                 = 1;
+
+    // Unique domain id for which this set of attributes will be applied.
+    string domain                  = 2;
+
+    MatchingAttributes matching_attributes = 3; 
+}
+
+// Sets custom attributes for a project-domain combination.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectDomainAttributesUpdateRequest {
+    // +required
+    ProjectDomainAttributes attributes = 1;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectDomainAttributesUpdateResponse {
+}
+
+// Request to get an individual project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectDomainAttributesGetRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    // +required
+    string domain                  = 2;
+
+    // Which type of matchable attributes to return.
+    // +required
+    MatchableResource resource_type = 3;
+}
+
+// Response to get an individual project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectDomainAttributesGetResponse {
+  ProjectDomainAttributes attributes = 1;
+}
+
+// Request to delete a set matchable project domain attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message ProjectDomainAttributesDeleteRequest {
+    // Unique project id which this set of attributes references.
+    // +required
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    // +required
+    string domain                  = 2;
+
+    // Which type of matchable attributes to delete.
+    // +required
+    MatchableResource resource_type = 3;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectDomainAttributesDeleteResponse {
+}

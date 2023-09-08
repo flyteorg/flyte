@@ -1,0 +1,149 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl/service/auth.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/.well-known/oauth-authorization-server": {
+      "get": {
+        "summary": "Anonymously accessible. Retrieves local or external oauth authorization server metadata.",
+        "operationId": "GetOAuth2Metadata",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceOAuth2MetadataResponse"
+            }
+          }
+        },
+        "tags": [
+          "AuthMetadataService"
+        ]
+      }
+    },
+    "/config/v1/flyte_client": {
+      "get": {
+        "summary": "Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization\nrequests.",
+        "operationId": "GetPublicClientConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/servicePublicClientAuthConfigResponse"
+            }
+          }
+        },
+        "tags": [
+          "AuthMetadataService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "serviceOAuth2MetadataResponse": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "description": "Defines the issuer string in all JWT tokens this server issues. The issuer can be admin itself or an external\nissuer."
+        },
+        "authorization_endpoint": {
+          "type": "string",
+          "description": "URL of the authorization server's authorization endpoint [RFC6749]. This is REQUIRED unless no grant types are\nsupported that use the authorization endpoint."
+        },
+        "token_endpoint": {
+          "type": "string",
+          "description": "URL of the authorization server's token endpoint [RFC6749]."
+        },
+        "response_types_supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Array containing a list of the OAuth 2.0 response_type values that this authorization server supports."
+        },
+        "scopes_supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports."
+        },
+        "token_endpoint_auth_methods_supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JSON array containing a list of client authentication methods supported by this token endpoint."
+        },
+        "jwks_uri": {
+          "type": "string",
+          "description": "URL of the authorization server's JWK Set [JWK] document. The referenced document contains the signing key(s) the\nclient uses to validate signatures from the authorization server."
+        },
+        "code_challenge_methods_supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by\nthis authorization server."
+        },
+        "grant_types_supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JSON array containing a list of the OAuth 2.0 grant type values that this authorization server supports."
+        },
+        "device_authorization_endpoint": {
+          "type": "string",
+          "title": "URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]"
+        }
+      },
+      "title": "OAuth2MetadataResponse defines an RFC-Compliant response for /.well-known/oauth-authorization-server metadata\nas defined in https://tools.ietf.org/html/rfc8414"
+    },
+    "servicePublicClientAuthConfigResponse": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "description": "client_id to use when initiating OAuth2 authorization requests."
+        },
+        "redirect_uri": {
+          "type": "string",
+          "description": "redirect uri to use when initiating OAuth2 authorization requests."
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "scopes to request when initiating OAuth2 authorization requests."
+        },
+        "authorization_metadata_key": {
+          "type": "string",
+          "description": "Authorization Header to use when passing Access Tokens to the server. If not provided, the client should use the\ndefault http `Authorization` header."
+        },
+        "service_http_endpoint": {
+          "type": "string",
+          "description": "ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used\nto configure the gRPC connection can be used for the http one respecting the insecure flag to choose between\nSSL or no SSL connections."
+        },
+        "audience": {
+          "type": "string",
+          "description": "audience to use when initiating OAuth2 authorization requests."
+        }
+      },
+      "description": "FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users."
+    }
+  }
+}

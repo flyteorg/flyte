@@ -1,0 +1,248 @@
+name: Verification Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Lint
+    uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+    with:
+      go-version: 1.19
+  tests:
+    name: Unit Tests
+    uses: flyteorg/flytetools/.github/workflows/tests.yml@master
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+    with:
+      go-version: 1.19
+  generate-protos:
+    runs-on: ubuntu-latest
+    name: Generate Protos
+    container:
+      image: lyft/protocgenerator:8167e11d3b3439373c2f033080a4b550078884a2
+      options: --cpus 1
+      volumes:
+        - /github/workspace:/defs
+      env:
+        REPO_BLOB_SHA: master
+        PROJECT_ANNOTATION_PREFIX: flyte.interface
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      # GO Protos
+      - name: Proto-Service-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service --with_gateway -l go --go_source_relative
+      - name: Proto-Admin-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin --with_gateway -l go --go_source_relative --validate_out
+      - name: Proto-Core-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core --with_gateway -l go --go_source_relative --validate_out
+      - name: Proto-Event-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event --with_gateway -l go --go_source_relative --validate_out
+      - name: Proto-Plugins-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l go --go_source_relative --validate_out
+      - name: Proto-Datacatalog-Go
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l go --go_source_relative --validate_out
+
+      # Python is going to be generated using buf
+      # Python
+      # - name: Proto-Service-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l python
+      # - name: Proto-Admin-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l python
+      # - name: Proto-Core-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l python
+      # - name: Proto-Event-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l python
+      # - name: Proto-Plugins-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l python
+      # - name: Proto-Datacatalog-Python
+      #   run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l python
+
+      # Cpp
+      - name: Proto-Service-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l cpp
+      - name: Proto-Admin-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l cpp
+      - name: Proto-Core-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l cpp
+      - name: Proto-Event-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l cpp
+      - name: Proto-Plugins-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l cpp
+      - name: Proto-Datacatalog-Cpp
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l cpp
+
+      # Java
+      - name: Proto-Service-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l java
+      - name: Proto-Admin-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l java
+      - name: Proto-Core-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l java
+      - name: Proto-Event-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l java
+      - name: Proto-Plugins-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l java
+      - name: Proto-Datacatalog-Java
+        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l java
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated
+          path: ./gen
+
+  generate-protos-buf:
+    name: Generate python protos using buf
+    runs-on: ubuntu-latest
+    needs: [ generate-protos ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: bufbuild/buf-setup-action@v1
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - name: "Run buf generate"
+        run: buf generate
+      - name: "Include __init__.py files"
+        run: find gen/pb_python -type d -exec touch {}/__init__.py \;
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated-buf
+          path: ./gen
+
+  generate-admin-swagger-code:
+    runs-on: ubuntu-latest
+    name: Generate Admin Swagger Code
+    needs:
+      - generate-protos
+      - generate-protos-buf
+    container:
+      image: lyft/protocgenerator:8167e11d3b3439373c2f033080a4b550078884a2
+      options: --cpus 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated
+          path: ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated-buf
+          path: ./gen
+      - run: ls gen/pb-go/flyteidl/service/
+      - run: cp -R gen/pb-go/flyteidl/service/ ../
+      - run: ls ../service/
+      # Open API 2
+      - name: OpenAPI-Binary
+        run: go-bindata -pkg service -o ../service/openapi.go -prefix ../service/ -modtime 1562572800 ../service/admin.swagger.json
+      - run: rm -rf gen/pb-go/flyteidl/service
+      - run: mkdir -p gen/pb-go/flyteidl/service
+      - run: cp -R ../service gen/pb-go/flyteidl/
+      - run: ls gen/pb-go/flyteidl/
+      - run: ls gen/pb-go/flyteidl/service/
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated
+          path: ./gen
+
+  generate-js-code:
+    runs-on: ubuntu-latest
+    name: Generate JS Code
+    needs: [ generate-admin-swagger-code ]
+    container:
+      image: schottra/docker-protobufjs:v0.0.2
+      options: --cpus 1
+      volumes:
+        - /github/workspace:/defs
+      env:
+        REPO_BLOB_SHA: master
+        PROJECT_ANNOTATION_PREFIX: flyte.interface
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated
+          path: ./gen
+      - run: mkdir -p /defs
+      - run: mkdir -p /gen
+      - run: cp -R . /defs
+      - run: node /code/generate-protobuf.js --module-name flyteidl -d protos/flyteidl/core  -d protos/flyteidl/event -d protos/flyteidl/admin -d protos/flyteidl/service  -- --root flyteidl -t static-module -w default --no-delimited --force-long --no-convert -p /defs/protos
+      - run: ls /defs/gen/
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated
+          path: /defs/gen
+
+  generate-swagger-code:
+    runs-on: ubuntu-latest
+    name: Generate Swagger Code
+    needs: [ generate-js-code ]
+    container:
+      image: docker.io/lyft/swagger-codegen-cli:dc5ce6ec6d7d4d980fa882d6bd13a83cba3be3c3
+      options: --cpus 1
+      volumes:
+        - /github/workspace:/defs
+      env:
+        REPO_BLOB_SHA: master
+        PROJECT_ANNOTATION_PREFIX: flyte.interface
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated
+          path: ./gen
+      - run: java -jar /opt/swagger-codegen-cli/swagger-codegen-cli.jar generate -i ./gen/pb-go/flyteidl/service/admin.swagger.json -l go -o ./gen/pb-go/flyteidl/service/flyteadmin --additional-properties=packageName=flyteadmin
+      - run: java -jar /opt/swagger-codegen-cli/swagger-codegen-cli.jar generate -i ./gen/pb-go/flyteidl/service/admin.swagger.json -l python -o ./gen/pb_python/flyteidl/service/flyteadmin --additional-properties=packageName=flyteadmin
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated
+          path: ./gen
+
+  test-proto-changes:
+    runs-on: ubuntu-latest
+    name: Test Proto Changes
+    needs: [ generate-swagger-code ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: "Clean Generated"
+        run: rm -rf ./gen
+      - uses: actions/download-artifact@master
+        with:
+          name: generated
+          path: ./gen
+      - name: Test
+        run: ./scripts/test_diff.sh
+
+  generate:
+    name: Check Generate
+    uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
+    with:
+      go-version: 1.19
