@@ -2,9 +2,9 @@
 # FLYTE_AGENT SETTINGS
 # ---------------------------------------------------------------------
 
-# nameOverride String to override flyte-agent.name template
+# nameOverride String to override flyteagent.name template
 nameOverride: ""
-# fullnameOverride String to override flyte-agent.fullname template
+# fullnameOverride String to override flyteagent.fullname template
 fullnameOverride: ""
 # commonLabels Add labels to all the deployed resources
 commonLabels: {}
