@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 )

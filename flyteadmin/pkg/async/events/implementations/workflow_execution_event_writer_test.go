@@ -3,7 +3,7 @@ package implementations
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	event2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"

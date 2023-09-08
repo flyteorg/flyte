@@ -4,8 +4,8 @@ package mocks
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 type CreateWorkflowFunc func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error

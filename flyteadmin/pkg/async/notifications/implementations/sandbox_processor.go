@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 )
 

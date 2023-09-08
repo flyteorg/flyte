@@ -12,9 +12,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/spf13/cobra"
 )

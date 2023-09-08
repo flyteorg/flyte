@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 type TierName = string

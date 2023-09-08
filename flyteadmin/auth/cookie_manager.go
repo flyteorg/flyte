@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 )
 
 type CookieManager struct {

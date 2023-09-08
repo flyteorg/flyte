@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 )
 
 // Parameters for getting an individual resource.

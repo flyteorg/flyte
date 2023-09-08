@@ -15,11 +15,11 @@ import (
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 )
 
 func Test_tokenEndpoint(t *testing.T) {

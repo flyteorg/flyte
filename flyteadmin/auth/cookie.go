@@ -9,11 +9,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/gorilla/securecookie"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 )
 
 const (

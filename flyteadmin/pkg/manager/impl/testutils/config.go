@@ -1,9 +1,9 @@
 package testutils
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 )
 
 func GetApplicationConfigWithDefaultDomains() runtimeInterfaces.ApplicationConfiguration {

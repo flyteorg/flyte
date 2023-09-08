@@ -6,29 +6,29 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/prometheus/client_golang/prometheus"
 
-	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
+	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/aws"
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 )
 

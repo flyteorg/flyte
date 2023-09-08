@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 
-	authConfig "github.com/flyteorg/flyteadmin/auth/config"
+	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )

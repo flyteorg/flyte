@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	flyteSchedulerDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	interfaces2 "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flytestdlib/promutils"
+	flyteSchedulerDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	interfaces2 "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 )
 

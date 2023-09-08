@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 	"github.com/lestrrat-go/jwx/jwk"
 
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 
 	"github.com/stretchr/testify/assert"
 )

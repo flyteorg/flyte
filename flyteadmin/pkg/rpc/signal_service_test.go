@@ -5,11 +5,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/data/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 

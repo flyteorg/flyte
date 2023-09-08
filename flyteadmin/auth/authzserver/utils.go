@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/flyteorg/flyteadmin/auth"
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/gtank/cryptopasta"
 	"github.com/ory/fosite"
 )

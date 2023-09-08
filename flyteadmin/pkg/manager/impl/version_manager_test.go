@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	adminversion "github.com/flyteorg/flytestdlib/version"
+	adminversion "github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/stretchr/testify/assert"
 )
 

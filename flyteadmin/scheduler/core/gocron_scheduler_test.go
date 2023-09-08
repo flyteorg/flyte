@@ -13,13 +13,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/time/rate"
 
-	adminModels "github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flyteadmin/scheduler/executor/mocks"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flyteadmin/scheduler/snapshoter"
+	adminModels "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/executor/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var scheduleCron models.SchedulableEntity

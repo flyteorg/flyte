@@ -12,11 +12,11 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
 	"github.com/coreos/go-oidc"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"golang.org/x/oauth2"
 )
