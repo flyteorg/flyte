@@ -3,11 +3,12 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.51
+	github.com/flyteorg/datacatalog v1.0.53
 	github.com/flyteorg/flyteadmin v1.1.118
 	github.com/flyteorg/flytepropeller v1.1.116
 	github.com/flyteorg/flytestdlib v1.0.22
 	github.com/golang/glog v1.1.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sync v0.1.0
@@ -156,7 +157,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
-	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
