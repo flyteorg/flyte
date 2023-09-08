@@ -3,14 +3,14 @@ package array
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/tests"
+	"github.com/flyteorg/flyte/flyteplugins/tests"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"context"
 

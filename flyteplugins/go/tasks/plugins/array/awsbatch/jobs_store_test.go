@@ -12,17 +12,17 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/batch"
 
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	mocks3 "github.com/flyteorg/flytestdlib/cache/mocks"
-	"github.com/flyteorg/flytestdlib/utils"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	mocks3 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )

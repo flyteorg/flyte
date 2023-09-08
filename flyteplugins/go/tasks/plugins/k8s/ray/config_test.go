@@ -3,7 +3,7 @@ package ray
 import (
 	"testing"
 
-	pluginmachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"gotest.tools/assert"
 )
 

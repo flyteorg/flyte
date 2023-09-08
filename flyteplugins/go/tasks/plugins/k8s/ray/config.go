@@ -1,8 +1,8 @@
 package ray
 
 import (
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
-	pluginmachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

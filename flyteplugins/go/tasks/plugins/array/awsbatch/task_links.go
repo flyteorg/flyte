@@ -3,15 +3,15 @@ package awsbatch
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 
-	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flytestdlib/errors"
+	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"golang.org/x/net/context"
 )
 
