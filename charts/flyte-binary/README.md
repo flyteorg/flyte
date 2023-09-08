@@ -8,7 +8,7 @@ Chart for basic single Flyte executable deployment
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyte-agent | flyteagent(flyteagent) | v0.1.10 |
+| file://../flyteagent | flyteagent(flyteagent) | v0.1.10 |
 
 ## Values
 

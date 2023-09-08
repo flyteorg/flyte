@@ -8,4 +8,4 @@ dependencies:
     condition: flyteagent.enabled
     alias: flyteagent
     version: v0.1.10 # VERSION
-    repository: file://../flyte-agent # REPOSITORY
+    repository: file://../flyteagent # REPOSITORY
