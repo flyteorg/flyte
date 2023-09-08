@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 

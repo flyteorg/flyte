@@ -23,7 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 

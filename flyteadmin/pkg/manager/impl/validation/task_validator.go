@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"

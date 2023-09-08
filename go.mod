@@ -72,7 +72,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyteidl v1.5.14 // indirect
-	github.com/flyteorg/flyteplugins v1.1.16 // indirect
 	github.com/flyteorg/flytestdlib v1.0.22 // indirect
 	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect

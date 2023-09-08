@@ -19,7 +19,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
