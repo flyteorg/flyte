@@ -104,3 +104,11 @@ require (
 	k8s.io/klog/v2 v2.5.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.3 // indirect
 )
+
+replace (
+	github.com/flyteorg/datacatalog => ../datacatalog
+	github.com/flyteorg/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flytestdlib => ../flytestdlib
+)

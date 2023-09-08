@@ -105,3 +105,11 @@ require (
 	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847 // indirect
 	k8s.io/klog/v2 v2.5.0 // indirect
 )
+
+replace (
+	github.com/flyteorg/datacatalog => ../datacatalog
+	github.com/flyteorg/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flytestdlib => ../flytestdlib
+)
