@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+// Represents the Email object that is sent to a publisher/subscriber
+// to forward the notification.
+// Note: This is internal to Admin and doesn't need to be exposed to other components.
+message EmailMessage {
+    // The list of email addresses to receive an email with the content populated in the other fields.
+    // Currently, each email recipient will receive its own email.
+    // This populates the TO field.
+    repeated string recipients_email = 1;
+
+    // The email of the sender.
+    // This populates the FROM field.
+    string sender_email = 2;
+
+    // The content of the subject line.
+    // This populates the SUBJECT field.
+    string subject_line = 3;
+
+    // The content of the email body.
+    // This populates the BODY field.
+    string body = 4;
+}

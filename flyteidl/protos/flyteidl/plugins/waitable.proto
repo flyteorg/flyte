@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// Represents an Execution that was launched and could be waited on.
+message Waitable {
+    core.WorkflowExecutionIdentifier wf_exec_id = 1;
+    core.WorkflowExecution.Phase phase = 2;
+    string workflow_id = 3;
+}

@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+// Indicates a resource type within Flyte.
+enum ResourceType {
+  UNSPECIFIED        = 0;
+  TASK               = 1;
+  WORKFLOW           = 2;
+  LAUNCH_PLAN        = 3;
+  // A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
+  // Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
+  // in a similar manner to other Flyte objects
+  DATASET            = 4;
+}
+
+// Encapsulation of fields that uniquely identifies a Flyte resource.
+message Identifier {
+    // Identifies the specific type of resource that this identifier corresponds to.
+    core.ResourceType resource_type  = 1;
+
+    // Name of the project the resource belongs to.
+    string project              = 2;
+
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain               = 3;
+
+    // User provided value for the resource.
+    string name                 = 4;
+
+    // Specific version of the resource.
+    string version              = 5;
+}
+
+// Encapsulation of fields that uniquely identifies a Flyte workflow execution
+message WorkflowExecutionIdentifier {
+    // Name of the project the resource belongs to.
+    string project              = 1;
+
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain               = 2;
+
+    // User or system provided value for the resource.
+    string name                 = 4;
+}
+
+// Encapsulation of fields that identify a Flyte node execution entity.
+message NodeExecutionIdentifier {
+    string node_id           = 1;
+
+    WorkflowExecutionIdentifier execution_id        = 2;
+}
+
+// Encapsulation of fields that identify a Flyte task execution entity.
+message TaskExecutionIdentifier {
+    core.Identifier task_id           = 1;
+
+    core.NodeExecutionIdentifier node_execution_id = 2;
+
+    uint32 retry_attempt     = 3;
+}
+
+// Encapsulation of fields the uniquely identify a signal.
+message SignalIdentifier {
+    // Unique identifier for a signal.
+    string signal_id = 1;
+
+    // Identifies the Flyte workflow execution this signal belongs to.
+    WorkflowExecutionIdentifier execution_id = 2;
+}

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/execution.proto";
+
+// Error message to propagate detailed errors from container executions to the execution
+// engine.
+message ContainerError {
+    // A simplified code for errors, so that we can provide a glossary of all possible errors.
+    string code = 1;
+    // A detailed error message.
+    string message = 2;
+
+    // Defines a generic error type that dictates the behavior of the retry strategy.
+    enum Kind {
+        NON_RECOVERABLE = 0;
+        RECOVERABLE = 1;
+    }
+
+    // An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
+    Kind kind = 3;
+
+    // Defines the origin of the error (system, user, unknown).
+    ExecutionError.ErrorKind origin = 4;
+}
+
+// Defines the errors.pb file format the container can produce to communicate
+// failure reasons to the execution engine.
+message ErrorDocument {
+    // The error raised during execution.
+    ContainerError error = 1;
+}

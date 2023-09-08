@@ -1,0 +1,321 @@
+syntax = "proto3";
+
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/security.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+// A customizable interface to convey resources requested for a container. This can be interpreted differently for different
+// container engines.
+message Resources {
+    // Known resource names.
+    enum ResourceName {
+        UNKNOWN = 0;
+        CPU = 1;
+        GPU = 2;
+        MEMORY = 3;
+        STORAGE = 4;
+        // For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
+        EPHEMERAL_STORAGE = 5;
+    }
+
+    // Encapsulates a resource name and value.
+    message ResourceEntry {
+        // Resource name.
+        ResourceName name = 1;
+
+        // Value must be a valid k8s quantity. See
+        // https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80
+        string value = 2;
+    }
+
+    // The desired set of resources requested. ResourceNames must be unique within the list.
+    repeated ResourceEntry requests = 1;
+
+    // Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
+    // within the list.
+    repeated ResourceEntry limits = 2;
+}
+
+// Runtime information. This is loosely defined to allow for extensibility.
+message RuntimeMetadata {
+    enum RuntimeType {
+        OTHER = 0;
+        FLYTE_SDK = 1;
+    }
+
+    // Type of runtime.
+    RuntimeType type = 1;
+
+    // Version of the runtime. All versions should be backward compatible. However, certain cases call for version
+    // checks to ensure tighter validation or setting expectations.
+    string version = 2;
+
+    //+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+    string flavor = 3;
+}
+
+// Task Metadata
+message TaskMetadata {
+    // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
+    bool discoverable = 1;
+
+    // Runtime information about the task.
+    RuntimeMetadata runtime = 2;
+
+    // The overall timeout of a task including user-triggered retries.
+    google.protobuf.Duration timeout = 4;
+
+    // Number of retries per task.
+    RetryStrategy retries = 5;
+
+    // Indicates a logical version to apply to this task for the purpose of discovery.
+    string discovery_version = 6;
+
+    // If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers
+    // of the ending of support for a given task.
+    string deprecated_error_message = 7;
+
+    // For interruptible we will populate it at the node level but require it be part of TaskMetadata
+    // for a user to set the value.
+    // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
+    // set by the user or defaulting to false.
+    // The logic of handling precedence will be done as part of flytepropeller.
+
+    // Identify whether task is interruptible
+    oneof interruptible_value {
+        bool interruptible = 8;
+    };
+
+    // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
+    bool cache_serializable = 9;
+
+    // Indicates whether the task will generate a Deck URI when it finishes executing.
+    bool generates_deck = 10;
+
+    // Arbitrary tags that allow users and the platform to store small but arbitrary labels
+    map<string, string> tags = 11;
+
+    // pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+    // task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+    // identically as, the default PodTemplate configured in FlytePropeller.
+    string pod_template_name = 12;
+}
+
+// A Task structure that uniquely identifies a task in the system
+// Tasks are registered as a first step in the system.
+message TaskTemplate {
+    // Auto generated taskId by the system. Task Id uniquely identifies this task globally.
+    Identifier id = 1;
+
+    // A predefined yet extensible Task type identifier. This can be used to customize any of the components. If no
+    // extensions are provided in the system, Flyte will resolve the this task to its TaskCategory and default the
+    // implementation registered for the TaskCategory.
+    string type = 2;
+
+    // Extra metadata about the task.
+    TaskMetadata metadata = 3;
+
+    // A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees
+    // compile-time validation of the workflow to avoid costly runtime failures.
+    TypedInterface interface = 4;
+
+    // Custom data about the task. This is extensible to allow various plugins in the system.
+    google.protobuf.Struct custom = 5;
+
+    // Known target types that the system will guarantee plugins for. Custom SDK plugins are allowed to set these if needed.
+    // If no corresponding execution-layer plugins are found, the system will default to handling these using built-in
+    // handlers.
+    oneof target {
+        Container container = 6;
+        K8sPod k8s_pod = 17;
+        Sql sql = 18;
+    }
+
+    // This can be used to customize task handling at execution time for the same task type.
+    int32 task_type_version = 7;
+
+    // security_context encapsulates security attributes requested to run this task.
+    SecurityContext security_context = 8;
+
+    // Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+    // to use as required.
+    // reserve the field numbers 1 through 15 for very frequently occurring message elements
+    map<string, string> config = 16;
+}
+
+// ----------------- First class Plugins
+
+// Defines port properties for a container.
+message ContainerPort {
+    // Number of port to expose on the pod's IP address.
+    // This must be a valid port number, 0 < x < 65536.
+    uint32 container_port = 1;
+}
+
+message Container {
+    // Container image url. Eg: docker/redis:latest
+    string image = 1;
+
+    // Command to be executed, if not provided, the default entrypoint in the container image will be used.
+    repeated string command = 2;
+
+    // These will default to Flyte given paths. If provided, the system will not append known paths. If the task still
+    // needs flyte's inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the
+    // system will populate these before executing the container.
+    repeated string args = 3;
+
+    // Container resources requirement as specified by the container engine.
+    Resources resources = 4;
+
+    // Environment variables will be set as the container is starting up.
+    repeated KeyValuePair env = 5;
+
+    // Allows extra configs to be available for the container.
+    // TODO: elaborate on how configs will become available.
+    // Deprecated, please use TaskTemplate.config instead.
+    repeated KeyValuePair config = 6 [deprecated = true];
+
+    // Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
+    // not supported on AWS Batch)
+    // Only K8s
+    repeated ContainerPort ports = 7;
+
+    // BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+    // This makes it possible to to run a completely portable container, that uses inputs and outputs
+    // only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+    // If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+    // are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+    // to understand the default paths.
+    // Only K8s
+    DataLoadingConfig data_config = 9;
+
+    // Architecture-type the container image supports.
+    enum Architecture {
+        UNKNOWN = 0;
+        AMD64  = 1;
+        ARM64  = 2;
+        ARM_V6 = 3;
+        ARM_V7 = 4;
+    }
+    Architecture architecture = 10;
+}
+
+// Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)
+message IOStrategy {
+    // Mode to use for downloading
+    enum DownloadMode {
+        // All data will be downloaded before the main container is executed
+        DOWNLOAD_EAGER = 0;
+        // Data will be downloaded as a stream and an End-Of-Stream marker will be written to indicate all data has been downloaded. Refer to protocol for details
+        DOWNLOAD_STREAM = 1;
+        // Large objects (offloaded) will not be downloaded
+        DO_NOT_DOWNLOAD = 2;
+    }
+    // Mode to use for uploading
+    enum UploadMode {
+        // All data will be uploaded after the main container exits
+        UPLOAD_ON_EXIT = 0;
+        // Data will be uploaded as it appears. Refer to protocol specification for details
+        UPLOAD_EAGER = 1;
+        // Data will not be uploaded, only references will be written
+        DO_NOT_UPLOAD = 2;
+    }
+    // Mode to use to manage downloads
+    DownloadMode download_mode = 1;
+    // Mode to use to manage uploads
+    UploadMode upload_mode = 2;
+}
+
+// This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.
+// Flyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path
+// Any outputs generated by the user container - within output_path are automatically uploaded.
+message DataLoadingConfig {
+    // LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.
+    // If the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.
+    // JSON and YAML do not need any protobuf definitions to read it
+    // All remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)
+    enum LiteralMapFormat {
+        // JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html
+        JSON = 0;
+        YAML = 1;
+        // Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core
+        PROTO = 2;
+    }
+    // Flag enables DataLoading Config. If this is not set, data loading will not be used!
+    bool enabled = 1;
+    // File system path (start at root). This folder will contain all the inputs exploded to a separate file.
+    // Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is '/var/flyte/inputs', then the file system will look like
+    // /var/flyte/inputs/inputs.<metadata format dependent -> .pb .json .yaml> -> Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations
+    // /var/flyte/inputs/x -> X is a file that contains the value of x (integer) in string format
+    // /var/flyte/inputs/y -> Y is a file in Binary format
+    // /var/flyte/inputs/z/... -> Note Z itself is a directory
+    // More information about the protocol - refer to docs #TODO reference docs here
+    string input_path = 2;
+    // File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+    string output_path = 3;
+    // In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+    // This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+    LiteralMapFormat format = 4;
+    IOStrategy io_strategy = 5;
+}
+
+// Defines a pod spec and additional pod metadata that is created when a task is executed.
+message K8sPod {
+    // Contains additional metadata for building a kubernetes pod.
+    K8sObjectMetadata metadata = 1;
+
+    // Defines the primary pod spec created when a task is executed.
+    // This should be a JSON-marshalled pod spec, which can be defined in
+    // - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+    // - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+    google.protobuf.Struct pod_spec = 2;
+
+    // BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+    // This makes it possible to to run a completely portable container, that uses inputs and outputs
+    // only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+    // If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+    // are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+    // to understand the default paths.
+    // Only K8s
+    DataLoadingConfig data_config = 3;
+}
+
+// Metadata for building a kubernetes object when a task is executed.
+message K8sObjectMetadata {
+    // Optional labels to add to the pod definition.
+    map<string, string> labels = 1;
+
+    // Optional annotations to add to the pod definition.
+    map<string, string> annotations = 2;
+}
+
+// Sql represents a generic sql workload with a statement and dialect.
+message Sql {
+    // The actual query to run, the query can have templated parameters.
+    // We use Flyte's Golang templating format for Query templating.
+    // Refer to the templating documentation.
+    // https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
+    // For example,
+    // insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
+    // select *
+    // from my_table
+    // where ds = '{{ .Inputs.ds }}'
+    string statement = 1;
+    // The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid
+    // expensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.
+    // We support the following dialect: ansi, hive.
+    enum Dialect {
+        UNDEFINED = 0;
+        ANSI = 1;
+        HIVE = 2;
+        OTHER = 3;
+    }
+    Dialect dialect = 2;
+}

@@ -1,0 +1,94 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+
+message OAuth2MetadataRequest {}
+
+// OAuth2MetadataResponse defines an RFC-Compliant response for /.well-known/oauth-authorization-server metadata
+// as defined in https://tools.ietf.org/html/rfc8414
+message OAuth2MetadataResponse {
+    // Defines the issuer string in all JWT tokens this server issues. The issuer can be admin itself or an external
+    // issuer.
+    string issuer = 1;
+
+    // URL of the authorization server's authorization endpoint [RFC6749]. This is REQUIRED unless no grant types are
+    // supported that use the authorization endpoint.
+    string authorization_endpoint = 2;
+
+    // URL of the authorization server's token endpoint [RFC6749].
+    string token_endpoint = 3;
+
+    // Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
+    repeated string response_types_supported = 4;
+
+    // JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
+    repeated string scopes_supported = 5;
+
+    // JSON array containing a list of client authentication methods supported by this token endpoint.
+    repeated string token_endpoint_auth_methods_supported = 6;
+
+    // URL of the authorization server's JWK Set [JWK] document. The referenced document contains the signing key(s) the
+    // client uses to validate signatures from the authorization server.
+    string jwks_uri = 7;
+
+    // JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by
+    // this authorization server.
+    repeated string code_challenge_methods_supported = 8;
+
+    // JSON array containing a list of the OAuth 2.0 grant type values that this authorization server supports.
+    repeated string grant_types_supported = 9;
+
+    // URL of the authorization server's device authorization endpoint, as defined in Section 3.1 of [RFC8628]
+    string device_authorization_endpoint = 10;
+}
+
+message PublicClientAuthConfigRequest {}
+
+// FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
+message PublicClientAuthConfigResponse {
+    // client_id to use when initiating OAuth2 authorization requests.
+    string client_id = 1;
+    // redirect uri to use when initiating OAuth2 authorization requests.
+    string redirect_uri = 2;
+    // scopes to request when initiating OAuth2 authorization requests.
+    repeated string scopes = 3;
+    // Authorization Header to use when passing Access Tokens to the server. If not provided, the client should use the
+    // default http `Authorization` header.
+    string authorization_metadata_key = 4;
+    // ServiceHttpEndpoint points to the http endpoint for the backend. If empty, clients can assume the endpoint used
+    // to configure the gRPC connection can be used for the http one respecting the insecure flag to choose between
+    // SSL or no SSL connections.
+    string service_http_endpoint = 5;
+    // audience to use when initiating OAuth2 authorization requests.
+    string audience = 6;
+}
+
+// The following defines an RPC service that is also served over HTTP via grpc-gateway.
+// Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
+// RPCs defined in this service must be anonymously accessible.
+service AuthMetadataService {
+    // Anonymously accessible. Retrieves local or external oauth authorization server metadata.
+    rpc GetOAuth2Metadata (OAuth2MetadataRequest) returns (OAuth2MetadataResponse) {
+        option (google.api.http) = {
+            get: "/.well-known/oauth-authorization-server"
+        };
+        // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+        //     description: "Retrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible."
+        // };
+    }
+
+    // Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
+    // requests.
+    rpc GetPublicClientConfig (PublicClientAuthConfigRequest) returns (PublicClientAuthConfigResponse) {
+        option (google.api.http) = {
+            get: "/config/v1/flyte_client"
+        };
+        // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+        //     description: "Retrieves public flyte client info. This endpoint is anonymously accessible."
+        // };
+    }
+}

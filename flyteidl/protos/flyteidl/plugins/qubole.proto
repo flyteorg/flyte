@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// Defines a query to execute on a hive cluster.
+message HiveQuery {
+    string query = 1;
+    uint32 timeout_sec = 2;
+    uint32 retryCount = 3;
+}
+
+// Defines a collection of hive queries.
+message HiveQueryCollection {
+    repeated HiveQuery queries = 2;
+}
+
+// This message works with the 'hive' task type in the SDK and is the object that will be in the 'custom' field
+// of a hive task's TaskTemplate
+message QuboleHiveJob {
+    string cluster_label = 1;
+    HiveQueryCollection query_collection = 2 [deprecated=true];
+    repeated string tags = 3;
+    HiveQuery query = 4;
+}

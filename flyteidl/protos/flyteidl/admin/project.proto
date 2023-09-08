@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+
+import "flyteidl/admin/common.proto";
+
+// Namespace within a project commonly used to differentiate between different service instances.
+// e.g. "production", "development", etc.
+message Domain {
+    // Globally unique domain name.
+    string id    = 1;
+
+    // Display name.
+    string name  = 2;
+}
+
+
+// Top-level namespace used to classify different entities like workflows and executions.
+message Project {
+    // Globally unique project name.
+    string id               = 1;
+
+    // Display name.
+    string name             = 2;
+
+    repeated Domain domains = 3;
+
+    string description      = 4;
+
+    // Leverage Labels from flyteidl.admin.common.proto to
+    // tag projects with ownership information.
+    Labels labels = 5;
+
+    // The state of the project is used to control its visibility in the UI and validity.
+    enum ProjectState {
+        // By default, all projects are considered active.
+        ACTIVE = 0;
+
+        // Archived projects are no longer visible in the UI and no longer valid.
+        ARCHIVED = 1;
+
+        // System generated projects that aren't explicitly created or managed by a user.
+        SYSTEM_GENERATED = 2;
+    }
+    ProjectState state = 6;
+}
+
+// Represents a list of projects.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message Projects {
+    repeated Project projects = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token        = 2;
+}
+
+// Request to retrieve a list of projects matching specified filters. 
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectListRequest {
+    // Indicates the number of projects to be returned.
+    // +required
+    uint32 limit    = 1;
+
+    // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 2;
+
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 3;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by    = 4;
+}
+
+// Adds a new user-project within the Flyte deployment.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectRegisterRequest {
+    // +required
+    Project project                       = 1;
+}
+
+// Purposefully empty, may be updated in the future.
+message ProjectRegisterResponse {
+}
+
+// Purposefully empty, may be updated in the future.
+message ProjectUpdateResponse {
+}
