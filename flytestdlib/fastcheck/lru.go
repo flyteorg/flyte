@@ -3,7 +3,7 @@ package fastcheck
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	cache "github.com/hashicorp/golang-lru"
 )
 

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/version"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	// #nosec G108

@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	utils "github.com/flyteorg/flytestdlib/utils"
+	utils "github.com/flyteorg/flyte/flytestdlib/utils"
 	mock "github.com/stretchr/testify/mock"
 )
 
