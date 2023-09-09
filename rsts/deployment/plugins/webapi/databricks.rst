@@ -389,12 +389,17 @@ You can use Spark via the Databricks Agent Service.
 
 To do so, follow these steps:
 
-1. Start the agent service using PyFlyte.
-2. Configure the Databricks Agent Service.
-3. Create a secret with the group "databricks" and the key "token."
+1. Configure the Databricks Agent Service.
+2. Create a secret with the group "databricks" and the key "access_token".
+
+.. code-block::
+
+  kubectl create secret generic databricks --namespace=flyte --from-literal=access_token=your_databricks_access_token
+
+3. Mount the secret to the Flyte agent deployment
     
    For more details, you can refer to
-   `here <https://docs.flyte.org/projects/cookbook/en/stable/auto_examples/containerization/use_secrets.html>`__.
+   `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
 
 
 .. code-block:: yaml
