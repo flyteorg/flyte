@@ -1,0 +1,787 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl/service/dataproxy.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/data": {
+      "get": {
+        "operationId": "GetData",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceGetDataResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "flyte_url",
+            "description": "A unique identifier in the form of flyte://\u003csomething\u003e that uniquely, for a given Flyte\nbackend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).\ne.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)\n     flyte://v1/proj/development/execid/n2/i (for node execution input)\n     flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
+    "/api/v1/dataproxy/artifact_link": {
+      "post": {
+        "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
+        "operationId": "CreateDownloadLink",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceCreateDownloadLinkResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceCreateDownloadLinkRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    },
+    "/api/v1/dataproxy/artifact_urn": {
+      "get": {
+        "summary": "CreateDownloadLocation creates a signed url to download artifacts.",
+        "operationId": "CreateDownloadLocation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceCreateDownloadLocationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "native_url",
+            "description": "NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar).",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "expires_in",
+            "description": "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this\nexceeds the platform allowed max.\n+optional. The default value comes from a global config.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      },
+      "post": {
+        "summary": "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.",
+        "operationId": "CreateUploadLocation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceCreateUploadLocationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceCreateUploadLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BlobTypeBlobDimensionality": {
+      "type": "string",
+      "enum": [
+        "SINGLE",
+        "MULTIPART"
+      ],
+      "default": "SINGLE"
+    },
+    "SchemaColumnSchemaColumnType": {
+      "type": "string",
+      "enum": [
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION"
+      ],
+      "default": "INTEGER"
+    },
+    "SchemaTypeSchemaColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "A unique name -within the schema type- for the column"
+        },
+        "type": {
+          "$ref": "#/definitions/SchemaColumnSchemaColumnType",
+          "description": "The column type. This allows a limited set of types currently."
+        }
+      }
+    },
+    "StructuredDatasetTypeDatasetColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name within the schema type for the column."
+        },
+        "literal_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The column type."
+        }
+      }
+    },
+    "coreBinary": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
+    },
+    "coreBlob": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreBlobMetadata"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "description": "Refers to an offloaded set of files. It encapsulates the type of the store and a unique uri for where the data is.\nThere are no restrictions on how the uri is formatted since it will depend on how to interact with the store."
+    },
+    "coreBlobMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreBlobType"
+        }
+      }
+    },
+    "coreBlobType": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "title": "Format can be a free form string understood by SDK/UI etc like\ncsv, parquet etc"
+        },
+        "dimensionality": {
+          "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        }
+      },
+      "title": "Defines type behavior for blob objects"
+    },
+    "coreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "coreError": {
+      "type": "object",
+      "properties": {
+        "failed_node_id": {
+          "type": "string",
+          "description": "The node id that threw the error."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message thrown."
+        }
+      },
+      "description": "Represents an error thrown from a node."
+    },
+    "coreLiteral": {
+      "type": "object",
+      "properties": {
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "description": "A simple value."
+        },
+        "collection": {
+          "$ref": "#/definitions/coreLiteralCollection",
+          "description": "A collection of literals to allow nesting."
+        },
+        "map": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of strings to literals."
+        },
+        "hash": {
+          "type": "string",
+          "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        }
+      },
+      "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
+    },
+    "coreLiteralCollection": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralMap": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralType": {
+      "type": "object",
+      "properties": {
+        "simple": {
+          "$ref": "#/definitions/coreSimpleType",
+          "description": "A simple type that can be compared one-to-one with another."
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchemaType",
+          "description": "A complex type that requires matching of inner fields."
+        },
+        "collection_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a collection. Only homogeneous collections are allowed."
+        },
+        "map_value_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a map type. The type of the key is always a string."
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlobType",
+          "description": "A blob might have specialized implementation details depending on associated metadata."
+        },
+        "enum_type": {
+          "$ref": "#/definitions/coreEnumType",
+          "description": "Defines an enum with pre-defined string values."
+        },
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "title": "Generalized schema support"
+        },
+        "union_type": {
+          "$ref": "#/definitions/coreUnionType",
+          "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "metadata": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
+        },
+        "annotation": {
+          "$ref": "#/definitions/coreTypeAnnotation",
+          "description": "This field contains arbitrary data that might have special semantic\nmeaning for the client but does not effect internal flyte behavior."
+        },
+        "structure": {
+          "$ref": "#/definitions/coreTypeStructure",
+          "description": "Hints to improve type matching."
+        }
+      },
+      "description": "Defines a strong type to allow type checking between interfaces."
+    },
+    "coreNodeExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "execution_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+        }
+      },
+      "description": "Encapsulation of fields that identify a Flyte node execution entity."
+    },
+    "corePrimitive": {
+      "type": "object",
+      "properties": {
+        "integer": {
+          "type": "string",
+          "format": "int64"
+        },
+        "float_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "boolean": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        }
+      },
+      "title": "Primitive Types"
+    },
+    "coreScalar": {
+      "type": "object",
+      "properties": {
+        "primitive": {
+          "$ref": "#/definitions/corePrimitive"
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlob"
+        },
+        "binary": {
+          "$ref": "#/definitions/coreBinary"
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchema"
+        },
+        "none_type": {
+          "$ref": "#/definitions/coreVoid"
+        },
+        "error": {
+          "$ref": "#/definitions/coreError"
+        },
+        "generic": {
+          "$ref": "#/definitions/protobufStruct"
+        },
+        "structured_dataset": {
+          "$ref": "#/definitions/coreStructuredDataset"
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnion"
+        }
+      }
+    },
+    "coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "coreSchemaType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaTypeSchemaColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        }
+      },
+      "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
+    },
+    "coreSimpleType": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION",
+        "BINARY",
+        "ERROR",
+        "STRUCT"
+      ],
+      "default": "NONE",
+      "description": "Define a set of simple types."
+    },
+    "coreStructuredDataset": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the data is.\nShould start with the storage location (e.g. s3://, gs://, bq://, etc.)"
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreStructuredDatasetMetadata"
+        }
+      }
+    },
+    "coreStructuredDatasetMetadata": {
+      "type": "object",
+      "properties": {
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "description": "Bundle the type information along with the literal.\nThis is here because StructuredDatasets can often be more defined at run time than at compile time.\nThat is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,\nwithout any column information, but at run time, you might have that column information.\nflytekit python will copy this type information into the literal, from the type information, if not provided by\nthe various plugins (encoders).\nSince this field is run time generated, it's not used for any type checking."
+        }
+      }
+    },
+    "coreStructuredDatasetType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        },
+        "format": {
+          "type": "string",
+          "description": "This is the storage format, the format of the bits at rest\nparquet, feather, csv, etc.\nFor two types to be compatible, the format will need to be an exact match."
+        },
+        "external_schema_type": {
+          "type": "string",
+          "description": "This is a string representing the type that the bytes in external_schema_bytes are formatted in.\nThis is an optional field that will not be used for type checking."
+        },
+        "external_schema_bytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
+    },
+    "coreTypeAnnotation": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "A arbitrary JSON payload to describe a type."
+        }
+      },
+      "description": "TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs."
+    },
+    "coreTypeStructure": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "Must exactly match for types to be castable"
+        }
+      },
+      "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
+    },
+    "coreUnion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      },
+      "description": "The runtime representation of a tagged union value. See `UnionType` for more details."
+    },
+    "coreUnionType": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "description": "Predefined set of variants in union."
+        }
+      },
+      "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
+    },
+    "coreVoid": {
+      "type": "object",
+      "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "coreWorkflowExecutionIdentifier": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User or system provided value for the resource."
+        }
+      },
+      "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+    },
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "serviceArtifactType": {
+      "type": "string",
+      "enum": [
+        "ARTIFACT_TYPE_UNDEFINED",
+        "ARTIFACT_TYPE_DECK"
+      ],
+      "default": "ARTIFACT_TYPE_UNDEFINED",
+      "description": "- ARTIFACT_TYPE_UNDEFINED: ARTIFACT_TYPE_UNDEFINED is the default, often invalid, value for the enum.\n - ARTIFACT_TYPE_DECK: ARTIFACT_TYPE_DECK refers to the deck html file optionally generated after a task, a workflow or a launch plan\nfinishes executing.",
+      "title": "ArtifactType"
+    },
+    "serviceCreateDownloadLinkRequest": {
+      "type": "object",
+      "properties": {
+        "artifact_type": {
+          "$ref": "#/definitions/serviceArtifactType",
+          "description": "ArtifactType of the artifact requested."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this\nexceeds the platform allowed max.\n+optional. The default value comes from a global config."
+        },
+        "node_execution_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier",
+          "description": "NodeId is the unique identifier for the node execution. For a task node, this will retrieve the output of the\nmost recent attempt of the task."
+        }
+      },
+      "title": "CreateDownloadLinkRequest defines the request parameters to create a download link (signed url)"
+    },
+    "serviceCreateDownloadLinkResponse": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when will the signed URL expire."
+        },
+        "pre_signed_urls": {
+          "$ref": "#/definitions/servicePreSignedURLs",
+          "title": "New wrapper object containing the signed urls and expiration time"
+        }
+      },
+      "title": "CreateDownloadLinkResponse defines the response for the generated links"
+    },
+    "serviceCreateDownloadLocationResponse": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "string",
+          "title": "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when will the signed URL expires."
+        }
+      }
+    },
+    "serviceCreateUploadLocationRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "title": "Project to create the upload location for\n+required"
+        },
+        "domain": {
+          "type": "string",
+          "title": "Domain to create the upload location for.\n+required"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Filename specifies a desired suffix for the generated location. E.g. `file.py` or `pre/fix/file.zip`.\n+optional. By default, the service will generate a consistent name based on the provided parameters."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "ExpiresIn defines a requested expiration duration for the generated url. The request will be rejected if this\nexceeds the platform allowed max.\n+optional. The default value comes from a global config."
+        },
+        "content_md5": {
+          "type": "string",
+          "format": "byte",
+          "title": "ContentMD5 restricts the upload location to the specific MD5 provided. The ContentMD5 will also appear in the\ngenerated path.\n+required"
+        },
+        "filename_root": {
+          "type": "string",
+          "title": "If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included\nthis makes the upload location deterministic. The native url will still be prefixed by the upload location prefix\nin data proxy config. This option is useful when uploading multiple files.\n+optional"
+        }
+      },
+      "description": "CreateUploadLocationRequest specified request for the CreateUploadLocation API.\nThe implementation in data proxy service will create the s3 location with some server side configured prefixes,\nand then:\n  - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR\n  - project/domain/filename_root (if present)/filename (if present)."
+    },
+    "serviceCreateUploadLocationResponse": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "string",
+          "title": "SignedUrl specifies the url to use to upload content to (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+        },
+        "native_url": {
+          "type": "string",
+          "title": "NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when will the signed URL expires."
+        }
+      }
+    },
+    "serviceGetDataResponse": {
+      "type": "object",
+      "properties": {
+        "literal_map": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "title": "literal map data will be returned"
+        },
+        "pre_signed_urls": {
+          "$ref": "#/definitions/servicePreSignedURLs",
+          "title": "Flyte deck html will be returned as a signed url users can download"
+        },
+        "literal": {
+          "$ref": "#/definitions/coreLiteral",
+          "description": "Single literal will be returned. This is returned when the user/url requests a specific output or input\nby name. See the o3 example above."
+        }
+      }
+    },
+    "servicePreSignedURLs": {
+      "type": "object",
+      "properties": {
+        "signed_url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ExpiresAt defines when will the signed URL expire."
+        }
+      },
+      "title": "Wrapper object since the message is shared across this and the GetDataResponse"
+    }
+  }
+}

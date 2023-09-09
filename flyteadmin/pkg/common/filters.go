@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 )
 

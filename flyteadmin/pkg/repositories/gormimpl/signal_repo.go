@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
-	adminerrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	flyteAdminDbErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	adminerrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 // SignalRepo is an implementation of SignalRepoInterface.

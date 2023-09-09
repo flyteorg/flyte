@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

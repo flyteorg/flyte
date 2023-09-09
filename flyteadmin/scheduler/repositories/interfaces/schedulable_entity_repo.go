@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 )
 
 //go:generate mockery -name=SchedulableEntityRepoInterface -output=../mocks -case=underscore

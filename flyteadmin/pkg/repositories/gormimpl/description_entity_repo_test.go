@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

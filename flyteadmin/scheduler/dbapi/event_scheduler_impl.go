@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // eventScheduler used for saving the scheduler entries after launch plans are enabled or disabled.

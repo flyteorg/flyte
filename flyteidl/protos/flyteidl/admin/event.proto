@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/event/event.proto";
+
+// Indicates that a sent event was not used to update execution state due to
+// the referenced execution already being terminated (and therefore ineligible
+// for further state transitions).
+message EventErrorAlreadyInTerminalState {
+    // +required
+    string current_phase = 1;
+}
+
+// Indicates an event was rejected because it came from a different cluster than 
+// is on record as running the execution.
+message EventErrorIncompatibleCluster {
+    // The cluster which has been recorded as processing the execution.
+    // +required
+    string cluster = 1;
+}
+
+// Indicates why a sent event was not used to update execution.
+message EventFailureReason {
+    // +required
+    oneof reason {
+        EventErrorAlreadyInTerminalState already_in_terminal_state = 1;
+        EventErrorIncompatibleCluster incompatible_cluster = 2;
+    }
+}
+
+// Request to send a notification that a workflow execution event has occurred.
+message WorkflowExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.WorkflowExecutionEvent event = 2;
+}
+
+message WorkflowExecutionEventResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// Request to send a notification that a node execution event has occurred.
+message NodeExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.NodeExecutionEvent event = 2;
+}
+
+message NodeExecutionEventResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// Request to send a notification that a task execution event has occurred.
+message TaskExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.TaskExecutionEvent event = 2;
+}
+
+message TaskExecutionEventResponse {
+    // Purposefully empty, may be populated in the future.
+}

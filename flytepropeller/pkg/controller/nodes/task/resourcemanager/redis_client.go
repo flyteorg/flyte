@@ -3,9 +3,9 @@ package resourcemanager
 import (
 	"context"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/go-redis/redis"
 )
 

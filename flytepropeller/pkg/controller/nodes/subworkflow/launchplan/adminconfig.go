@@ -1,7 +1,7 @@
 package launchplan
 
 import (
-	ctrlConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	ctrlConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 )
 
 //go:generate pflags AdminConfig --default-var defaultAdminConfig

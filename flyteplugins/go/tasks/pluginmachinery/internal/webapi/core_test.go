@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func Test_validateConfig(t *testing.T) {

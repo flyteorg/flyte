@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

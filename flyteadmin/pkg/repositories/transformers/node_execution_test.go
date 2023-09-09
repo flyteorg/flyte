@@ -6,25 +6,25 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/storage"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/golang/protobuf/ptypes"
 
-	genModel "github.com/flyteorg/flyteadmin/pkg/repositories/gen/models"
+	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 var occurredAt = time.Now().UTC()

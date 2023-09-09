@@ -3,13 +3,13 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 

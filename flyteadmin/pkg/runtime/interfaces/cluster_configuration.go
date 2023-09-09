@@ -3,7 +3,7 @@ package interfaces
 import (
 	"io/ioutil"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 
 	"github.com/pkg/errors"
 )

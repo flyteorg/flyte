@@ -8,12 +8,12 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	batchMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	batchMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"golang.org/x/net/context"
 
 	"github.com/stretchr/testify/assert"

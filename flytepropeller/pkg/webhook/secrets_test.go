@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 	"github.com/stretchr/testify/mock"
 
 	corev1 "k8s.io/api/core/v1"

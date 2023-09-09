@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 

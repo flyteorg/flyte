@@ -1,0 +1,282 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/condition.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/tasks.proto";
+import "flyteidl/core/types.proto";
+import "flyteidl/core/security.proto";
+import "google/protobuf/duration.proto";
+
+// Defines a condition and the execution unit that should be executed if the condition is satisfied.
+message IfBlock {
+    core.BooleanExpression condition = 1;
+    Node then_node = 2;
+}
+
+// Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.
+// If no conditions were satisfied, the else_node or the error will execute.
+message IfElseBlock {
+    //+required. First condition to evaluate.
+    IfBlock case = 1;
+
+    //+optional. Additional branches to evaluate.
+    repeated IfBlock other = 2;
+
+    //+required.
+    oneof default {
+        // The node to execute in case none of the branches were taken.
+        Node else_node = 3;
+
+        // An error to throw in case none of the branches were taken.
+        Error error = 4;
+    }
+}
+
+// BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at
+// runtime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primitives).
+message BranchNode {
+    //+required
+    IfElseBlock if_else = 1;
+}
+
+// Refers to the task that the Node is to execute.
+message TaskNode {
+    oneof reference {
+        // A globally unique identifier for the task.
+        Identifier reference_id = 1;
+    }
+
+    // Optional overrides applied at task execution time.
+    TaskNodeOverrides overrides = 2;
+}
+
+// Refers to a the workflow the node is to execute.
+message WorkflowNode {
+    oneof reference {
+        // A globally unique identifier for the launch plan.
+        Identifier launchplan_ref = 1;
+
+        // Reference to a subworkflow, that should be defined with the compiler context
+        Identifier sub_workflow_ref = 2;
+    }
+}
+
+// ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean
+// signal with the provided signal_id.
+message ApproveCondition {
+    // A unique identifier for the requested boolean signal.
+    string signal_id = 1;
+}
+
+// SignalCondition represents a dependency on an signal.
+message SignalCondition {
+    // A unique identifier for the requested signal.
+    string signal_id = 1;
+
+    // A type denoting the required value type for this signal.
+    LiteralType type = 2;
+
+    // The variable name for the signal value in this nodes outputs.
+    string output_variable_name = 3;
+}
+
+// SleepCondition represents a dependency on waiting for the specified duration.
+message SleepCondition {
+    // The overall duration for this sleep.
+    google.protobuf.Duration duration = 1;
+}
+
+// GateNode refers to the condition that is required for the gate to successfully complete.
+message GateNode {
+    oneof condition {
+        // ApproveCondition represents a dependency on an external approval provided by a boolean signal.
+        ApproveCondition approve = 1;
+
+        // SignalCondition represents a dependency on an signal.
+        SignalCondition signal = 2;
+
+        // SleepCondition represents a dependency on waiting for the specified duration.
+        SleepCondition sleep = 3;
+    }
+}
+
+// ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input
+// values. An ArrayNode can be executed with configurable parallelism (separate from the parent
+// workflow) and can be configured to succeed when a certain number of sub-nodes succeed.
+message ArrayNode {
+    // node is the sub-node that will be executed for each element in the array.
+    Node node = 1;
+
+    // parallelism defines the minimum number of instances to bring up concurrently at any given
+    // point. Note that this is an optimistic restriction and that, due to network partitioning or
+    // other failures, the actual number of currently running instances might be more. This has to
+    // be a positive number if assigned. Default value is size.
+    uint32 parallelism = 2;
+
+    oneof success_criteria {
+        // min_successes is an absolute number of the minimum number of successful completions of
+        // sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+        // and outputs will be computed. This has to be a non-negative number if assigned. Default
+        // value is size (if specified).
+        uint32 min_successes = 3;
+
+        // If the array job size is not known beforehand, the min_success_ratio can instead be used
+        // to determine when an ArrayNode can be marked successful.
+        float min_success_ratio = 4;
+    }
+}
+
+// Defines extra information about the Node.
+message NodeMetadata {
+    // A friendly name for the Node
+    string name = 1;
+
+    // The overall timeout of a task.
+    google.protobuf.Duration timeout = 4;
+
+    // Number of retries per task.
+    RetryStrategy retries = 5;
+
+    // Identify whether node is interruptible
+    oneof interruptible_value {
+        bool interruptible = 6;
+    };
+
+}
+
+// Links a variable to an alias.
+message Alias {
+    // Must match one of the output variable names on a node.
+    string var = 1;
+
+    // A workflow-level unique alias that downstream nodes can refer to in their input.
+    string alias = 2;
+}
+
+// A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
+// node.
+message Node {
+    // A workflow-level unique identifier that identifies this node in the workflow. 'inputs' and 'outputs' are reserved
+    // node ids that cannot be used by other nodes.
+    string id = 1;
+
+    // Extra metadata about the node.
+    NodeMetadata metadata = 2;
+
+    // Specifies how to bind the underlying interface's inputs. All required inputs specified in the underlying interface
+    // must be fulfilled.
+    repeated Binding inputs = 3;
+
+    //+optional Specifies execution dependency for this node ensuring it will only get scheduled to run after all its
+    // upstream nodes have completed. This node will have an implicit dependency on any node that appears in inputs
+    // field.
+    repeated string upstream_node_ids = 4;
+
+    //+optional. A node can define aliases for a subset of its outputs. This is particularly useful if different nodes
+    // need to conform to the same interface (e.g. all branches in a branch node). Downstream nodes must refer to this
+    // nodes outputs using the alias if one's specified.
+    repeated Alias output_aliases = 5;
+
+    // Information about the target to execute in this node.
+    oneof target {
+        // Information about the Task to execute in this node.
+        TaskNode task_node = 6;
+
+        // Information about the Workflow to execute in this mode.
+        WorkflowNode workflow_node = 7;
+
+        // Information about the branch node to evaluate in this node.
+        BranchNode branch_node = 8;
+
+        // Information about the condition to evaluate in this node.
+        GateNode gate_node = 9;
+
+        // Information about the sub-node executions for each value in the list of this nodes
+        // inputs values.
+        ArrayNode array_node = 10;
+    }
+}
+
+// This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not
+// percolate down to child entities (like tasks) launched by the workflow.
+message WorkflowMetadata {
+    // Indicates the runtime priority of workflow executions. 
+    QualityOfService quality_of_service = 1;
+
+    // Failure Handling Strategy
+    enum OnFailurePolicy {
+        // FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It'll automatically
+        // abort all currently running nodes and clean up resources before finally marking the workflow executions as
+        // failed.
+        FAIL_IMMEDIATELY = 0;
+
+        // FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will
+        // not alter the dependencies of the execution graph so any node that depend on the failed node will not be run.
+        // Other nodes that will be executed to completion before cleaning up resources and marking the workflow
+        // execution as failed.
+        FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 1;
+    }
+
+    // Defines how the system should behave when a failure is detected in the workflow execution.
+    OnFailurePolicy on_failure = 2;
+
+    // Arbitrary tags that allow users and the platform to store small but arbitrary labels
+    map<string, string> tags = 3; 
+}
+
+// The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to
+// a workflow's underlying entities (like tasks). For instance, 'interruptible' has no meaning at the workflow layer, it
+// is only relevant when a task executes. The settings here are the defaults that are passed to all nodes
+// unless explicitly overridden at the node layer.
+// If you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be
+// added to both this object and the WorkflowMetadata object above.
+message WorkflowMetadataDefaults {
+    // Whether child nodes of the workflow are interruptible.
+    bool interruptible = 1;
+}
+
+// Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
+// directed acyclic graph.
+message WorkflowTemplate {
+    // A globally unique identifier for the workflow.
+    Identifier id = 1;
+
+    // Extra metadata about the workflow.
+    WorkflowMetadata metadata = 2;
+
+    // Defines a strongly typed interface for the Workflow. This can include some optional parameters.
+    TypedInterface interface = 3;
+
+    // A list of nodes. In addition, 'globals' is a special reserved node id that can be used to consume workflow inputs.
+    repeated Node nodes = 4;
+
+    // A list of output bindings that specify how to construct workflow outputs. Bindings can pull node outputs or
+    // specify literals. All workflow outputs specified in the interface field must be bound in order for the workflow
+    // to be validated. A workflow has an implicit dependency on all of its nodes to execute successfully in order to
+    // bind final outputs.
+    // Most of these outputs will be Binding's with a BindingData of type OutputReference.  That is, your workflow can
+    // just have an output of some constant (`Output(5)`), but usually, the workflow will be pulling
+    // outputs from the output of a task.
+    repeated Binding outputs = 5;
+
+    //+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
+    // The interface of this node must match the Workflow interface with an additional input named 'error' of type
+    // pb.lyft.flyte.core.Error.
+    Node failure_node = 6;
+
+    // workflow defaults
+    WorkflowMetadataDefaults metadata_defaults = 7;
+}
+
+// Optional task node overrides that will be applied at task execution time.
+message TaskNodeOverrides {
+    // A customizable interface to convey resources requested for a task container. 
+    Resources resources = 1;
+}

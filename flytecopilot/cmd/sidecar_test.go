@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytecopilot/cmd/containerwatcher"
+	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
 )
 
 func TestUploadOptions_Upload(t *testing.T) {

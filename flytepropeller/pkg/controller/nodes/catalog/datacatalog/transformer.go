@@ -10,9 +10,9 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flytestdlib/pbhash"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 )
 
 const cachedTaskTag = "flyte_cached"

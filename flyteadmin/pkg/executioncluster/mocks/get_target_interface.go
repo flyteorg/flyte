@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	executioncluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 
 	mock "github.com/stretchr/testify/mock"
 )

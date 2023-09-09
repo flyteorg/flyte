@@ -3,8 +3,8 @@ package interfaces
 import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/golang/protobuf/ptypes/wrappers"
 
 	"golang.org/x/time/rate"

@@ -3,10 +3,10 @@ package common
 import (
 	"strconv"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 )
 
 const maxUniqueIDLength = 20

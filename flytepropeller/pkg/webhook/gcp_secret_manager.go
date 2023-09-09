@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 )
 

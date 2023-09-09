@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	mocket "github.com/Selvatico/go-mocket"
 

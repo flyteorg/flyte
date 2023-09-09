@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	storageMocks "github.com/flyteorg/flytestdlib/storage/mocks"
+	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

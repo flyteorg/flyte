@@ -5,15 +5,15 @@ import (
 	"regexp"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
-	awsUtils "github.com/flyteorg/flyteplugins/go/tasks/plugins/awsutils"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
+	awsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/awsutils"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 )
 
 const defaultComputeEngine = "EC2"

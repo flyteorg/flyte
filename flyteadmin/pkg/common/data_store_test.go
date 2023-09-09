@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	errs "github.com/pkg/errors"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/codes"
 
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 )

@@ -3,17 +3,17 @@ package gormimpl
 import (
 	"context"
 
-	datacatalog_error "github.com/flyteorg/datacatalog/pkg/errors"
+	datacatalog_error "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
-	errors2 "github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flytestdlib/promutils"
+	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

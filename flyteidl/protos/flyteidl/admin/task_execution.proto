@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/event/event.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+// A message used to fetch a single task execution entity.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+message TaskExecutionGetRequest {
+    // Unique identifier for the task execution.
+    // +required
+    core.TaskExecutionIdentifier id = 1;
+}
+
+// Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+message TaskExecutionListRequest {
+    // Indicates the node execution to filter by.
+    // +required
+    core.NodeExecutionIdentifier node_execution_id = 1;
+
+    // Indicates the number of resources to be returned.
+    // +required
+    uint32 limit    = 2;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 3;
+
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 4;
+
+    // Sort ordering for returned list.
+    // +optional
+    Sort sort_by    = 5;
+}
+
+// Encapsulates all details for a single task execution entity.
+// A task execution represents an instantiated task, including all inputs and additional
+// metadata as well as computed results included state, outputs, and duration-based attributes.
+message TaskExecution {
+    // Unique identifier for the task execution.
+    core.TaskExecutionIdentifier id = 1;
+
+    // Path to remote data store where input blob is stored.
+    string input_uri                       = 2;
+
+    // Task execution details and results.
+    TaskExecutionClosure closure           = 3;
+
+    // Whether this task spawned nodes.
+    bool is_parent                         = 4;
+}
+
+// Response structure for a query to list of task execution entities.
+// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
+message TaskExecutionList {
+    repeated TaskExecution task_executions = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                           = 2;
+}
+
+// Container for task execution details and results.
+message TaskExecutionClosure {
+    oneof output_result {
+        // Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).
+        // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
+        string output_uri                  = 1 [deprecated = true];
+
+        // Error information for the task execution. Populated if the execution failed.
+        core.ExecutionError error          = 2;
+
+        // Raw output data produced by this task execution.
+        // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
+        core.LiteralMap output_data        = 12 [deprecated = true];
+    }
+
+    // The last recorded phase for this task execution.
+    core.TaskExecution.Phase phase          = 3;
+
+    // Detailed log information output by the task execution.
+    repeated core.TaskLog logs = 4;
+
+    // Time at which the task execution began running.
+    google.protobuf.Timestamp started_at   = 5;
+
+    // The amount of time the task execution spent running.
+    google.protobuf.Duration duration      = 6;
+
+    // Time at which the task execution was created.
+    google.protobuf.Timestamp created_at   = 7;
+
+    // Time at which the task execution was last updated.
+    google.protobuf.Timestamp updated_at   = 8;
+
+    // Custom data specific to the task plugin.
+    google.protobuf.Struct custom_info     = 9;
+
+    // If there is an explanation for the most recent phase transition, the reason will capture it.
+    string reason                         = 10;
+
+    // A predefined yet extensible Task type identifier.
+    string task_type                      = 11;
+
+    // Metadata around how a task was executed.
+    event.TaskExecutionMetadata metadata  = 16;
+
+    // The event version is used to indicate versioned changes in how data is maintained using this
+    // proto message. For example, event_verison > 0 means that maps tasks logs use the
+    // TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
+    // in this message.
+    int32 event_version = 17;
+
+    // A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+    // as previously done, is much more valuable in visualizing and understanding historical evaluations.
+    repeated Reason reasons = 18;
+}
+
+// Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.
+message Reason {
+    // occurred_at is the timestamp indicating the instant that this reason happened.
+    google.protobuf.Timestamp occurred_at = 1;
+
+    // message is the explanation for the most recent phase transition or status update.
+    string message = 2;
+}
+
+// Request structure to fetch inputs and output for a task execution.
+// By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
+message TaskExecutionGetDataRequest {
+    // The identifier of the task execution for which to fetch inputs and outputs.
+    // +required
+    core.TaskExecutionIdentifier id        = 1;
+}
+
+// Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
+message TaskExecutionGetDataResponse {
+    // Signed url to fetch a core.LiteralMap of task execution inputs.
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs                             = 1 [deprecated = true];
+
+    // Signed url to fetch a core.LiteralMap of task execution outputs.
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs                            = 2 [deprecated = true];
+
+    // Full_inputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_inputs                = 3;
+
+    // Full_outputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_outputs               = 4;
+
+    // flyte tiny url to fetch a core.LiteralMap of task execution's IO
+    // Deck will be empty for task
+    FlyteURLs flyte_urls = 5;
+}

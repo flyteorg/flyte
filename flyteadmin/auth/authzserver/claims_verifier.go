@@ -7,8 +7,8 @@ import (
 	"github.com/ory/x/jwtx"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyteadmin/auth"
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 

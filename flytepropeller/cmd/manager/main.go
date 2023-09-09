@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/flyteorg/flytepropeller/cmd/manager/cmd"
+	"github.com/flyteorg/flyte/flytepropeller/cmd/manager/cmd"
 )
 
 func main() {

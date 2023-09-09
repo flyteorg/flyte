@@ -8,14 +8,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 
 	"github.com/ory/fosite"
 

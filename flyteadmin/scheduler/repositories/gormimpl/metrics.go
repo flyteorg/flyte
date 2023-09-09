@@ -3,7 +3,7 @@ package gormimpl
 import (
 	"time"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // Common metrics emitted by gormimpl repos.

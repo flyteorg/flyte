@@ -6,29 +6,29 @@ import (
 	"reflect"
 	"testing"
 
-	mocks4 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	mocks3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	mocks4 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	mocks3 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	mocks2 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	execMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	recoveryMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	execMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	recoveryMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 )
 
 func createInmemoryStore(t testing.TB) *storage.DataStore {

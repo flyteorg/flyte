@@ -10,7 +10,7 @@ import (
 
 	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Env Var Lookup based on Prefix + SecretGroup + _ + SecretKey

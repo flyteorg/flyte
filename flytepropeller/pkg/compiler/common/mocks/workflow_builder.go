@@ -4,9 +4,9 @@ package mocks
 
 import (
 	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	common "github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	common "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 
-	errors "github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	errors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 
 	mock "github.com/stretchr/testify/mock"
 )

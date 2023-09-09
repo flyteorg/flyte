@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
@@ -20,8 +20,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const maxRetries = 3

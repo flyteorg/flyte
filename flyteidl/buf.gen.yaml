@@ -1,0 +1,12 @@
+version: v1
+managed:
+  enabled: true
+plugins:
+  - plugin: buf.build/grpc/python:v1.53.0
+    out: gen/pb_python
+  - plugin: buf.build/protocolbuffers/python:v22.2
+    out: gen/pb_python
+  - plugin: buf.build/protocolbuffers/pyi:v22.2
+    out: gen/pb_python
+  - plugin: buf.build/community/neoeinstein-prost
+    out: gen/pb_rust

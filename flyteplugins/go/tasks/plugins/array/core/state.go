@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 

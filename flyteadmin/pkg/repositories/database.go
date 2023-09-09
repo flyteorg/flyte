@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 
 	"gorm.io/driver/sqlite"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/jackc/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

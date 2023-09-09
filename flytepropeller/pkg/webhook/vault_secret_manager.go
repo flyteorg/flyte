@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 
 	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 )
 

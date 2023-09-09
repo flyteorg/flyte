@@ -5,12 +5,12 @@ import (
 	"context"
 	"os"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp" // to overcome gke auth provider issue
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"

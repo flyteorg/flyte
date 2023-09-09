@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 )

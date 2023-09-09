@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package flyteidl.plugins.sagemaker;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// HyperparameterScalingType defines the way to increase or decrease the value of the hyperparameter
+// For details, refer to: https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+// See examples of these scaling type, refer to: https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-automatic-model-tuning-now-supports-random-search-and-hyperparameter-scaling/
+message HyperparameterScalingType {
+    enum Value {
+        AUTO = 0;
+        LINEAR = 1;
+        LOGARITHMIC = 2;
+        REVERSELOGARITHMIC = 3;
+    }
+}
+
+// ContinuousParameterRange refers to a continuous range of hyperparameter values, allowing
+// users to specify the search space of a floating-point hyperparameter
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+message ContinuousParameterRange {
+    double max_value = 1;
+    double min_value = 2;
+    HyperparameterScalingType.Value scaling_type = 3;
+}
+
+// IntegerParameterRange refers to a discrete range of hyperparameter values, allowing
+// users to specify the search space of an integer hyperparameter
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+message IntegerParameterRange {
+    int64 max_value = 1;
+    int64 min_value = 2;
+    HyperparameterScalingType.Value scaling_type = 3;
+}
+
+// ContinuousParameterRange refers to a continuous range of hyperparameter values, allowing
+// users to specify the search space of a floating-point hyperparameter
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+message CategoricalParameterRange {
+    repeated string values = 1;
+}
+
+
+// ParameterRangeOneOf describes a single ParameterRange, which is a one-of structure that can be one of
+// the three possible types: ContinuousParameterRange, IntegerParameterRange, and CategoricalParameterRange.
+// This one-of structure in Flyte enables specifying a Parameter in a type-safe manner
+// See: https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+message ParameterRangeOneOf {
+    oneof parameter_range_type {
+        ContinuousParameterRange continuous_parameter_range = 1;
+        IntegerParameterRange integer_parameter_range = 2;
+        CategoricalParameterRange categorical_parameter_range = 3;
+    }
+}
+
+// ParameterRanges is a map that maps hyperparameter name to the corresponding hyperparameter range
+// https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html
+message ParameterRanges {
+    map<string, ParameterRangeOneOf> parameter_range_map = 1;
+}

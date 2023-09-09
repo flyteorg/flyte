@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	schedMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	schedMocks "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 

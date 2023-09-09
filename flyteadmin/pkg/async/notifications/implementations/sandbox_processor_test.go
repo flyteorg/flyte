@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

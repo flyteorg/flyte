@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 
 	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
-	pluginUtils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/api/bigquery/v2"
 )

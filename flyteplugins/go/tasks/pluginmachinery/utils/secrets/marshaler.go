@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 
 	"github.com/golang/protobuf/proto"
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/stretchr/testify/assert"
 )
 
