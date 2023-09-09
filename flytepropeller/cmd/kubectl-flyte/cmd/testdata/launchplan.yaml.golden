@@ -1,0 +1,10 @@
+workflow:
+  id:
+    name: missing-launchplan
+  nodes:
+  - id: node-1
+    workflowNode:
+      launchplanRef:
+        project: foo
+        domain: bar
+        name: baz

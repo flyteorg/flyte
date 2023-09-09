@@ -1,0 +1,271 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionConfig:
+  EnvironmentVariables: null
+  Interruptible: null
+  MaxParallelism: 0
+  OverwriteCache: false
+  RecoveryExecution: {}
+  TaskPluginImpls: null
+  TaskResources:
+    Limits:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+    Requests:
+      CPU: "0"
+      EphemeralStorage: "0"
+      GPU: "0"
+      Memory: "0"
+      Storage: "0"
+executionId: {}
+inputs:
+  literals:
+    columns_metadata:
+      collection:
+        literals:
+        - collection:
+            literals:
+            - scalar:
+                primitive:
+                  stringValue: ""
+    columns_to_normalize_metadata:
+      collection:
+        literals:
+        - collection:
+            literals:
+            - scalar:
+                primitive:
+                  stringValue: ""
+    csv_urls:
+      collection:
+        literals:
+        - scalar:
+            primitive:
+              stringValue: ""
+kind: flyteworkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    domain: domain
+    execution-id: name
+    project: hello
+    shard-key: "6"
+    workflow-name: core-flyte-basics-folders-download-and-normalize-csv-files
+  name: name
+  namespace: namespace
+node-defaults: {}
+rawOutputDataConfig: {}
+securityContext: {}
+spec:
+  connections:
+    n0:
+    - n1
+    n1:
+    - end-node
+    start-node:
+    - n0
+    - n1
+  edges:
+    downstream:
+      n0:
+      - n1
+      n1:
+      - end-node
+      start-node:
+      - n0
+      - n1
+    upstream:
+      end-node:
+      - n1
+      n0:
+      - start-node
+      n1:
+      - n0
+      - start-node
+  id: ::core.flyte_basics.folders.download_and_normalize_csv_files
+  nodes:
+    end-node:
+      id: end-node
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: n1
+            var: o0
+        var: o0
+      kind: end
+      resources: {}
+    n0:
+      id: n0
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: csv_urls
+        var: csv_urls
+      kind: task
+      name: download_files
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.folders.download_files" '
+    n1:
+      id: n1
+      inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: columns_metadata
+        var: columns_metadata
+      - binding:
+          promise:
+            nodeId: start-node
+            var: columns_to_normalize_metadata
+        var: columns_to_normalize_metadata
+      - binding:
+          promise:
+            nodeId: n0
+            var: o0
+        var: csv_files_dir
+      kind: task
+      name: normalize_all_files
+      resources: {}
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK name:"core.flyte_basics.folders.normalize_all_files" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputBindings:
+  - binding:
+      promise:
+        nodeId: n1
+        var: o0
+    var: o0
+  outputs:
+    variables:
+      o0:
+        type:
+          blob:
+            dimensionality: MULTIPART
+status:
+  phase: 0
+tasks:
+  'resource_type:TASK name:"core.flyte_basics.folders.download_files" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.folders
+      - task-name
+      - download_files
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.flyte_basics.folders.download_files
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          csv_urls:
+            type:
+              collectionType:
+                simple: STRING
+      outputs:
+        variables:
+          o0:
+            type:
+              blob:
+                dimensionality: MULTIPART
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task
+  'resource_type:TASK name:"core.flyte_basics.folders.normalize_all_files" ':
+    container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.folders
+      - task-name
+      - normalize_all_files
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+    id:
+      name: core.flyte_basics.folders.normalize_all_files
+      resourceType: TASK
+    interface:
+      inputs:
+        variables:
+          columns_metadata:
+            type:
+              collectionType:
+                collectionType:
+                  simple: STRING
+          columns_to_normalize_metadata:
+            type:
+              collectionType:
+                collectionType:
+                  simple: STRING
+          csv_files_dir:
+            type:
+              blob:
+                dimensionality: MULTIPART
+      outputs:
+        variables:
+          o0:
+            type:
+              blob:
+                dimensionality: MULTIPART
+    metadata:
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.32.6
+    type: python-task

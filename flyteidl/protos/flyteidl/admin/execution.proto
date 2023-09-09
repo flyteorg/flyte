@@ -1,0 +1,408 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/cluster_assignment.proto";
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/metrics.proto";
+import "flyteidl/core/security.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+// Request to launch an execution with the given project, domain and optionally-assigned name.
+message ExecutionCreateRequest {
+    // Name of the project the execution belongs to.
+    // +required
+    string project = 1;
+
+    // Name of the domain the execution belongs to.
+    // A domain can be considered as a subset within a specific project.
+    // +required
+    string domain = 2;
+
+    // User provided value for the resource.
+    // If none is provided the system will generate a unique string.
+    // +optional
+    string name = 3;
+
+    // Additional fields necessary to launch the execution.
+    // +optional
+    ExecutionSpec spec = 4;
+
+    // The inputs required to start the execution. All required inputs must be
+    // included in this map. If not required and not provided, defaults apply.
+    // +optional
+    core.LiteralMap inputs = 5;
+}
+
+// Request to relaunch the referenced execution.
+message ExecutionRelaunchRequest {
+    // Identifier of the workflow execution to relaunch.
+    // +required
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // Deprecated field, do not use.
+    reserved 2;
+
+    // User provided value for the relaunched execution.
+    // If none is provided the system will generate a unique string.
+    // +optional
+    string name = 3;
+
+    // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+    // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+    // data once execution finishes successfully.
+    bool overwrite_cache = 4;
+}
+
+// Request to recover the referenced execution.
+message ExecutionRecoverRequest {
+    // Identifier of the workflow execution to recover.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // User provided value for the recovered execution.
+    // If none is provided the system will generate a unique string.
+    // +optional
+    string name = 2;
+
+   // Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution.
+   ExecutionMetadata metadata = 3; 
+}
+
+// The unique identifier for a successfully created execution.
+// If the name was *not* specified in the create request, this identifier will include a generated name.
+message ExecutionCreateResponse {
+    core.WorkflowExecutionIdentifier id = 1;
+}
+
+// A message used to fetch a single workflow execution entity.
+// See :ref:`ref_flyteidl.admin.Execution` for more details
+message WorkflowExecutionGetRequest {
+    // Uniquely identifies an individual workflow execution.
+    core.WorkflowExecutionIdentifier id = 1;
+}
+
+// A workflow execution represents an instantiated workflow, including all inputs and additional
+// metadata as well as computed results included state, outputs, and duration-based attributes.
+// Used as a response object used in Get and List execution requests.
+message Execution {
+    // Unique identifier of the workflow execution.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // User-provided configuration and inputs for launching the execution.
+    ExecutionSpec spec = 2;
+
+    // Execution results.
+    ExecutionClosure closure = 3;
+}
+
+// Used as a response for request to list executions.
+// See :ref:`ref_flyteidl.admin.Execution` for more details
+message ExecutionList {
+    repeated Execution executions = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token = 2;
+}
+
+// Input/output data can represented by actual values or a link to where values are stored
+message LiteralMapBlob {
+    oneof data {
+        // Data in LiteralMap format
+        core.LiteralMap values = 1 [deprecated = true];
+
+        // In the event that the map is too large, we return a uri to the data
+        string uri = 2;
+    }
+}
+
+// Specifies metadata around an aborted workflow execution.
+message AbortMetadata {
+    // In the case of a user-specified abort, this will pass along the user-supplied cause.
+    string cause = 1;
+
+    // Identifies the entity (if any) responsible for terminating the execution
+    string principal = 2;
+}
+
+// Encapsulates the results of the Execution
+message ExecutionClosure {
+    // A result produced by a terminated execution.
+    // A pending (non-terminal) execution will not have any output result.
+    oneof output_result {
+        // Output URI in the case of a successful execution.
+        // DEPRECATED. Use GetExecutionData to fetch output data instead.
+        LiteralMapBlob outputs = 1 [deprecated = true];
+
+        // Error information in the case of a failed execution.
+        core.ExecutionError error = 2;
+
+        // In the case of a user-specified abort, this will pass along the user-supplied cause.
+        string abort_cause = 10 [deprecated = true];
+
+        // In the case of a user-specified abort, this will pass along the user and their supplied cause.
+        AbortMetadata abort_metadata = 12;
+
+        // Raw output data produced by this execution.
+        // DEPRECATED. Use GetExecutionData to fetch output data instead.
+        core.LiteralMap output_data = 13 [deprecated = true];
+    }
+
+    // Inputs computed and passed for execution.
+    // computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
+    core.LiteralMap computed_inputs = 3 [deprecated = true];
+
+    // Most recent recorded phase for the execution.
+    core.WorkflowExecution.Phase phase = 4;
+
+    // Reported time at which the execution began running.
+    google.protobuf.Timestamp started_at = 5;
+
+    // The amount of time the execution spent running.
+    google.protobuf.Duration duration = 6;
+
+    // Reported time at which the execution was created.
+    google.protobuf.Timestamp created_at = 7;
+
+    // Reported time at which the execution was last updated.
+    google.protobuf.Timestamp updated_at = 8;
+
+    // The notification settings to use after merging the CreateExecutionRequest and the launch plan
+    // notification settings. An execution launched with notifications will always prefer that definition
+    // to notifications defined statically in a launch plan.
+    repeated Notification notifications = 9;
+
+    // Identifies the workflow definition for this execution.
+    core.Identifier workflow_id = 11;
+
+    // Provides the details of the last stage change
+    ExecutionStateChangeDetails state_change_details = 14;
+}
+
+// Represents system, rather than user-facing, metadata about an execution.
+message SystemMetadata {
+
+    // Which execution cluster this execution ran on.
+    string execution_cluster = 1;
+
+    // Which kubernetes namespace the execution ran under.
+    string namespace = 2;
+}
+
+// Represents attributes about an execution which are not required to launch the execution but are useful to record.
+// These attributes are assigned at launch time and do not change.
+message ExecutionMetadata {
+    // The method by which this execution was launched.
+    enum ExecutionMode {
+        // The default execution mode, MANUAL implies that an execution was launched by an individual.
+        MANUAL = 0;
+
+        // A schedule triggered this execution launch.
+        SCHEDULED = 1;
+
+        // A system process was responsible for launching this execution rather an individual.
+        SYSTEM = 2;
+
+        // This execution was launched with identical inputs as a previous execution.
+        RELAUNCH = 3;
+
+        // This execution was triggered by another execution.
+        CHILD_WORKFLOW = 4;
+
+        // This execution was recovered from another execution.
+        RECOVERED = 5;
+    }
+    ExecutionMode mode = 1;
+
+    // Identifier of the entity that triggered this execution.
+    // For systems using back-end authentication any value set here will be discarded in favor of the
+    // authenticated user context.
+    string principal = 2;
+
+    // Indicates the nestedness of this execution.
+    // If a user launches a workflow execution, the default nesting is 0.
+    // If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1
+    // Generally, if workflow at nesting level k launches a workflow then the child workflow will have
+    // nesting = k + 1.
+    uint32 nesting = 3;
+
+    // For scheduled executions, the requested time for execution for this specific schedule invocation.
+    google.protobuf.Timestamp scheduled_at = 4;
+
+    // Which subworkflow node (if any) launched this execution
+    core.NodeExecutionIdentifier parent_node_execution = 5;
+
+    // Optional, a reference workflow execution related to this execution.
+    // In the case of a relaunch, this references the original workflow execution.
+    core.WorkflowExecutionIdentifier reference_execution = 16;
+
+    // Optional, platform-specific metadata about the execution.
+    // In this the future this may be gated behind an ACL or some sort of authorization.
+    SystemMetadata system_metadata = 17;
+}
+
+message NotificationList {
+    repeated Notification notifications = 1;
+}
+
+// An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
+// of an execution as it progresses across phase changes.
+message ExecutionSpec {
+    // Launch plan to be executed
+    core.Identifier launch_plan = 1;
+
+    // Input values to be passed for the execution
+    core.LiteralMap inputs = 2 [deprecated = true];
+
+    // Metadata for the execution
+    ExecutionMetadata metadata = 3;
+
+    // This field is deprecated.  Do not use.
+    reserved 4;
+
+    oneof notification_overrides {
+        // List of notifications based on Execution status transitions
+        // When this list is not empty it is used rather than any notifications defined in the referenced launch plan.
+        // When this list is empty, the notifications defined for the launch plan will be applied.
+        NotificationList notifications = 5;
+
+        // This should be set to true if all notifications are intended to be disabled for this execution.
+        bool disable_all = 6;
+    }
+
+    // Labels to apply to the execution resource.
+    Labels labels = 7;
+
+    // Annotations to apply to the execution resource.
+    Annotations annotations = 8;
+
+    // Optional: security context override to apply this execution.
+    core.SecurityContext security_context = 10;
+
+    // Optional: auth override to apply this execution.
+    AuthRole auth_role = 16 [deprecated = true];
+
+    // Indicates the runtime priority of the execution.
+    core.QualityOfService quality_of_service = 17;
+
+    // Controls the maximum number of task nodes that can be run in parallel for the entire workflow.
+    // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+    // and parallelism/concurrency of MapTasks is independent from this.
+    int32 max_parallelism = 18;
+
+    // User setting to configure where to store offloaded data (i.e. Blobs, structured datasets, query data, etc.).
+    // This should be a prefix like s3://my-bucket/my-data
+    RawOutputDataConfig raw_output_data_config = 19;
+
+    // Controls how to select an available cluster on which this execution should run.
+    ClusterAssignment cluster_assignment = 20;
+
+    // Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    // Omitting this field uses the workflow's value as a default.
+    // As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    // around the bool field.
+    google.protobuf.BoolValue interruptible = 21;
+
+    // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+    // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+    // data once execution finishes successfully.
+    bool overwrite_cache = 22;
+
+    // Environment variables to be set for the execution.
+    Envs envs = 23;
+    // Tags to be set for the execution.
+    repeated string tags = 24;
+}
+
+// Request to terminate an in-progress execution.  This action is irreversible.
+// If an execution is already terminated, this request will simply be a no-op.
+// This request will fail if it references a non-existent execution.
+// If the request succeeds the phase "ABORTED" will be recorded for the termination
+// with the optional cause added to the output_result.
+message ExecutionTerminateRequest {
+    // Uniquely identifies the individual workflow execution to be terminated.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // Optional reason for aborting.
+    string cause = 2;
+}
+
+message ExecutionTerminateResponse {
+    // Purposefully empty, may be populated in the future.
+}
+
+// Request structure to fetch inputs, output and other data produced by an execution.
+// By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
+message WorkflowExecutionGetDataRequest {
+    // The identifier of the execution for which to fetch inputs and outputs.
+    core.WorkflowExecutionIdentifier id = 1;
+}
+
+// Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
+message WorkflowExecutionGetDataResponse {
+    // Signed url to fetch a core.LiteralMap of execution outputs.
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs = 1 [deprecated = true];
+
+    // Signed url to fetch a core.LiteralMap of execution inputs.
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs = 2 [deprecated = true];
+
+    // Full_inputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_inputs = 3;
+
+    // Full_outputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_outputs = 4;
+}
+
+// The state of the execution is used to control its visibility in the UI/CLI.
+enum ExecutionState {
+    // By default, all executions are considered active.
+    EXECUTION_ACTIVE = 0;
+
+    // Archived executions are no longer visible in the UI.
+    EXECUTION_ARCHIVED = 1;
+}
+
+message ExecutionUpdateRequest {
+    // Identifier of the execution to update
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // State to set as the new value active/archive
+    ExecutionState state = 2;
+}
+
+message ExecutionStateChangeDetails {
+    // The state of the execution is used to control its visibility in the UI/CLI.
+    ExecutionState state = 1;
+
+    // This timestamp represents when the state changed.
+    google.protobuf.Timestamp occurred_at = 2;
+
+    // Identifies the entity (if any) responsible for causing the state change of the execution
+    string principal = 3;
+}
+
+message ExecutionUpdateResponse {}
+
+// WorkflowExecutionGetMetricsRequest represents a request to retrieve metrics for the specified workflow execution.
+message WorkflowExecutionGetMetricsRequest {
+    // id defines the workflow execution to query for.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+    int32 depth = 2;
+}
+
+// WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution.
+message WorkflowExecutionGetMetricsResponse {
+    // Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+    // hierarchical structure using Flyte entity references.
+    core.Span span = 1;
+}

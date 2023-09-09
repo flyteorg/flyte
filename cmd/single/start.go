@@ -2,39 +2,39 @@ package single
 
 import (
 	"context"
-
-	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/plugins"
-	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
-	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
-
-	"github.com/flyteorg/flytepropeller/pkg/signals"
-	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
-	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"net/http"
 
 	datacatalogConfig "github.com/flyteorg/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/datacatalog/pkg/repositories"
 	datacatalog "github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/plugins"
 	"github.com/flyteorg/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyteadmin/pkg/server"
 	adminScheduler "github.com/flyteorg/flyteadmin/scheduler"
+	propellerEntrypoint "github.com/flyteorg/flytepropeller/pkg/controller"
+	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/signals"
+	webhookEntrypoint "github.com/flyteorg/flytepropeller/pkg/webhook"
+	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/profutils"
 	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const defaultNamespace = "all"
@@ -147,6 +147,20 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 	}
 
 	if !cfg.DisableWebhook || !cfg.Disabled {
+		handlers := map[string]http.Handler{
+			"/k8smetrics": promhttp.HandlerFor(metrics.Registry, promhttp.HandlerOpts{
+				ErrorHandling: promhttp.HTTPErrorOnError,
+			}),
+		}
+
+		g.Go(func() error {
+			err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, handlers)
+			if err != nil {
+				logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
+			}
+			return err
+		})
+
 		g.Go(func() error {
 			err := propellerEntrypoint.StartControllerManager(childCtx, mgr)
 			if err != nil {

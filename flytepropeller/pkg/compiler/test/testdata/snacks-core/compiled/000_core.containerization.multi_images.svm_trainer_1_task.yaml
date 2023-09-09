@@ -1,0 +1,70 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.containerization.multi_images
+      - task-name
+      - svm_trainer
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-with-sklearn-baa17ccf39aa667c5950bd713a4366ce7d5fccaf7f85e6be8c07fe4b522f92c3
+      resources: {}
+  id:
+    name: core.containerization.multi_images.svm_trainer
+    resource_type: 1
+  interface:
+    inputs: {}
+    outputs:
+      variables:
+        test_features:
+          description: test_features
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        test_labels:
+          description: test_labels
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        train_features:
+          description: train_features
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        train_labels:
+          description: train_labels
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

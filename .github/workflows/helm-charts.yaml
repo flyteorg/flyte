@@ -1,6 +1,7 @@
 name: Package & Push Flyte Helm Charts
 
 on:
+  pull_request:
   push:
     branches:
       - master
@@ -13,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        chart: ["flyte-binary", "flyte-core", "flyte-agent"]
+        chart: ["flyte-binary", "flyte-core", "flyteagent"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,11 +26,21 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Publish Helm chart to GHCR
+      - name: Build helm chart
         working-directory: charts
         run: |
+          helm dep update ${{ matrix.chart }}
           helm package \
             --app-version=${{ github.sha }} \
             --version=0.0-${{ github.sha }} \
             ${{ matrix.chart }}
+          
+          if ! ls ${{ matrix.chart }}-* 2>&1 >/dev/null;
+          then
+              echo "Chart package not found."
+              exit 1
+          fi
+      - name: Publish Helm chart to GHCR
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        run:
           helm push ${{ matrix.chart }}-*.tgz oci://ghcr.io/flyteorg/helm-charts

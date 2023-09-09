@@ -1,0 +1,46 @@
+name: Pull Request
+
+on: pull_request
+
+jobs:
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+      - name: Unit Tests
+        run: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v3.1.1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: false
+
+  lint:
+    name: Run lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+      - name: Lint
+        run: make install && make lint
+
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+      - name: Go generate and diff
+        run: DELTA_CHECK=true make generate

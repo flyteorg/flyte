@@ -1,0 +1,34 @@
+apiVersion: flyte.flyteorg.com/v1alpha1
+kind: DynamicJob
+metadata:
+  annotations:
+    iam.amazonaws.com/role: arn:aws:iam::173840052742:role/modelbuildertemplatebatchworker-development
+  creationTimestamp: null
+  generateName: dynamic-job-
+  namespace: modelbuilderapi
+spec:
+  args:
+  - --task-module=batch_task_workflow
+  - --task-name=find_odd_numbers2
+  - --inputs={{$input}}
+  - --output-prefix={{$output}}
+  backoffLimit: 2
+  command:
+  - service_venv
+  - flyte-python-entrypoint
+  completions: 2
+  config:
+    batch_child_task_queue: arn:aws:batch:us-east-1:173840052742:job-queue/FlyteNonProductionSubTaskCPU-staging-iad
+    batch_master_task_queue: arn:aws:batch:us-east-1:173840052742:job-queue/FlyteNonProductionTaskCPU-staging-iad
+  env:
+  - name: FLYTE_INTERNAL_IMAGE
+    value: registry.ingress.ktensorgym.us-east-1.k8s.flyteorg.net/sdk:latest
+  image: registry.ingress.ktensorgym.us-east-1.k8s.flyteorg.net/sdk:latest
+  input: s3://flyteorg-modelbuilder/empty_inputs.pb
+  name: ""
+  output: s3://flyteorg-modelbuilder/metadata/BetaOneSecondFunctionalTest/00011450-52d6-4dd4-805c-9de8a981acee/dummy2/
+  resources:
+    requests:
+      cpu: "1"
+      memory: 500M
+status: {}

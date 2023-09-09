@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/catalog.proto";
+import "flyteidl/core/compiler.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+// A message used to fetch a single node execution entity.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
+message NodeExecutionGetRequest {
+
+   // Uniquely identifies an individual node execution.
+   // +required
+   core.NodeExecutionIdentifier id  = 1;  
+}
+
+// Represents a request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
+message NodeExecutionListRequest {
+    // Indicates the workflow execution to filter by.
+   // +required
+    core.WorkflowExecutionIdentifier workflow_execution_id = 1;
+
+    // Indicates the number of resources to be returned.
+   // +required
+    uint32 limit    = 2;
+
+    // In the case of multiple pages of results, the, server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+
+    string token    = 3;
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by    = 5;
+
+    // Unique identifier of the parent node in the execution
+    // +optional
+    string unique_parent_id = 6;
+}
+
+// Represents a request structure to retrieve a list of node execution entities launched by a specific task.
+// This can arise when a task yields a subworkflow.
+message NodeExecutionForTaskListRequest {
+    // Indicates the node execution to filter by.
+    // +required
+    core.TaskExecutionIdentifier task_execution_id = 1;
+
+    // Indicates the number of resources to be returned.
+    // +required
+    uint32 limit    = 2;
+
+    // In the case of multiple pages of results, the, server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 3;
+
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by    = 5;
+}
+
+// Encapsulates all details for a single node execution entity.
+// A node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested
+// sub-workflow, or even a separate child-workflow execution.
+// The same task can be called repeatedly in a single workflow but each node is unique.
+message NodeExecution {
+
+    // Uniquely identifies an individual node execution.
+    core.NodeExecutionIdentifier id        = 1;
+
+    // Path to remote data store where input blob is stored.
+    string input_uri                       = 2;
+
+    // Computed results associated with this node execution.
+    NodeExecutionClosure closure           = 3;
+
+    // Metadata for Node Execution
+    NodeExecutionMetaData metadata = 4;
+}
+
+// Represents additional attributes related to a Node Execution
+message NodeExecutionMetaData {
+    // Node executions are grouped depending on retries of the parent
+    // Retry group is unique within the context of a parent node.
+    string retry_group = 1;
+
+    // Boolean flag indicating if the node has child nodes under it
+    // This can be true when a node contains a dynamic workflow which then produces
+    // child nodes.
+    bool is_parent_node = 2;
+
+    // Node id of the node in the original workflow
+    // This maps to value of WorkflowTemplate.nodes[X].id
+    string spec_node_id = 3;
+
+    // Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
+    // This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
+    bool is_dynamic = 4;
+}
+
+// Request structure to retrieve a list of node execution entities.
+// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
+message NodeExecutionList {
+    repeated NodeExecution node_executions = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                           = 2;
+}
+
+// Container for node execution details and results.
+message NodeExecutionClosure {
+    // Only a node in a terminal state will have a non-empty output_result.
+    oneof output_result {
+        // Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
+        // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
+        string output_uri                  = 1 [deprecated = true];
+
+        // Error information for the Node
+        core.ExecutionError error          = 2;
+
+        // Raw output data produced by this node execution.
+        // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
+        core.LiteralMap output_data        = 10 [deprecated = true];
+    }
+
+    // The last recorded phase for this node execution.
+    core.NodeExecution.Phase phase          = 3;
+
+    // Time at which the node execution began running.
+    google.protobuf.Timestamp started_at   = 4;
+
+    // The amount of time the node execution spent running.
+    google.protobuf.Duration duration      = 5;
+
+    // Time at which the node execution was created.
+    google.protobuf.Timestamp created_at   = 6;
+
+    // Time at which the node execution was last updated.
+    google.protobuf.Timestamp updated_at   = 7;
+
+    // Store metadata for what the node launched.
+    // for ex: if this is a workflow node, we store information for the launched workflow.
+    oneof target_metadata {
+        WorkflowNodeMetadata workflow_node_metadata = 8;
+        TaskNodeMetadata task_node_metadata = 9;
+    }
+
+    // String location uniquely identifying where the deck HTML file is.
+    // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+    string deck_uri = 11;
+
+    // dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required
+    // to correctly recover partially completed executions where the subworkflow has already been compiled.
+    string dynamic_job_spec_uri = 12;
+}
+
+// Metadata for a WorkflowNode
+message WorkflowNodeMetadata {
+    // The identifier for a workflow execution launched by a node.
+    core.WorkflowExecutionIdentifier executionId        = 1;
+}
+
+// Metadata for the case in which the node is a TaskNode
+message TaskNodeMetadata {
+    // Captures the status of caching for this execution.
+    core.CatalogCacheStatus cache_status = 1;
+    // This structure carries the catalog artifact information
+    core.CatalogMetadata catalog_key = 2;
+    // The latest checkpoint location
+    string checkpoint_uri = 4;
+}
+
+// For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.
+message DynamicWorkflowNodeMetadata {
+    // id represents the unique identifier of the workflow.
+    core.Identifier id     = 1;
+
+    // Represents the compiled representation of the embedded dynamic workflow.
+    core.CompiledWorkflowClosure compiled_workflow = 2;
+
+    // dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+    // required to correctly recover partially completed executions where the subworkflow has already been compiled.
+    string dynamic_job_spec_uri = 3;
+}
+
+// Request structure to fetch inputs and output for a node execution.
+// By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
+message NodeExecutionGetDataRequest {
+    // The identifier of the node execution for which to fetch inputs and outputs.
+    core.NodeExecutionIdentifier id        = 1;
+}
+
+// Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.
+message NodeExecutionGetDataResponse {
+    // Signed url to fetch a core.LiteralMap of node execution inputs.
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs                             = 1  [deprecated = true];
+
+    // Signed url to fetch a core.LiteralMap of node execution outputs.
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs                            = 2  [deprecated = true];
+
+    // Full_inputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_inputs                = 3;
+
+    // Full_outputs will only be populated if they are under a configured size threshold. 
+    core.LiteralMap full_outputs               = 4;
+
+    // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
+    DynamicWorkflowNodeMetadata dynamic_workflow = 16;
+
+    FlyteURLs flyte_urls = 17;
+
+}
