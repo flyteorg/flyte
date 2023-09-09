@@ -396,9 +396,6 @@ To do so, follow these steps:
    For more details, you can refer to
    `here <https://docs.flyte.org/projects/cookbook/en/stable/auto_examples/containerization/use_secrets.html>`__.
 
-.. code-block::
-
-  pyflyte serve
 
 .. code-block:: yaml
 
