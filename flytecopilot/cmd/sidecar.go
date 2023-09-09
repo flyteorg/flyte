@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flytecopilot/cmd/containerwatcher"
-	"github.com/flyteorg/flytecopilot/data"
+	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
+	"github.com/flyteorg/flyte/flytecopilot/data"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

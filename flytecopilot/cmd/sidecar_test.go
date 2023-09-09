@@ -13,7 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytecopilot/cmd/containerwatcher"
+	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
 )
 
 func TestUploadOptions_Upload(t *testing.T) {
