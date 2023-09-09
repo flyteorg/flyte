@@ -74,6 +74,8 @@ type Config struct {
 
 	Command []string `json:"command" pflag:",Command for external authentication token generation"`
 
+	ProxyCommand []string `json:"proxyCommand" pflag:",Command for external proxy-authorization token generation"`
+
 	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
 	// eg. {"loadBalancingConfig": [{"round_robin":{}}], "methodConfig": [{"name":[{"service": "foo", "method": "bar"}, {"service": "baz"}], "timeout": "1.000000001s"}]}
 	// find the full schema here https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto#L625
