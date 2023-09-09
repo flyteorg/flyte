@@ -411,7 +411,7 @@ To do so, follow these steps:
         - spark
       # By default, all the request will be sent to the default agent.
       defaultAgent:
-        endpoint: "dns:///localhost:8000"
+        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
         insecure: true
         timeouts:
           GetTask: 100s
