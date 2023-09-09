@@ -416,14 +416,3 @@ To do so, follow these steps:
         timeouts:
           GetTask: 100s
         defaultTimeout: 100s
-      agents:
-        custom_agent:
-          endpoint: "dns:///localhost:8000"
-          insecure: false
-          defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
-          timeouts:
-            GetTask: 100s
-          defaultTimeout: 100s
-      agentForTaskTypes:
-        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
-        - custom_task: custom_agent
