@@ -409,8 +409,6 @@ To do so, follow these steps:
     agent-service:
       supportedTaskTypes:
         - spark
-        - default_task
-        - custom_task
       # By default, all the request will be sent to the default agent.
       defaultAgent:
         endpoint: "dns:///localhost:8000"
