@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/config"
@@ -163,7 +164,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 
 	switch resource.State {
 	case admin.State_PENDING:
-		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, "Job is PENDING", taskInfo), nil
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, "job submitted", taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:

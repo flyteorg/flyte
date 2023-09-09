@@ -111,7 +111,7 @@ func TestPlugin(t *testing.T) {
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
+		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {

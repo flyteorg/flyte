@@ -218,7 +218,6 @@ func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) 
 }
 
 func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
-
 	pi := phaseInfo(PhaseInitializing, version, nil, info, false)
 	pi.reason = reason
 	return pi
