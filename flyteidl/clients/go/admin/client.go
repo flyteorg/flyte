@@ -172,7 +172,9 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 // for the process. Note that if called with different cfg/dialoptions, it will not refresh the connection.
 func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
 	credentialsFuture := NewPerRPCCredentialsFuture()
+	// TODO, only optionally add the proxy authenticator
 	opts = append(opts,
+		grpc.WithChainUnaryInterceptor(NewProxyAuthInterceptor(cfg, tokenCache, credentialsFuture)),
 		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture)),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 

@@ -48,6 +48,26 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 	return nil
 }
 
+// MaterializeCredentials will attempt to build a TokenSource given the anonymously available information exposed by the server.
+// Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
+func MaterializeProxyAuthCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, perRPCCredentials *PerRPCCredentialsFuture) error {
+	tokenSourceProvider, err := NewProxyTokenSourceProvider(ctx, cfg, tokenCache)
+	if err != nil {
+		return fmt.Errorf("failed to initialized proxy authorization token source provider. Err: %w", err)
+	}
+
+	authorizationMetadataKey := "proxy-authorization"
+
+	proxyTokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
+	if err != nil {
+		return err
+	}
+
+	wrappedTokenSource := NewCustomHeaderTokenSource(proxyTokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
+	perRPCCredentials.Store(wrappedTokenSource)
+	return nil
+}
+
 func shouldAttemptToAuthenticate(errorCode codes.Code) bool {
 	return errorCode == codes.Unauthenticated
 }
@@ -99,6 +119,31 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			}
 		}
 
+		return err
+	}
+}
+
+func NewProxyAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		ctx = setHTTPClientContext(ctx, cfg)
+
+		err := invoker(ctx, method, req, reply, cc, opts...)
+		if err != nil {
+			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
+
+			// st, ok := status.FromError(err)
+			//if ok {
+			// If the error we receive from executing the request expects
+			//if shouldAttemptToAuthenticate(st.Code()) {
+			fmt.Println("Would attempt to attach proxy-auth header here")
+			newErr := MaterializeProxyAuthCredentials(ctx, cfg, tokenCache, credentialsFuture)
+			if newErr != nil {
+				return fmt.Errorf("proxy-authorization error! Original Error: %v, Auth Error: %w", err, newErr)
+			}
+			return invoker(ctx, method, req, reply, cc, opts...)
+			//	}
+			// }
+		}
 		return err
 	}
 }

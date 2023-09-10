@@ -107,6 +107,14 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 	return tokenProvider, nil
 }
 
+func NewProxyTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.TokenCache) (TokenSourceProvider, error) {
+	proxyTokenSourceProvider, err := NewExternalTokenSourceProvider(cfg.ProxyCommand)
+	if err != nil {
+		return nil, err
+	}
+	return proxyTokenSourceProvider, nil
+}
+
 type ExternalTokenSourceProvider struct {
 	command []string
 }
