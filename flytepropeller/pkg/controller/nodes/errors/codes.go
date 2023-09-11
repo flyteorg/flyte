@@ -26,4 +26,5 @@ const (
 	EventRecordingFailed               ErrorCode = "EventRecordingFailed"
 	CatalogCallFailed                  ErrorCode = "CatalogCallFailed"
 	InvalidArrayLength                 ErrorCode = "InvalidArrayLength"
+	PromiseAttributeResolveError       ErrorCode = "PromiseAttributeResolveError"
 )

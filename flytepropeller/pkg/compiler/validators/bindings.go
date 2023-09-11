@@ -125,6 +125,12 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 					}
 				}
 
+				// Skip the validation if the promise has attribute paths
+				// because we don't know the type of the resolved attribute
+				if len(val.Promise.AttrPath) > 0 {
+					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
+				}
+
 				if !validateParamTypes || AreTypesCastable(sourceType, expectedType) {
 					val.Promise.NodeId = upNode.GetId()
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true

@@ -61,6 +61,7 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 
 		upstreamNodeID := bindingData.GetPromise().GetNodeId()
 		bindToVar := bindingData.GetPromise().GetVar()
+		bindAttrPath := bindingData.GetPromise().GetAttrPath()
 
 		if nl == nil {
 			return nil, errors.Errorf(errors.IllegalStateError, upstreamNodeID,
@@ -79,7 +80,7 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 				"Undefined node in Workflow")
 		}
 
-		return outputResolver.ExtractOutput(ctx, nl, n, bindToVar)
+		return outputResolver.ExtractOutput(ctx, nl, n, bindToVar, bindAttrPath)
 	case *core.BindingData_Scalar:
 		logger.Debugf(ctx, "bindingData.GetValue() [%v] is of type Scalar", bindingData.GetValue())
 		literal.Value = &core.Literal_Scalar{Scalar: bindingData.GetScalar()}

@@ -22,7 +22,7 @@ type VarName = string
 type OutputResolver interface {
 	// Extracts a subset of node outputs to literals.
 	ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode,
-		bindToVar VarName) (values *core.Literal, err error)
+		bindToVar VarName, bindAttrPath []*core.PromiseAtrribute) (values *core.Literal, err error)
 }
 
 func CreateAliasMap(aliases []v1alpha1.Alias) map[string]string {
@@ -39,7 +39,7 @@ type remoteFileOutputResolver struct {
 }
 
 func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode,
-	bindToVar VarName) (values *core.Literal, err error) {
+	bindToVar VarName, bindAttrPath []*core.PromiseAtrribute) (values *core.Literal, err error) {
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 	outputsFileRef := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
@@ -54,11 +54,15 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 		actualVar = variable
 	}
 
+	var output *core.Literal
+
 	if index == nil {
-		return resolveSingleOutput(ctx, r.store, n.GetID(), outputsFileRef, actualVar)
+		output, err = resolveSingleOutput(ctx, r.store, n.GetID(), outputsFileRef, actualVar)
+	} else {
+		output, err = resolveSubtaskOutput(ctx, r.store, n.GetID(), outputsFileRef, *index, actualVar)
 	}
 
-	return resolveSubtaskOutput(ctx, r.store, n.GetID(), outputsFileRef, *index, actualVar)
+	return resolveAttrPathInPromise(ctx, n.GetID(), output, bindAttrPath)
 }
 
 func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, nodeID string, outputsFileRef storage.DataReference,
