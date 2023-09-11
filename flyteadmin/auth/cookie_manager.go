@@ -175,20 +175,9 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 	return nil
 }
 
-func (c *CookieManager) getLogoutAccessCookie() *http.Cookie {
+func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 	return &http.Cookie{
-		Name:     accessTokenCookieName,
-		Value:    "",
-		Domain:   c.domain,
-		MaxAge:   0,
-		HttpOnly: true,
-		Expires:  time.Now().Add(-1 * time.Hour),
-	}
-}
-
-func (c *CookieManager) getLogoutRefreshCookie() *http.Cookie {
-	return &http.Cookie{
-		Name:     refreshTokenCookieName,
+		Name:     name,
 		Value:    "",
 		Domain:   c.domain,
 		MaxAge:   0,
@@ -198,8 +187,9 @@ func (c *CookieManager) getLogoutRefreshCookie() *http.Cookie {
 }
 
 func (c CookieManager) DeleteCookies(_ context.Context, writer http.ResponseWriter) {
-	http.SetCookie(writer, c.getLogoutAccessCookie())
-	http.SetCookie(writer, c.getLogoutRefreshCookie())
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieName))
+	http.SetCookie(writer, c.getLogoutCookie(refreshTokenCookieName))
+	http.SetCookie(writer, c.getLogoutCookie(idTokenCookieName))
 }
 
 func (c CookieManager) getHTTPSameSitePolicy() http.SameSite {

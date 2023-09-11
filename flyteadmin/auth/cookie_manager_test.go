@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -17,7 +19,7 @@ import (
 	"github.com/flyteorg/flyteadmin/auth/config"
 )
 
-func TestCookieManager_SetTokenCookies(t *testing.T) {
+func TestCookieManager(t *testing.T) {
 	ctx := context.Background()
 	// These were generated for unit testing only.
 	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
@@ -59,6 +61,14 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 		assert.Equal(t, "flyte_at", c[0].Name)
 		assert.Equal(t, "flyte_idt", c[1].Name)
 		assert.Equal(t, "flyte_rt", c[2].Name)
+	})
+
+	t.Run("set_token_nil", func(t *testing.T) {
+		w := httptest.NewRecorder()
+
+		err = manager.SetTokenCookies(ctx, w, nil)
+
+		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Attempting to set cookies with nil token")
 	})
 
 	t.Run("set_token_cookies_wrong_key", func(t *testing.T) {
@@ -115,31 +125,22 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Error reading existing secure cookie [flyte_idt]. Error: [SECURE_COOKIE_ERROR] Error reading secure cookie flyte_idt, caused by: securecookie: error - caused by: crypto/aes: invalid key size 75")
 	})
 
-	t.Run("logout_access_cookie", func(t *testing.T) {
-		cookie := manager.getLogoutAccessCookie()
-
-		assert.True(t, time.Now().After(cookie.Expires))
-		assert.Equal(t, cookieSetting.Domain, cookie.Domain)
-	})
-
-	t.Run("logout_refresh_cookie", func(t *testing.T) {
-		cookie := manager.getLogoutRefreshCookie()
-
-		assert.True(t, time.Now().After(cookie.Expires))
-		assert.Equal(t, cookieSetting.Domain, cookie.Domain)
-	})
-
 	t.Run("delete_cookies", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		manager.DeleteCookies(ctx, w)
 
 		cookies := w.Result().Cookies()
-		require.Equal(t, 2, len(cookies))
+		require.Equal(t, 3, len(cookies))
 		assert.True(t, time.Now().After(cookies[0].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[0].Domain)
+		assert.Equal(t, accessTokenCookieName, cookies[0].Name)
 		assert.True(t, time.Now().After(cookies[1].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
+		assert.Equal(t, refreshTokenCookieName, cookies[1].Name)
+		assert.True(t, time.Now().After(cookies[1].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
+		assert.Equal(t, idTokenCookieName, cookies[2].Name)
 	})
 
 	t.Run("get_http_same_site_policy", func(t *testing.T) {
@@ -151,5 +152,31 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 
 		manager.sameSitePolicy = config.SameSiteNoneMode
 		assert.Equal(t, http.SameSiteNoneMode, manager.getHTTPSameSitePolicy())
+	})
+
+	t.Run("set_user_info", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		info := &service.UserInfoResponse{
+			Subject: "sub",
+			Name:    "foo",
+		}
+
+		err := manager.SetUserInfoCookie(ctx, w, info)
+
+		assert.NoError(t, err)
+		cookies := w.Result().Cookies()
+		require.Len(t, cookies, 1)
+		assert.Equal(t, "flyte_user_info", cookies[0].Name)
+	})
+
+	t.Run("set_auth_code", func(t *testing.T) {
+		w := httptest.NewRecorder()
+
+		err := manager.SetAuthCodeCookie(ctx, w, "foo.com")
+
+		assert.NoError(t, err)
+		cookies := w.Result().Cookies()
+		require.Len(t, cookies, 1)
+		assert.Equal(t, "flyte_auth_code", cookies[0].Name)
 	})
 }
