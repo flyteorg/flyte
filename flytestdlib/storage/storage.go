@@ -69,7 +69,7 @@ type RawStore interface {
 	// CreateSignedURL creates a signed url with the provided properties.
 	CreateSignedURL(ctx context.Context, reference DataReference, properties SignedURLProperties) (SignedURLResponse, error)
 
-	// Head gets metadata about the reference. This should generally be a light weight operation.
+	// Head gets metadata about the reference. This should generally be a lightweight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error

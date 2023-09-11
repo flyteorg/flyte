@@ -25,13 +25,13 @@ func (_m RawStore_CopyRaw) Return(_a0 error) *RawStore_CopyRaw {
 }
 
 func (_m *RawStore) OnCopyRaw(ctx context.Context, source storage.DataReference, destination storage.DataReference, opts storage.Options) *RawStore_CopyRaw {
-	c := _m.On("CopyRaw", ctx, source, destination, opts)
-	return &RawStore_CopyRaw{Call: c}
+	c_call := _m.On("CopyRaw", ctx, source, destination, opts)
+	return &RawStore_CopyRaw{Call: c_call}
 }
 
 func (_m *RawStore) OnCopyRawMatch(matchers ...interface{}) *RawStore_CopyRaw {
-	c := _m.On("CopyRaw", matchers...)
-	return &RawStore_CopyRaw{Call: c}
+	c_call := _m.On("CopyRaw", matchers...)
+	return &RawStore_CopyRaw{Call: c_call}
 }
 
 // CopyRaw provides a mock function with given fields: ctx, source, destination, opts
@@ -57,13 +57,13 @@ func (_m RawStore_CreateSignedURL) Return(_a0 storage.SignedURLResponse, _a1 err
 }
 
 func (_m *RawStore) OnCreateSignedURL(ctx context.Context, reference storage.DataReference, properties storage.SignedURLProperties) *RawStore_CreateSignedURL {
-	c := _m.On("CreateSignedURL", ctx, reference, properties)
-	return &RawStore_CreateSignedURL{Call: c}
+	c_call := _m.On("CreateSignedURL", ctx, reference, properties)
+	return &RawStore_CreateSignedURL{Call: c_call}
 }
 
 func (_m *RawStore) OnCreateSignedURLMatch(matchers ...interface{}) *RawStore_CreateSignedURL {
-	c := _m.On("CreateSignedURL", matchers...)
-	return &RawStore_CreateSignedURL{Call: c}
+	c_call := _m.On("CreateSignedURL", matchers...)
+	return &RawStore_CreateSignedURL{Call: c_call}
 }
 
 // CreateSignedURL provides a mock function with given fields: ctx, reference, properties
@@ -96,13 +96,13 @@ func (_m RawStore_Delete) Return(_a0 error) *RawStore_Delete {
 }
 
 func (_m *RawStore) OnDelete(ctx context.Context, reference storage.DataReference) *RawStore_Delete {
-	c := _m.On("Delete", ctx, reference)
-	return &RawStore_Delete{Call: c}
+	c_call := _m.On("Delete", ctx, reference)
+	return &RawStore_Delete{Call: c_call}
 }
 
 func (_m *RawStore) OnDeleteMatch(matchers ...interface{}) *RawStore_Delete {
-	c := _m.On("Delete", matchers...)
-	return &RawStore_Delete{Call: c}
+	c_call := _m.On("Delete", matchers...)
+	return &RawStore_Delete{Call: c_call}
 }
 
 // Delete provides a mock function with given fields: ctx, reference
@@ -128,13 +128,13 @@ func (_m RawStore_GetBaseContainerFQN) Return(_a0 storage.DataReference) *RawSto
 }
 
 func (_m *RawStore) OnGetBaseContainerFQN(ctx context.Context) *RawStore_GetBaseContainerFQN {
-	c := _m.On("GetBaseContainerFQN", ctx)
-	return &RawStore_GetBaseContainerFQN{Call: c}
+	c_call := _m.On("GetBaseContainerFQN", ctx)
+	return &RawStore_GetBaseContainerFQN{Call: c_call}
 }
 
 func (_m *RawStore) OnGetBaseContainerFQNMatch(matchers ...interface{}) *RawStore_GetBaseContainerFQN {
-	c := _m.On("GetBaseContainerFQN", matchers...)
-	return &RawStore_GetBaseContainerFQN{Call: c}
+	c_call := _m.On("GetBaseContainerFQN", matchers...)
+	return &RawStore_GetBaseContainerFQN{Call: c_call}
 }
 
 // GetBaseContainerFQN provides a mock function with given fields: ctx
@@ -160,13 +160,13 @@ func (_m RawStore_Head) Return(_a0 storage.Metadata, _a1 error) *RawStore_Head {
 }
 
 func (_m *RawStore) OnHead(ctx context.Context, reference storage.DataReference) *RawStore_Head {
-	c := _m.On("Head", ctx, reference)
-	return &RawStore_Head{Call: c}
+	c_call := _m.On("Head", ctx, reference)
+	return &RawStore_Head{Call: c_call}
 }
 
 func (_m *RawStore) OnHeadMatch(matchers ...interface{}) *RawStore_Head {
-	c := _m.On("Head", matchers...)
-	return &RawStore_Head{Call: c}
+	c_call := _m.On("Head", matchers...)
+	return &RawStore_Head{Call: c_call}
 }
 
 // Head provides a mock function with given fields: ctx, reference
@@ -201,13 +201,13 @@ func (_m RawStore_ReadRaw) Return(_a0 io.ReadCloser, _a1 error) *RawStore_ReadRa
 }
 
 func (_m *RawStore) OnReadRaw(ctx context.Context, reference storage.DataReference) *RawStore_ReadRaw {
-	c := _m.On("ReadRaw", ctx, reference)
-	return &RawStore_ReadRaw{Call: c}
+	c_call := _m.On("ReadRaw", ctx, reference)
+	return &RawStore_ReadRaw{Call: c_call}
 }
 
 func (_m *RawStore) OnReadRawMatch(matchers ...interface{}) *RawStore_ReadRaw {
-	c := _m.On("ReadRaw", matchers...)
-	return &RawStore_ReadRaw{Call: c}
+	c_call := _m.On("ReadRaw", matchers...)
+	return &RawStore_ReadRaw{Call: c_call}
 }
 
 // ReadRaw provides a mock function with given fields: ctx, reference
@@ -242,13 +242,13 @@ func (_m RawStore_WriteRaw) Return(_a0 error) *RawStore_WriteRaw {
 }
 
 func (_m *RawStore) OnWriteRaw(ctx context.Context, reference storage.DataReference, size int64, opts storage.Options, raw io.Reader) *RawStore_WriteRaw {
-	c := _m.On("WriteRaw", ctx, reference, size, opts, raw)
-	return &RawStore_WriteRaw{Call: c}
+	c_call := _m.On("WriteRaw", ctx, reference, size, opts, raw)
+	return &RawStore_WriteRaw{Call: c_call}
 }
 
 func (_m *RawStore) OnWriteRawMatch(matchers ...interface{}) *RawStore_WriteRaw {
-	c := _m.On("WriteRaw", matchers...)
-	return &RawStore_WriteRaw{Call: c}
+	c_call := _m.On("WriteRaw", matchers...)
+	return &RawStore_WriteRaw{Call: c_call}
 }
 
 // WriteRaw provides a mock function with given fields: ctx, reference, size, opts, raw
