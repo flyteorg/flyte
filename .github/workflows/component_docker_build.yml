@@ -1,4 +1,4 @@
-name: Build Component Docker Image
+name: Build Docker Image
 
 on:
   workflow_call:
@@ -12,7 +12,6 @@ on:
         value: ${{ jobs.build_docker.outputs.cache_key }}
 jobs:
   build_docker:
-    name: Build Docker Image
     runs-on: ubuntu-latest
     outputs:
       cache_key: ${{ steps.cache_key.outputs.cache_key }}
