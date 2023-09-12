@@ -46,4 +46,4 @@ jobs:
 
       - name: Tag and cache docker image
         run: |
-          mkdir -p /tmp/tmp/docker-images && docker save ${{ github.repository_owner }}/${{ inputs.component }}:builder -o /tmp/tmp/docker-images/snapshot-builder.tar && docker save ${{ github.repository_owner }}/${{ inputs.component }}:latest -o /tmp/tmp/docker-images/snapshot.tar
+          mkdir -p /tmp/tmp/docker-images && docker save ${{ github.repository_owner }}/${{ inputs.component }}:builder -o /tmp/tmp/docker-images/snapshot-builder-${{ inputs.component }}.tar && docker save ${{ github.repository_owner }}/${{ inputs.component }}:latest -o /tmp/tmp/docker-images/snapshot-${{ inputs.component }}.tar
