@@ -15,7 +15,8 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
-          - flytecopilot
+          # TODO(monorepo): Enable lint flytecopilot
+          # flytecopilot
           - flyteidl
           - flyteplugins
           - flytepropeller
