@@ -38,7 +38,7 @@ jobs:
   endtoend:
     name: End2End Test
     needs: [ docker-build ]
-    uses: ./.github/.github/workflows/end2end.yml
+    uses: ./.github/workflows/end2end.yml
     with:
       # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
       cache_key: ${{ needs.docker-build.outputs.cache_key }}
