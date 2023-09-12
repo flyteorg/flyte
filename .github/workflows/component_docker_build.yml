@@ -15,9 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache_key: ${{ steps.cache_key.outputs.cache_key }}
-    defaults:
-      run:
-        working-directory: ${{ inputs.component }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,8 +41,8 @@ jobs:
           # should rewrite this pipeline to use docker buildx with cache type=gha.
           DOCKER_BUILDKIT: "1"
         run: |
-          docker build -t ${{ github.repository_owner }}/${{ github.event.repository.name }}:builder --target builder --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder .
-          docker build -t ${{ github.repository_owner }}/${{ inputs.component }}:latest --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder .
+          docker build -t ${{ github.repository_owner }}/${{ inputs.component }}:builder --target builder --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder --file Dockerfile.${{ inputs.component }} .
+          docker build -t ${{ github.repository_owner }}/${{ inputs.component }}:latest --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder --file Dockerfile.${{ inputs.component }} .
 
       - name: Tag and cache docker image
         run: |
