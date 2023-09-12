@@ -8,9 +8,9 @@ import (
 	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
 	"github.com/flyteorg/flyte/flytecopilot/data"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

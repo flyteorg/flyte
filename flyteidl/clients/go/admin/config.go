@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
+	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
