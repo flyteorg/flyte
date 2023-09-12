@@ -292,6 +292,44 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 	return nil
 }
 
+//Update tag information of existing execution model.
+func UpdateExecutionModelTag(executionModel *models.Execution, tagsUpdatedTo []string) error {
+	//tagUpdatedAt time.Time, tagUpdatedBy string) error {
+	
+	
+
+	// First: I need to figure out why is executionclosure here.. Do I need it?
+	//var closure admin.ExecutionClosure
+	//err := proto.Unmarshal(executionModel.Closure, &closure)
+	//if err != nil {
+	//	return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
+	//}
+	
+	// Update the closure with the same
+	//var tagUpdatedAtProto *timestamppb.Timestamp
+	// Default use the createdAt timestamp as the state change occurredAt time
+	//if stateUpdatedAtProto, err = ptypes.TimestampProto(stateUpdatedAt); err != nil {
+	//	return err
+	//}
+	
+	// combine tags and tagsUpdatedTo to one []models.AdminTag and then write back to executionModel.Tags
+	for _, tag := range tagsUpdatedTo {
+		executionModel.Tags = append(executionModel.Tags, models.AdminTag{Name: tag})
+	}
+	//I need to figure out where is tag is wrote?
+	//closure.StateChangeDetails = &admin.ExecutionStateChangeDetails{
+	//	Tags:      tagsUpdatedTo,
+	//	Principal:  stateUpdatedBy,
+	//	OccurredAt: stateUpdatedAtProto,
+	//}
+	//marshaledClosure, err := proto.Marshal(&closure)
+	//if err != nil {
+	//	return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
+	//}
+	//executionModel.Closure = marshaledClosure
+	return nil
+}
+
 // The execution abort metadata is recorded but the phase is not actually updated *until* the abort event is propagated
 // by flytepropeller. The metadata is preemptively saved at the time of the abort.
 func SetExecutionAborting(execution *models.Execution, cause, principal string) error {
