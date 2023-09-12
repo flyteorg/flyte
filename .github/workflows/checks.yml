@@ -8,6 +8,31 @@ env:
   GO_VERSION: "1.19"
   PRIORITIES": "P0"
 jobs:
+  lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - datacatalog
+          - flyteadmin
+          - flytecopilot
+          - flyteidl
+          - flyteplugins
+          - flytepropeller
+          - flytestdlib
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ matrix.component }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Lint
+        run: make install && make lint
   unit-tests:
     strategy:
       fail-fast: false
@@ -16,6 +41,7 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
+          - flyteidl
           - flyteplugins
           - flytepropeller
           - flytestdlib
