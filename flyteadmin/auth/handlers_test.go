@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,8 +12,11 @@ import (
 	"testing"
 
 	"github.com/coreos/go-oidc"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -21,8 +25,6 @@ import (
 	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/plugins"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
 )
 
 const (
@@ -50,8 +52,8 @@ func setupMockedAuthContextAtEndpoint(endpoint string) *mocks.AuthenticationCont
 		Timeout: IdpConnectionTimeout,
 	}
 	mockAuthCtx.OnCookieManagerMatch().Return(mockCookieHandler)
-	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
 	mockAuthCtx.OnGetHTTPClient().Return(dummyHTTPClient)
 	return mockAuthCtx
@@ -253,6 +255,97 @@ func TestGetLoginHandler(t *testing.T) {
 	assert.Equal(t, 307, w.Code)
 	assert.True(t, strings.Contains(w.Header().Get("Location"), "response_type=code&scope=openid+other"))
 	assert.True(t, strings.Contains(w.Header().Get("Set-Cookie"), "flyte_csrf_state="))
+}
+
+func TestGetLogoutHandler(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("no_hook_no_redirect", func(t *testing.T) {
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		req, err := http.NewRequest(http.MethodGet, "/logout", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		require.Len(t, w.Result().Cookies(), 3)
+		authCtx.AssertExpectations(t)
+	})
+
+	t.Run("no_hook_with_redirect", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/foo", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		authCtx.AssertExpectations(t)
+		require.Len(t, w.Result().Cookies(), 3)
+	})
+
+	t.Run("with_hook_with_redirect", func(t *testing.T) {
+		ctx := context.Background()
+		cookieHandler := &CookieManager{}
+		authCtx := mocks.AuthenticationContext{}
+		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		hook := new(mock.Mock)
+		err := r.Register(plugins.PluginIDLogoutHook, LogoutHookFunc(func(
+			ctx context.Context,
+			authCtx interfaces.AuthenticationContext,
+			request *http.Request,
+			w http.ResponseWriter) error {
+			return hook.MethodCalled("hook").Error(0)
+		}))
+		hook.On("hook").Return(nil).Once()
+		require.NoError(t, err)
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/foo", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
+		require.Len(t, w.Result().Cookies(), 3)
+		authCtx.AssertExpectations(t)
+		hook.AssertExpectations(t)
+	})
+
+	t.Run("hook_error", func(t *testing.T) {
+		ctx := context.Background()
+		authCtx := mocks.AuthenticationContext{}
+		w := httptest.NewRecorder()
+		r := plugins.NewRegistry()
+		hook := new(mock.Mock)
+		err := r.Register(plugins.PluginIDLogoutHook, LogoutHookFunc(func(
+			ctx context.Context,
+			authCtx interfaces.AuthenticationContext,
+			request *http.Request,
+			w http.ResponseWriter) error {
+			return hook.MethodCalled("hook").Error(0)
+		}))
+		hook.On("hook").Return(errors.New("fail")).Once()
+		require.NoError(t, err)
+		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/foo", nil)
+		require.NoError(t, err)
+
+		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Empty(t, w.Result().Cookies())
+		authCtx.AssertExpectations(t)
+		hook.AssertExpectations(t)
+	})
 }
 
 func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
