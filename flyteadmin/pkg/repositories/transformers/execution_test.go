@@ -901,6 +901,73 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 	})
 }
 
+func TestUpdateExecutionModelAddTags(t *testing.T) {
+	t.Run("empty closure", func(t *testing.T) {
+		execModel := &models.Execution{}
+		tags := []string{"tags1", "tags2"}
+
+		err := UpdateExecutionModelAddTag(execModel, tags)
+		assert.Nil(t, err)
+		execTags := execModel.Tags
+		// Extract string of execTags
+		var execTagsString []string
+		for _, tag := range execTags {
+			execTagsString = append(execTagsString, tag.Name)
+		}
+		assert.Equal(t, tags, execTagsString)
+
+		var spec admin.ExecutionSpec
+		err = proto.Unmarshal(execModel.Spec, &spec)
+		assert.Nil(t, err)
+		assert.NotNil(t, spec)
+		assert.Equal(t, tags, spec.Tags)
+	})
+
+	t.Run("empty add tags", func(t *testing.T) {
+		execModel := &models.Execution{}
+		execModel.Tags = []models.AdminTag{
+			{Name: "tags1"},
+			{Name: "tags2"},
+		}
+		refTags := []string{"tags1", "tags2"}
+		tags := []string{""}
+
+		err := UpdateExecutionModelAddTag(execModel, tags)
+		assert.Nil(t, err)
+		var execTagsString []string
+		for _, tag := range execModel.Tags {
+			execTagsString = append(execTagsString, tag.Name)
+		}
+		assert.Nil(t, err)
+		assert.Equal(t, refTags, execTagsString)
+	})
+	t.Run("duplicate tags", func(t *testing.T) {
+		spec := testutils.GetExecutionRequest().Spec
+		spec.Tags = []string{"tags1", "tags2"}
+		specBytes, _ := proto.Marshal(spec)
+
+		execModel := &models.Execution{
+			Spec: specBytes,
+		}
+
+		execModel.Tags = []models.AdminTag{
+			{Name: "tags1"},
+			{Name: "tags2"},
+		}
+
+		tags := []string{"tags2", "tags3"}
+		err := UpdateExecutionModelAddTag(execModel, tags)
+		assert.Nil(t, err)
+
+		var execTagsString []string
+		for _, tag := range execModel.Tags {
+			execTagsString = append(execTagsString, tag.Name)
+		}
+		assert.Nil(t, err)
+		assert.Equal(t, []string{"tags1", "tags2", "tags3"}, execTagsString)
+	})
+}
+
 func TestTrimErrorMessage(t *testing.T) {
 	errMsg := "[1/1] currentAttempt done. Last Error: USER::                   │\n│ ❱  760 │   │   │   │   return __callback(*args, **kwargs)                    │\n││"
 	trimmedErrMessage := TrimErrorMessage(errMsg)

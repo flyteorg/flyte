@@ -1346,6 +1346,10 @@ func (m *ExecutionManager) UpdateExecution(ctx context.Context, request admin.Ex
 		return nil, err
 	}
 
+	if err = transformers.UpdateExecutionModelAddTag(executionModel, request.AddTags); err != nil {
+		return nil, err
+	}
+
 	if err := m.db.ExecutionRepo().Update(ctx, *executionModel); err != nil {
 		return nil, err
 	}

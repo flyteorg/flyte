@@ -4087,6 +4087,13 @@
         "state": {
           "$ref": "#/definitions/adminExecutionState",
           "title": "State to set as the new value active/archive"
+        },
+        "add_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tag of the execution to update"
         }
       }
     },

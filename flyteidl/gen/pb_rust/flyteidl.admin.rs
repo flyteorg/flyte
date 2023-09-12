@@ -1221,6 +1221,9 @@ pub struct ExecutionUpdateRequest {
     /// State to set as the new value active/archive
     #[prost(enumeration="ExecutionState", tag="2")]
     pub state: i32,
+    /// Tag of the execution to update
+    #[prost(string, repeated, tag="3")]
+    pub add_tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

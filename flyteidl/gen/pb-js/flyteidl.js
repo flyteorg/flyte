@@ -28881,6 +28881,7 @@
                  * @interface IExecutionUpdateRequest
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] ExecutionUpdateRequest id
                  * @property {flyteidl.admin.ExecutionState|null} [state] ExecutionUpdateRequest state
+                 * @property {Array.<string>|null} [addTags] ExecutionUpdateRequest addTags
                  */
     
                 /**
@@ -28892,6 +28893,7 @@
                  * @param {flyteidl.admin.IExecutionUpdateRequest=} [properties] Properties to set
                  */
                 function ExecutionUpdateRequest(properties) {
+                    this.addTags = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -28913,6 +28915,14 @@
                  * @instance
                  */
                 ExecutionUpdateRequest.prototype.state = 0;
+    
+                /**
+                 * ExecutionUpdateRequest addTags.
+                 * @member {Array.<string>} addTags
+                 * @memberof flyteidl.admin.ExecutionUpdateRequest
+                 * @instance
+                 */
+                ExecutionUpdateRequest.prototype.addTags = $util.emptyArray;
     
                 /**
                  * Creates a new ExecutionUpdateRequest instance using the specified properties.
@@ -28942,6 +28952,9 @@
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.state != null && message.hasOwnProperty("state"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.state);
+                    if (message.addTags != null && message.addTags.length)
+                        for (var i = 0; i < message.addTags.length; ++i)
+                            writer.uint32(/* id 3, wireType 2 =*/26).string(message.addTags[i]);
                     return writer;
                 };
     
@@ -28968,6 +28981,11 @@
                             break;
                         case 2:
                             message.state = reader.int32();
+                            break;
+                        case 3:
+                            if (!(message.addTags && message.addTags.length))
+                                message.addTags = [];
+                            message.addTags.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29001,6 +29019,13 @@
                         case 1:
                             break;
                         }
+                    if (message.addTags != null && message.hasOwnProperty("addTags")) {
+                        if (!Array.isArray(message.addTags))
+                            return "addTags: array expected";
+                        for (var i = 0; i < message.addTags.length; ++i)
+                            if (!$util.isString(message.addTags[i]))
+                                return "addTags: string[] expected";
+                    }
                     return null;
                 };
     

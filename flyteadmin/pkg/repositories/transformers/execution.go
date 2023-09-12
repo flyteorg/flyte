@@ -292,6 +292,46 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 	return nil
 }
 
+// Update tag information of existing execution model.
+func UpdateExecutionModelAddTag(executionModel *models.Execution, addTags []string) error {
+
+	var spec admin.ExecutionSpec
+	var err error
+	if err = proto.Unmarshal(executionModel.Spec, &spec); err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
+	}
+
+	//if spec.Tags is not list, create a new list an assign to spec.Tags
+	if spec.Tags == nil {
+		spec.Tags = make([]string, 0)
+	}
+
+	tagSet := sets.NewString()
+	for _, tag := range spec.Tags {
+		tagSet.Insert(tag)
+	}
+	for _, tag := range addTags {
+		// if len(tag) == 0, skip
+		if len(tag) == 0 {
+			continue
+		}
+		// if tag not in tagSet, append into executionModel.Tags
+		if !tagSet.Has(tag) {
+			executionModel.Tags = append(executionModel.Tags, models.AdminTag{Name: tag})
+		}
+		tagSet.Insert(tag)
+	}
+	spec.Tags = tagSet.List()
+
+	marshaledSpec, err := proto.Marshal(&spec)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution spec: %v", err)
+	}
+	executionModel.Spec = marshaledSpec
+
+	return nil
+}
+
 // The execution abort metadata is recorded but the phase is not actually updated *until* the abort event is propagated
 // by flytepropeller. The metadata is preemptively saved at the time of the abort.
 func SetExecutionAborting(execution *models.Execution, cause, principal string) error {

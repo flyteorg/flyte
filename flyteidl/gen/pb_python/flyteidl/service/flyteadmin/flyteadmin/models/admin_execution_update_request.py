@@ -35,25 +35,30 @@ class AdminExecutionUpdateRequest(object):
     """
     swagger_types = {
         'id': 'CoreWorkflowExecutionIdentifier',
-        'state': 'AdminExecutionState'
+        'state': 'AdminExecutionState',
+        'add_tags': 'list[str]'
     }
 
     attribute_map = {
         'id': 'id',
-        'state': 'state'
+        'state': 'state',
+        'add_tags': 'add_tags'
     }
 
-    def __init__(self, id=None, state=None):  # noqa: E501
+    def __init__(self, id=None, state=None, add_tags=None):  # noqa: E501
         """AdminExecutionUpdateRequest - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._state = None
+        self._add_tags = None
         self.discriminator = None
 
         if id is not None:
             self.id = id
         if state is not None:
             self.state = state
+        if add_tags is not None:
+            self.add_tags = add_tags
 
     @property
     def id(self):
@@ -96,6 +101,27 @@ class AdminExecutionUpdateRequest(object):
         """
 
         self._state = state
+
+    @property
+    def add_tags(self):
+        """Gets the add_tags of this AdminExecutionUpdateRequest.  # noqa: E501
+
+
+        :return: The add_tags of this AdminExecutionUpdateRequest.  # noqa: E501
+        :rtype: list[str]
+        """
+        return self._add_tags
+
+    @add_tags.setter
+    def add_tags(self, add_tags):
+        """Sets the add_tags of this AdminExecutionUpdateRequest.
+
+
+        :param add_tags: The add_tags of this AdminExecutionUpdateRequest.  # noqa: E501
+        :type: list[str]
+        """
+
+        self._add_tags = add_tags
 
     def to_dict(self):
         """Returns the model properties as a dict"""

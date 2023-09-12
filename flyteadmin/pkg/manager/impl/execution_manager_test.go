@@ -2912,6 +2912,38 @@ func TestUpdateExecution(t *testing.T) {
 		assert.True(t, updateExecFuncCalled)
 	})
 
+	t.Run("add tag", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+		updateExecFuncCalled := false
+		updateExecFunc := func(ctx context.Context, execModel models.Execution) error {
+			// add tags to the execution, list of string
+			tags := []string{"tag1", "tag2"}
+			// read execModel.Tags
+			execTags := execModel.Tags
+			// Extract string of execTags
+			var execTagsString []string
+			for _, tag := range execTags {
+				execTagsString = append(execTagsString, tag.Name)
+			}
+
+			// Compare the tags
+			assert.Equal(t, tags, execTagsString)
+			updateExecFuncCalled = true
+			return nil
+		}
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
+		r := plugins.NewRegistry()
+		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+		updateResponse, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
+			Id:      &executionIdentifier,
+			AddTags: []string{"tag1", "tag2"},
+		}, time.Now())
+		assert.NoError(t, err)
+		assert.NotNil(t, updateResponse)
+		assert.True(t, updateExecFuncCalled)
+	})
+
 	t.Run("update error", func(t *testing.T) {
 		repository := repositoryMocks.NewMockRepository()
 		updateExecFunc := func(ctx context.Context, execModel models.Execution) error {

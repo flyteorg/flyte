@@ -250,12 +250,14 @@ class WorkflowExecutionGetDataResponse(_message.Message):
     def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 
 class ExecutionUpdateRequest(_message.Message):
-    __slots__ = ["id", "state"]
+    __slots__ = ["id", "state", "add_tags"]
     ID_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    ADD_TAGS_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.WorkflowExecutionIdentifier
     state: ExecutionState
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., state: _Optional[_Union[ExecutionState, str]] = ...) -> None: ...
+    add_tags: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., state: _Optional[_Union[ExecutionState, str]] = ..., add_tags: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ExecutionStateChangeDetails(_message.Message):
     __slots__ = ["state", "occurred_at", "principal"]
