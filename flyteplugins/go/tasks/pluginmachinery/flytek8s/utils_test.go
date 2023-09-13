@@ -3,8 +3,8 @@ package flytek8s
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 

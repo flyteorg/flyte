@@ -6,9 +6,9 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -16,6 +16,7 @@ import (
 type MemoryMetadata struct {
 	exists bool
 	size   int64
+	etag   string
 }
 
 func (m MemoryMetadata) Size() int64 {
@@ -24,6 +25,10 @@ func (m MemoryMetadata) Size() int64 {
 
 func (m MemoryMetadata) Exists() bool {
 	return m.exists
+}
+
+func (m MemoryMetadata) Etag() string {
+	return m.etag
 }
 
 func TestReadOrigin(t *testing.T) {

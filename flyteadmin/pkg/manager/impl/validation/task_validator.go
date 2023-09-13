@@ -14,9 +14,9 @@ import (
 	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 
 	"google.golang.org/grpc/codes"

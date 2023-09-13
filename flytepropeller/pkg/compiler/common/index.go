@@ -1,8 +1,8 @@
 package common
 
 import (
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 

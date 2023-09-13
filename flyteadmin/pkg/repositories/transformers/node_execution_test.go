@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"

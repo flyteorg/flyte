@@ -6,8 +6,6 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -18,6 +16,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"

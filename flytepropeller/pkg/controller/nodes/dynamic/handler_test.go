@@ -10,10 +10,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v12 "k8s.io/api/core/v1"

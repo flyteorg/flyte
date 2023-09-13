@@ -10,13 +10,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/aws/aws-sdk-go/service/sagemaker"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	taskError "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 

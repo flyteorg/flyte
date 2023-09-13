@@ -14,10 +14,10 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"google.golang.org/grpc/codes"
 )
 

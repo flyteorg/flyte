@@ -6,11 +6,11 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -34,6 +34,7 @@ import (
 type metadata struct {
 	exists bool
 	size   int64
+	etag   string
 }
 
 func (m metadata) Exists() bool {
@@ -42,6 +43,10 @@ func (m metadata) Exists() bool {
 
 func (m metadata) Size() int64 {
 	return m.size
+}
+
+func (m metadata) Etag() string {
+	return m.etag
 }
 
 func createSampleContainerTask() *core2.Container {
@@ -124,7 +129,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {
 		return true
 	})
-	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0}, nil)
+	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0, ""}, nil)
 	dataStore := &storage.DataStore{
 		ComposedProtobufStore: composedProtobufStore,
 		ReferenceConstructor:  &storage.URLPathConstructor{},

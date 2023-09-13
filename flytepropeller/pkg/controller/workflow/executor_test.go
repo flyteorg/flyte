@@ -40,10 +40,10 @@ import (
 
 	wfErrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/yamlutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"

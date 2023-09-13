@@ -10,8 +10,8 @@ import (
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 )
