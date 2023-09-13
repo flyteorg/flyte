@@ -232,8 +232,8 @@ github.com/evanphx/json-patch v4.12.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQL
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
-github.com/flyteorg/flyteidl v1.5.18-0.20230912163644-f3eaebce376f h1:+g39GXsk5586Hl+yBe1RPx3DifVEjKkeB58+yUTeA1Q=
-github.com/flyteorg/flyteidl v1.5.18-0.20230912163644-f3eaebce376f/go.mod h1:EtE/muM2lHHgBabjYcxqe9TWeJSL0kXwbI0RgVwI4Og=
+github.com/flyteorg/flyteidl v1.5.18-0.20230913190844-dc07c4922069 h1:8MJ/9HeJ+B+K8lvOuQjUXmpYQkZNLEzyMlhZdmtLtpM=
+github.com/flyteorg/flyteidl v1.5.18-0.20230913190844-dc07c4922069/go.mod h1:EtE/muM2lHHgBabjYcxqe9TWeJSL0kXwbI0RgVwI4Og=
 github.com/flyteorg/flytestdlib v1.0.15 h1:kv9jDQmytbE84caY+pkZN8trJU2ouSAmESzpTEhfTt0=
 github.com/flyteorg/flytestdlib v1.0.15/go.mod h1:ghw/cjY0sEWIIbyCtcJnL/Gt7ZS7gf9SUi0CCPhbz3s=
 github.com/flyteorg/stow v0.3.6 h1:jt50ciM14qhKBaIrB+ppXXY+SXB59FNREFgTJqCyqIk=

@@ -433,22 +433,7 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		podSpec := &v1.PodSpec{}
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.ResourceMetadata{
-				Accelerator: &core.ResourceMetadata_GpuAccelerator {
-					GpuAccelerator: &core.GPUAccelerator{
-						Device: "nvidia-tesla-a100",
-					},
-				},
-			},
-		)
-		assert.Nil(t, podSpec.Affinity)
-	})
-
-	t.Run("without gpu accelerator spec", func(t *testing.T) {
-		podSpec := basePodSpec.DeepCopy()
-		ApplyGPUNodeSelectors(
-			podSpec,
-			&core.ResourceMetadata{},
+			&core.GPUAccelerator{Device: "nvidia-tesla-a100"},
 		)
 		assert.Nil(t, podSpec.Affinity)
 	})
@@ -457,13 +442,7 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.ResourceMetadata{
-				Accelerator: &core.ResourceMetadata_GpuAccelerator {
-					GpuAccelerator: &core.GPUAccelerator{
-						Device: "nvidia-tesla-a100",
-					},
-				},
-			},
+			&core.GPUAccelerator{Device: "nvidia-tesla-a100"},
 		)
 		assert.EqualValues(
 			t,
@@ -498,14 +477,10 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.ResourceMetadata{
-				Accelerator: &core.ResourceMetadata_GpuAccelerator {
-					GpuAccelerator: &core.GPUAccelerator{
-						Device: "nvidia-tesla-a100",
-						Partition: &core.GPUAccelerator_PartitionSize {
-							PartitionSize: "1g.5gb",
-						},
-					},
+			&core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
 				},
 			},
 		)
@@ -553,14 +528,10 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.ResourceMetadata{
-				Accelerator: &core.ResourceMetadata_GpuAccelerator {
-					GpuAccelerator: &core.GPUAccelerator{
-						Device: "nvidia-tesla-a100",
-						Partition: &core.GPUAccelerator_Unpartitioned {
-							Unpartitioned: true,
-						},
-					},
+			&core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{
+					Unpartitioned: true,
 				},
 			},
 		)

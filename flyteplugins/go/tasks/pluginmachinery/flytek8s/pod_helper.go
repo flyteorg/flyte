@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flytestdlib/logger"
 
@@ -107,13 +108,21 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
-func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, resourceMetadata *core.ResourceMetadata) {
-	// Short circuit if a GPU accelerator is not specified
-	gpu := resourceMetadata.GetGpuAccelerator()
-	if gpu == nil {
-		return
+// Specialized merging of overrides into a base *core.ResourceMetadata object. Note
+// that doing a nested merge may not be the intended behavior all the time, so we
+// handle each field separately here to convey intent.
+func ApplyResourceMetadataOverrides(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
+	new := proto.Clone(base).(*core.ResourceMetadata)
+
+	// Accelerator
+	if overrides.GetAcceleratorValue() != nil {
+		new.AcceleratorValue = overrides.GetAcceleratorValue()
 	}
 
+	return new
+}
+
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
 	// Short circuit if pod spec does not contain any containers that use GPUs
 	requiresGPUs := false
 	for _, cnt := range podSpec.Containers {
@@ -131,7 +140,7 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, resourceMetadata *core.ResourceM
 	}
 
 	// Apply changes for GPU device
-	device := gpu.GetDevice()
+	device := gpuAccelerator.GetDevice()
 	if len(device) > 0 {
 		// Add node selector requirement for GPU device
 		deviceNsr := v1.NodeSelectorRequirement{
@@ -150,18 +159,18 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, resourceMetadata *core.ResourceM
 		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
 	}
 
-	// Short circuit if a partition preference is not specified
-	partition := gpu.GetPartition()
-	if partition == nil {
+	// Short circuit if a partition size preference is not specified
+	partitionSizeValue := gpuAccelerator.GetPartitionSizeValue()
+	if partitionSizeValue == nil {
 		return
 	}
 
 	// Apply changes for GPU partition size, if applicable
 	var partitionSizeNsr *v1.NodeSelectorRequirement
 	var partitionSizeTol *v1.Toleration
-	switch partition.(type) {
+	switch partitionSizeValue.(type) {
 	case *core.GPUAccelerator_Unpartitioned:
-		if !gpu.GetUnpartitioned() {
+		if !gpuAccelerator.GetUnpartitioned() {
 			break
 		}
 		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
@@ -186,11 +195,11 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, resourceMetadata *core.ResourceM
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
 			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{gpu.GetPartitionSize()},
+			Values:   []string{gpuAccelerator.GetPartitionSize()},
 		}
 		partitionSizeTol = &v1.Toleration{
 			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-			Value:    gpu.GetPartitionSize(),
+			Value:    gpuAccelerator.GetPartitionSize(),
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
@@ -379,8 +388,11 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	if taskTemplate.GetMetadata() != nil {
-		ApplyGPUNodeSelectors(podSpec, taskTemplate.GetMetadata().ResourceMetadata)
+	// handling for resource metadata
+	// Base config
+	if taskTemplate.GetMetadata() != nil && taskTemplate.GetMetadata().GetResourceMetadata() != nil {
+		gpuAccelerator := taskTemplate.GetMetadata().GetResourceMetadata().GetGpuAccelerator()
+		ApplyGPUNodeSelectors(podSpec, gpuAccelerator)
 	}
 
 	return podSpec, objectMeta, nil
