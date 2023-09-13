@@ -108,7 +108,7 @@ jobs:
   #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
   push_docker_image:
-    name: Build & Push Flytepropeller Image
+    name: Build & Push Image
     # TODO(monorepo): depend on bump_version
     # needs: [ bump_version ]
     strategy:
