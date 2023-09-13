@@ -267,7 +267,6 @@ You can run snowflake query through agent service, here are the steps to follow.
       - K8S-ARRAY
     default-for-task-types:
       - snowflake: agent-service
-      - bigquery_query_job_task: agent-service
       - custom_task: agent-service
       - container: container
       - container_array: K8S-ARRAY
@@ -303,7 +302,7 @@ You can run snowflake query through agent service, here are the steps to follow.
           GetTask: 10s
         defaultTimeout: 10s
 
-4. Re-run the flyte server with the following command:
+1. Re-run the flyte server with the following command:
 
 .. code-block:: bash
 
