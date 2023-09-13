@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - master
-
+env:
+  GO_VERSION: "1.19"
+  PRIORITIES": "P0"
 jobs:
   # lint:
   #   name: Lint
@@ -35,22 +37,24 @@ jobs:
     with:
        component: ${{ matrix.component }}
 
-  endtoend:
-    name: End2End Test
-    needs: [ docker-build ]
-    uses: ./.github/workflows/end2end.yml
-    with:
-      # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
-      cache_key: ${{ needs.docker-build.outputs.cache_key }}
-      priorities: "P0"
-
-  # integration:
-  #   name: Integration Test
+  # TODO(monorepo): these tests are broken. They never test an actual change.
+  # endtoend:
+  #   name: End2End Test
   #   needs: [ docker-build ]
-  #   uses: flyteorg/flytetools/.github/workflows/integration.yml@master
+  #   uses: ./.github/workflows/end2end.yml
   #   with:
+  #     # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
   #     cache_key: ${{ needs.docker-build.outputs.cache_key }}
-  #     go-version: "1.19"
+  #     priorities: "P0"
+
+  integration:
+    name: Integration Test
+    needs: [ docker-build ]
+    uses: ./.github/workflows/integration.yml
+    with:
+      component: flyteadmin
+      cache_key: ${{ needs.docker-build.outputs.cache_key }}
+      go-version: ${{ env.GO_VERSION }}
 
   # generate:
   #   name: Check Go Generate
