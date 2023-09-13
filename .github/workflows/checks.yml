@@ -68,18 +68,26 @@ jobs:
           - flytepropeller
     uses: ./.github/workflows/integration.yml
     with:
-      # TODO(monorepo): enable other components
       component: ${{ matrix.component }}
       cache_key: ${{ needs.docker-build.outputs.cache_key }}
-      # TODO(monorepo): figure out environment
-      # go-version: ${{ env.GO_VERSION }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
-  # generate:
-  #   name: Check Go Generate
-  #   uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
-  #   with:
-  #     go-version: "1.19"
+  generate:
+    name: Check Go Generate
+    needs:
+      - unpack-envvars
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - datacatalog
+          - flyteadmin
+          - flytecopilot
+          - flytepropeller
+    uses: ./.github/workflows/go_generate.yml
+    with:
+      component: ${{ matrix.component }}
+      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
   # bump_version:
   #   name: Bump Version
@@ -107,6 +115,20 @@ jobs:
   #     dockerfile: Dockerfile
   #     push: true
   #     repository: ${{ github.repository }}
+  #   secrets:
+  #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+  #     FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  # TODO(monorepo): push flytescheduler image
+  # push-docker-image-flytescheduler:
+  #   name: Build & Push Flytescheduler Image
+  #   needs: [ bump_version ]
+  #   uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+  #   with:
+  #     version: ${{ needs.bump_version.outputs.version }}
+  #     push: true
+  #     repository: flyteorg/flytescheduler
+  #     dockerfile: scheduler.Dockerfile
   #   secrets:
   #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
   #     FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
