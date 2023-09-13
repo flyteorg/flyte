@@ -107,7 +107,13 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
-func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, resourceMetadata *core.ResourceMetadata) {
+	// Short circuit if a GPU accelerator is not specified
+	gpu := resourceMetadata.GetGpuAccelerator()
+	if gpu == nil {
+		return
+	}
+
 	// Short circuit if pod spec does not contain any containers that use GPUs
 	requiresGPUs := false
 	for _, cnt := range podSpec.Containers {
@@ -120,76 +126,80 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, selectors ...*core.Selector) {
 		return
 	}
 
-	// Determine the node selector requirements and tolerations
-	var deviceNsr, partitionSizeNsr *v1.NodeSelectorRequirement
-	var deviceTol, partitionSizeTol *v1.Toleration
-	for _, selector := range selectors {
-		switch selector.GetSelection().(type) {
-		case *core.Selector_GpuDevice:
-			deviceNsr = &v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-				Operator: v1.NodeSelectorOpIn,
-				Values:   []string{selector.GetGpuDevice()},
-			}
-			deviceTol = &v1.Toleration{
-				Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-				Value:    selector.GetGpuDevice(),
-				Operator: v1.TolerationOpEqual,
-				Effect:   v1.TaintEffectNoSchedule,
-			}
-		case *core.Selector_GpuUnpartitioned:
-			if !selector.GetGpuUnpartitioned() {
-				break
-			}
-			if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
-				partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
-			} else {
-				partitionSizeNsr = &v1.NodeSelectorRequirement{
-					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Operator: v1.NodeSelectorOpDoesNotExist,
-				}
-			}
-			if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
-				partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
-			} else {
-				partitionSizeTol = &v1.Toleration{
-					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Value:    GpuPartitionSizeNotSet,
-					Operator: v1.TolerationOpEqual,
-					Effect:   v1.TaintEffectNoSchedule,
-				}
-			}
-		case *core.Selector_GpuPartitionSize:
-			partitionSizeNsr = &v1.NodeSelectorRequirement{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-				Operator: v1.NodeSelectorOpIn,
-				Values:   []string{selector.GetGpuPartitionSize()},
-			}
-			partitionSizeTol = &v1.Toleration{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-				Value:    selector.GetGpuPartitionSize(),
-				Operator: v1.TolerationOpEqual,
-				Effect:   v1.TaintEffectNoSchedule,
-			}
-		}
-	}
-
 	if podSpec.Affinity == nil {
 		podSpec.Affinity = &v1.Affinity{}
 	}
 
-	// Add node selector requirements to pod spec
-	for _, nsr := range []*v1.NodeSelectorRequirement{deviceNsr, partitionSizeNsr} {
-		if nsr != nil {
-			AddRequiredNodeSelectorRequirements(podSpec.Affinity, *nsr)
+	// Apply changes for GPU device
+	device := gpu.GetDevice()
+	if len(device) > 0 {
+		// Add node selector requirement for GPU device
+		deviceNsr := v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{device},
 		}
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
+		// Add toleration for GPU device
+		deviceTol := v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Value:    device,
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
 	}
 
-	// Add tolerations to pod spec
-	for _, tol := range []*v1.Toleration{deviceTol, partitionSizeTol} {
-		if tol != nil {
-			podSpec.Tolerations = append(podSpec.Tolerations, *tol)
+	// Short circuit if a partition preference is not specified
+	partition := gpu.GetPartition()
+	if partition == nil {
+		return
+	}
+
+	// Apply changes for GPU partition size, if applicable
+	var partitionSizeNsr *v1.NodeSelectorRequirement
+	var partitionSizeTol *v1.Toleration
+	switch partition.(type) {
+	case *core.GPUAccelerator_Unpartitioned:
+		if !gpu.GetUnpartitioned() {
+			break
 		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
+			partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+		} else {
+			partitionSizeNsr = &v1.NodeSelectorRequirement{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpDoesNotExist,
+			}
+		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
+			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+		} else {
+			partitionSizeTol = &v1.Toleration{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Value:    GpuPartitionSizeNotSet,
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
+			}
+		}
+	case *core.GPUAccelerator_PartitionSize:
+		partitionSizeNsr = &v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{gpu.GetPartitionSize()},
+		}
+		partitionSizeTol = &v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Value:    gpu.GetPartitionSize(),
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+	}
+	if partitionSizeNsr != nil {
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, *partitionSizeNsr)
+	}
+	if partitionSizeTol != nil {
+		podSpec.Tolerations = append(podSpec.Tolerations, *partitionSizeTol)
 	}
 }
 
@@ -370,7 +380,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	if taskTemplate.GetMetadata() != nil {
-		ApplyGPUNodeSelectors(podSpec, taskTemplate.GetMetadata().Selectors...)
+		ApplyGPUNodeSelectors(podSpec, taskTemplate.GetMetadata().ResourceMetadata)
 	}
 
 	return podSpec, objectMeta, nil

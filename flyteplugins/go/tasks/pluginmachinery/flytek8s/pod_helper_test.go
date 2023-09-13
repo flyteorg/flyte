@@ -429,31 +429,83 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		},
 	}
 
-	t.Run("without gpus", func(t *testing.T) {
+	t.Run("without gpu resource", func(t *testing.T) {
 		podSpec := &v1.PodSpec{}
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-a100",
+			&core.ResourceMetadata{
+				Accelerator: &core.ResourceMetadata_GpuAccelerator {
+					GpuAccelerator: &core.GPUAccelerator{
+						Device: "nvidia-tesla-a100",
+					},
 				},
 			},
 		)
 		assert.Nil(t, podSpec.Affinity)
 	})
 
-	t.Run("with gpu device and partition size", func(t *testing.T) {
+	t.Run("without gpu accelerator spec", func(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-a100",
+			&core.ResourceMetadata{},
+		)
+		assert.Nil(t, podSpec.Affinity)
+	})
+
+	t.Run("with gpu device spec only", func(t *testing.T) {
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.ResourceMetadata{
+				Accelerator: &core.ResourceMetadata_GpuAccelerator {
+					GpuAccelerator: &core.GPUAccelerator{
+						Device: "nvidia-tesla-a100",
+					},
 				},
 			},
-			&core.Selector{
-				Selection: &core.Selector_GpuPartitionSize{
-					GpuPartitionSize: "1g.5gb",
+		)
+		assert.EqualValues(
+			t,
+			[]v1.NodeSelectorTerm{
+				v1.NodeSelectorTerm{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]v1.Toleration{
+				{
+					Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+	})
+
+	t.Run("with gpu device and partition size spec", func(t *testing.T) {
+		podSpec := basePodSpec.DeepCopy()
+		ApplyGPUNodeSelectors(
+			podSpec,
+			&core.ResourceMetadata{
+				Accelerator: &core.ResourceMetadata_GpuAccelerator {
+					GpuAccelerator: &core.GPUAccelerator{
+						Device: "nvidia-tesla-a100",
+						Partition: &core.GPUAccelerator_PartitionSize {
+							PartitionSize: "1g.5gb",
+						},
+					},
 				},
 			},
 		)
@@ -497,18 +549,18 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 		)
 	})
 
-	t.Run("with unpartitioned gpu device", func(t *testing.T) {
+	t.Run("with unpartitioned gpu device spec", func(t *testing.T) {
 		podSpec := basePodSpec.DeepCopy()
 		ApplyGPUNodeSelectors(
 			podSpec,
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-a100",
-				},
-			},
-			&core.Selector{
-				Selection: &core.Selector_GpuUnpartitioned{
-					GpuUnpartitioned: true,
+			&core.ResourceMetadata{
+				Accelerator: &core.ResourceMetadata_GpuAccelerator {
+					GpuAccelerator: &core.GPUAccelerator{
+						Device: "nvidia-tesla-a100",
+						Partition: &core.GPUAccelerator_Unpartitioned {
+							Unpartitioned: true,
+						},
+					},
 				},
 			},
 		)
@@ -543,110 +595,6 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 				{
 					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
 					Value:    GpuPartitionSizeNotSet,
-					Operator: v1.TolerationOpEqual,
-					Effect:   v1.TaintEffectNoSchedule,
-				},
-			},
-			podSpec.Tolerations,
-		)
-	})
-
-	t.Run("with gpu device but without partition size", func(t *testing.T) {
-		podSpec := basePodSpec.DeepCopy()
-		ApplyGPUNodeSelectors(
-			podSpec,
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-a100",
-				},
-			},
-		)
-		assert.EqualValues(
-			t,
-			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
-					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
-							Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-							Operator: v1.NodeSelectorOpIn,
-							Values:   []string{"nvidia-tesla-a100"},
-						},
-					},
-				},
-			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
-			[]v1.Toleration{
-				{
-					Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-					Value:    "nvidia-tesla-a100",
-					Operator: v1.TolerationOpEqual,
-					Effect:   v1.TaintEffectNoSchedule,
-				},
-			},
-			podSpec.Tolerations,
-		)
-	})
-
-	t.Run("with multiple gpu device and partition size selectors", func(t *testing.T) {
-		podSpec := basePodSpec.DeepCopy()
-		ApplyGPUNodeSelectors(
-			podSpec,
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-t4",
-				},
-			},
-			&core.Selector{
-				Selection: &core.Selector_GpuDevice{
-					GpuDevice: "nvidia-tesla-a100",
-				},
-			},
-			&core.Selector{
-				Selection: &core.Selector_GpuPartitionSize{
-					GpuPartitionSize: "1g.5gb",
-				},
-			},
-			&core.Selector{
-				Selection: &core.Selector_GpuPartitionSize{
-					GpuPartitionSize: "2g.10gb",
-				},
-			},
-		)
-		assert.EqualValues(
-			t,
-			[]v1.NodeSelectorTerm{
-				v1.NodeSelectorTerm{
-					MatchExpressions: []v1.NodeSelectorRequirement{
-						v1.NodeSelectorRequirement{
-							Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-							Operator: v1.NodeSelectorOpIn,
-							Values:   []string{"nvidia-tesla-a100"},
-						},
-						v1.NodeSelectorRequirement{
-							Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-							Operator: v1.NodeSelectorOpIn,
-							Values:   []string{"2g.10gb"},
-						},
-					},
-				},
-			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
-			[]v1.Toleration{
-				{
-					Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-					Value:    "nvidia-tesla-a100",
-					Operator: v1.TolerationOpEqual,
-					Effect:   v1.TaintEffectNoSchedule,
-				},
-				{
-					Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Value:    "2g.10gb",
 					Operator: v1.TolerationOpEqual,
 					Effect:   v1.TaintEffectNoSchedule,
 				},
