@@ -6,8 +6,8 @@ import (
 
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"

@@ -14,8 +14,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"

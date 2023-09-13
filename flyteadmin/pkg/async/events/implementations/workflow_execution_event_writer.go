@@ -7,8 +7,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // This event writer acts to asynchronously persist workflow execution events. As flytepropeller sends workflow
