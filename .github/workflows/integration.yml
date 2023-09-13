@@ -11,8 +11,7 @@ on:
         required: true
         type: string
       go-version:
-        default: "1.19"
-        required: false
+        required: true
         type: string
 jobs:
   integration:
@@ -20,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ matrix.component }}
+        working-directory: ${{ inputs.component }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
