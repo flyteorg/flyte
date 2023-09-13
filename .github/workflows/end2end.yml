@@ -117,11 +117,12 @@ jobs:
         run: |
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait \
-            --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
-            --set flyteadmin.image.repository=${{ github.repository_owner }}/datacalog,flyteadmin.image.tag=latest
-            --set flytecopilot.image.repository=${{ github.repository_owner }}/datacalog,flytecopilot.image.tag=latest
-            --set flytepropeller.image.repository=${{ github.repository_owner }}/datacalog,flytepropeller.image.tag=latest
+          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
+          # flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait \
+          #   --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
+          #   --set flyteadmin.image.repository=${{ github.repository_owner }}/datacalog,flyteadmin.image.tag=latest
+          #   --set flytecopilot.image.repository=${{ github.repository_owner }}/datacalog,flytecopilot.image.tag=latest
+          #   --set flytepropeller.image.repository=${{ github.repository_owner }}/datacalog,flytepropeller.image.tag=latest
 
           flytectl sandbox exec -- k3s kubectl get pods -n flyte -oyaml
       - name: Post Upgrade Tests
