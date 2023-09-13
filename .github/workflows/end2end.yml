@@ -33,29 +33,29 @@ jobs:
       - id: load-docker-cache-datacatalog
         uses: actions/cache@v3
         with:
-          path: /tmp/docker-images-datacatalog
+          path: /tmp/tmp/docker-images-datacatalog
           key: ${{ inputs.cache_key }}-datacatalog
       - id: load-docker-cache-flyteadmin
         uses: actions/cache@v3
         with:
-          path: /tmp/docker-images-flyteadmin
+          path: /tmp/tmp/docker-images-flyteadmin
           key: ${{ inputs.cache_key }}-flyteadmin
       - id: load-docker-cache-flytecopilot
         uses: actions/cache@v3
         with:
-          path: /tmp/docker-images-flytecopilot
+          path: /tmp/tmp/docker-images-flytecopilot
           key: ${{ inputs.cache_key }}-flytecopilot
       - id: load-docker-cache-flytepropeller
         uses: actions/cache@v3
         with:
-          path: /tmp/docker-images-flytepropeller
+          path: /tmp/tmp/docker-images-flytepropeller
           key: ${{ inputs.cache_key }}-flytepropeller
       - name: Create Sandbox Cluster
         run: |
-          cp /tmp/docker-images-datacatalog/snapshot-datacatalog.tar snapshot-datacatalog.tar
-          cp /tmp/docker-images-flyteadmin/snapshot-flyteadmin.tar snapshot-flyteadmin.tar
-          cp /tmp/docker-images-flytecopilot/snapshot-flytecopilot.tar snapshot-flytecopilot.tar
-          cp /tmp/docker-images-flytepropeller/snapshot-flytepropeller.tar snapshot-flytepropeller.tar
+          cp /tmp/tmp/docker-images-datacatalog/snapshot-datacatalog.tar snapshot-datacatalog.tar
+          cp /tmp/tmp/docker-images-flyteadmin/snapshot-flyteadmin.tar snapshot-flyteadmin.tar
+          cp /tmp/tmp/docker-images-flytecopilot/snapshot-flytecopilot.tar snapshot-flytecopilot.tar
+          cp /tmp/tmp/docker-images-flytepropeller/snapshot-flytepropeller.tar snapshot-flytepropeller.tar
           flytectl config init
           flytectl sandbox start --source=$(pwd)
       - name: Prime docker cache
