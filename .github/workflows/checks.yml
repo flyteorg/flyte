@@ -150,6 +150,7 @@ jobs:
           - flyteadmin
           - flytecopilot
           - flytepropeller
+          - flytescheduler
     uses: ./.github/workflows/publish.yml
     with:
       version: "test-version-monorepo"
@@ -161,17 +162,3 @@ jobs:
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
       FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
-
-  # TODO(monorepo): push flytescheduler image
-  # push-docker-image-flytescheduler:
-  #   name: Build & Push Flytescheduler Image
-  #   needs: [ bump_version ]
-  #   uses: flyteorg/flytetools/.github/workflows/publish.yml@master
-  #   with:
-  #     version: ${{ needs.bump_version.outputs.version }}
-  #     push: true
-  #     repository: flyteorg/flytescheduler
-  #     dockerfile: scheduler.Dockerfile
-  #   secrets:
-  #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-  #     FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
