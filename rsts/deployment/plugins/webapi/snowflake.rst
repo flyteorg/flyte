@@ -11,18 +11,18 @@ Spin up a cluster
 .. tabs::
 
   .. group-tab:: Flyte binary
-      
+
     You can spin up a demo cluster using the following command:
-   
+
     .. code-block:: bash
-  
+
       flytectl demo start
 
     Or install Flyte using the :ref:`flyte-binary helm chart <deployment-deployment-cloud-simple>`.
 
   .. group-tab:: Flyte core
 
-    If you've installed Flyte using the 
+    If you've installed Flyte using the
     `flyte-core helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__,
     please ensure:
 
@@ -45,7 +45,7 @@ Specify plugin configuration
   .. group-tab:: Flyte binary
 
     .. tabs::
-         
+
       .. group-tab:: Demo cluster
 
         Enable the Snowflake plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
@@ -85,7 +85,7 @@ Specify plugin configuration
                 - snowflake: snowflake
 
   .. group-tab:: Flyte core
-    
+
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
@@ -112,7 +112,7 @@ Specify plugin configuration
 Obtain and add the Snowflake JWT token
 --------------------------------------
 
-Create a Snowflake account, and follow the `Snowflake docs 
+Create a Snowflake account, and follow the `Snowflake docs
 <https://docs.snowflake.com/en/developer-guide/sql-api/authenticating#using-key-pair-authentication>`__
 to generate a JWT token.
 Then, add the Snowflake JWT token to FlytePropeller.
@@ -168,8 +168,8 @@ Then, add the Snowflake JWT token to FlytePropeller.
           stringData:
             FLYTE_SNOWFLAKE_CLIENT_TOKEN: <JWT_TOKEN>
           EOF
-        
-        Reference the newly created secret in 
+
+        Reference the newly created secret in
         ``.Values.configuration.auth.clientSecretsExternalSecretRef``
         in your YAML file as follows:
 
@@ -178,8 +178,8 @@ Then, add the Snowflake JWT token to FlytePropeller.
 
           configuration:
             auth:
-              clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret 
-      
+              clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret
+
     Replace ``<JWT_TOKEN>`` with your JWT token.
 
   .. group-tab:: Flyte core
@@ -241,3 +241,61 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block::
 
   kubectl get pods -n flyte
+
+Snowflake Agent Service Configuration
+-------------------------------------
+You can run snowflake query through agent service, here are the steps to follow.
+1. Setup the key pair authentication in snowflake. For more details, you can refer to `here <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
+2. Create a secret with the group "snowflake" and the key "private_key". For more details, you can refer to
+   `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
+.. code-block::
+  kubectl create secret generic snowflake --namespace=flyte --from-literal=private_key=your_private_key_above
+1. Update flyte-single-binary-local.yaml in flyte
+.. code-block:: yaml
+  tasks:
+  task-plugins:
+    enabled-plugins:
+      - agent-service
+      - container
+      - sidecar
+      - K8S-ARRAY
+    default-for-task-types:
+      - snowflake: agent-service
+      - bigquery_query_job_task: agent-service
+      - custom_task: agent-service
+      - container: container
+      - container_array: K8S-ARRAY
+
+  plugins:
+    logs:
+      kubernetes-enabled: true
+      kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+      cloudwatch-enabled: false
+      stackdriver-enabled: false
+    k8s:
+      default-env-vars:
+      - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    k8s-array:
+      logs:
+        config:
+          kubernetes-enabled: true
+          kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+          cloudwatch-enabled: false
+          stackdriver-enabled: false
+    agent-service:
+      supportedTaskTypes:
+        - default_task
+        - custom_task
+        - snowflake
+      # By default, all the request will be sent to the default agent.
+      defaultAgent:
+        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+        insecure: true
+        timeouts:
+          GetTask: 10s
+        defaultTimeout: 10s
+
+1. Re-run the flyte server with following command
+.. code-block:: flyte start --config flyte-single-binary-local.yaml
