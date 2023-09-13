@@ -7,11 +7,11 @@ import (
 	"hash/fnv"
 	"reflect"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const specialEncoderKey = "abcdefghijklmnopqrstuvwxyz123456"

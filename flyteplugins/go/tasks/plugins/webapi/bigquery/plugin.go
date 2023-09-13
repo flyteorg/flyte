@@ -18,9 +18,9 @@ import (
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"
 
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/api/option"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"

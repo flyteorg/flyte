@@ -9,8 +9,8 @@ import (
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"gorm.io/gorm"
 )

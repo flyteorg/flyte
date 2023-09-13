@@ -18,11 +18,11 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
-	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 type DataCatalogService struct {

@@ -30,7 +30,6 @@ jobs:
           - flyteadmin
           # TODO(monorepo): Enable lint flytecopilot
           # - flytecopilot
-          - flytecopilot
           - flyteidl
           - flyteplugins
           - flytepropeller
@@ -51,8 +50,7 @@ jobs:
           - flyteadmin
           - flytecopilot
           # TODO(monorepo): Enable flyteidl unit tests
-          # flyteidl
-          - flyteidl
+          # - flyteidl
           - flyteplugins
           - flytepropeller
           - flytestdlib
