@@ -18,19 +18,48 @@ jobs:
         run: |
           echo "go-version=${{ env.GO_VERSION }}" >> $GITHUB_OUTPUT
 
-  # lint:
-  #   name: Lint
-  #   uses: flyteorg/flytetools/.github/workflows/lint.yml@master
-  #   with:
-  #     go-version: "1.19"
-
-  # tests:
-  #   name: Unit Tests
-  #   uses: flyteorg/flytetools/.github/workflows/tests.yml@master
-  #   with:
-  #     go-version: "1.19"
-  #   secrets:
-  #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+  lint:
+    name: Lint
+    needs:
+      - unpack-envvars
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - datacatalog
+          - flyteadmin
+          # TODO(monorepo): Enable lint flytecopilot
+          # - flytecopilot
+          - flytecopilot
+          - flyteidl
+          - flyteplugins
+          - flytepropeller
+          - flytestdlib
+    uses: ./.github/workflows/lint.yml
+    with:
+      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+  unit-tests:
+    name: Unit Tests
+    needs:
+      - unpack-envvars
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - datacatalog
+          - flyteadmin
+          - flytecopilot
+          # TODO(monorepo): Enable flyteidl unit tests
+          # flyteidl
+          - flyteidl
+          - flyteplugins
+          - flytepropeller
+          - flytestdlib
+    uses: ./.github/workflows/unit-tests.yml
+    with:
+      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
   docker-build:
     strategy:
       fail-fast: false
