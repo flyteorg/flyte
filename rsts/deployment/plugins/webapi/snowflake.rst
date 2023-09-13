@@ -245,13 +245,19 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 Snowflake Agent Service Configuration
 -------------------------------------
 You can run snowflake query through agent service, here are the steps to follow.
+
 1. Setup the key pair authentication in snowflake. For more details, you can refer to `here <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
-2. Create a secret with the group "snowflake" and the key "private_key". For more details, you can refer to
-   `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
-.. code-block::
-  kubectl create secret generic snowflake --namespace=flyte --from-literal=private_key=your_private_key_above
-1. Update flyte-single-binary-local.yaml in flyte
+
+2. Create a secret with the group "snowflake" and the key "private_key". For more details, you can refer to `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
+
+.. code-block:: bash
+
+   kubectl create secret generic snowflake --namespace=flyte --from-literal=private_key=your_private_key_above
+
+3. Update flyte-single-binary-local.yaml in flyte:
+
 .. code-block:: yaml
+
   tasks:
   task-plugins:
     enabled-plugins:
@@ -297,5 +303,8 @@ You can run snowflake query through agent service, here are the steps to follow.
           GetTask: 10s
         defaultTimeout: 10s
 
-1. Re-run the flyte server with following command
-.. code-block:: flyte start --config flyte-single-binary-local.yaml
+4. Re-run the flyte server with the following command:
+
+.. code-block:: bash
+
+   flyte start --config flyte-single-binary-local.yaml
