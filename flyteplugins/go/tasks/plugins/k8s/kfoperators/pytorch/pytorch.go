@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -147,6 +148,10 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	if workerReplica.ReplicaNum == 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
+
+	cfg := config.GetK8sPluginConfig()
+	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
 	jobSpec := kubeflowv1.PyTorchJobSpec{
 		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
