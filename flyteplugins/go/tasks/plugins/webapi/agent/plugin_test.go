@@ -113,6 +113,7 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+		assert.Equal(t, "Waiting for cluster", phase.Info().Logs[0].Name)
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {

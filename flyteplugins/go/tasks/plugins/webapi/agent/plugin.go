@@ -14,7 +14,7 @@ import (
 
 	"google.golang.org/grpc/grpclog"
 
-	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
@@ -37,7 +37,7 @@ type Plugin struct {
 
 type ResourceWrapper struct {
 	State   admin.State
-	Outputs *flyteIdl.LiteralMap
+	Outputs *flyteIdlCore.LiteralMap
 	Message string
 }
 
@@ -166,6 +166,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 
 	switch resource.State {
 	case admin.State_PENDING:
+		taskInfo.Logs = createTaskLog(resource.Message)
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
@@ -183,6 +184,14 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
+}
+
+func createTaskLog(message string) []*flyteIdlCore.TaskLog {
+	return []*flyteIdlCore.TaskLog{
+		{
+			Name: message,
+		},
+	}
 }
 
 func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
