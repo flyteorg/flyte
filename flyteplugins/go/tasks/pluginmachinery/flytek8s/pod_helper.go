@@ -110,8 +110,8 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 
 // Specialized merging of overrides into a base *core.ResourceMetadata object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
-// handle each field separately here to convey intent.
-func ApplyResourceMetadataOverrides(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
+// handle each field separately here.
+func MergeResourceMetadata(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
 	new := proto.Clone(base).(*core.ResourceMetadata)
 
 	// Accelerator
