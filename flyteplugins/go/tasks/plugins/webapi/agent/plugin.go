@@ -68,6 +68,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 
+	var argTemplate []string
 	if taskTemplate.GetContainer() != nil {
 		templateParameters := template.Parameters{
 			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
@@ -75,6 +76,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			OutputPath:       taskCtx.OutputWriter(),
 			Task:             taskCtx.TaskReader(),
 		}
+		argTemplate = taskTemplate.GetContainer().Args
 		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
 		if err != nil {
 			return nil, nil, err
@@ -99,6 +101,11 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// Restore unrendered template for subsequent renders.
+	if taskTemplate.GetContainer() != nil {
+		taskTemplate.GetContainer().Args = argTemplate
 	}
 
 	return &ResourceMetaWrapper{
