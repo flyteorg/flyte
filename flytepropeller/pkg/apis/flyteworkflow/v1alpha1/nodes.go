@@ -191,8 +191,8 @@ func (in *NodeSpec) GetResources() *typesv1.ResourceRequirements {
 	return in.Resources
 }
 
-func (in *NodeSpec) GetResourceMetadata() *ResourceMetadata {
-	return in.ResourceMetadata
+func (in *NodeSpec) GetResourceMetadata() *core.ResourceMetadata {
+	return in.ResourceMetadata.ResourceMetadata
 }
 
 func (in *NodeSpec) GetOutputAlias() []Alias {
