@@ -78,20 +78,26 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		logger.Debugf(ctx, "Sync loop - processing resource with cache key [%s]",
 			resource.GetID())
 
-		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
-			logger.Infof(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
-				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
-			cacheItem.State.Phase = PhaseSystemFailure
-		}
-
 		if cacheItem.State.Phase.IsTerminal() {
 			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
 				resource.GetID())
-
 			resp = append(resp, cache.ItemSyncResponse{
 				ID:     resource.GetID(),
-				Item:   resource.GetItem(),
+				Item:   cacheItem,
 				Action: cache.Unchanged,
+			})
+
+			continue
+		}
+
+		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
+			logger.Debugf(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
+				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
+			cacheItem.State.Phase = PhaseSystemFailure
+			resp = append(resp, cache.ItemSyncResponse{
+				ID:     resource.GetID(),
+				Item:   cacheItem,
+				Action: cache.Update,
 			})
 
 			continue
@@ -103,6 +109,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		if err != nil {
 			logger.Infof(ctx, "Error retrieving resource [%s]. Error: %v", resource.GetID(), err)
 			cacheItem.SyncFailureCount++
+			cacheItem.ErrorMessage = err.Error()
 
 			// Make sure we don't return nil for the first argument, because that deletes it from the cache.
 			resp = append(resp, cache.ItemSyncResponse{
