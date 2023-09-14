@@ -111,8 +111,19 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 // Specialized merging of overrides into a base *core.ResourceMetadata object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.
-func MergeResourceMetadata(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
-	new := proto.Clone(base).(*core.ResourceMetadata)
+func applyResourceMetadataOverrides(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
+	// Handle case where base might be nil
+	var new *core.ResourceMetadata
+	if base == nil {
+		new = &core.ResourceMetadata{}
+	} else {
+		new = proto.Clone(base).(*core.ResourceMetadata)
+	}
+
+	// No overrides found
+	if overrides == nil {
+		return new
+	}
 
 	// Accelerator
 	if overrides.GetAcceleratorValue() != nil {
@@ -389,10 +400,17 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// handling for resource metadata
-	// Base config
-	if taskTemplate.GetMetadata() != nil && taskTemplate.GetMetadata().GetResourceMetadata() != nil {
-		gpuAccelerator := taskTemplate.GetMetadata().GetResourceMetadata().GetGpuAccelerator()
-		ApplyGPUNodeSelectors(podSpec, gpuAccelerator)
+	// Merge overrides with base resource meteadata
+	var resourceMetadataBase *core.ResourceMetadata
+	if taskTemplate.GetMetadata() != nil {
+		resourceMetadataBase = taskTemplate.GetMetadata().GetResourceMetadata()
+	}
+	resourceMetadataOverrides := tCtx.TaskExecutionMetadata().GetOverrides().GetResourceMetadata()
+	resourceMetadataFinal := applyResourceMetadataOverrides(resourceMetadataBase, resourceMetadataOverrides)
+
+	// GPU accelerator
+	if resourceMetadataFinal.GetGpuAccelerator() != nil {
+		ApplyGPUNodeSelectors(podSpec, resourceMetadataFinal.GetGpuAccelerator())
 	}
 
 	return podSpec, objectMeta, nil
