@@ -107,6 +107,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_PENDING,
 			Outputs: nil,
+			Message: "Waiting for cluster",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -119,6 +120,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_RUNNING,
 			Outputs: nil,
+			Message: "",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -131,6 +133,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_PERMANENT_FAILURE,
 			Outputs: nil,
+			Message: "",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -143,6 +146,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_RETRYABLE_FAILURE,
 			Outputs: nil,
+			Message: "",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -155,6 +159,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_SUCCEEDED,
 			Outputs: nil,
+			Message: "",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -167,6 +172,7 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   5,
 			Outputs: nil,
+			Message: "",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
