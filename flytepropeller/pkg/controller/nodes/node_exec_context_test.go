@@ -378,43 +378,48 @@ func Test_NodeContext_RecordTaskEvent(t1 *testing.T) {
 
 func Test_NodeContext_IsInterruptible(t *testing.T) {
 	ctx := context.Background()
-	scope := promutils.NewTestScope()
-
-	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
-	nodeExecutor := nodeExecutor{
-		interruptibleFailureThreshold: 1, // interruptibleFailureThreshold is hardcoded to 1
-		maxDatasetSizeBytes:           0,
-		defaultDataSandbox:            "s3://bucket-a",
-		store:                         dataStore,
-		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
-		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
-		metrics: &nodeMetrics{
-			InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
-			InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
-			InterruptedThresholdHit:      labeled.NewCounter("thresholdHit", "xyz", scope.NewSubScope("interruptible3")),
-		},
-	}
 
 	tests := []struct {
-		name                  string
-		ignoreRetryCause      bool
-		attempts              uint32
-		systemFailures        uint32
-		expectedInterruptible bool
-		// interruptibleFailureThreshold is hardcoded to 2
+		name                          string
+		ignoreRetryCause              bool
+		attempts                      uint32
+		systemFailures                uint32
+		maxAttempts                   int32
+		interruptibleFailureThreshold int32
+		expectedInterruptible         bool
 	}{
-		{"Interruptible", false, 0, 0, true},
-		{"NonInterruptible", false, 0, 2, false},
-		//{"IgnoreCauseInterruptible", true, 0, 0, true}, // TODO
-		//{"IgnoreCauseNonInterruptibleSystem", true, 0, 2, false}, // TODO
-		//{"IgnoreCauseNonInterruptibleUser", true, 1, 0, false}, // TODO
+		{"Interruptible", false, 0, 0, 2, 1, true},
+		{"NonInterruptible", false, 0, 1, 2, 1, false},
+		{"InterruptibleNegativeThreshold", false, 0, 0, 2, -1, true},
+		{"NonInterruptibleNegativeThreshold", false, 0, 1, 2, -1, false},
+		{"IgnoreCauseInterruptible", true, 0, 0, 2, 1, true},
+		{"IgnoreCauseNonInterruptibleSystem", true, 0, 1, 2, 1, false},
+		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 2, 1, false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config.GetConfig().NodeConfig.IgnoreRetryCause = tt.ignoreRetryCause
+			scope := promutils.NewTestScope()
 
 			// mock all inputs
+			config.GetConfig().NodeConfig.DefaultMaxAttempts = tt.maxAttempts
+			config.GetConfig().NodeConfig.IgnoreRetryCause = tt.ignoreRetryCause
+
+			dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
+			nodeExecutor := nodeExecutor{
+				interruptibleFailureThreshold: tt.interruptibleFailureThreshold,
+				maxDatasetSizeBytes:           0,
+				defaultDataSandbox:            "s3://bucket-a",
+				store:                         dataStore,
+				shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
+				enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+				metrics: &nodeMetrics{
+					InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
+					InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
+					InterruptedThresholdHit:      labeled.NewCounter("thresholdHit", "xyz", scope.NewSubScope("interruptible3")),
+				},
+			}
+
 			w := getTestFlyteWorkflow()
 
 			nodeLookup := &mocks2.NodeLookup{}

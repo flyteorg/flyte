@@ -707,8 +707,8 @@ func TestConfig_SetFlags(t *testing.T) {
 			testValue := "1"
 
 			cmdFlags.Set("node-config.interruptible-failure-threshold", testValue)
-			if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.InterruptibleFailureThreshold)
+			if vInt32, err := cmdFlags.GetInt32("node-config.interruptible-failure-threshold"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.NodeConfig.InterruptibleFailureThreshold)
 
 			} else {
 				assert.FailNow(t, err.Error())

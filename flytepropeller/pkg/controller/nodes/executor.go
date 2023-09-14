@@ -484,7 +484,7 @@ type nodeExecutor struct {
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
-	interruptibleFailureThreshold   uint32
+	interruptibleFailureThreshold   int32
 	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
@@ -1442,7 +1442,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
-		interruptibleFailureThreshold:   uint32(nodeConfig.InterruptibleFailureThreshold),
+		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,
