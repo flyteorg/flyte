@@ -2765,3 +2765,55 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 		})
 	}
 }
+
+func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
+	tests := []struct {
+		name                string
+		ignoreRetryCause    bool
+		attempts            uint32
+		systemFailures      uint32
+		maxAttempts         int32
+		maxSystemFailures   uint32
+		errorKind           core.ExecutionError_ErrorKind
+		expectedEligibility bool
+	}{
+		{"EligibleUserRetries", false, 0, 0, 2, 0, core.ExecutionError_USER, true},
+		{"IneligibleUserRetries", false, 1, 0, 2, 0, core.ExecutionError_USER, false},
+		{"EligibleSystemRetries", false, 0, 0, 1, 1, core.ExecutionError_SYSTEM, true},
+		{"IneligibleSystemRetries", false, 0, 1, 1, 1, core.ExecutionError_SYSTEM, false},
+		{"IgnoreCauseEligibleUserRetries", true, 0, 0, 2, 0, core.ExecutionError_USER, true},
+		{"IgnoreCauseIneligibleUserRetries", true, 1, 0, 2, 0, core.ExecutionError_USER, false},
+		{"IgnoreCauseEligibleSystemRetries", true, 0, 0, 2, 0, core.ExecutionError_SYSTEM, true},
+		{"IgnoreCauseIneligibleSystemRetries", true, 0, 1, 2, 0, core.ExecutionError_SYSTEM, false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// mock all inputs
+			nodeExecutor := &nodeExecutor{
+				maxNodeRetriesForSystemFailures: test.maxSystemFailures,
+			}
+
+			config.GetConfig().NodeConfig.IgnoreRetryCause = test.ignoreRetryCause
+			config.GetConfig().NodeConfig.DefaultMaxAttempts = test.maxAttempts
+
+			node := &mocks.ExecutableNode{}
+			node.OnGetRetryStrategy().Return(nil)
+			nCtx := &nodeExecContext{node: node}
+
+			nodeStatus := &mocks.ExecutableNodeStatus{}
+			nodeStatus.OnGetAttempts().Return(test.attempts)
+			nodeStatus.OnGetSystemFailures().Return(test.systemFailures)
+
+			err := &core.ExecutionError{
+				Kind: test.errorKind,
+			}
+
+			// validate eligibility
+			currentAttempt, maxAttempts, isEligible := nodeExecutor.isEligibleForRetry(nCtx, nodeStatus, err)
+			fmt.Println(currentAttempt, maxAttempts, isEligible)
+			assert.Equal(t, test.expectedEligibility, isEligible)
+		})
+	}
+
+}

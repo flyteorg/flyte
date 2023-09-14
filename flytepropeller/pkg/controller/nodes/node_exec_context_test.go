@@ -375,3 +375,63 @@ func Test_NodeContext_RecordTaskEvent(t1 *testing.T) {
 		})
 	}
 }
+
+func Test_NodeContext_IsInterruptible(t *testing.T) {
+	ctx := context.Background()
+	scope := promutils.NewTestScope()
+
+	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
+	nodeExecutor := nodeExecutor{
+		interruptibleFailureThreshold: 1, // interruptibleFailureThreshold is hardcoded to 1
+		maxDatasetSizeBytes:           0,
+		defaultDataSandbox:            "s3://bucket-a",
+		store:                         dataStore,
+		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
+		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+		metrics: &nodeMetrics{
+			InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
+			InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
+			InterruptedThresholdHit:      labeled.NewCounter("thresholdHit", "xyz", scope.NewSubScope("interruptible3")),
+		},
+	}
+
+	tests := []struct {
+		name                  string
+		ignoreRetryCause      bool
+		attempts              uint32
+		systemFailures        uint32
+		expectedInterruptible bool
+		// interruptibleFailureThreshold is hardcoded to 2
+	}{
+		{"Interruptible", false, 0, 0, true},
+		{"NonInterruptible", false, 0, 2, false},
+		//{"IgnoreCauseInterruptible", true, 0, 0, true}, // TODO
+		//{"IgnoreCauseNonInterruptibleSystem", true, 0, 2, false}, // TODO
+		//{"IgnoreCauseNonInterruptibleUser", true, 1, 0, false}, // TODO
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config.GetConfig().NodeConfig.IgnoreRetryCause = tt.ignoreRetryCause
+
+			// mock all inputs
+			w := getTestFlyteWorkflow()
+
+			nodeLookup := &mocks2.NodeLookup{}
+			interruptible := true
+			nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
+			nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+				Attempts:       tt.attempts,
+				SystemFailures: tt.systemFailures,
+			})
+
+			p := parentInfo{}
+			execContext := executors.NewExecutionContext(w, w, w, p, nil)
+
+			// validate interruptible
+			nCtx, err := nodeExecutor.BuildNodeExecutionContext(context.Background(), execContext, nodeLookup, "node-a")
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedInterruptible, nCtx.NodeExecutionMetadata().IsInterruptible())
+		})
+	}
+}
