@@ -28,6 +28,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 	var task *core.TaskTemplate
 	var resources *core.Resources
+	var resourceMetadata *v1alpha1.ResourceMetadata
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -43,8 +44,15 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, !errs.HasErrors()
 		}
 
-		if n.GetTaskNode().Overrides != nil && n.GetTaskNode().Overrides.Resources != nil {
-			resources = n.GetTaskNode().Overrides.Resources
+		if n.GetTaskNode().Overrides != nil {
+			if n.GetTaskNode().Overrides.Resources != nil {
+				resources = n.GetTaskNode().Overrides.Resources
+			}
+			if n.GetTaskNode().Overrides.ResourceMetadata != nil {
+				resourceMetadata = &v1alpha1.ResourceMetadata{
+					ResourceMetadata: n.GetTaskNode().Overrides.ResourceMetadata,
+				}
+			}
 		}
 	}
 
@@ -81,6 +89,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		RetryStrategy:     computeRetryStrategy(n, task),
 		ExecutionDeadline: timeout,
 		Resources:         res,
+		ResourceMetadata:  resourceMetadata,
 		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,

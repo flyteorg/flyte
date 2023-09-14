@@ -92,20 +92,29 @@ func (in *NodeMetadata) DeepCopyInto(out *NodeMetadata) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
+type ResourceMetadata struct {
+	*core.ResourceMetadata
+}
+
+func (in *ResourceMetadata) DeepCopyInto(out *ResourceMetadata) {
+	*out = *in
+}
+
 type NodeSpec struct {
-	ID            NodeID                        `json:"id"`
-	Name          string                        `json:"name,omitempty"`
-	Resources     *typesv1.ResourceRequirements `json:"resources,omitempty"`
-	Kind          NodeKind                      `json:"kind"`
-	BranchNode    *BranchNodeSpec               `json:"branch,omitempty"`
-	TaskRef       *TaskID                       `json:"task,omitempty"`
-	WorkflowNode  *WorkflowNodeSpec             `json:"workflow,omitempty"`
-	GateNode      *GateNodeSpec                 `json:"gate,omitempty"`
-	ArrayNode     *ArrayNodeSpec                `json:"array,omitempty"`
-	InputBindings []*Binding                    `json:"inputBindings,omitempty"`
-	Config        *typesv1.ConfigMap            `json:"config,omitempty"`
-	RetryStrategy *RetryStrategy                `json:"retry,omitempty"`
-	OutputAliases []Alias                       `json:"outputAlias,omitempty"`
+	ID               NodeID                        `json:"id"`
+	Name             string                        `json:"name,omitempty"`
+	Resources        *typesv1.ResourceRequirements `json:"resources,omitempty"`
+	ResourceMetadata *ResourceMetadata             `json:"resourceMetadata,omitempty"`
+	Kind             NodeKind                      `json:"kind"`
+	BranchNode       *BranchNodeSpec               `json:"branch,omitempty"`
+	TaskRef          *TaskID                       `json:"task,omitempty"`
+	WorkflowNode     *WorkflowNodeSpec             `json:"workflow,omitempty"`
+	GateNode         *GateNodeSpec                 `json:"gate,omitempty"`
+	ArrayNode        *ArrayNodeSpec                `json:"array,omitempty"`
+	InputBindings    []*Binding                    `json:"inputBindings,omitempty"`
+	Config           *typesv1.ConfigMap            `json:"config,omitempty"`
+	RetryStrategy    *RetryStrategy                `json:"retry,omitempty"`
+	OutputAliases    []Alias                       `json:"outputAlias,omitempty"`
 
 	// SecurityContext holds pod-level security attributes and common container settings.
 	// Optional: Defaults to empty.  See type description for default values of each field.
@@ -180,6 +189,10 @@ func (in *NodeSpec) GetConfig() *typesv1.ConfigMap {
 
 func (in *NodeSpec) GetResources() *typesv1.ResourceRequirements {
 	return in.Resources
+}
+
+func (in *NodeSpec) GetResourceMetadata() *ResourceMetadata {
+	return in.ResourceMetadata
 }
 
 func (in *NodeSpec) GetOutputAlias() []Alias {
