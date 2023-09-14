@@ -124,7 +124,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, opts ...grpc.DialOptio
 	if opts == nil {
 		// Initialize opts list to the potential number of options we will add. Initialization optimizes memory
 		// allocation.
-		opts = make([]grpc.DialOption, 0, 5)
+		opts = make([]grpc.DialOption, 0, 6)
 	}
 
 	if cfg.UseInsecureConnection {
@@ -153,6 +153,11 @@ func NewAdminConnection(ctx context.Context, cfg *Config, opts ...grpc.DialOptio
 
 	opts = append(opts, GetAdditionalAdminClientConfigOptions(cfg)...)
 
+	// Ensure proxy auth interceptor is invoked prior to auth interceptor
+	if cfg.ProxyCommand != nil {
+		opts = append([]grpc.DialOption{grpc.WithChainUnaryInterceptor(NewProxyAuthInterceptor(cfg))}, opts...)
+	}
+
 	return grpc.Dial(cfg.Endpoint.String(), opts...)
 }
 
@@ -172,9 +177,8 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 // for the process. Note that if called with different cfg/dialoptions, it will not refresh the connection.
 func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
 	credentialsFuture := NewPerRPCCredentialsFuture()
-	// TODO, only optionally add the proxy authenticator
+
 	opts = append(opts,
-		grpc.WithChainUnaryInterceptor(NewProxyAuthInterceptor(cfg, tokenCache, credentialsFuture)),
 		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture)),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
