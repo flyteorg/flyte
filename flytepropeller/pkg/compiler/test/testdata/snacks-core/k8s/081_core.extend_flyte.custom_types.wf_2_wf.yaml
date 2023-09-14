@@ -75,8 +75,6 @@ spec:
       kind: task
       name: generate
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.extend_flyte.custom_types.generate" '
     n1:
       id: n1
@@ -89,8 +87,6 @@ spec:
       kind: task
       name: consume
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.extend_flyte.custom_types.consume" '
     start-node:
       id: start-node

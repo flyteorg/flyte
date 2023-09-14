@@ -290,20 +290,20 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		// For the unified retry behavior we execute the last interruptibleFailureThreshold attempts on a non
 		// interruptible machine
 		currentAttempt := int32(s.GetAttempts() + s.GetSystemFailures())
-		maxAttempts := int32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		maxAttempts := config.GetConfig().NodeConfig.DefaultMaxAttempts
 		if n.GetRetryStrategy() != nil && n.GetRetryStrategy().MinAttempts != nil && *n.GetRetryStrategy().MinAttempts != 0 {
 			maxAttempts = int32(*n.GetRetryStrategy().MinAttempts)
 		}
 
 		if interruptible && ((c.interruptibleFailureThreshold > 0 && currentAttempt >= c.interruptibleFailureThreshold) ||
-				(c.interruptibleFailureThreshold <= 0 && currentAttempt >= maxAttempts+c.interruptibleFailureThreshold)) {
+			(c.interruptibleFailureThreshold <= 0 && currentAttempt >= maxAttempts+c.interruptibleFailureThreshold)) {
 			interruptible = false
 			c.metrics.InterruptedThresholdHit.Inc(ctx)
 		}
 	} else {
 		// Else a node is not considered interruptible if the system failures have exceeded the configured threshold
 		if interruptible && ((c.interruptibleFailureThreshold > 0 && int32(s.GetSystemFailures()) >= c.interruptibleFailureThreshold) ||
-				(c.interruptibleFailureThreshold <= 0 && int32(s.GetSystemFailures()) >= int32(c.maxNodeRetriesForSystemFailures)+c.interruptibleFailureThreshold)) {
+			(c.interruptibleFailureThreshold <= 0 && int32(s.GetSystemFailures()) > int32(c.maxNodeRetriesForSystemFailures)+c.interruptibleFailureThreshold)) {
 			interruptible = false
 			c.metrics.InterruptedThresholdHit.Inc(ctx)
 		}

@@ -385,16 +385,17 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 		attempts                      uint32
 		systemFailures                uint32
 		maxAttempts                   int32
+		maxSystemFailures             uint32
 		interruptibleFailureThreshold int32
 		expectedInterruptible         bool
 	}{
-		{"Interruptible", false, 0, 0, 2, 1, true},
-		{"NonInterruptible", false, 0, 1, 2, 1, false},
-		{"InterruptibleNegativeThreshold", false, 0, 0, 2, -1, true},
-		{"NonInterruptibleNegativeThreshold", false, 0, 1, 2, -1, false},
-		{"IgnoreCauseInterruptible", true, 0, 0, 2, 1, true},
-		{"IgnoreCauseNonInterruptibleSystem", true, 0, 1, 2, 1, false},
-		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 2, 1, false},
+		{"Interruptible", false, 0, 0, 2, 1, 1, true},
+		{"NonInterruptible", false, 0, 1, 2, 1, 1, false},
+		{"InterruptibleNegativeThreshold", false, 0, 0, 2, 1, -1, true},
+		{"NonInterruptibleNegativeThreshold", false, 0, 1, 2, 1, -1, false},
+		{"IgnoreCauseInterruptible", true, 0, 0, 2, 1, 1, true},
+		{"IgnoreCauseNonInterruptibleSystem", true, 0, 1, 2, 1, 1, false},
+		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 2, 1, 1, false},
 	}
 
 	for _, tt := range tests {
@@ -407,12 +408,13 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 
 			dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
 			nodeExecutor := nodeExecutor{
-				interruptibleFailureThreshold: tt.interruptibleFailureThreshold,
-				maxDatasetSizeBytes:           0,
-				defaultDataSandbox:            "s3://bucket-a",
-				store:                         dataStore,
-				shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
-				enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+				interruptibleFailureThreshold:   tt.interruptibleFailureThreshold,
+				maxNodeRetriesForSystemFailures: tt.maxSystemFailures,
+				maxDatasetSizeBytes:             0,
+				defaultDataSandbox:              "s3://bucket-a",
+				store:                           dataStore,
+				shardSelector:                   ioutils.NewConstantShardSelector([]string{"x"}),
+				enqueueWorkflow:                 func(workflowID v1alpha1.WorkflowID) {},
 				metrics: &nodeMetrics{
 					InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
 					InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
