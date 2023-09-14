@@ -3,9 +3,8 @@
 package mocks
 
 import (
-	events "github.com/flyteorg/flytepropeller/events"
 	executors "github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	interfaces "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 
 	io "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
@@ -161,7 +160,7 @@ type NodeExecutionContext_EventsRecorder struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionContext_EventsRecorder) Return(_a0 events.TaskEventRecorder) *NodeExecutionContext_EventsRecorder {
+func (_m NodeExecutionContext_EventsRecorder) Return(_a0 interfaces.EventRecorder) *NodeExecutionContext_EventsRecorder {
 	return &NodeExecutionContext_EventsRecorder{Call: _m.Call.Return(_a0)}
 }
 
@@ -176,15 +175,15 @@ func (_m *NodeExecutionContext) OnEventsRecorderMatch(matchers ...interface{}) *
 }
 
 // EventsRecorder provides a mock function with given fields:
-func (_m *NodeExecutionContext) EventsRecorder() events.TaskEventRecorder {
+func (_m *NodeExecutionContext) EventsRecorder() interfaces.EventRecorder {
 	ret := _m.Called()
 
-	var r0 events.TaskEventRecorder
-	if rf, ok := ret.Get(0).(func() events.TaskEventRecorder); ok {
+	var r0 interfaces.EventRecorder
+	if rf, ok := ret.Get(0).(func() interfaces.EventRecorder); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(events.TaskEventRecorder)
+			r0 = ret.Get(0).(interfaces.EventRecorder)
 		}
 	}
 
@@ -329,7 +328,7 @@ type NodeExecutionContext_NodeExecutionMetadata struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionContext_NodeExecutionMetadata) Return(_a0 handler.NodeExecutionMetadata) *NodeExecutionContext_NodeExecutionMetadata {
+func (_m NodeExecutionContext_NodeExecutionMetadata) Return(_a0 interfaces.NodeExecutionMetadata) *NodeExecutionContext_NodeExecutionMetadata {
 	return &NodeExecutionContext_NodeExecutionMetadata{Call: _m.Call.Return(_a0)}
 }
 
@@ -344,15 +343,15 @@ func (_m *NodeExecutionContext) OnNodeExecutionMetadataMatch(matchers ...interfa
 }
 
 // NodeExecutionMetadata provides a mock function with given fields:
-func (_m *NodeExecutionContext) NodeExecutionMetadata() handler.NodeExecutionMetadata {
+func (_m *NodeExecutionContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadata {
 	ret := _m.Called()
 
-	var r0 handler.NodeExecutionMetadata
-	if rf, ok := ret.Get(0).(func() handler.NodeExecutionMetadata); ok {
+	var r0 interfaces.NodeExecutionMetadata
+	if rf, ok := ret.Get(0).(func() interfaces.NodeExecutionMetadata); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(handler.NodeExecutionMetadata)
+			r0 = ret.Get(0).(interfaces.NodeExecutionMetadata)
 		}
 	}
 
@@ -395,7 +394,7 @@ type NodeExecutionContext_NodeStateReader struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionContext_NodeStateReader) Return(_a0 handler.NodeStateReader) *NodeExecutionContext_NodeStateReader {
+func (_m NodeExecutionContext_NodeStateReader) Return(_a0 interfaces.NodeStateReader) *NodeExecutionContext_NodeStateReader {
 	return &NodeExecutionContext_NodeStateReader{Call: _m.Call.Return(_a0)}
 }
 
@@ -410,15 +409,15 @@ func (_m *NodeExecutionContext) OnNodeStateReaderMatch(matchers ...interface{}) 
 }
 
 // NodeStateReader provides a mock function with given fields:
-func (_m *NodeExecutionContext) NodeStateReader() handler.NodeStateReader {
+func (_m *NodeExecutionContext) NodeStateReader() interfaces.NodeStateReader {
 	ret := _m.Called()
 
-	var r0 handler.NodeStateReader
-	if rf, ok := ret.Get(0).(func() handler.NodeStateReader); ok {
+	var r0 interfaces.NodeStateReader
+	if rf, ok := ret.Get(0).(func() interfaces.NodeStateReader); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(handler.NodeStateReader)
+			r0 = ret.Get(0).(interfaces.NodeStateReader)
 		}
 	}
 
@@ -429,7 +428,7 @@ type NodeExecutionContext_NodeStateWriter struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionContext_NodeStateWriter) Return(_a0 handler.NodeStateWriter) *NodeExecutionContext_NodeStateWriter {
+func (_m NodeExecutionContext_NodeStateWriter) Return(_a0 interfaces.NodeStateWriter) *NodeExecutionContext_NodeStateWriter {
 	return &NodeExecutionContext_NodeStateWriter{Call: _m.Call.Return(_a0)}
 }
 
@@ -444,15 +443,15 @@ func (_m *NodeExecutionContext) OnNodeStateWriterMatch(matchers ...interface{}) 
 }
 
 // NodeStateWriter provides a mock function with given fields:
-func (_m *NodeExecutionContext) NodeStateWriter() handler.NodeStateWriter {
+func (_m *NodeExecutionContext) NodeStateWriter() interfaces.NodeStateWriter {
 	ret := _m.Called()
 
-	var r0 handler.NodeStateWriter
-	if rf, ok := ret.Get(0).(func() handler.NodeStateWriter); ok {
+	var r0 interfaces.NodeStateWriter
+	if rf, ok := ret.Get(0).(func() interfaces.NodeStateWriter); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(handler.NodeStateWriter)
+			r0 = ret.Get(0).(interfaces.NodeStateWriter)
 		}
 	}
 
@@ -563,7 +562,7 @@ type NodeExecutionContext_TaskReader struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionContext_TaskReader) Return(_a0 handler.TaskReader) *NodeExecutionContext_TaskReader {
+func (_m NodeExecutionContext_TaskReader) Return(_a0 interfaces.TaskReader) *NodeExecutionContext_TaskReader {
 	return &NodeExecutionContext_TaskReader{Call: _m.Call.Return(_a0)}
 }
 
@@ -578,15 +577,15 @@ func (_m *NodeExecutionContext) OnTaskReaderMatch(matchers ...interface{}) *Node
 }
 
 // TaskReader provides a mock function with given fields:
-func (_m *NodeExecutionContext) TaskReader() handler.TaskReader {
+func (_m *NodeExecutionContext) TaskReader() interfaces.TaskReader {
 	ret := _m.Called()
 
-	var r0 handler.TaskReader
-	if rf, ok := ret.Get(0).(func() handler.TaskReader); ok {
+	var r0 interfaces.TaskReader
+	if rf, ok := ret.Get(0).(func() interfaces.TaskReader); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(handler.TaskReader)
+			r0 = ret.Get(0).(interfaces.TaskReader)
 		}
 	}
 

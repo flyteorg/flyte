@@ -20,6 +20,11 @@ type ExecutableNodeStatus struct {
 	mock.Mock
 }
 
+// ClearArrayNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) ClearArrayNodeStatus() {
+	_m.Called()
+}
+
 // ClearDynamicNodeStatus provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
@@ -48,6 +53,40 @@ func (_m *ExecutableNodeStatus) ClearTaskStatus() {
 // ClearWorkflowStatus provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearWorkflowStatus() {
 	_m.Called()
+}
+
+type ExecutableNodeStatus_GetArrayNodeStatus struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetArrayNodeStatus) Return(_a0 v1alpha1.MutableArrayNodeStatus) *ExecutableNodeStatus_GetArrayNodeStatus {
+	return &ExecutableNodeStatus_GetArrayNodeStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetArrayNodeStatus() *ExecutableNodeStatus_GetArrayNodeStatus {
+	c_call := _m.On("GetArrayNodeStatus")
+	return &ExecutableNodeStatus_GetArrayNodeStatus{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetArrayNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetArrayNodeStatus {
+	c_call := _m.On("GetArrayNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetArrayNodeStatus{Call: c_call}
+}
+
+// GetArrayNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetArrayNodeStatus() v1alpha1.MutableArrayNodeStatus {
+	ret := _m.Called()
+
+	var r0 v1alpha1.MutableArrayNodeStatus
+	if rf, ok := ret.Get(0).(func() v1alpha1.MutableArrayNodeStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.MutableArrayNodeStatus)
+		}
+	}
+
+	return r0
 }
 
 type ExecutableNodeStatus_GetAttempts struct {
@@ -378,6 +417,40 @@ func (_m *ExecutableNodeStatus) GetNodeExecutionStatus(ctx context.Context, id s
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableNodeStatus)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_GetOrCreateArrayNodeStatus struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetOrCreateArrayNodeStatus) Return(_a0 v1alpha1.MutableArrayNodeStatus) *ExecutableNodeStatus_GetOrCreateArrayNodeStatus {
+	return &ExecutableNodeStatus_GetOrCreateArrayNodeStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOrCreateArrayNodeStatus() *ExecutableNodeStatus_GetOrCreateArrayNodeStatus {
+	c_call := _m.On("GetOrCreateArrayNodeStatus")
+	return &ExecutableNodeStatus_GetOrCreateArrayNodeStatus{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOrCreateArrayNodeStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOrCreateArrayNodeStatus {
+	c_call := _m.On("GetOrCreateArrayNodeStatus", matchers...)
+	return &ExecutableNodeStatus_GetOrCreateArrayNodeStatus{Call: c_call}
+}
+
+// GetOrCreateArrayNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetOrCreateArrayNodeStatus() v1alpha1.MutableArrayNodeStatus {
+	ret := _m.Called()
+
+	var r0 v1alpha1.MutableArrayNodeStatus
+	if rf, ok := ret.Get(0).(func() v1alpha1.MutableArrayNodeStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.MutableArrayNodeStatus)
 		}
 	}
 

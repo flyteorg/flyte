@@ -16,6 +16,7 @@ type nodeStateManager struct {
 	d          *handler.DynamicNodeState
 	w          *handler.WorkflowNodeState
 	g          *handler.GateNodeState
+	a          *handler.ArrayNodeState
 }
 
 func (n *nodeStateManager) PutTaskNodeState(s handler.TaskNodeState) error {
@@ -43,7 +44,40 @@ func (n *nodeStateManager) PutGateNodeState(s handler.GateNodeState) error {
 	return nil
 }
 
+func (n *nodeStateManager) PutArrayNodeState(s handler.ArrayNodeState) error {
+	n.a = &s
+	return nil
+}
+
+func (n *nodeStateManager) HasTaskNodeState() bool {
+	return n.t != nil
+}
+
+func (n *nodeStateManager) HasBranchNodeState() bool {
+	return n.b != nil
+}
+
+func (n *nodeStateManager) HasDynamicNodeState() bool {
+	return n.d != nil
+}
+
+func (n *nodeStateManager) HasWorkflowNodeState() bool {
+	return n.w != nil
+}
+
+func (n *nodeStateManager) HasGateNodeState() bool {
+	return n.g != nil
+}
+
+func (n *nodeStateManager) HasArrayNodeState() bool {
+	return n.a != nil
+}
+
 func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
+	if n.t != nil {
+		return *n.t
+	}
+
 	tn := n.nodeStatus.GetTaskNodeStatus()
 	if tn != nil {
 		return handler.TaskNodeState{
@@ -59,7 +93,11 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 	return handler.TaskNodeState{}
 }
 
-func (n nodeStateManager) GetBranchNode() handler.BranchNodeState {
+func (n nodeStateManager) GetBranchNodeState() handler.BranchNodeState {
+	if n.b != nil {
+		return *n.b
+	}
+
 	bn := n.nodeStatus.GetBranchStatus()
 	bs := handler.BranchNodeState{}
 	if bn != nil {
@@ -70,6 +108,10 @@ func (n nodeStateManager) GetBranchNode() handler.BranchNodeState {
 }
 
 func (n nodeStateManager) GetDynamicNodeState() handler.DynamicNodeState {
+	if n.d != nil {
+		return *n.d
+	}
+
 	dn := n.nodeStatus.GetDynamicNodeStatus()
 	ds := handler.DynamicNodeState{}
 	if dn != nil {
@@ -83,6 +125,10 @@ func (n nodeStateManager) GetDynamicNodeState() handler.DynamicNodeState {
 }
 
 func (n nodeStateManager) GetWorkflowNodeState() handler.WorkflowNodeState {
+	if n.w != nil {
+		return *n.w
+	}
+
 	wn := n.nodeStatus.GetWorkflowNodeStatus()
 	ws := handler.WorkflowNodeState{}
 	if wn != nil {
@@ -93,6 +139,10 @@ func (n nodeStateManager) GetWorkflowNodeState() handler.WorkflowNodeState {
 }
 
 func (n nodeStateManager) GetGateNodeState() handler.GateNodeState {
+	if n.g != nil {
+		return *n.g
+	}
+
 	gn := n.nodeStatus.GetGateNodeStatus()
 	gs := handler.GateNodeState{}
 	if gn != nil {
@@ -101,12 +151,32 @@ func (n nodeStateManager) GetGateNodeState() handler.GateNodeState {
 	return gs
 }
 
-func (n *nodeStateManager) clearNodeStatus() {
+func (n nodeStateManager) GetArrayNodeState() handler.ArrayNodeState {
+	if n.a != nil {
+		return *n.a
+	}
+
+	an := n.nodeStatus.GetArrayNodeStatus()
+	as := handler.ArrayNodeState{}
+	if an != nil {
+		as.Phase = an.GetArrayNodePhase()
+		as.Error = an.GetExecutionError()
+		as.SubNodePhases = an.GetSubNodePhases()
+		as.SubNodeTaskPhases = an.GetSubNodeTaskPhases()
+		as.SubNodeRetryAttempts = an.GetSubNodeRetryAttempts()
+		as.SubNodeSystemFailures = an.GetSubNodeSystemFailures()
+		as.TaskPhaseVersion = an.GetTaskPhaseVersion()
+	}
+	return as
+}
+
+func (n *nodeStateManager) ClearNodeStatus() {
 	n.t = nil
 	n.b = nil
 	n.d = nil
 	n.w = nil
 	n.g = nil
+	n.a = nil
 	n.nodeStatus.ClearLastAttemptStartedAt()
 }
 

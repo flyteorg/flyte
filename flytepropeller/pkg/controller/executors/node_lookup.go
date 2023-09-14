@@ -12,6 +12,7 @@ import (
 type NodeLookup interface {
 	GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool)
 	GetNodeExecutionStatus(ctx context.Context, id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus
+
 	// Lookup for upstream edges, find all node ids from which this node can be reached.
 	ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error)
 	// Lookup for downstream edges, find all node ids that can be reached from the given node id.

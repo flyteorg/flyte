@@ -9,11 +9,11 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 )
 
 // Constructs the expected interface of a given node.
-func underlyingInterface(ctx context.Context, taskReader handler.TaskReader) (*core.TypedInterface, error) {
+func underlyingInterface(ctx context.Context, taskReader interfaces.TaskReader) (*core.TypedInterface, error) {
 	t, err := taskReader.Read(ctx)
 	iface := &core.TypedInterface{}
 	if err != nil {

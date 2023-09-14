@@ -356,5 +356,15 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 }
 
 func AreTypesCastable(upstreamType, downstreamType *flyte.LiteralType) bool {
-	return getTypeChecker(downstreamType).CastsFrom(upstreamType)
+	typeChecker := getTypeChecker(downstreamType)
+
+	// if upstream is a singular union we check if the downstream type is castable from the union variant
+	if upstreamType.GetUnionType() != nil && len(upstreamType.GetUnionType().GetVariants()) == 1 {
+		variants := upstreamType.GetUnionType().GetVariants()
+		if len(variants) == 1 && typeChecker.CastsFrom(variants[0]) {
+			return true
+		}
+	}
+
+	return typeChecker.CastsFrom(upstreamType)
 }

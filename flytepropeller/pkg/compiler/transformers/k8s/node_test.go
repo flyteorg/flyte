@@ -243,6 +243,29 @@ func TestBuildNodeSpec(t *testing.T) {
 
 		mustBuild(t, n, 1, errs.NewScope())
 	})
+
+	t.Run("ArrayNode", func(t *testing.T) {
+		n.Node.Target = &core.Node_ArrayNode{
+			ArrayNode: &core.ArrayNode{
+				Node: &core.Node{
+					Id: "foo",
+					Target: &core.Node_TaskNode{
+						TaskNode: &core.TaskNode{
+							Reference: &core.TaskNode_ReferenceId{
+								ReferenceId: &core.Identifier{Name: "ref_1"},
+							},
+						},
+					},
+				},
+				Parallelism: 10,
+				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
+					MinSuccessRatio: 0.5,
+				},
+			},
+		}
+
+		mustBuild(t, n, 1, errs.NewScope())
+	})
 }
 
 func TestBuildTasks(t *testing.T) {

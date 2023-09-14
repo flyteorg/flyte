@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/bitarray"
 	"github.com/flyteorg/flytestdlib/storage"
 )
 
@@ -45,6 +46,7 @@ const (
 	NodeKindBranch   NodeKind = "branch"   // A Branch node with conditions
 	NodeKindWorkflow NodeKind = "workflow" // Either an inline workflow or a remote workflow definition
 	NodeKindGate     NodeKind = "gate"     // A Gate node with a condition
+	NodeKindArray    NodeKind = "array"    // An array node with a subtask Node
 	NodeKindStart    NodeKind = "start"    // Start node is a special node
 	NodeKindEnd      NodeKind = "end"
 )
@@ -255,6 +257,13 @@ type ExecutableGateNode interface {
 	GetSleep() *core.SleepCondition
 }
 
+type ExecutableArrayNode interface {
+	GetSubNodeSpec() *NodeSpec
+	GetParallelism() uint32
+	GetMinSuccesses() *uint32
+	GetMinSuccessRatio() *float32
+}
+
 type ExecutableWorkflowNodeStatus interface {
 	GetWorkflowNodePhase() WorkflowNodePhase
 	GetExecutionError() *core.ExecutionError
@@ -275,6 +284,28 @@ type MutableGateNodeStatus interface {
 	Mutable
 	ExecutableGateNodeStatus
 	SetGateNodePhase(phase GateNodePhase)
+}
+
+type ExecutableArrayNodeStatus interface {
+	GetArrayNodePhase() ArrayNodePhase
+	GetExecutionError() *core.ExecutionError
+	GetSubNodePhases() bitarray.CompactArray
+	GetSubNodeTaskPhases() bitarray.CompactArray
+	GetSubNodeRetryAttempts() bitarray.CompactArray
+	GetSubNodeSystemFailures() bitarray.CompactArray
+	GetTaskPhaseVersion() uint32
+}
+
+type MutableArrayNodeStatus interface {
+	Mutable
+	ExecutableArrayNodeStatus
+	SetArrayNodePhase(phase ArrayNodePhase)
+	SetExecutionError(executionError *core.ExecutionError)
+	SetSubNodePhases(subNodePhases bitarray.CompactArray)
+	SetSubNodeTaskPhases(subNodeTaskPhases bitarray.CompactArray)
+	SetSubNodeRetryAttempts(subNodeRetryAttempts bitarray.CompactArray)
+	SetSubNodeSystemFailures(subNodeSystemFailures bitarray.CompactArray)
+	SetTaskPhaseVersion(taskPhaseVersion uint32)
 }
 
 type Mutable interface {
@@ -312,6 +343,10 @@ type MutableNodeStatus interface {
 	GetGateNodeStatus() MutableGateNodeStatus
 	GetOrCreateGateNodeStatus() MutableGateNodeStatus
 	ClearGateNodeStatus()
+
+	GetArrayNodeStatus() MutableArrayNodeStatus
+	GetOrCreateArrayNodeStatus() MutableArrayNodeStatus
+	ClearArrayNodeStatus()
 }
 
 type ExecutionTimeInfo interface {
@@ -397,6 +432,7 @@ type ExecutableNode interface {
 	GetBranchNode() ExecutableBranchNode
 	GetWorkflowNode() ExecutableWorkflowNode
 	GetGateNode() ExecutableGateNode
+	GetArrayNode() ExecutableArrayNode
 	GetOutputAlias() []Alias
 	GetInputBindings() []*Binding
 	GetResources() *v1.ResourceRequirements

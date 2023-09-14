@@ -41,6 +41,7 @@ type Node interface {
 	GetTask() Task
 	GetSubWorkflow() Workflow
 	GetGateNode() *core.GateNode
+	GetArrayNode() *core.ArrayNode
 }
 
 // An immutable task that represents the final output of the compiler.

@@ -14,9 +14,9 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 )
 
@@ -40,11 +40,11 @@ func (w *workflowNodeHandler) FinalizeRequired() bool {
 	return false
 }
 
-func (w *workflowNodeHandler) Setup(_ context.Context, _ handler.SetupContext) error {
+func (w *workflowNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) error {
 	return nil
 }
 
-func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 
 	logger.Debug(ctx, "Starting workflow Node")
 	invalidWFNodeError := func() (handler.Transition, error) {
@@ -112,7 +112,7 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecu
 	return invalidWFNodeError()
 }
 
-func (w *workflowNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (w *workflowNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	wfNode := nCtx.Node().GetWorkflowNode()
 	if wfNode.GetSubWorkflowRef() != nil {
 		return w.subWfHandler.HandleAbort(ctx, nCtx, reason)
@@ -124,12 +124,12 @@ func (w *workflowNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecut
 	return nil
 }
 
-func (w *workflowNodeHandler) Finalize(ctx context.Context, _ handler.NodeExecutionContext) error {
+func (w *workflowNodeHandler) Finalize(ctx context.Context, _ interfaces.NodeExecutionContext) error {
 	logger.Warnf(ctx, "Subworkflow finalize invoked. Nothing to be done")
 	return nil
 }
 
-func New(executor executors.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client, eventConfig *config.EventConfig, scope promutils.Scope) handler.Node {
+func New(executor interfaces.Node, workflowLauncher launchplan.Executor, recoveryClient recovery.Client, eventConfig *config.EventConfig, scope promutils.Scope) interfaces.NodeHandler {
 	workflowScope := scope.NewSubScope("workflow")
 	return &workflowNodeHandler{
 		subWfHandler: newSubworkflowHandler(executor, eventConfig),

@@ -25,10 +25,11 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/catalog"
 	errors3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/factory"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 	leader "github.com/flyteorg/flytepropeller/pkg/leaderelection"
@@ -437,9 +438,16 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	controller.levelMonitor = NewResourceLevelMonitor(scope.NewSubScope("collector"), flyteworkflowInformer.Lister())
 
+	recoveryClient := recovery.NewClient(adminClient)
+	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
+		kubeClient, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to create node handler factory")
+	}
+
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes,
-		storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient, catalogClient, recovery.NewClient(adminClient), &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
+		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
@@ -590,9 +598,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	}
 
 	go flyteworkflowInformerFactory.Start(ctx.Done())
-	if flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateName != "" {
-		go informerFactory.Start(ctx.Done())
-	}
+	go informerFactory.Start(ctx.Done())
 
 	if err = c.Run(ctx); err != nil {
 		return errors.Wrapf(err, "Error running FlytePropeller.")

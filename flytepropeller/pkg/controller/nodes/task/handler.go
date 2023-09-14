@@ -6,58 +6,48 @@ import (
 	"runtime/debug"
 	"time"
 
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	pluginMachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
+	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
+
 	"github.com/golang/protobuf/ptypes"
+
 	regErrors "github.com/pkg/errors"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 )
 
 const pluginContextKey = contextutils.Key("plugin")
 
 type metrics struct {
-	pluginPanics                   labeled.Counter
-	unsupportedTaskType            labeled.Counter
-	catalogPutFailureCount         labeled.Counter
-	catalogGetFailureCount         labeled.Counter
-	catalogPutSuccessCount         labeled.Counter
-	catalogMissCount               labeled.Counter
-	catalogHitCount                labeled.Counter
-	catalogSkipCount               labeled.Counter
-	pluginExecutionLatency         labeled.StopWatch
-	pluginQueueLatency             labeled.StopWatch
-	reservationGetSuccessCount     labeled.Counter
-	reservationGetFailureCount     labeled.Counter
-	reservationReleaseSuccessCount labeled.Counter
-	reservationReleaseFailureCount labeled.Counter
+	pluginPanics           labeled.Counter
+	unsupportedTaskType    labeled.Counter
+	pluginExecutionLatency labeled.StopWatch
+	pluginQueueLatency     labeled.StopWatch
 
 	// TODO We should have a metric to capture custom state size
 	scope promutils.Scope
@@ -227,7 +217,7 @@ func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	return nil
 }
 
-func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
+func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error {
 	tSCtx := t.newSetupContext(sCtx)
 
 	// Create a new base resource negotiator
@@ -487,11 +477,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		// -------------------------------------
 		logger.Debugf(ctx, "Task success detected, calling on Task success")
 		outputCommitter := ioutils.NewRemoteFileOutputWriter(ctx, tCtx.DataStore(), tCtx.OutputWriter())
-		execID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-		cacheStatus, ee, err := t.ValidateOutputAndCacheAdd(ctx, tCtx.NodeID(), tCtx.InputReader(), tCtx.ow.GetReader(),
-			outputCommitter, tCtx.ExecutionContext().GetExecutionConfig(), tCtx.tr, catalog.Metadata{
-				TaskExecutionIdentifier: &execID,
-			})
+		ee, err := t.ValidateOutput(ctx, tCtx.NodeID(), tCtx.InputReader(), tCtx.ow.GetReader(),
+			outputCommitter, tCtx.ExecutionContext().GetExecutionConfig(), tCtx.tr)
 		if err != nil {
 			return nil, err
 		}
@@ -515,8 +502,6 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			}
 			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
 				&event.TaskNodeMetadata{
-					CacheStatus:   cacheStatus.GetCacheStatus(),
-					CatalogKey:    cacheStatus.GetMetadata(),
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		}
@@ -532,17 +517,12 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	return pluginTrns, nil
 }
 
-func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
-	}
-
-	checkCatalog := !p.GetProperties().DisableNodeLevelCaching
-	if !checkCatalog {
-		logger.Infof(ctx, "Node level caching is disabled. Skipping catalog read.")
 	}
 
 	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p)
@@ -553,6 +533,14 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 	ts := nCtx.NodeStateReader().GetTaskNodeState()
 
 	pluginTrns := &pluginRequestedTransition{}
+	defer func() {
+		// increment parallelism if the final pluginTrns is not in a terminal state
+		if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+			eCtx := nCtx.ExecutionContext()
+			logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
+		}
+	}()
+
 	// We will start with the assumption that catalog is disabled
 	pluginTrns.PopulateCacheInfo(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil)))
 
@@ -578,84 +566,6 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 			}
 		}
 	}
-	// STEP 1: Check Cache
-	if (ts.PluginPhase == pluginCore.PhaseUndefined || ts.PluginPhase == pluginCore.PhaseWaitingForCache) && checkCatalog {
-		// This is assumed to be first time. we will check catalog and call handle
-		// If the cache should be skipped (requested by user for the execution), do not check datacatalog for any cached
-		// data, but instead always perform calculations again and overwrite the stored data after successful execution.
-		if nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
-			logger.Info(ctx, "Execution config forced cache skip, not checking catalog")
-			pluginTrns.PopulateCacheInfo(catalog.NewCatalogEntry(nil, cacheSkipped))
-			t.metrics.catalogSkipCount.Inc(ctx)
-		} else {
-			entry, err := t.CheckCatalogCache(ctx, tCtx.tr, nCtx.InputReader(), tCtx.ow)
-			if err != nil {
-				logger.Errorf(ctx, "failed to check catalog cache with error")
-				return handler.UnknownTransition, err
-			}
-
-			if entry.GetStatus().GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT {
-				r := tCtx.ow.GetReader()
-				if r == nil {
-					return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "failed to reader outputs from a CacheHIT. Unexpected!")
-				}
-
-				// TODO @kumare this can be optimized, if we have paths then the reader could be pipelined to a sink
-				o, ee, err := r.Read(ctx)
-				if err != nil {
-					logger.Errorf(ctx, "failed to read from catalog, err: %s", err.Error())
-					return handler.UnknownTransition, err
-				}
-
-				if ee != nil {
-					logger.Errorf(ctx, "got execution error from catalog output reader? This should not happen, err: %s", ee.String())
-					return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "execution error from a cache output, bad state: %s", ee.String())
-				}
-
-				if err := nCtx.DataStore().WriteProtobuf(ctx, tCtx.ow.GetOutputPath(), storage.Options{}, o); err != nil {
-					logger.Errorf(ctx, "failed to write cached value to datastore, err: %s", err.Error())
-					return handler.UnknownTransition, err
-				}
-
-				pluginTrns.CacheHit(tCtx.ow.GetOutputPath(), nil, entry)
-			} else {
-				logger.Infof(ctx, "No CacheHIT. Status [%s]", entry.GetStatus().GetCacheStatus().String())
-				pluginTrns.PopulateCacheInfo(entry)
-			}
-		}
-	}
-
-	// Check catalog for cache reservation and acquire if none exists
-	if checkCatalog && (pluginTrns.execInfo.TaskNodeInfo == nil || pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.CacheStatus != core.CatalogCacheStatus_CACHE_HIT) {
-		ownerID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-		reservation, err := t.GetOrExtendCatalogReservation(ctx, ownerID, controllerConfig.GetConfig().WorkflowReEval.Duration, tCtx.tr, nCtx.InputReader())
-		if err != nil {
-			logger.Errorf(ctx, "failed to get or extend catalog reservation with error")
-			return handler.UnknownTransition, err
-		}
-
-		pluginTrns.PopulateReservationInfo(reservation)
-
-		if reservation.GetStatus() == core.CatalogReservation_RESERVATION_ACQUIRED &&
-			(ts.PluginPhase == pluginCore.PhaseUndefined || ts.PluginPhase == pluginCore.PhaseWaitingForCache) {
-			logger.Infof(ctx, "Acquired cache reservation")
-		}
-
-		// If we do not own the reservation then we transition to WaitingForCache phase. If we are
-		// already running (ie. in a phase other than PhaseUndefined or PhaseWaitingForCache) and
-		// somehow lost the reservation (ex. by expiration), continue to execute until completion.
-		if reservation.GetStatus() == core.CatalogReservation_RESERVATION_EXISTS {
-			if ts.PluginPhase == pluginCore.PhaseUndefined || ts.PluginPhase == pluginCore.PhaseWaitingForCache {
-				pluginTrns.ttype = handler.TransitionTypeEphemeral
-				pluginTrns.pInfo = pluginCore.PhaseInfoWaitingForCache(pluginCore.DefaultPhaseVersion, nil)
-			}
-
-			if ts.PluginPhase == pluginCore.PhaseWaitingForCache {
-				logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
-				return pluginTrns.FinalTransition(ctx)
-			}
-		}
-	}
 
 	occurredAt := time.Now()
 	// STEP 2: If no cache-hit and not transitioning to PhaseWaitingForCache, then lets invoke the plugin and wait for a transition out of undefined
@@ -668,9 +578,6 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 		}
 		if pluginTrns.IsPreviouslyObserved() {
-			if !pluginTrns.pInfo.Phase().IsTerminal() {
-				logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
-			}
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
 			return pluginTrns.FinalTransition(ctx)
 		}
@@ -757,13 +664,88 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		return handler.UnknownTransition, err
 	}
 
-	if !pluginTrns.pInfo.Phase().IsTerminal() {
-		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
-	}
 	return pluginTrns.FinalTransition(ctx)
 }
 
-func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+	r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
+	tr ioutils.SimpleTaskReader) (*io.ExecutionError, error) {
+
+	tk, err := tr.Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read TaskTemplate, error :%s", err.Error())
+		return nil, err
+	}
+
+	iface := tk.Interface
+	outputsDeclared := iface != nil && iface.Outputs != nil && len(iface.Outputs.Variables) > 0
+
+	if r == nil {
+		if outputsDeclared {
+			// Whack! plugin did not return any outputs for this task
+			// Also When an error is observed, cache is automatically disabled
+			return &io.ExecutionError{
+				ExecutionError: &core.ExecutionError{
+					Code:    "OutputsNotGenerated",
+					Message: "Output Reader was nil. Plugin/Platform problem.",
+				},
+				IsRecoverable: true,
+			}, nil
+		}
+		return nil, nil
+	}
+	// Reader exists, we can check for error, even if this task may not have any outputs declared
+	y, err := r.IsError(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if y {
+		taskErr, err := r.ReadError(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if taskErr.ExecutionError == nil {
+			taskErr.ExecutionError = &core.ExecutionError{Kind: core.ExecutionError_UNKNOWN, Code: "Unknown", Message: "Unknown"}
+		}
+		return &taskErr, nil
+	}
+
+	// Do this if we have outputs declared for the Handler interface!
+	if !outputsDeclared {
+		return nil, nil
+	}
+	ok, err := r.Exists(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to check if the output file exists. Error: %s", err.Error())
+		return nil, err
+	}
+
+	if !ok {
+		// Does not exist
+		return &io.ExecutionError{
+			ExecutionError: &core.ExecutionError{
+				Code:    "OutputsNotFound",
+				Message: "Outputs not generated by task execution",
+			},
+			IsRecoverable: true,
+		}, nil
+	}
+
+	if !r.IsFile(ctx) {
+		// Read output and write to file
+		// No need to check for Execution Error here as we have done so above this block.
+		err = outputCommitter.Put(ctx, r)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to commit output to remote location. Error: %v", err)
+			return nil, err
+		}
+	}
+
+	return nil, nil
+}
+
+func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
 	currentPhase := taskNodeState.PluginPhase
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
@@ -829,7 +811,7 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 	return nil
 }
 
-func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	logger.Debugf(ctx, "Finalize invoked.")
 	ttype := nCtx.TaskReader().GetTaskType()
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -851,13 +833,6 @@ func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext
 				err = fmt.Errorf("panic when executing a plugin for TaskType [%s]. Stack: [%s]", ttype, string(stack))
 			}
 		}()
-
-		// release catalog reservation (if exists)
-		ownerID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-		_, err = t.ReleaseCatalogReservation(ctx, ownerID, tCtx.tr, tCtx.InputReader())
-		if err != nil {
-			return errors.Wrapf(errors.CatalogCallFailed, nCtx.NodeID(), err, "failed to release reservation")
-		}
 
 		childCtx := context.WithValue(ctx, pluginContextKey, p.GetID())
 		err = p.Finalize(childCtx, tCtx)
@@ -883,21 +858,11 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 		pluginsForType: make(map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin),
 		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{
-			pluginPanics:                   labeled.NewCounter("plugin_panic", "Task plugin paniced when trying to execute a Handler.", scope),
-			unsupportedTaskType:            labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
-			catalogHitCount:                labeled.NewCounter("discovery_hit_count", "Task cached in Discovery", scope),
-			catalogMissCount:               labeled.NewCounter("discovery_miss_count", "Task not cached in Discovery", scope),
-			catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task lookup skipped in Discovery", scope),
-			catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
-			catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
-			catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
-			pluginExecutionLatency:         labeled.NewStopWatch("plugin_exec_latency", "Time taken to invoke plugin for one round", time.Microsecond, scope),
-			pluginQueueLatency:             labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
-			reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", scope),
-			reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", scope),
-			reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", scope),
-			reservationReleaseSuccessCount: labeled.NewCounter("reservation_release_success_count", "Reservation Release success count", scope),
-			scope:                          scope,
+			pluginPanics:           labeled.NewCounter("plugin_panic", "Task plugin paniced when trying to execute a Handler.", scope),
+			unsupportedTaskType:    labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
+			pluginExecutionLatency: labeled.NewStopWatch("plugin_exec_latency", "Time taken to invoke plugin for one round", time.Microsecond, scope),
+			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
+			scope:                  scope,
 		},
 		pluginScope:     scope.NewSubScope("plugin"),
 		kubeClient:      kubeClient,

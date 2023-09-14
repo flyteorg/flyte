@@ -13,7 +13,7 @@ import (
 
 	coreMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	execMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 func TestGetSubWorkflow(t *testing.T) {
@@ -87,7 +87,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnNodeStatus().Return(ns)
 		nCtx.OnNodeID().Return("n1")
 
-		nodeExec := &execMocks.Node{}
+		nodeExec := &mocks.Node{}
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
@@ -120,7 +120,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 
-		nodeExec := &execMocks.Node{}
+		nodeExec := &mocks.Node{}
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
@@ -154,7 +154,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 
-		nodeExec := &execMocks.Node{}
+		nodeExec := &mocks.Node{}
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")

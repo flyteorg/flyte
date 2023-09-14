@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -373,6 +374,90 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
 			assertNonEmptyInterface(t, iface, ifaceOk, errs)
 		})
+	})
+
+	t.Run("ArrayNode", func(t *testing.T) {
+		// mock underlying task node
+		iface := &core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"foo": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
+					},
+				},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"bar": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_FLOAT,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		taskNode := &core.Node{
+			Id: "node_1",
+			Target: &core.Node_TaskNode{
+				TaskNode: &core.TaskNode{
+					Reference: &core.TaskNode_ReferenceId{
+						ReferenceId: &core.Identifier{
+							Name: "Task_1",
+						},
+					},
+				},
+			},
+		}
+
+		task := mocks.Task{}
+		task.On("GetInterface").Return(iface)
+
+		taskNodeBuilder := &mocks.NodeBuilder{}
+		taskNodeBuilder.On("GetCoreNode").Return(taskNode)
+		taskNodeBuilder.On("GetId").Return(taskNode.Id)
+		taskNodeBuilder.On("GetTaskNode").Return(taskNode.Target.(*core.Node_TaskNode).TaskNode)
+		taskNodeBuilder.On("GetInterface").Return(nil)
+		taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
+
+		wfBuilder := mocks.WorkflowBuilder{}
+		wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+			return id.String() == (&core.Identifier{
+				Name: "Task_1",
+			}).String()
+		})).Return(&task, true)
+		wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
+			return node.Id == "node_1"
+		})).Return(taskNodeBuilder)
+
+		// mock array node
+		arrayNode := &core.Node{
+			Id: "node_2",
+			Target: &core.Node_ArrayNode{
+				ArrayNode: &core.ArrayNode{
+					Node: taskNode,
+				},
+			},
+		}
+
+		nodeBuilder := mocks.NodeBuilder{}
+		nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+		nodeBuilder.On("GetCoreNode").Return(arrayNode)
+		nodeBuilder.On("GetId").Return(arrayNode.Id)
+		nodeBuilder.On("GetInterface").Return(nil)
+		nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+		// compute arrayNode interface
+		errs := errors.NewCompileErrors()
+		arrayNodeIface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+		assertNonEmptyInterface(t, arrayNodeIface, ifaceOk, errs)
+		assert.True(t, reflect.DeepEqual(arrayNodeIface, iface))
 	})
 }
 

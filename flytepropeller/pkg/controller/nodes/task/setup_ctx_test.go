@@ -4,13 +4,13 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 
 type dummySetupCtx struct {
-	handler.SetupContext
+	interfaces.SetupContext
 	testScopeName string
 }
 

@@ -326,6 +326,32 @@ func TestUnionCasting(t *testing.T) {
 		)
 		assert.False(t, castable, "Union types can only be cast to a union that contains a superset of variants")
 	})
+
+	t.Run("SingularUnionToUnderlyingType", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_UnionType{
+					UnionType: &core.UnionType{
+						Variants: []*core.LiteralType{
+							{
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+								Structure: &core.TypeStructure{
+									Tag: "string",
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+				Structure: &core.TypeStructure{
+					Tag: "string",
+				},
+			},
+		)
+		assert.True(t, castable, "Singular unions should be castable to their underlying type")
+	})
 }
 
 func TestCollectionCasting(t *testing.T) {

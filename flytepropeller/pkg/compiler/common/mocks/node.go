@@ -14,6 +14,40 @@ type Node struct {
 	mock.Mock
 }
 
+type Node_GetArrayNode struct {
+	*mock.Call
+}
+
+func (_m Node_GetArrayNode) Return(_a0 *core.ArrayNode) *Node_GetArrayNode {
+	return &Node_GetArrayNode{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Node) OnGetArrayNode() *Node_GetArrayNode {
+	c_call := _m.On("GetArrayNode")
+	return &Node_GetArrayNode{Call: c_call}
+}
+
+func (_m *Node) OnGetArrayNodeMatch(matchers ...interface{}) *Node_GetArrayNode {
+	c_call := _m.On("GetArrayNode", matchers...)
+	return &Node_GetArrayNode{Call: c_call}
+}
+
+// GetArrayNode provides a mock function with given fields:
+func (_m *Node) GetArrayNode() *core.ArrayNode {
+	ret := _m.Called()
+
+	var r0 *core.ArrayNode
+	if rf, ok := ret.Get(0).(func() *core.ArrayNode); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ArrayNode)
+		}
+	}
+
+	return r0
+}
+
 type Node_GetBranchNode struct {
 	*mock.Call
 }

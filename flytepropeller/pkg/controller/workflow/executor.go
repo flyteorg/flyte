@@ -5,23 +5,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/tools/record"
 
 	"github.com/flyteorg/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
+
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/tools/record"
 )
 
 type workflowMetrics struct {
@@ -64,7 +66,7 @@ type workflowExecutor struct {
 	wfRecorder      events.WorkflowEventRecorder
 	k8sRecorder     record.EventRecorder
 	metadataPrefix  storage.DataReference
-	nodeExecutor    executors.Node
+	nodeExecutor    interfaces.Node
 	metrics         *workflowMetrics
 	eventConfig     *config.EventConfig
 	clusterID       string
@@ -495,7 +497,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 }
 
 func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor executors.Node, eventConfig *config.EventConfig,
+	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor interfaces.Node, eventConfig *config.EventConfig,
 	clusterID string, scope promutils.Scope) (executors.Workflow, error) {
 	basePrefix := store.GetBaseContainerFQN(ctx)
 	if metadataPrefix != "" {
