@@ -121,12 +121,13 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(&ResourceWrapper{
 			State:   admin.State_RUNNING,
 			Outputs: nil,
-			Message: "",
+			Message: "Job is running",
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		assert.Equal(t, "Job is running", phase.Info().Logs[0].Name)
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
