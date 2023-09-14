@@ -21,7 +21,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 
 	"github.com/flyteorg/flytestdlib/bitarray"
@@ -213,7 +212,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// initialize ArrayNode state
-		maxAttempts := task.DefaultMaxAttempts
+		maxAttempts := int(config.GetConfig().NodeConfig.DefaultMaxAttempts)
 		subNodeSpec := *arrayNode.GetSubNodeSpec()
 		if subNodeSpec.GetRetryStrategy() != nil && subNodeSpec.GetRetryStrategy().MinAttempts != nil {
 			maxAttempts = *subNodeSpec.GetRetryStrategy().MinAttempts
