@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -146,8 +147,18 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 	})
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
-	resources := &mocks.TaskOverrides{}
-	resources.OnGetResources().Return(resourceRequirements)
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(resourceRequirements)
+	overrides.OnGetResourceMetadata().Return(&core.ResourceMetadata{
+		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		},
+	})
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -159,7 +170,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 		Name: "blah",
 	})
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(resources)
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
@@ -308,8 +319,8 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 
 	for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
 		var hasContainerWithDefaultTensorFlowName = false
-
-		for _, container := range replicaSpec.Template.Spec.Containers {
+		podSpec := replicaSpec.Template.Spec
+		for _, container := range podSpec.Containers {
 			if container.Name == kubeflowv1.TFJobDefaultContainerName {
 				hasContainerWithDefaultTensorFlowName = true
 			}
@@ -317,6 +328,45 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
+
+		assert.EqualValues(
+			t,
+			[]corev1.NodeSelectorTerm{
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]corev1.Toleration{
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
 
 		assert.True(t, hasContainerWithDefaultTensorFlowName)
 	}

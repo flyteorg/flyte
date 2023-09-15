@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	flytek8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -48,12 +49,14 @@ var (
 
 	resourceRequirements = &corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("1000m"),
-			corev1.ResourceMemory: resource.MustParse("1Gi"),
+			corev1.ResourceCPU:               resource.MustParse("1000m"),
+			corev1.ResourceMemory:            resource.MustParse("1Gi"),
+			flytek8sConfig.ResourceNvidiaGPU: resource.MustParse("1"),
 		},
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("100m"),
-			corev1.ResourceMemory: resource.MustParse("512Mi"),
+			corev1.ResourceCPU:               resource.MustParse("100m"),
+			corev1.ResourceMemory:            resource.MustParse("512Mi"),
+			flytek8sConfig.ResourceNvidiaGPU: resource.MustParse("1"),
 		},
 	}
 
@@ -144,8 +147,18 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	})
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
-	resources := &mocks.TaskOverrides{}
-	resources.OnGetResources().Return(resourceRequirements)
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(resourceRequirements)
+	overrides.OnGetResourceMetadata().Return(&core.ResourceMetadata{
+		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		},
+	})
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -157,7 +170,7 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 		Name: "blah",
 	})
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(resources)
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
@@ -305,10 +318,49 @@ func TestBuildResourceMPI(t *testing.T) {
 	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
 
 	for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
-		for _, container := range replicaSpec.Template.Spec.Containers {
+		podSpec := replicaSpec.Template.Spec
+		for _, container := range podSpec.Containers {
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
+		assert.EqualValues(
+			t,
+			[]corev1.NodeSelectorTerm{
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]corev1.Toleration{
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
 	}
 }
 

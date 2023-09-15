@@ -92,6 +92,16 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.Ta
 
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
+	to.OnGetResourceMetadata().Return(&core.ResourceMetadata{
+		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		},
+	})
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
 
@@ -136,14 +146,14 @@ func getPodSpec() v1.PodSpec {
 				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
 				Resources: v1.ResourceRequirements{
 					Limits: v1.ResourceList{
-						"cpu":    resource.MustParse("2"),
-						"memory": resource.MustParse("200Mi"),
-						"gpu":    resource.MustParse("1"),
+						"cpu":             resource.MustParse("2"),
+						"memory":          resource.MustParse("200Mi"),
+						ResourceNvidiaGPU: resource.MustParse("1"),
 					},
 					Requests: v1.ResourceList{
-						"cpu":    resource.MustParse("1"),
-						"memory": resource.MustParse("100Mi"),
-						"gpu":    resource.MustParse("1"),
+						"cpu":             resource.MustParse("1"),
+						"memory":          resource.MustParse("100Mi"),
+						ResourceNvidiaGPU: resource.MustParse("1"),
 					},
 				},
 				VolumeMounts: []v1.VolumeMount{
@@ -180,16 +190,48 @@ func getPodSpec() v1.PodSpec {
 
 func checkTolerations(t *testing.T, res client.Object, gpuTol v1.Toleration) {
 	// Assert user-specified tolerations don't get overridden
-	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 2)
-	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
-		if tol.Key == "my toleration key" {
-			assert.Equal(t, tol.Value, "my toleration value")
-		} else if tol.Key == gpuTol.Key {
-			assert.Equal(t, tol, gpuTol)
-		} else {
-			t.Fatalf("unexpected toleration [%+v]", tol)
-		}
+	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 4)
+	for _, tol := range []v1.Toleration{
+		v1.Toleration{Key: "my toleration key", Value: "my toleration value"},
+		gpuTol,
+		{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Value:    "nvidia-tesla-a100",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		},
+		{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Value:    "1g.5gb",
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		},
+	} {
+		assert.Contains(t, res.(*v1.Pod).Spec.Tolerations, tol)
 	}
+}
+
+func checkNodeAffinity(t *testing.T, res client.Object) {
+	assert.EqualValues(
+		t,
+		[]v1.NodeSelectorTerm{
+			v1.NodeSelectorTerm{
+				MatchExpressions: []v1.NodeSelectorRequirement{
+					v1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"nvidia-tesla-a100"},
+					},
+					v1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"1g.5gb"},
+					},
+				},
+			},
+		},
+		res.(*v1.Pod).Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
 }
 
 func TestBuildSidecarResource_TaskType2(t *testing.T) {
@@ -267,6 +309,7 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
 	checkTolerations(t, res, tolGPU)
+	checkNodeAffinity(t, res)
 
 	// Assert resource requirements are correctly set
 	expectedCPURequest := resource.MustParse("1")
@@ -356,6 +399,7 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
+		GpuResourceName:      ResourceNvidiaGPU,
 	}))
 	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
@@ -373,6 +417,8 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
 	checkTolerations(t, res, tolGPU)
+	checkNodeAffinity(t, res)
+
 	// Assert resource requirements are correctly set
 	expectedCPURequest := resource.MustParse("1")
 	assert.Equal(t, expectedCPURequest.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Requests.Cpu().Value())
@@ -473,6 +519,7 @@ func TestBuildSidecarResource(t *testing.T) {
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
+		GpuResourceName:      ResourceNvidiaGPU,
 	}))
 	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
@@ -496,6 +543,7 @@ func TestBuildSidecarResource(t *testing.T) {
 	assert.Equal(t, "service-account", res.(*v1.Pod).Spec.ServiceAccountName)
 
 	checkTolerations(t, res, tolGPU)
+	checkNodeAffinity(t, res)
 
 	// Assert resource requirements are correctly set
 	expectedCPURequest := resource.MustParse("2048m")

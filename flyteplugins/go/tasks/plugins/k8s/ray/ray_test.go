@@ -122,8 +122,18 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	})
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
-	resources := &mocks.TaskOverrides{}
-	resources.OnGetResources().Return(resourceRequirements)
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(resourceRequirements)
+	overrides.OnGetResourceMetadata().Return(&core.ResourceMetadata{
+		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
+			GpuAccelerator: &core.GPUAccelerator{
+				Device: "nvidia-tesla-a100",
+				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+					PartitionSize: "1g.5gb",
+				},
+			},
+		},
+	})
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -135,7 +145,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 		Name: "blah",
 	})
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(resources)
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetSecurityContext().Return(core.SecurityContext{
@@ -146,16 +156,73 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	return taskCtx
 }
 
+func checkTolerations(t *testing.T, podSpec corev1.PodSpec) {
+	// Assert user-specified tolerations don't get overridden
+	assert.Len(t, podSpec.Tolerations, 3)
+	for _, tol := range []corev1.Toleration{
+		{
+			Key:      "storage",
+			Value:    "dedicated",
+			Operator: corev1.TolerationOpExists,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+		{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Value:    "nvidia-tesla-a100",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+		{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Value:    "1g.5gb",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	} {
+		assert.Contains(t, podSpec.Tolerations, tol)
+	}
+}
+
+func checkNodeAffinity(t *testing.T, podSpec corev1.PodSpec) {
+	assert.EqualValues(
+		t,
+		[]corev1.NodeSelectorTerm{
+			corev1.NodeSelectorTerm{
+				MatchExpressions: []corev1.NodeSelectorRequirement{
+					corev1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+						Operator: corev1.NodeSelectorOpIn,
+						Values:   []string{"nvidia-tesla-a100"},
+					},
+					corev1.NodeSelectorRequirement{
+						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+						Operator: corev1.NodeSelectorOpIn,
+						Values:   []string{"1g.5gb"},
+					},
+				},
+			},
+		},
+		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
+}
+
 func TestBuildResourceRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
-	toleration := []corev1.Toleration{{
-		Key:      "storage",
-		Value:    "dedicated",
-		Operator: corev1.TolerationOpExists,
-		Effect:   corev1.TaintEffectNoSchedule,
-	}}
-	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
+	toleration := []corev1.Toleration{
+		{
+			Key:      "storage",
+			Value:    "dedicated",
+			Operator: corev1.TolerationOpExists,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultTolerations:        toleration,
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           config.ResourceNvidiaGPU,
+	})
 	assert.Nil(t, err)
 
 	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate))
@@ -172,7 +239,8 @@ func TestBuildResourceRay(t *testing.T) {
 		map[string]string{"dashboard-host": "0.0.0.0", "include-dashboard": "true", "node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
+	checkTolerations(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec)
+	checkNodeAffinity(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec)
 
 	workerReplica := int32(3)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
@@ -183,7 +251,8 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"node-ip-address": "$MY_POD_IP"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+	checkTolerations(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec)
+	checkNodeAffinity(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec)
 }
 
 func TestGetPropertiesRay(t *testing.T) {
